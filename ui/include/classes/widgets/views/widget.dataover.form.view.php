@@ -49,10 +49,13 @@ $field_hostids = CWidgetHelper::getHost($fields['hostids'],
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 
-// Application.
-$form_list->addRow(CWidgetHelper::getLabel($fields['application']),
-	CWidgetHelper::getApplicationSelector($fields['application'])
-);
+// Tags.
+$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
+
+// Tags filter list.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$scripts[] = $fields['tags']->getJavascript();
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
@@ -66,5 +69,6 @@ $form->addItem($form_list);
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

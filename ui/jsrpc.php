@@ -121,7 +121,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers", "application_prototypes"
+	 * Supported objects: "hosts", "hostGroup", "templates", "triggers"
 	 *
 	 * @param string $data['object_name']
 	 * @param string $data['search']
@@ -329,58 +329,6 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'applications':
-				$applications = API::Application()->get([
-					'output' => ['applicationid', 'name'],
-					'hostids' => zbx_toArray($data['hostid']),
-					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'limit' => $limit
-				]);
-
-				if ($applications) {
-					CArrayHelper::sort($applications, [
-						['field' => 'name', 'order' => ZBX_SORT_UP]
-					]);
-
-					if (isset($data['limit'])) {
-						$applications = array_slice($applications, 0, $data['limit']);
-					}
-
-					$result = CArrayHelper::renameObjectsKeys($applications, ['applicationid' => 'id']);
-				}
-				break;
-
-			case 'application_prototypes':
-				$discovery_rules = API::DiscoveryRule()->get([
-					'output' => [],
-					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
-					'itemids' => [$data['parent_discoveryid']],
-					'limitSelects' => $limit
-				]);
-
-				if ($discovery_rules) {
-					$discovery_rule = $discovery_rules[0];
-
-					if ($discovery_rule['applicationPrototypes']) {
-						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
-							if (array_key_exists('search', $data)
-									&& stripos($application_prototype['name'], $data['search']) !== false) {
-								$result[] = [
-									'id' => $application_prototype['application_prototypeid'],
-									'name' => $application_prototype['name']
-								];
-							}
-						}
-
-						CArrayHelper::sort($result, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
-
-						if (array_key_exists('limit', $data)) {
-							$result = array_slice($result, 0, $data['limit']);
-						}
-					}
-				}
-				break;
-
 			case 'triggers':
 				$host_fields = ['name'];
 				if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {
@@ -499,10 +447,6 @@ switch ($data['method']) {
 					CArrayHelper::sort($drules, [
 						['field' => 'name', 'order' => ZBX_SORT_UP]
 					]);
-
-					if (array_key_exists('limit', $data)) {
-						$applications = array_slice($drules, 0, $data['limit']);
-					}
 
 					$result = CArrayHelper::renameObjectsKeys($drules, ['druleid' => 'id']);
 				}

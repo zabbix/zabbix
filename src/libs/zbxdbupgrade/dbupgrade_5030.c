@@ -21,7 +21,9 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
 #include "zbxalgo.h"
+#include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
 
 /*
@@ -3649,6 +3651,831 @@ static int	DBpatch_5030109(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030110(void)
+{
+	const ZBX_TABLE table =
+			{"item_tag", "itemtagid", 0,
+				{
+					{"itemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030111(void)
+{
+	return DBcreate_index("item_tag", "item_tag_1", "itemid", 0);
+}
+
+static int	DBpatch_5030112(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_tag", 1, &field);
+}
+
+static int	DBpatch_5030113(void)
+{
+	const ZBX_TABLE table =
+			{"httptest_tag", "httptesttagid", 0,
+				{
+					{"httptesttagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030114(void)
+{
+	return DBcreate_index("httptest_tag", "httptest_tag_1", "httptestid", 0);
+}
+
+static int	DBpatch_5030115(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest_tag", 1, &field);
+}
+
+static int	DBpatch_5030116(void)
+{
+	const ZBX_TABLE table =
+			{"sysmaps_element_tag", "selementtagid", 0,
+				{
+					{"selementtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030117(void)
+{
+	return DBcreate_index("sysmaps_element_tag", "sysmaps_element_tag_1", "selementid", 0);
+}
+
+static int	DBpatch_5030118(void)
+{
+	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmaps_element_tag", 1, &field);
+}
+
+static int	DBpatch_5030119(void)
+{
+	const ZBX_FIELD	field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_5030120(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	itemid, itemtagid = 1;
+	int		ret;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	result = DBselect(
+			"select i.itemid,a.name from items i"
+			" join items_applications ip on i.itemid=ip.itemid"
+			" join applications a on ip.applicationid=a.applicationid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030121(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	itemid;
+	int		ret;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select i.itemid,ap.name from items i"
+			" join item_application_prototype ip on i.itemid=ip.itemid"
+			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030122(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	httptestid, httptesttagid = 1;
+	int		ret;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
+	result = DBselect(
+			"select h.httptestid,a.name from httptest h"
+			" join applications a on h.applicationid=a.applicationid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(httptestid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, httptesttagid++, httptestid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030123(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	selementid, selementtagid = 1;
+	int		ret;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
+	result = DBselect(
+			"select selementid,application from sysmaps_elements"
+			" where elementtype in (0,3) and application<>''");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(selementid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, selementtagid++, selementid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030124(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select distinct e.eventid,it.tag,it.value from events e"
+			" join triggers t on e.objectid=t.triggerid"
+			" join functions f on t.triggerid=f.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join item_tag it on i.itemid=it.itemid"
+			" where e.source in (%d,%d) and e.object=%d and t.flags in (%d,%d) order by e.eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
+				eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030125(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select distinct e.eventid,it.tag,it.value from events e"
+			" join items i on i.itemid=e.objectid"
+			" join item_tag it on i.itemid=it.itemid"
+			" where e.source=%d and e.object=%d and i.flags in (%d,%d)",
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
+				eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030126(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select distinct e.eventid,e.tag,e.value from event_tag e"
+			" join problem p on e.eventid=p.eventid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from problem_tag where eventid=" ZBX_FS_UI64 " and tag='%s'"
+				" and value='%s'", eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "problemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030127(void)
+{
+#define CONDITION_TYPE_APPLICATION	15
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
+			CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_APPLICATION))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef CONDITION_TYPE_APPLICATION
+}
+
+static int	DBpatch_5030128(void)
+{
+#define AUDIT_RESOURCE_APPLICATION	12
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+		return FAIL;
+
+	return SUCCEED;
+#undef AUDIT_RESOURCE_APPLICATION
+}
+
+static int	DBpatch_5030129(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+			"'web.applications.filter','web.latest.filter.application',"
+			"'web.overview.filter.application','web.applications.filter.active',"
+			"'web.applications.filter_groups','web.applications.filter_hostids',"
+			"'web.applications.php.sort','web.applications.php.sortorder',"
+			"'web.hosts.items.subfilter_apps','web.templates.items.subfilter_apps',"
+			"'web.latest.toggle','web.latest.toggle_other','web.items.filter_application')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+typedef struct
+{
+	char	*tag;
+	char	*op;
+	char	*value;
+}
+patch_filtertag_t;
+
+ZBX_PTR_VECTOR_DECL(patch_filtertag, patch_filtertag_t)
+ZBX_PTR_VECTOR_IMPL(patch_filtertag, patch_filtertag_t)
+
+static void	patch_filtertag_free(patch_filtertag_t tag)
+{
+	zbx_free(tag.tag);
+	zbx_free(tag.op);
+	zbx_free(tag.value);
+}
+
+static int	DBpatch_parse_tags_json(struct zbx_json_parse *jp, zbx_vector_patch_filtertag_t *tags)
+{
+	const char		*p = NULL;
+	struct zbx_json_parse	jp_data;
+	patch_filtertag_t	tag;
+	size_t			tag_alloc, op_alloc, val_alloc;
+
+	while (NULL != (p = zbx_json_next(jp, p)))
+	{
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_data))
+			return FAIL;
+
+		tag.tag = NULL;
+		tag.op = NULL;
+		tag.value = NULL;
+
+		tag_alloc = 0;
+		op_alloc = 0;
+		val_alloc = 0;
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "tag", &tag.tag, &tag_alloc, NULL) ||
+				SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "operator", &tag.op, &op_alloc, NULL) ||
+				SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "value", &tag.value, &val_alloc, NULL))
+		{
+			patch_filtertag_free(tag);
+			return FAIL;
+		}
+
+		zbx_vector_patch_filtertag_append(tags, tag);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_parse_applications_json(struct zbx_json_parse *jp, struct zbx_json *json_dest,
+		zbx_vector_patch_filtertag_t *tags, char **app, int depth)
+{
+	struct zbx_json_parse	jp_sub;
+	const char		*p = NULL, *prev = NULL;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	zbx_json_type_t		type;
+
+	do
+	{
+		if (NULL != (p = zbx_json_pair_next(jp, p, name, sizeof(name))))
+		{
+			if (NULL == zbx_json_decodevalue(p, value, sizeof(value), NULL))
+			{
+				type = zbx_json_valuetype(p);
+
+				if (type == ZBX_JSON_TYPE_ARRAY)
+				{
+					if (0 == depth && 0 == strcmp(name, "tags"))
+					{
+						if (SUCCEED != zbx_json_brackets_open(p, &jp_sub) ||
+								SUCCEED != DBpatch_parse_tags_json(&jp_sub, tags))
+						{
+							return FAIL;
+						}
+
+						continue;
+					}
+
+					zbx_json_addarray(json_dest, name);
+				}
+				else if (type == ZBX_JSON_TYPE_OBJECT)
+				{
+					zbx_json_addobject(json_dest, name);
+				}
+			}
+			else
+			{
+				if (0 == depth && 0 == strcmp(name, "application"))
+					*app = zbx_strdup(*app, value);
+				else
+					zbx_json_addstring(json_dest, name, value, ZBX_JSON_TYPE_STRING);
+			}
+		}
+		else
+		{
+			p = prev;
+
+			if (NULL == (p = zbx_json_next_value(jp, p, value, sizeof(value), NULL)))
+			{
+				p = prev;
+
+				if (NULL != (p = zbx_json_next(jp, p)))
+				{
+					type = zbx_json_valuetype(p);
+
+					if (type == ZBX_JSON_TYPE_OBJECT)
+						zbx_json_addobject(json_dest, NULL);
+					else if (type == ZBX_JSON_TYPE_ARRAY)
+						zbx_json_addarray(json_dest, NULL);
+				}
+				else
+				{
+					if (0 == depth)
+					{
+						if (NULL != *app)
+						{
+							patch_filtertag_t	tag;
+
+							tag.tag = zbx_strdup(NULL, "Application");
+							tag.op = zbx_strdup(NULL, "0");
+							tag.value = zbx_strdup(NULL, *app);
+
+							zbx_vector_patch_filtertag_append(tags, tag);
+						}
+
+						if (0 < tags->values_num)
+						{
+							int	i;
+
+							zbx_json_addarray(json_dest, "tags");
+
+							for (i = 0; i < tags->values_num; i++)
+							{
+								zbx_json_addobject(json_dest, NULL);
+								zbx_json_addstring(json_dest, "tag",
+										tags->values[i].tag,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_addstring(json_dest, "operator",
+										tags->values[i].op,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_addstring(json_dest, "value",
+										tags->values[i].value,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_close(json_dest);
+							}
+						}
+
+						zbx_json_close(json_dest);
+					}
+
+					zbx_json_close(json_dest);
+				}
+			}
+			else
+				zbx_json_addstring(json_dest, NULL, value, ZBX_JSON_TYPE_STRING);
+		}
+
+		if (NULL != p && SUCCEED == zbx_json_brackets_open(p, &jp_sub))
+		{
+			if (SUCCEED != DBpatch_parse_applications_json(&jp_sub, json_dest, tags, app, depth + 1))
+				return FAIL;
+		}
+
+		prev = p;
+	} while (NULL != p);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030130(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select profileid,value_str from profiles"
+			" where idx='web.monitoring.problem.properties'");
+
+	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	{
+		struct zbx_json_parse		jp;
+		struct zbx_json			json;
+		zbx_vector_patch_filtertag_t	tags;
+		char				*app, *value_str;
+		zbx_uint64_t			profileid;
+
+		app = NULL;
+		zbx_vector_patch_filtertag_create(&tags);
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+		if (SUCCEED == (ret = zbx_json_open(row[1], &jp)) &&
+				SUCCEED == (ret = DBpatch_parse_applications_json(&jp, &json, &tags, &app, 0)))
+		{
+			ZBX_DBROW2UINT64(profileid, row[0]);
+
+			value_str = DBdyn_escape_string(json.buffer);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update profiles set value_str='%s' where profileid=" ZBX_FS_UI64 ";\n",
+					value_str, profileid);
+			zbx_free(value_str);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
+
+		zbx_vector_patch_filtertag_clear_ext(&tags, patch_filtertag_free);
+		zbx_vector_patch_filtertag_destroy(&tags);
+		zbx_free(app);
+		zbx_json_free(&json);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030131(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_uint64_t	widget_fieldids;
+	int			ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			"value_str", NULL);
+
+	zbx_vector_uint64_create(&widget_fieldids);
+
+	result = DBselect(
+			"select w.widgetid,wf.value_str,wf.widget_fieldid from widget w"
+			" join widget_field wf on wf.widgetid=w.widgetid"
+			" where w.type in ('dataover','trigover') and wf.type=1 and wf.name='application'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	widgetid, widget_fieldid;
+		char		*val;
+
+		ZBX_DBROW2UINT64(widgetid, row[0]);
+		val = DBdyn_escape_string(row[1]);
+		ZBX_DBROW2UINT64(widget_fieldid, row[2]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 0, "");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.tag.0", 0, "Application");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.value.0", 0, val);
+
+		zbx_vector_uint64_append(&widget_fieldids, widget_fieldid);
+
+		zbx_free(val);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+
+	if (0 < widget_fieldids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", widget_fieldids.values,
+				widget_fieldids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+out:
+	zbx_db_insert_clean(&db_insert);
+	zbx_vector_uint64_destroy(&widget_fieldids);
+
+	return ret;
+}
+
+static int	DBpatch_5030132(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name like 'api.method.%%'"
+			" and value_str like 'application.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030133(void)
+{
+	return DBdrop_foreign_key("httptest", 1);
+}
+
+static int	DBpatch_5030134(void)
+{
+	return DBdrop_index("httptest", "httptest_1");
+}
+
+static int	DBpatch_5030135(void)
+{
+	return DBdrop_field("httptest", "applicationid");
+}
+
+static int	DBpatch_5030136(void)
+{
+	return DBdrop_field("sysmaps_elements", "application");
+}
+
+static int	DBpatch_5030137(void)
+{
+	return DBdrop_table("application_discovery");
+}
+
+static int	DBpatch_5030138(void)
+{
+	return DBdrop_table("item_application_prototype");
+}
+
+static int	DBpatch_5030139(void)
+{
+	return DBdrop_table("application_prototype");
+}
+
+static int	DBpatch_5030140(void)
+{
+	return DBdrop_table("application_template");
+}
+
+static int	DBpatch_5030141(void)
+{
+	return DBdrop_table("items_applications");
+}
+
+static int	DBpatch_5030142(void)
+{
+	return DBdrop_table("applications");
+}
+
+static int	DBpatch_5030143(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030144(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -3765,5 +4592,40 @@ DBPATCH_ADD(5030106, 0, 1)
 DBPATCH_ADD(5030107, 0, 1)
 DBPATCH_ADD(5030108, 0, 1)
 DBPATCH_ADD(5030109, 0, 1)
+DBPATCH_ADD(5030110, 0, 1)
+DBPATCH_ADD(5030111, 0, 1)
+DBPATCH_ADD(5030112, 0, 1)
+DBPATCH_ADD(5030113, 0, 1)
+DBPATCH_ADD(5030114, 0, 1)
+DBPATCH_ADD(5030115, 0, 1)
+DBPATCH_ADD(5030116, 0, 1)
+DBPATCH_ADD(5030117, 0, 1)
+DBPATCH_ADD(5030118, 0, 1)
+DBPATCH_ADD(5030119, 0, 1)
+DBPATCH_ADD(5030120, 0, 1)
+DBPATCH_ADD(5030121, 0, 1)
+DBPATCH_ADD(5030122, 0, 1)
+DBPATCH_ADD(5030123, 0, 1)
+DBPATCH_ADD(5030124, 0, 1)
+DBPATCH_ADD(5030125, 0, 1)
+DBPATCH_ADD(5030126, 0, 1)
+DBPATCH_ADD(5030127, 0, 1)
+DBPATCH_ADD(5030128, 0, 1)
+DBPATCH_ADD(5030129, 0, 1)
+DBPATCH_ADD(5030130, 0, 1)
+DBPATCH_ADD(5030131, 0, 1)
+DBPATCH_ADD(5030132, 0, 1)
+DBPATCH_ADD(5030133, 0, 1)
+DBPATCH_ADD(5030134, 0, 1)
+DBPATCH_ADD(5030135, 0, 1)
+DBPATCH_ADD(5030136, 0, 1)
+DBPATCH_ADD(5030137, 0, 1)
+DBPATCH_ADD(5030138, 0, 1)
+DBPATCH_ADD(5030139, 0, 1)
+DBPATCH_ADD(5030140, 0, 1)
+DBPATCH_ADD(5030141, 0, 1)
+DBPATCH_ADD(5030142, 0, 1)
+DBPATCH_ADD(5030143, 0, 1)
+DBPATCH_ADD(5030144, 0, 1)
 
 DBPATCH_END()

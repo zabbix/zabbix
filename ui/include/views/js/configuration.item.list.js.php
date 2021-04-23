@@ -32,6 +32,18 @@
 				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 			})
 			.trigger('change');
+
+		$('#filter-tags')
+			.dynamicRows({template: '#filter-tag-row-tmpl'})
+			.on('afteradd.dynamicRows', function() {
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length - 1]);
+			});
+
+		// Init existing fields once loaded.
+		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 	});
 </script>
 
@@ -70,3 +82,8 @@
 		->addClass('form_row')
 ?>
 </script>
+
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
+</script>
+

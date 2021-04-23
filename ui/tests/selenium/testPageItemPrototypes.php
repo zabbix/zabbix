@@ -54,9 +54,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 			$this->zbxTestTextPresent('All templates');
 		}
 
-		$this->zbxTestTextPresent(
-			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Create enabled']
-		);
+		$this->zbxTestTextPresent(['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled']);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 

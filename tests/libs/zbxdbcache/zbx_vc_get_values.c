@@ -52,6 +52,9 @@ void	zbx_mock_test_entry(void **state)
 	/* set small cache size to force smaller cache free request size (5% of cache size) */
 	CONFIG_VALUE_CACHE_SIZE = ZBX_KIBIBYTE;
 
+	err = zbx_locks_create(&error);
+	zbx_mock_assert_result_eq("Lock initialization failed", SUCCEED, err);
+
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 
@@ -83,6 +86,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vcmock_get_request_params(handle, &itemid, &value_type, &seconds, &count, &ts);
 	err = zbx_vc_get_values(itemid, value_type, &returned, seconds, count, &ts);
+	zbx_vc_flush_stats();
 	zbx_mock_assert_result_eq("zbx_vc_get_values() return value", SUCCEED, err);
 
 	/* validate results */

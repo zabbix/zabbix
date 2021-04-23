@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-25T19:10:31Z'
+  date: '2021-04-22T11:28:23Z'
   groups:
     -
       name: Templates/Modules
@@ -17,9 +17,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'SMART: Get attributes'
@@ -27,9 +24,10 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
       discovery_rules:
         -
           name: 'Attribute discovery'
@@ -43,9 +41,6 @@ zabbix_export:
               key: 'smart.disk.error[{#NAME},{#ID}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -57,6 +52,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()} <= {#THRESH}'
@@ -96,9 +95,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'This field indicates critical warnings for the state of the controller.'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -110,6 +106,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
             -
               name: 'SMART [{#NAME}]: Power on hours'
               type: DEPENDENT
@@ -118,9 +118,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -128,6 +125,10 @@ zabbix_export:
                     - '$[?(@.disk_name==''{#NAME}'')].power_on_time.hours.first()'
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
             -
               name: 'SMART [{#NAME}]: Media errors'
               type: DEPENDENT
@@ -135,9 +136,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Contains the number of occurrences where the controller detected an unrecovered data integrity error. Errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch are included in this field.'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -149,6 +147,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
             -
               name: 'SMART [{#NAME}]: Device model'
               type: DEPENDENT
@@ -157,9 +159,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -171,6 +170,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
             -
               name: 'SMART [{#NAME}]: Percentage used'
               type: DEPENDENT
@@ -179,9 +182,6 @@ zabbix_export:
               history: 7d
               units: '%'
               description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -193,6 +193,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}>90'
@@ -206,9 +210,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -220,6 +221,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -235,9 +240,6 @@ zabbix_export:
               history: 7d
               units: °C
               description: 'Current drive temperature.'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -249,6 +251,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}'
@@ -271,9 +277,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The disk is passed the SMART self-test or not.'
-              application_prototypes:
-                -
-                  name: '{#DISKTYPE} {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -285,6 +288,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}="false"'

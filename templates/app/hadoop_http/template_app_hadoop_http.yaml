@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:43Z'
   groups:
     -
       name: Templates/Applications
@@ -17,11 +17,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Hadoop
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Get DataNodes states'
@@ -30,9 +25,6 @@ zabbix_export:
           history: 0h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -64,6 +56,10 @@ zabbix_export:
                     throw 'Failed to process response received from Hadoop';
                   }
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'NameNode: Total blocks'
           type: DEPENDENT
@@ -71,9 +67,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of blocks tracked by NameNode.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -81,6 +74,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].BlocksTotal.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Blocks allocable'
           type: DEPENDENT
@@ -88,9 +85,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Maximum number of blocks allocable.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -98,6 +92,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].BlockCapacity.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Capacity remaining'
           type: DEPENDENT
@@ -106,9 +104,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Available capacity.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -116,6 +111,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].CapacityRemaining.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Corrupt blocks'
           type: DEPENDENT
@@ -123,9 +122,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of corrupt blocks.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -133,6 +129,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].CorruptBlocks.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Total files'
           type: DEPENDENT
@@ -140,9 +140,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total count of files tracked by the NameNode.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -150,6 +147,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].FilesTotal.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'Get NameNode stats'
           type: HTTP_AGENT
@@ -157,10 +158,11 @@ zabbix_export:
           history: 0h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'NameNode: Missing blocks'
           type: DEPENDENT
@@ -168,9 +170,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of missing blocks.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -178,6 +177,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].MissingBlocks.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(15m)}>0'
@@ -191,9 +194,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of dead DataNodes.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -205,6 +205,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(5m)}>0'
@@ -218,9 +222,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of alive DataNodes.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -232,6 +233,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Stale DataNodes'
           type: DEPENDENT
@@ -239,9 +244,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -253,6 +255,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Block Pool Renaming'
           type: DEPENDENT
@@ -260,9 +266,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -270,6 +273,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=NameNodeInfo'')].PercentBlockPoolUsed.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Percent capacity remaining'
           type: DEPENDENT
@@ -279,9 +286,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Available capacity in percent.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -293,6 +297,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{max(15m)}<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}'
@@ -308,9 +316,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Average time spent on processing RPC requests.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -318,6 +323,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=RpcActivityForPort9000'')].RpcProcessingTimeAvgTime.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Total load'
           type: DEPENDENT
@@ -325,9 +334,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of concurrent file accesses (read/write) across all DataNodes.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -335,6 +341,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].TotalLoad.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Transactions since last checkpoint'
           type: DEPENDENT
@@ -342,9 +352,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of transactions since last checkpoint.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -352,6 +359,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].TransactionsSinceLastCheckpoint.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Under-replicated blocks'
           type: DEPENDENT
@@ -359,9 +370,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of blocks with insufficient replication.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -369,6 +377,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].UnderReplicatedBlocks.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'NameNode: Uptime'
           type: DEPENDENT
@@ -377,9 +389,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -391,6 +400,10 @@ zabbix_export:
                 - '0.001'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -415,9 +428,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of failed volumes.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -425,6 +435,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=NameNode,name=FSNamesystem'')].VolumeFailuresTotal.first()'
           master_item:
             key: hadoop.namenode.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(15m)}>0'
@@ -438,15 +452,16 @@ zabbix_export:
           history: 0h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers))'
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Get ResourceManager stats'
           type: HTTP_AGENT
@@ -454,10 +469,11 @@ zabbix_export:
           history: 0h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'ResourceManager: Active NMs'
           type: DEPENDENT
@@ -465,9 +481,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Active NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -479,6 +492,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{max(5m)}=0'
@@ -492,9 +509,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Decommissioned NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -502,6 +516,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=ResourceManager,name=ClusterMetrics'')].NumDecommissionedNMs.first()'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Decommissioning NMs'
           type: DEPENDENT
@@ -509,9 +527,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Decommissioning NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -523,6 +538,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Lost NMs'
           type: DEPENDENT
@@ -530,9 +549,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Lost NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -544,6 +560,10 @@ zabbix_export:
                 - 6h
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Rebooted NMs'
           type: DEPENDENT
@@ -551,9 +571,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Rebooted NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -561,6 +578,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=ResourceManager,name=ClusterMetrics'')].NumRebootedNMs.first()'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Shutdown NMs'
           type: DEPENDENT
@@ -568,9 +589,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Shutdown NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -578,6 +596,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=ResourceManager,name=ClusterMetrics'')].NumShutdownNMs.first()'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Unhealthy NMs'
           type: DEPENDENT
@@ -585,9 +607,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of Unhealthy NodeManagers.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -595,6 +614,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=ResourceManager,name=ClusterMetrics'')].NumUnhealthyNMs.first()'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(15m)}>0'
@@ -610,9 +633,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Average time spent on processing RPC requests.'
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -620,6 +640,10 @@ zabbix_export:
                 - '$.beans[?(@.name==''Hadoop:service=ResourceManager,name=RpcActivityForPort8031'')].RpcProcessingTimeAvgTime.first()'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
         -
           name: 'ResourceManager: Uptime'
           type: DEPENDENT
@@ -628,9 +652,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
-            -
-              name: Hadoop
           preprocessing:
             -
               type: JSONPATH
@@ -642,6 +663,10 @@ zabbix_export:
                 - '0.001'
           master_item:
             key: hadoop.resourcemanager.get
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -667,9 +692,10 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Hadoop NameNode API performance.'
-          applications:
+          tags:
             -
-              name: Hadoop
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(5m)}>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}'
@@ -688,9 +714,10 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Hadoop ResourceManager API performance.'
-          applications:
+          tags:
             -
-              name: Hadoop
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{min(5m)}>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}'
@@ -707,9 +734,6 @@ zabbix_export:
           key: 'net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]'
           history: 7d
           description: 'Hadoop NameNode API port availability.'
-          applications:
-            -
-              name: Hadoop
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -717,6 +741,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{last()}=0'
@@ -729,9 +757,6 @@ zabbix_export:
           key: 'net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]'
           history: 7d
           description: 'Hadoop ResourceManager API port availability.'
-          applications:
-            -
-              name: Hadoop
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -739,6 +764,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Hadoop
           triggers:
             -
               expression: '{last()}=0'
@@ -761,9 +790,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Administrative state.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -775,6 +801,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: hadoop.datanodes.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Used'
               type: DEPENDENT
@@ -783,9 +813,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Used disk space.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -793,6 +820,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=DataNode,name=FSDatasetState'')].DfsUsed.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: 'Hadoop DataNode {#HOSTNAME}: Get stats'
               type: HTTP_AGENT
@@ -800,10 +831,11 @@ zabbix_export:
               history: 0h
               trends: '0'
               value_type: TEXT
-              applications:
-                -
-                  name: 'Zabbix raw items'
               url: '{#INFOADDR}/jmx'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: '{#HOSTNAME}: JVM Garbage collection time'
               type: DEPENDENT
@@ -812,9 +844,6 @@ zabbix_export:
               history: 7d
               units: '!ms'
               description: 'The JVM garbage collection time in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -822,6 +851,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=DataNode,name=JvmMetrics'')].GcTimeMillis.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: JVM Heap usage'
               type: DEPENDENT
@@ -831,9 +864,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!MB'
               description: 'The JVM heap usage in MBytes.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -841,6 +871,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=DataNode,name=JvmMetrics'')].MemHeapUsedM.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: JVM Threads'
               type: DEPENDENT
@@ -848,9 +882,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of JVM threads.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -858,6 +889,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''java.lang:type=Threading'')].ThreadCount.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Number of failed volumes'
               type: DEPENDENT
@@ -865,9 +900,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of failed storage volumes.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -875,6 +907,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=DataNode,name=FSDatasetState'')].NumFailedVolumes.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Oper state'
               type: DEPENDENT
@@ -884,9 +920,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Operational state.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -898,6 +931,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: hadoop.datanodes.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>"Live"'
@@ -912,9 +949,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Remaining disk space.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -922,6 +956,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=DataNode,name=FSDatasetState'')].Remaining.first()'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Uptime'
               type: DEPENDENT
@@ -930,9 +968,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -944,6 +979,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
               trigger_prototypes:
                 -
                   expression: '{nodata(30m)}=1'
@@ -970,9 +1009,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'DataNode software version.'
-              application_prototypes:
-                -
-                  name: 'Hadoop DataNode {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -984,6 +1020,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: hadoop.datanodes.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop DataNode {#HOSTNAME}'
           graph_prototypes:
             -
               name: '{#HOSTNAME}: DataNode {#HOSTNAME} DFS size'
@@ -1044,9 +1084,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!MB'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1054,6 +1091,10 @@ zabbix_export:
                     - '$[?(@.HostName==''{#HOSTNAME}'')].AvailableMemoryMB.first()'
               master_item:
                 key: hadoop.nodemanagers.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Container launch avg duration'
               type: DEPENDENT
@@ -1061,9 +1102,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1071,6 +1109,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=NodeManager,name=NodeManagerMetrics'')].ContainerLaunchDurationAvgTime.first()'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: 'Hadoop NodeManager {#HOSTNAME}: Get stats'
               type: HTTP_AGENT
@@ -1078,10 +1120,11 @@ zabbix_export:
               history: 0h
               trends: '0'
               value_type: TEXT
-              applications:
-                -
-                  name: 'Zabbix raw items'
               url: '{#NODEHTTPADDRESS}/jmx'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: '{#HOSTNAME}: JVM Garbage collection time'
               type: DEPENDENT
@@ -1090,9 +1133,6 @@ zabbix_export:
               history: 7d
               units: '!ms'
               description: 'The JVM garbage collection time in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1100,6 +1140,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=NodeManager,name=JvmMetrics'')].GcTimeMillis.first()'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: JVM Heap usage'
               type: DEPENDENT
@@ -1109,9 +1153,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!MB'
               description: 'The JVM heap usage in MBytes.'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1119,6 +1160,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=NodeManager,name=JvmMetrics'')].MemHeapUsedM.first()'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: JVM Threads'
               type: DEPENDENT
@@ -1126,9 +1171,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of JVM threads.'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1136,6 +1178,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''java.lang:type=Threading'')].ThreadCount.first()'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Number of containers'
               type: DEPENDENT
@@ -1144,9 +1190,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1154,6 +1197,10 @@ zabbix_export:
                     - '$[?(@.HostName==''{#HOSTNAME}'')].NumContainers.first()'
               master_item:
                 key: hadoop.nodemanagers.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: RPC queue & processing time'
               type: DEPENDENT
@@ -1162,9 +1209,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Average time spent on processing RPC requests.'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1172,6 +1216,10 @@ zabbix_export:
                     - '$.beans[?(@.name==''Hadoop:service=NodeManager,name=RpcActivityForPort8040'')].RpcProcessingTimeAvgTime.first()'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: State'
               type: DEPENDENT
@@ -1181,9 +1229,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'State of the node - valid values are: NEW, RUNNING, UNHEALTHY, DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN.'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1195,6 +1240,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: hadoop.nodemanagers.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>"RUNNING"'
@@ -1209,9 +1258,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1223,6 +1269,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
               trigger_prototypes:
                 -
                   expression: '{nodata(30m)}=1'
@@ -1247,9 +1297,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!MB'
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1257,6 +1304,10 @@ zabbix_export:
                     - '$[?(@.HostName==''{#HOSTNAME}'')].UsedMemoryMB.first()'
               master_item:
                 key: hadoop.nodemanagers.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
             -
               name: '{#HOSTNAME}: Version'
               type: DEPENDENT
@@ -1265,9 +1316,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hadoop NodeManager {#HOSTNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1279,6 +1327,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: hadoop.nodemanagers.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Hadoop NodeManager {#HOSTNAME}'
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo'
           preprocessing:
             -

@@ -30,8 +30,12 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter                       Item filter options.
 	 * @param array  $filter['groupids']           Filter items by host groups.
 	 * @param array  $filter['hostids']            Filter items by hosts.
-	 * @param string $filter['application']        Filter items by application.
 	 * @param string $filter['select']             Filter items by name.
+	 * @param int    $filter['evaltype']           Filter evaltype.
+	 * @param array  $filter['tags']               Filter tags.
+	 * @param string $filter['tags'][]['tag']
+	 * @param string $filter['tags'][]['value']
+	 * @param int    $filter['tags'][]['operator']
 	 * @param int    $filter['show_without_data']  Include items with empty history.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
@@ -39,62 +43,11 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
+		// Select groups for subsequent selection of hosts and items.
 		$multiselect_hostgroup_data = [];
-		$multiselect_host_data = [];
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids'], $multiselect_hostgroup_data) : null;
 
-		// Sorting options for hosts, applications and items.
-
-		$host_sort_options = [
-			'field' => 'name',
-			'order' => ($sort_field === 'host') ? $sort_order : 'ASC'
-		];
-		$application_sort_options = [
-			'field' => 'name',
-			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
-		];
-		$item_sort_options = [
-			'field' => 'name',
-			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
-		];
-
-		// Select groups for subsequent selection of hosts, applications and items.
-
-		if ($filter['groupids']) {
-			$groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groupids'],
-				'preservekeys' => true
-			]);
-
-			if ($groups) {
-				$subgroup_names = [];
-
-				foreach ($groups as $group) {
-					$subgroup_names[] = $group['name'].'/';
-
-					$multiselect_hostgroup_data[] = [
-						'id' => $group['groupid'],
-						'name' => $group['name']
-					];
-				}
-
-				$groups += API::HostGroup()->get([
-					'output' => ['groupid'],
-					'search' => ['name' => $subgroup_names],
-					'startSearch' => true,
-					'searchByAny' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			$groupids = array_keys($groups);
-		}
-		else {
-			$groupids = null;
-		}
-
-		// Select hosts for subsequent selection of applications and items.
-
+		// Select hosts for subsequent selection of items.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'groupids' => $groupids,
@@ -103,39 +56,23 @@ abstract class CControllerLatest extends CController {
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($hosts, [$host_sort_options]);
-		$hostids = array_keys($hosts);
-		$hostids_index = array_flip($hostids);
-
-		$applications = [];
-
-		$select_hosts = [];
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$select_items_cnt = 0;
 		$select_items = [];
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-
 		foreach ($hosts as $hostid => $host) {
-			if ($filter['application'] !== '') {
-				$host_applications = API::Application()->get([
-					'output' => ['applicationid', 'name'],
-					'hostids' => [$hostid],
-					'search' => ['name' => $filter['application']],
-					'preservekeys' => true
-				]);
-
-				$host_applicationids = array_keys($host_applications);
-
-				$applications += $host_applications;
-			}
-			else {
-				$host_applicationids = null;
+			if ($select_items_cnt > $search_limit) {
+				unset($hosts[$hostid]);
+				continue;
 			}
 
 			$host_items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'value_type'],
 				'hostids' => [$hostid],
-				'applicationids' => $host_applicationids,
 				'webitems' => true,
+				'evaltype' => $filter['evaltype'],
+				'tags' => $filter['tags'] ? $filter['tags'] : null,
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE]
 				],
@@ -145,15 +82,11 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
-			$select_hosts[$hostid] = true;
-
 			$select_items += $filter['show_without_data']
 				? $host_items
 				: Manager::History()->getItemsHavingValues($host_items, $history_period);
 
-			if (count($select_items) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
-				break;
-			}
+			$select_items_cnt = count($select_items);
 		}
 
 		if ($select_items) {
@@ -161,128 +94,49 @@ abstract class CControllerLatest extends CController {
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'description', 'state', 'error'
 				],
-				'selectApplications' => ['applicationid'],
+				'selectTags' => ['tag', 'value'],
 				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
 			]);
 
-			if ($filter['application'] === '') {
-				$applications = API::Application()->get([
-					'output' => ['applicationid', 'name'],
-					'hostids' => array_keys($select_hosts),
-					'preservekeys' => true
-				]);
-			}
-
-			CArrayHelper::sort($applications, [$application_sort_options]);
-			$applicationids = array_keys($applications);
-			$applicationids_index = array_flip($applicationids);
-
-			$applications_size = [];
-			$items_grouped = [];
-
-			foreach ($items as $itemid => $item) {
-				if (!array_key_exists($item['hostid'], $applications_size)) {
-					$applications_size[$item['hostid']] = [];
-				}
-
-				$item_applicationids = $item['applications']
-					? array_column($item['applications'], 'applicationid')
-					: [0];
-
-				foreach ($item_applicationids as $applicationid) {
-					if ($applicationid != 0 && !array_key_exists($applicationid, $applications)) {
-						continue;
-					}
-
-					$items_grouped[$item['hostid']][$applicationid][$itemid] = $item;
-
-					if (array_key_exists($applicationid, $applications_size[$item['hostid']])) {
-						$applications_size[$item['hostid']][$applicationid]++;
-					}
-					else {
-						$applications_size[$item['hostid']][$applicationid] = 1;
-					}
-				}
-			}
-
-			$applications_index = [];
-			$items = [];
-			$rows = [];
-
-			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids_index) {
-				return ($hostids_index[$hostid_1] <=> $hostids_index[$hostid_2]);
-			});
-
-			foreach ($items_grouped as $hostid => $host_items_grouped) {
-				uksort($host_items_grouped,
-					function($id_1, $id_2) use ($applicationids_index, $application_sort_options) {
-						if ($id_1 == 0 || $id_2 == 0) {
-							return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
-						}
-
-						return ($applicationids_index[$id_1] <=> $applicationids_index[$id_2]);
-					}
-				);
-
-				foreach ($host_items_grouped as $applicationid => $application_items) {
-					CArrayHelper::sort($application_items, [$item_sort_options]);
-
-					$applications_index[$hostid][$applicationid] = [
-						'start' => count($rows)
+			if ($sort_field === 'host') {
+				$items = array_map(function ($item) use ($hosts) {
+					return $item + [
+						'host_name' => $hosts[$item['hostid']]['name']
 					];
+				}, $items);
 
-					foreach ($application_items as $itemid => $item) {
-						unset($item['applications']);
-
-						$applications_index[$hostid][$applicationid]['end'] = count($rows);
-						$items[$itemid] = $item;
-						$rows[] = [
-							'itemid' => $itemid,
-							'applicationid' => $applicationid
-						];
-
-						if (count($rows) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
-							break 3;
-						}
-					}
-				}
+				CArrayHelper::sort($items, [[
+					'field' => 'host_name',
+					'order' => $sort_order
+				]]);
+			}
+			else {
+				CArrayHelper::sort($items, [[
+					'field' => 'name',
+					'order' => $sort_order
+				]]);
 			}
 		}
 		else {
-			$rows = [];
 			$hosts = [];
-			$applications = [];
-			$applications_size = [];
-			$applications_index = [];
 			$items = [];
 		}
 
-		if ($filter['hostids']) {
-			$filter_hosts = API::Host()->get([
+		$multiselect_host_data = $filter['hostids']
+			? API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'hostids' => $filter['hostids']
-			]);
-
-			foreach ($filter_hosts as $host) {
-				$multiselect_host_data[] = [
-					'id' => $host['hostid'],
-					'name' => $host['name']
-				];
-			}
-		}
+			])
+			: [];
 
 		return [
-			'rows' => $rows,
 			'hosts' => $hosts,
-			'applications' => $applications,
-			'applications_size' => $applications_size,
-			'applications_index' => $applications_index,
 			'items' => $items,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
-			'multiselect_host_data' => $multiselect_host_data
+			'multiselect_host_data' => CArrayHelper::renameObjectsKeys($multiselect_host_data, ['hostid' => 'id'])
 		];
 	}
 
@@ -290,16 +144,9 @@ abstract class CControllerLatest extends CController {
 	 * Extend previously prepared data.
 	 *
 	 * @param array $prepared_data      Data returned by prepareData method.
-	 * @param int   $show_without_data  Include items with empty history.
 	 */
-	protected function extendData(array &$prepared_data, $show_without_data) {
-		$items = array_intersect_key($prepared_data['items'],
-			array_flip(array_column($prepared_data['rows'], 'itemid'))
-		);
-
-		// Resolve macros.
-
-		$items = CMacrosResolverHelper::resolveItemKeys($items);
+	protected function extendData(array &$prepared_data) {
+		$items = CMacrosResolverHelper::resolveItemKeys($prepared_data['items']);
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
@@ -310,35 +157,5 @@ abstract class CControllerLatest extends CController {
 
 		$prepared_data['items'] = $items;
 		$prepared_data['history'] = $history;
-	}
-
-	/**
-	 * Add collapsed data from user profile.
-	 *
-	 * @param array $prepared_data  Data returned by prepareData method.
-	 */
-	protected function addCollapsedDataFromProfile(array &$prepared_data) {
-		$collapsed_index = [];
-		$collapsed_all = true;
-
-		foreach ($prepared_data['rows'] as $row) {
-			$hostid = $prepared_data['items'][$row['itemid']]['hostid'];
-			$applicationid = $row['applicationid'];
-
-			if (array_key_exists($hostid, $collapsed_index)
-					&& array_key_exists($applicationid, $collapsed_index[$hostid])) {
-				continue;
-			}
-
-			$collapsed = $applicationid
-				? (CProfile::get('web.latest.toggle', null, $applicationid) !== null)
-				: (CProfile::get('web.latest.toggle_other', null, $hostid) !== null);
-
-			$collapsed_index[$hostid][$applicationid] = $collapsed;
-			$collapsed_all = $collapsed_all && $collapsed;
-		}
-
-		$prepared_data['collapsed_index'] = $collapsed_index;
-		$prepared_data['collapsed_all'] = $collapsed_all;
 	}
 }

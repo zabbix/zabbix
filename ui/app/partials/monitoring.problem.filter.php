@@ -71,15 +71,6 @@ $left_column = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->setId('hostids_#{uniqid}')
 	)
-	->addRow(_('Application'), [
-		(new CTextBox('application', $data['application']))
-			->setId('application_#{uniqid}')
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_select', _('Select')))
-			->setId('application_select_#{uniqid}')
-			->addClass(ZBX_STYLE_BTN_GREY)
-	])
 	->addRow((new CLabel(_('Triggers'), 'triggerids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'triggerids[]',
@@ -398,9 +389,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags',
-				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age',
-				'tag_name_format', 'evaltype'
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags', 'unacknowledged',
+				'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age', 'tag_name_format',
+				'evaltype'
 			],
 			eventHandler = {
 				show: () => {
@@ -494,31 +485,14 @@ if (array_key_exists('render_html', $data)) {
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
-				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-				$(this)
-					.find('z-select')
-					.on('change', function() {
-						var num = this.id.match(/tags_(\d+)_operator/);
-
-						if (num !== null) {
-							$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-							);
-						}
-					});
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length - 1]);
 			});
 
-		$('#filter-tags_' + data.uniqid + ' z-select')
-			.on('change', function() {
-				var num = this.id.match(/tags_(\d+)_operator/);
-
-				if (num !== null) {
-					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-					);
-				}
-			})
-			.trigger('change');
+		// Init existing fields once loaded.
+		document.querySelectorAll('#filter-tags_' + data.uniqid + ' .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -562,20 +536,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfld1: 'hostids_' + data.uniqid,
 				}
 			}
-		});
-
-		// Application
-		$('#application_select_' + data.uniqid).on('click', function() {
-			let options = {
-					srctbl: 'applications',
-					srcfld1: 'name',
-					dstfrm: 'zbx_filter',
-					dstfld1: 'application_' + data.uniqid,
-					with_applications: '1',
-					real_hosts: '1'
-				};
-
-			PopUp('popup.generic', $.extend(options, getFirstMultiselectValue('hostids_' + data.uniqid)), null, this);
 		});
 
 		// Triggers multiselect.

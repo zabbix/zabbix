@@ -1097,7 +1097,7 @@ class testFormUser extends CWebTest {
 		$this->query('link', $username)->one()->click();
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username =' . zbx_dbstr($username));
 
-		// Link user with map, slideshow, action to validate user deletion.
+		// Link user with map, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
 					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid).

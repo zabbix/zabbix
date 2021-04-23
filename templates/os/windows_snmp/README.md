@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 
 ## Setup
 
@@ -16,11 +16,11 @@ No specific Zabbix configuration is required.
 
 ## Template links
 
-|Name|
-|----|
-|Generic SNMP |
-|HOST-RESOURCES-MIB SNMP |
-|Interfaces Windows SNMP |
+| Name                    |
+|-------------------------|
+| Generic SNMP            |
+| HOST-RESOURCES-MIB SNMP |
+| Interfaces Windows SNMP |
 
 ## Discovery rules
 

@@ -1365,6 +1365,8 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
 		goto out;
 
+	zbx_vc_flush_stats();
+
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
@@ -1452,6 +1454,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
+			zbx_vc_flush_stats();
 			zbx_history_value_print(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
@@ -4796,7 +4799,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_TAG))
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4845,24 +4848,28 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+
+				if (EVENT_SOURCE_TRIGGERS == event->source)
 				{
-					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
-							raw_value);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-				{
-					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
-							event->clock, event->ns, raw_value);
-				}
-				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
-				{
-					ret = get_history_log_value(m, event->trigger.expression, &replace_to,
-							N_functionid, event->clock, event->ns, tz);
-				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+					if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+					{
+						ret = DBitem_lastvalue(event->trigger.expression, &replace_to,
+								N_functionid, raw_value);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+					{
+						ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value);
+					}
+					else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+					{
+						ret = get_history_log_value(m, event->trigger.expression, &replace_to,
+								N_functionid, event->clock, event->ns, tz);
+					}
+					else if (0 == strcmp(m, MVAR_TRIGGER_ID))
+					{
+						replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+					}
 				}
 			}
 		}
@@ -4870,7 +4877,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		{
 			/* Using dc_item to pass itemid and hostid only, all other fields are not initialized! */
 
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_SOURCE_TRIGGERS == event->source && 0 == strcmp(m, MVAR_TRIGGER_ID))
+			{
+				replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+			}
+			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4911,10 +4922,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
 							ZBX_REQUEST_HOST_PORT);
-				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 				}
 			}
 		}
@@ -4989,6 +4996,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 
 		pos++;
 	}
+
+	zbx_vc_flush_stats();
 
 	zbx_free(user_username);
 	zbx_free(user_name);
@@ -5484,6 +5493,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			func->value = zbx_strdup(func->value, buffer);
 		}
 	}
+
+	zbx_vc_flush_stats();
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
 	zbx_vector_uint64_destroy(&itemids);

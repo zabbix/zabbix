@@ -34,9 +34,6 @@ const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
 const TABFILTERITEM_STYLE_FOCUSED = 'focused';
 
-const TAG_OPERATOR_EXISTS = '4';
-const TAG_OPERATOR_NOT_EXISTS = '5';
-
 class CTabFilterItem extends CBaseComponent {
 
 	constructor(target, options) {
@@ -333,6 +330,9 @@ class CTabFilterItem extends CBaseComponent {
 	getFilterParams() {
 		let form = this.getForm(),
 			params = null;
+
+		const TAG_OPERATOR_EXISTS = '4';
+		const TAG_OPERATOR_NOT_EXISTS = '5';
 
 		if (form instanceof HTMLFormElement) {
 			var form_data = new FormData(form);

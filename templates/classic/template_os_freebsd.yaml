@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:15Z'
+  version: '5.4'
+  date: '2021-04-22T11:26:34Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -14,25 +14,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Operating systems'
-      applications:
-        -
-          name: CPU
-        -
-          name: Filesystems
-        -
-          name: General
-        -
-          name: Memory
-        -
-          name: 'Network interfaces'
-        -
-          name: OS
-        -
-          name: Performance
-        -
-          name: Processes
-        -
-          name: Security
       items:
         -
           name: 'Maximum number of opened files'
@@ -40,9 +21,10 @@ zabbix_export:
           delay: 1h
           history: 1w
           description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
-          applications:
+          tags:
             -
-              name: OS
+              tag: Application
+              value: OS
           triggers:
             -
               expression: '{last()}<1024'
@@ -54,9 +36,10 @@ zabbix_export:
           delay: 1h
           history: 1w
           description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
-          applications:
+          tags:
             -
-              name: OS
+              tag: Application
+              value: OS
           triggers:
             -
               expression: '{last()}<256'
@@ -67,9 +50,10 @@ zabbix_export:
           key: 'proc.num[,,run]'
           history: 1w
           description: 'Number of processes in running state.'
-          applications:
+          tags:
             -
-              name: Processes
+              tag: Application
+              value: Processes
           triggers:
             -
               expression: '{avg(5m)}>30'
@@ -80,9 +64,10 @@ zabbix_export:
           key: 'proc.num[]'
           history: 1w
           description: 'Total number of processes in any state.'
-          applications:
+          tags:
             -
-              name: Processes
+              tag: Application
+              value: Processes
           triggers:
             -
               expression: '{avg(5m)}>300'
@@ -94,37 +79,43 @@ zabbix_export:
           delay: 10m
           history: 1w
           units: unixtime
-          applications:
+          tags:
             -
-              name: General
+              tag: Application
+              value: General
             -
-              name: OS
+              tag: Application
+              value: OS
         -
           name: 'Interrupts per second'
           key: system.cpu.intr
           history: 1w
           units: ips
-          applications:
-            -
-              name: CPU
-            -
-              name: Performance
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: CPU
+            -
+              tag: Application
+              value: Performance
         -
           name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 1w
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
           triggers:
             -
               expression: '{avg(5m)}>5'
@@ -136,37 +127,43 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 1w
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'Context switches per second'
           key: system.cpu.switches
           history: 1w
           units: sps
-          applications:
-            -
-              name: CPU
-            -
-              name: Performance
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: CPU
+            -
+              tag: Application
+              value: Performance
         -
           name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
@@ -174,11 +171,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent doing nothing.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
@@ -186,11 +185,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of time the CPU has been servicing hardware interrupts.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
@@ -198,11 +199,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that have been niced.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'CPU system time'
           key: 'system.cpu.util[,system]'
@@ -210,11 +213,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running the kernel and its processes.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'CPU user time'
           key: 'system.cpu.util[,user]'
@@ -222,11 +227,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that are not niced.'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
             -
-              name: Performance
+              tag: Application
+              value: Performance
         -
           name: 'Host name'
           key: system.hostname
@@ -236,11 +243,13 @@ zabbix_export:
           value_type: CHAR
           description: 'System host name.'
           inventory_link: NAME
-          applications:
+          tags:
             -
-              name: General
+              tag: Application
+              value: General
             -
-              name: OS
+              tag: Application
+              value: OS
           triggers:
             -
               expression: '{diff(0)}>0'
@@ -251,28 +260,32 @@ zabbix_export:
           key: system.localtime
           history: 1w
           units: unixtime
-          applications:
+          tags:
             -
-              name: General
+              tag: Application
+              value: General
             -
-              name: OS
+              tag: Application
+              value: OS
         -
           name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 1w
           units: B
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{last()}<50'
@@ -285,9 +298,10 @@ zabbix_export:
           delay: 1h
           history: 1w
           units: B
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'System information'
           key: system.uname
@@ -297,11 +311,13 @@ zabbix_export:
           value_type: CHAR
           description: 'The information as normally returned by ''uname -a''.'
           inventory_link: OS
-          applications:
+          tags:
             -
-              name: General
+              tag: Application
+              value: General
             -
-              name: OS
+              tag: Application
+              value: OS
           triggers:
             -
               expression: '{diff(0)}>0'
@@ -313,11 +329,13 @@ zabbix_export:
           delay: 10m
           history: 1w
           units: uptime
-          applications:
+          tags:
             -
-              name: General
+              tag: Application
+              value: General
             -
-              name: OS
+              tag: Application
+              value: OS
           triggers:
             -
               expression: '{change(0)}<0'
@@ -328,19 +346,22 @@ zabbix_export:
           key: system.users.num
           history: 1w
           description: 'Number of users who are currently logged in.'
-          applications:
+          tags:
             -
-              name: OS
+              tag: Application
+              value: OS
             -
-              name: Security
+              tag: Application
+              value: Security
         -
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd]'
           delay: 1h
           history: 1w
-          applications:
+          tags:
             -
-              name: Security
+              tag: Application
+              value: Security
           triggers:
             -
               expression: '{diff(0)}>0'
@@ -352,9 +373,10 @@ zabbix_export:
           history: 1w
           units: B
           description: 'Available memory is defined as free+cached+buffers memory.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{last()}<20M'
@@ -366,9 +388,10 @@ zabbix_export:
           delay: 1h
           history: 1w
           units: B
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
       discovery_rules:
         -
           name: 'Network interface discovery'
@@ -387,9 +410,6 @@ zabbix_export:
               key: 'net.if.in[{#IFNAME}]'
               history: 1w
               units: bps
-              applications:
-                -
-                  name: 'Network interfaces'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -399,14 +419,15 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
             -
               name: 'Outgoing network traffic on {#IFNAME}'
               key: 'net.if.out[{#IFNAME}]'
               history: 1w
               units: bps
-              applications:
-                -
-                  name: 'Network interfaces'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -416,6 +437,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
           graph_prototypes:
             -
               name: 'Network traffic on {#IFNAME}'
@@ -452,9 +477,10 @@ zabbix_export:
               history: 1w
               value_type: FLOAT
               units: '%'
-              applications:
+              tags:
                 -
-                  name: Filesystems
+                  tag: Application
+                  value: Filesystems
               trigger_prototypes:
                 -
                   expression: '{last()}<20'
@@ -465,18 +491,20 @@ zabbix_export:
               key: 'vfs.fs.size[{#FSNAME},free]'
               history: 1w
               units: B
-              applications:
+              tags:
                 -
-                  name: Filesystems
+                  tag: Application
+                  value: Filesystems
             -
               name: 'Free disk space on {#FSNAME} (percentage)'
               key: 'vfs.fs.size[{#FSNAME},pfree]'
               history: 1w
               value_type: FLOAT
               units: '%'
-              applications:
+              tags:
                 -
-                  name: Filesystems
+                  tag: Application
+                  value: Filesystems
               trigger_prototypes:
                 -
                   expression: '{last()}<20'
@@ -488,17 +516,19 @@ zabbix_export:
               delay: 1h
               history: 1w
               units: B
-              applications:
+              tags:
                 -
-                  name: Filesystems
+                  tag: Application
+                  value: Filesystems
             -
               name: 'Used disk space on {#FSNAME}'
               key: 'vfs.fs.size[{#FSNAME},used]'
               history: 1w
               units: B
-              applications:
+              tags:
                 -
-                  name: Filesystems
+                  tag: Application
+                  value: Filesystems
           graph_prototypes:
             -
               name: 'Disk space usage {#FSNAME}'
@@ -524,71 +554,73 @@ zabbix_export:
       dashboards:
         -
           name: 'System performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU load'
+                        host: FreeBSD
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'CPU load'
-                    host: FreeBSD
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU utilization'
+                        host: FreeBSD
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: FreeBSD
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'CPU utilization'
-                    host: FreeBSD
-            -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '12'
-              height: '7'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Memory usage'
-                    host: FreeBSD
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '5'
-              width: '12'
-              height: '7'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Swap usage'
-                    host: FreeBSD
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Swap usage'
+                        host: FreeBSD
   graphs:
     -
       name: 'CPU jumps'

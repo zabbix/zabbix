@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-04-22T11:28:20Z'
   groups:
     -
       name: Templates/Applications
@@ -11,9 +11,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: 'Zabbix server'
       items:
         -
           name: 'LLD queue'
@@ -22,9 +19,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           description: 'Count of values enqueued in the preprocessing queue.'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -32,6 +26,10 @@ zabbix_export:
                 - $.data.lld_queue
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Preprocessing queue'
           type: DEPENDENT
@@ -39,9 +37,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           description: 'Count of values enqueued in the preprocessing queue.'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -49,6 +44,10 @@ zabbix_export:
                 - $.data.preprocessing_queue
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Utilization of alerter internal processes, in %'
           type: DEPENDENT
@@ -57,9 +56,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -67,6 +63,10 @@ zabbix_export:
                 - $.data.process.alerter.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -82,9 +82,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -92,6 +89,10 @@ zabbix_export:
                 - '$.data.process[''alert manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -107,9 +108,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -117,6 +115,10 @@ zabbix_export:
                 - '$.data.process[''alert syncer''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -132,9 +134,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -142,6 +141,10 @@ zabbix_export:
                 - '$.data.process[''availability manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -157,9 +160,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -167,6 +167,10 @@ zabbix_export:
                 - '$.data.process[''configuration syncer''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -183,9 +187,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -193,6 +194,10 @@ zabbix_export:
                 - $.data.process.discoverer.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -208,9 +213,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -218,6 +220,10 @@ zabbix_export:
                 - $.data.process.escalator.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -233,9 +239,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -243,6 +246,10 @@ zabbix_export:
                 - '$.data.process[''history poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -258,9 +265,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -268,6 +272,10 @@ zabbix_export:
                 - '$.data.process[''history syncer''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -283,9 +291,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -293,6 +298,10 @@ zabbix_export:
                 - $.data.process.housekeeper.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(30m)}>75'
@@ -308,9 +317,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -318,6 +324,10 @@ zabbix_export:
                 - '$.data.process[''http poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -333,9 +343,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -343,6 +350,10 @@ zabbix_export:
                 - '$.data.process[''icmp pinger''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -358,9 +369,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -368,6 +376,10 @@ zabbix_export:
                 - '$.data.process[''ipmi manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -383,9 +395,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -393,6 +402,10 @@ zabbix_export:
                 - '$.data.process[''ipmi poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -408,9 +421,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -418,6 +428,10 @@ zabbix_export:
                 - '$.data.process[''java poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -433,9 +447,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -443,6 +454,10 @@ zabbix_export:
                 - '$.data.process[''lld manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -458,9 +473,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -468,6 +480,10 @@ zabbix_export:
                 - '$.data.process[''lld worker''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -483,9 +499,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -493,6 +506,10 @@ zabbix_export:
                 - $.data.process.poller.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -508,9 +525,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -518,6 +532,10 @@ zabbix_export:
                 - '$.data.process[''preprocessing manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -533,9 +551,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -543,6 +558,10 @@ zabbix_export:
                 - '$.data.process[''preprocessing worker''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -558,9 +577,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -568,6 +584,10 @@ zabbix_export:
                 - '$.data.process[''proxy poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -583,9 +603,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -593,6 +610,10 @@ zabbix_export:
                 - '$.data.process[''self-monitoring''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -608,9 +629,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -618,6 +636,10 @@ zabbix_export:
                 - '$.data.process[''snmp trapper''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -633,9 +655,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -643,6 +662,10 @@ zabbix_export:
                 - '$.data.process[''task manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -658,9 +681,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -668,6 +688,10 @@ zabbix_export:
                 - $.data.process.timer.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -683,9 +707,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -693,6 +714,10 @@ zabbix_export:
                 - $.data.process.trapper.busy.avg
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -708,9 +733,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -718,6 +740,10 @@ zabbix_export:
                 - '$.data.process[''unreachable poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -733,9 +759,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -743,6 +766,10 @@ zabbix_export:
                 - '$.data.process[''vmware collector''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -758,9 +785,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -768,6 +792,10 @@ zabbix_export:
                 - $.data.rcache.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -782,9 +810,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -792,6 +817,10 @@ zabbix_export:
                 - $.data.tcache.pitems
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Trend function cache, % misses'
           type: DEPENDENT
@@ -800,9 +829,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -810,6 +836,10 @@ zabbix_export:
                 - $.data.tcache.pmisses
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Value cache, % used'
           type: DEPENDENT
@@ -818,9 +848,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -828,6 +855,10 @@ zabbix_export:
                 - $.data.vcache.buffer.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>95'
@@ -842,9 +873,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -856,6 +884,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Value cache misses'
           type: DEPENDENT
@@ -864,9 +896,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -878,15 +907,16 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Value cache operating mode'
           type: DEPENDENT
           key: vcache.cache.mode
           delay: '0'
           history: 1w
-          applications:
-            -
-              name: 'Zabbix server'
           valuemap:
             name: 'Value cache operating mode'
           preprocessing:
@@ -896,6 +926,10 @@ zabbix_export:
                 - $.data.vcache.cache.mode
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{last()}=1'
@@ -910,9 +944,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of Zabbix server.'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -924,6 +955,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -939,9 +974,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -949,6 +981,10 @@ zabbix_export:
                 - $.data.vmware.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -963,9 +999,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -973,6 +1006,10 @@ zabbix_export:
                 - $.data.wcache.history.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -987,9 +1024,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -997,6 +1031,10 @@ zabbix_export:
                 - $.data.wcache.index.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -1011,9 +1049,6 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1021,6 +1056,10 @@ zabbix_export:
                 - $.data.wcache.trend.pused
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -1034,9 +1073,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1048,6 +1084,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed numeric (float) values per second'
           type: DEPENDENT
@@ -1055,9 +1095,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1069,6 +1106,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed log values per second'
           type: DEPENDENT
@@ -1076,9 +1117,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1090,6 +1128,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed not supported values per second'
           type: DEPENDENT
@@ -1097,9 +1139,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1111,6 +1150,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed character values per second'
           type: DEPENDENT
@@ -1118,9 +1161,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1132,6 +1172,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed text values per second'
           type: DEPENDENT
@@ -1139,9 +1183,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1153,6 +1194,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Number of processed numeric (unsigned) values per second'
           type: DEPENDENT
@@ -1160,9 +1205,6 @@ zabbix_export:
           delay: '0'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
@@ -1174,20 +1216,25 @@ zabbix_export:
                 - ''
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Zabbix stats queue over $5'
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue,10m]'
           delay: 10m
           history: 1w
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.queue
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
           triggers:
             -
               expression: '{min(10m)}>100'
@@ -1199,14 +1246,15 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
           history: 1w
-          applications:
-            -
-              name: 'Zabbix server'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.queue
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
         -
           name: 'Zabbix stats'
           type: INTERNAL
@@ -1215,9 +1263,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Zabbix server statistics master item.'
-          applications:
+          tags:
             -
-              name: 'Zabbix server'
+              tag: Application
+              value: 'Zabbix server'
       macros:
         -
           macro: '{$ADDRESS}'
@@ -1226,104 +1275,106 @@ zabbix_export:
       dashboards:
         -
           name: 'Zabbix server health'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '6'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix server performance'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix server performance'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix data gathering process busy %'
+                        host: 'Remote Zabbix server'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '6'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix internal process busy %'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix data gathering process busy %'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              'y': '6'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '6'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix cache usage, % free'
+                        host: 'Remote Zabbix server'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '11'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Value cache effectiveness'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix internal process busy %'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '6'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix cache usage, % free'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              'y': '11'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Value cache effectiveness'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '11'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix internal queues'
-                    host: 'Remote Zabbix server'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '11'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix internal queues'
+                        host: 'Remote Zabbix server'
       valuemaps:
         -
           name: 'Value cache operating mode'
