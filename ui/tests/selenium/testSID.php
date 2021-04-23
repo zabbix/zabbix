@@ -438,23 +438,6 @@ class testSID extends CWebTest {
 					'iframe_sandboxing_exceptions=&socket_timeout=4s&connect_timeout=3s&media_type_test_timeout=65s&'.
 					'script_timeout=60s&item_test_timeout=60s&update=Update']],
 
-			// Application creation.
-			[['link' => 'zabbix.php?action=application.create&applicationid=0&hostid=50013&form_refresh=1&hostid=50013&'.
-					'name=1111&add=Add']],
-
-			// Application delete.
-			[['link' => 'zabbix.php?action=application.delete&applicationids%5B0%5D=99014']],
-
-			// Application disable.
-			[['link' => 'zabbix.php?form_refresh=1&applicationids%5B99013%5D=99013&action=application.disable']],
-
-			// Application enable.
-			[['link' => 'zabbix.php?form_refresh=1&applicationids%5B99013%5D=99013&action=application.enable']],
-
-			// Application update.
-			[['link' => 'zabbix.php?action=application.update&applicationid=99014&hostid=50013&form_refresh=1&'.
-					'hostid=50013&name=111111&update=Update']],
-
 			// Discovery create.
 			[['link' => 'zabbix.php?form_refresh=1&name=11111&proxy_hostid=0&iprange=192.168.0.1-254&delay=1h&'.
 					'dchecks%5Bnew1%5D%5Btype%5D=3&dchecks%5Bnew1%5D%5Bports%5D=21&dchecks%5Bnew1%5D%5B'.
@@ -734,24 +717,6 @@ class testSID extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'hosts.php?form=update&hostid=10084'
-				]
-			],
-
-			// Application update.
-			[
-				[
-					'db' => 'SELECT * FROM applications',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=application.edit&applicationid=99010&hostid=50011'
-				]
-			],
-
-			// Application creation.
-			[
-				[
-					'db' => 'SELECT * FROM applications',
-					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=application.edit&hostid=50011'
 				]
 			],
 
