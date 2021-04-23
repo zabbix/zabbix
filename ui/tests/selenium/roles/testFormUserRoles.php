@@ -402,70 +402,14 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// Trailing space in name.
+			// Trailing, leading space in name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'space' => true,
 					'fields' => [
-						'Name' => 'user_trailing ',
+						'Name' => ' user_leading_trailing ',
 						'User type' => 'User'
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'space' => true,
-					'fields' => [
-						'Name' => 'admin_trailing ',
-						'User type' => 'Admin'
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'space' => true,
-					'fields' => [
-						'Name' => 'super_admin_trailing ',
-						'User type' => 'Super admin'
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			// Leading space in name.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'space' => true,
-					'fields' => [
-						'Name' => ' user_leading',
-						'User type' => 'User'
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'space' => true,
-					'fields' => [
-						'Name' => ' admin_leading',
-						'User type' => 'Admin'
-					],
-					'message_header' => 'User role created'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'space' => true,
-					'fields' => [
-						'Name' => ' super_admin_leading',
-						'User type' => 'Super admin'
 					],
 					'message_header' => 'User role created'
 				]
