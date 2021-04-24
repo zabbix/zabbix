@@ -1719,13 +1719,13 @@ class CExpressionParserTest extends TestCase {
 			['length(last(/host/key,1m:now-1h)) > 0', null, CParser::PARSE_SUCCESS],
 
 			// logeventid (item, <pattern>)
-			['logeventid(/host/key,"^error") > 0', null, CParser::PARSE_SUCCESS],
+			['logeventid(/host/key,,"^error") > 0', null, CParser::PARSE_SUCCESS],
 
 			// logseverity (item)
 			['logseverity(/host/key) > 0', null, CParser::PARSE_SUCCESS],
 
 			// logsource (item, <pattern>)
-			['logsource(/host/item,"^system$") > 0', null, CParser::PARSE_SUCCESS],
+			['logsource(/host/item,,"^system$") > 0', null, CParser::PARSE_SUCCESS],
 
 			// nodata (item, period)
 			['nodata(/host/item,60s) > 0', null, CParser::PARSE_SUCCESS],
@@ -2159,6 +2159,8 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key)="\n"', null, CParser::PARSE_SUCCESS_CONT],
 			['"abc"="abc"and"abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['"abc"="abc" and abc"', null, CParser::PARSE_SUCCESS_CONT],
+			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_FAIL],
+			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro' => ['{HOST.HOST}']]],
 
 			['last(/host1/agent.ping) = 1 or last(/host2/agent.ping) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
 			['last(/host1/agent.version) = "5.0.0" or last(/host2/agent.ping) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true]]

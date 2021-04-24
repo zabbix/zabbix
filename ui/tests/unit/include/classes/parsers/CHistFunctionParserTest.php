@@ -50,6 +50,27 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key']
 			],
 			[
+				'last(/{HOST.HOST}/key)', 0, ['host_macro' => ['{HOST.HOST}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/{HOST.HOST}/key)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/{HOST.HOST}/key',
+							'length' => 16,
+							'data' => [
+								'host' => '{HOST.HOST}',
+								'item' => 'key'
+							]
+						]
+					]
+				],
+				['/{HOST.HOST}/key']
+			],
+			[
 				'{$A} = 5 or last(/host/key)', 12, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -453,6 +474,16 @@ class CHistFunctionParserTest extends TestCase {
 					]
 				],
 				['/host/key', '#25', 'abc' , '"def"', '1', '1.125', '-1e12', '{$M}', '{$M: context}', '{#M}', '{{#M}.regsub()}', '', '', '']
+			],
+			[
+				'last(/{HOST.HOST}/key)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
 			],
 			[
 				'last(', 0, [],

@@ -69,13 +69,6 @@ class CExpressionParser extends CParser {
 	private $result;
 
 	/**
-	 * Parser for the {HOST.HOST} macro.
-	 *
-	 * @var CSetParser
-	 */
-	private $host_macro_parser;
-
-	/**
 	 * Chars that should be treated as spaces.
 	 */
 	public const WHITESPACES = " \r\n\t";
@@ -92,10 +85,6 @@ class CExpressionParser extends CParser {
 
 		if ($this->options['collapsed_expression'] && $this->options['host_macro']) {
 			exit('Incompatible options.');
-		}
-
-		if ($this->options['host_macro']) {
-			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
 		}
 	}
 
@@ -603,7 +592,8 @@ class CExpressionParser extends CParser {
 	private static function parseHistFunction(string $source, int &$pos, array &$tokens, array $options): bool {
 		$hist_function_parser = new CHistFunctionParser([
 			'usermacros' => true,
-			'lldmacros' => $options['lldmacros']
+			'lldmacros' => $options['lldmacros'],
+			'host_macro' => $options['host_macro']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {

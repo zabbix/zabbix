@@ -40,12 +40,14 @@ class CHistFunctionParser extends CParser {
 	 * Supported options:
 	 *   'usermacros' => false  Enable user macros usage in function parameters.
 	 *   'lldmacros' => false   Enable low-level discovery macros usage in function parameters.
+	 *   'host_macro'           Array of macros supported as host name part in the query.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'host_macro' => []
 	];
 
 	private $query_parser;
@@ -75,7 +77,9 @@ class CHistFunctionParser extends CParser {
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		$this->query_parser = new CQueryParser();
+		$this->query_parser = new CQueryParser([
+			'host_macro' => $this->options['host_macro']
+		]);
 		$this->period_parser = new CPeriodParser([
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']

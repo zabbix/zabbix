@@ -39,6 +39,27 @@ class CQueryParser extends CParser {
 	private $host_name_parser;
 
 	/**
+	 * Parser for the {HOST.HOST} macro.
+	 *
+	 * @var CSetParser
+	 */
+	private $host_macro_parser;
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'calculated' => false  Parse calculated item formula instead of trigger expression.
+	 *   'host_macro'           Array of macros supported as host name part in the query.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'calculated' => false,
+		'host_macro' => []
+	];
+
+	/**
 	 * Parsed data.
 	 *
 	 * @var CQueryParserResult
@@ -49,7 +70,9 @@ class CQueryParser extends CParser {
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		if (array_key_exists('calculated', $options) && $options['calculated']) {
+		$this->options = $options + $this->options;
+
+		if ($this->options['calculated']) {
 			$this->item_key_parser = new CItemKey(['with_filter' => true, 'allow_wildcard' => true]);
 			$this->host_name_parser = new CHostNameParser([
 				'allow_host_all' => true,
@@ -59,6 +82,10 @@ class CQueryParser extends CParser {
 		else {
 			$this->item_key_parser = new CItemKey();
 			$this->host_name_parser = new CHostNameParser();
+		}
+
+		if ($this->options['host_macro']) {
+			$this->host_macro_parser = new CMacroParser(['macros' => $this->options['host_macro']]);
 		}
 	}
 
@@ -82,7 +109,15 @@ class CQueryParser extends CParser {
 		}
 		$pos++;
 
-		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
+		if ($this->options['host_macro'] && $this->host_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->host_macro_parser->getLength();
+			$host = $this->host_macro_parser->getMatch();
+		}
+		elseif ($this->host_name_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->host_name_parser->getLength();
+			$host = $this->host_name_parser->getMatch();
+		}
+		else {
 			$error = $this->host_name_parser->getErrorDetails();
 
 			if ($error) {
@@ -91,7 +126,6 @@ class CQueryParser extends CParser {
 
 			return CParser::PARSE_FAIL;
 		}
-		$pos += $this->host_name_parser->getLength();
 
 		if (!isset($source[$pos]) || $source[$pos] !== '/') {
 			$this->errorPos($source, $pos);
@@ -110,7 +144,7 @@ class CQueryParser extends CParser {
 
 		$this->length = $pos - $start_pos;
 		$this->result->match = substr($source, $start_pos, $this->length);
-		$this->result->host = $this->host_name_parser->getMatch();
+		$this->result->host = $host;
 		$this->result->item = $this->item_key_parser->getMatch();
 		$this->result->length = $this->length;
 		$this->result->pos = $start_pos;
