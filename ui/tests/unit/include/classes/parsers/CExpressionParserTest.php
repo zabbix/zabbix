@@ -2364,6 +2364,7 @@ class CExpressionParserTest extends TestCase {
 							'match' => 'math()',
 							'length' => 6,
 							'data' => [
+								'function' => 'math',
 								'parameters' => []
 							]
 						],
@@ -2379,6 +2380,7 @@ class CExpressionParserTest extends TestCase {
 							'match' => 'min( last(/host/key), {$MACRO}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 )',
 							'length' => 86,
 							'data' => [
+								'function' => 'min',
 								'parameters' => [
 									[
 										'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,
@@ -2475,6 +2477,7 @@ class CExpressionParserTest extends TestCase {
 													'match' => 'min(min(/host/key, 1d:now/d), 125)',
 													'length' => 34,
 													'data' => [
+														'function' => 'min',
 														'parameters' => [
 															[
 																'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,
@@ -2599,6 +2602,7 @@ class CExpressionParserTest extends TestCase {
 							'match' => 'min({52736}, {52737}, 5M + {$MACRO})',
 							'length' => 36,
 							'data' => [
+								'function' => 'min',
 								'parameters' => [
 									[
 										'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,

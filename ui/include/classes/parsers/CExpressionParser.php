@@ -77,10 +77,8 @@ class CExpressionParser extends CParser {
 
 	/**
 	 * Chars that should be treated as spaces.
-	 *
-	 * @var array
 	 */
-	private const WHITESPACES = " \r\n\t";
+	public const WHITESPACES = " \r\n\t";
 
 	/**
 	 * @param array $options
@@ -723,6 +721,7 @@ class CExpressionParser extends CParser {
 			'match' => substr($source, $pos, $len),
 			'length' => $len,
 			'data' => [
+				'function' => $matches[1],
 				'parameters' => $_tokens
 			]
 		];

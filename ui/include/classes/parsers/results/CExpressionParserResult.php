@@ -76,6 +76,10 @@ class CExpressionParserResult extends CParserResult {
 		$result = [];
 
 		foreach ($tokens as $token) {
+			if (in_array($token['type'], $types)) {
+				$result[] = $token;
+			}
+
 			if ($token['type'] == CExpressionParserResult::TOKEN_TYPE_EXPRESSION) {
 				$result = array_merge($result, self::_getTokensOfTypes($token['data']['tokens'], $types));
 			}
@@ -84,16 +88,13 @@ class CExpressionParserResult extends CParserResult {
 					$result = array_merge($result, self::_getTokensOfTypes($parameter['data']['tokens'], $types));
 				}
 			}
-			elseif (in_array($token['type'], $types)) {
-				$result[] = $token;
-			}
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Returns all tokens of the given types.
+	 * Returns all tokens include nested of the given types.
 	 *
 	 * @param array  $tokens
 	 * @param array  $types
