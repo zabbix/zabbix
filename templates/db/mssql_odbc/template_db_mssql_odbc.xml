@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-22T12:28:45Z</date>
+   <date>2021-04-24T19:42:07Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -13,13 +13,13 @@
          <name>Template DB MSSQL by ODBC</name>
          <description>1. Create an MSSQL user for monitoring.&#13;
   View Server State and View Any Definition permissions should be granted to the user.&#13;
-  Please, also add to the user read permission of tables sysjobschedules, sysjobhistory, sysjobs.&#13;
-  For more information please see the MSSQL documentation.&#13;
+  Grant this user read permissions to the sysjobschedules, sysjobhistory, sysjobs tables.  &#13;
+  For more information, see MSSQL documentation.&#13;
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).&#13;
-  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.&#13;
+  Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy.&#13;
   See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.&#13;
   Note! Credentials in the odbc.ini do not work for MSSQL.&#13;
-3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name, please.&#13;
+3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name.&#13;
 The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.&#13;
 &#13;
 &#13;
@@ -70,7 +70,7 @@ LEFT JOIN ( SELECT job.job_id,
 WHERE Enabled = 1</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <description>The item get sql agent job status.</description>
+               <description>The item gets sql agent job status.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -167,7 +167,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of auto-parameterization attempts per second. Total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters so that reuse of the resulting cached execution plan across multiple similar-looking requests is possible. Note that auto-parameterizations are also known as simple parameterizations in newer versions of SQL Server. This counter does not include forced parameterizations.</description>
+               <description>Number of auto-parameterization attempts per second. The total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters to me reuse of the resulting cached execution plan across multiple similar-looking requests possible. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This counter does not include forced parameterizations.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -365,7 +365,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high. Generally, you can increase the buffer cache hit ratio by increasing the amount of memory available to SQL Server or by using the buffer pool extension feature.</description>
+               <description>Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio changes very little. Since reading from the cache is much less expensive than reading from the disk, a higher value is preffered for this item. To increase the buffer cache hit ratio, consider increasing the amount of memory available to SQL Server or using the buffer pool extension feature.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -503,7 +503,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.</description>
+               <description>Indicates the number of pages flushed to disk per second by a checkpoint or other operation which required all dirty pages to be flushed.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -531,7 +531,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <units>B</units>
-               <description>Total size of all the data files.</description>
+               <description>Total size of all data files.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -610,7 +610,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of failed auto-parameterization attempts per second. This should be small. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server.</description>
+               <description>Number of failed auto-parameterization attempts per second. This numer should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -703,7 +703,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that we are having table / Index page scans. If we see high CPU then we need to investigate this counter, otherwise if the full scans are on small tables we can ignore this counter.</description>
+               <description>Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that there are table / Index page scans. If that is combined with high CPU, this counter requires further investigation, otherwise, if the full scans are on small tables, it can be ignored.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -933,7 +933,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{min(5m)}&gt;{$MSSQL.LOCK_REQUESTS.MAX}</expression>
                      <name>MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The number of new locks and lock conversions per second requested from the lock manager is high.</description>
+                     <description>Number of new locks and lock conversions per second requested from the lock manager is high.</description>
                   </trigger>
                </triggers>
             </item>
@@ -946,7 +946,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
-               <description>Number of lock requests per second that timed out, including requests for NOWAIT locks.</description>
+               <description>Number of timed out lock requests per second, including requests for NOWAIT locks.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -970,7 +970,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{min(5m)}&gt;{$MSSQL.LOCK_TIMEOUTS.MAX}</expression>
                      <name>MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The total number of lock requests per second that timed out, including requests for NOWAIT locks is high.</description>
+                     <description>The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1464,7 +1464,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <units>%</units>
                <params>last(mssql.sql_compilations_sec.rate) * 100 /
 (last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))</params>
-               <description>The ratio of SQL compilations per second to Batch requests per second in percent.</description>
+               <description>The ratio of SQL compilations per second to Batch requests per second in percentage.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1490,7 +1490,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <units>%</units>
                <params>last(mssql.sql_recompilations_sec.rate) * 100 /
 (last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))</params>
-               <description>The ratio of SQL re-compilations per second to SQL compilations per second in percent.</description>
+               <description>The ratio of SQL re-compilations per second to SQL compilations per second in percentage.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1501,7 +1501,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{min(15m)} &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
                      <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m</name>
                      <priority>WARNING</priority>
-                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
+                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1564,7 +1564,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server. This does not include forced parameterizations.</description>
+               <description>Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This does not include forced parameterizations.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1699,7 +1699,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>7d</history>
                <status>ENABLED</status>
-               <description>The optimum number of pages in the buffer pool.</description>
+               <description>The optimal number of pages in the buffer pool.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -2022,7 +2022,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of work files created per second. For example, work files could be used to store temporary results for hash joins and hash aggregates.</description>
+               <description>Number of work files created per second. For example, work files can be used to store temporary results for hash joins and hash aggregates.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -2044,7 +2044,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MSSQL.WORK_FILES.MAX}</expression>
-                     <name>MSSQL: Number work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)</name>
+                     <name>MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>Too many work files created per second to store temporary results for hash joins and hash aggregates.</description>
                   </trigger>
@@ -2058,7 +2058,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of work tables created per second. For example, work tables could be used to store temporary results for query spool, lob variables, XML variables, and cursors.</description>
+               <description>Number of work tables created per second. For example, work tables can be used to store temporary results for query spool, lob variables, XML variables, and cursors.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -2080,7 +2080,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MSSQL.WORK_TABLES.MAX}</expression>
-                     <name>MSSQL: Number work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)</name>
+                     <name>MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.</description>
                   </trigger>
@@ -2115,7 +2115,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{max(5m)}&lt;{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}</expression>
                      <name>MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)</name>
                      <priority>HIGH</priority>
-                     <description>A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or may indicate, on 32-bit systems, the need for an upgrade to a 64-bit system</description>
+                     <description>A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system</description>
                   </trigger>
                </triggers>
             </item>
@@ -2126,7 +2126,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>30s</delay>
                <history>7d</history>
                <status>ENABLED</status>
-               <description>Test the availability of MS SQL Server on TCP port.</description>
+               <description>Test the availability of MS SQL Server on a TCP port.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -2161,7 +2161,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
 FROM sys.availability_groups</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <description>Discovery the existed availability groups.</description>
+               <description>Discovery of the existing availability groups.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MSSQL AG '{#GROUP_NAME}': Get replica states</name>
@@ -2305,9 +2305,9 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <history>7d</history>
                      <status>ENABLED</status>
                      <description>Reflects a rollup of the synchronization_health of all availability replicas in the availability group:&#13;
-0: Not healthy. None of the availability replicas have a healthy.&#13;
-1: Partially healthy. The synchronization health of some, but not all, availability replicas is healthy.&#13;
-2: Healthy. The synchronization health of every availability replica is healthy.</description>
+0: Not healthy. None of the availability replicas have a healthy synchronization.&#13;
+1: Partially healthy. The synchronization of some, but not all, availability replicas is healthy.&#13;
+2: Healthy. The synchronization of every availability replica is healthy.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Availability Group '{#GROUP_NAME}'</name>
@@ -2334,7 +2334,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                            <expression>{last()}=0</expression>
                            <name>MSSQL AG '{#GROUP_NAME}': All replicas unhealthy</name>
                            <priority>DISASTER</priority>
-                           <description>None of the availability replicas have a healthy.</description>
+                           <description>None of the availability replicas have a healthy synchronization.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
@@ -2388,7 +2388,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The last exec differential backup duration.</description>
+                     <description>Duration of the last differential backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2414,7 +2414,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The time amount since the last exec differential backup.</description>
+                     <description>The amount of time since the last differential backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2437,7 +2437,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
-                           <description>The differential backup did not exec a long time.</description>
+                           <description>The differential backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
@@ -2445,7 +2445,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
-                           <description>The differential backup did not exec a long time.</description>
+                           <description>The differential backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                            <dependencies>
                               <dependency>
@@ -2464,7 +2464,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The last exec full backup duration.</description>
+                     <description>Duration of the last full backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2490,7 +2490,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The time amount since the last exec full backup.</description>
+                     <description>The amount of time since the last full backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2513,7 +2513,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
-                           <description>The full backup did not exec a long time.</description>
+                           <description>The full backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
@@ -2521,7 +2521,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
-                           <description>The full backup did not exec a long time.</description>
+                           <description>The full backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                            <dependencies>
                               <dependency>
@@ -2540,7 +2540,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The last exec duration of the log backup.</description>
+                     <description>Duration of the last log backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2566,7 +2566,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The time amount since the last exec the log backup.</description>
+                     <description>The amount of time since the last log backup.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2589,7 +2589,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
-                           <description>The log backup did not exec a long time.</description>
+                           <description>The log backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
@@ -2597,7 +2597,7 @@ FROM sys.databases</params>
                            <name>MSSQL DB '{#DBNAME}': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}</name>
                            <opdata>Time since last backup: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
-                           <description>The log backup did not exec a long time.</description>
+                           <description>The log backup has not been executed for a long time.</description>
                            <manual_close>YES</manual_close>
                            <dependencies>
                               <dependency>
@@ -2724,7 +2724,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>B</units>
-                     <description>The cumulative used size of all the log files in the database.</description>
+                     <description>Cumulative used size of all the log files in the database.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -2898,7 +2898,7 @@ FROM sys.databases</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <description>The number of times the transaction log has been shrunk.</description>
+                     <description>Number of times the transaction log has been shrunk.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Database '{#DBNAME}'</name>
@@ -3216,7 +3216,7 @@ FROM sys.databases</params>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>s</units>
-                     <description>The last run job duration.</description>
+                     <description>Duration of the last run job.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Job '{#JOBNAME}'</name>
@@ -3239,7 +3239,7 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}</expression>
-                           <name>MSSQL Job '{#JOBNAME}': Job duration greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}</name>
+                           <name>MSSQL Job '{#JOBNAME}': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}</name>
                            <opdata>Job duration: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>The job is taking too long.</description>
@@ -3287,7 +3287,7 @@ FROM sys.databases</params>
                            <expression>{last()}=0</expression>
                            <name>MSSQL Job '{#JOBNAME}': Failed to run</name>
                            <priority>WARNING</priority>
-                           <description>The last run of the job is failed.</description>
+                           <description>The last run of the job has failed.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -3621,7 +3621,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
 3 = Pending Failover&#13;
 4 = Synchronized&#13;
 5 = The partners are not synchronized. Failover is not possible now.&#13;
-6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.</description>
+6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for the failover, see Database Mirroring Operating Modes.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Mirroring '{#DBNAME}'</name>
@@ -3786,7 +3786,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <history>7d</history>
                      <status>ENABLED</status>
                      <units>B</units>
-                     <description>Amount of log records of the primary database that has not been sent to the secondary databases.</description>
+                     <description>Amount of the log records of the primary database that has not been sent to the secondary databases.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL Available Group '{#GROUP_NAME}' Non-Local DB '{#DBNAME}'</name>
@@ -3814,7 +3814,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                            <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
                            <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Log queue size is growing</name>
                            <priority>HIGH</priority>
-                           <description>The log records of the primary database do not send to the secondary databases.</description>
+                           <description>The log records of the primary database are not sent to the secondary databases.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -4147,7 +4147,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <description>Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state the databases on the replica:&#13;
+                     <description>Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state of the databases on the replica:&#13;
 0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.&#13;
 1 : Partially healthy. Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.&#13;
 2 : Healthy. All replicas are in the target synchronization state: synchronous-commit replicas are synchronized, and asynchronous-commit replicas are synchronizing.</description>
@@ -4210,67 +4210,67 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <macro>
                <macro>{$MSSQL.AVERAGE_WAIT_TIME.MAX}</macro>
                <value>500</value>
-               <description>The maximum average wait time in ms for trigger expression.</description>
+               <description>The maximum average wait time in ms - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_DIFF.CRIT}</macro>
                <value>6d</value>
-               <description>The maximum days without a differential backup for high trigger expression.</description>
+               <description>The maximum days without a differential backup - for the High trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_DIFF.WARN}</macro>
                <value>3d</value>
-               <description>The maximum days without a differential backup for warning trigger expression.</description>
+               <description>The maximum days without a differential backup - for the Warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_DURATION.WARN}</macro>
                <value>1h</value>
-               <description>The maximum job duration for warning trigger expression.</description>
+               <description>The maximum job duration - for the Warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_FULL.CRIT}</macro>
                <value>10d</value>
-               <description>The maximum days without a full backup for high trigger expression.</description>
+               <description>The maximum days without a full backup - for the High trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_FULL.WARN}</macro>
                <value>9d</value>
-               <description>The maximum days without a full backup for warning trigger expression.</description>
+               <description>The maximum days without a full backup - for the Warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_LOG.CRIT}</macro>
                <value>8h</value>
-               <description>The maximum days without a log backup for high trigger expression.</description>
+               <description>The maximum days without a log backup - for the High trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_LOG.WARN}</macro>
                <value>4h</value>
-               <description>The maximum days without a log backup for warning trigger expression.</description>
+               <description>The maximum days without a log backup - for the Warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</macro>
                <value>30</value>
-               <description>The minimum % buffer cache hit ratio for high trigger expression.</description>
+               <description>The minimum % buffer cache hit ratio - for the High trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}</macro>
                <value>50</value>
-               <description>The minimum % buffer cache hit ratio for warning trigger expression.</description>
+               <description>The minimum % buffer cache hit ratio - for the Warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.DBNAME.MATCHES}</macro>
                <value>.*</value>
-               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in database discovery. It can be overridden on a host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.DBNAME.NOT_MATCHES}</macro>
                <value>master|tempdb|model|msdb</value>
-               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in database discovery. It can be overridden on a host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.DEADLOCKS.MAX}</macro>
                <value>1</value>
-               <description>The maximum deadlocks per second for trigger expression.</description>
+               <description>The maximum deadlocks per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.DSN}</macro>
@@ -4280,62 +4280,62 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <macro>
                <macro>{$MSSQL.FREE_LIST_STALLS.MAX}</macro>
                <value>2</value>
-               <description>The maximum free list stalls per second for trigger expression.</description>
+               <description>The maximum free list stalls per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.INSTANCE}</macro>
                <value>SQLServer</value>
-               <description>The instance name for the default instance is SQLServer. For named instance set macro value as MSSQL$instance name.</description>
+               <description>The instance name for the default instance is SQLServer. For named instance set the macro value as MSSQL$instance name.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.JOB.MATCHES}</macro>
                <value>.*</value>
-               <description>This macro is used in job discovery. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in job discovery. It can be overridden on a host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.JOB.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in job discovery. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in job discovery. It can be overridden on a host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LAZY_WRITES.MAX}</macro>
                <value>20</value>
-               <description>The maximum lazy writes per second for trigger expression.</description>
+               <description>The maximum lazy writes per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LOCK_REQUESTS.MAX}</macro>
                <value>1000</value>
-               <description>The maximum lock requests per second for trigger expression.</description>
+               <description>The maximum lock requests per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LOCK_TIMEOUTS.MAX}</macro>
                <value>1</value>
-               <description>The maximum lock timeouts per second for trigger expression.</description>
+               <description>The maximum lock timeouts per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX}</macro>
                <value>1</value>
-               <description>The maximum log flush wait time in ms for trigger expression.</description>
+               <description>The maximum log flush wait time in ms - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LOG_FLUSH_WAITS.MAX}</macro>
                <value>1</value>
-               <description>The maximum log flush waits per second for trigger expression.</description>
+               <description>The maximum log flush waits per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>
                <value>300</value>
-               <description>The minimum page life expectancy for trigger expression.</description>
+               <description>The minimum page life expectancy - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_READS.MAX}</macro>
                <value>90</value>
-               <description>The maximum page reads per second for trigger expression.</description>
+               <description>The maximum page reads per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_WRITES.MAX}</macro>
                <value>90</value>
-               <description>The maximum page writes per second for trigger expression.</description>
+               <description>The maximum page writes per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PASSWORD}</macro>
@@ -4345,22 +4345,22 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <macro>
                <macro>{$MSSQL.PERCENT_COMPILATIONS.MAX}</macro>
                <value>10</value>
-               <description>The maximum percent of Transact-SQL compilations for trigger expression.</description>
+               <description>The maximum percentage of Transact-SQL compilations - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PERCENT_LOG_USED.MAX}</macro>
                <value>80</value>
-               <description>The maximum percent log used for trigger expression.</description>
+               <description>The maximum percentage of log used - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PERCENT_READAHEAD.MAX}</macro>
                <value>20</value>
-               <description>The maximum percent of pages read/sec in anticipation of use for trigger expression.</description>
+               <description>The maximum percentage of pages read/sec in anticipation of use - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PERCENT_RECOMPILATIONS.MAX}</macro>
                <value>10</value>
-               <description>The maximum percent of Transact-SQL recompilations for trigger expression.</description>
+               <description>The maximum percentage of Transact-SQL recompilations - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PORT}</macro>
@@ -4375,17 +4375,17 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <macro>
                <macro>{$MSSQL.WORK_FILES.MAX}</macro>
                <value>20</value>
-               <description>The maximum number of work files created per second for trigger expression.</description>
+               <description>The maximum number of work files created per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.WORK_TABLES.MAX}</macro>
                <value>20</value>
-               <description>The maximum number of work tables created per second for trigger expression.</description>
+               <description>The maximum number of work tables created per second - for the trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}</macro>
                <value>90</value>
-               <description>The minimum % worktables from cache ratio for high trigger expression.</description>
+               <description>The minimum percentage of the worktables from cache ratio - for the High trigger expression.</description>
             </macro>
          </macros>
       </template>
@@ -4401,7 +4401,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
          <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
          <name>MSSQL: Too many physical reads occurring</name>
          <priority>WARNING</priority>
-         <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>
+         <description>If this value makes up even a sizeable minority of the total Page Reads/sec (say, greater than 20% of the total page reads), you may have too many physical reads occurring.</description>
       </trigger>
    </triggers>
    <graphs>
