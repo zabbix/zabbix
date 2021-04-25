@@ -102,9 +102,7 @@ class GetExpressionTreeTest extends TestCase {
 	 * @param $expected_parsed
 	 */
 	public function test($expression, $expected_parsed) {
-		if ($this->expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
-			$this->fail('CTriggerExpression parse error');
-		}
+		$this->assertSame(CParser::PARSE_SUCCESS, $this->expression_parser->parse($expression));
 
 		$result = getExpressionTree($this->expression_parser, 0, $this->expression_parser->getLength() - 1);
 
