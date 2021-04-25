@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-24T19:42:07Z</date>
+   <date>2021-04-24T21:00:17Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -365,7 +365,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio changes very little. Since reading from the cache is much less expensive than reading from the disk, a higher value is preffered for this item. To increase the buffer cache hit ratio, consider increasing the amount of memory available to SQL Server or using the buffer pool extension feature.</description>
+               <description>Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio changes very little. Since reading from the cache is much less expensive than reading from the disk, a higher value is preferred for this item. To increase the buffer cache hit ratio, consider increasing the amount of memory available to SQL Server or using the buffer pool extension feature.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -610,7 +610,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <history>7d</history>
                <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <description>Number of failed auto-parameterization attempts per second. This numer should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.</description>
+               <description>Number of failed auto-parameterization attempts per second. This number should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
