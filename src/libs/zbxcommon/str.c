@@ -2095,7 +2095,7 @@ size_t	zbx_strlen_utf8(const char *text)
 	return n;
 }
 
-char	*zbx_strshift_utf8(char *text, int num)
+char	*zbx_strshift_utf8(char *text, size_t num)
 {
 	while ('\0' != *text && 0 < num)
 	{

@@ -42,7 +42,7 @@ typedef enum
 {
 	FUNCTION_OPTYPE_TRIM_ALL = 0,
 	FUNCTION_OPTYPE_TRIM_LEFT,
-	FUNCTION_OPTYPE_TRIM_RIGHT,
+	FUNCTION_OPTYPE_TRIM_RIGHT
 }
 zbx_function_trim_optype_t;
 
@@ -1444,7 +1444,7 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
 	}
 
 	p = zbx_strshift_utf8(arg->data.str, zbx_strlen_utf8(arg->data.str) - len->data.ui64);
-	sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
+	sz = zbx_strlen_utf8_nchars(p, (size_t)len->data.ui64) + 1;
 	strval = zbx_malloc(NULL, sz);
 	zbx_strlcpy_utf8(strval, p, sz);
 
@@ -1512,13 +1512,13 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 		return FAIL;
 	}
 
-	p = zbx_strshift_utf8(arg->data.str, (int)start->data.ui64 - 1);
+	p = zbx_strshift_utf8(arg->data.str, start->data.ui64 - 1);
 	sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
 	strval = zbx_malloc(NULL, sz);
 	zbx_strlcpy_utf8(strval, p, sz);
 
 	zbx_variant_set_str(&value, strval);
-	eval_function_return(token->opt, &value, output);
+	eval_function_return(3, &value, output);
 
 	return SUCCEED;
 }
@@ -1798,7 +1798,7 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 		size_t	str_alloc, str_len;
 
 		str_alloc = str_len = strlen(strval) + 1;
-		zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, p - strval, strlen(pattern->data.str),
+		zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, (size_t)(p - strval), strlen(pattern->data.str),
 				replacement->data.str, strlen(replacement->data.str));
 	}
 
@@ -2083,7 +2083,7 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
 		return FAIL;
 	}
 
-	zbx_variant_set_ui64(&value, *arg->data.str);
+	zbx_variant_set_ui64(&value, *(zbx_uint64_t*)arg->data.str);
 	eval_function_return(1, &value, output);
 
 	return SUCCEED;
