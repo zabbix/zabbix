@@ -29,7 +29,7 @@ class CTextTriggerConstructorTest extends TestCase {
 	protected $constructor;
 
 	protected function setUp(): void {
-		$this->constructor = new CTextTriggerConstructor(new CTriggerExpression());
+		$this->constructor = new CTextTriggerConstructor(new CExpressionParser(['lldmacros' => true]));
 	}
 
 	public function dataProviderGetExpressionFromPartsValid() {
@@ -39,7 +39,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","test")',
+						'value' => 'regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -50,7 +50,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","test")',
+						'value' => 'regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -61,7 +61,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a") and find($,,"regexp","b")',
+						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -72,7 +72,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a") or find($,,"regexp","b")',
+						'value' => 'regexp(a) or regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -83,11 +83,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					],
 					[
-						'value' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -98,11 +98,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -113,11 +113,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a") and find($,,"regexp","b")',
+						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					],
 					[
-						'value' => 'find($,,"regexp","c") or find($,,"regexp","d")',
+						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -128,11 +128,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"regexp","a") and find($,,"regexp","b")',
+						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find($,,"regexp","c") or find($,,"regexp","d")',
+						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -144,7 +144,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"iregexp","test")',
+						'value' => 'iregexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -155,7 +155,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'find($,,"iregexp","test")',
+						'value' => 'iregexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -166,7 +166,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '(find($,,"regexp","a"))>0',
+						'value' => '(regexp(a))>0',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -179,7 +179,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'not find($,,"regexp","test")',
+						'value' => 'not regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -190,7 +190,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'not (find($,,"regexp","test"))',
+						'value' => 'not (regexp(test))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -201,7 +201,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'not find($,,"regexp","a") and not find($,,"regexp","b")',
+						'value' => 'not regexp(a) and not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -212,7 +212,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'not find($,,"regexp","a") or not find($,,"regexp","b")',
+						'value' => 'not regexp(a) or not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -223,11 +223,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => 'not find($,,"regexp","a")',
+						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					],
 					[
-						'value' => 'not find($,,"regexp","b")',
+						'value' => 'not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -240,7 +240,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '- find($,,"regexp","test")',
+						'value' => '- regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -251,7 +251,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '- (find($,,"regexp","test"))',
+						'value' => '- (regexp(test))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				],
@@ -262,7 +262,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '- find($,,"regexp","a") and - find($,,"regexp","b")',
+						'value' => '- regexp(a) and - regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -273,7 +273,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '- find($,,"regexp","a") or - find($,,"regexp","b")',
+						'value' => '- regexp(a) or - regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -284,11 +284,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'item',
 				[
 					[
-						'value' => '- find($,,"regexp","a")',
+						'value' => '- regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					],
 					[
-						'value' => '- find($,,"regexp","b")',
+						'value' => '- regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				],
@@ -321,8 +321,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))=0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -331,8 +330,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))<>0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
 					]
 				]
@@ -341,8 +339,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'((find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -351,13 +348,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))=0 and (find(/Zabbix server/system.hostname,,"regexp","b"))=0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -366,13 +361,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))=0 or (find(/Zabbix server/system.hostname,,"regexp","b"))=0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -381,13 +374,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'((find(/Zabbix server/system.hostname,,"regexp","a"))=0 or (find(/Zabbix server/system.hostname,,"regexp","b"))=0) and (find(/Zabbix server/system.hostname,,"regexp","c"))=0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a") or find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","a") or find($,,"regexp","b")',
+						'value' => 'regexp(a) or regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","c")',
-						'value_raw' => 'find($,,"regexp","c")',
+						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -396,13 +387,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))=0 or ((find(/Zabbix server/system.hostname,,"regexp","b"))=0 and (find(/Zabbix server/system.hostname,,"regexp","c"))=0)',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","b") and find(/Zabbix server/system.hostname,,"regexp","c")',
-						'value_raw' => 'find($,,"regexp","b") and find($,,"regexp","c")',
+						'value' => 'regexp(b) and regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -411,18 +400,15 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(find(/Zabbix server/system.hostname,,"regexp","a"))=0 or (find(/Zabbix server/system.hostname,,"regexp","b"))=0 and (find(/Zabbix server/system.hostname,,"regexp","c"))=0',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","c")',
-						'value_raw' => 'find($,,"regexp","c")',
+						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -431,13 +417,11 @@ class CTextTriggerConstructorTest extends TestCase {
 				'((find(/Zabbix server/system.hostname,,"regexp","a"))=0 and (find(/Zabbix server/system.hostname,,"regexp","b"))=0) or ((find(/Zabbix server/system.hostname,,"regexp","c"))=0 or (find(/Zabbix server/system.hostname,,"regexp","d"))=0)',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a") and find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","a") and find($,,"regexp","b")',
+						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","c") or find(/Zabbix server/system.hostname,,"regexp","d")',
-						'value_raw' => 'find($,,"regexp","c") or find($,,"regexp","d")',
+						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -446,18 +430,15 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(((find(/Zabbix server/system.hostname,,"regexp","a"))=0) or ((find(/Zabbix server/system.hostname,,"regexp","b"))=0)) and ((find(/Zabbix server/system.hostname,,"regexp","c"))=0)',
 				[
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'find($,,"regexp","a")',
+						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","b")',
-						'value_raw' => 'find($,,"regexp","b")',
+						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					],
 					[
-						'value' => 'find(/Zabbix server/system.hostname,,"regexp","c")',
-						'value_raw' => 'find($,,"regexp","c")',
+						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -468,8 +449,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(not find(/Zabbix server/system.hostname,,"regexp","a"))=0',
 				[
 					[
-						'value' => 'not find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'not find($,,"regexp","a")',
+						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -478,8 +458,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(not (find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => 'not find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => 'not find($,,"regexp","a")',
+						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -488,8 +467,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'not ((find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => 'not (find(/Zabbix server/system.hostname,,"regexp","a"))',
-						'value_raw' => 'not (find($,,"regexp","a"))',
+						'value' => 'not (regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -500,8 +478,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(-find(/Zabbix server/system.hostname,,"regexp","a"))=0',
 				[
 					[
-						'value' => '-find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => '-find($,,"regexp","a")',
+						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -510,8 +487,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(-(find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => '-find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => '-find($,,"regexp","a")',
+						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -520,8 +496,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'-((find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => '-(find(/Zabbix server/system.hostname,,"regexp","a"))',
-						'value_raw' => '-(find($,,"regexp","a"))',
+						'value' => '-(regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -530,8 +505,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(- find(/Zabbix server/system.hostname,,"regexp","a"))=0',
 				[
 					[
-						'value' => '-find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => '-find($,,"regexp","a")',
+						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -540,8 +514,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'(- (find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => '-find(/Zabbix server/system.hostname,,"regexp","a")',
-						'value_raw' => '-find($,,"regexp","a")',
+						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
@@ -550,8 +523,7 @@ class CTextTriggerConstructorTest extends TestCase {
 				'- ((find(/Zabbix server/system.hostname,,"regexp","a"))=0)',
 				[
 					[
-						'value' => '-(find(/Zabbix server/system.hostname,,"regexp","a"))',
-						'value_raw' => '-(find($,,"regexp","a"))',
+						'value' => '-(regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]

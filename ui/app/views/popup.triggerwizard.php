@@ -51,10 +51,8 @@ $expressions = [];
 foreach ($data['expressions'] as $expr) {
 	$expressions[] = [
 		'expression' => $expr['value'],
-		'expression_raw' => $expr['value_raw'],
 		'type_label' => $expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH ? _('Include') : _('Exclude'),
-		'type' => $expr['type'],
-		'details' => $expr['details']
+		'type' => $expr['type']
 	];
 }
 
@@ -65,11 +63,7 @@ $ms_itemid = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
 	'multiple' => false,
-	'data' => [[
-		'id' => $options['itemid'],
-		'name' => $options['item_name'],
-		'query' => $options['query']
-	]],
+	'data' => [['id' => $options['itemid'], 'name' => $options['item_name']]],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'items',
