@@ -1196,6 +1196,13 @@ out:
   result: SUCCEED
   value: 'A'
 ---
+test case: Expression 'char(256)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'char(256)'
+out:
+  result: FAIL
+---
 test case: Expression 'ascii("A")'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
@@ -1203,6 +1210,13 @@ in:
 out:
   result: SUCCEED
   value: '65'
+---
+test case: Expression 'ascii("Ф")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'ascii("Ф")'
+out:
+  result: FAIL
 ---
 test case: Expression 'bytelength(256)'
 in:
