@@ -590,32 +590,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 					foreach ($tokens as $key => $token) {
 						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION) {
-							if (!array_key_exists($key + 2, $tokens)) {
-								break;
-							}
-
-							if ($tokens[$key + 1]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
-								$operator_token = $tokens[$key + 1];
-								$value_token = $tokens[$key + 2];
-							}
-							elseif (array_key_exists($key + 3, $tokens)
-									&& $tokens[$key + 2]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
-								$operator_token = $tokens[$key + 2];
-								$value_token = $tokens[$key + 3];
-							}
-							else {
-								break;
-							}
-
 							$fn_name = $token->function;
-							if (array_key_exists($fn_name, $this->functions)
-									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
-								$operator = $operator_token->match;
-							}
-							$value = (($value_token instanceof CTriggerExprParserResult)
-									&& array_key_exists('string', $value_token->data))
-								? $value_token->data['string']
-								: $value_token->match;
 
 							if (!in_array($fn_name, getStandaloneFunctions())
 									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
@@ -634,6 +609,29 @@ class CControllerPopupTriggerExpr extends CController {
 									error(_('Unknown host item, no such item in selected host'));
 								}
 							}
+
+							if (!array_key_exists($key + 2, $tokens)) {
+								break;
+							}
+
+							if ($tokens[$key + 1]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+								$operator_token = $tokens[$key + 1];
+								$value_token = $tokens[$key + 2];
+							}
+							elseif (array_key_exists($key + 3, $tokens)
+									&& $tokens[$key + 2]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+								$operator_token = $tokens[$key + 2];
+								$value_token = $tokens[$key + 3];
+							}
+
+							if (array_key_exists($fn_name, $this->functions)
+									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
+								$operator = $operator_token->match;
+							}
+							$value = (($value_token instanceof CTriggerExprParserResult)
+									&& array_key_exists('string', $value_token->data))
+								? $value_token->data['string']
+								: $value_token->match;
 						}
 					}
 				}
