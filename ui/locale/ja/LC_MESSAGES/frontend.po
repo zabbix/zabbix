@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-16 19:55+0300\n"
-"PO-Revision-Date: 2021-04-03 14:29+0300\n"
+"POT-Creation-Date: 2021-04-23 19:55+0300\n"
+"PO-Revision-Date: 2021-04-22 02:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1617452992.000000\n"
+"X-POOTLE-MTIME: 1619052547.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -192,7 +192,7 @@ msgid_plural "%1$s problems in total"
 msgstr[0] "計%1$s件の障害"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2090 include/classes/screens/CScreenActions.php:129
+#: include/actions.inc.php:2090
 #: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
@@ -505,7 +505,7 @@ msgstr "確認済の解決済イベント"
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:125
 #: app/views/popup.valuemap.edit.php:54 app/views/reports.auditlog.list.php:70
 #: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/classes/screens/CScreenActions.php:112
+#: include/actions.inc.php:1839
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.edit.php:174
@@ -590,7 +590,6 @@ msgstr[0] "アクションを有効にしました"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:126
 #: include/classes/helpers/CRoleHelper.php:410
-#: include/classes/screens/CScreenActions.php:168
 #: include/classes/widgets/CWidgetConfig.php:45
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -1794,10 +1793,6 @@ msgstr "プロキシを追加できません"
 msgid "Cannot add regular expression"
 msgstr "正規表現を追加できません"
 
-#: screenconf.php:159
-msgid "Cannot add screen"
-msgstr "スクリーンを追加できません"
-
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
 msgid "Cannot add script"
@@ -1806,10 +1801,6 @@ msgstr "スクリプトを追加できません"
 #: services.php:154
 msgid "Cannot add service"
 msgstr "サービスを追加できません"
-
-#: slideconf.php:162
-msgid "Cannot add slide show"
-msgstr "スライドショーを追加できません"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
@@ -2107,10 +2098,6 @@ msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "正規表現を削除できません"
 
-#: screenconf.php:241
-msgid "Cannot delete screen"
-msgstr "スクリーンを削除できません"
-
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
@@ -2128,10 +2115,6 @@ msgstr "選択したアクションを削除できません。"
 #: services.php:108
 msgid "Cannot delete service"
 msgstr "サービスを削除できません"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Cannot delete slide show"
-msgstr "スライドショーを削除できません"
 
 #: templates.php:433 templates.php:447 templates.php:480
 msgid "Cannot delete template"
@@ -2881,10 +2864,6 @@ msgstr "読み込み専用のユーザーの役割\"%1$s\"を更新できませ�
 msgid "Cannot update regular expression"
 msgstr "正規表現を更新できません"
 
-#: screenconf.php:113
-msgid "Cannot update screen"
-msgstr "スクリーンを更新できません"
-
 #: app/controllers/CControllerScriptUpdate.php:61
 #: app/controllers/CControllerScriptUpdate.php:170
 msgid "Cannot update script"
@@ -2900,10 +2879,6 @@ msgstr "スクリプトの範囲を更新できません。\"%1$s\"はアクシ�
 #: services.php:147
 msgid "Cannot update service"
 msgstr "サービスを更新できません"
-
-#: slideconf.php:147
-msgid "Cannot update slide show"
-msgstr "スライドショーを更新できません"
 
 #: include/classes/api/services/CHttpTest.php:494
 #: include/classes/api/services/CHttpTest.php:694
@@ -3010,8 +2985,8 @@ msgstr "中央"
 msgid "Certificate"
 msgstr "証明書"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:71 include/items.inc.php:1843
+#: app/partials/monitoring.latest.view.html.php:57
+#: app/partials/monitoring.latest.view.html.php:70 include/items.inc.php:1843
 #: include/items.inc.php:1847
 msgctxt "noun"
 msgid "Change"
@@ -3318,7 +3293,7 @@ msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコ
 msgid "Colour (OK)"
 msgstr "色 (正常)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:71 screenconf.php:43
+#: include/classes/widgets/forms/CWidgetForm.php:71
 msgid "Columns"
 msgstr "列"
 
@@ -3544,10 +3519,6 @@ msgstr "プロキシの設定"
 msgid "Configuration of regular expressions"
 msgstr "正規表現の設定"
 
-#: screenconf.php:29
-msgid "Configuration of screens"
-msgstr "スクリーンの設定"
-
 #: app/controllers/CControllerScriptEdit.php:204
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
@@ -3556,10 +3527,6 @@ msgstr "スクリプトの設定"
 #: services.php:27
 msgid "Configuration of services"
 msgstr "サービスの設定"
-
-#: slideconf.php:25
-msgid "Configuration of slide shows"
-msgstr "スライドショーの設定"
 
 #: templates.php:28
 msgid "Configuration of templates"
@@ -4517,10 +4484,6 @@ msgstr "デフォルトで新しいモジュールに対してアクセス"
 msgid "Default authentication"
 msgstr "デフォルトの認証"
 
-#: slideconf.php:37
-msgid "Default delay"
-msgstr "デフォルトのリフレッシュ間隔"
-
 #: app/views/administration.miscconfig.edit.php:52
 msgid "Default host inventory mode"
 msgstr "デフォルトのホストインベントリモード"
@@ -5356,7 +5319,7 @@ msgstr "ディスク書き込み統計。typeがsectors、operations、bytesの�
 msgid "Display OK triggers for"
 msgstr "正常イベントの表示期間"
 
-#: app/partials/monitoring.latest.view.html.php:238
+#: app/partials/monitoring.latest.view.html.php:237
 msgid "Display graph"
 msgstr "グラフ表示"
 
@@ -5364,7 +5327,7 @@ msgstr "グラフ表示"
 msgid "Display problems"
 msgstr "障害数の表示"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:236
 msgid "Display stacked graph"
 msgstr "積算グラフ表示"
 
@@ -6774,7 +6737,7 @@ msgid "Gradient line"
 msgstr "グラデーションライン"
 
 #: app/controllers/CControllerAuditLogList.php:190
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:905
 #: include/classes/screens/CScreenProblem.php:1311
@@ -7203,8 +7166,8 @@ msgid "Highlight whole row"
 msgstr "行を強調表示"
 
 #: app/partials/configuration.filter.items.php:152
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -7268,7 +7231,7 @@ msgid "Horizontal align"
 msgstr "横位置"
 
 #: app/controllers/CControllerAuditLogList.php:187
-#: app/partials/monitoring.latest.view.html.php:41
+#: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
 #: app/views/monitoring.charts.view.php:85
@@ -9083,12 +9046,11 @@ msgid "Infinity"
 msgstr "無限大"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
-#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:60
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1756 include/actions.inc.php:1839
-#: include/blocks.inc.php:684 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenProblem.php:869
+#: include/blocks.inc.php:684 include/classes/screens/CScreenProblem.php:869
 #: include/classes/screens/CScreenProblem.php:893
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
@@ -9133,11 +9095,11 @@ msgstr "継承したマクロとホストのプロトタイプのマクロ"
 
 #: app/partials/configuration.tags.tab.php:138
 msgid "Inherited and item tags"
-msgstr ""
+msgstr "継承したタグとアイテムタグ"
 
 #: app/partials/configuration.tags.tab.php:133
 msgid "Inherited and scenario tags"
-msgstr ""
+msgstr "継承したタグとシナリオタグ"
 
 #: include/views/configuration.template.edit.php:211
 msgid "Inherited and template macros"
@@ -9262,7 +9224,7 @@ msgstr "内部イベント復旧"
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:51
 #: app/views/configuration.discovery.list.php:78
 #: app/views/popup.lldoperation.php:115
 #: app/views/popup.massupdate.item.php:226 include/forms.inc.php:565
@@ -9668,7 +9630,6 @@ msgstr "イタリア語 (it_IT)"
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:96
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
-#: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:47
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
 #: include/forms.inc.php:894 include/views/configuration.graph.edit.php:178
@@ -9806,7 +9767,7 @@ msgstr "アイテムのプロトタイプを更新しました"
 
 #: app/partials/configuration.tags.tab.php:138
 msgid "Item tags"
-msgstr ""
+msgstr "アイテムタグ"
 
 #: jsLoader.php:373
 msgid "Item type does not use interface"
@@ -10175,8 +10136,8 @@ msgstr "最新7日"
 msgid "Last accessed at"
 msgstr "最終アクセス日時"
 
-#: app/partials/monitoring.latest.view.html.php:56
-#: app/partials/monitoring.latest.view.html.php:69
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:68
 #: include/classes/screens/CScreenHttpTest.php:115
 msgid "Last check"
 msgstr "最新のチェック時刻"
@@ -10206,8 +10167,8 @@ msgstr "最新の"
 msgid "Last seen (age)"
 msgstr "最新データ受信時刻 (経過時間)"
 
-#: app/partials/monitoring.latest.view.html.php:57
-#: app/partials/monitoring.latest.view.html.php:70
+#: app/partials/monitoring.latest.view.html.php:56
+#: app/partials/monitoring.latest.view.html.php:69
 msgid "Last value"
 msgstr "最新の値"
 
@@ -11071,7 +11032,6 @@ msgstr "メニューパス"
 #: app/views/popup.mediatype.message.php:80
 #: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1623
 #: include/actions.inc.php:1894 include/actions.inc.php:2001
-#: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:66
 #: include/views/administration.auditacts.list.php:97
 msgid "Message"
@@ -11411,7 +11371,7 @@ msgstr "NTLM"
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
 #: app/partials/monitoring.host.view.html.php:29
-#: app/partials/monitoring.latest.view.html.php:42
+#: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/popup.operations.php:257
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
@@ -11537,8 +11497,8 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.list.php:48
 #: include/views/monitoring.sysmap.list.php:67 items.php:48 maintenance.php:40
-#: report2.php:506 screenconf.php:41 services.php:36 slideconf.php:36
-#: sysmaps.php:40 trigger_prototypes.php:38 triggers.php:45
+#: report2.php:506 services.php:36 sysmaps.php:40 trigger_prototypes.php:38
+#: triggers.php:45
 msgid "Name"
 msgstr "名前"
 
@@ -13976,7 +13936,6 @@ msgid "Recent problems"
 msgstr "最近の障害"
 
 #: app/views/monitoring.widget.actionlog.view.php:36
-#: include/classes/screens/CScreenActions.php:114
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
 #: include/views/administration.auditacts.list.php:65
@@ -14574,7 +14533,7 @@ msgstr "ユーザーの役割"
 msgid "Romanian (ro_RO)"
 msgstr "ルーマニア語 (ro_RO)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:81 screenconf.php:46
+#: include/classes/widgets/forms/CWidgetForm.php:81
 msgid "Rows"
 msgstr "行"
 
@@ -14875,7 +14834,7 @@ msgstr "シナリオ"
 
 #: app/partials/configuration.tags.tab.php:133
 msgid "Scenario tags"
-msgstr ""
+msgstr "シナリオタグ"
 
 #: include/views/configuration.maintenance.edit.php:45
 msgid "Schedule"
@@ -14907,18 +14866,6 @@ msgstr "範囲"
 msgctxt "selected problems"
 msgid "Scope"
 msgstr "範囲"
-
-#: screenconf.php:158
-msgid "Screen added"
-msgstr "スクリーンを追加しました"
-
-#: screenconf.php:241
-msgid "Screen deleted"
-msgstr "スクリーンを削除しました"
-
-#: screenconf.php:112
-msgid "Screen updated"
-msgstr "スクリーンを更新しました"
 
 #: app/controllers/CControllerAuditLogList.php:208
 #: app/views/administration.mediatype.edit.php:218
@@ -15654,18 +15601,6 @@ msgstr "Zabbixサーバー\"%1$s\"から受信したデータのサイズが上�
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "ホスト\"%2$s\"へのグラフ\"%1$s\"のコピーをスキップしました。"
 
-#: slideconf.php:161
-msgid "Slide show added"
-msgstr "スライドショーを追加しました"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Slide show deleted"
-msgstr "スライドショーを削除しました"
-
-#: slideconf.php:146
-msgid "Slide show updated"
-msgstr "スライドショーを更新しました"
-
 #: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "スロバキア語 (sk_SK)"
@@ -15845,7 +15780,6 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 #: app/views/popup.massupdate.host.php:96
 #: app/views/popup.massupdate.item.php:325 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/classes/html/CHostAvailability.php:76
-#: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/screens/CScreenProblem.php:868
@@ -16206,8 +16140,8 @@ msgstr "タグの値"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
-#: app/partials/monitoring.latest.view.html.php:59
-#: app/partials/monitoring.latest.view.html.php:72
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
 #: app/views/monitoring.latest.view.php:95
 #: app/views/monitoring.web.view.php:87
@@ -16678,8 +16612,7 @@ msgstr "終了"
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1623
 #: include/actions.inc.php:1676 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/actions.inc.php:1894
-#: include/blocks.inc.php:666 include/classes/screens/CScreenActions.php:111
-#: include/classes/screens/CScreenProblem.php:823
+#: include/blocks.inc.php:666 include/classes/screens/CScreenProblem.php:823
 #: include/classes/screens/CScreenProblem.php:1161
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -16754,8 +16687,6 @@ msgstr "タイムアウト"
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenHistory.php:446
-#: include/classes/screens/CScreenPlainText.php:42
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/monitoring.history.php:288
 msgid "Timestamp"
 msgstr "タイムスタンプ"
@@ -16880,7 +16811,7 @@ msgid "Trend storage period"
 msgstr "トレンドの保存期間"
 
 #: app/partials/configuration.filter.items.php:156
-#: app/partials/monitoring.latest.view.html.php:54
+#: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:142
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
@@ -17144,7 +17075,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: app/controllers/CControllerPopupGeneric.php:247
 #: app/controllers/CControllerPopupGeneric.php:298
 #: app/partials/configuration.filter.items.php:145
-#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:54
 #: app/views/administration.image.list.php:38
 #: app/views/administration.mediatype.edit.php:56
 #: app/views/administration.mediatype.list.php:80
@@ -17160,7 +17091,6 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:48
 #: app/views/popup.massupdate.item.php:225 app/views/popup.media.php:70
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:124
-#: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
@@ -17650,12 +17580,6 @@ msgstr "障害更新"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスを更新しました。"
-
-#: include/classes/screens/CScreenActions.php:165
-#: include/classes/screens/CScreenPlainText.php:97
-#, c-format
-msgid "Updated: %1$s"
-msgstr "更新時刻: %1$s"
 
 #: app/views/administration.image.edit.php:52
 msgid "Upload"
@@ -18275,7 +18199,6 @@ msgstr "バリデーション"
 #: include/blocks.inc.php:529 include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.host.discovery.edit.php:305

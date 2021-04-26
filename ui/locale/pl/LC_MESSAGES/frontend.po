@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-16 19:55+0300\n"
+"POT-Creation-Date: 2021-04-23 19:55+0300\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -216,7 +216,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2090 include/classes/screens/CScreenActions.php:129
+#: include/actions.inc.php:2090
 #: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
@@ -546,7 +546,7 @@ msgstr "Oznacz zdarzenia ROZWIĄZANE"
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:125
 #: app/views/popup.valuemap.edit.php:54 app/views/reports.auditlog.list.php:70
 #: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/classes/screens/CScreenActions.php:112
+#: include/actions.inc.php:1839
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.edit.php:174
@@ -635,7 +635,6 @@ msgstr[2] "Włączono akcje"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:126
 #: include/classes/helpers/CRoleHelper.php:410
-#: include/classes/screens/CScreenActions.php:168
 #: include/classes/widgets/CWidgetConfig.php:45
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -1841,10 +1840,6 @@ msgstr "Nie można dodać proxy"
 msgid "Cannot add regular expression"
 msgstr "Nie można dodać wyrażenia regularnego"
 
-#: screenconf.php:159
-msgid "Cannot add screen"
-msgstr "Nie można dodać ekranu"
-
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
 msgid "Cannot add script"
@@ -1853,10 +1848,6 @@ msgstr "Nie można dodać skryptu"
 #: services.php:154
 msgid "Cannot add service"
 msgstr "Nie można dodać usługi"
-
-#: slideconf.php:162
-msgid "Cannot add slide show"
-msgstr "Nie można dodać pokazu slajdów"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
@@ -2182,10 +2173,6 @@ msgstr[0] "Nie można usunąć wyrażenia regularnego"
 msgstr[1] "Nie można usunąć wyrażeń regularnych"
 msgstr[2] "Nie można usunąć wyrażeń regularnych"
 
-#: screenconf.php:241
-msgid "Cannot delete screen"
-msgstr "Nie można usunąć ekranu"
-
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
@@ -2205,10 +2192,6 @@ msgstr "Nie można usunąć wybranych akcji"
 #: services.php:108
 msgid "Cannot delete service"
 msgstr "Nie można usunąć usługi"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Cannot delete slide show"
-msgstr "Nie można usunąć pokazu slajdów"
 
 #: templates.php:433 templates.php:447 templates.php:480
 msgid "Cannot delete template"
@@ -3016,10 +2999,6 @@ msgstr "Nie można zaktualizować roli użytkownika jest ona tylko do odczytu \"
 msgid "Cannot update regular expression"
 msgstr "Nie można zaktualizować wyrażenia regularnego"
 
-#: screenconf.php:113
-msgid "Cannot update screen"
-msgstr "Nie można zaktualizować ekranu"
-
 #: app/controllers/CControllerScriptUpdate.php:61
 #: app/controllers/CControllerScriptUpdate.php:170
 msgid "Cannot update script"
@@ -3035,10 +3014,6 @@ msgstr ""
 #: services.php:147
 msgid "Cannot update service"
 msgstr "Nie można zaktualizować usługi"
-
-#: slideconf.php:147
-msgid "Cannot update slide show"
-msgstr "Nie można zaktualizować pokazu slajdów"
 
 #: include/classes/api/services/CHttpTest.php:494
 #: include/classes/api/services/CHttpTest.php:694
@@ -3149,8 +3124,8 @@ msgstr "Środek"
 msgid "Certificate"
 msgstr "Certyfikat"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:71 include/items.inc.php:1843
+#: app/partials/monitoring.latest.view.html.php:57
+#: app/partials/monitoring.latest.view.html.php:70 include/items.inc.php:1843
 #: include/items.inc.php:1847
 msgctxt "noun"
 msgid "Change"
@@ -3457,7 +3432,7 @@ msgstr "Kolor \"%1$s\" jest nieprawidłowy: oczekiwano heksadecymalnego kodu kol
 msgid "Colour (OK)"
 msgstr "Kolor (OK)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:71 screenconf.php:43
+#: include/classes/widgets/forms/CWidgetForm.php:71
 msgid "Columns"
 msgstr "Kolumny"
 
@@ -3683,10 +3658,6 @@ msgstr "Konfiguracja proxy"
 msgid "Configuration of regular expressions"
 msgstr "Konfiguracja wyrażeń regularnych"
 
-#: screenconf.php:29
-msgid "Configuration of screens"
-msgstr "Konfiguracja ekranów"
-
 #: app/controllers/CControllerScriptEdit.php:204
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
@@ -3695,10 +3666,6 @@ msgstr "Konfiguracja skryptów"
 #: services.php:27
 msgid "Configuration of services"
 msgstr "Konfiguracja usług"
-
-#: slideconf.php:25
-msgid "Configuration of slide shows"
-msgstr "Konfiguracja pokazów slajdów"
 
 #: templates.php:28
 msgid "Configuration of templates"
@@ -4664,10 +4631,6 @@ msgstr "Domyślny dostęp do nowych modułów"
 msgid "Default authentication"
 msgstr "Domyślne uwierzytelnianie"
 
-#: slideconf.php:37
-msgid "Default delay"
-msgstr "Domyślne opóźnienie"
-
 #: app/views/administration.miscconfig.edit.php:52
 msgid "Default host inventory mode"
 msgstr "Domyślny tryb inwentarza hosta"
@@ -5509,7 +5472,7 @@ msgstr "Statystyki zapisu na dysk. Zwraca liczbę całkowitą dla typów sectors
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
-#: app/partials/monitoring.latest.view.html.php:238
+#: app/partials/monitoring.latest.view.html.php:237
 msgid "Display graph"
 msgstr "Wyświetl wykres"
 
@@ -5517,7 +5480,7 @@ msgstr "Wyświetl wykres"
 msgid "Display problems"
 msgstr "Wyświetl problemy"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:236
 msgid "Display stacked graph"
 msgstr "Wyświetl wykres skumulowany"
 
@@ -6929,7 +6892,7 @@ msgid "Gradient line"
 msgstr "Linia gradientu"
 
 #: app/controllers/CControllerAuditLogList.php:190
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:905
 #: include/classes/screens/CScreenProblem.php:1311
@@ -7362,8 +7325,8 @@ msgid "Highlight whole row"
 msgstr "Podkreśl cały wiersz"
 
 #: app/partials/configuration.filter.items.php:152
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -7427,7 +7390,7 @@ msgid "Horizontal align"
 msgstr "Ułożenie poziome"
 
 #: app/controllers/CControllerAuditLogList.php:187
-#: app/partials/monitoring.latest.view.html.php:41
+#: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
 #: app/views/monitoring.charts.view.php:85
@@ -9250,12 +9213,11 @@ msgid "Infinity"
 msgstr "Nieskończoność"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
-#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:60
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1756 include/actions.inc.php:1839
-#: include/blocks.inc.php:684 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenProblem.php:869
+#: include/blocks.inc.php:684 include/classes/screens/CScreenProblem.php:869
 #: include/classes/screens/CScreenProblem.php:893
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
@@ -9429,7 +9391,7 @@ msgstr "Odzyskiwanie wewnętrznego problemu"
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:51
 #: app/views/configuration.discovery.list.php:78
 #: app/views/popup.lldoperation.php:115
 #: app/views/popup.massupdate.item.php:226 include/forms.inc.php:565
@@ -9835,7 +9797,6 @@ msgstr "Włoski (it_IT)"
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:96
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
-#: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:47
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
 #: include/forms.inc.php:894 include/views/configuration.graph.edit.php:178
@@ -10362,8 +10323,8 @@ msgstr "Ostatnie 7 dni"
 msgid "Last accessed at"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:56
-#: app/partials/monitoring.latest.view.html.php:69
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:68
 #: include/classes/screens/CScreenHttpTest.php:115
 msgid "Last check"
 msgstr "Ostatnie sprawdzenie"
@@ -10393,8 +10354,8 @@ msgstr "Ostatni z"
 msgid "Last seen (age)"
 msgstr "Ostatnio widziany (wiek)"
 
-#: app/partials/monitoring.latest.view.html.php:57
-#: app/partials/monitoring.latest.view.html.php:70
+#: app/partials/monitoring.latest.view.html.php:56
+#: app/partials/monitoring.latest.view.html.php:69
 msgid "Last value"
 msgstr "Ostatnia wartość"
 
@@ -11266,7 +11227,6 @@ msgstr ""
 #: app/views/popup.mediatype.message.php:80
 #: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1623
 #: include/actions.inc.php:1894 include/actions.inc.php:2001
-#: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:66
 #: include/views/administration.auditacts.list.php:97
 msgid "Message"
@@ -11616,7 +11576,7 @@ msgstr "NTLM"
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
 #: app/partials/monitoring.host.view.html.php:29
-#: app/partials/monitoring.latest.view.html.php:42
+#: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/popup.operations.php:257
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
@@ -11742,8 +11702,8 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.list.php:48
 #: include/views/monitoring.sysmap.list.php:67 items.php:48 maintenance.php:40
-#: report2.php:506 screenconf.php:41 services.php:36 slideconf.php:36
-#: sysmaps.php:40 trigger_prototypes.php:38 triggers.php:45
+#: report2.php:506 services.php:36 sysmaps.php:40 trigger_prototypes.php:38
+#: triggers.php:45
 msgid "Name"
 msgstr "Nazwa"
 
@@ -14185,7 +14145,6 @@ msgid "Recent problems"
 msgstr "Ostatnie problemy"
 
 #: app/views/monitoring.widget.actionlog.view.php:36
-#: include/classes/screens/CScreenActions.php:114
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
 #: include/views/administration.auditacts.list.php:65
@@ -14785,7 +14744,7 @@ msgstr "Rola"
 msgid "Romanian (ro_RO)"
 msgstr "Rumuński (ro_RO)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:81 screenconf.php:46
+#: include/classes/widgets/forms/CWidgetForm.php:81
 msgid "Rows"
 msgstr "Wiersze"
 
@@ -15118,18 +15077,6 @@ msgstr ""
 msgctxt "selected problems"
 msgid "Scope"
 msgstr "Zakres"
-
-#: screenconf.php:158
-msgid "Screen added"
-msgstr "Dodano ekran"
-
-#: screenconf.php:241
-msgid "Screen deleted"
-msgstr "Usunięto ekran"
-
-#: screenconf.php:112
-msgid "Screen updated"
-msgstr "Zaktualizowano ekran"
 
 #: app/controllers/CControllerAuditLogList.php:208
 #: app/views/administration.mediatype.edit.php:218
@@ -15867,18 +15814,6 @@ msgstr "Rozmiar odpowiedzi z serwera Zabbix \"%1$s\" przekracza dozwolony rozmia
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "Pominięto kopiowanie wykresu \"%1$s\" na hosta \"%2$s\"."
 
-#: slideconf.php:161
-msgid "Slide show added"
-msgstr "Dodano pokaz slajdów"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Slide show deleted"
-msgstr "Usunięto pokaz slajdów"
-
-#: slideconf.php:146
-msgid "Slide show updated"
-msgstr "Zaktualizowano pokaz slajdów"
-
 #: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "Słowacki (sk_SK)"
@@ -16058,7 +15993,6 @@ msgstr "Statystyki i dostępności zapisu pamięci Zabbix. Pamięć - jedna z wa
 #: app/views/popup.massupdate.host.php:96
 #: app/views/popup.massupdate.item.php:325 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/classes/html/CHostAvailability.php:76
-#: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/screens/CScreenProblem.php:868
@@ -16419,8 +16353,8 @@ msgstr "Wartość znacznika"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
-#: app/partials/monitoring.latest.view.html.php:59
-#: app/partials/monitoring.latest.view.html.php:72
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
 #: app/views/monitoring.latest.view.php:95
 #: app/views/monitoring.web.view.php:87
@@ -16895,8 +16829,7 @@ msgstr "Do"
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1623
 #: include/actions.inc.php:1676 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/actions.inc.php:1894
-#: include/blocks.inc.php:666 include/classes/screens/CScreenActions.php:111
-#: include/classes/screens/CScreenProblem.php:823
+#: include/blocks.inc.php:666 include/classes/screens/CScreenProblem.php:823
 #: include/classes/screens/CScreenProblem.php:1161
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -16971,8 +16904,6 @@ msgstr "Przekroczenie czasu"
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenHistory.php:446
-#: include/classes/screens/CScreenPlainText.php:42
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/monitoring.history.php:288
 msgid "Timestamp"
 msgstr "Odcisk czasowy"
@@ -17097,7 +17028,7 @@ msgid "Trend storage period"
 msgstr "Okres przechowywania trendu"
 
 #: app/partials/configuration.filter.items.php:156
-#: app/partials/monitoring.latest.view.html.php:54
+#: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:142
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
@@ -17369,7 +17300,7 @@ msgstr "Dwa elementy mapy powinny być wybrane"
 #: app/controllers/CControllerPopupGeneric.php:247
 #: app/controllers/CControllerPopupGeneric.php:298
 #: app/partials/configuration.filter.items.php:145
-#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:54
 #: app/views/administration.image.list.php:38
 #: app/views/administration.mediatype.edit.php:56
 #: app/views/administration.mediatype.list.php:80
@@ -17385,7 +17316,6 @@ msgstr "Dwa elementy mapy powinny być wybrane"
 #: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:48
 #: app/views/popup.massupdate.item.php:225 app/views/popup.media.php:70
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:124
-#: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
@@ -17877,12 +17807,6 @@ msgstr "Problem z aktualizacją"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Zaktualizowano stan hosta \"%1$s\"."
-
-#: include/classes/screens/CScreenActions.php:165
-#: include/classes/screens/CScreenPlainText.php:97
-#, c-format
-msgid "Updated: %1$s"
-msgstr "Zaktualizowany: %1$s"
 
 #: app/views/administration.image.edit.php:52
 msgid "Upload"
@@ -18512,7 +18436,6 @@ msgstr "Sprawdzenie"
 #: include/blocks.inc.php:529 include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.host.discovery.edit.php:305
