@@ -2337,7 +2337,11 @@ class CExpressionParserTest extends TestCase {
 										'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 										'pos' => 114,
 										'match' => '#25:now/M',
-										'length' => 9
+										'length' => 9,
+										'data' => [
+											'sec_num' => '#25',
+											'time_shift' => 'now/M'
+										]
 									],
 									[
 										'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
@@ -2510,7 +2514,11 @@ class CExpressionParserTest extends TestCase {
 																						'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 																						'pos' => 215,
 																						'match' => '1d:now/d',
-																						'length' => 8
+																						'length' => 8,
+																						'data' => [
+																							'sec_num' => '1d',
+																							'time_shift' => 'now/d'
+																						]
 																					]
 																				]
 																			]

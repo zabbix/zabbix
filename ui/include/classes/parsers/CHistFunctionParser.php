@@ -208,7 +208,11 @@ class CHistFunctionParser extends CParser {
 											'type' => self::PARAM_TYPE_PERIOD,
 											'pos' => $this->period_parser->result->pos,
 											'match' => $this->period_parser->result->match,
-											'length' => $this->period_parser->result->length
+											'length' => $this->period_parser->result->length,
+											'data' => [
+												'sec_num' => $this->period_parser->result->sec_num,
+												'time_shift' => $this->period_parser->result->time_shift
+											]
 										];
 										$state = self::STATE_END;
 									}
