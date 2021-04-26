@@ -509,7 +509,7 @@ zabbix_export:
                 -
                   name: 'Network Cards'
               valuemap:
-                name: 'Dell Open Manage System Status'
+                name: 'IDRAC-MIB-SMIv2::NICConnectionStatus'
               trigger_prototypes:
                 -
                   expression: '{diff(0)}=1'
@@ -1483,3 +1483,30 @@ zabbix_export:
         -
           value: '3'
           newvalue: 'Force Write Back'
+    -
+      name: 'IDRAC-MIB-SMIv2::NICConnectionStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: 'connected'
+        -
+          value: '2'
+          newvalue: 'disconnected'
+        -
+          value: '3'
+          newvalue: 'driverBad'
+        -
+          value: '4'
+          newvalue: 'driverDisabled'
+        -
+          value: '10'
+          newvalue: 'hardwareInitalizing'
+        -
+          value: '11'
+          newvalue: 'hardwareResetting'
+        -
+          value: '12'
+          newvalue: 'hardwareClosing'
+        -
+          value: '13'
+          newvalue: 'hardwareNotReady'
