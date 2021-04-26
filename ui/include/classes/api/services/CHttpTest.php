@@ -261,10 +261,19 @@ class CHttpTest extends CApiService {
 	 * @param $httptests
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create($httptests) {
-		$this->validateCreate($httptests);
-		$this->addUuid($httptests);
+		$this->validateCreate($httptests, $db_hosts);
+
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('uuid', $httptest)
+				&& $db_hosts[$httptest['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+				$httptest['uuid'] = generateUuidV4();
+			}
+		}
+		unset($httptest);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
 
@@ -274,13 +283,15 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * @param array $httpTests
+	 * @param array $httptests
+	 * @param array $db_hosts
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$httptests) {
+	protected function validateCreate(array &$httptests, &$db_hosts): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'uuid' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'uuid')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
@@ -342,34 +353,28 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
+		$db_hosts = API::Host()->get([
+			'output' => ['status'],
+			'hostids' => array_keys($names_by_hostid),
+			'templated_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($httptests as $index => $httptest) {
+			if (array_key_exists('uuid', $httptest)
+				&& $db_hosts[$httptest['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					// TODO VM: check, if this message is correct
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+		}
+
 		$this->checkHostPermissions(array_keys($names_by_hostid));
 		$this->checkDuplicates($names_by_hostid);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
 		$this->validateSteps($httptests, __FUNCTION__);
-	}
-
-	/**
-	 * Add UUID for created Web scenarios. UUID should be added only for templated web scenarios.
-	 *
-	 * @param array $httptests
-	 */
-	protected function addUuid(array &$httptests): void {
-		$hostids = array_flip(array_column($httptests, 'hostid'));
-
-		$db_hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => array_keys($hostids),
-			'templated_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($httptests as &$httptest) {
-			if ($db_hosts[$httptest['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-				$httptest['uuid'] = generateUuidV4();
-			}
-		}
-		unset($httptest);
 	}
 
 	/**

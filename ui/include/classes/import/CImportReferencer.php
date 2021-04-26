@@ -59,7 +59,7 @@ class CImportReferencer {
 	protected $db_proxies;
 	protected $hostPrototypesRefs;
 	protected $db_httptests;
-	protected $httpstepsRefs;
+	protected $db_httpsteps;
 
 	/**
 	 * Initializes references for items.
@@ -490,26 +490,21 @@ class CImportReferencer {
 	 * @param string $httptestid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveHttpStep($hostid, $httptestid, $name) {
-		if ($this->httpstepsRefs === null) {
+	public function findHttpStepidByName(string $hostid, string $httptestid, string $name): ?string {
+		if ($this->db_httpsteps === null) {
 			$this->selectHttpSteps();
 		}
 
-		if (!array_key_exists($hostid, $this->httpstepsRefs)) {
-			return false;
+		foreach ($this->db_httpsteps as $httpstepid => $httpstep) {
+			if ($httpstep['hostid'] === $hostid && $httpstep['name'] === $name
+					&& $httpstep['httptestid'] === $httptestid) {
+				return $httpstepid;
+			}
 		}
 
-		if (!array_key_exists($httptestid, $this->httpstepsRefs[$hostid])) {
-			return false;
-		}
-
-		if (!array_key_exists($name, $this->httpstepsRefs[$hostid][$httptestid])) {
-			return false;
-		}
-
-		return $this->httpstepsRefs[$hostid][$httptestid][$name];
+		return null;
 	}
 
 	/**
@@ -853,6 +848,8 @@ class CImportReferencer {
 	 * Select group ids for previously added group names.
 	 */
 	protected function selectGroups(): void {
+		$this->db_groups = [];
+
 		if (!$this->groups) {
 			return;
 		}
@@ -874,6 +871,8 @@ class CImportReferencer {
 	 * Select template ids for previously added template names.
 	 */
 	protected function selectTemplates(): void {
+		$this->db_templates = [];
+
 		if (!$this->templates) {
 			return;
 		}
@@ -896,6 +895,8 @@ class CImportReferencer {
 	 * Select host ids for previously added host names.
 	 */
 	protected function selectHosts(): void {
+		$this->db_hosts = [];
+
 		if (!$this->hosts) {
 			return;
 		}
@@ -915,11 +916,12 @@ class CImportReferencer {
 	 * Select item ids for previously added item keys.
 	 */
 	protected function selectItems(): void {
+		$this->db_items = [];
+
 		if (!$this->items) {
 			return;
 		}
 
-		$this->db_items = [];
 		$sql_where = [];
 
 		foreach ($this->items as $host => $items) {
@@ -991,11 +993,12 @@ class CImportReferencer {
 	 * Select trigger ids for previously added trigger names/expressions.
 	 */
 	protected function selectTriggers(): void {
+		$this->db_triggers = [];
+
 		if (!$this->triggers) {
 			return;
 		}
 
-		$this->db_triggers = [];
 		$uuids = [];
 
 		foreach ($this->triggers as $trigger) {
@@ -1062,11 +1065,12 @@ class CImportReferencer {
 	 * Select graph IDs for previously added graph names.
 	 */
 	protected function selectGraphs(): void {
+		$this->db_graphs = [];
+
 		if (!$this->graphs) {
 			return;
 		}
 
-		$this->db_graphs = [];
 		$graph_uuids = [];
 		$graph_names = [];
 
@@ -1178,11 +1182,12 @@ class CImportReferencer {
 	 * Select macro ids for previously added macro names.
 	 */
 	protected function selectMacros(): void {
+		$this->db_macros = [];
+
 		if (!$this->macros) {
 			return;
 		}
 
-		$this->db_macros = [];
 		$sql_where = [];
 
 		foreach ($this->macros as $host => $macros) {
@@ -1212,6 +1217,8 @@ class CImportReferencer {
 	 * Select proxy ids for previously added proxy names.
 	 */
 	protected function selectProxies(): void {
+		$this->db_proxies = [];
+
 		if (!$this->proxies) {
 			return;
 		}
@@ -1262,11 +1269,11 @@ class CImportReferencer {
 	 * Select httptestids for previously added web scenario names.
 	 */
 	protected function selectHttpTests(): void {
+		$this->db_httptests = [];
+
 		if (!$this->httptests) {
 			return;
 		}
-
-		$this->db_httptests = [];
 
 		$sql_where = [];
 
@@ -1307,38 +1314,39 @@ class CImportReferencer {
 	/**
 	 * Select httpstepids for previously added web scenario step names.
 	 */
-	protected function selectHttpSteps() {
-		if ($this->httpsteps) {
-			$this->httpstepsRefs = [];
+	protected function selectHttpSteps(): void {
+		$this->db_httpsteps = [];
 
-			$sql_where = [];
+		if (!$this->httpsteps) {
+			return;
+		}
 
-			foreach ($this->httpsteps as $host => $httptests) {
-				$hostid = $this->findTemplateidOrHostidByHost($host);
+		$sql_where = [];
 
-				if ($hostid !== false) {
-					foreach ($httptests as $httptest_name => $httpstep_names) {
-						$httptestid = $this->findHttpTestidByName($hostid, $httptest_name);
+		foreach ($this->httpsteps as $host => $httptests) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
 
-						if ($httptestid !== false) {
-							$sql_where[] = '(hs.httptestid='.zbx_dbstr($httptestid).
-								' AND '.dbConditionString('hs.name', $httpstep_names).')';
-						}
-					}
+			if ($hostid !== null) {
+				foreach ($httptests as $httpstep_names) {
+					$sql_where[] = dbConditionString('hs.name', array_keys($httpstep_names));
 				}
 			}
+		}
 
-			if ($sql_where) {
-				$db_httpsteps = DBselect(
-					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
-					' FROM httptest ht,httpstep hs'.
-					' WHERE ht.httptestid=hs.httptestid'.
-						' AND ('.implode(' OR ', $sql_where).')'
-				);
-				while ($db_httpstep = DBfetch($db_httpsteps)) {
-					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =
-						$db_httpstep['httpstepid'];
-				}
+		if ($sql_where) {
+			$db_httpsteps = DBselect(
+				'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
+				' FROM httptest ht,httpstep hs'.
+				' WHERE ht.httptestid=hs.httptestid'.
+					' AND ('.implode(' OR ', $sql_where).')'
+			);
+
+			while ($db_httpstep = DBfetch($db_httpsteps)) {
+				$this->db_httpsteps[$db_httpstep['httpstepid']] = [
+					'name' => $db_httpstep['name'],
+					'hostid' => $db_httpstep['hostid'],
+					'httptestid' => $db_httpstep['httptestid']
+				];
 			}
 		}
 	}

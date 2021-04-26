@@ -124,9 +124,11 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * @param array  $valuemaps
+	 * @param array $valuemaps
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps, $db_hosts);

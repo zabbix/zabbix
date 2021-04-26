@@ -134,15 +134,15 @@ class CConfigurationImport {
 		$this->processTemplates();
 		$this->processHosts();
 
-//		// delete missing objects from processed hosts and templates
+		// delete missing objects from processed hosts and templates
 		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
 		$this->deleteMissingItems();
 
-//		// import objects
-//		$this->processHttpTests();
+		// import objects
+		$this->processHttpTests();
 //		$this->processItems();
 //		$this->processTriggers();
 //		$this->processDiscoveryRules();
@@ -509,24 +509,16 @@ class CConfigurationImport {
 
 	/**
 	 * Import groups.
-	 *
-	 * @return null
 	 */
-	protected function processGroups() {
+	protected function processGroups(): void {
 		if (!$this->options['groups']['createMissing'] && !$this->options['groups']['updateExisting']) {
-			return;
-		}
-
-		$groups = $this->getFormattedGroups();
-
-		if (!$groups) {
 			return;
 		}
 
 		$groups_to_create = [];
 		$groups_to_update = [];
 
-		foreach ($groups as $group) {
+		foreach ($this->getFormattedGroups() as $group) {
 			$groupid = $this->referencer->findGroupidByUuid($group['uuid']);
 
 			if ($groupid) {
@@ -537,7 +529,7 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($groups_to_update && $this->options['groups']['updateExisting']) {
+		if ($this->options['groups']['updateExisting'] && $groups_to_update) {
 			API::HostGroup()->update(array_map(function($group) {
 				unset($group['uuid']);
 				return $group;
@@ -548,7 +540,7 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($groups_to_create && $this->options['groups']['createMissing']) {
+		if ($this->options['groups']['createMissing'] && $groups_to_create) {
 			$created_groups = API::HostGroup()->create($groups_to_create);
 
 			foreach ($created_groups['groupids'] as $index => $groupid) {
@@ -1406,21 +1398,15 @@ class CConfigurationImport {
 	/**
 	 * Import web scenarios.
 	 */
-	protected function processHttpTests() {
+	protected function processHttpTests(): void {
 		if (!$this->options['httptests']['createMissing'] && !$this->options['httptests']['updateExisting']) {
-			return;
-		}
-
-		$all_httptests = $this->getFormattedHttpTests();
-
-		if (!$all_httptests) {
 			return;
 		}
 
 		$httptests_to_create = [];
 		$httptests_to_update = [];
 
-		foreach ($all_httptests as $host => $httptests) {
+		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			if (!$this->importedObjectContainer->isHostProcessed($hostid)
@@ -1429,19 +1415,23 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+				$httptestid = array_key_exists('uuid', $httptest)
+					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
+					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
 
-				if ($httptestid !== false) {
+				if ($httptestid !== null) {
 					foreach ($httptest['steps'] as &$httpstep) {
-						$httpstepid = $this->referencer->resolveHttpStep($hostid, $httptestid, $httpstep['name']);
+						$httpstepid = $this->referencer->findHttpStepidByName($hostid, $httptestid, $httpstep['name']);
 
-						if ($httpstepid !== false) {
+						if ($httpstepid !== null) {
 							$httpstep['httpstepid'] = $httpstepid;
 						}
 					}
 					unset($httpstep);
 
 					$httptest['httptestid'] = $httptestid;
+					unset($httptest['uuid']);
+
 					$httptests_to_update[] = $httptest;
 				}
 				else {
@@ -1451,13 +1441,12 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update web scenarios and create a hash hostid->name->httptestid
-		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
-			API::HttpTest()->create($httptests_to_create);
-		}
-
 		if ($this->options['httptests']['updateExisting'] && $httptests_to_update) {
 			API::HttpTest()->update($httptests_to_update);
+		}
+
+		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
+			API::HttpTest()->create($httptests_to_create);
 		}
 
 		$this->referencer->refreshHttpTests();
