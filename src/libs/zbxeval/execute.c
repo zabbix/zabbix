@@ -1881,6 +1881,13 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
+	if (num->data.ui64 * strlen(str->data.str) >= MAX_STRING_LEN)
+	{
+		*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
+				MAX_STRING_LEN, num->data.ui64 * strlen(str->data.str));
+		return FAIL;
+	}
+
 	for (i = num->data.ui64; i > 0; i--)
 		strval = zbx_strdcat(strval, str->data.str);
 
