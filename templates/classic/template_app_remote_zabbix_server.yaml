@@ -674,6 +674,58 @@ zabbix_export:
               name: 'Zabbix task manager processes more than 75% busy'
               priority: AVERAGE
         -
+          name: 'Utilization of report manager internal processes, in %'
+          type: DEPENDENT
+          key: process.report_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''report manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix report manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of report writer internal processes, in %'
+          type: DEPENDENT
+          key: process.report_writer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''report writer''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix report writer processes more than 75% busy'
+              priority: AVERAGE
+        -
           name: 'Utilization of timer internal processes, in %'
           type: DEPENDENT
           key: process.timer.avg.busy
@@ -1633,6 +1685,18 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server'
             key: process.availability_manager.avg.busy
+        -
+          sortorder: '17'
+          color: 8048B4
+          item:
+            host: 'Remote Zabbix server'
+            key: process.report_manager.avg.busy
+        -
+          sortorder: '18'
+          color: FD5434
+          item:
+            host: 'Remote Zabbix server'
+            key: process.report_writer.avg.busy
     -
       name: 'Zabbix internal queues'
       graph_items:

@@ -31,6 +31,12 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $from_list = (new CFormList())
+	->addRow(new CLabel(_('Frontend URL'), 'url'),
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('config', 'url')))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
+			->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'discovery_groupid',
@@ -157,6 +163,14 @@ $from_list = (new CFormList())
 		(new CLabel(_('Network timeout for item test'), 'item_test_timeout'))->setAsteriskMark(),
 		(new CTextBox('item_test_timeout', $data['item_test_timeout'], false,
 			DB::getFieldLength('config', 'item_test_timeout')
+		))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Network timeout for scheduled report test'), 'report_test_timeout'))->setAsteriskMark(),
+		(new CTextBox('report_test_timeout', $data['report_test_timeout'], false,
+			DB::getFieldLength('config', 'report_test_timeout')
 		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()

@@ -17,13 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package serverlistener
+package zbxnet
 
 import (
 	"net"
 	"strings"
-
-	"zabbix.com/internal/agent"
 )
 
 // AllowedPeers is preparsed content of field Server
@@ -34,11 +32,11 @@ type AllowedPeers struct {
 }
 
 // GetAllowedPeers is parses the Server field
-func GetAllowedPeers(options *agent.AgentOptions) (allowedPeers *AllowedPeers, err error) {
+func GetAllowedPeers(servers string) (allowedPeers *AllowedPeers, err error) {
 	ap := &AllowedPeers{}
 
-	if options.Server != "" {
-		opts := strings.Split(options.Server, ",")
+	if servers != "" {
+		opts := strings.Split(servers, ",")
 		for _, o := range opts {
 			peer := strings.Trim(o, " \t")
 			if _, peerNet, err := net.ParseCIDR(peer); nil == err {

@@ -22,16 +22,16 @@
 
 #include "common.h"
 
-#define zbx_serialize_prepare_str(len, str)			\
-	str##_len = (NULL != str ? strlen(str) + 1 : 0);	\
+#define zbx_serialize_prepare_str(len, str)				\
+	str##_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
 	len += str##_len + sizeof(zbx_uint32_t)
 
-#define zbx_serialize_prepare_str_len(len, str, str_len)	\
-	str_len = (NULL != str ? strlen(str) + 1 : 0);		\
+#define zbx_serialize_prepare_str_len(len, str, str_len)			\
+	str_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);		\
 	len += str_len + sizeof(zbx_uint32_t)
 
 #define zbx_serialize_prepare_value(len, value)			\
-	len += sizeof(value)
+	len += (zbx_uint32_t)sizeof(value)
 
 #define zbx_serialize_uint64(buffer, value) (memcpy(buffer, &value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
 
