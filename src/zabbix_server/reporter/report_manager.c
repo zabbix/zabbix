@@ -691,7 +691,7 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 		return FAIL;
 
 	*to = *tm;
-	zbx_tm_round_down(to, ZBX_TIME_UNIT_DAY);
+	zbx_tm_round_down(to, period2unit[period]);
 
 	*from = *to;
 	zbx_tm_sub(from, 1, period2unit[period]);
