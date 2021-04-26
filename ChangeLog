@@ -1,6 +1,7 @@
 Changes for 5.2.7rc1
 
 New features:
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
