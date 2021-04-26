@@ -380,8 +380,17 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $dbHosts[$fullItem['hostid']];
 
+			// Validate UUID.
+			if (array_key_exists('uuid', $item)
+				&& ($update || (!$update && $host['status'] != HOST_STATUS_TEMPLATE))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					// TODO VM: check, if this message is correct
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($inum + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
 			// UUID should be added only for items on template.
-			if (!$update && $host['status'] == HOST_STATUS_TEMPLATE) {
+			if (!$update && $host['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 

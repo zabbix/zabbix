@@ -28,12 +28,13 @@ class CImportReferencer {
 	/**
 	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
 	 */
-	public $interfacesCache = [];
+	public $interfaces_cache = [];
+
 	protected $groups = [];
 	protected $templates = [];
 	protected $hosts = [];
 	protected $items = [];
-	protected $valueMaps = [];
+	protected $valuemaps = [];
 	protected $triggers = [];
 	protected $graphs = [];
 	protected $iconMaps = [];
@@ -49,7 +50,7 @@ class CImportReferencer {
 	protected $db_templates;
 	protected $db_hosts;
 	protected $db_items;
-	protected $valueMapsRefs;
+	protected $db_valuemaps;
 	protected $db_triggers;
 	protected $db_graphs;
 	protected $iconMapsRefs;
@@ -165,18 +166,20 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get interface ID by host ID and interface reference name.
+	 * Get interface ID by host ID and interface reference.
 	 *
-	 * @param string $hostid  Host ID.
-	 * @param string $name    Interface reference name.
+	 * @param string $hostid
+	 * @param string $interface_ref
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveInterface($hostid, $name) {
-		return (array_key_exists($hostid, $this->interfacesCache)
-				&& array_key_exists($name, $this->interfacesCache[$hostid]))
-			? $this->interfacesCache[$hostid][$name]
-			: false;
+	public function findInterfaceidByRef(string $hostid, string $interface_ref): ?string {
+		if (array_key_exists($hostid, $this->interfaces_cache)
+				&& array_key_exists($interface_ref, $this->interfaces_cache[$hostid])) {
+			return $this->interfaces_cache[$hostid][$interface_ref];
+		}
+
+		return null;
 	}
 
 	/**
@@ -186,13 +189,13 @@ class CImportReferencer {
 	 *
 	 * @return string|null
 	 */
-	public function findItemByUuid(string $uuid): ?string {
+	public function findItemidByUuid(string $uuid): ?string {
 		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if ($item['uuid'] === $uuid) {
+			if (array_key_exists('uuid', $item) && $item['uuid'] === $uuid) {
 				return $itemid;
 			}
 		}
@@ -208,7 +211,7 @@ class CImportReferencer {
 	 *
 	 * @return string|null
 	 */
-	public function findItemByKey(string $hostid, string $key): ?string {
+	public function findItemidByKey(string $hostid, string $key): ?string {
 		if ($this->db_items === null) {
 			$this->selectItems();
 		}
@@ -223,19 +226,25 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get value map id by vale map name.
+	 * Get value map id by value map name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveValueMap($hostid, $name) {
-		if ($this->valueMapsRefs === null) {
+	public function findValuemapidByName(string $hostid, string $name): ?string {
+		if ($this->db_valuemaps === null) {
 			$this->selectValueMaps();
 		}
 
-		return isset($this->valueMapsRefs[$hostid][$name]) ? $this->valueMapsRefs[$hostid][$name] : false;
+		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
+			if ($valuemap['hostid'] === $hostid && $valuemap['name'] === $name) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -583,26 +592,24 @@ class CImportReferencer {
 	 *
 	 * @param array $items
 	 */
-	public function addItems(array $items) {
-//		foreach ($items as $host => $keys) {
-//			if (!isset($this->items[$host])) {
-//				$this->items[$host] = [];
-//			}
-//			$this->items[$host] = array_unique(array_merge($this->items[$host], $keys));
-//		}
-
+	public function addItems(array $items): void {
 		$this->items = $items;
 	}
 
 	/**
 	 * Add item key association with item id.
 	 *
-	 * @param string $hostId
-	 * @param string $key
-	 * @param string $itemId
+	 * @param array $item
 	 */
-	public function addItemRef($hostId, $key, $itemId) {
-		$this->db_items[$hostId][$key] = $itemId;
+	public function setDbItem(array $item): void {
+		$this->db_items[$item['itemid']] = [
+			'hostid' => $item['hostid'],
+			'key_' => $item['key_']
+		];
+
+		if (array_key_exists('uuid', $item)) {
+			$this->db_items[$item['itemid']]['uuid'] = $item['uuid'];
+		}
 	}
 
 	/**
@@ -618,7 +625,7 @@ class CImportReferencer {
 //			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
 //		}
 
-		$this->valueMaps = $valueMaps;
+		$this->valuemaps = $valueMaps;
 	}
 
 	/**
@@ -961,32 +968,40 @@ class CImportReferencer {
 	/**
 	 * Select value map IDs for previously added value map names.
 	 */
-	protected function selectValueMaps() {
-		if ($this->valueMaps) {
-			$this->valueMapsRefs = [];
-			$sql_where = [];
+	protected function selectValueMaps(): void {
+		$this->db_valuemaps = [];
 
-			foreach ($this->valueMaps as $host => $valuemap_names) {
-				$hostid = $this->findTemplateidOrHostidByHost($host);
-				if ($hostid) {
-					$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-						dbConditionString('vm.name', $valuemap_names).')';
-				}
-			}
-
-			if ($sql_where) {
-				$db_valuemaps = DBselect(
-					'SELECT vm.valuemapid,vm.hostid,vm.name'.
-					' FROM valuemap vm'.
-					' WHERE '.implode(' OR ', $sql_where)
-				);
-				while ($valuemap = DBfetch($db_valuemaps)) {
-					$this->valueMapsRefs[$valuemap['hostid']][$valuemap['name']] = $valuemap['valuemapid'];
-				}
-			}
-
-			$this->valueMaps = [];
+		if (!$this->valuemaps) {
+			return;
 		}
+
+		$sql_where = [];
+
+		foreach ($this->valuemaps as $host => $valuemap_names) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+					dbConditionString('vm.name', array_keys($valuemap_names)).')';
+			}
+		}
+
+		if ($sql_where) {
+			$db_valuemaps = DBselect(
+				'SELECT vm.valuemapid,vm.hostid,vm.name'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($valuemap = DBfetch($db_valuemaps)) {
+				$this->db_valuemaps[$valuemap['valuemapid']] = [
+					'name' => $valuemap['name'],
+					'hostid' => $valuemap['hostid']
+				];
+			}
+		}
+
+		$this->valuemaps = [];
 	}
 
 	/**
@@ -1243,7 +1258,7 @@ class CImportReferencer {
 				$hostId = $this->findTemplateidOrHostidByHost($host);
 
 				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-					$discoveryRuleId = $this->findItemByKey($hostId, $discoveryRuleKey);
+					$discoveryRuleId = $this->findItemidByKey($hostId, $discoveryRuleKey);
 					if ($hostId) {
 						$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.host', $hostPrototypes).')';
 					}

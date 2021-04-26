@@ -238,8 +238,8 @@ class CHostImporter extends CImporter {
 				foreach ($host['interfaces'] as $interface) {
 					$hostid = $this->processedHostIds[$host['host']];
 
-					if (!array_key_exists($hostid, $this->referencer->interfacesCache)) {
-						$this->referencer->interfacesCache[$hostid] = [];
+					if (!array_key_exists($hostid, $this->referencer->interfaces_cache)) {
+						$this->referencer->interfaces_cache[$hostid] = [];
 					}
 
 					foreach ($db_interfaces as $db_interface) {
@@ -264,7 +264,7 @@ class CHostImporter extends CImporter {
 								}
 							}
 
-							$this->referencer->interfacesCache[$hostid][$interface['interface_ref']]
+							$this->referencer->interfaces_cache[$hostid][$interface['interface_ref']]
 								= $db_interface['interfaceid'];
 						}
 					}
