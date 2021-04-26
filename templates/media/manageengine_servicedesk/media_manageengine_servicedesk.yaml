@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-26T11:14:16Z'
+  date: '2021-04-26T13:40:40Z'
   media_types:
     -
       name: 'ManageEngine ServiceDesk'
@@ -273,10 +273,12 @@ zabbix_export:
                                     }
         
                                     if (prefix.endsWith('string')) {
-                                        root[field.substring(field.indexOf(':') + 1)] = fields[field];
+                                        root[field.substring(field.indexOf(':') + 1)
+                                            .toLowerCase()] = fields[field];
                                     }
                                     else {
-                                        root[field.substring(field.indexOf(':') + 1)] = {
+                                        root[field.substring(field.indexOf(':') + 1)
+                                            .toLowerCase()] = {
                                             name: fields[field]
                                         };
                                     }
