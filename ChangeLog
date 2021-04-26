@@ -1,6 +1,8 @@
 Changes for 5.4.0rc1
 
 New features:
+A.F.....ST [ZBXNEXT-6478] added dashboard based pdf report support (abakaldin, agriscenko, ashubin, esneiders, wiper)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in the template MSSQL by ODBC (mchudinov)
 .........T [ZBXNEXT-6571] added templates with multi-page dashboards (afayantsev)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
