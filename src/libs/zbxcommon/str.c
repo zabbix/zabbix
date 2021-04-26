@@ -2099,7 +2099,7 @@ char	*zbx_strshift_utf8(char *text, size_t num)
 {
 	while ('\0' != *text && 0 < num)
 	{
-		if (0x80 != (0xc0 & *text++))
+		if (0x80 != (0xc0 & *(++text)))
 			num--;
 	}
 

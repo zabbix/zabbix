@@ -1413,7 +1413,7 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
 {
 	int		ret;
 	zbx_variant_t	*arg, *len, value;
-	size_t		sz;
+	size_t		sz, srclen;
 	char		*strval, *p;
 
 	if (2 != token->opt)
@@ -1443,10 +1443,17 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
 		return FAIL;
 	}
 
-	p = zbx_strshift_utf8(arg->data.str, zbx_strlen_utf8(arg->data.str) - len->data.ui64);
-	sz = zbx_strlen_utf8_nchars(p, (size_t)len->data.ui64) + 1;
-	strval = zbx_malloc(NULL, sz);
-	zbx_strlcpy_utf8(strval, p, sz);
+	srclen = zbx_strlen_utf8(arg->data.str);
+
+	if (len->data.ui64 < srclen)
+	{
+		p = zbx_strshift_utf8(arg->data.str, srclen - len->data.ui64);
+		sz = zbx_strlen_utf8_nchars(p, (size_t)len->data.ui64) + 1;
+		strval = zbx_malloc(NULL, sz);
+		zbx_strlcpy_utf8(strval, p, sz);
+	}
+	else
+		strval = zbx_strdup(NULL, arg->data.str);
 
 	zbx_variant_set_str(&value, strval);
 	eval_function_return(2, &value, output);
@@ -1474,7 +1481,7 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 {
 	int		ret;
 	zbx_variant_t	*arg, *start, *len, value;
-	size_t		sz;
+	size_t		sz, srclen;
 	char		*strval, *p;
 
 	if (3 != token->opt)
@@ -1498,10 +1505,13 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64))
+	srclen = zbx_strlen_utf8(arg->data.str);
+
+	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64) || 0 == start->data.ui64 ||
+			start->data.ui64 > srclen)
 	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(start), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
+				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1513,9 +1523,15 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 	}
 
 	p = zbx_strshift_utf8(arg->data.str, start->data.ui64 - 1);
-	sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
-	strval = zbx_malloc(NULL, sz);
-	zbx_strlcpy_utf8(strval, p, sz);
+
+	if (srclen > start->data.ui64 + len->data.ui64)
+	{
+		sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
+		strval = zbx_malloc(NULL, sz);
+		zbx_strlcpy_utf8(strval, p, sz);
+	}
+	else
+		strval = zbx_strdup(NULL, p);
 
 	zbx_variant_set_str(&value, strval);
 	eval_function_return(3, &value, output);
