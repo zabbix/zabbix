@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-11T11:50:30Z'
+  date: '2021-04-25T12:55:39Z'
   groups:
     -
       name: Templates/Databases
@@ -11,12 +11,13 @@ zabbix_export:
       description: |
         1. Create an MSSQL user for monitoring.
           View Server State and View Any Definition permissions should be granted to the user.
-          For more information please see the MSSQL documentation.
+          Grant this user read permissions to the sysjobschedules, sysjobhistory, sysjobs tables.  
+          For more information, see MSSQL documentation.
         2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
-          Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.
+          Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy.
           See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.
           Note! Credentials in the odbc.ini do not work for MSSQL.
-        3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name, please.
+        3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name.
         The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
         
         
@@ -32,6 +33,67 @@ zabbix_export:
         -
           name: 'Zabbix raw items'
       items:
+        -
+          name: 'MSSQL: Get job status'
+          type: ODBC
+          key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+          delay: 10m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT sj.name AS JobName
+            , sj.enabled AS Enabled
+            , sjs.last_run_outcome AS RunStatus
+            , sjs.last_outcome_message AS LastRunStatusMessage
+            , sjs.last_run_duration/10000*3600 + sjs.last_run_duration/100%100*60 + sjs.last_run_duration%100 AS RunDuration
+            , CASE sjs.last_run_date
+                WHEN 0 THEN NULL
+                ELSE msdb.dbo.agent_datetime(sjs.last_run_date,sjs.last_run_time)
+                END AS LastRunDateTime
+            , sja.next_scheduled_run_date AS NextRunDateTime
+            FROM msdb..sysjobs AS sj
+            LEFT JOIN msdb..sysjobservers AS sjs ON sj.job_id = sjs.job_id
+            LEFT JOIN ( SELECT job.job_id,
+                max(act.session_id) AS s_id,
+                max(act.next_scheduled_run_date) AS next_scheduled_run_date
+                FROM msdb..sysjobs AS job
+                LEFT JOIN msdb..sysjobactivity AS act ON act.job_id = job.job_id
+                GROUP BY job.job_id ) AS sja ON sja.job_id = sj.job_id
+            WHERE Enabled = 1
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'The item gets sql agent job status.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MSSQL: Get last backup'
+          type: ODBC
+          key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+          delay: 10m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT bs.database_name as dbname,[type], DATEDIFF(SECOND, bs.backup_finish_date, getdate()) as timesincelastbackup, (DATEDIFF(SECOND, bs.backup_start_date, bs.backup_finish_date)) as duration
+            FROM msdb.dbo.backupset as bs WHERE bs.database_name not in (
+            SELECT
+            AGDatabases.database_name AS Databasename
+            FROM sys.dm_hadr_availability_group_states States
+            INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id
+            INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id
+            WHERE primary_replica != @@Servername OR primary_replica is NULL
+            )
+            GROUP BY bs.database_name, backup_finish_date, [type], backup_start_date
+            HAVING backup_finish_date = (SELECT MAX(backup_finish_date) from msdb.dbo.backupset WHERE database_name = bs.database_name AND bs.type = [type])
+            ORDER BY bs.database_name
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'The item gets information about backup processes.'
+          applications:
+            -
+              name: 'Zabbix raw items'
         -
           name: 'MSSQL: Get performance counters'
           type: ODBC
@@ -88,7 +150,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of auto-parameterization attempts per second. Total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters so that reuse of the resulting cached execution plan across multiple similar-looking requests is possible. Note that auto-parameterizations are also known as simple parameterizations in newer versions of SQL Server. This counter does not include forced parameterizations.'
+          description: 'Number of auto-parameterization attempts per second. The total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters to me reuse of the resulting cached execution plan across multiple similar-looking requests possible. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This counter does not include forced parameterizations.'
           applications:
             -
               name: MSSQL
@@ -242,7 +304,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high. Generally, you can increase the buffer cache hit ratio by increasing the amount of memory available to SQL Server or by using the buffer pool extension feature.'
+          description: 'Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio changes very little. Since reading from the cache is much less expensive than reading from the disk, a higher value is preferred for this item. To increase the buffer cache hit ratio, consider increasing the amount of memory available to SQL Server or using the buffer pool extension feature.'
           applications:
             -
               name: MSSQL
@@ -345,7 +407,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.'
+          description: 'Indicates the number of pages flushed to disk per second by a checkpoint or other operation which required all dirty pages to be flushed.'
           applications:
             -
               name: MSSQL
@@ -384,7 +446,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Total size of all the data files.'
+          description: 'Total size of all data files.'
           applications:
             -
               name: MSSQL
@@ -428,7 +490,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of failed auto-parameterization attempts per second. This should be small. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server.'
+          description: 'Number of failed auto-parameterization attempts per second. This number should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.'
           applications:
             -
               name: MSSQL
@@ -501,7 +563,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that we are having table / Index page scans. If we see high CPU then we need to investigate this counter, otherwise if the full scans are on small tables we can ignore this counter.'
+          description: 'Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that there are table / Index page scans. If that is combined with high CPU, this counter requires further investigation, otherwise, if the full scans are on small tables, it can be ignored.'
           applications:
             -
               name: MSSQL
@@ -683,7 +745,7 @@ zabbix_export:
               expression: '{min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}'
               name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
               priority: WARNING
-              description: 'The number of new locks and lock conversions per second requested from the lock manager is high.'
+              description: 'Number of new locks and lock conversions per second requested from the lock manager is high.'
         -
           name: 'MSSQL: Total lock requests per second that timed out'
           type: DEPENDENT
@@ -692,7 +754,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of lock requests per second that timed out, including requests for NOWAIT locks.'
+          description: 'Number of timed out lock requests per second, including requests for NOWAIT locks.'
           applications:
             -
               name: MSSQL
@@ -712,7 +774,7 @@ zabbix_export:
               expression: '{min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}'
               name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
               priority: WARNING
-              description: 'The total number of lock requests per second that timed out, including requests for NOWAIT locks is high.'
+              description: 'The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.'
         -
           name: 'MSSQL: Total lock requests per second that required waiting'
           type: DEPENDENT
@@ -1097,7 +1159,7 @@ zabbix_export:
           params: |
             last(mssql.sql_compilations_sec.rate) * 100 /
             (last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))
-          description: 'The ratio of SQL compilations per second to Batch requests per second in percent.'
+          description: 'The ratio of SQL compilations per second to Batch requests per second in percentage.'
           applications:
             -
               name: MSSQL
@@ -1118,7 +1180,7 @@ zabbix_export:
           params: |
             last(mssql.sql_recompilations_sec.rate) * 100 /
             (last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))
-          description: 'The ratio of SQL re-compilations per second to SQL compilations per second in percent.'
+          description: 'The ratio of SQL re-compilations per second to SQL compilations per second in percentage.'
           applications:
             -
               name: MSSQL
@@ -1127,7 +1189,7 @@ zabbix_export:
               expression: '{min(15m)} > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
               name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
-              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.'
+              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
         -
           name: 'MSSQL: Number of blocked processes'
           type: DEPENDENT
@@ -1174,7 +1236,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server. This does not include forced parameterizations.'
+          description: 'Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This does not include forced parameterizations.'
           applications:
             -
               name: MSSQL
@@ -1279,7 +1341,7 @@ zabbix_export:
           key: mssql.target_pages
           delay: '0'
           history: 7d
-          description: 'The optimum number of pages in the buffer pool.'
+          description: 'The optimal number of pages in the buffer pool.'
           applications:
             -
               name: MSSQL
@@ -1529,7 +1591,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of work files created per second. For example, work files could be used to store temporary results for hash joins and hash aggregates.'
+          description: 'Number of work files created per second. For example, work files can be used to store temporary results for hash joins and hash aggregates.'
           applications:
             -
               name: MSSQL
@@ -1547,7 +1609,7 @@ zabbix_export:
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.WORK_FILES.MAX}'
-              name: 'MSSQL: Number work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
+              name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
         -
@@ -1557,7 +1619,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of work tables created per second. For example, work tables could be used to store temporary results for query spool, lob variables, XML variables, and cursors.'
+          description: 'Number of work tables created per second. For example, work tables can be used to store temporary results for query spool, lob variables, XML variables, and cursors.'
           applications:
             -
               name: MSSQL
@@ -1575,7 +1637,7 @@ zabbix_export:
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.WORK_TABLES.MAX}'
-              name: 'MSSQL: Number work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
+              name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.'
         -
@@ -1602,14 +1664,14 @@ zabbix_export:
               expression: '{max(5m)}<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
-              description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or may indicate, on 32-bit systems, the need for an upgrade to a 64-bit system'
+              description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
         -
           name: 'MSSQL: Service''s TCP port state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]'
           delay: 30s
           history: 7d
-          description: 'Test the availability of MS SQL Server on TCP port.'
+          description: 'Test the availability of MS SQL Server on a TCP port.'
           applications:
             -
               name: MSSQL
@@ -1637,7 +1699,7 @@ zabbix_export:
             FROM sys.availability_groups
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
-          description: 'Discovery the existed availability groups.'
+          description: 'Discovery of the existing availability groups.'
           item_prototypes:
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'': Get replica states'
@@ -1756,9 +1818,9 @@ zabbix_export:
               history: 7d
               description: |
                 Reflects a rollup of the synchronization_health of all availability replicas in the availability group:
-                0: Not healthy. None of the availability replicas have a healthy.
-                1: Partially healthy. The synchronization health of some, but not all, availability replicas is healthy.
-                2: Healthy. The synchronization health of every availability replica is healthy.
+                0: Not healthy. None of the availability replicas have a healthy synchronization.
+                1: Partially healthy. The synchronization of some, but not all, availability replicas is healthy.
+                2: Healthy. The synchronization of every availability replica is healthy.
               application_prototypes:
                 -
                   name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
@@ -1780,7 +1842,7 @@ zabbix_export:
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': All replicas unhealthy'
                   priority: DISASTER
-                  description: 'None of the availability replicas have a healthy.'
+                  description: 'None of the availability replicas have a healthy synchronization.'
                 -
                   expression: '{last()}=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Some replicas unhealthy'
@@ -1815,6 +1877,183 @@ zabbix_export:
                 formulaid: B
           description: 'Scanning databases in DBMS.'
           item_prototypes:
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last diff backup duration'
+              type: DEPENDENT
+              key: 'mssql.backup.diff.duration["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Duration of the last differential backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''I'')].duration.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last diff backup (time ago)'
+              type: DEPENDENT
+              key: 'mssql.backup.diff["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The amount of time since the last differential backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''I'')].timesincelastbackup.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'The differential backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The differential backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                      expression: '{MSSQL by ODBC:mssql.backup.diff["{#DBNAME}"].last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last full backup duration'
+              type: DEPENDENT
+              key: 'mssql.backup.full.duration["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Duration of the last full backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''D'')].duration.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last full backup (time ago)'
+              type: DEPENDENT
+              key: 'mssql.backup.full["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The amount of time since the last full backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''D'')].timesincelastbackup.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'The full backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The full backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                      expression: '{MSSQL by ODBC:mssql.backup.full["{#DBNAME}"].last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last log backup duration'
+              type: DEPENDENT
+              key: 'mssql.backup.log.duration["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Duration of the last log backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''L'')].duration.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Last log backup'
+              type: DEPENDENT
+              key: 'mssql.backup.log["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The amount of time since the last log backup.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''L'')].timesincelastbackup.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'The log backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
+                  opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The log backup has not been executed for a long time.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                      expression: '{MSSQL by ODBC:mssql.backup.log["{#DBNAME}"].last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
             -
               name: 'MSSQL DB ''{#DBNAME}'': Active transactions'
               type: DEPENDENT
@@ -1906,7 +2145,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The cumulative used size of all the log files in the database.'
+              description: 'Cumulative used size of all the log files in the database.'
               application_prototypes:
                 -
                   name: 'MSSQL Database ''{#DBNAME}'''
@@ -2040,7 +2279,7 @@ zabbix_export:
               key: 'mssql.db.log_truncations["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'The number of times the transaction log has been shrunk.'
+              description: 'Number of times the transaction log has been shrunk.'
               application_prototypes:
                 -
                   name: 'MSSQL Database ''{#DBNAME}'''
@@ -2179,6 +2418,172 @@ zabbix_export:
                   item:
                     host: 'MSSQL by ODBC'
                     key: 'mssql.db.data_files_size["{#DBNAME}"]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Job discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[jobname,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: 'SELECT name AS jobname FROM msdb..sysjobs WHERE enabled = 1'
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          filter:
+            conditions:
+              -
+                macro: '{#JOBNAME}'
+                value: '{$MSSQL.JOB.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JOBNAME}'
+                value: '{$MSSQL.JOB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Scanning jobs in DBMS.'
+          item_prototypes:
+            -
+              name: 'MSSQL Job ''{#JOBNAME}'': Last run date-time'
+              type: DEPENDENT
+              key: 'mssql.job.lastrundatetime["{#JOBNAME}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The last date-time of the job run.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Job ''{#JOBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].LastRunDateTime.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Job ''{#JOBNAME}'': Last run status message'
+              type: DEPENDENT
+              key: 'mssql.job.lastrunstatusmessage["{#JOBNAME}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The informational message about the last run of the job.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Job ''{#JOBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].LastRunStatusMessage.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Job ''{#JOBNAME}'': Next run date-time'
+              type: DEPENDENT
+              key: 'mssql.job.nextrundatetime["{#JOBNAME}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The next date-time of the job run.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Job ''{#JOBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].NextRunDateTime.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Job ''{#JOBNAME}'': Run status'
+              type: DEPENDENT
+              key: 'mssql.job.runstatus["{#JOBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                The job status possible values:
+                0 ⇒ Failed
+                1 ⇒ Succeeded
+                2 ⇒ Retry
+                3 ⇒ Canceled
+                4 ⇒ Running
+              application_prototypes:
+                -
+                  name: 'MSSQL Job ''{#JOBNAME}'''
+              valuemap:
+                name: 'MSSQL Job Run Status'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].RunStatus.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL Job ''{#JOBNAME}'': Failed to run'
+                  priority: WARNING
+                  description: 'The last run of the job has failed.'
+                  manual_close: 'YES'
+            -
+              name: 'MSSQL Job ''{#JOBNAME}'': Run duration'
+              type: DEPENDENT
+              key: 'mssql.job.run_duration["{#JOBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Duration of the last run job.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Job ''{#JOBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].RunDuration.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  name: 'MSSQL Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  opdata: 'Job duration: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The job is taking too long.'
+                  manual_close: 'YES'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2457,7 +2862,7 @@ zabbix_export:
                 3 = Pending Failover
                 4 = Synchronized
                 5 = The partners are not synchronized. Failover is not possible now.
-                6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.
+                6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for the failover, see Database Mirroring Operating Modes.
               application_prototypes:
                 -
                   name: 'MSSQL Mirroring ''{#DBNAME}'''
@@ -2590,7 +2995,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Amount of log records of the primary database that has not been sent to the secondary databases.'
+              description: 'Amount of the log records of the primary database that has not been sent to the secondary databases.'
               application_prototypes:
                 -
                   name: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
@@ -2614,7 +3019,7 @@ zabbix_export:
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size is growing'
                   priority: HIGH
-                  description: 'The log records of the primary database do not send to the secondary databases.'
+                  description: 'The log records of the primary database are not sent to the secondary databases.'
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size'
               type: DEPENDENT
@@ -2888,7 +3293,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state the databases on the replica:
+                Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state of the databases on the replica:
                 0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.
                 1 : Partially healthy. Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.
                 2 : Healthy. All replicas are in the target synchronization state: synchronous-commit replicas are synchronized, and asynchronous-commit replicas are synchronizing.
@@ -2936,27 +3341,55 @@ zabbix_export:
         -
           macro: '{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
           value: '500'
-          description: 'The maximum average wait time in ms for trigger expression.'
+          description: 'The maximum average wait time in ms - for the trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_DIFF.CRIT}'
+          value: 6d
+          description: 'The maximum days without a differential backup - for the High trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_DIFF.WARN}'
+          value: 3d
+          description: 'The maximum days without a differential backup - for the Warning trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_DURATION.WARN}'
+          value: 1h
+          description: 'The maximum job duration - for the Warning trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_FULL.CRIT}'
+          value: 10d
+          description: 'The maximum days without a full backup - for the High trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_FULL.WARN}'
+          value: 9d
+          description: 'The maximum days without a full backup - for the Warning trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_LOG.CRIT}'
+          value: 8h
+          description: 'The maximum days without a log backup - for the High trigger expression.'
+        -
+          macro: '{$MSSQL.BACKUP_LOG.WARN}'
+          value: 4h
+          description: 'The maximum days without a log backup - for the Warning trigger expression.'
         -
           macro: '{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
           value: '30'
-          description: 'The minimum % buffer cache hit ratio for high trigger expression.'
+          description: 'The minimum % buffer cache hit ratio - for the High trigger expression.'
         -
           macro: '{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
           value: '50'
-          description: 'The minimum % buffer cache hit ratio for warning trigger expression.'
+          description: 'The minimum % buffer cache hit ratio - for the Warning trigger expression.'
         -
           macro: '{$MSSQL.DBNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in database discovery. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in database discovery. It can be overridden on a host or linked template level.'
         -
           macro: '{$MSSQL.DBNAME.NOT_MATCHES}'
           value: master|tempdb|model|msdb
-          description: 'This macro is used in database discovery. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in database discovery. It can be overridden on a host or linked template level.'
         -
           macro: '{$MSSQL.DEADLOCKS.MAX}'
           value: '1'
-          description: 'The maximum deadlocks per second for trigger expression.'
+          description: 'The maximum deadlocks per second - for the trigger expression.'
         -
           macro: '{$MSSQL.DSN}'
           value: '<Put your DSN here>'
@@ -2964,43 +3397,51 @@ zabbix_export:
         -
           macro: '{$MSSQL.FREE_LIST_STALLS.MAX}'
           value: '2'
-          description: 'The maximum free list stalls per second for trigger expression.'
+          description: 'The maximum free list stalls per second - for the trigger expression.'
         -
           macro: '{$MSSQL.INSTANCE}'
           value: SQLServer
-          description: 'The instance name for the default instance is SQLServer. For named instance set macro value as MSSQL$instance name.'
+          description: 'The instance name for the default instance is SQLServer. For named instance set the macro value as MSSQL$instance name.'
+        -
+          macro: '{$MSSQL.JOB.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in job discovery. It can be overridden on a host or linked template level.'
+        -
+          macro: '{$MSSQL.JOB.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in job discovery. It can be overridden on a host or linked template level.'
         -
           macro: '{$MSSQL.LAZY_WRITES.MAX}'
           value: '20'
-          description: 'The maximum lazy writes per second for trigger expression.'
+          description: 'The maximum lazy writes per second - for the trigger expression.'
         -
           macro: '{$MSSQL.LOCK_REQUESTS.MAX}'
           value: '1000'
-          description: 'The maximum lock requests per second for trigger expression.'
+          description: 'The maximum lock requests per second - for the trigger expression.'
         -
           macro: '{$MSSQL.LOCK_TIMEOUTS.MAX}'
           value: '1'
-          description: 'The maximum lock timeouts per second for trigger expression.'
+          description: 'The maximum lock timeouts per second - for the trigger expression.'
         -
           macro: '{$MSSQL.LOG_FLUSH_WAITS.MAX}'
           value: '1'
-          description: 'The maximum log flush waits per second for trigger expression.'
+          description: 'The maximum log flush waits per second - for the trigger expression.'
         -
           macro: '{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX}'
           value: '1'
-          description: 'The maximum log flush wait time in ms for trigger expression.'
+          description: 'The maximum log flush wait time in ms - for the trigger expression.'
         -
           macro: '{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
           value: '300'
-          description: 'The minimum page life expectancy for trigger expression.'
+          description: 'The minimum page life expectancy - for the trigger expression.'
         -
           macro: '{$MSSQL.PAGE_READS.MAX}'
           value: '90'
-          description: 'The maximum page reads per second for trigger expression.'
+          description: 'The maximum page reads per second - for the trigger expression.'
         -
           macro: '{$MSSQL.PAGE_WRITES.MAX}'
           value: '90'
-          description: 'The maximum page writes per second for trigger expression.'
+          description: 'The maximum page writes per second - for the trigger expression.'
         -
           macro: '{$MSSQL.PASSWORD}'
           value: '<Put your password here>'
@@ -3008,19 +3449,19 @@ zabbix_export:
         -
           macro: '{$MSSQL.PERCENT_COMPILATIONS.MAX}'
           value: '10'
-          description: 'The maximum percent of Transact-SQL compilations for trigger expression.'
+          description: 'The maximum percentage of Transact-SQL compilations - for the trigger expression.'
         -
           macro: '{$MSSQL.PERCENT_LOG_USED.MAX}'
           value: '80'
-          description: 'The maximum percent log used for trigger expression.'
+          description: 'The maximum percentage of log used - for the trigger expression.'
         -
           macro: '{$MSSQL.PERCENT_READAHEAD.MAX}'
           value: '20'
-          description: 'The maximum percent of pages read/sec in anticipation of use for trigger expression.'
+          description: 'The maximum percentage of pages read/sec in anticipation of use - for the trigger expression.'
         -
           macro: '{$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
           value: '10'
-          description: 'The maximum percent of Transact-SQL recompilations for trigger expression.'
+          description: 'The maximum percentage of Transact-SQL recompilations - for the trigger expression.'
         -
           macro: '{$MSSQL.PORT}'
           value: '1433'
@@ -3032,15 +3473,15 @@ zabbix_export:
         -
           macro: '{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
           value: '90'
-          description: 'The minimum % worktables from cache ratio for high trigger expression.'
+          description: 'The minimum percentage of the worktables from cache ratio - for the High trigger expression.'
         -
           macro: '{$MSSQL.WORK_FILES.MAX}'
           value: '20'
-          description: 'The maximum number of work files created per second for trigger expression.'
+          description: 'The maximum number of work files created per second - for the trigger expression.'
         -
           macro: '{$MSSQL.WORK_TABLES.MAX}'
           value: '20'
-          description: 'The maximum number of work tables created per second for trigger expression.'
+          description: 'The maximum number of work tables created per second - for the trigger expression.'
   triggers:
     -
       expression: '{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 > 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}'
@@ -3051,7 +3492,7 @@ zabbix_export:
       expression: '{MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {MSSQL by ODBC:mssql.page_reads_sec.rate.last()}'
       name: 'MSSQL: Too many physical reads occurring'
       priority: WARNING
-      description: 'If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.'
+      description: 'If this value makes up even a sizeable minority of the total Page Reads/sec (say, greater than 20% of the total page reads), you may have too many physical reads occurring.'
   graphs:
     -
       name: 'MSSQL: Access methods'
@@ -3526,6 +3967,27 @@ zabbix_export:
         -
           value: '10'
           newvalue: OFFLINE_SECONDARY
+    -
+      name: 'MSSQL Job Run Status'
+      mappings:
+        -
+          value: '0'
+          newvalue: Failed
+        -
+          value: '1'
+          newvalue: Succeeded
+        -
+          value: '2'
+          newvalue: Retry
+        -
+          value: '3'
+          newvalue: Canceled
+        -
+          value: '4'
+          newvalue: Running
+        -
+          value: '5'
+          newvalue: Unknown
     -
       name: 'MSSQL Mirroring Role'
       mappings:
