@@ -1694,8 +1694,8 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 {
 	int		ret;
 	zbx_variant_t	*arg, *start, *len, *replacement, value;
-	char		*strval;
-	size_t		str_alloc, str_len;
+	char		*strval, *p;
+	size_t		str_alloc, str_len, sz, src_len;
 
 	if (4 != token->opt)
 	{
@@ -1719,17 +1719,21 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64))
+	src_len = zbx_strlen_utf8(arg->data.str);
+
+	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64) || 0 == start->data.ui64 ||
+			start->data.ui64 > src_len)
 	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(start), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
+				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64) || 0 == len->data.ui64 ||
+			src_len < start->data.ui64 + len->data.ui64)
 	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
+				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1741,9 +1745,11 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 	}
 
 	strval = zbx_strdup(NULL, arg->data.str);
+	p = zbx_strshift_utf8(strval, start->data.ui64 - 1);
+	sz = zbx_strlen_utf8_nchars(p, len->data.ui64);
 
 	str_alloc = str_len = strlen(strval) + 1;
-	zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, start->data.ui64 - 1, len->data.ui64, replacement->data.str,
+	zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, p - strval, sz, replacement->data.str,
 			strlen(replacement->data.str));
 
 	zbx_variant_set_str(&value, strval);
