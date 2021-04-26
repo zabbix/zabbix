@@ -114,7 +114,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getItems() {
+	public function getItems(): array {
 		$items = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -145,7 +145,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getDiscoveryRules() {
+	public function getDiscoveryRules(): array {
 		$discovery_rules = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -178,7 +178,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHttpTests() {
+	public function getHttpTests(): array {
 		$httptests = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -209,7 +209,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHttpSteps() {
+	public function getHttpSteps(): array {
 		$httpsteps = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -244,11 +244,15 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getGraphs() {
+	public function getGraphs(): array {
 		$graphs = [];
 
 		if (array_key_exists('graphs', $this->data)) {
 			foreach ($this->data['graphs'] as $graph) {
+				if (array_key_exists('uuid', $graph) && $graph['uuid'] === '') {
+					unset($graph['uuid']);
+				}
+
 				$graphs[] = $this->renameGraphFields($graph);
 			}
 		}
@@ -261,7 +265,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	protected function getSimpleTriggers() {
+	protected function getSimpleTriggers(): array {
 		$simple_triggers = [];
 		$expression_options = ['lldmacros' => false, 'allow_func_only' => true];
 
@@ -309,11 +313,15 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getTriggers() {
+	public function getTriggers(): array {
 		$triggers = [];
 
 		if (array_key_exists('triggers', $this->data)) {
 			foreach ($this->data['triggers'] as $trigger) {
+				if (array_key_exists('uuid', $trigger) && $trigger['uuid'] === '') {
+					unset($trigger['uuid']);
+				}
+
 				$triggers[] = $this->renameTriggerFields($trigger);
 			}
 		}
@@ -659,7 +667,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	protected function renameTriggerFields(array $trigger) {
+	protected function renameTriggerFields(array $trigger): array {
 		$trigger = CArrayHelper::renameKeys($trigger, ['description' => 'comments']);
 
 		return CArrayHelper::renameKeys($trigger, ['name' => 'description', 'severity' => 'priority']);

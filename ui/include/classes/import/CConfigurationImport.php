@@ -227,7 +227,6 @@ class CConfigurationImport {
 
 			foreach ($host['groups'] as $group) {
 				$groups_refs += [$group['name'] => []];
-//				$groupsRefs[$group['name']] = $group['name'];
 			}
 
 			if (array_key_exists('macros', $host)) {
@@ -239,7 +238,6 @@ class CConfigurationImport {
 			if ($host['templates']) {
 				foreach ($host['templates'] as $linked_template) {
 					$templates_refs += [$linked_template['name'] => []];
-//					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
 			}
 
@@ -250,11 +248,9 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
-//				$itemsRefs[$host][$item['key_']] = $item['key_'];
-				$items_refs[$host][$item['key_']] =
-					(array_key_exists('uuid', $item) && $item['uuid'] !== '')
-						? ['uuid' => $item['uuid']]
-						: [];
+				$items_refs[$host][$item['key_']] = array_key_exists('uuid', $item)
+					? ['uuid' => $item['uuid']]
+					: [];
 
 				if ($item['valuemap']) {
 					$valuemaps_refs[$host] += [$item['valuemap']['name'] => []];
@@ -264,21 +260,16 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedDiscoveryRules() as $host => $discovery_rules) {
 			foreach ($discovery_rules as $discovery_rule) {
-//				$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
-				$items_refs[$host][$discovery_rule['key_']] =
-					(array_key_exists('uuid', $discovery_rule) && $discovery_rule['uuid'] !== '')
-						? ['uuid' => $discovery_rule['uuid']]
-						: [];
+				$items_refs[$host][$discovery_rule['key_']] = array_key_exists('uuid', $discovery_rule)
+					? ['uuid' => $discovery_rule['uuid']]
+					: [];
 
 				foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
-//					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
-					$items_refs[$host][$item_prototype['key_']] =
-						(array_key_exists('uuid', $item_prototype) && $item_prototype['uuid'] !== '')
-							? ['uuid' => $item_prototype['uuid']]
-							: [];
+					$items_refs[$host][$item_prototype['key_']] = array_key_exists('uuid', $item_prototype)
+						? ['uuid' => $item_prototype['uuid']]
+						: [];
 
 					if (!empty($item_prototype['valuemap'])) {
-//						$valueMapsRefs[$host][$item_prototype['valuemap']['name']] = $item_prototype['valuemap']['name'];
 						$valuemaps_refs[$host] += [$item_prototype['valuemap']['name'] => []];
 					}
 				}
@@ -288,10 +279,9 @@ class CConfigurationImport {
 					$expression = $trigger['expression'];
 					$recovery_expression = $trigger['recovery_expression'];
 
-					$triggers_refs[$description][$expression][$recovery_expression] =
-						(array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '')
-							? ['uuid' => $trigger['uuid']]
-							: [];
+					$triggers_refs[$description][$expression][$recovery_expression] = array_key_exists('uuid', $trigger)
+						? ['uuid' => $trigger['uuid']]
+						: [];
 
 					if (array_key_exists('dependencies', $trigger)) {
 						foreach ($trigger['dependencies'] as $dependency) {
@@ -299,7 +289,6 @@ class CConfigurationImport {
 							$expression = $dependency['expression'];
 							$recovery_expression = $dependency['recovery_expression'];
 
-//							$triggersRefs[$name][$expression][$recovery_expression] = true;
 							$triggers_refs[$name][$expression] += [$recovery_expression => []];
 						}
 					}
@@ -307,34 +296,28 @@ class CConfigurationImport {
 
 				foreach ($discovery_rule['graph_prototypes'] as $graph) {
 					if ($graph['ymin_item_1']) {
-//						$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 						$items_refs[$graph['ymin_item_1']['host']] += [$graph['ymin_item_1']['key'] => []];
 					}
 
 					if ($graph['ymax_item_1']) {
-//						$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
 						$items_refs[$graph['ymax_item_1']['host']] += [$graph['ymax_item_1']['key'] => []];
 					}
 
 					foreach ($graph['gitems'] as $gitem) {
-//						$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
 						if (!array_key_exists($gitem['item']['host'], $templates_refs)) {
 							$hosts_refs[$gitem['item']['host']] = [];
 						}
 
-//						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 						$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
-//						$graphsRefs[$gitemItem['host']][$graph['name']] = $graph['name'];
-						$graphs_refs[$gitem['item']['host']][$graph['name']] =
-							(array_key_exists('uuid', $graph) && $graph['uuid'] !== '')
-								? ['uuid' => $graph['uuid']]
-								: [];
+						$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
+							? ['uuid' => $graph['uuid']]
+							: [];
 					}
 				}
 
 				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
 					$host_prototypes_refs[$host][$discovery_rule['key_']][$host_prototype['host']] =
-						(array_key_exists('uuid', $host_prototype) && $host_prototype['uuid'] !== '')
+						array_key_exists('uuid', $host_prototype)
 							? ['uuid' => $host_prototype['uuid']]
 							: [];
 
@@ -390,17 +373,16 @@ class CConfigurationImport {
 					}
 
 					$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
-					$graphs_refs[$gitem['item']['host']][$graph['name']] =
-						(array_key_exists('uuid', $graph) && $graph['uuid'] !== '')
-							? ['uuid' => $graph['uuid']]
-							: [];
+					$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
+						? ['uuid' => $graph['uuid']]
+						: [];
 				}
 			}
 		}
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggers_refs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
-				(array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '')
+				array_key_exists('uuid', $trigger)
 					? ['uuid' => $trigger['uuid']]
 					: [];
 
@@ -494,10 +476,9 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			foreach ($httptests as $httptest) {
-				$httptests_refs[$host][$httptest['name']] =
-					(array_key_exists('uuid', $httptest) && $httptest['uuid'] !== '')
-						? ['uuid' => $httptest['uuid']]
-						: [];
+				$httptests_refs[$host][$httptest['name']] = array_key_exists('uuid', $httptest)
+					? ['uuid' => $httptest['uuid']]
+					: [];
 			}
 		}
 
@@ -1831,7 +1812,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($items as $item) {
-				$itemid = (array_key_exists('uuid', $item) && $item['uuid'] !== '')
+				$itemid = array_key_exists('uuid', $item)
 					? $this->referencer->findItemByUuid($item['uuid'])
 					: $this->referencer->findItemByKey($hostid, $item['key_']);
 
@@ -1881,7 +1862,7 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggerid = null;
 
-			if (array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '') {
+			if (array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
 			}
 
@@ -1950,7 +1931,7 @@ class CConfigurationImport {
 		foreach ($this->getFormattedGraphs() as $graph) {
 			$graphid = null;
 
-			if (array_key_exists('uuid', $graph) && $graph['uuid'] !== '') {
+			if (array_key_exists('uuid', $graph)) {
 				$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
 			}
 
@@ -2156,7 +2137,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = (array_key_exists('uuid', $httptest) && $httptest['uuid'] !== '')
+				$httptestid = array_key_exists('uuid', $httptest)
 					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
 					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
 
@@ -2210,7 +2191,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discovery_ruleid = (array_key_exists('uuid', $discovery_rule) && $discovery_rule['uuid'] !== '')
+				$discovery_ruleid = array_key_exists('uuid', $discovery_rule)
 					? $this->referencer->findItemByUuid($discovery_rule['uuid'])
 					: $this->referencer->findItemByKey($hostid, $discovery_rule['key_']);
 
@@ -2282,7 +2263,7 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedItems(): array {
-		if (!isset($this->formattedData['items'])) {
+		if (!array_key_exists('items', $this->formattedData)) {
 			$this->formattedData['items'] = $this->adapter->getItems();
 		}
 
@@ -2294,8 +2275,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedDiscoveryRules() {
-		if (!isset($this->formattedData['discoveryRules'])) {
+	protected function getFormattedDiscoveryRules(): array {
+		if (!array_key_exists('discoveryRules', $this->formattedData)) {
 			$this->formattedData['discoveryRules'] = $this->adapter->getDiscoveryRules();
 		}
 
@@ -2320,7 +2301,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedHttpSteps() {
+	protected function getFormattedHttpSteps(): array {
 		if (!array_key_exists('httpsteps', $this->formattedData)) {
 			$this->formattedData['httpsteps'] = $this->adapter->getHttpSteps();
 		}
@@ -2346,8 +2327,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedGraphs() {
-		if (!isset($this->formattedData['graphs'])) {
+	protected function getFormattedGraphs(): array {
+		if (!array_key_exists('graphs', $this->formattedData)) {
 			$this->formattedData['graphs'] = $this->adapter->getGraphs();
 		}
 
