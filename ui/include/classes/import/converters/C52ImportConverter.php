@@ -491,6 +491,7 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertTriggers(array $triggers, ?string $host = null, ?string $item = null): array {
 		$expression_converter = new C52TriggerExpressionConverter();
+		$event_name_converter = new C52EventNameConverter();
 
 		foreach ($triggers as &$trigger) {
 			$trigger['expression'] = $expression_converter->convert([
@@ -498,6 +499,10 @@ class C52ImportConverter extends CConverter {
 				'host' => $host,
 				'item' => $item
 			]);
+
+			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== '') {
+				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
+			}
 
 			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
 				$trigger['recovery_expression'] = $expression_converter->convert([

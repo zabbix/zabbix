@@ -36,7 +36,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 *
 	 * @var array
 	 */
-	protected $hanged_refs;
+	protected $hanged_refs = [];
 
 	/**
 	 * Host for simplified functions.
@@ -155,7 +155,9 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 		else {
 			$query = sprintf('/%s/%s', $fn['host'], $fn['item']);
-			$has_hanged_functions = $this->hanged_refs[$fn['host']];
+			$has_hanged_functions = array_key_exists($fn['host'], $this->hanged_refs)
+				? $this->hanged_refs[$fn['host']]
+				: false;
 		}
 
 		$extra_expr = '';
