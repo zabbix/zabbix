@@ -1729,8 +1729,7 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64) || 0 == len->data.ui64 ||
-			src_len < start->data.ui64 + len->data.ui64)
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64) || src_len < start->data.ui64 + len->data.ui64)
 	{
 		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
 				ctx->expression + token->loc.l);
