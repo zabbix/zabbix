@@ -45,6 +45,8 @@ typedef struct
 }
 zbx_buffer_t;
 
+#if defined(HAVE_LIBCURL)
+
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t		r_size = size * nmemb, buf_alloc;
@@ -66,7 +68,6 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
-#if defined(HAVE_LIBCURL)
 static char	*rw_curl_error(CURLcode err)
 {
 	char	*error;
