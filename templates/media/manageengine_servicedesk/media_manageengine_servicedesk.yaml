@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T09:43:39Z'
+  date: '2021-04-26T11:14:16Z'
   media_types:
     -
       name: 'ManageEngine ServiceDesk'
@@ -287,7 +287,10 @@ zabbix_export:
                                 }
                             }
                         });
-                    data.description = data.description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                    if (data.description) {
+                        data.description = data.description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                    }
+        
                     result = {request: data};
                 }
         
@@ -383,9 +386,11 @@ zabbix_export:
             }
             // Update created issue for trigger-based event.
             else {
-                MEngine.request('post', 'requests/' + params.sd_request_id + '/notes',
-                    MEngine.createPaylaod(fields, params.event_update_status === '1')
-                );
+                if (params.event_update_status === '1') {
+                    MEngine.request('post', 'requests/' + params.sd_request_id + '/notes',
+                        MEngine.createPaylaod(fields, true)
+                    );
+                }
                 delete fields['field_string:description'];
                 MEngine.request('put', 'requests/' + params.sd_request_id, MEngine.createPaylaod(fields));
             }
