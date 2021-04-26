@@ -139,7 +139,7 @@ class CConfigurationImport {
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
-//		$this->deleteMissingItems();
+		$this->deleteMissingItems();
 
 //		// import objects
 //		$this->processHttpTests();
@@ -1806,55 +1806,54 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes items from DB that are missing in XML.
-	 *
-	 * @return null
 	 */
-	protected function deleteMissingItems() {
+	protected function deleteMissingItems(): void {
 		if (!$this->options['items']['deleteMissing']) {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostids();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostids(),
+			$this->importedObjectContainer->getTemplateids()
+		);
 
-		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
-
-		// no hosts or templates have been processed
-		if (!$processedHostIds) {
+		if (!$processed_hostids) {
 			return;
 		}
 
-		$itemIdsXML = [];
+		$itemids = [];
 
-		$allItems = $this->getFormattedItems();
+		foreach ($this->getFormattedItems() as $host => $items) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-		if ($allItems) {
-			foreach ($allItems as $host => $items) {
-				$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
+			if ($hostid === null) {
+				continue;
+			}
 
-				foreach ($items as $item) {
-					$itemId = $this->referencer->findItemByKey($hostId, $item['key_']);
+			foreach ($items as $item) {
+				$itemid = (array_key_exists('uuid', $item) && $item['uuid'] !== '')
+					? $this->referencer->findItemByUuid($item['uuid'])
+					: $this->referencer->findItemByKey($hostid, $item['key_']);
 
-					if ($itemId) {
-						$itemIdsXML[$itemId] = $itemId;
-					}
+				if ($itemid) {
+					$itemids[$itemid] = [];
 				}
 			}
 		}
 
-		$dbItemIds = API::Item()->get([
+		$db_itemids = API::Item()->get([
 			'output' => ['itemid'],
-			'hostids' => $processedHostIds,
-			'preservekeys' => true,
-			'nopermissions' => true,
+			'hostids' => $processed_hostids,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
-		$itemsToDelete = array_diff_key($dbItemIds, $itemIdsXML);
+		$items_to_delete = array_diff_key($db_itemids, $itemids);
 
-		if ($itemsToDelete) {
-			API::Item()->delete(array_keys($itemsToDelete));
+		if ($items_to_delete) {
+			API::Item()->delete(array_keys($items_to_delete));
 		}
 
 		$this->referencer->refreshItems();
@@ -2282,7 +2281,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedItems() {
+	protected function getFormattedItems(): array {
 		if (!isset($this->formattedData['items'])) {
 			$this->formattedData['items'] = $this->adapter->getItems();
 		}
