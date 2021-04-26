@@ -1068,6 +1068,13 @@ out:
   result: SUCCEED
   value: ''
 ---
+test case: Expression 'left("Zabbix", -1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'left("Zabbix", -1)'
+out:
+  result: FAIL
+---
 test case: Expression 'mid("Zabbix", 3, 2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
