@@ -1638,6 +1638,7 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 {
 	int		ret;
 	zbx_variant_t	*str1, *str2, value;
+	char		*strval;
 
 	if (2 != token->opt)
 	{
@@ -1666,7 +1667,8 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	zbx_variant_set_str(&value, zbx_strdcat(str1->data.str, str2->data.str));
+	strval = zbx_strdup(NULL, str1->data.str);
+	zbx_variant_set_str(&value, zbx_strdcat(strval, str2->data.str));
 	eval_function_return(2, &value, output);
 
 	return SUCCEED;
