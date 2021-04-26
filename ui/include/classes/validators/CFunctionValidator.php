@@ -466,7 +466,7 @@ class CFunctionValidator extends CValidator {
 				return $this->validateNumSuffix($param->getValue());
 
 			case 'nodata_mode':
-				return ($param->getValue() === 'strict' || $param->getValue() === '');
+				return $this->validateNoDataMode($param->getValue());
 
 			case 'fit':
 				return ($param->getValue() === '' || $this->validateFit($param->getValue()));
@@ -688,6 +688,17 @@ class CFunctionValidator extends CValidator {
 		else {
 			return in_array($param, ['iregexp', 'regexp', 'like']);
 		}
+	}
+
+	/**
+	 * Validate nodata_mode parameter.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateNoDataMode(string $param): bool {
+		return ($this->isMacro($param) || $param->getValue() === 'strict' || $param->getValue() === '');
 	}
 
 	/**
