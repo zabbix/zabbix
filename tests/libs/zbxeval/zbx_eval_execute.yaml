@@ -1076,13 +1076,51 @@ out:
   result: SUCCEED
   value: 'bb'
 ---
+test case: Expression 'mid("Zabbix", 3, 10)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'mid("Zabbix", 3, 10)'
+out:
+  result: SUCCEED
+  value: 'bbix'
+---
+test case: Expression 'mid("Заббикс", 3, 10)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'mid("Заббикс", 3, 10)'
+out:
+  result: SUCCEED
+  value: 'ббикс'
+---
+test case: Expression 'mid("Заббикс", 3, 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'mid("Заббикс", 3, 2)'
+out:
+  result: SUCCEED
+  value: 'бб'
+---
+test case: Expression 'mid("Zabbix", 3, 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'mid("Zabbix", 3, 0)'
+out:
+  result: SUCCEED
+  value: ''
+---
 test case: Expression 'mid("Zabbix", 0, 0)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
   expression: 'mid("Zabbix", 0, 0)'
 out:
-  result: SUCCEED
-  value: ''
+  result: FAIL
+---
+test case: Expression 'mid("Zabbix", 33, 1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'mid("Zabbix", 33, 1)'
+out:
+  result: FAIL
 ---
 test case: Expression 'right("Zabbix", 2)'
 in:
@@ -1100,10 +1138,34 @@ out:
   result: SUCCEED
   value: 'Zabbix'
 ---
+test case: Expression 'right("Заббикс", 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'right("Заббикс", 2)'
+out:
+  result: SUCCEED
+  value: 'кс'
+---
+test case: Expression 'right("Заббикс", 10)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'right("Заббикс", 10)'
+out:
+  result: SUCCEED
+  value: 'Заббикс'
+---
 test case: Expression 'right("Zabbix", 0)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
   expression: 'right("Zabbix", 0)'
+out:
+  result: SUCCEED
+  value: ''
+---
+test case: Expression 'right("Заббикс", 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'right("Заббикс", 0)'
 out:
   result: SUCCEED
   value: ''
@@ -1180,6 +1242,14 @@ out:
   result: SUCCEED
   value: 'ZabbixZabbixZabbix'
 ---
+test case: Expression 'repeat("ZabbixЗаббикс", 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'repeat("ZabbixЗаббикс", 2)'
+out:
+  result: SUCCEED
+  value: 'ZabbixЗаббиксZabbixЗаббикс'
+---
 test case: Expression 'repeat("Zabbix", 0)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
@@ -1187,6 +1257,13 @@ in:
 out:
   result: SUCCEED
   value: ''
+---
+test case: Expression 'repeat("Zabbix", 999999)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'repeat("Zabbix", 999999)'
+out:
+  result: FAIL
 ---
 test case: Expression 'char(65)'
 in:
@@ -1274,6 +1351,43 @@ out:
   result: SUCCEED
   value: 'Zabbix'
 ---
+test case: Expression 'insert("Зибикс", 2, 2, "абб")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'insert("Зибикс", 2, 2, "абб")'
+out:
+  result: SUCCEED
+  value: 'Заббикс'
+---
+test case: Expression 'insert("zabbix", 2, 2, "")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'insert("zabbix", 2, 2, "")'
+out:
+  result: SUCCEED
+  value: 'zbix'
+---
+test case: Expression 'insert("", 1, 1, "zabbix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'insert("", 1, 1, "zabbix")'
+out:
+  result: FAIL
+---
+test case: Expression 'insert("", 0, 0, "")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'insert("", 0, 0, "")'
+out:
+  result: FAIL
+---
+test case: Expression 'insert("Zabbix",2,33,"aaa")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'insert("Zabbix",2,33,"aaa")'
+out:
+  result: FAIL
+---
 test case: Expression 'replace("Zibix", "ibi", "abbi")'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
@@ -1289,4 +1403,36 @@ in:
 out:
   result: SUCCEED
   value: 'Заббикс'
+---
+test case: Expression 'replace("Zibix", "", "abbi")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'replace("Zibix", "", "abbi")'
+out:
+  result: SUCCEED
+  value: 'Zibix'
+---
+test case: Expression 'replace("Zibix", "ibi", "")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'replace("Zibix", "ibi", "")'
+out:
+  result: SUCCEED
+  value: 'Zx'
+---
+test case: Expression 'replace("", "ibi", "abbi")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'replace("", "ibi", "abbi")'
+out:
+  result: SUCCEED
+  value: ''
+---
+test case: Expression 'replace("Hello Hello", "ll", "y")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'replace("Hello Hello", "ll", "y")'
+out:
+  result: SUCCEED
+  value: 'Heyo Heyo'
 ...
