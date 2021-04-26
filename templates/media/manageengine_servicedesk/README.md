@@ -47,16 +47,17 @@ Save the *refresh_token* for using in Zabbix later.
 1\. In the *Administration > Media types* section, import [media_manageengine_servicedesk.yaml](media_manageengine_servicedesk.yaml).
 
 2\. Open the newly added **ManageEngine ServiceDesk** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
-The following parameters are required:<br>
-**sd_on_premise** - true or false. Pass *true* if you are using on-premise installation and *false* if not.<br>
-**sd_url** - the URL of your instance.<br>
 
 The following parameters are required for on-premise ServiceDesk:<br>
+**sd_on_premise** - *true*.<br>
+**sd_url** - the URL of your instance.<br>
 **sd_on_premise_auth_token** - the TEHNICAN_KEY generated earlier.<br>
 **field_ref:requester** - login of the account used for request creation.<br>
 
 The following parameters are required for on-demand ServiceDesk:<br>
-**sd_url_auth** - your domain-specific Zoho accounts URL for refreshing access token.<br>
+**sd_on_premise** - *false**.<br>
+**sd_url** - the URL of your instance.<br>
+**sd_on_demand_url_auth** - your domain-specific Zoho accounts URL for refreshing access token.<br>
 **sd_on_demand_client_id**, **sd_on_demand_client_secret**, **sd_on_demand_refresh_token** - created earlier authentication details.<br>
 **field_ref:requester** - requester's displaying name. You can remove this parameter or use any name. *"Zabbix"*, for example. <br>
 
@@ -69,11 +70,17 @@ You can add any data to ServiceDesk or user-defined fields.<br>
 Please see the [On-demand](https://www.manageengine.com/products/service-desk/sdpod-v3-api/SDPOD-V3-API.html#add-request) and [On-premise](
 https://ui.servicedeskplus.com/APIDocs3/index.html#add-request) API specification for details about fields.<br>
 Most of fields should be filled as single-line string, other should be an object with *name* property. Zabbix can fill both, but not *"date"* fields.<br>
+Supported fied types: Single-line, Multi-line, Numeric, Pick List, Email, Phone, Currency, Decimal, Percent, Web URL, Radio Button, Decision Box. All of them should be passed as string.<br>
+
 Fields should be in format **field_string:fieldname**, where:<br>
-**field** - can be *field* or *udf_field*. The prefix for payload generator.<br>
-**string** - should be *string* for single-line strings or any other for objects.<br>
+**field** - can be *field* for system fields or *udf_field* for user-defined fields. The prefix for payload generator.<br>
+**string** - should be *string* for single-line strings or any other for *REFERRED_FIELD*.<br>
 **:** - separator between prefix and field name.<br>
 **fieldname** - the name of ServiceDesk or user-defined field.<br>
+Examples:<br>
+`field_string:subject`<br>
+`field_ref:template`<br>
+`udf_field_string:udf_char1`
 
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/5.4/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
