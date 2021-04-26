@@ -84,15 +84,16 @@ class CPeriodParser extends CParser {
 			$sec_num = $this->simple_interval_parser->match;
 			$p += $this->simple_interval_parser->length;
 		}
-		else {
-			return self::PARSE_FAIL;
-		}
 
 		if (isset($source[$p]) && $source[$p] === ':') {
 			if ($this->relative_time_parser->parse($source, $p + 1) !== self::PARSE_FAIL) {
 				$time_shift = $this->relative_time_parser->match;
 				$p += $this->relative_time_parser->length + 1;
 			}
+		}
+
+		if ($p == $pos) {
+			return self::PARSE_FAIL;
 		}
 
 		$this->length = $p - $pos;
