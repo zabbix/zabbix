@@ -3795,7 +3795,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_DATE],
 				'2000-02-29',
 				'/1/date',
-				'2000-02-29',
+				'2000-02-29'
 			],
 			[
 				['type' => API_DATE],
