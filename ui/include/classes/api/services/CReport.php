@@ -816,7 +816,7 @@ class CReport extends CApiService {
 		}
 
 		if ($ins_report_users) {
-			DB::insertBatch('report_user', $ins_report_users);
+			DB::insert('report_user', $ins_report_users);
 		}
 
 		if ($upd_report_users) {
@@ -890,7 +890,7 @@ class CReport extends CApiService {
 		}
 
 		if ($ins_report_usrgrps) {
-			DB::insertBatch('report_usrgrp', $ins_report_usrgrps);
+			DB::insert('report_usrgrp', $ins_report_usrgrps);
 		}
 
 		if ($upd_report_usrgrps) {
