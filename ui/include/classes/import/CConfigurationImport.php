@@ -144,7 +144,7 @@ class CConfigurationImport {
 		// import objects
 		$this->processHttpTests();
 		$this->processItems();
-//		$this->processTriggers();
+		$this->processTriggers();
 //		$this->processDiscoveryRules();
 //		$this->processGraphs();
 //		$this->processImages();
@@ -389,8 +389,15 @@ class CConfigurationImport {
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
-					$triggers_refs[$dependency['name']][$dependency['expression']]
-						+= [$dependency['recovery_expression'] => []];
+					$name = $dependency['name'];
+					$expression = $dependency['expression'];
+					$recovery_expression = $dependency['recovery_expression'];
+
+					if (!array_key_exists($name, $triggers_refs)
+							|| !array_key_exists($expression, $triggers_refs[$name])
+							|| !array_key_exists($recovery_expression, $triggers_refs[$name][$expression])) {
+						$triggers_refs[$name][$expression][$recovery_expression] = [];
+					}
 				}
 			}
 		}
@@ -1550,66 +1557,73 @@ class CConfigurationImport {
 
 	/**
 	 * Import triggers.
+	 *
+	 * @throws Exception
 	 */
-	protected function processTriggers() {
+	protected function processTriggers(): void {
 		if (!$this->options['triggers']['createMissing'] && !$this->options['triggers']['updateExisting']) {
 			return;
 		}
 
-		$allTriggers = $this->getFormattedTriggers();
+		$triggers_to_create = [];
+		$triggers_to_update = [];
 
-		if (!$allTriggers) {
-			return;
-		}
+		$triggers_to_process_dependencies = [];
 
-		$triggersToCreate = [];
-		$triggersToUpdate = [];
-		// the list of triggers to process dependencies
-		$triggers = [];
+		foreach ($this->getFormattedTriggers() as $trigger) {
+			$triggerid = null;
 
-		foreach ($allTriggers as $trigger) {
-			$triggerId = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-				$trigger['recovery_expression']
-			);
+			if (array_key_exists('uuid', $trigger)) {
+				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
+			}
 
-			if ($triggerId) {
+			// In import file host trigger can have UUID assigned after conversion, such should be searched by name.
+			if ($triggerid === null) {
+				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression']
+				);
+
+				// Template triggers should only be searched by UUID.
+				if ($triggerid !== null && array_key_exists('uuid', $trigger)) {
+					$db_trigger = $this->referencer->findTriggerById($triggerid);
+
+					if ($db_trigger['uuid'] !== '' && $db_trigger['uuid'] !== $trigger['uuid']) {
+						$triggerid = null;
+					}
+				}
+			}
+
+			if ($triggerid !== null) {
 				if ($this->options['triggers']['updateExisting']) {
-					$triggers[] = $trigger;
+					$triggers_to_process_dependencies[] = $trigger;
 
-					$trigger['triggerid'] = $triggerId;
-					unset($trigger['dependencies']);
-					$triggersToUpdate[] = $trigger;
+					$trigger['triggerid'] = $triggerid;
+					unset($trigger['dependencies'], $trigger['uuid']);
+					$triggers_to_update[] = $trigger;
 				}
 			}
 			else {
 				if ($this->options['triggers']['createMissing']) {
-					$triggers[] = $trigger;
+					$triggers_to_process_dependencies[] = $trigger;
 
 					unset($trigger['dependencies']);
-					$triggersToCreate[] = $trigger;
+					$triggers_to_create[] = $trigger;
 				}
 			}
 		}
 
-		if ($triggersToCreate) {
-			$result = API::Trigger()->create($triggersToCreate);
-
-			foreach ($result['triggerids'] as $tnum => $triggerid) {
-				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
-					$trigger['recovery_expression'], $triggerid
-				);
-			}
+		if ($triggers_to_update) {
+			API::Trigger()->update($triggers_to_update);
 		}
 
-		if ($triggersToUpdate) {
-			API::Trigger()->update($triggersToUpdate);
+		if ($triggers_to_create) {
+			API::Trigger()->create($triggers_to_create);
 		}
 
-		// refresh triggers because template triggers can be inherited to host and used in maps
+		// Refresh triggers because template triggers can be inherited to host and used in maps.
 		$this->referencer->refreshTriggers();
 
-		$this->processTriggerDependencies($triggers);
+		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
 	/**
@@ -1619,42 +1633,43 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 */
-	protected function processTriggerDependencies(array $triggers) {
-		$dependencies = [];
+	protected function processTriggerDependencies(array $triggers): void {
+		$trigger_dependencies = [];
 
 		foreach ($triggers as $trigger) {
 			if (!array_key_exists('dependencies', $trigger)) {
 				continue;
 			}
 
-			$deps = [];
 			$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
 
+			$dependencies = [];
+
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->findTriggeridByName($dependency['name'], $dependency['expression'],
-					$dependency['recovery_expression']
+				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
+					$dependency['expression'], $dependency['recovery_expression']
 				);
 
-				if (!$dep_triggerid) {
+				if ($dependent_triggerid === null) {
 					throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
 						$trigger['description'],
 						$dependency['name']
 					));
 				}
 
-				$deps[] = ['triggerid' => $dep_triggerid];
+				$dependencies[] = ['triggerid' => $dependent_triggerid];
 			}
 
-			$dependencies[] = [
+			$trigger_dependencies[] = [
 				'triggerid' => $triggerid,
-				'dependencies' => $deps
+				'dependencies' => $dependencies
 			];
 		}
 
-		if ($dependencies) {
-			API::Trigger()->update($dependencies);
+		if ($trigger_dependencies) {
+			API::Trigger()->update($trigger_dependencies);
 		}
 	}
 
@@ -1866,6 +1881,15 @@ class CConfigurationImport {
 				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 					$trigger['recovery_expression']
 				);
+
+				// Template triggers should only be searched by UUID.
+				if ($triggerid !== null && array_key_exists('uuid', $trigger)) {
+					$db_trigger = $this->referencer->findTriggerById($triggerid);
+
+					if ($db_trigger['uuid'] !== '' && $db_trigger['uuid'] !== $trigger['uuid']) {
+						$triggerid = null;
+					}
+				}
 			}
 
 			if ($triggerid !== null) {

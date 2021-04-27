@@ -514,7 +514,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$db_hosts = DBselect(
-			'SELECT h.hostid,h.host'.
+			'SELECT h.hostid,h.host,h.status'.
 			' FROM hosts h'.
 			' WHERE '.dbConditionInt('h.host', array_keys($hosts)). // TODO VM: (?) h.host is hostNAME and is not an integer. It should use dbConditionString.
 				' AND '.dbConditionInt('h.status',
@@ -525,7 +525,10 @@ abstract class CTriggerGeneral extends CApiService {
 		while ($db_host = DBfetch($db_hosts)) {
 			foreach ($hosts[$db_host['host']] as $description => $indexes) {
 				foreach ($indexes as $index) {
-					$descriptions[$description][$index]['hostid'] = $db_host['hostid'];
+					$descriptions[$description][$index]['host'] = [
+						'hostid' => $db_host['hostid'],
+						'status' => $db_host['status']
+					];
 				}
 			}
 			unset($hosts[$db_host['host']]);
@@ -557,8 +560,8 @@ abstract class CTriggerGeneral extends CApiService {
 			$expressions = [];
 
 			foreach ($triggers as $trigger) {
-				$hostids[$trigger['hostid']] = true;
-				$expressions[$trigger['expression']][$trigger['recovery_expression']] = $trigger['hostid'];
+				$hostids[$trigger['host']['hostid']] = true;
+				$expressions[$trigger['expression']][$trigger['recovery_expression']] = $trigger['host']['hostid'];
 			}
 
 			$db_triggers = DBfetchArray(DBselect(
@@ -599,44 +602,49 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Add UUID only for triggers on templates.
+	 * Check that only triggers on templates have UUID. Add UUID to all triggers on templates, if it does not exists.
 	 *
-	 * @param type $triggers
+	 * @param array $triggers_to_create
+	 * @param array $descriptions
+	 *
+	 * @throws APIException
 	 */
-	protected function addUuid(&$triggers): void {
-		$expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+	protected function checkAndAddUuid(array &$triggers_to_create, array $descriptions): void {
+		foreach ($descriptions as $triggers) {
+			foreach ($triggers as $trigger) {
+				if ($trigger['host']['status'] != HOST_STATUS_TEMPLATE && $trigger['uuid'] !== null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						// TODO VM: check, if this message is correct
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($trigger['index'] + 1),
+							_s('unexpected parameter "%1$s"', 'uuid')
+						)
+					);
+				}
 
-		$hosts = [];
-		$hosts_per_trigger = [];
-
-		foreach ($triggers as $index => $trigger) {
-			// TODO VM: (?) getting only first host could be enough (as it is not possible to have trigger on host and template simultaneously). But this is safer.
-			$expression_data->parse($trigger['expression']);
-			$expression_hosts = $expression_data->getHosts();
-
-			$expression_data->parse($trigger['recovery_expression']);
-			$recovery_hosts = $expression_data->getHosts();
-
-			$hosts_per_trigger[$index] = array_flip($expression_hosts) + array_flip($recovery_hosts);
-			$hosts += $hosts_per_trigger[$index];
-		}
-
-		$db_templates = DBfetchColumn(DBselect(
-			'SELECT h.host'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
-				' AND h.status = ' . HOST_STATUS_TEMPLATE
-		), 'host');
-
-		$db_templates = array_flip($db_templates);
-
-		foreach ($triggers as $index => &$trigger) {
-			foreach (array_keys($hosts_per_trigger[$index]) as $expression_host) {
-				if (array_key_exists($expression_host, $db_templates)) {
-					$trigger['uuid'] = generateUuidV4();
-					break;
+				if ($trigger['host']['status'] == HOST_STATUS_TEMPLATE && $trigger['uuid'] === null) {
+					$triggers_to_create[$trigger['index']]['uuid'] = generateUuidV4();
 				}
 			}
+		}
+
+		$new_uuids = array_column($triggers_to_create, 'uuid');
+
+		if (count(array_unique($new_uuids)) !== count($new_uuids)) {
+			// TODO VM: check, if this message is correct
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Duplicate UUID detected.'));
+		}
+
+		$db_uuid = DB::select('triggers', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => $new_uuids],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				// TODO VM: check, if this message is correct
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
 		}
 	}
 
@@ -817,6 +825,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateCreate(array &$triggers) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
+			// TODO VM: new type for UUID check. Add unittests.
+			'uuid' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'uuid')],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
 			'event_name' =>				['type' => API_EVENT_NAME, 'length' => DB::getFieldLength('triggers', 'event_name')],
@@ -851,17 +861,21 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$descriptions = [];
-		foreach ($triggers as $trigger) {
+		foreach ($triggers as $index => $trigger) {
 			self::checkTriggerRecoveryMode($trigger);
 			self::checkTriggerCorrelationMode($trigger);
 
 			$descriptions[$trigger['description']][] = [
+				'index' => $index,
+				'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : null,
 				'expression' => $trigger['expression'],
 				'recovery_expression' => $trigger['recovery_expression']
 			];
 		}
+
 		$descriptions = $this->populateHostIds($descriptions);
 		$this->checkDuplicates($descriptions);
+		$this->checkAndAddUuid($triggers, $descriptions);
 	}
 
 	/**

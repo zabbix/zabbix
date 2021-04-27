@@ -421,7 +421,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function create(array $trigger_prototypes) {
 		$this->validateCreate($trigger_prototypes);
-		$this->addUuid($trigger_prototypes);
 		$this->createReal($trigger_prototypes);
 		$this->inherit($trigger_prototypes);
 

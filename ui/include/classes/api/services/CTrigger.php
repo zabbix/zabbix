@@ -516,7 +516,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function create(array $triggers) {
 		$this->validateCreate($triggers);
-		$this->addUuid($triggers);
 		$this->createReal($triggers);
 		$this->inherit($triggers);
 
