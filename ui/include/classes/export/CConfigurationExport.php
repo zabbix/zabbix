@@ -1114,7 +1114,7 @@ class CConfigurationExport {
 	protected function gatherValueMaps(array $valuemapids) {
 		$this->data['valueMaps'] = API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
-			'selectMappings' => ['value', 'newvalue'],
+			'selectMappings' => ['type', 'value', 'newvalue'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);

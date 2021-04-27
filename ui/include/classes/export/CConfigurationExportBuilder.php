@@ -440,16 +440,9 @@ class CConfigurationExportBuilder {
 	 * @param array $valuemaps
 	 */
 	protected function formatValueMaps(array $valuemaps) {
-		$result = [];
-
 		CArrayHelper::sort($valuemaps, ['name']);
 
-		foreach ($valuemaps as $valuemap) {
-			CArrayHelper::sort($valuemap['mappings'], ['value']);
-			$result[] = $valuemap;
-		}
-
-		return $result;
+		return $valuemaps;
 	}
 
 	/**

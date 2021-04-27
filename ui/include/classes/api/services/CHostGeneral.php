@@ -831,13 +831,16 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
 				$params = [
-					'output' => ['valuemapid', 'value', 'newvalue'],
-					'filter' => ['valuemapid' => array_keys($valuemaps)]
+					'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)],
+					'sortfield' => ['sortorder'],
+					'sortorder' => ZBX_SORT_UP
 				];
 				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
 
 				while ($mapping = DBfetch($query)) {
 					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'type' => $mapping['type'],
 						'value' => $mapping['value'],
 						'newvalue' => $mapping['newvalue']
 					];
