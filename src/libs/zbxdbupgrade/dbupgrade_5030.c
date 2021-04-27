@@ -5119,12 +5119,16 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	else if (0 == strcmp(function->name, "logeventid") || 0 == strcmp(function->name, "logsource"))
 	{
 		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 	else if (0 == strcmp(function->name, "logseverity"))
 	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
+				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 
@@ -5844,11 +5848,19 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 		{
 			char	*arg0, *host = NULL, *key = NULL;
 			int	ret;
+			size_t	arg0_len;
 
 			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
 
 			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted);
+			arg0_len = strlen(arg0);
 			zbx_remove_chars(arg0, "\t\n\r");
+			if (strlen(arg0) != arg0_len)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "control characters were removed from calculated item \""
+						ZBX_FS_UI64 "\" formula host:key parameter at %s", itemid, ptr);
+			}
+
 			ret = parse_host_key(arg0, &host, &key);
 			zbx_free(arg0);
 

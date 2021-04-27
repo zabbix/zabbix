@@ -25,7 +25,7 @@ class C52AggregateItemKeyConverterTest extends TestCase {
 
 	protected $converter;
 
-	public function setup() {
+	protected function setUp(): void {
 		$this->converter = new C52AggregateItemKeyConverter();
 	}
 

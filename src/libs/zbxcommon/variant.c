@@ -224,6 +224,11 @@ static int	variant_to_ui64(zbx_variant_t *value)
 			if (0 > value->data.dbl)
 				return FAIL;
 
+			/* uint64_t(double(UINT64_MAX)) conversion results in 0, to avoid      */
+			/* conversion issues require floating value to be less than UINT64_MAX */
+			if (ZBX_MAX_UINT64 <= value->data.dbl)
+				return FAIL;
+
 			zbx_variant_set_ui64(value, value->data.dbl);
 			return SUCCEED;
 		case ZBX_VARIANT_STR:

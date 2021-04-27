@@ -23,41 +23,109 @@ use PHPUnit\Framework\TestCase;
 
 class CQueryParserTest extends TestCase {
 
-	protected function setUp(): void {
-		$this->query_parser = new CQueryParser();
-	}
-
 	public function dataProvider() {
 		return [
-			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]',
 				'host' => 'Zabbix server',
 				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
 			]],
-			['/h/i', 0, [
+			['/h/i', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/h/i',
 				'host' => 'h',
 				'item' => 'i'
 			]],
-			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log,ERROR,,1000,,,120.0]', 0, [
+			['text /h/i text', 5, [], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/h/i',
+				'host' => 'h',
+				'item' => 'i'
+			]],
+			['text /{HOST.HOST}/item[pam, "param"] text', 5, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['text /{HOST.HOST}/item[pam, "param"] text', 5, ['host_macro' => true], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/{HOST.HOST}/item[pam, "param"]',
+				'host' => '{HOST.HOST}',
+				'item' => 'item[pam, "param"]'
+			]],
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log,ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '/Zabbix server/logrt',
 				'host' => 'Zabbix server',
 				'item' => 'logrt'
 			]],
-			['/Zabbix server^/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [
-				'rc' => CParser::PARSE_FAIL
+			['/Zabbix server^/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
 			]],
-			['/Zabbix server', 0, [
-				'rc' => CParser::PARSE_FAIL
+			['/Zabbix server', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
 			]],
-			['/Zabbix server/', 0, [
-				'rc' => CParser::PARSE_FAIL
+			['/Zabbix server/', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
 			]],
-			['//logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [
-				'rc' => CParser::PARSE_FAIL
+			['//logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/Zabbix server/*', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/Zabbix server/*', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/Zabbix server/*',
+				'host' => 'Zabbix server',
+				'item' => '*'
+			]],
+			['/*/key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/*/key', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/*/key',
+				'host' => '*',
+				'item' => 'key'
+			]],
+			['/*/*', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/*/*',
+				'host' => '*',
+				'item' => '*'
+			]],
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]', 0, [], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]',
+				'host' => 'Zabbix server',
+				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
+			]],
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]',
+				'host' => 'Zabbix server',
+				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
 			]]
 		];
 	}
@@ -67,21 +135,18 @@ class CQueryParserTest extends TestCase {
 	 *
 	 * @param string  $source
 	 * @param int     $source
+	 * @param array   $options
 	 * @param array   $expected
 	 */
-	public function testQueryParse(string $source, int $pos, array $expected) {
-		$this->query_parser->parse($source, $pos);
+	public function testQueryParse(string $source, int $pos, array $options, array $expected) {
+		$query_parser = new CQueryParser($options);
 
-		if ($expected['rc'] == CParser::PARSE_FAIL) {
-			$this->assertSame($expected, ['rc' => $this->query_parser->parse($source, $pos)]);
-		}
-		else {
-			$this->assertSame($expected, [
-				'rc' => $this->query_parser->parse($source, $pos),
-				'match' => $this->query_parser->result->match,
-				'host' => $this->query_parser->result->host,
-				'item' => $this->query_parser->result->item
-			]);
-		}
+		$this->assertSame($expected, [
+			'rc' => $query_parser->parse($source, $pos),
+			'match' => $query_parser->getMatch(),
+			'host' => $query_parser->getHost(),
+			'item' => $query_parser->getItem()
+		]);
+		$this->assertSame(strlen($expected['match']), strlen($query_parser->getMatch()));
 	}
 }

@@ -39,11 +39,14 @@ class CPeriodParser extends CParser {
 	];
 
 	/**
-	 * Parsed data.
-	 *
-	 * @var CPeriodParserResult
+	 * @var string
 	 */
-	public $result;
+	private $sec_num = '';
+
+	/**
+	 * @var string
+	 */
+	private $timeshift = '';
 
 	/**
 	 * @param array $options
@@ -72,9 +75,14 @@ class CPeriodParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->match = '';
+		$this->length = 0;
+		$this->sec_num = '';
+		$this->timeshift = '';
+
 		$p = $pos;
 		$sec_num = '';
-		$time_shift = '';
+		$timeshift = '';
 
 		if (preg_match('/^#[0-9]+/', substr($source, $p), $matches)) {
 			$sec_num = $matches[0];
@@ -84,28 +92,41 @@ class CPeriodParser extends CParser {
 			$sec_num = $this->simple_interval_parser->match;
 			$p += $this->simple_interval_parser->length;
 		}
-		else {
-			return self::PARSE_FAIL;
-		}
 
 		if (isset($source[$p]) && $source[$p] === ':') {
 			if ($this->relative_time_parser->parse($source, $p + 1) !== self::PARSE_FAIL) {
-				$time_shift = $this->relative_time_parser->match;
+				$timeshift = $this->relative_time_parser->match;
 				$p += $this->relative_time_parser->length + 1;
 			}
 		}
 
-		$this->length = $p - $pos;
+		if ($p == $pos) {
+			return self::PARSE_FAIL;
+		}
 
-		$this->result = new CPeriodParserResult();
-		$this->result->match = substr($source, $pos, $this->length);
-		$this->result->sec_num = $sec_num;
-		$this->result->time_shift = $time_shift;
-		$this->result->sec_num_contains_macros = (strpos($sec_num, '{') !== false);
-		$this->result->time_shift_contains_macros = (strpos($time_shift, '{') !== false);
-		$this->result->length = $this->length;
-		$this->result->pos = $pos;
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+		$this->sec_num = $sec_num;
+		$this->timeshift = $timeshift;
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Returns the first part of the period.
+	 *
+	 * @return string
+	 */
+	public function getSecNum(): string {
+		return $this->sec_num;
+	}
+
+	/**
+	 * Returns the second part of the period.
+	 *
+	 * @return string
+	 */
+	public function getTimeshift(): string {
+		return $this->timeshift;
 	}
 }

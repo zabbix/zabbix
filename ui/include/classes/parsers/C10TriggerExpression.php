@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Trigger expressions parser.
+ */
 class C10TriggerExpression {
 	// For parsing of trigger expression.
 	const STATE_AFTER_OPEN_BRACE = 1;

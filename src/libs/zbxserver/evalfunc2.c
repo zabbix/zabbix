@@ -247,7 +247,7 @@ static int	get_function_parameter_hist_range(int from, const char *parameters, i
 	}
 	else
 	{
-		if (SUCCEED != is_uint31(parameter + 1, value))
+		if (SUCCEED != is_uint31(parameter + 1, value) || 0 >= *value)
 			goto out;
 		*type = ZBX_VALUE_NVALUES;
 	}
@@ -295,6 +295,64 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_last_n_value                                                 *
+ *                                                                            *
+ * Purpose: get last Nth value defined by #num:now-timeshift first parameter  *
+ *                                                                            *
+ * Parameters: item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] the parameter string with #sec|num/timeshift *
+ *                          in first parameter                                *
+ *             ts         - [IN] the starting timestmap                       *
+ *             value      - [OUT] the Nth value                               *
+ *             error      - [OUT] the error emssage                           *
+ *                                                                            *
+ * Return value: SUCCEED - value was found successfully copied                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_last_n_value(const DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		zbx_history_record_t *value, char **error)
+{
+	int				arg1 = 1, ret = FAIL, time_shift;
+	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (ZBX_VALUE_NVALUES != arg1_type)
+		arg1 = 1;	/* time or non parameter is defaulted to "last(0)" */
+
+	ts_end.sec -= time_shift;
+
+	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	if (arg1 <= values.values_num)
+	{
+		*value = values.values[arg1 - 1];
+		zbx_vector_history_record_remove(&values, arg1 - 1);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_LOGEVENTID                                              *
  *                                                                            *
  * Purpose: evaluate function 'logeventid' for the item                       *
@@ -309,8 +367,8 @@ out:
 static int	evaluate_LOGEVENTID(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	char			*arg1 = NULL;
-	int			ret = FAIL;
+	char			*pattern = NULL;
+	int			ret = FAIL, nparams;
 	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 
@@ -324,39 +382,45 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, DC_ITEM *item, const char *
 		goto out;
 	}
 
-	if (1 < num_param(parameters))
+	if (2 < (nparams = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_str(parameters, 1, &arg1))
+	if (2 == nparams)
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
-		goto out;
-	}
-
-	if ('@' == *arg1)
-	{
-		DCget_expressions_by_name(&regexps, arg1 + 1);
-
-		if (0 == regexps.values_num)
+		if (SUCCEED != get_function_parameter_str(parameters, 2, &pattern))
 		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
+			*error = zbx_strdup(*error, "invalid third parameter");
 			goto out;
 		}
-	}
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
+		if ('@' == *pattern)
+		{
+			DCget_expressions_by_name(&regexps, pattern + 1);
+
+			if (0 == regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist",
+						pattern + 1);
+				goto out;
+			}
+		}
+	}
+	else
+		pattern = zbx_strdup(NULL, "");
+
+	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
 		char	logeventid[16];
 		int	regexp_ret;
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
 
-		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
+		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, pattern, ZBX_CASE_SENSITIVE)))
 		{
-			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		}
 		else
 		{
@@ -371,12 +435,9 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, DC_ITEM *item, const char *
 		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 	else
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-	}
 out:
-	zbx_free(arg1);
+	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
@@ -402,8 +463,8 @@ out:
 static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-	char			*arg1 = NULL;
-	int			ret = FAIL;
+	char			*pattern = NULL;
+	int			ret = FAIL, nparams;
 	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 
@@ -417,32 +478,38 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (1 < num_param(parameters))
+	if (2 < (nparams = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_str(parameters, 1, &arg1))
+	if (2 == nparams)
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
-		goto out;
-	}
-
-	if ('@' == *arg1)
-	{
-		DCget_expressions_by_name(&regexps, arg1 + 1);
-
-		if (0 == regexps.values_num)
+		if (SUCCEED != get_function_parameter_str(parameters, 2, &pattern))
 		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
+			*error = zbx_strdup(*error, "invalid third parameter");
 			goto out;
 		}
-	}
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
+		if ('@' == *pattern)
+		{
+			DCget_expressions_by_name(&regexps, pattern + 1);
+
+			if (0 == regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist",
+						pattern + 1);
+				goto out;
+			}
+		}
+	}
+	else
+		pattern = zbx_strdup(NULL, "");
+
+	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		switch (regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				zbx_variant_set_dbl(value, 1);
@@ -459,12 +526,9 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *p
 		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 	else
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-	}
 out:
-	zbx_free(arg1);
+	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
@@ -486,7 +550,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSEVERITY(zbx_variant_t *value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+static int	evaluate_LOGSEVERITY(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
 {
 	int			ret = FAIL;
 	zbx_history_record_t	vc_value;
@@ -499,7 +564,13 @@ static int	evaluate_LOGSEVERITY(zbx_variant_t *value, DC_ITEM *item, const zbx_t
 		goto out;
 	}
 
-	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
+	if (1 < num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
 		zbx_variant_set_dbl(value, vc_value.value.log->severity);
 		zbx_history_record_clear(&vc_value, item->value_type);
@@ -507,10 +578,7 @@ static int	evaluate_LOGSEVERITY(zbx_variant_t *value, DC_ITEM *item, const zbx_t
 		ret = SUCCEED;
 	}
 	else
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
-		*error = zbx_strdup(*error, "cannot get value from value cache");
-	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1264,45 +1332,16 @@ out:
 static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-	int				arg1 = 1, ret = FAIL, time_shift;
-	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
-	zbx_vector_history_record_t	values;
-	zbx_timespec_t			ts_end = *ts;
+	int			ret;
+	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_history_record_vector_create(&values);
-
-	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
+	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
-		goto out;
+		zbx_history_value2variant(&vc_value.value, item->value_type, value);
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
-
-	if (ZBX_VALUE_NVALUES != arg1_type)
-		arg1 = 1;	/* time or non parameter is defaulted to "last(0)" */
-
-	ts_end.sec -= time_shift;
-
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
-	{
-		if (arg1 <= values.values_num)
-		{
-			zbx_history_value2variant(&values.values[arg1 - 1].value, item->value_type, value);
-			ret = SUCCEED;
-		}
-		else
-		{
-			*error = zbx_strdup(*error, "not enough data");
-			goto out;
-		}
-	}
-	else
-	{
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-	}
-out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3289,7 +3328,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	}
 	else if (0 == strcmp(function, "logseverity"))
 	{
-		ret = evaluate_LOGSEVERITY(value, item, ts, error);
+		ret = evaluate_LOGSEVERITY(value, item, parameter, ts, error);
 	}
 	else if (0 == strcmp(function, "logsource"))
 	{

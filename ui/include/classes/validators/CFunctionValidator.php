@@ -187,19 +187,22 @@ class CFunctionValidator extends CValidator {
 			'logeventid' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
+					['type' => 'scale', 'mandat' => 0x00],
 					['type' => 'pattern', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
 			'logseverity' => [
 				'args' => [
-					['type' => 'query', 'mandat' => 0x01]
+					['type' => 'query', 'mandat' => 0x01],
+					['type' => 'scale', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
 			'logsource' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
+					['type' => 'scale', 'mandat' => 0x00],
 					['type' => 'pattern', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
@@ -463,7 +466,7 @@ class CFunctionValidator extends CValidator {
 				return $this->validateNumSuffix($param->getValue());
 
 			case 'nodata_mode':
-				return ($param->getValue() === 'strict' || $param->getValue() === '');
+				return $this->validateNoDataMode($param->getValue());
 
 			case 'fit':
 				return ($param->getValue() === '' || $this->validateFit($param->getValue()));
@@ -685,6 +688,17 @@ class CFunctionValidator extends CValidator {
 		else {
 			return in_array($param, ['iregexp', 'regexp', 'like']);
 		}
+	}
+
+	/**
+	 * Validate nodata_mode parameter.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateNoDataMode(string $param): bool {
+		return ($this->isMacro($param) || $param->getValue() === 'strict' || $param->getValue() === '');
 	}
 
 	/**

@@ -249,16 +249,22 @@ class C52ImportConverter extends CConverter {
 				);
 			}
 
+			$applications = array_key_exists('applications', $item_prototype) ? $item_prototype['applications'] : [];
+
 			if (array_key_exists('application_prototypes', $item_prototype)) {
+				$applications = array_merge($applications, $item_prototype['application_prototypes']);
+			}
+
+			if ($applications) {
 				$i = 0;
 				$item_prototype['tags'] = [];
 
-				foreach (self::convertApplicationsToTags($item_prototype['application_prototypes']) as $tag) {
+				foreach (self::convertApplicationsToTags($applications) as $tag) {
 					$item_prototype['tags']['tag'.($i ? $i : '')] = $tag;
 					$i++;
 				}
 
-				unset($item_prototype['application_prototypes']);
+				unset($item_prototype['applications'], $item_prototype['application_prototypes']);
 			}
 
 			if (array_key_exists('type', $item_prototype)) {
@@ -485,6 +491,7 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertTriggers(array $triggers, ?string $host = null, ?string $item = null): array {
 		$expression_converter = new C52TriggerExpressionConverter();
+		$event_name_converter = new C52EventNameConverter();
 
 		foreach ($triggers as &$trigger) {
 			$trigger['expression'] = $expression_converter->convert([
@@ -492,6 +499,10 @@ class C52ImportConverter extends CConverter {
 				'host' => $host,
 				'item' => $item
 			]);
+
+			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== '') {
+				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
+			}
 
 			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
 				$trigger['recovery_expression'] = $expression_converter->convert([

@@ -309,6 +309,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -322,34 +323,41 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$parser = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		$result = $parser->parse($data);
-
-		if (!$result) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $parser->error);
-
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 
-		$validator = new CFunctionValidator(['calculated' => true]);
-		$math_validator = new CMathFunctionValidator(['calculated' => true]);
-		$skip_valid = $data;
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'calculated' => true,
+			'host_macro' => true
+		]);
 
-		foreach ($result->getFunctions() as $func) {
-			if ($math_validator->validate($func)) {
-				/**
-				 * Replace validated math functions with space to not validate functions in parameters
-				 * as standalone functions. Example:
-				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
-				 */
-				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
-			}
-			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
-				$error = $validator->getError();
-
-				return false;
-			}
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
+			return false;
 		}
+
+//		$validator = new CFunctionValidator(['calculated' => true]);
+//		$math_validator = new CMathFunctionValidator(['calculated' => true]);
+//		$skip_valid = $data;
+
+//		foreach ($result->getFunctions() as $func) {
+//			if ($math_validator->validate($func)) {
+//				/**
+//				 * Replace validated math functions with space to not validate functions in parameters
+//				 * as standalone functions. Example:
+//				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
+//				 */
+//				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
+//			}
+//			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
+//				$error = $validator->getError();
+
+//				return false;
+//			}
+//		}
 
 		return true;
 	}
@@ -2050,17 +2058,16 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression([
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'lowercase_errors' => true
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
 			return false;
 		}
 
-		if (!$expression_data->result->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_QUERY)) {
+		if (!$expression_parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION])) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('trigger expression must contain at least one /host/key reference')
 			);

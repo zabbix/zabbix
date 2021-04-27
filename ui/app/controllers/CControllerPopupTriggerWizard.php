@@ -111,7 +111,7 @@ class CControllerPopupTriggerWizard extends CController {
 			$exprs[] = array_shift($input) + array_shift($input);
 		}
 
-		$constructor = new CTextTriggerConstructor(new CTriggerExpression());
+		$constructor = new CTextTriggerConstructor(new CExpressionParser(['lldmacros' => true]));
 
 		if ($this->hasInput('triggerid')) {
 			$page_options['triggerid'] = $this->getInput('triggerid');
@@ -125,6 +125,7 @@ class CControllerPopupTriggerWizard extends CController {
 				'output' => ['key_'],
 				'selectHosts' => ['host'],
 				'itemids' => $page_options['itemid'],
+				'editable' => true,
 				'limit' => 1
 			]);
 
@@ -142,8 +143,8 @@ class CControllerPopupTriggerWizard extends CController {
 			$item = reset($items);
 			$host = reset($item['hosts']);
 
-			if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
-				if (check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) {
+			if ($trigger_valid) {
+				if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];
 						$description = $page_options['description'];
@@ -190,7 +191,7 @@ class CControllerPopupTriggerWizard extends CController {
 					}
 
 					// Save if no errors found.
-					if (array_key_exists('triggerid', $page_options) && $trigger_valid) {
+					if (array_key_exists('triggerid', $page_options)) {
 						$result = API::Trigger()->update($trigger);
 						$audit_action = AUDIT_ACTION_UPDATE;
 
@@ -198,7 +199,7 @@ class CControllerPopupTriggerWizard extends CController {
 							error(_('Cannot update trigger'));
 						}
 					}
-					elseif ($trigger_valid) {
+					else {
 						$result = API::Trigger()->create($trigger);
 						if ($result['triggerids']) {
 							$db_triggers = API::Trigger()->get([
@@ -214,9 +215,6 @@ class CControllerPopupTriggerWizard extends CController {
 							error(_('Cannot add trigger'));
 						}
 					}
-					else {
-						$result['triggerids'] = false;
-					}
 
 					if ($result['triggerids']) {
 						DBstart();
@@ -229,11 +227,8 @@ class CControllerPopupTriggerWizard extends CController {
 					}
 				}
 				else {
-					error('No permissions to referred object or it does not exist!');
+					error(_s('Field "%1$s" is mandatory.', 'expressions'));
 				}
-			}
-			else {
-				error(_s('Field "%1$s" is mandatory.', 'expressions'));
 			}
 
 			$output = [];
@@ -284,16 +279,13 @@ class CControllerPopupTriggerWizard extends CController {
 			if ($page_options['itemid']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'key_', 'name'],
-					'selectHosts' => ['name', 'host'],
+					'selectHosts' => ['name'],
 					'itemids' => $page_options['itemid']
 				]);
 
 				if ($items) {
 					$items = CMacrosResolverHelper::resolveItemNames($items);
-					$page_options = [
-						'query' => '/'.$items[0]['hosts'][0]['host'].'/'.$items[0]['key_'],
-						'item_name' => $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded']
-					] + $page_options;
+					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
 				}
 			}
 
