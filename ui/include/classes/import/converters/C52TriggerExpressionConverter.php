@@ -108,7 +108,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		return $trigger_data['expression'];
 	}
 
-	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
+	/**
+	 * Convert expressions parts.
+	 *
+	 * @param string $expression          Expression string.
+	 * @param array $expression_elements  Expression tree.
+	 * @param array $extra_expr           Array to accumulate strings to add at the end of converted expression.
+	 */
+	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr
+			): void {
 		for ($i = count($expression_elements) - 1; $i >= 0; $i--) {
 			$part = $expression_elements[$i];
 
@@ -121,7 +129,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
-	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
+	/**
+	 * Convert expression part.
+	 *
+	 * @param string $expression         Expression string.
+	 * @param array $expression_element  Expression part to convert.
+	 * @param array $extra_expr          Array to accumulate strings to add at the end of converted expression.
+	 */
+	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr
+			): void {
 		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
 
 		if (($expression_data->parse($expression_element['expression'])) !== false) {
@@ -148,6 +164,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
+	/**
+	 * Convert function to new syntax.
+	 *
+	 * @param array $fn          Function to convert.
+	 * @param string $host_name  Host name.
+	 * @param string $item_key   Item key.
+	 *
+	 * @return array
+	 */
 	protected function convertFunction(array $fn, string $host_name, string $item_key): array {
 		if ($fn['item'] === '' && $fn['host'] === '') {
 			$query = sprintf('/%s/%s', $host_name, $item_key);
@@ -249,6 +274,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		return [$new_expression, $extra_expr];
 	}
 
+	/**
+	 * Convert function parameters to new syntax.
+	 *
+	 * @param array $parameters             List of parameters according previous syntax.
+	 * @param array $unquotable_parameters  List of numeric indexes for parameters that don't need to be quoted.
+	 * @param string $fn_name               Function name.
+	 *
+	 * @return array
+	 */
 	private static function convertParameters(array $parameters, array $unquotable_parameters, string $fn_name): array {
 		switch ($fn_name) {
 			// (sec|#num,<time_shift>)
@@ -407,18 +441,39 @@ class C52TriggerExpressionConverter extends CConverter {
 		return array_values($parameters);
 	}
 
+	/**
+	 * Convert seconds.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertParamSec(string $param): string {
 		return (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
 	}
 
+	/**
+	 * Convert period.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertParamPeriod(string $param): string {
 		return (preg_match('/^(?<num>\d+)(?<suffix>[hdwMy]{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
 	}
 
+	/**
+	 * Convert time shift.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertTimeshift(string $param): string {
 		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
@@ -426,6 +481,13 @@ class C52TriggerExpressionConverter extends CConverter {
 		return ($param !== '') ? 'now-'.$param : '';
 	}
 
+	/**
+	 * Concatenate parameters into comma separated string.
+	 *
+	 * @param array $parameters  Parameter to concatenate.
+	 *
+	 * @return string
+	 */
 	private static function paramsToString(array $parameters): string {
 		$parameters = rtrim(implode(',', $parameters), ',');
 		return ($parameters === '') ? '' : ','.$parameters;
@@ -514,6 +576,7 @@ class C52TriggerExpressionConverter extends CConverter {
 							}
 						}
 						break;
+
 					default:
 						// Try to parse an operator.
 						if ($operator[$operator_pos] === $this->parser->expression[$i]) {
@@ -522,8 +585,10 @@ class C52TriggerExpressionConverter extends CConverter {
 
 							// Operator found.
 							if ($operator_token === $operator) {
-								// We've reached the end of a complete expression, parse the expression on the left side
-								// of the operator.
+								/*
+								 * We've reached the end of a complete expression, parse the expression on the left side
+								 * of the operator.
+								 */
 								if ($level == 0) {
 									// Find the last symbol of the expression before the operator.
 									$close_symbol_pos = $i - strlen($operator);
@@ -550,8 +615,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				$close_symbol_pos--;
 			}
 
-			// We've found a whole expression and parsed the expression on the left side of the operator, parse the
-			// expression on the right.
+			/*
+			 * We've found a whole expression and parsed the expression on the left side of the operator, parse the
+			 * expression on the right.
+			 */
 			if ($operator_found) {
 				$expressions[] = $this->getExpressionParts($open_symbol_pos, $close_symbol_pos);
 
@@ -577,8 +644,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				];
 				break;
 			}
-			// If we've tried both operators and didn't find anything, it means there's only one expression return the
-			// result.
+			/*
+			 * If we've tried both operators and didn't find anything, it means there's only one expression return the
+			 * result.
+			 */
 			elseif ($operator === 'and') {
 				// Trim extra parentheses.
 				if ($open_symbol_pos == $left_parentheses && $close_symbol_pos == $right_parentheses) {
@@ -603,5 +672,4 @@ class C52TriggerExpressionConverter extends CConverter {
 
 		return $result;
 	}
-
 }

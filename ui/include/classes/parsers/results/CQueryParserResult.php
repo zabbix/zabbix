@@ -28,14 +28,14 @@ class CQueryParserResult extends CFunctionParameterResult {
 	const HOST_ITEMKEY_WILDCARD = '*';
 
 	/**
-	 * Host name
+	 * Host name.
 	 *
 	 * @var string
 	 */
 	public $host;
 
 	/**
-	 * Item key
+	 * Item key.
 	 *
 	 * @var string
 	 */

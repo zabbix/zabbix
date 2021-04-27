@@ -77,9 +77,11 @@ class CTriggerExprParserResult extends CParserResult {
 
 		while ($params_stack) {
 			$param = array_shift($params_stack);
+
 			if ($param instanceof CFunctionParserResult) {
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
 			}
+
 			if (($param instanceof CParserResult) && in_array($param->type, $types)) {
 				$result[] = $param;
 			}
@@ -114,6 +116,7 @@ class CTriggerExprParserResult extends CParserResult {
 
 		while ($params_stack) {
 			$param = array_shift($params_stack);
+
 			if ($param instanceof CFunctionParserResult) {
 				$functions[] = $param;
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
@@ -134,6 +137,7 @@ class CTriggerExprParserResult extends CParserResult {
 
 		while ($params_stack) {
 			$param = array_shift($params_stack);
+
 			if ($param instanceof CFunctionParserResult) {
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
 			}
@@ -161,6 +165,7 @@ class CTriggerExprParserResult extends CParserResult {
 
 		while ($params_stack) {
 			$param = array_shift($params_stack);
+
 			if ($param instanceof CFunctionParserResult) {
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
 			}
@@ -182,7 +187,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 *
 	 * @return array
 	 */
-	public function getItems():array {
+	public function getItems(): array {
 		$items = [];
 		foreach ($this->tokens as $token) {
 			if ($token instanceof CFunctionParserResult) {
@@ -197,7 +202,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 *
 	 * @return array
 	 */
-	public function getHosts():array {
+	public function getHosts(): array {
 		$hosts = [];
 		foreach ($this->tokens as $token) {
 			if ($token instanceof CFunctionParserResult) {

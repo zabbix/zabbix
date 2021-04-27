@@ -24,9 +24,9 @@
  */
 class CFunctionIdParserResult extends CParserResult {
 
-	public $functionid;
+	public string $functionid;
 
-	public $type;
+	public int $type;
 
 	public function __construct() {
 		$this->type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO;

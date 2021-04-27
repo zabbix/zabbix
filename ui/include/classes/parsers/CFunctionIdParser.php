@@ -20,7 +20,7 @@
 
 
 /**
- * A parser for function id macros.
+ * A parser for functionid macros.
  */
 class CFunctionIdParser extends CParser {
 

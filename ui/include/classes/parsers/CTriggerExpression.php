@@ -37,14 +37,14 @@ class CTriggerExpression {
 	public const ERROR_FUNCTION_PARSER = 4;
 
 	/**
-	 * Shows a validity of trigger expression
+	 * Shows a validity of trigger expression.
 	 *
 	 * @var bool
 	 */
 	public $is_valid;
 
 	/**
-	 * An error message if trigger expression is not valid
+	 * An error message if trigger expression is not valid.
 	 *
 	 * @var string
 	 */

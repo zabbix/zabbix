@@ -62,6 +62,7 @@ class CTextTriggerConstructor {
 
 		if (empty($expressions)) {
 			error(_('Expression cannot be empty'));
+
 			return false;
 		}
 
@@ -112,6 +113,7 @@ class CTextTriggerConstructor {
 				$arr[6] = strtolower($arr[6]);
 				if (!isset($functions[$arr[6]])) {
 					error(_('Incorrect function is used').'. ['.$expression['value'].']');
+
 					return false;
 				}
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
@@ -126,6 +128,7 @@ class CTextTriggerConstructor {
 
 			if (empty($expr_array)) {
 				error(_('Incorrect trigger expression').'. ['.$expression['value'].']');
+
 				return false;
 			}
 

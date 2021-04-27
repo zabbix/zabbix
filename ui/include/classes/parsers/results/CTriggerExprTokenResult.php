@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Class used to store details of trigger expression tokens.
  */
@@ -39,6 +40,7 @@ class CTriggerExprTokenResult extends CParserResult {
 
 	public function __construct(array $data) {
 		$data = array_intersect_key($data, array_flip(['type', 'source', 'match', 'pos', 'length', 'data']));
+
 		foreach ($data as $property => $value) {
 			$this->$property = $value;
 		}
