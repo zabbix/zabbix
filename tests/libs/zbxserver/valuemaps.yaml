@@ -11,7 +11,7 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: "3"
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
 out:
   return: SUCCEED
   value: "Value 0 (0)"
@@ -28,12 +28,12 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: "3"
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
 out:
   return: SUCCEED
   value: "Regex 1 (1)"
 ---
-test case: range < 3
+test case: range <= 3
 in:
   value: 2
   valuemaps:
@@ -45,10 +45,10 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: "3"
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
 out:
   return: SUCCEED
-  value: "Value < 3 (2)"
+  value: "Value <= 3 (2)"
 ---
 test case: range 5-7
 in:
@@ -62,7 +62,7 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: "3"
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
   - type: 3
     value: "5-7"
     newvalue: "Value 5-7"
@@ -82,16 +82,16 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: 3
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
   - type: 3
     value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
-    newvalue: "Value > 10"
+    newvalue: "Value >= 10"
 out:
   return: SUCCEED
-  value: "Value > 10 (15)"
+  value: "Value >= 10 (15)"
 ---
 test case: default
 in:
@@ -105,13 +105,13 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: 3
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
   - type: 3
     value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
-    newvalue: "Value > 10"
+    newvalue: "Value >= 10"
   - type: 5
     value: ""
     newvalue: "Default"
@@ -131,13 +131,13 @@ in:
     newvalue: "Regex 1"
   - type: 2
     value: 3
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
   - type: 3
     value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
-    newvalue: "Value > 10"
+    newvalue: "Value >= 10"
 out:
   return: FAIL
   value: 4
@@ -148,7 +148,7 @@ in:
   valuemaps:
   - type: 2
     value: 3
-    newvalue: "Value < 3"
+    newvalue: "Value <= 3"
   - type: 0
     value: 1
     newvalue: "Value 1"
@@ -157,7 +157,7 @@ in:
     newvalue: "Regex 1"
 out:
   return: SUCCEED
-  value: "Value < 3 (1)"
+  value: "Value <= 3 (1)"
 ---
 test case: complex range
 in:
@@ -165,6 +165,17 @@ in:
   valuemaps:
   - type: 3
     value: "-10--5,-3-5,32,44,4- 6, 10.5 -12.5, 133.1, 8"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (4)"
+---
+test case: complex range2
+in:
+  value: 4
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-1,32,44,9.0e-1- 6.0e0, 10.5 -12.5, 133.1, 8"
     newvalue: "Range"
 out:
   return: SUCCEED

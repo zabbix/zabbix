@@ -42,7 +42,6 @@ ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
 
 #include "valuemaps_test.h"
 
-
 static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
 {
 	zbx_free(valuemap);
@@ -86,7 +85,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("valuemaps return value", expected_ret, ret);
 	zbx_mock_assert_str_eq("new value", newvalue, value);
-
 
 	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
 	zbx_vector_valuemaps_ptr_destroy(&valuemaps);

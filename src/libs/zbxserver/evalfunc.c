@@ -43,12 +43,12 @@ zbx_value_type_t;
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
-#define ZBX_VALUEMAP_TYPE_MATCH		0
-#define ZBX_VALUEMAP_TYPE_GREATER	1
-#define ZBX_VALUEMAP_TYPE_LESS		2
-#define ZBX_VALUEMAP_TYPE_RANGE		3
-#define ZBX_VALUEMAP_TYPE_REGEX		4
-#define ZBX_VALUEMAP_TYPE_DEFAULT	5
+#define ZBX_VALUEMAP_TYPE_MATCH			0
+#define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
+#define ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL		2
+#define ZBX_VALUEMAP_TYPE_RANGE			3
+#define ZBX_VALUEMAP_TYPE_REGEX			4
+#define ZBX_VALUEMAP_TYPE_DEFAULT		5
 
 typedef struct
 {
@@ -3323,10 +3323,10 @@ static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
  ******************************************************************************/
 static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps)
 {
-	char				*value_tmp;
-	int				i, ret = FAIL;
-	double				input_value;
-	zbx_valuemaps_t			*valuemap;
+	char		*value_tmp;
+	int		i, ret = FAIL;
+	double		input_value;
+	zbx_valuemaps_t	*valuemap;
 
 	for (i = 0; i < valuemaps->values_num; i++)
 	{
@@ -3345,7 +3345,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 			pattern = valuemap->value;
 
-			match =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+			match = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
 
 			zbx_regexp_clean_expressions(&regexps);
 			zbx_vector_ptr_destroy(&regexps);
@@ -3358,13 +3358,13 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 		{
 			double	min, max;
 
-			if (ZBX_VALUEMAP_TYPE_LESS == valuemap->type &&
+			if (ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL == valuemap->type &&
 					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value <= max)
 					goto map_value;
 			}
-			else if (ZBX_VALUEMAP_TYPE_GREATER == valuemap->type &&
+			else if (ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL == valuemap->type &&
 					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
 			{
 				if (input_value >= min)
@@ -3372,55 +3372,34 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 			}
 			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
 			{
-				int				num, j;
-				char				*input_ptr, *range_str;
+				int	num, j;
+				char	*input_ptr, *range_str;
 
 				input_ptr = valuemap->value;
 
 				zbx_trim_str_list(input_ptr, ',');
+				zbx_trim_str_list(input_ptr, '-');
 				num = num_param(input_ptr);
 
 				for (j = 0; j < num; j++)
 				{
-					int	sign = 0, found = 0;
-					char	*ptr, *threshold_min, *threshold_max = NULL;
+					int	scanned, found = 0;
 
 					range_str = get_param_dyn(input_ptr, j + 1, NULL);
-					ptr = range_str;
-					if (1 < strlen(ptr) && '-' == ptr[0])
-					{
-						ptr++;
-						sign = 1;
-					}
+					scanned = sscanf(range_str,"%lf-%lf", &min, &max);
 
-					zbx_strsplit(ptr, '-', &threshold_min, &threshold_max);
-					zbx_lrtrim(threshold_min, " ");
-					zbx_lrtrim(threshold_max, " ");
+					if (1 == scanned && input_value >= min && input_value <= min )
+						found = 1;
+					else if (2 == scanned && input_value >= min && input_value <= max)
+						found = 1;
+
 					zbx_free(range_str);
-
-					if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
-							(NULL == threshold_max || ZBX_INFINITY !=
-							(max = evaluate_string_to_double(threshold_max))))
-					{
-						if (1 == sign)
-							min = - min;
-						if (NULL == threshold_max)
-							max = min;
-
-						if (input_value >= min && input_value <= max)
-							found = 1;
-					}
-
-					zbx_free(threshold_min);
-					zbx_free(threshold_max);
 
 					if (0 != found)
 						goto map_value;
 				}
 			}
 		}
-
-
 	}
 
 	for (i = 0; i < valuemaps->values_num; i++)
@@ -3430,7 +3409,6 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 		if (ZBX_VALUEMAP_TYPE_DEFAULT == valuemap->type)
 			goto map_value;
 	}
-
 map_value:
 	if (0 <= i && i < valuemaps->values_num)
 	{
@@ -3459,7 +3437,7 @@ map_value:
  ******************************************************************************/
 static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
 {
-	int				ret;
+	int				ret = FAIL;
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_valuemaps_t			*valuemap;
@@ -3476,7 +3454,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
-			" order by valuemap_mappingid asc",
+			" order by sortorder asc",
 			valuemapid);
 
 	while (NULL != (row = DBfetch(result)))

@@ -3656,6 +3656,93 @@ static int	DBpatch_5030110(void)
 
 	return DBadd_field("valuemap_mapping", &field);
 }
+
+static int	DBpatch_5030111(void)
+{
+	return DBdrop_foreign_key("valuemap_mapping", 1);
+}
+
+static int	DBpatch_5030112(void)
+{
+	return DBdrop_index("valuemap_mapping", "valuemap_mapping_1");
+}
+static int	DBpatch_5030113(void)
+{
+	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value,type", 1);
+}
+
+static int	DBpatch_5030114(void)
+{
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap_mapping", 1, &field);
+}
+
+static int	DBpatch_5030115(void)
+{
+	const ZBX_FIELD	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("valuemap_mapping", &field);
+}
+
+static int	DBpatch_5030116(void)
+{
+	int 		ret = SUCCEED;
+	zbx_uint64_t	valuemap_num, i;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	result = DBselect("select max(valuemapid) from valuemap_mapping");
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_DBROW2UINT64(valuemap_num, row[0]);
+	else
+		valuemap_num = 0;
+
+	DBfree_result(result);
+
+	for (i = 0; i <= valuemap_num; i++)
+	{
+		int		j = 0;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		result = DBselect("select valuemap_mappingid"
+				" from valuemap_mapping"
+				" where valuemapid=" ZBX_FS_UI64
+				" order by valuemap_mappingid asc", i);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update valuemap_mapping set sortorder=%d where valuemap_mappingid=%s;\n",
+					j, row[0]);
+			j++;
+
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto out;
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+out:
+		DBfree_result(result);
+		zbx_free(sql);
+
+		if (FAIL == ret)
+			break;
+
+	}
+
+	return ret;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -3773,5 +3860,11 @@ DBPATCH_ADD(5030107, 0, 1)
 DBPATCH_ADD(5030108, 0, 1)
 DBPATCH_ADD(5030109, 0, 1)
 DBPATCH_ADD(5030110, 0, 1)
+DBPATCH_ADD(5030111, 0, 1)
+DBPATCH_ADD(5030112, 0, 1)
+DBPATCH_ADD(5030113, 0, 1)
+DBPATCH_ADD(5030114, 0, 1)
+DBPATCH_ADD(5030115, 0, 1)
+DBPATCH_ADD(5030116, 0, 1)
 
 DBPATCH_END()
