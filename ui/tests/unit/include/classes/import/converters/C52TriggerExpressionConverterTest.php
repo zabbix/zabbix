@@ -288,7 +288,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[4].logeventid("^error")} > 0',
-				'logeventid(/Trapper/trap[4],"^error") > 0'
+				'logeventid(/Trapper/trap[4],,"^error") > 0'
 			],
 			[
 				'{Trapper:trap[4].logseverity()} > 0',
@@ -296,7 +296,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[4].logsource("^system$")} > 0',
-				'logsource(/Trapper/trap[4],"^system$") > 0'
+				'logsource(/Trapper/trap[4],,"^system$") > 0'
 			],
 			[
 				'{Trapper:trap[1].change()} = 10'.

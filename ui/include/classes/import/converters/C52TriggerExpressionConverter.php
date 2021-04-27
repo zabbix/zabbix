@@ -309,7 +309,10 @@ class C52TriggerExpressionConverter extends CConverter {
 			// (<#num>,<time_shift>)
 			case 'last':
 				$parameters += ['', ''];
-				if (ctype_digit($parameters[0])) {
+				if ((string) $parameters[0] === '0') {
+					$parameters[0] = '';
+				}
+				elseif (ctype_digit($parameters[0])) {
 					$parameters[0] = '#'.$parameters[0];
 				}
 
