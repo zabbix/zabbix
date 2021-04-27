@@ -3388,7 +3388,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 					range_str = get_param_dyn(input_ptr, j + 1, NULL);
 					scanned = sscanf(range_str,"%lf-%lf", &min, &max);
 
-					if (1 == scanned && input_value >= min && input_value <= min )
+					if (1 == scanned && SUCCEED == zbx_double_compare(input_value, min))
 						found = 1;
 					else if (2 == scanned && input_value >= min && input_value <= max)
 						found = 1;

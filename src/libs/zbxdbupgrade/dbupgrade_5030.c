@@ -4688,7 +4688,7 @@ static int	DBpatch_5030169(void)
 
 static int	DBpatch_5030170(void)
 {
-	int 		ret = SUCCEED;
+	int		ret = SUCCEED;
 	zbx_uint64_t	valuemap_num, i;
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -4739,7 +4739,6 @@ out:
 
 		if (FAIL == ret)
 			break;
-
 	}
 
 	return ret;
