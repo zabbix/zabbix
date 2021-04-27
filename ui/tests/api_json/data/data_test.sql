@@ -921,14 +921,14 @@ insert into functions (functionid,itemid,triggerid,name,parameter) values (13500
 insert into triggers (triggerid,expression,description,priority,comments) values (134002,'{135002}=0','triggerstester_t2',2,'');
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135002,132000,134002,'now','$,0');
 insert into triggers (triggerid,expression,description,priority,comments) values (134003,'{135003}=0','triggerstester_t3',3,'');
-insert into functions (functionid,itemid,triggerid,name,parameter) values (135003,132000,134003,'now','0');
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135003,132000,134003,'now','$,0');
 insert into triggers (triggerid,expression,description,priority,comments) values (134004,'{135004}=0','triggerstester_t4',4,'');
-insert into functions (functionid,itemid,triggerid,name,parameter) values (135004,132000,134004,'now','0');
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135004,132000,134004,'now','$,0');
 insert into triggers (triggerid,expression,description,priority,comments) values (134005,'{135005}=0','triggerstester_t5',5,'');
-insert into functions (functionid,itemid,triggerid,name,parameter) values (135005,132000,134005,'now','0');
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135005,132000,134005,'now','$,0');
 
 insert into triggers (triggerid,expression,description,priority,flags,comments) values (134106,'{135106}=0','triggerstesterlld_t0',0,2,'');
-insert into functions (functionid,itemid,triggerid,name,parameter) values (135106,132004,134106,'now','0');
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135106,132004,134106,'now','$,0');
 -- discovered
 INSERT INTO items (itemid,hostid,type,name,key_,flags,params,description,posts,headers) VALUES (132006,130000,2,'TriggersTesterItemLLDDiscovered[res1]','TriggersTesterItemLLDDiscovered[res1]',4,'','','','');
 INSERT INTO triggers (triggerid,expression,description,priority,flags,comments) VALUES (134118,'{135118}=0','TriggersTesterLLDTmpl_T0[res1]',0,4,'');
