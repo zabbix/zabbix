@@ -195,6 +195,9 @@ class CApiInputValidator {
 
 			case API_DATE:
 				return self::validateDate($rule, $data, $path, $error);
+
+			case API_NUMERIC_RANGES:
+				return self::validateNumericRanges($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -2159,5 +2162,39 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate numeric ranges. Multiple ranges separated by comma character.
+	 * Example:
+	 *   10-20,-20--10,-5-0,0.5-0.7,-20--10,-20.20--20.10
+	 *   30,-10,0.7,-0.5
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateNumericRanges($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$parser = new CRangesParser(['with_minus' => true, 'with_float' => true]);
+
+		return $parser->parse($data) == CParser::PARSE_SUCCESS;
 	}
 }

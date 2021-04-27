@@ -45,24 +45,18 @@ class CRangesParser extends CParser {
 	 */
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'with_minus' => false,
+		'with_float' => false
 	];
 
 	/**
 	 * @param array $options   An array of options to initialize other parsers.
 	 */
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
 
-		$this->range_parser = new CRangeParser([
-			'usermacros' => $this->options['usermacros'],
-			'lldmacros' => $this->options['lldmacros']
-		]);
+		$this->range_parser = new CRangeParser($this->options);
 	}
 
 	/**

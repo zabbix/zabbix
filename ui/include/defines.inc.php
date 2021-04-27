@@ -1286,6 +1286,14 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
+// Value map mappings type
+define('VALUEMAP_MAPPING_TYPE_EQUAL',			0);
+define('VALUEMAP_MAPPING_TYPE_GREATER_EQUAL',	1);
+define('VALUEMAP_MAPPING_TYPE_LESS_EQUAL',		2);
+define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
+define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
+define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
+
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1355,6 +1363,7 @@ define('API_EVENT_NAME',			37);
 define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
+define('API_NUMERIC_RANGES',		41);
 
 // flags
 define('API_REQUIRED',					0x0001);
