@@ -92,7 +92,11 @@ function getMenuPopupHistory(options) {
  * @param {array}  options['urls']                    (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application']      (optional) Application name for filter by application.
+ * @param {array}  options['tags']                    (optional)
+ * @param {string} options['tags'][]['tag']
+ * @param {string} options['tags'][]['value']
+ * @param {number} options['tags'][]['operator']
+ * @param {number} options['evaltype']                (optional)
  * @param {bool}   options['allowed_ui_inventory']    Whether user has access to inventory hosts page.
  * @param {bool}   options['allowed_ui_latest_data']  Whether user has access to latest data page.
  * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
@@ -134,8 +138,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		// latest data link
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
-		if (typeof options.filter_application !== 'undefined') {
-			url.setArgument('filter_application', options.filter_application);
+		if (typeof options.tags !== 'undefined') {
+			url.setArgument('filter_tags', options.tags);
+			url.setArgument('filter_evaltype', options.evaltype);
 		}
 		url.setArgument('filter_hostids[]', options.hostid);
 		url.setArgument('filter_set', '1');
@@ -155,8 +160,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('show_suppressed', '1');
 			}
-			if (typeof options.filter_application !== 'undefined') {
-				url.setArgument('application', options.filter_application);
+			if (typeof options.tags !== 'undefined') {
+				url.setArgument('tags', options.tags);
+				url.setArgument('evaltype', options.evaltype);
 			}
 
 			problems.url = url.getUrl();
@@ -329,7 +335,11 @@ function getMenuPopupMapElementSubmap(options) {
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application'] (optional) Application name for filter by application.
+ * @param {array}  options['tags']               (optional)
+ * @param {string} options['tags'][]['tag']
+ * @param {string} options['tags'][]['value']
+ * @param {number} options['tags'][]['operator']
+ * @param {number} options['evaltype']           (optional)
  *
  * @return array
  */
@@ -350,8 +360,9 @@ function getMenuPopupMapElementGroup(options) {
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('show_suppressed', '1');
 	}
-	if (typeof options.filter_application !== 'undefined') {
-		problems_url.setArgument('application', options.filter_application);
+	if (typeof options.tags !== 'undefined') {
+		problems_url.setArgument('tags', options.tags);
+		problems_url.setArgument('evaltype', options.evaltype);
 	}
 
 	sections.push({
@@ -444,64 +455,107 @@ function getMenuPopupMapElementImage(options) {
 }
 
 /**
- * Get menu popup trigger section data.
+ * Get menu popup dashboard actions data.
  *
  * @param {string} options['dashboardid']
  * @param {bool}   options['editable']
- * @param {object} trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ * @param {bool}   options['has_related_reports']
+ * @param {bool}   options['can_edit_dashboards']
+ * @param {bool}   options['can_view_reports']
+ * @param {bool}   options['can_create_reports']
+ * @param {object} trigger_elmnt                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
 function getMenuPopupDashboard(options, trigger_elmnt) {
-	var	url_create = new Curl('zabbix.php', false),
-		url_clone = new Curl('zabbix.php', false),
-		url_delete = new Curl('zabbix.php', false);
+	const sections = [];
+	const popup_options = {
+		dashboardid: options.dashboardid
+	};
 
-	url_create.setArgument('action', 'dashboard.view');
-	url_create.setArgument('new', '1');
+	// Dashboard actions.
+	if (options.can_edit_dashboards) {
+		const url_create = new Curl('zabbix.php', false);
+		url_create.setArgument('action', 'dashboard.view');
+		url_create.setArgument('new', '1');
 
-	url_clone.setArgument('action', 'dashboard.view');
-	url_clone.setArgument('source_dashboardid', options.dashboardid);
+		const url_clone = new Curl('zabbix.php', false);
+		url_clone.setArgument('action', 'dashboard.view');
+		url_clone.setArgument('source_dashboardid', options.dashboardid);
 
-	url_delete.setArgument('action', 'dashboard.delete');
-	url_delete.setArgument('dashboardids', [options.dashboardid]);
+		const url_delete = new Curl('zabbix.php', false);
+		url_delete.setArgument('action', 'dashboard.delete');
+		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
-	return [{
-		label: t('Actions'),
-		items: [
+		sections.push({
+			label: t('Actions'),
+			items: [
+				{
+					label: t('Sharing'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+					},
+					disabled: !options.editable
+				},
+				{
+					label: t('Create new'),
+					url: url_create.getUrl()
+				},
+				{
+					label: t('Clone'),
+					url: url_clone.getUrl()
+				},
+				{
+					label: t('Delete'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						if (!confirm(t('Delete dashboard?'))) {
+							return false;
+						}
+
+						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+					},
+					disabled: !options.editable
+				}
+			]
+		});
+	}
+
+	// Report actions.
+	if (options.can_view_reports) {
+		const report_actions = [
 			{
-				label: t('Sharing'),
+				label: t('View related reports'),
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					var popup_options = {'dashboardid': options.dashboardid};
-					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
 				},
-				disabled: !options.editable
-			},
-			{
-				label: t('Create new'),
-				url: url_create.getUrl()
-			},
-			{
-				label: t('Clone'),
-				url: url_clone.getUrl()
-			},
-			{
-				label: t('Delete'),
-				clickCallback: function () {
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					if (!confirm(t('Delete dashboard?'))) {
-						return false;
-					}
-
-					redirect(url_delete.getUrl(), 'post', 'sid', true, true);
-				},
-				disabled: !options.editable
+				disabled: !options.has_related_reports
 			}
-		]
-	}];
+		];
+
+		if (options.can_create_reports) {
+			report_actions.unshift({
+				label: t('Create new report'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
+				}
+			});
+		}
+
+		sections.push({
+			label: options.can_edit_dashboards ? null : t('Actions'),
+			items: report_actions
+		})
+	}
+
+	return sections;
 }
 
 /**

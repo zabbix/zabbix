@@ -1,8 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
+agent_MANS =
+
 if AGENT
-agent_MANS = zabbix_agentd.man
+agent_MANS += zabbix_agentd.man
 client_MANS = zabbix_get.man zabbix_sender.man
+endif
+
+if AGENT2
+agent_MANS += zabbix_agent2.man
 endif
 
 if PROXY
@@ -13,8 +19,12 @@ if SERVER
 server_MANS = zabbix_server.man
 endif
 
+if WEBSERVICE
+webservice_MANS = zabbix_web_service.man
+endif
+
 man1_MANS = $(client_MANS)
-man8_MANS = $(agent_MANS) $(proxy_MANS) $(server_MANS)
+man8_MANS = $(agent_MANS) $(proxy_MANS) $(server_MANS) $(webservice_MANS)
 
 EXTRA_DIST = \
 	zabbix_agentd.man \
@@ -22,4 +32,5 @@ EXTRA_DIST = \
 	zabbix_get.man \
 	zabbix_sender.man \
 	zabbix_proxy.man \
-	zabbix_server.man
+	zabbix_server.man \
+	zabbix_web_service.man

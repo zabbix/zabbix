@@ -75,10 +75,10 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (503, 9, 20, 0, '20000');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (504, 10, 16, 11, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (505, 11, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (507, 12, 16, 10, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (508, 12, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (509, 12, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (507, 12, 26, 3, 'PostgreSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (508, 12, 26, 2, 'MYSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (509, 12, 26, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 16, 10, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (511, 12, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (512, 12, 13, 0, '10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (513, 12, 6, 7, '6-7,08:00-18:00');
@@ -96,10 +96,10 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (530, 13, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (532, 13, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (534, 13, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (530, 13, 26, 3, 'PostgreSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (531, 13, 26, 2, 'MYSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (532, 13, 26, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 16, 11, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (535, 13, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (536, 13, 13, 0, '10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (537, 13, 6, 7, '6-7,08:00-18:00');
@@ -117,10 +117,10 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (554, 14, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (556, 14, 15, 3, 'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 15, 2, 'MYSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (558, 14, 15, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (554, 14, 26, 3, 'PostgreSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (555, 14, 26, 2, 'MYSQL', 'Database');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (556, 14, 26, 0, 'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 16, 11, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (559, 14, 13, 1, '10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (560, 14, 13, 0, '10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (561, 14, 6, 7, '6-7,08:00-18:00');
@@ -433,23 +433,6 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, re
 
 -- delete action
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (524, 1, 1411543800, 2, 5, 'Actions [11] deleted', '192.168.3.32', 11, 'Action deleted');
-
--- add application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (525, 1, 1411543800, 0, 12, 'Application [App1 ] [177]', '192.168.3.32', 0, '');
-
--- update application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (526, 1, 1411543800, 1, 12, 'Application [App1 updated ] []', '192.168.3.32', 0, '');
-
--- disable application  (work in the same way as update app- disable all items on this host), such records do not exist at this moment
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (527, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
-INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (508, 527, 'items', 'status', '0', '1');
-
--- enable application (work in the same way as update app- disable all items on this host), such records do not exist at this moment
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (528, 1, 1411543800, 1, 12, '0', '192.168.3.32', 22165, 'test_item');
-INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (509, 528, 'items', 'status', '1', '0');
-
--- delete application
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (529, 1, 1411543800, 2, 12, 'Application [App1] from host [H1]', '192.168.3.32', 0, '');
 
 -- add graph
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (530, 1, 1411543800, 0, 6, 'Graph [graph1]', '192.168.3.32', 0, '');
@@ -1180,13 +1163,6 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50002, 50001, 4)
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50000, 50001, 50002);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50002, 50000, 50002);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50001, 50015);
-INSERT INTO applications (applicationid,hostid,name) VALUES (359,50000,'App ZBX6663 First');
-INSERT INTO applications (applicationid,hostid,name) VALUES (362,50000,'App ZBX6663 Second');
-INSERT INTO applications (applicationid,hostid,name) VALUES (360,50001,'App ZBX6663');
-INSERT INTO applications (applicationid,hostid,name) VALUES (365,50001,'App ZBX6663 Second');
-INSERT INTO applications (applicationid,hostid,name) VALUES (361,50002,'App ZBX6663 Second');
-INSERT INTO application_template (application_templateid,applicationid,templateid) VALUES (50,365,361);
-INSERT INTO application_template (application_templateid,applicationid,templateid) VALUES (51,362,361);
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40008,9,50000,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 First,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40009,9,50000,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 First]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40010,9,50000,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 First]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
@@ -1399,17 +1375,17 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (107, 7, 93);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (94, 'filter-update', '$2y$10$rHPaFkVgIx.ceaZYTlMTiuH9HyCv5M/GXQkrCyQLcK2sdubp303ze', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (108, 7, 94);
 
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (24, 93, 'web.monitoring.problem.properties', 1, 0, 0, '{"hostids":["10084"],"filter_name":"delete_problems_1"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (25, 93, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (20, 93, 'web.monitoring.hosts.properties', 1, 0, 0, '{"groupids":["4"],"filter_name":"delete_hosts_1"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (21, 93, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (24, 93, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (25, 93, 'web.monitoring.problem.properties', 1, 0, 0, '{"hostids":["10084"],"filter_name":"delete_problems_1"}', 3);
 INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (30, 93, 'web.monitoring.problem.properties', 2, 0, 0, '{"filter_name":"delete_problems_2"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (20, 93, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (21, 93, 'web.monitoring.hosts.properties', 1, 0, 0, '{"groupids":["4"],"filter_name":"delete_hosts_1"}', 3);
 INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (31, 93, 'web.monitoring.hosts.properties', 2, 0, 0, '{"filter_name":"delete_hosts_2"}', 3);
 
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (26, 94, 'web.monitoring.problem.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1,"show_timeline":"0"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (27, 94, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (28, 94, 'web.monitoring.hosts.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (29, 94, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (26, 94, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (27, 94, 'web.monitoring.problem.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1,"show_timeline":"0"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (28, 94, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (29, 94, 'web.monitoring.hosts.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1}', 3);
 
 -- testTimezone
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
@@ -1432,11 +1408,6 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts'
 INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (5, 0, 'Selenium script','test',2,14,NULL,'selenium script description', 1);
 UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
-
--- testPageApplication
-INSERT INTO applications (applicationid,hostid,name) VALUES (99000,10084,'Selenium test application');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99000, 10084, 1, 0, 2, 'Selenium item for testPageApplication','item-with-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (999000,99000,99000);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
@@ -1755,23 +1726,6 @@ INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5501, 50010, 'Service st
 INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55001, 5501, 0, 'Down');
 INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55002, 5501, 1, 'Up');
 
--- testInheritanceApplication
-INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99002, 15001, 'Inheritance application');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (900, 99002, 99001);
-INSERT INTO applications (applicationid, hostid, name) VALUES (99003, 15000, 'Inheritance application for delete without items');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99004, 15001, 'Inheritance application for delete without items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (901, 99004, 99003);
-INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'Inheritance application for delete with items');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999001, 99006, 99085);
-INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
-INSERT INTO applications (applicationid, hostid, name) VALUES (99009, 15001, 'Application on host');
-
 -- testPageProblems_TagPriority
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100181','99252','29192','avg','5m');
@@ -2005,18 +1959,14 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90284, 50013, 50
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50039,50011,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50040,50012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50041,50013,1,1,1,'127.0.0.1','','10050');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99010, 50011, '1 application');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99011, 50011, '2 application');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99012, 50012, '3 application');
-INSERT INTO applications (applicationid, hostid, name) VALUES (99013, 50013, '4 application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999002, 99010, 99086);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99000, 99086, 'DataBase', 'mysql');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999003, 99011, 99091);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99001, 99091, 'DataBase', 'PostgreSQL');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999004, 99012, 99088);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99002, 99088, 'DataBase', 'Oracle');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999005, 99013, 99089);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99003, 99089, 'DataBase', 'Oracle DB');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', 'Macro should be resolved, host IP should be visible here: {HOST.CONN}', 0, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', 'The following url should be clickable: https://zabbix.com', 2);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', 'https://zabbix.com', 3, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
@@ -2184,6 +2134,24 @@ INSERT INTO triggers (triggerid, expression, description, comments) VALUES (1001
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100113, 99102, 100112, 'last', '0');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 100112, 'action', 'update');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99116, 2, 99109, 'Item with tags for updating', 'tags.update', '', '', '', '');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99004, 99116, 'action', 'update');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99005, 99116, 'without value', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99117, 2, 99109, 'Item with tags for cloning', 'tags.cloning', '', '', '', '');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99006, 99117, 'action', 'clone');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99007, 99117, 'without value', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99118, 2, 40001, 'Item prototype with tags for updating', 'prototype.tags.update', '', 2, '', '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15090, 99118, 133800);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99008, 99118, 'action', 'update');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99009, 99118, 'without value prototype', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99119, 2, 40001, 'Item prototype with tags for cloning', 'prototype.tags.cloning', '', 2,  '', '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15091, 99119, 133800);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99010, 99119, 'action', 'clone');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99011, 99119, 'without value prototype', '');
 
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
@@ -2536,8 +2504,10 @@ INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, perio
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
 
 -- Dashboards and widgets for Copy widget tests
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (130, 'Dashboard for Copying widgets', 1, 1);
+INSERT INTO dashboard (dashboardid, name, userid, private, auto_start) VALUES (130, 'Dashboard for Copying widgets', 1, 1, 0);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (130, 130);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (143, 130, 'Test_page', 1);
+
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (131, 'Dashboard for Paste widgets', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (131, 131);
 
@@ -2600,21 +2570,21 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904009, 1060, 1, 'reference', 0, 'OYKZW');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_sysmapid) VALUES (904010, 1060, 8, 'sysmapid', 0, 3);
 
--- INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1061, 130, 'navtree', 'Test copy Map navigation tree', 0, 10, 6, 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904011, 1061, 0, 'navtree.order.2', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904012, 1061, 0, 'rf_rate', 60);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904013, 1061, 0, 'show_unavailable', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904014, 1061, 1, 'navtree.name.1', 0, 'Map with icon mapping');
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904015, 1061, 1, 'navtree.name.2', 0, 'Public map with image');
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904016, 1061, 1, 'reference', 0, 'STZDI');
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904017, 1061, 8, 'navtree.sysmapid.1', 0, 6);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904018, 1061, 8, 'navtree.sysmapid.2', 0, 10);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1061, 130, 'navtree', 'Test copy Map navigation tree', 0, 10, 6, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904011, 1061, 0, 'navtree.order.2', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904012, 1061, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904013, 1061, 0, 'show_unavailable', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904014, 1061, 1, 'navtree.name.1', 0, 'Map with icon mapping');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904015, 1061, 1, 'navtree.name.2', 0, 'Public map with image');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904016, 1061, 1, 'reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904017, 1061, 8, 'navtree.sysmapid.1', 0, 6);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904018, 1061, 8, 'navtree.sysmapid.2', 0, 10);
 
--- INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1062, 130, 'map', 'Test copy Map from tree', 6, 10, 7, 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904019, 1062, 0, 'rf_rate', 120);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904020, 1062, 0, 'source_type', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904021, 1062, 1, 'filter_widget_reference', 0, 'STZDI');
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904022, 1062, 1, 'reference', 0, 'PVEYR');
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1062, 130, 'map', 'Test copy Map from tree', 6, 10, 7, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904019, 1062, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904020, 1062, 0, 'source_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904021, 1062, 1, 'filter_widget_reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904022, 1062, 1, 'reference', 0, 'PVEYR');
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1063, 130, 'plaintext', 'Test copy plain text', 13, 10, 5, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904023, 1063, 0, 'dynamic', 1);

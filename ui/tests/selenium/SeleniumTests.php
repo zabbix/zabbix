@@ -126,6 +126,8 @@ require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTagsHost.php';
 require_once dirname(__FILE__).'/testFormTagsHostPrototype.php';
+require_once dirname(__FILE__).'/testFormTagsItem.php';
+require_once dirname(__FILE__).'/testFormTagsItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTagsTemplate.php';
 require_once dirname(__FILE__).'/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
@@ -139,10 +141,7 @@ require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
-require_once dirname(__FILE__).'/testFormApplication.php';
-require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-require_once dirname(__FILE__).'/testInheritanceApplication.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
@@ -171,6 +170,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -284,6 +284,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
+		$suite->addTestSuite('testFormTagsItem');
+		$suite->addTestSuite('testFormTagsItemPrototype');
 		$suite->addTestSuite('testFormTagsTemplate');
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');
@@ -297,10 +299,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
-		$suite->addTestSuite('testFormApplication');
-		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
-		$suite->addTestSuite('testInheritanceApplication');
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceGraph');
@@ -329,6 +328,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testSID');
 
 		return $suite;
 	}

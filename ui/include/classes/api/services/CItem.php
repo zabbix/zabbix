@@ -61,7 +61,6 @@ class CItem extends CItemGeneral {
 	 * @param array  $options['hostids']
 	 * @param array  $options['groupids']
 	 * @param array  $options['triggerids']
-	 * @param array  $options['applicationids']
 	 * @param bool   $options['status']
 	 * @param bool   $options['templated_items']
 	 * @param bool   $options['editable']
@@ -93,7 +92,6 @@ class CItem extends CItemGeneral {
 			'interfaceids'				=> null,
 			'graphids'					=> null,
 			'triggerids'				=> null,
-			'applicationids'			=> null,
 			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
@@ -102,8 +100,9 @@ class CItem extends CItemGeneral {
 			'nopermissions'				=> null,
 			'group'						=> null,
 			'host'						=> null,
-			'application'				=> null,
 			'with_triggers'				=> null,
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -115,9 +114,9 @@ class CItem extends CItemGeneral {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
+			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectApplications'		=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
@@ -131,6 +130,8 @@ class CItem extends CItemGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
+
 		$this->validateGet($options);
 
 		// editable + permission check
@@ -228,13 +229,11 @@ class CItem extends CItemGeneral {
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
-		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'i',
+				'item_tag', 'itemid'
+			);
 		}
 
 		// graphids
@@ -352,15 +351,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
-		// application
-		if (!is_null($options['application'])) {
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
-			$sqlParts['where']['iai'] = 'ia.itemid=i.itemid';
-			$sqlParts['where'][] = ' a.name='.zbx_dbstr($options['application']);
-		}
-
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
 			if ($options['with_triggers'] == 1) {
@@ -448,10 +438,11 @@ class CItem extends CItemGeneral {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateGet(array $options) {
+	private function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
+			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -550,32 +541,13 @@ class CItem extends CItemGeneral {
 
 		DB::insert('item_rtdata', $items_rtdata, false);
 
-		$item_applications = [];
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
-
-			if (!isset($item['applications'])) {
-				continue;
-			}
-
-			foreach ($item['applications'] as $appid) {
-				if ($appid == 0) {
-					continue;
-				}
-
-				$item_applications[] = [
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				];
-			}
-		}
-
-		if ($item_applications) {
-			DB::insertBatch('items_applications', $item_applications);
 		}
 
 		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
+		$this->createItemTags($items, $itemids);
 	}
 
 	/**
@@ -593,29 +565,9 @@ class CItem extends CItemGeneral {
 		}
 		DB::update('items', $data);
 
-		$itemApplications = [];
-		$applicationids = [];
-		foreach ($items as $item) {
-			if (!isset($item['applications'])) {
-				continue;
-			}
-			$applicationids[] = $item['itemid'];
-
-			foreach ($item['applications'] as $appid) {
-				$itemApplications[] = [
-					'applicationid' => $appid,
-					'itemid' => $item['itemid']
-				];
-			}
-		}
-
-		if (!empty($applicationids)) {
-			DB::delete('items_applications', ['itemid' => $applicationids]);
-			DB::insertBatch('items_applications', $itemApplications);
-		}
-
 		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
+		$this->updateItemTags($items);
 	}
 
 	/**
@@ -740,6 +692,12 @@ class CItem extends CItemGeneral {
 					unset($item['valuemapid']);
 				}
 			}
+
+			if (array_key_exists('tags', $item)) {
+				$item['tags'] = array_map(function ($tag) {
+					return $tag + ['value' => ''];
+				}, $item['tags']);
+			}
 		}
 		unset($item);
 
@@ -815,16 +773,14 @@ class CItem extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'selectApplications' => ['applicationid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {
-			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
-
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
 					$tpl_item['query_fields'] = $tpl_item['query_fields']
@@ -1058,17 +1014,6 @@ class CItem extends CItemGeneral {
 
 		$itemids = array_keys($result);
 
-		// adding applications
-		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get([
-				'output' => $options['selectApplications'],
-				'applicationids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $applications, 'applications');
-		}
-
 		// adding interfaces
 		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'interfaceid');
@@ -1234,6 +1179,30 @@ class CItem extends CItemGeneral {
 				}
 			}
 			unset($item);
+		}
+
+		// Adding item tags.
+		if ($options['selectTags'] !== null) {
+			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
+				? (array) $options['selectTags']
+				: ['tag', 'value'];
+
+			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
+			$requested_output = array_flip($options['selectTags']);
+
+			$db_tags = DBselect(
+				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
+				' FROM item_tag'.
+				' WHERE '.dbConditionInt('itemid', $itemids)
+			);
+
+			array_walk($result, function (&$item) {
+				$item['tags'] = [];
+			});
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
+			}
 		}
 
 		return $result;

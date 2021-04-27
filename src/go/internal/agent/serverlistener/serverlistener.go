@@ -31,6 +31,7 @@ import (
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxcomms"
+	"zabbix.com/pkg/zbxnet"
 )
 
 type ServerListener struct {
@@ -39,7 +40,7 @@ type ServerListener struct {
 	scheduler    scheduler.Scheduler
 	options      *agent.AgentOptions
 	tlsConfig    *tls.Config
-	allowedPeers *AllowedPeers
+	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
 }
 
@@ -101,7 +102,7 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
 		return
 	}
-	if sl.allowedPeers, err = GetAllowedPeers(sl.options); err != nil {
+	if sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server); err != nil {
 		return
 	}
 	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("%s:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {

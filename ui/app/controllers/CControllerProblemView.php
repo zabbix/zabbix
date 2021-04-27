@@ -30,7 +30,6 @@ class CControllerProblemView extends CControllerProblem {
 			'show' =>					'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
 			'groupids' =>				'array_id',
 			'hostids' =>				'array_id',
-			'application' =>			'string',
 			'triggerids' =>				'array_id',
 			'name' =>					'string',
 			'severities' =>				'array',

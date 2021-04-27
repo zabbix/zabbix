@@ -328,16 +328,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=application.list',
-				'title' =>	'Configuration of applications',
-				'header' => 'Applications',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'items.php?context=host',
 				'title' =>	'Configuration of items',
 				'header' => 'Items',

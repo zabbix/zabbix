@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:31Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -23,15 +23,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Firmware version'
@@ -43,9 +34,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: ICS-CHASSIS-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: REGEX
@@ -56,6 +44,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -75,9 +67,6 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: ICS-CHASSIS-MIB'
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: REGEX
@@ -88,6 +77,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
       discovery_rules:
         -
           name: 'FAN Discovery'
@@ -108,11 +101,12 @@ zabbix_export:
               description: |
                 MIB: ICS-CHASSIS-MIB
                 The operational status of the fan unit.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -147,11 +141,12 @@ zabbix_export:
                 (6) engaged - power supply is supplying power.
                 (7) redundant - power supply is supplying power, but not needed.
                 (8) notPresent - power supply is supplying power is not present.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -195,11 +190,12 @@ zabbix_export:
               description: |
                 MIB: ICS-CHASSIS-MIB
                 The operational status of the sensor.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
@@ -211,9 +207,10 @@ zabbix_export:
               description: |
                 MIB: ICS-CHASSIS-MIB
                 The current value read from the sensor.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
@@ -278,14 +275,15 @@ zabbix_export:
               description: |
                 MIB: ICS-CHASSIS-MIB
                 The serial number of the FRU.  If not available, this value is a zero-length string.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'

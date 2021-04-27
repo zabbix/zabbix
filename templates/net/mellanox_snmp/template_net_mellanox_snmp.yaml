@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-03-16T09:53:43Z'
+  date: '2021-04-22T12:40:12Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -23,38 +23,18 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: General
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Network interfaces'
-        -
-          name: 'Power supply'
-        -
-          name: Status
-        -
-          name: Storage
-        -
-          name: Temperature
       items:
         -
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 1w
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{max(#3)}=0'
@@ -68,9 +48,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: Status
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{min(5m)}>{$ICMP.LOSS.WARN} and {min(5m)}<100'
@@ -88,9 +69,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: Status
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{avg(5m)}>{$ICMP.RESPONSE_TIME.WARN}'
@@ -112,10 +94,11 @@ zabbix_export:
           trends: '0'
           value_type: LOG
           description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
-          applications:
-            -
-              name: General
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'System contact details'
           type: SNMP_AGENT
@@ -129,14 +112,15 @@ zabbix_export:
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
           inventory_link: CONTACT
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'CPU utilization'
           type: SNMP_AGENT
@@ -149,14 +133,15 @@ zabbix_export:
             MIB: HOST-RESOURCES-MIB
             The average, over the last minute, of the percentage of time that processors was not idle.
             Implementations may approximate this one minute smoothing period if necessary.
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$..[''{#CPU.UTIL}''].avg()'
+          tags:
+            -
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -178,14 +163,15 @@ zabbix_export:
             A textual description of the entity. This value should
             include the full name and version identification of the system's hardware type, software operating-system, and
             networking software.
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'System location'
           type: SNMP_AGENT
@@ -199,14 +185,15 @@ zabbix_export:
             MIB: SNMPv2-MIB
             The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
           inventory_link: LOCATION
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'System name'
           type: SNMP_AGENT
@@ -220,14 +207,15 @@ zabbix_export:
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
           inventory_link: NAME
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -247,14 +235,15 @@ zabbix_export:
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: Uptime
           type: SNMP_AGENT
@@ -267,14 +256,15 @@ zabbix_export:
           description: |
             MIB: SNMPv2-MIB
             The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -291,11 +281,12 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
-          applications:
-            -
-              name: Status
           valuemap:
             name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{max({$SNMP.TIMEOUT})}=0'
@@ -331,14 +322,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
@@ -349,14 +341,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -395,9 +388,10 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
             -
               name: '{#SENSOR_INFO}: Fan status'
               type: SNMP_AGENT
@@ -409,11 +403,12 @@ zabbix_export:
               description: |
                 MIB: ENTITY-SENSORS-MIB
                 The operational status of the sensor {#SENSOR_INFO}
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN.STATUS.CRIT},eq)}=1'
@@ -514,14 +509,15 @@ zabbix_export:
                 One possible reason for discarding such a packet could be to free up buffer space.
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: SNMP_AGENT
@@ -532,14 +528,15 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: SNMP_AGENT
@@ -551,9 +548,6 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -563,6 +557,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: SNMP_AGENT
@@ -577,14 +575,15 @@ zabbix_export:
                 One possible reason for discarding such a packet could be to free up buffer space.
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: SNMP_AGENT
@@ -595,14 +594,15 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: SNMP_AGENT
@@ -614,9 +614,6 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -626,6 +623,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: SNMP_AGENT
@@ -638,9 +639,6 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -650,6 +648,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: SNMP_AGENT
@@ -666,11 +668,12 @@ zabbix_export:
                 - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
                 - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)'
@@ -700,9 +703,6 @@ zabbix_export:
                 The type of interface.
                 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
                 through updating the syntax of the IANAifType textual convention.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
@@ -710,6 +710,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
           trigger_prototypes:
             -
               expression: |
@@ -847,11 +851,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: ENTITY-STATE-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU.STATUS.CRIT},eq)}=1'
@@ -897,11 +902,12 @@ zabbix_export:
                 - ok(1) indicates that the agent can obtain the sensor value.
                 - unavailable(2) indicates that the agent presently cannot obtain the sensor value.
                 - nonoperational(3) indicates that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
@@ -915,14 +921,15 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
@@ -1008,9 +1015,10 @@ zabbix_export:
               units: '%'
               params: '(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100'
               description: 'Space utilization in % for {#FSNAME}'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Total space'
               type: SNMP_AGENT
@@ -1023,14 +1031,15 @@ zabbix_export:
                 The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Used space'
               type: SNMP_AGENT
@@ -1041,14 +1050,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
               expression: |
@@ -1150,14 +1160,15 @@ zabbix_export:
                 The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '{#MEMNAME}: Used memory'
               type: SNMP_AGENT
@@ -1168,14 +1179,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '{#MEMNAME}: Memory utilization'
               type: CALCULATED
@@ -1185,9 +1197,10 @@ zabbix_export:
               units: '%'
               params: 'last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100'
               description: 'Memory utilization in %'
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -1343,96 +1356,100 @@ zabbix_export:
       dashboards:
         -
           name: 'Network interfaces'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    host: 'Mellanox SNMP'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Mellanox SNMP'
         -
           name: 'System performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '24'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'CPU utilization'
-                    host: 'Mellanox SNMP'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '5'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  type: GRAPH_CLASSIC
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU utilization'
+                        host: 'Mellanox SNMP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#MEMNAME}: Memory utilization'
-                    host: 'Mellanox SNMP'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '10'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#MEMNAME}: Memory utilization'
+                        host: 'Mellanox SNMP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#FSNAME}: Disk space usage'
-                    host: 'Mellanox SNMP'
+                  'y': '10'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#FSNAME}: Disk space usage'
+                        host: 'Mellanox SNMP'
       valuemaps:
         -
           name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'

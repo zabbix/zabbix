@@ -28,7 +28,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js',
-	'class.tab-indicators.js'
+	'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -324,9 +324,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
-			if (!copyApplications($cloneTemplateId, $templateId)) {
-				throw new Exception();
-			}
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -783,7 +780,6 @@ else {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,

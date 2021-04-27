@@ -1,13 +1,30 @@
-Changes for 5.4.0rc1
+Changes for 5.4.0beta3
 
 New features:
+A.F.....ST [ZBXNEXT-6478] added dashboard based pdf report support (abakaldin, agriscenko, ashubin, esneiders, wiper)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in the template MSSQL by ODBC (mchudinov)
+.........T [ZBXNEXT-6571] added templates with multi-page dashboards (afayantsev)
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP", "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 A.F.....S. [ZBXNEXT-6288,ZBXNEXT-6289] removed screens and slideshows (akozlovs, talbergs)
 A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, ashubin, averza)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
-...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+..F....... [ZBX-19240] fixed JavaScript errors upon copying map or map navigation tree widgets (averza)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+.........T [ZBX-19220] fixed broken link to Hikvision camera manufacturer page (abakaldin)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+..F....... [ZBX-19199] fixed console errors when updating problem widgets when other popups are active (averza)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 .........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
 .........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
@@ -172,11 +189,23 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
-...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
 .........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
 .........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
@@ -658,14 +687,24 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.11
+
+5.0.11rc1 was released as 5.0.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.11rc1
 
 New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
-...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 .........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
@@ -2692,6 +2731,7 @@ Changes for 4.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
 

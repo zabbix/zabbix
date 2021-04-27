@@ -27,7 +27,9 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('multiselect.js');
+$this->addJsFile('class.tagfilteritem.js');
 
+$this->includeJsFile('monitoring.web.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -81,7 +83,13 @@ $web_layout_mode = $this->getLayoutMode();
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
+				),
+			(new CFormList())->addRow(_('Tags'),
+				CTagFilterFieldHelper::getTagFilterField([
+					'evaltype' => $data['filter']['evaltype'],
+					'tags' => $data['filter']['tags']
+				])
+			)
 		])
 	)
 	->addItem($data['screen_view'])

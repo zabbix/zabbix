@@ -84,10 +84,11 @@ class CControllerMenuPopup extends CController {
 	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
 	 * @param int    $data['severity_min']       (optional)
 	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['tags']               (optional)
+	 * @param array  $data['evaltype']           (optional)
 	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
-	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */
@@ -205,8 +206,9 @@ class CControllerMenuPopup extends CController {
 				$menu_data['urls'] = $data['urls'];
 			}
 
-			if (array_key_exists('filter_application', $data)) {
-				$menu_data['filter_application'] = $data['filter_application'];
+			if (array_key_exists('tags', $data)) {
+				$menu_data['tags'] = $data['tags'];
+				$menu_data['evaltype'] = $data['evaltype'];
 			}
 
 			return $menu_data;
@@ -371,7 +373,9 @@ class CControllerMenuPopup extends CController {
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'tags',
+				'evaltype'
+			],
 			'selectUrls' => ['name', 'url', 'elementtype'],
 			'sysmapids' => $data['sysmapid']
 		]);
@@ -432,8 +436,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$menu_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$menu_data['evaltype'] = $selement['evaltype'];
+							$menu_data['tags'] = $selement['tags'];
 						}
 						return $menu_data;
 
@@ -450,8 +455,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$host_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$host_data['evaltype'] = $selement['evaltype'];
+							$host_data['tags'] = $selement['tags'];
 						}
 						return self::getMenuDataHost($host_data);
 

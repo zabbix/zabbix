@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:29Z'
   groups:
     -
       name: Templates/Modules
@@ -16,21 +16,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Array
-        -
-          name: Battery
-        -
-          name: Counter
-        -
-          name: Load
-        -
-          name: Status
-        -
-          name: Temperature
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Battery: Battery Voltage discovery'
@@ -48,14 +33,15 @@ zabbix_export:
             Units:V
             Range:[0.0, 80.0]
             Modbus address:0x0008
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.002950042725'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Status: Control Mode'
           type: SNMP_AGENT
@@ -72,11 +58,12 @@ zabbix_export:
             1: loadControl
             2: diversion
             3: lighting
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'TriStar PWM control mode'
+          tags:
+            -
+              tag: Application
+              value: Status
         -
           name: 'Counter: Amp-hours'
           type: SNMP_AGENT
@@ -92,14 +79,15 @@ zabbix_export:
             Units:Ah
             Range:[0.0, 50000.0]
             Modbus addresses:H=0x0011 L=0x0012
-          applications:
-            -
-              name: Counter
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.1'
+          tags:
+            -
+              tag: Application
+              value: Counter
         -
           name: 'Counter: KW-hours'
           type: SNMP_AGENT
@@ -115,9 +103,6 @@ zabbix_export:
             Units:kWh
             Range:[0.0, 5000.0]
             Modbus address:0x001E
-          applications:
-            -
-              name: Counter
           preprocessing:
             -
               type: MULTIPLIER
@@ -128,6 +113,10 @@ zabbix_export:
               parameters:
                 - '^(\d+)(\.\d{1,2})?'
                 - \1\2
+          tags:
+            -
+              tag: Application
+              value: Counter
         -
           name: 'Status: Alarms'
           type: SNMP_AGENT
@@ -140,9 +129,6 @@ zabbix_export:
             MIB: TRISTAR
             Description:Alarms
             Modbus addresses:H=0x001D L=0x0017
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -183,6 +169,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"batterySense","like")}=2'
@@ -284,9 +274,6 @@ zabbix_export:
             Units:V
             Range:[0.0, 80.0]
             Modbus address:0x0008
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -321,6 +308,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"customSettingsEdit","like")}=2'
@@ -390,14 +381,15 @@ zabbix_export:
           history: 7d
           units: uptime
           description: 'Device uptime in seconds'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -426,9 +418,10 @@ zabbix_export:
             Units:deg C
             Range:[-40, 120]
             Modbus address:0x000F
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
@@ -473,9 +466,10 @@ zabbix_export:
             Units:deg C
             Range:[-40, 120]
             Modbus address:0x000E
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
       discovery_rules:
         -
           name: 'Battery voltage discovery'
@@ -499,9 +493,6 @@ zabbix_export:
                 Units:V
                 Range:[0.0, 80.0]
                 Modbus address:0x0008
-              applications:
-                -
-                  name: Battery
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -512,6 +503,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Battery
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'
@@ -602,9 +597,6 @@ zabbix_export:
                 Units:V
                 Range:[0, 80]
                 Modbus address:0x000A
-              applications:
-                -
-                  name: Array
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -615,6 +607,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Array
             -
               name: 'Battery: Charge Current{#SINGLETON}'
               type: SNMP_AGENT
@@ -630,9 +626,6 @@ zabbix_export:
                 Units:A
                 Range:[0, 60]
                 Modbus address:0x000B
-              applications:
-                -
-                  name: Battery
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -643,6 +636,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Battery
           graph_prototypes:
             -
               name: 'Array: Voltage{#SINGLETON}'
@@ -688,9 +685,6 @@ zabbix_export:
                 MIB: TRISTAR
                 Description:Control State
                 Modbus address:0x001B
-              applications:
-                -
-                  name: Battery
               valuemap:
                 name: 'TriStar PWM charge state'
               preprocessing:
@@ -698,6 +692,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Battery
               trigger_prototypes:
                 -
                   expression: '{last()}={$CHARGE.STATE.CRIT}'
@@ -728,9 +726,6 @@ zabbix_export:
                 Units:V
                 Range:[0.0, 80.0]
                 Modbus address:0x0010
-              applications:
-                -
-                  name: Battery
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -741,6 +736,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Battery
           master_item:
             key: 'control.mode[controlMode.0]'
           preprocessing:
@@ -772,9 +771,6 @@ zabbix_export:
                 Units:%
                 Range:[0.0, 100.0]
                 Modbus address:0x001C
-              applications:
-                -
-                  name: Load
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -785,6 +781,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Load
           master_item:
             key: 'control.mode[controlMode.0]'
           preprocessing:
@@ -821,9 +821,6 @@ zabbix_export:
                 6: LvdWarning1
                 7: OverrideLvd
                 8: Equalize
-              applications:
-                -
-                  name: Load
               valuemap:
                 name: 'TriStar PWM load state'
               preprocessing:
@@ -831,6 +828,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Load
               trigger_prototypes:
                 -
                   expression: '{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}'
@@ -876,9 +877,6 @@ zabbix_export:
                 Units:A
                 Range:[0, 60]
                 Modbus address:0x000C
-              applications:
-                -
-                  name: Load
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -889,6 +887,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Load
             -
               name: 'Load: Voltage{#SINGLETON}'
               type: SNMP_AGENT
@@ -904,9 +906,6 @@ zabbix_export:
                 Units:V
                 Range:[0, 80]
                 Modbus address:0x000A
-              applications:
-                -
-                  name: Load
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -917,6 +916,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Load
           graph_prototypes:
             -
               name: 'Load: Current{#SINGLETON}'
