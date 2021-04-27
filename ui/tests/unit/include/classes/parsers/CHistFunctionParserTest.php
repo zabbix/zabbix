@@ -154,7 +154,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '#25',
-							'length' => 3
+							'length' => 3,
+							'data' => [
+								'sec_num' => '#25',
+								'time_shift' => ''
+							]
 						]
 					]
 				],
@@ -181,7 +185,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '25',
-							'length' => 2
+							'length' => 2,
+							'data' => [
+								'sec_num' => '25',
+								'time_shift' => ''
+							]
 						]
 					]
 				],
@@ -208,7 +216,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '10h',
-							'length' => 3
+							'length' => 3,
+							'data' => [
+								'sec_num' => '10h',
+								'time_shift' => ''
+							]
 						]
 					]
 				],
@@ -235,7 +247,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '1h:now/d-1h',
-							'length' => 11
+							'length' => 11,
+							'data' => [
+								'sec_num' => '1h',
+								'time_shift' => 'now/d-1h'
+							]
 						]
 					]
 				],
@@ -289,7 +305,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '{$PERIOD}:{$OFFSET}',
-							'length' => 19
+							'length' => 19,
+							'data' => [
+								'sec_num' => '{$PERIOD}',
+								'time_shift' => '{$OFFSET}'
+							]
 						]
 					]
 				],
@@ -316,7 +336,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '{$PERIOD}:now-{$ONE_HOUR}',
-							'length' => 25
+							'length' => 25,
+							'data' => [
+								'sec_num' => '{$PERIOD}',
+								'time_shift' => 'now-{$ONE_HOUR}'
+							]
 						]
 					]
 				],
@@ -343,7 +367,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '{$PERIOD}',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'sec_num' => '{$PERIOD}',
+								'time_shift' => ''
+							]
 						]
 					]
 				],
@@ -370,7 +398,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR}',
-							'length' => 60
+							'length' => 60,
+							'data' => [
+								'sec_num' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}',
+								'time_shift' => 'now/{#MONTH}-{#ONE_HOUR}'
+							]
 						]
 					]
 				],
@@ -397,7 +429,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
 							'pos' => 16,
 							'match' => '#25',
-							'length' => 3
+							'length' => 3,
+							'data' => [
+								'sec_num' => '#25',
+								'time_shift' => ''
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
