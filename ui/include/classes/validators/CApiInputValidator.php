@@ -192,6 +192,9 @@ class CApiInputValidator {
 
 			case API_JSONRPC_ID:
 				return self::validateJsonRpcId($rule, $data, $path, $error);
+
+			case API_UUID:
+				return self::validateUuid($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -247,6 +250,7 @@ class CApiInputValidator {
 			case API_EVENT_NAME:
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
+			case API_UUID:
 				return true;
 
 			case API_OBJECT:
@@ -2116,5 +2120,49 @@ class CApiInputValidator {
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
 
 		return false;
+	}
+
+	/**
+	 * UUIDv4 validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuid(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (mb_strlen($data) != 32) {
+			// TODO VM: check trasnlation string
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', 32));
+			return false;
+		}
+
+		if (!ctype_xdigit($data)) {
+			// TODO VM: check trasnlation string
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$binary = hex2bin($data);
+		if ((ord($binary[6]) & 0xf0) != 0x40 || (ord($binary[8]) & 0xc0) != 0x80) {
+			// TODO VM: check trasnlation string
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		return true;
 	}
 }

@@ -627,16 +627,9 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		$new_uuids = array_column($triggers_to_create, 'uuid');
-
-		if (count(array_unique($new_uuids)) !== count($new_uuids)) {
-			// TODO VM: check, if this message is correct
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Duplicate UUID detected.'));
-		}
-
 		$db_uuid = DB::select('triggers', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => $new_uuids],
+			'filter' => ['uuid' => array_column($triggers_to_create, 'uuid')],
 			'limit' => 1
 		]);
 
@@ -824,9 +817,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateCreate(array &$triggers) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
-			// TODO VM: new type for UUID check. Add unittests.
-			'uuid' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'uuid')],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['description', 'expression']], 'fields' => [
+			'uuid' =>					['type' => API_UUID, 'flags' => API_NOT_EMPTY],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
 			'event_name' =>				['type' => API_EVENT_NAME, 'length' => DB::getFieldLength('triggers', 'event_name')],
