@@ -136,8 +136,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * @param array $expression_element  Expression part to convert.
 	 * @param array $extra_expr          Array to accumulate strings to add at the end of converted expression.
 	 */
-	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr
-			): void {
+	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
 
 		if (($expression_data->parse($expression_element['expression'])) !== false) {
