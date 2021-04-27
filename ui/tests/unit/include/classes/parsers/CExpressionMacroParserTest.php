@@ -73,7 +73,7 @@ class CExpressionMacroParserTest extends TestCase {
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'length' => 0
-			]],
+			]]
 		];
 	}
 

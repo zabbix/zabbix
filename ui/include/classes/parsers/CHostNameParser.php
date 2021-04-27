@@ -25,9 +25,7 @@
 class CHostNameParser extends CParser {
 
 	private $options = [
-		'lldmacros' => false,
-		'allow_host_all' => false,
-		'allow_host_current' => false
+		'lldmacros' => false
 	];
 
 	/**
@@ -52,7 +50,9 @@ class CHostNameParser extends CParser {
 	private $lld_macro_function_parser;
 
 	public function __construct($options = []) {
-		$this->options = $options + $this->options;
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
 
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
@@ -91,12 +91,7 @@ class CHostNameParser extends CParser {
 			break;
 		}
 
-		if ($this->options['allow_host_all']
-				&& isset($source[$p]) && $source[$p] === CQueryParserResult::HOST_ITEMKEY_WILDCARD) {
-			$p++;
-		}
-
-		if ($pos == $p && (!isset($source[$p]) || $source[$p] !== '/' || !$this->options['allow_host_current'])) {
+		if ($pos == $p) {
 			return self::PARSE_FAIL;
 		}
 

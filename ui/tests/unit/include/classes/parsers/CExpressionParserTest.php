@@ -2160,10 +2160,14 @@ class CExpressionParserTest extends TestCase {
 			['"abc"="abc"and"abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['"abc"="abc" and abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_FAIL],
-			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro' => ['{HOST.HOST}']]],
+			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro' => true]],
 
-			['last(/host1/agent.ping) = 1 or last(/host2/agent.ping) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
-			['last(/host1/agent.version) = "5.0.0" or last(/host2/agent.ping) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true]]
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = "tag1" or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'host_macro' => true]],
+			['last(/*/agent.ping) = {TRIGGER.VALUE}', ['error' => 'incorrect expression starting from "{TRIGGER.VALUE}"', 'match' => 'last(/*/agent.ping)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1', null, CParser::PARSE_FAIL]
 		];
 	}
 

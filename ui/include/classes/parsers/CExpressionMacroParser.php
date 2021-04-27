@@ -34,7 +34,7 @@ class CExpressionMacroParser extends CParser {
 	 */
 	public function __construct() {
 		$this->expression_parser = new CExpressionParser([
-			'host_macro' => ['{HOST.HOST}'],
+			'host_macro' => true,
 			'lldmacros' => true
 		]);
 	}

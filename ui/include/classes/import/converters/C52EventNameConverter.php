@@ -52,7 +52,7 @@ class C52EventNameConverter extends C52TriggerExpressionConverter {
 					if ($function['data']['host'] === '{HOST.HOST}' || $function['data']['host'] === '{HOST.HOST1}') {
 						$function['data']['host'] = '';
 					}
-					[$new_expr, ] = $this->convertFunction($function['data'], '', '');
+					[$new_expr ] = $this->convertFunction($function['data'], '', '');
 					$start = $pos + $function['pos'] + 2;
 					$event_name = substr_replace($event_name, $new_expr, $start, strlen($function['value']));
 				}
