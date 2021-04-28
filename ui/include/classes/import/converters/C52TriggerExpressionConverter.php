@@ -229,15 +229,10 @@ class C52TriggerExpressionConverter extends CConverter {
 
 			case 'iregexp':
 			case 'regexp':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
-				$new_expression = sprintf('find(%1$s,%2$s,"%3$s",%4$s)', $query, $params[0], $fn['functionName'],
-					$params[1]
-				);
-				break;
-
 			case 'str':
 				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
-				$new_expression = sprintf('find(%1$s,%2$s,"like",%3$s)', $query, $params[0], $params[1]);
+				$params = self::paramsToString($params);
+				$new_expression = sprintf('find(%1$s%2$s)', $query, $params);
 				break;
 
 			case 'strlen':
@@ -299,7 +294,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
@@ -329,7 +324,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
@@ -342,7 +337,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[2] = self::convertTimeshift($parameters[2]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[2] !== '') {
 					$parameters[0] .= ':'.$parameters[2];
 				}
@@ -354,7 +349,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[3] = self::convertTimeshift($parameters[3]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[3] !== '') {
 					$parameters[0] .= ':'.$parameters[3];
 				}
@@ -383,9 +378,12 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'regexp':
 			case 'str':
 				$parameters += ['', ''];
-				$parameters[1] = self::convertParamSec($parameters[1]);
-				array_unshift($parameters, $parameters[1]);
-				unset($parameters[2], $unquotable_parameters[2]);
+				$parameters = [
+					self::convertParamSec($parameters[1]),
+					($fn_name === 'str') ? 'like' : $fn_name,
+					$parameters[0]
+				];
+				unset($unquotable_parameters[1]);
 				break;
 
 			// (period,period_shift)
@@ -439,6 +437,15 @@ class C52TriggerExpressionConverter extends CConverter {
 
 			$param = '"'.str_replace('"', '\\"', $param).'"';
 		});
+
+		// Remove empty parameters from the end of the parameters array.
+		while (($last_param = end($parameters)) !== false) {
+			if ($last_param !== '' && $last_param !== '""') {
+				break;
+			}
+
+			array_pop($parameters);
+		}
 
 		return array_values($parameters);
 	}

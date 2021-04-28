@@ -222,7 +222,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32/8") > 0'.
-				' and count(/Trapper/trap[1],1m,"","") > 0'
+				' and count(/Trapper/trap[1],1m) > 0'
 			],
 			[
 				'{Trapper:trap[3].iregexp("^error", #10)} > 0'.
