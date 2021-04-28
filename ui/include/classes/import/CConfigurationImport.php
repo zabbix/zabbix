@@ -66,7 +66,7 @@ class CConfigurationImport {
 	public function __construct(array $options = [], CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {
 		$default_options = [
-			'groups' => ['createMissing' => false],
+			'groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -127,30 +127,30 @@ class CConfigurationImport {
 	public function import(CImportDataAdapter $adapter): bool {
 		$this->adapter = $adapter;
 
-		// parse all import for references to resolve them all together with less sql count
+		// Parse all import for references to resolve them all together with less sql count.
 		$this->gatherReferences();
 
 		$this->processGroups();
 		$this->processTemplates();
 		$this->processHosts();
 
-		// delete missing objects from processed hosts and templates
+		// Delete missing objects from processed hosts and templates.
 		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
 		$this->deleteMissingItems();
 
-		// import objects
+		// Import objects.
 		$this->processHttpTests();
 		$this->processItems();
 		$this->processTriggers();
-//		$this->processDiscoveryRules();
+		$this->processDiscoveryRules();
 //		$this->processGraphs();
-//		$this->processImages();
+		$this->processImages();
 //		$this->processMaps();
 //		$this->processTemplateDashboards();
-//		$this->processMediaTypes();
+		$this->processMediaTypes();
 
 		return true;
 	}
@@ -162,36 +162,21 @@ class CConfigurationImport {
 	 *
 	 * @see CImportReferencer
 	 */
-	protected function gatherReferences() {
-//		$groupsRefs = [];
+	protected function gatherReferences(): void {
 		$groups_refs = [];
-//		$templatesRefs = [];
 		$templates_refs = [];
-//		$hostsRefs = [];
 		$hosts_refs = [];
-//		$itemsRefs = [];
 		$items_refs = [];
-//		$valueMapsRefs = [];
 		$valuemaps_refs = [];
-//		$triggersRefs = [];
 		$triggers_refs = [];
-//		$graphsRefs = [];
 		$graphs_refs = [];
-//		$iconMapsRefs = [];
 		$iconmaps_refs = [];
-//		$mapsRefs = [];
 		$maps_refs = [];
-//		$templateDashboardsRefs = [];
 		$template_dashboards_refs = [];
-//		$macrosRefs = [];
 		$macros_refs = [];
-//		$proxyRefs = [];
 		$proxy_refs = [];
-//		$hostPrototypesRefs = [];
 		$host_prototypes_refs = [];
-//		$httptestsRefs = [];
 		$httptests_refs = [];
-//		$httpstepsRefs = [];
 		$httpsteps_refs = [];
 
 		foreach ($this->getFormattedGroups() as $group) {
@@ -319,7 +304,10 @@ class CConfigurationImport {
 				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
 					$host_prototypes_refs[$host][$discovery_rule['key_']][$host_prototype['host']] =
 						array_key_exists('uuid', $host_prototype)
-							? ['uuid' => $host_prototype['uuid']]
+							? [
+								'uuid' => $host_prototype['uuid'],
+								'discovery_rule_uuid' => $discovery_rule['uuid']
+							]
 							: [];
 
 					// TODO VM: test, how group prototypes are managed in UUID context.
@@ -818,110 +806,113 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 */
-	protected function processDiscoveryRules() {
+	protected function processDiscoveryRules(): void {
 		if (!$this->options['discoveryRules']['createMissing'] && !$this->options['discoveryRules']['updateExisting']) {
 			return;
 		}
 
-		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
+		$master_item_key = 'master_item';
+		$discovery_rules_by_hosts = $this->getFormattedDiscoveryRules();
 
-		if (!$allDiscoveryRules) {
+		if (!$discovery_rules_by_hosts) {
 			return;
 		}
 
-		// unset rules that are related to hosts we did not process
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
+		// Unset rules that are related to hosts we did not process.
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			if (!$this->importedObjectContainer->isHostProcessed($hostId)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
-				unset($allDiscoveryRules[$host]);
+			if (!$this->importedObjectContainer->isHostProcessed($hostid)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+				// TODO VM: (?) I don't see use-case, when this will be called.
+				unset($discovery_rules_by_hosts[$host]);
 			}
 		}
 
 		if ($this->options['discoveryRules']['updateExisting']) {
-			$this->deleteMissingPrototypes($allDiscoveryRules);
+			$this->deleteMissingPrototypes($discovery_rules_by_hosts);
 		}
 
-		$itemsToCreate = [];
-		$itemsToUpdate = [];
+		$discovery_rules_to_create = [];
+		$discovery_rules_to_update = [];
 
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			foreach ($discoveryRules as $item) {
-				$item['hostid'] = $hostId;
+			foreach ($discovery_rules as $discovery_rule) {
+				$discovery_rule['hostid'] = $hostid;
 
-				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$interfaceid = $this->referencer->findInterfaceidByRef($hostId, $item['interface_ref']);
+				$itemid = array_key_exists('uuid', $discovery_rule)
+					? $this->referencer->findItemidByUuid($discovery_rule['uuid'])
+					: $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
 
-					if ($interfaceid !== null) {
-						$item['interfaceid'] = $interfaceid;
-					}
-					else {
+				unset($discovery_rule['item_prototypes'], $discovery_rule['trigger_prototypes'],
+					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
+				);
+
+				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
+					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
+
+					if ($interfaceid === null) {
 						throw new Exception(_s('Cannot find interface "%1$s" used for discovery rule "%2$s" on "%3$s".',
-							$item['interface_ref'], $item['name'], $host
+							$discovery_rule['interface_ref'], $discovery_rule['name'], $host
 						));
 					}
+
+					$discovery_rule['interfaceid'] = $interfaceid;
 				}
 
-				unset($item['item_prototypes']);
-				unset($item['trigger_prototypes']);
-				unset($item['graph_prototypes']);
-				unset($item['host_prototypes']);
-
-				$itemId = $this->referencer->findItemidByKey($hostId, $item['key_']);
-
-				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if ($discovery_rule['type'] == ITEM_TYPE_HTTPAGENT) {
 					$headers = [];
 
-					foreach ($item['headers'] as $header) {
+					foreach ($discovery_rule['headers'] as $header) {
 						$headers[$header['name']] = $header['value'];
 					}
 
-					$item['headers'] = $headers;
+					$discovery_rule['headers'] = $headers;
 
 					$query_fields = [];
 
-					foreach ($item['query_fields'] as $query_field) {
+					foreach ($discovery_rule['query_fields'] as $query_field) {
 						$query_fields[] = [$query_field['name'] => $query_field['value']];
 					}
 
-					$item['query_fields'] = $query_fields;
+					$discovery_rule['query_fields'] = $query_fields;
 				}
 
-				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $item['master_item'])) {
+				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
 						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 							_('cannot be empty')
 						));
 					}
 
-					$item['master_itemid'] = $this->referencer->findItemidByKey($hostId,  $item['master_item']['key']);
+					$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
+						$discovery_rule[$master_item_key]['key']
+					);
 				}
 
-				unset($item['master_item']);
+				unset($discovery_rule[$master_item_key]);
 
-				if ($item['overrides']) {
-					foreach ($item['overrides'] as &$override) {
+				if ($discovery_rule['overrides']) {
+					foreach ($discovery_rule['overrides'] as &$override) {
 						foreach ($override['operations'] as &$operation) {
 							if ($operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE
 									&& array_key_exists('optemplate', $operation)) {
 								foreach ($operation['optemplate'] as &$template) {
 									$templateid = $this->referencer->findTemplateidByHost($template['name']);
 
-									if (!$templateid) {
+									if ($templateid === null) {
 										throw new Exception(_s(
 											'Cannot find template "%1$s" for override "%2$s" of discovery rule "%3$s" on "%4$s".',
 											$template['name'],
 											$override['name'],
-											$item['name'],
+											$discovery_rule['name'],
 											$host
 										));
 									}
 
 									$template['templateid'] = $templateid;
-
 									unset($template['name']);
 								}
 							}
@@ -931,15 +922,16 @@ class CConfigurationImport {
 					unset($override);
 				}
 
-				foreach ($item['preprocessing'] as &$preprocessing_step) {
+				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
 					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 					unset($preprocessing_step['parameters']);
 				}
 				unset($preprocessing_step);
 
-				if ($itemId) {
-					$item['itemid'] = $itemId;
-					$itemsToUpdate[] = $item;
+				if ($itemid !== null) {
+					$discovery_rule['itemid'] = $itemid;
+					unset($discovery_rule['uuid']);
+					$discovery_rules_to_update[] = $discovery_rule;
 				}
 				else {
 					/*
@@ -947,233 +939,236 @@ class CConfigurationImport {
 					 * Unlike discoveryrule.update method, discoveryrule.create does not allow "lld_macro_paths"
 					 * to be empty.
 					 */
-					if (!$item['lld_macro_paths']) {
-						unset($item['lld_macro_paths']);
+					if (!$discovery_rule['lld_macro_paths']) {
+						unset($discovery_rule['lld_macro_paths']);
 					}
-					$itemsToCreate[] = $item;
+					$discovery_rules_to_create[] = $discovery_rule;
 				}
 			}
 		}
 
-		// create/update discovery rules and add processed rules to array $processedRules
-		$processedRules = [];
+		$processed_discovery_rules = [];
 
-		if ($this->options['discoveryRules']['createMissing'] && $itemsToCreate) {
-			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
+		if ($this->options['discoveryRules']['createMissing'] && $discovery_rules_to_create) {
+			API::DiscoveryRule()->create($discovery_rules_to_create);
 
-			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
-				$item = $itemsToCreate[$inum];
-
-				$item['itemid'] = $itemid;
-				$this->referencer->setDbItem($item);
-			}
-
-			foreach ($itemsToCreate as $item) {
-				$processedRules[$item['hostid']][$item['key_']] = 1;
+			foreach ($discovery_rules_to_create as $discovery_rule) {
+				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
 			}
 		}
 
-		if ($this->options['discoveryRules']['updateExisting'] && $itemsToUpdate) {
-			API::DiscoveryRule()->update($itemsToUpdate);
+		if ($this->options['discoveryRules']['updateExisting'] && $discovery_rules_to_update) {
+			API::DiscoveryRule()->update($discovery_rules_to_update);
 
-			foreach ($itemsToUpdate as $item) {
-				$processedRules[$item['hostid']][$item['key_']] = 1;
+			foreach ($discovery_rules_to_update as $discovery_rule) {
+				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
 			}
 		}
 
-		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
+		// Refresh discovery rules because templated ones can be inherited to host and used for prototypes.
 		$this->referencer->refreshItems();
 
-		$xml_item_key = 'master_item';
-		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_item_key);
+		$order_tree = $this->getDiscoveryRulesItemsOrder($master_item_key);
 
 		// process prototypes
-		$prototypes_to_update = [];
-		$prototypes_to_create = [];
+		$item_prototypes_to_update = [];
+		$item_prototypes_to_create = [];
 		$host_prototypes_to_update = [];
-		$hostPrototypesToCreate = [];
+		$host_prototypes_to_create = [];
 		$ex_group_prototypes_where = [];
 
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			foreach ($discoveryRules as $item) {
+			foreach ($discovery_rules as $discovery_rule) {
 				// if rule was not processed we should not create/update any of its prototypes
-				if (!isset($processedRules[$hostId][$item['key_']])) {
+				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
-				$item['hostid'] = $hostId;
-				$item_key = $item['key_'];
-				$itemId = $this->referencer->findItemidByKey($hostId, $item_key);
+				$itemid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
 
 				// prototypes
-				$item_prototypes = $item['item_prototypes'] ? $order_tree[$host][$item_key] : [];
+				$item_prototypes = $discovery_rule['item_prototypes'] ? $order_tree[$host][$discovery_rule['key_']] : [];
 
 				foreach ($item_prototypes as $index => $level) {
-					$prototype = $item['item_prototypes'][$index];
-					$prototype['hostid'] = $hostId;
+					$item_prototype = $discovery_rule['item_prototypes'][$index];
+					$item_prototype['hostid'] = $hostid;
 
-					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
-						$interfaceid = $this->referencer->findInterfaceidByRef($hostId, $prototype['interface_ref']);
+					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
+						$interfaceid = $this->referencer->findInterfaceidByRef($hostid,
+							$item_prototype['interface_ref']
+						);
 
 						if ($interfaceid !== null) {
-							$prototype['interfaceid'] = $interfaceid;
+							$item_prototype['interfaceid'] = $interfaceid;
 						}
 						else {
 							throw new Exception(_s(
 								'Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
-								$prototype['interface_ref'],
-								$prototype['name'],
-								$item['name'],
+								$item_prototype['interface_ref'],
+								$item_prototype['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 					}
 
-					if ($prototype['valuemap']) {
-						$valueMapId = $this->referencer->findValuemapidByName($hostId, $prototype['valuemap']['name']);
+					if ($item_prototype['valuemap']) {
+						$valuemapid = $this->referencer->findValuemapidByName($hostid,
+							$item_prototype['valuemap']['name']
+						);
 
-						if (!$valueMapId) {
+						if ($valuemapid === null) {
 							throw new Exception(_s(
 								'Cannot find value map "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
-								$prototype['valuemap']['name'],
-								$prototype['name'],
-								$item['name'],
+								$item_prototype['valuemap']['name'],
+								$item_prototype['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 
-						$prototype['valuemapid'] = $valueMapId;
-						unset($prototype['valuemap']);
+						$item_prototype['valuemapid'] = $valuemapid;
+						unset($item_prototype['valuemap']);
 					}
 
-					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
-						if (!array_key_exists('key', $prototype[$xml_item_key])) {
+					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
 							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('cannot be empty')
 							));
 						}
 
-						$master_itemprototypeid = $this->referencer->findItemidByKey($hostId,
-							$prototype[$xml_item_key]['key']
+						$master_item_prototypeid = $this->referencer->findItemidByKey($hostid,
+							$item_prototype[$master_item_key]['key']
 						);
 
-						if ($master_itemprototypeid !== false) {
-							$prototype['master_itemid'] = $master_itemprototypeid;
-							unset($prototype[$xml_item_key]);
+						if ($master_item_prototypeid !== false) {
+							$item_prototype['master_itemid'] = $master_item_prototypeid;
+							unset($item_prototype[$master_item_key]);
 						}
 					}
 					else {
-						unset($prototype[$xml_item_key]);
+						unset($item_prototype[$master_item_key]);
 					}
 
-					if ($prototype['type'] == ITEM_TYPE_HTTPAGENT) {
+					if ($item_prototype['type'] == ITEM_TYPE_HTTPAGENT) {
 						$headers = [];
 
-						foreach ($prototype['headers'] as $header) {
+						foreach ($item_prototype['headers'] as $header) {
 							$headers[$header['name']] = $header['value'];
 						}
 
-						$prototype['headers'] = $headers;
+						$item_prototype['headers'] = $headers;
 
 						$query_fields = [];
 
-						foreach ($prototype['query_fields'] as $query_field) {
+						foreach ($item_prototype['query_fields'] as $query_field) {
 							$query_fields[] = [$query_field['name'] => $query_field['value']];
 						}
 
-						$prototype['query_fields'] = $query_fields;
+						$item_prototype['query_fields'] = $query_fields;
 					}
 
-					$prototypeId = $this->referencer->findItemidByKey($hostId, $prototype['key_']);
-					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
-					$prototype['ruleid'] = $this->referencer->findItemidByKey($hostId, $item['key_']);
+					$item_prototypeid = array_key_exists('uuid', $item_prototype)
+						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
+						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 
-					foreach ($prototype['preprocessing'] as &$preprocessing_step) {
+					$item_prototype['rule'] = [
+						'hostid' => $hostid,
+						'key' => $discovery_rule['key_'],
+						'ruleid' => $itemid
+					];
+
+					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
 						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 						unset($preprocessing_step['parameters']);
 					}
 					unset($preprocessing_step);
 
-					if ($prototypeId) {
-						if (!array_key_exists($level, $prototypes_to_update)) {
-							$prototypes_to_update[$level] = [];
+					if ($item_prototypeid !== null) {
+						if (!array_key_exists($level, $item_prototypes_to_update)) {
+							$item_prototypes_to_update[$level] = [];
 						}
-						$prototype['itemid'] = $prototypeId;
-						$prototypes_to_update[$level][] = $prototype;
+						$item_prototype['itemid'] = $item_prototypeid;
+						$item_prototypes_to_update[$level][] = $item_prototype;
 					}
 					else {
-						if (!array_key_exists($level, $prototypes_to_create)) {
-							$prototypes_to_create[$level] = [];
+						if (!array_key_exists($level, $item_prototypes_to_create)) {
+							$item_prototypes_to_create[$level] = [];
 						}
-						$prototypes_to_create[$level][] = $prototype;
+						$item_prototypes_to_create[$level][] = $item_prototype;
 					}
 				}
 
-				// host prototype
-				foreach ($item['host_prototypes'] as $hostPrototype) {
-					// resolve group prototypes
-					$groupLinks = [];
+				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+					// Resolve group prototypes.
+					$group_links = [];
 
-					foreach ($hostPrototype['group_links'] as $groupLink) {
-						$groupId = $this->referencer->findGroupidByName($groupLink['group']['name']);
+					foreach ($host_prototype['group_links'] as $group_link) {
+						$groupid = $this->referencer->findGroupidByName($group_link['group']['name']);
 
-						if (!$groupId) {
+						if ($groupid === null) {
 							throw new Exception(_s(
 								'Cannot find host group "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
-								$groupLink['group']['name'],
-								$hostPrototype['name'],
-								$item['name'],
+								$group_link['group']['name'],
+								$host_prototype['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 
-						$groupLinks[] = ['groupid' => $groupId];
+						$group_links[] = ['groupid' => $groupid];
 					}
 
-					$hostPrototype['groupLinks'] = $groupLinks;
-					$hostPrototype['groupPrototypes'] = $hostPrototype['group_prototypes'];
-					unset($hostPrototype['group_links'], $hostPrototype['group_prototypes']);
+					$host_prototype['groupLinks'] = $group_links;
+					$host_prototype['groupPrototypes'] = $host_prototype['group_prototypes'];
+					unset($host_prototype['group_links'], $host_prototype['group_prototypes']);
 
-					// resolve templates
+					// Resolve templates.
 					$templates = [];
 
-					foreach ($hostPrototype['templates'] as $template) {
-						$templateId = $this->referencer->findTemplateidByHost($template['name']);
+					foreach ($host_prototype['templates'] as $template) {
+						$templateid = $this->referencer->findTemplateidByHost($template['name']);
 
-						if (!$templateId) {
+						if ($templateid === null) {
 							throw new Exception(_s(
 								'Cannot find template "%1$s" for host prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
 								$template['name'],
-								$hostPrototype['name'],
-								$item['name'],
+								$host_prototype['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 
-						$templates[] = ['templateid' => $templateId];
+						$templates[] = ['templateid' => $templateid];
 					}
 
-					$hostPrototype['templates'] = $templates;
+					$host_prototype['templates'] = $templates;
 
-					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $itemId, $hostPrototype['host']);
+					$host_prototypeid = array_key_exists('uuid', $host_prototype)
+						? $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid'])
+						: $this->referencer->findHostPrototypeidByHost($hostid, $itemid,
+							$host_prototype['host']
+						);
 
-					if ($hostPrototypeId) {
-						if ($hostPrototype['groupPrototypes']) {
-							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$hostPrototypeId]).
+					if ($host_prototypeid !== null) {
+						if ($host_prototype['groupPrototypes']) {
+							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$host_prototypeid]).
 								' AND '.dbConditionString('name',
-									zbx_objectValues($hostPrototype['groupPrototypes'], 'name')
+									array_column($host_prototype['groupPrototypes'], 'name')
 								).
 							')';
 						}
 
-						$hostPrototype['hostid'] = $hostPrototypeId;
-						$host_prototypes_to_update[] = $hostPrototype;
+						$host_prototype['hostid'] = $host_prototypeid;
+						unset($host_prototypeid['uuid']);
+						$host_prototypes_to_update[] = $host_prototype;
 					}
 					else {
-						$hostPrototype['ruleid'] = $itemId;
-						$hostPrototypesToCreate[] = $hostPrototype;
+						$host_prototype['ruleid'] = $itemid;
+						$host_prototypes_to_create[] = $host_prototype;
 					}
 				}
 			}
@@ -1210,201 +1205,221 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($prototypes_to_create) {
-			ksort($prototypes_to_create);
-			$this->createItemsWithDependency($prototypes_to_create, $xml_item_key, API::ItemPrototype());
+		if ($item_prototypes_to_update) {
+			ksort($item_prototypes_to_update);
+			$this->updateItemsWithDependency($item_prototypes_to_update, $master_item_key, API::ItemPrototype());
 		}
 
-		if ($prototypes_to_update) {
-			ksort($prototypes_to_update);
-			$this->updateItemsWithDependency($prototypes_to_update, $xml_item_key, API::ItemPrototype());
+		if ($item_prototypes_to_create) {
+			ksort($item_prototypes_to_create);
+			$this->createItemsWithDependency($item_prototypes_to_create, $master_item_key, API::ItemPrototype());
 		}
 
-		if ($hostPrototypesToCreate) {
-			API::HostPrototype()->create($hostPrototypesToCreate);
-		}
 		if ($host_prototypes_to_update) {
 			API::HostPrototype()->update($host_prototypes_to_update);
 		}
 
-		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes
+		if ($host_prototypes_to_create) {
+			API::HostPrototype()->create($host_prototypes_to_create);
+		}
+
+		// Refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph
+		//   prototypes.
 		$this->referencer->refreshItems();
 
-		// first we need to create item prototypes and only then graph prototypes
-		$triggersToCreate = [];
-		$triggersToUpdate = [];
-		$graphsToCreate = [];
-		$graphsToUpdate = [];
-		// the list of triggers to process dependencies
+		// First we need to create item prototypes and only then trigger and graph prototypes.
+		$triggers_to_create = [];
+		$triggers_to_update = [];
+		$graphs_to_create = [];
+		$graphs_to_update = [];
+
+		// The list of triggers to process dependencies.
 		$triggers = [];
 
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			foreach ($discoveryRules as $item) {
-				// if rule was not processed we should not create/update any of its prototypes
-				if (!isset($processedRules[$hostId][$item['key_']])) {
+			foreach ($discovery_rules as $discovery_rule) {
+				// If rule was not processed we should not create/update any of its prototypes.
+				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
-				// trigger prototypes
-				foreach ($item['trigger_prototypes'] as $trigger) {
-					$triggerId = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-						$trigger['recovery_expression']
-					);
+				foreach ($discovery_rule['trigger_prototypes'] as $trigger) {
+					$triggerid = array_key_exists('uuid', $trigger)
+						? $this->referencer->findTriggeridByUuid($trigger['uuid'])
+						: $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+							$trigger['recovery_expression']
+						);
 
 					$triggers[] = $trigger;
 					unset($trigger['dependencies']);
 
-					if ($triggerId) {
-						$trigger['triggerid'] = $triggerId;
-						$triggersToUpdate[] = $trigger;
+					if ($triggerid !== null) {
+						$trigger['triggerid'] = $triggerid;
+						$triggers_to_update[] = $trigger;
 					}
 					else {
-						$triggersToCreate[] = $trigger;
+						$triggers_to_create[] = $trigger;
 					}
 				}
 
-				// graph prototypes
-				foreach ($item['graph_prototypes'] as $graph) {
+				foreach ($discovery_rule['graph_prototypes'] as $graph) {
 					if ($graph['ymin_item_1']) {
-						$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
-						$itemId = $hostId
-							? $this->referencer->findItemidByKey($hostId, $graph['ymin_item_1']['key'])
-							: false;
+						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 
-						if (!$itemId) {
+						$itemid = ($hostid !== null)
+							? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+							: null;
+
+						if ($itemid === null) {
 							throw new Exception(_s(
 								'Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
 								$graph['ymin_item_1']['key'],
 								$graph['ymin_item_1']['host'],
 								$graph['name'],
-								$item['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 
-						$graph['ymin_itemid'] = $itemId;
+						$graph['ymin_itemid'] = $itemid;
 					}
 
 					if ($graph['ymax_item_1']) {
-						$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
-						$itemId = $hostId
-							? $this->referencer->findItemidByKey($hostId, $graph['ymax_item_1']['key'])
-							: false;
+						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 
-						if (!$itemId) {
+						$itemid = ($hostid !== null)
+							? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+							: null;
+
+						if ($itemid === null) {
 							throw new Exception(_s(
 								'Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
 								$graph['ymax_item_1']['key'],
 								$graph['ymax_item_1']['host'],
 								$graph['name'],
-								$item['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 
-						$graph['ymax_itemid'] = $itemId;
+						$graph['ymax_itemid'] = $itemid;
 					}
 
-					foreach ($graph['gitems'] as &$gitem) {
-						$gitemHostId = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
-						$gitem['itemid'] = $gitemHostId
-							? $this->referencer->findItemidByKey($gitemHostId, $gitem['item']['key'])
-							: false;
+					foreach ($graph['gitems'] as &$item) {
+						$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
 
-						if (!$gitem['itemid']) {
+						$item['itemid'] = ($hostid !== null)
+							? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+							: null;
+
+						if ($item['itemid'] === null) {
 							throw new Exception(_s(
 								'Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
-								$gitem['item']['key'],
-								$gitem['item']['host'],
+								$item['item']['key'],
+								$item['item']['host'],
 								$graph['name'],
-								$item['name'],
+								$discovery_rule['name'],
 								$host
 							));
 						}
 					}
-					unset($gitem);
+					unset($item);
 
-					$graphId = $this->referencer->findGraphidByName($gitemHostId, $graph['name']);
-					if ($graphId) {
-						$graph['graphid'] = $graphId;
-						$graphsToUpdate[] = $graph;
+					$graphid = array_key_exists('uuid', $graph)
+						? $this->referencer->findGraphidByUuid($graph['uuid'])
+						: $this->referencer->findGraphidByName($hostid, $graph['name']);
+
+					if ($graphid !== null) {
+						$graph['graphid'] = $graphid;
+						unset($graph['uuid']);
+						$graphs_to_update[] = $graph;
 					}
 					else {
-						$graphsToCreate[] = $graph;
+						$graphs_to_create[] = $graph;
 					}
 				}
 			}
 		}
 
-		if ($triggersToCreate) {
-			$result = API::TriggerPrototype()->create($triggersToCreate);
+		if ($triggers_to_update) {
+			$updated_triggers = API::TriggerPrototype()->update(array_map(function($trigger) {
+				unset($trigger['uuid']);
+				return $trigger;
+			}, $triggers_to_update));
 
-			foreach ($result['triggerids'] as $tnum => $triggerid) {
-				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
-					$trigger['recovery_expression'], $triggerid
-				);
+			foreach ($updated_triggers['triggerids'] as $index => $triggerid) {
+				$trigger = $triggers_to_update[$index];
+				$this->referencer->setDbTrigger($trigger + ['triggerid' => $triggerid]);
 			}
 		}
-		if ($triggersToUpdate) {
-			API::TriggerPrototype()->update($triggersToUpdate);
+
+		if ($triggers_to_create) {
+			$created_triggers = API::TriggerPrototype()->create($triggers_to_create);
+
+			foreach ($created_triggers['triggerids'] as $index => $triggerid) {
+				$trigger = $triggers_to_create[$index];
+				$this->referencer->setDbTrigger($trigger + ['triggerid' => $triggerid]);
+			}
 		}
-		if ($graphsToCreate) {
-			API::GraphPrototype()->create($graphsToCreate);
+
+		if ($graphs_to_update) {
+			API::GraphPrototype()->update($graphs_to_update);
 			$this->referencer->refreshGraphs();
 		}
-		if ($graphsToUpdate) {
-			API::GraphPrototype()->update($graphsToUpdate);
+
+		if ($graphs_to_create) {
+			API::GraphPrototype()->create($graphs_to_create);
+			$this->referencer->refreshGraphs();
 		}
 
 		$this->processTriggerPrototypeDependencies($triggers);
 	}
 
 	/**
-	 * Update trigger dependencies
+	 * Update trigger prototype dependencies.
 	 *
 	 * @param array $triggers
 	 *
 	 * @throws Exception
 	 */
-	protected function processTriggerPrototypeDependencies(array $triggers) {
-		$dependencies = [];
+	protected function processTriggerPrototypeDependencies(array $triggers): void {
+		$trigger_dependencies = [];
 
 		foreach ($triggers as $trigger) {
 			if (!array_key_exists('dependencies', $trigger)) {
 				continue;
 			}
 
-			$deps = [];
+			$dependencies = [];
 			$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->findTriggeridByName($dependency['name'], $dependency['expression'],
-					$dependency['recovery_expression']
+				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
+					$dependency['expression'], $dependency['recovery_expression']
 				);
 
-				if (!$dep_triggerid) {
+				if ($dependent_triggerid === null) {
 					throw new Exception(_s('Trigger prototype "%1$s" depends on trigger "%2$s", which does not exist.',
 						$trigger['description'],
 						$dependency['name']
 					));
 				}
 
-				$deps[] = ['triggerid' => $dep_triggerid];
+				$dependencies[] = ['triggerid' => $dependent_triggerid];
 			}
 
-			$dependencies[] = [
+			$trigger_dependencies[] = [
 				'triggerid' => $triggerid,
-				'dependencies' => $deps
+				'dependencies' => $dependencies
 			];
 		}
 
-		if ($dependencies) {
-			API::TriggerPrototype()->update($dependencies);
+		if ($trigger_dependencies) {
+			API::TriggerPrototype()->update($trigger_dependencies);
 		}
 	}
 
@@ -1677,48 +1692,46 @@ class CConfigurationImport {
 	 * Import images.
 	 *
 	 * @throws Exception
-	 *
-	 * @return null
 	 */
-	protected function processImages() {
+	protected function processImages(): void {
 		if (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing']) {
 			return;
 		}
 
-		$allImages = $this->getFormattedImages();
+		$images_to_import = $this->getFormattedImages();
 
-		if (!$allImages) {
+		if (!$images_to_import) {
 			return;
 		}
 
-		$allImages = zbx_toHash($allImages, 'name');
+		$images_to_import = zbx_toHash($images_to_import, 'name');
 
-		$dbImages = API::Image()->get([
+		$db_images = API::Image()->get([
 			'output' => ['imageid', 'name'],
-			'filter' => ['name' => array_keys($allImages)]
+			'filter' => ['name' => array_keys($images_to_import)]
 		]);
-		$dbImages = zbx_toHash($dbImages, 'name');
+		$db_images = zbx_toHash($db_images, 'name');
 
-		$imagesToUpdate = [];
-		$imagesToCreate = [];
+		$images_to_update = [];
+		$images_to_create = [];
 
-		foreach ($allImages as $imageName => $image) {
-			if (isset($dbImages[$imageName])) {
-				$image['imageid'] = $dbImages[$imageName]['imageid'];
+		foreach ($images_to_import as $image_name => $image) {
+			if (array_key_exists($image_name, $db_images)) {
+				$image['imageid'] = $db_images[$image_name]['imageid'];
 				unset($image['imagetype']);
-				$imagesToUpdate[] = $image;
+				$images_to_update[] = $image;
 			}
 			else {
-				$imagesToCreate[] = $image;
+				$images_to_create[] = $image;
 			}
 		}
 
-		if ($this->options['images']['createMissing'] && $imagesToCreate) {
-			API::Image()->create($imagesToCreate);
+		if ($this->options['images']['updateExisting'] && $images_to_update) {
+			API::Image()->update($images_to_update);
 		}
 
-		if ($this->options['images']['updateExisting'] && $imagesToUpdate) {
-			API::Image()->update($imagesToUpdate);
+		if ($this->options['images']['createMissing'] && $images_to_create) {
+			API::Image()->create($images_to_create);
 		}
 	}
 
@@ -1754,44 +1767,44 @@ class CConfigurationImport {
 	/**
 	 * Import media types.
 	 */
-	protected function processMediaTypes() {
+	protected function processMediaTypes(): void {
 		if (!$this->options['mediaTypes']['updateExisting'] && !$this->options['mediaTypes']['createMissing']) {
 			return;
 		}
 
-		$all_media_types = $this->getFormattedMediaTypes();
+		$media_types_to_import = $this->getFormattedMediaTypes();
 
-		if (!$all_media_types) {
+		if (!$media_types_to_import) {
 			return;
 		}
 
-		$all_media_types = zbx_toHash($all_media_types, 'name');
+		$media_types_to_import = zbx_toHash($media_types_to_import, 'name');
 
 		$db_media_types = API::MediaType()->get([
 			'output' => ['mediatypeid', 'name'],
-			'filter' => ['name' => array_keys($all_media_types)]
+			'filter' => ['name' => array_keys($media_types_to_import)]
 		]);
 		$db_media_types = zbx_toHash($db_media_types, 'name');
 
-		$upd_media_types = [];
-		$new_media_types = [];
+		$media_types_to_update = [];
+		$media_types_to_create = [];
 
-		foreach ($all_media_types as $name => $media_type) {
+		foreach ($media_types_to_import as $name => $media_type) {
 			if (array_key_exists($name, $db_media_types)) {
 				$media_type['mediatypeid'] = $db_media_types[$name]['mediatypeid'];
-				$upd_media_types[] = $media_type;
+				$media_types_to_update[] = $media_type;
 			}
 			else {
-				$new_media_types[] = $media_type;
+				$media_types_to_create[] = $media_type;
 			}
 		}
 
-		if ($this->options['mediaTypes']['createMissing'] && $new_media_types) {
-			API::MediaType()->create($new_media_types);
+		if ($this->options['mediaTypes']['updateExisting'] && $media_types_to_update) {
+			API::MediaType()->update($media_types_to_update);
 		}
 
-		if ($this->options['mediaTypes']['updateExisting'] && $upd_media_types) {
-			API::MediaType()->update($upd_media_types);
+		if ($this->options['mediaTypes']['createMissing'] && $media_types_to_create) {
+			API::MediaType()->create($media_types_to_create);
 		}
 	}
 
@@ -2003,129 +2016,137 @@ class CConfigurationImport {
 	/**
 	 * Deletes prototypes from DB that are missing in XML.
 	 *
-	 * @param array $all_discovery_rules
+	 * @param array $discovery_rules_by_hosts
+	 *
+	 * @throws APIException
 	 */
-	protected function deleteMissingPrototypes(array $all_discovery_rules) {
-		$xml_discoveryids = [];
-		$xml_host_prototypeids = [];
-		$xml_trigger_prototypeids = [];
-		$xml_graph_prototypeids = [];
-		$xml_item_prototypeids = [];
+	protected function deleteMissingPrototypes(array $discovery_rules_by_hosts): void {
+		$discovery_ruleids = [];
+		$host_prototypeids = [];
+		$trigger_prototypeids = [];
+		$graph_prototypeids = [];
+		$item_prototypeids = [];
 
-		foreach ($all_discovery_rules as $host => $discovery_rules) {
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discoveryid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				$discoveryid = array_key_exists('uuid', $discovery_rule)
+					? $this->referencer->findItemidByUuid($discovery_rule['uuid'])
+					: $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
 
-				if ($discoveryid) {
-					$xml_discoveryids[$discoveryid] = $discoveryid;
+				if ($discoveryid === null) {
+					continue;
+				}
 
-					// gather host prototype IDs to delete
-					foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
-						$host_prototypeid = $this->referencer->resolveHostPrototype($hostid, $discoveryid,
-							$host_prototype['host']
-						);
+				$discovery_ruleids[$discoveryid] = [];
 
-						if ($host_prototypeid) {
-							$xml_host_prototypeids[$host_prototypeid] = $host_prototypeid;
-						}
+				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+					$host_prototypeid = array_key_exists('uuid', $host_prototype)
+						? $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid'])
+						: $this->referencer->findHostPrototypeidByHost($hostid, $discoveryid, $host_prototype['host']);
+
+					if ($host_prototypeid !== null) {
+						$host_prototypeids[$host_prototypeid] = [];
 					}
+				}
 
-					// gather trigger prototype IDs to delete
-					foreach ($discovery_rule['trigger_prototypes'] as $trigger_prototype) {
-						$trigger_prototypeid = $this->referencer->findTriggeridByName($trigger_prototype['description'],
+				foreach ($discovery_rule['trigger_prototypes'] as $trigger_prototype) {
+					$trigger_prototypeid = array_key_exists('uuid', $trigger_prototype)
+						? $this->referencer->findTriggeridByUuid($trigger_prototype['uuid'])
+						: $this->referencer->findTriggeridByName($trigger_prototype['description'],
 							$trigger_prototype['expression'], $trigger_prototype['recovery_expression']
 						);
 
-						if ($trigger_prototypeid) {
-							$xml_trigger_prototypeids[$trigger_prototypeid] = $trigger_prototypeid;
-						}
+					if ($trigger_prototypeid !== null) {
+						$trigger_prototypeids[$trigger_prototypeid] = [];
 					}
+				}
 
-					// gather graph prototype IDs to delete
-					foreach ($discovery_rule['graph_prototypes'] as $graph_prototype) {
-						$graph_prototypeid = $this->referencer->findGraphidByName($hostid, $graph_prototype['name']);
+				foreach ($discovery_rule['graph_prototypes'] as $graph_prototype) {
+					$graph_prototypeid = array_key_exists('uuid', $graph_prototype)
+						? $this->referencer->findGraphidByUuid($graph_prototype['uuid'])
+						: $this->referencer->findGraphidByName($hostid, $graph_prototype['name']);
 
-						if ($graph_prototypeid) {
-							$xml_graph_prototypeids[$graph_prototypeid] = $graph_prototypeid;
-						}
+					if ($graph_prototypeid !== null) {
+						$graph_prototypeids[$graph_prototypeid] = [];
 					}
+				}
 
-					// gather item prototype IDs to delete
-					foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
-						$item_prototypeid = $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
+				foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
+					$item_prototypeid = array_key_exists('uuid', $item_prototype)
+						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
+						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 
-						if ($item_prototypeid) {
-							$xml_item_prototypeids[$item_prototypeid] = $item_prototypeid;
-						}
+					if ($item_prototypeid !== null) {
+						$item_prototypeids[$item_prototypeid] = [];
 					}
 				}
 			}
 		}
 
-		// delete missing host prototypes
 		$db_host_prototypes = API::HostPrototype()->get([
-			'output' => ['hostid'],
-			'discoveryids' => $xml_discoveryids,
+			'output' => [],
+			'discoveryids' => array_keys($discovery_ruleids),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$del_host_prototypes = array_diff_key($db_host_prototypes, $xml_host_prototypeids);
+		$host_prototypes_to_delete = array_diff_key($db_host_prototypes, $host_prototypeids);
 
-		if ($del_host_prototypes) {
-			API::HostPrototype()->delete(array_keys($del_host_prototypes));
+		if ($host_prototypes_to_delete) {
+			API::HostPrototype()->delete(array_keys($host_prototypes_to_delete));
 		}
 
-		// delete missing trigger prototypes
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
-			'output' => ['triggerid'],
-			'discoveryids' => $xml_discoveryids,
+			'output' => [],
+			'discoveryids' => array_keys($discovery_ruleids),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$del_trigger_prototypes = array_diff_key($db_trigger_prototypes, $xml_trigger_prototypeids);
+		$trigger_prototypes_to_delete = array_diff_key($db_trigger_prototypes, $trigger_prototypeids);
 
-		// unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them
-		if ($del_trigger_prototypes) {
-			API::TriggerPrototype()->delete(array_keys($del_trigger_prototypes));
+		// Unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them.
+		if ($trigger_prototypes_to_delete) {
+			API::TriggerPrototype()->delete(array_keys($trigger_prototypes_to_delete));
+
+			$this->referencer->refreshTriggers();
 		}
 
-		// delete missing graph prototypes
 		$db_graph_prototypes = API::GraphPrototype()->get([
-			'output' => ['graphid'],
-			'discoveryids' => $xml_discoveryids,
+			'output' => [],
+			'discoveryids' => array_keys($discovery_ruleids),
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$del_graph_prototypes = array_diff_key($db_graph_prototypes, $xml_graph_prototypeids);
+		$graph_prototypes_to_delete = array_diff_key($db_graph_prototypes, $graph_prototypeids);
 
-		// unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them
-		if ($del_graph_prototypes) {
-			API::GraphPrototype()->delete(array_keys($del_graph_prototypes));
-		}
-
-		// delete missing item prototypes
-		$db_item_prototypes = API::ItemPrototype()->get([
-			'output' => ['itemid'],
-			'discoveryids' => $xml_discoveryids,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'inherited' => false
-		]);
-
-		$del_item_prototypes = array_diff_key($db_item_prototypes, $xml_item_prototypeids);
-
-		if ($del_item_prototypes) {
-			API::ItemPrototype()->delete(array_keys($del_item_prototypes));
+		// Unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them.
+		if ($graph_prototypes_to_delete) {
+			API::GraphPrototype()->delete(array_keys($graph_prototypes_to_delete));
 
 			$this->referencer->refreshGraphs();
+		}
+
+		$db_item_prototypes = API::ItemPrototype()->get([
+			'output' => [],
+			'discoveryids' => array_keys($discovery_ruleids),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'inherited' => false
+		]);
+
+		$item_prototypes_to_delete = array_diff_key($db_item_prototypes, $item_prototypeids);
+
+		if ($item_prototypes_to_delete) {
+			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
+
+			$this->referencer->refreshItems();
 		}
 	}
 
@@ -2359,8 +2380,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedImages() {
-		if (!isset($this->formattedData['images'])) {
+	protected function getFormattedImages(): array {
+		if (!array_key_exists('images', $this->formattedData)) {
 			$this->formattedData['images'] = $this->adapter->getImages();
 		}
 
@@ -2398,8 +2419,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedMediaTypes() {
-		if (!isset($this->formattedData['mediaTypes'])) {
+	protected function getFormattedMediaTypes(): array {
+		if (!array_key_exists('mediaTypes', $this->formattedData)) {
 			$this->formattedData['mediaTypes'] = $this->adapter->getMediaTypes();
 		}
 
@@ -2410,16 +2431,16 @@ class CConfigurationImport {
 	 * Get items keys order tree, to ensure that master item will be inserted or updated before any of it dependent
 	 * item. Returns associative array where key is item index and value is item dependency level.
 	 *
-	 * @param string $master_key_identifier String containing master key name used to identify item master.
+	 * @param string $master_item_key  String containing master key name used to identify item master.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected function getItemsOrder(string $master_key_identifier): array {
+	protected function getItemsOrder(string $master_item_key): array {
 		$entities = $this->getFormattedItems();
 
-		return $this->getEntitiesOrder($master_key_identifier, $entities);
+		return $this->getEntitiesOrder($entities, $master_item_key);
 	}
 
 	/**
@@ -2427,20 +2448,22 @@ class CConfigurationImport {
 	 * before any of it dependent item. Returns associative array where key is item prototype index and value is item
 	 * prototype dependency level.
 	 *
-	 * @param string $master_key_identifier     String containing master key name used to identify item master.
+	 * @param string $master_item_key  String containing master key name used to identify item master.
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
-	protected function getDiscoveryRulesItemsOrder($master_key_identifier) {
-		$discovery_rules = $this->getFormattedDiscoveryRules();
+	protected function getDiscoveryRulesItemsOrder(string $master_item_key): array {
+		$discovery_rules_by_hosts = $this->getFormattedDiscoveryRules();
 		$entities_order = [];
 
-		foreach ($discovery_rules as $host_key => $items) {
-			foreach ($items as $item) {
-				if ($item['item_prototypes']) {
-					$item_prototypes = [$host_key => $item['item_prototypes']];
-					$item_prototypes = $this->getEntitiesOrder($master_key_identifier, $item_prototypes, true);
-					$entities_order[$host_key][$item['key_']] = $item_prototypes[$host_key];
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			foreach ($discovery_rules as $discovery_rule) {
+				if ($discovery_rule['item_prototypes']) {
+					$item_prototypes = [$host => $discovery_rule['item_prototypes']];
+					$item_prototypes = $this->getEntitiesOrder($item_prototypes, $master_item_key, true);
+					$entities_order[$host][$discovery_rule['key_']] = $item_prototypes[$host];
 				}
 			}
 		}
@@ -2454,123 +2477,125 @@ class CConfigurationImport {
 	 * Returns associative array where key is entity index in source array grouped by host key and value is entity
 	 * dependency level.
 	 *
-	 * @param string $master_key_identifier  String containing master key name to identify item master.
-	 * @param array  $host_entities          Associative array of host key and host items.
-	 * @param bool   $get_prototypes         Option to get also master item prototypes not found in supplied input.
+	 * @param array  $items_by_hosts   Associative array of host key and host items.
+	 * @param string $master_item_key  String containing master key name to identify item master.
+	 * @param bool   $get_prototypes   Option to get also master item prototypes not found in supplied input.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception if data is invalid.
 	 */
-	protected function getEntitiesOrder(string $master_key_identifier, array $host_entities,
+	protected function getEntitiesOrder(array $items_by_hosts, string $master_item_key,
 			bool $get_prototypes = false): array {
-		$find_keys = [];
-		$find_hosts = [];
+		$parent_item_hostids = [];
+		$parent_item_keys = [];
 		$resolved_masters_cache = [];
-		$hostkey_to_hostid = array_fill_keys(array_keys($host_entities), 0);
 
-		foreach ($hostkey_to_hostid as $host_key => &$hostid) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_key);
+		$host_name_to_hostid = array_fill_keys(array_keys($items_by_hosts), null);
+
+		foreach ($host_name_to_hostid as $host_name => &$hostid) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
 		}
+		unset($hostid);
 
-		foreach ($host_entities as $host_key => $entities) {
-			if (!array_key_exists($host_key, $hostkey_to_hostid)) {
+		foreach ($items_by_hosts as $host_name => $items) {
+			if (!array_key_exists($host_name, $host_name_to_hostid)) {
 				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'host',
-					_s('value "%1$s" not found', $host_key)
+					_s('value "%1$s" not found', $host_name)
 				));
 			}
 
-			if (!array_key_exists($host_key, $resolved_masters_cache)) {
-				$resolved_masters_cache[$host_key] = [];
+			if (!array_key_exists($host_name, $resolved_masters_cache)) {
+				$resolved_masters_cache[$host_name] = [];
 			}
 
 			// Cache input array entities.
-			foreach ($entities as $entity_key => $entity) {
-				$resolved_masters_cache[$host_key][$entity['key_']] = [
-					'type' => $entity['type'],
-					$master_key_identifier => $entity[$master_key_identifier]
+			foreach ($items as $item) {
+				$resolved_masters_cache[$host_name][$item['key_']] = [
+					'type' => $item['type'],
+					$master_item_key => $item[$master_item_key]
 				];
-			}
 
-			// Search master entities not in input array. Will be requested from database.
-			foreach ($entities as $entity_key => $entity) {
-				if ($entity['type'] == ITEM_TYPE_DEPENDENT
-						&& array_key_exists('key', $entity[$master_key_identifier])) {
-					$find_hosts[$hostkey_to_hostid[$host_key]] = true;
-					$find_keys[$entity[$master_key_identifier]['key']] = true;
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('key', $item[$master_item_key])) {
+					$parent_item_hostids[$host_name_to_hostid[$host_name]] = true;
+					$parent_item_keys[$item[$master_item_key]['key']] = true;
 				}
 			}
 		}
 
 		// There are entities to resolve from database, resolve and cache them recursively.
-		if ($find_keys) {
+		if ($parent_item_keys) {
 			/*
-			 * For existing items, 'referencer' should be initialized before 'addItemRef' method will be used.
-			 * Registering reference when property 'itemRefs' is empty, will not allow first call of 'resolveValueMap'
-			 * method update references to existing items.
+			 * For existing items, 'referencer' should be initialized before 'setDbItem' method will be used.
+			 * Registering reference when property 'db_items' is empty, will not allow first call of
+			 * 'findValueMapidByName' method update references to existing items.
 			 */
 			$this->referencer->initItemsReferences();
 
 			$options = [
 				'output' => ['itemid', 'uuid', 'key_', 'type', 'hostid', 'master_itemid'],
-				'hostids' => array_keys($find_hosts),
-				'filter' => ['key_' => array_keys($find_keys)],
+				'hostids' => array_keys($parent_item_hostids),
+				'filter' => ['key_' => array_keys($parent_item_keys)],
 				'preservekeys' => true
 			];
 
-			$resolved_entities = API::Item()->get($options + ['webitems' => true]);
+			$db_items = API::Item()->get($options + ['webitems' => true]);
 
 			if ($get_prototypes) {
-				$resolved_entities += API::ItemPrototype()->get($options);
+				$db_items += API::ItemPrototype()->get($options);
 			}
 
 			$resolve_entity_keys = [];
-			$host_entity_idkey_hash = [];
+			$itemid_to_item_key_by_hosts = [];
 
 			for ($level = 0; $level < ZBX_DEPENDENT_ITEM_MAX_LEVELS; $level++) {
-				$find_ids = [];
+				$missing_master_itemids = [];
 
-				foreach ($resolved_entities as $entityid => $entity) {
-					$host_key = array_search($entity['hostid'], $hostkey_to_hostid);
-					$this->referencer->setDbItem($entity);
-					$entity['key'] = $entity['key_'];
-					unset($entity['key_']);
-					$host_entity_idkey_hash[$host_key][$entityid] = $entity['key'];
+				foreach ($db_items as $itemid => $item) {
+					$host_name = array_search($item['hostid'], $host_name_to_hostid);
+
+					$this->referencer->setDbItem($item);
+
+					$item['key'] = $item['key_'];
+					unset($item['key_']);
+
+					$itemid_to_item_key_by_hosts[$host_name][$itemid] = $item['key'];
+
 					$cache_entity = [
-						'type' => $entity['type']
+						'type' => $item['type']
 					];
 
-					if ($entity['type'] == ITEM_TYPE_DEPENDENT) {
-						$master_itemid = $entity['master_itemid'];
+					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+						$master_itemid = $item['master_itemid'];
 
-						if (array_key_exists($master_itemid, $host_entity_idkey_hash[$host_key])) {
-							$cache_entity[$master_key_identifier] = [
-								'key' => $host_entity_idkey_hash[$host_key][$master_itemid]
+						if (array_key_exists($master_itemid, $itemid_to_item_key_by_hosts[$host_name])) {
+							$cache_entity[$master_item_key] = [
+								'key' => $itemid_to_item_key_by_hosts[$host_name][$master_itemid]
 							];
 						}
 						else {
-							$find_ids[] = $entity['master_itemid'];
+							$missing_master_itemids[] = $item['master_itemid'];
 							$resolve_entity_keys[] = [
-								'host' => $host_key,
-								'key' => $entity['key'],
-								'master_itemid' => $entity['master_itemid']
+								'host' => $host_name,
+								'key' => $item['key'],
+								'master_itemid' => $item['master_itemid']
 							];
 						}
 					}
 
-					$resolved_masters_cache[$host_key][$entity['key']] = $cache_entity;
+					$resolved_masters_cache[$host_name][$item['key']] = $cache_entity;
 				}
 
-				if ($find_ids) {
+				if ($missing_master_itemids) {
 					$options = [
 						'output' => ['key_', 'type', 'hostid', 'master_itemid'],
-						'itemids' => $find_ids,
+						'itemids' => $missing_master_itemids,
 						'preservekeys' => true
 					];
-					$resolved_entities = API::Item()->get($options + ['webitems' => true]);
+					$db_items = API::Item()->get($options + ['webitems' => true]);
 
 					if ($get_prototypes) {
-						$resolved_entities += API::ItemPrototype()->get($options);
+						$db_items += API::ItemPrototype()->get($options);
 					}
 				}
 				else {
@@ -2578,59 +2603,58 @@ class CConfigurationImport {
 				}
 			}
 
-			if ($find_ids) {
+			if ($missing_master_itemids) {
 				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 					_('maximum number of dependency levels reached')
 				));
 			}
 
-			foreach ($resolve_entity_keys as $entity) {
-				$master_itemid = $entity['master_itemid'];
+			foreach ($resolve_entity_keys as $item) {
+				$master_itemid = $item['master_itemid'];
 
-				if (!array_key_exists($entity['host'], $host_entity_idkey_hash) ||
-						!array_key_exists($master_itemid, $host_entity_idkey_hash[$entity['host']])) {
+				if (!array_key_exists($item['host'], $itemid_to_item_key_by_hosts) ||
+						!array_key_exists($master_itemid, $itemid_to_item_key_by_hosts[$item['host']])) {
 					throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 						_s('value "%1$s" not found', $master_itemid)
 					));
 				}
 
-				$master_key = $host_entity_idkey_hash[$entity['host']][$master_itemid];
-				$resolved_masters_cache[$entity['host']][$entity['key']] += [
-					$master_key_identifier => ['key' => $master_key]
+				$master_key = $itemid_to_item_key_by_hosts[$item['host']][$master_itemid];
+				$resolved_masters_cache[$item['host']][$item['key']] += [
+					$master_item_key => ['key' => $master_key]
 				];
 			}
 
-			unset($resolve_entity_keys);
-			unset($host_entity_idkey_hash);
+			unset($resolve_entity_keys, $itemid_to_item_key_by_hosts);
 		}
 
 		// Resolve every entity dependency level.
 		$tree = [];
 
-		foreach ($host_entities as $host_key => $entities) {
-			$hostid = $hostkey_to_hostid[$host_key];
+		foreach ($items_by_hosts as $host_name => $items) {
+			$hostid = $host_name_to_hostid[$host_name];
 			$host_items_tree = [];
 
-			foreach ($entities as $entity_index => $entity) {
+			foreach ($items as $index => $item) {
 				$level = 0;
-				$traversal_path = [$entity['key_']];
+				$traversal_path = [$item['key_']];
 
-				while ($entity && $entity['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $entity[$master_key_identifier])) {
+				while ($item && $item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item[$master_item_key])) {
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 							_('cannot be empty')
 						));
 					}
 
-					$master_key = $entity[$master_key_identifier]['key'];
+					$master_key = $item[$master_item_key]['key'];
 
-					if (array_key_exists($host_key, $resolved_masters_cache)
-							&& array_key_exists($master_key, $resolved_masters_cache[$host_key])) {
-						$entity = $resolved_masters_cache[$host_key][$master_key];
+					if (array_key_exists($host_name, $resolved_masters_cache)
+							&& array_key_exists($master_key, $resolved_masters_cache[$host_name])) {
+						$item = $resolved_masters_cache[$host_name][$master_key];
 
-						if (in_array($master_key, $traversal_path) || ($entity['type'] == ITEM_TYPE_DEPENDENT
-								&& $entity[$master_key_identifier]
-								&& $master_key == $entity[$master_key_identifier]['key'])) {
+						if (in_array($master_key, $traversal_path) || ($item['type'] == ITEM_TYPE_DEPENDENT
+								&& $item[$master_item_key]
+								&& $master_key == $item[$master_item_key]['key'])) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('circular item dependency is not allowed')
 							));
@@ -2652,14 +2676,14 @@ class CConfigurationImport {
 					}
 				}
 
-				$host_items_tree[$entity_index] = $level;
+				$host_items_tree[$index] = $level;
 			}
 
-			$tree[$host_key] = $host_items_tree;
+			$tree[$host_name] = $host_items_tree;
 		}
 
 		// Order item indexes in descending order by nesting level.
-		foreach ($tree as $host_key => &$item_indexes) {
+		foreach ($tree as &$item_indexes) {
 			asort($item_indexes);
 		}
 		unset($item_indexes);

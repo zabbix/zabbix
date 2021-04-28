@@ -42,7 +42,7 @@ class CImportReferencer {
 	protected $templateDashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
-	protected $hostPrototypes = [];
+	protected $host_prototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
 
@@ -58,18 +58,9 @@ class CImportReferencer {
 	protected $templateDashboardsRefs;
 	protected $db_macros;
 	protected $db_proxies;
-	protected $hostPrototypesRefs;
+	protected $db_host_prototypes;
 	protected $db_httptests;
 	protected $db_httpsteps;
-
-	/**
-	 * Initializes references for items.
-	 */
-	public function initItemsReferences() {
-		if ($this->db_items === null) {
-			$this->selectItems();
-		}
-	}
 
 	public function findGroupidByUuid(string $uuid): ?string {
 		if ($this->db_groups === null) {
@@ -183,6 +174,15 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Initializes references for items.
+	 */
+	public function initItemsReferences(): void {
+		if ($this->db_items === null) {
+			$this->selectItems();
+		}
+	}
+
+	/**
 	 * Get item id by uuid.
 	 *
 	 * @param string $uuid
@@ -235,7 +235,7 @@ class CImportReferencer {
 	 */
 	public function findValuemapidByName(string $hostid, string $name): ?string {
 		if ($this->db_valuemaps === null) {
-			$this->selectValueMaps();
+			$this->selectValuemaps();
 		}
 
 		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
@@ -447,25 +447,49 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get proxy id by name.
+	 * Get host prototype ID by uuid.
 	 *
-	 * @param string $hostId
-	 * @param string $discoveryRuleId
-	 * @param string $hostPrototype
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveHostPrototype($hostId, $discoveryRuleId, $hostPrototype) {
-		if ($this->hostPrototypesRefs === null) {
+	public function findHostPrototypeidByUuid(string $uuid): ?string {
+		if ($this->db_host_prototypes === null) {
 			$this->selectHostPrototypes();
 		}
 
-		if (isset($this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype])) {
-			return $this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype];
+		foreach ($this->db_host_prototypes as $host_prototypeid => $host_prototype) {
+			if ($host_prototype['uuid'] === $uuid) {
+				return $host_prototypeid;
+			}
 		}
-		else {
-			return false;
+
+		return null;
+	}
+
+	/**
+	 * Get host prototype ID by host.
+	 *
+	 * @param string $parent_hostid
+	 * @param string $discovery_ruleid
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
+	public function findHostPrototypeidByHost(string $parent_hostid, string $discovery_ruleid, string $host): ?string {
+		if ($this->db_host_prototypes === null) {
+			$this->selectHostPrototypes();
 		}
+
+		foreach ($this->db_host_prototypes as $host_prototypeid => $host_prototype) {
+			if ($host_prototype['parent_hostid'] === $parent_hostid
+					&& $host_prototype['discovery_ruleid'] === $discovery_ruleid
+					&& $host_prototype['host'] === $host) {
+				return $host_prototypeid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -698,13 +722,15 @@ class CImportReferencer {
 	/**
 	 * Add trigger name/expression association with trigger id.
 	 *
-	 * @param string $name
-	 * @param string $expression
-	 * @param string $recovery_expression
-	 * @param string $triggerid
+	 * @param array $trigger
 	 */
-	public function addTriggerRef($name, $expression, $recovery_expression, $triggerid) {
-		$this->db_triggers[$name][$expression][$recovery_expression] = $triggerid;
+	public function setDbTrigger(array $trigger): void {
+		$this->db_triggers[$trigger['triggerid']] = [
+			'uuid' => $trigger['uuid'],
+			'description' => $trigger['description'],
+			'expression' => $trigger['expression'],
+			'recovery_expression' => $trigger['recovery_expression']
+		];
 	}
 
 	/**
@@ -824,7 +850,7 @@ class CImportReferencer {
 //			}
 //		}
 
-		$this->hostPrototypes = $hostPrototypes;
+		$this->host_prototypes = $hostPrototypes;
 	}
 
 	/**
@@ -987,7 +1013,7 @@ class CImportReferencer {
 	/**
 	 * Select value map IDs for previously added value map names.
 	 */
-	protected function selectValueMaps(): void {
+	protected function selectValuemaps(): void {
 		$this->db_valuemaps = [];
 
 		if (!$this->valuemaps) {
@@ -1267,32 +1293,57 @@ class CImportReferencer {
 	/**
 	 * Select host prototype ids for previously added host prototypes names.
 	 */
-	protected function selectHostPrototypes() {
-		if (!empty($this->hostPrototypes)) {
-			$this->hostPrototypesRefs = [];
-			$sqlWhere = [];
-			foreach ($this->hostPrototypes as $host => $discoveryRule) {
-				$hostId = $this->findTemplateidOrHostidByHost($host);
+	protected function selectHostPrototypes(): void {
+		$this->db_host_prototypes = [];
 
-				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-					$discoveryRuleId = $this->findItemidByKey($hostId, $discoveryRuleKey);
-					if ($hostId) {
-						$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.host', $hostPrototypes).')';
+		if (!$this->host_prototypes) {
+			return;
+		}
+
+		$sql_where = [];
+
+		foreach ($this->host_prototypes as $host => $discovery_rule) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				continue;
+			}
+
+			foreach ($discovery_rule as $discovery_rule_key => $host_prototypes) {
+				if (array_key_exists('uuid', $host_prototypes)) {
+					$discovery_ruleid = $this->findItemidByUuid($host_prototypes[0]['discovery_rule_uuid']);
+
+					if ($discovery_ruleid !== null) {
+						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
+							.dbConditionString('h.uuid', array_column($host_prototypes, 'uuid')).')';
+					}
+				}
+				else {
+					$discovery_ruleid = $this->findItemidByKey($hostid, $discovery_rule_key);
+
+					if ($discovery_ruleid !== null) {
+						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
+							.dbConditionString('h.host', array_keys($host_prototypes)).')';
 					}
 				}
 			}
+		}
 
-			if ($sqlWhere) {
-				$query = DBselect(
-					'SELECT h.host,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
-					' FROM hosts h,host_discovery hd,items i'.
-					' WHERE h.hostid=hd.hostid'.
-						' AND hd.parent_itemid=i.itemid'.
-						' AND ('.implode(' OR ', $sqlWhere).')'
-				);
-				while ($data = DBfetch($query)) {
-					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
-				}
+		if ($sql_where) {
+			$query = DBselect(
+				'SELECT h.host,h.uuid,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
+				' FROM hosts h,host_discovery hd,items i'.
+				' WHERE h.hostid=hd.hostid'.
+					' AND hd.parent_itemid=i.itemid'.
+					' AND ('.implode(' OR ', $sql_where).')'
+			);
+			while ($host_prototype = DBfetch($query)) {
+				$this->db_host_prototypes[$host_prototype['hostid']] = [
+					'uuid' => $host_prototype['uuid'],
+					'host' => $host_prototype['host'],
+					'parent_hostid' => $host_prototype['parent_hostid'],
+					'discovery_ruleid' => $host_prototype['parent_itemid']
+				];
 			}
 		}
 	}
