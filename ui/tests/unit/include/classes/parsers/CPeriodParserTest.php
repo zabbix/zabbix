@@ -215,10 +215,10 @@ class CPeriodParserTest extends TestCase {
 				'time_shift' => ''
 			]],
 			[':now/y', 0, [], [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => ':now/y',
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
 				'sec_num' => '',
-				'time_shift' => 'now/y'
+				'time_shift' => ''
 			]]
 		];
 	}
