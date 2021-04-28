@@ -40,14 +40,15 @@ class CHistFunctionParser extends CParser {
 	 * Supported options:
 	 *   'usermacros' => false  Enable user macros usage in function parameters.
 	 *   'lldmacros' => false   Enable low-level discovery macros usage in function parameters.
-	 *   'host_macro'           Array of macros supported as host name part in the query.
+	 *   'host_macro' => false  Allow {HOST.HOST} macro as host name part in the query.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
-		'host_macro' => []
+		'calculated' => false,
+		'host_macro' => false
 	];
 
 	private $query_parser;
@@ -78,6 +79,7 @@ class CHistFunctionParser extends CParser {
 		$this->options = $options + $this->options;
 
 		$this->query_parser = new CQueryParser([
+			'calculated' => $this->options['calculated'],
 			'host_macro' => $this->options['host_macro']
 		]);
 		$this->period_parser = new CPeriodParser([
@@ -110,7 +112,7 @@ class CHistFunctionParser extends CParser {
 
 		$p = $pos;
 
-		if (!preg_match('/^([a-z]+)\(/', substr($source, $p), $matches)) {
+		if (!preg_match('/^([a-z_]+)\(/', substr($source, $p), $matches)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -163,17 +165,17 @@ class CHistFunctionParser extends CParser {
 					if ($source[$p] !== ' ') {
 						if ($num == 0) {
 							if ($this->query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $this->query_parser->getLength() - 1;
 								$_parameters[$num] = [
 									'type' => self::PARAM_TYPE_QUERY,
-									'pos' => $this->query_parser->result->pos,
-									'match' => $this->query_parser->result->match,
-									'length' => $this->query_parser->result->length,
+									'pos' => $p,
+									'match' => $this->query_parser->getMatch(),
+									'length' => $this->query_parser->getLength(),
 									'data' => [
-										'host' => $this->query_parser->result->host,
-										'item' => $this->query_parser->result->item
+										'host' => $this->query_parser->getHost(),
+										'item' => $this->query_parser->getItem()
 									]
 								];
+								$p += $this->query_parser->getLength() - 1;
 								$state = self::STATE_END;
 							}
 							else {
@@ -203,17 +205,17 @@ class CHistFunctionParser extends CParser {
 
 								default:
 									if ($this->period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-										$p += $this->period_parser->getLength() - 1;
 										$_parameters[$num] = [
 											'type' => self::PARAM_TYPE_PERIOD,
-											'pos' => $this->period_parser->result->pos,
-											'match' => $this->period_parser->result->match,
-											'length' => $this->period_parser->result->length,
+											'pos' => $p,
+											'match' => $this->period_parser->getMatch(),
+											'length' => $this->period_parser->getLength(),
 											'data' => [
-												'sec_num' => $this->period_parser->result->sec_num,
-												'time_shift' => $this->period_parser->result->time_shift
+												'sec_num' => $this->period_parser->getSecNum(),
+												'time_shift' => $this->period_parser->getTimeshift()
 											]
 										];
+										$p += $this->period_parser->getLength() - 1;
 										$state = self::STATE_END;
 									}
 									else {

@@ -30,70 +30,32 @@ class CItemKey extends CParser {
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_PARAMS = 4;
 
-	const STATE_AFTER_OPEN_BRACE = 1;
-	const STATE_AFTER_LOGICAL_OPERATOR = 3;
-	const STATE_AFTER_CLOSE_BRACE = 6;
-	const STATE_AFTER_CONSTANT = 7;
-
 	const PARAM_ARRAY = 0;
 	const PARAM_UNQUOTED = 1;
 	const PARAM_QUOTED = 2;
 
-	protected $key = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
-	protected $parameters = [];
-
-	/**
-	 * Array of parsed item key filter attributes.
-	 *
-	 * @var array $attributes
-	 */
-	protected $attributes = [];
-
-	/**
-	 * @var CLLDMacroParser
-	 */
-	protected $lldmacro_parser;
-
-	/**
-	 * @var CUserMacroParser
-	 */
-	protected $usermacro_parser;
-
-	/**
-	 * @var CSetParser
-	 */
-	protected $logicalop_parser;
-
-	/**
-	 * @var CSetParser
-	 */
-	protected $attribute_parser;
+	private $key = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
+	private $parameters = [];
 
 	/**
 	 * An options array
 	 *
 	 * Supported options:
 	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
-	 *   'with_filter'                  allow additional item key filter
-	 *   'allow_wildcard'               allow * as item key
 	 *
 	 * @var array
 	 */
-	protected $options = ['18_simple_checks' => false, 'with_filter' => false, 'allow_wildcard' => false];
+	private $options = ['18_simple_checks' => false];
 
 	/**
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
-		$this->options = $options + $this->options;
 		$this->error_msgs['empty'] = _('key is empty');
 		$this->error_msgs['unexpected_end'] = _('unexpected end of key');
 
-		if ($this->options['with_filter']) {
-			$this->lldmacro_parser = new CLLDMacroParser();
-			$this->usermacro_parser = new CUserMacroParser();
-			$this->logicalop_parser = new CSetParser(['and', 'or']);
-			$this->attribute_parser = new CSetParser(['group', 'tag']);
+		if (array_key_exists('18_simple_checks', $options)) {
+			$this->options['18_simple_checks'] = $options['18_simple_checks'];
 		}
 	}
 
@@ -127,13 +89,8 @@ class CItemKey extends CParser {
 		$this->parameters = [];
 		$this->errorClear();
 
-		if ($this->options['allow_wildcard'] && $data[$offset] === CQueryParserResult::HOST_ITEMKEY_WILDCARD) {
-			$p = $offset + 1;
-		}
-		else {
-			for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
-				// Code is not missing here.
-			}
+		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
+			// Code is not missing here.
 		}
 
 		// is key empty?
@@ -181,23 +138,6 @@ class CItemKey extends CParser {
 			}
 		}
 
-		if ($this->options['with_filter'] && isset($data[$p]) && $data[$p] === '?') {
-			$p++;
-
-			if (!isset($data[$p]) || $data[$p] !== '[') {
-				$this->errorPos($data, $p);
-
-				return self::PARSE_FAIL;
-			}
-			$p++;
-
-			if (!$this->parseKeyAttributes($data, $p)) {
-				return self::PARSE_FAIL;
-			}
-
-			$p2 = $p;
-		}
-
 		$this->length = $p - $offset;
 		$this->match = substr($data, $offset, $this->length);
 
@@ -205,7 +145,7 @@ class CItemKey extends CParser {
 			return self::PARSE_SUCCESS;
 		}
 
-		$this->errorPos($data, $p2);
+		$this->errorPos(substr($data, $offset), $p2 - $offset);
 
 		return self::PARSE_SUCCESS_CONT;
 	}
@@ -339,147 +279,6 @@ class CItemKey extends CParser {
 		$pos = $p;
 
 		return ($state == self::STATE_END_OF_PARAMS);
-	}
-
-	/**
-	 * Parse a filter attributes. Filter should starts with question mark character and should be defined
-	 * in square brackets.
-	 *
-	 * @param string $source
-	 * @param int    $pos
-	 *
-	 * @return int
-	 */
-	public function parseKeyAttributes($source, &$pos) {
-		$level = 0;
-		$this->attributes = [];
-		$state = self::STATE_AFTER_LOGICAL_OPERATOR;
-
-		while (isset($source[$pos]) && $source[$pos] !== ']') {
-			$last_pos = $pos;
-
-			if ($source[$pos] === ' ') {
-				$pos++;
-				continue;
-			}
-
-			switch ($source[$pos]) {
-				case '(':
-					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR && $state != self::STATE_AFTER_OPEN_BRACE) {
-						$this->errorPos($source, $pos);
-
-						return false;
-					}
-
-					$pos++;
-					$level++;
-					$state = self::STATE_AFTER_OPEN_BRACE;
-
-					break;
-
-				case ')':
-					if ($level == 0 || $state != self::STATE_AFTER_CONSTANT) {
-						$this->errorPos($source, $pos);
-
-						return false;
-					}
-
-					$pos++;
-					$level--;
-					$state = self::STATE_AFTER_CLOSE_BRACE;
-
-					break;
-
-				default:
-					if (($state == self::STATE_AFTER_CLOSE_BRACE || $state == self::STATE_AFTER_CONSTANT)
-							&& $this->logicalop_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
-						$state = self::STATE_AFTER_LOGICAL_OPERATOR;
-						$pos += $this->logicalop_parser->getLength();
-					}
-					else if (($state == self::STATE_AFTER_OPEN_BRACE || $state == self::STATE_AFTER_LOGICAL_OPERATOR)
-							&& $this->parseAttributePair($source, $pos)) {
-						$state = self::STATE_AFTER_CONSTANT;
-					}
-					else {
-						$this->errorPos($source, $pos);
-
-						return false;
-					}
-
-					break;
-			}
-		}
-
-		if ($level > 0 || !isset($source[$pos]) || $source[$pos] !== ']') {
-			$this->errorPos($source, strlen($source) + 1);
-
-			return false;
-		}
-		$pos++;
-
-		if (!$this->attributes) {
-			$this->errorPos($source, $pos);
-
-			return false;
-		}
-
-		if ($state != self::STATE_AFTER_CONSTANT && $state != self::STATE_AFTER_CLOSE_BRACE) {
-			$this->errorPos($source, $last_pos);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Parse single attribute pair of name=value, where value can be quoted string, lld macros or user macros.
-	 *
-	 * @param string $source
-	 * @param int    $pos
-	 */
-	protected function parseAttributePair($source, &$pos): bool {
-		$p = $pos;
-		$value = '';
-
-		if ($this->attribute_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
-			return false;
-		}
-		$pos += $this->attribute_parser->getLength();
-
-		if (!isset($source[$pos]) || $source[$pos] !== '=') {
-			return false;
-		}
-		$pos++;
-
-		if (isset($source[$pos]) && $source[$pos] === '"') {
-			$value_end = $pos;
-			$pos++;
-
-			do {
-				$value_end = strpos($source, '"', $value_end + 1);
-			} while ($value_end !== false && substr($source, $value_end - 1, 2) === '\\"');
-
-			if ($value_end === false) {
-				return false;
-			}
-
-			$value = substr($source, $pos, $value_end + 1 - $pos);
-		}
-		else if ($this->lldmacro_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
-			$value = $this->lldmacro_parser->getMatch();
-		}
-		else if ($this->usermacro_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
-			$value = $this->usermacro_parser->getMatch();
-		}
-		else {
-			return false;
-		}
-
-		$pos += strlen($value);
-		$this->attributes[] = substr($source, $p, $pos - $p);
-
-		return true;
 	}
 
 	/**

@@ -21,7 +21,7 @@
 
 class CExpressionParser extends CParser {
 
-	// For parsing of trigger expression.
+	// For parsing of expressions.
 	private const STATE_AFTER_OPEN_BRACE = 1;
 	private const STATE_AFTER_BINARY_OPERATOR = 2;
 	private const STATE_AFTER_LOGICAL_OPERATOR = 3;
@@ -50,7 +50,7 @@ class CExpressionParser extends CParser {
 	 *   'collapsed_expression' => false  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
-	 *   'host_macro'                     Array of macros supported as host name part in the query.
+	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
 	 *
 	 * @var array
 	 */
@@ -58,7 +58,7 @@ class CExpressionParser extends CParser {
 		'lldmacros' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
-		'host_macro' => []
+		'host_macro' => false
 	];
 
 	/**
@@ -89,18 +89,15 @@ class CExpressionParser extends CParser {
 	}
 
 	/**
-	 * Parse a trigger expression and set public variables $this->error, $this->result
+	 * Parse an expression and set public variables $this->error, $this->result
 	 *
 	 * Examples:
-	 *   expression:
-	 *     last(/Zabbix server/agent.ping,0)=1 and {TRIGGER.VALUE}={$TRIGGER.VALUE}
-	 *   results:
-	 *     $this->result : CExpressionParserResult
-	 *     $this->error : ''
+	 *   last(/Zabbix server/agent.ping,0) = 1 and {TRIGGER.VALUE} = {$MACRO}
 	 *
-	 * @param string $expression
+	 * @param string $source
+	 * @param int    $pos
 	 *
-	 * @return CExpressionParserResult|bool Returns a result object if a match has been found or false otherwise.
+	 * @return int
 	 */
 	public function parse($source, $pos = 0) {
 		// initializing local variables
@@ -511,7 +508,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * The constant can be:
 	 *  - function like func(<expression>)
-	 *  - trigger function like func(/host/item,<params>)
+	 *  - function like func(/host/item,<params>)
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
 	 *  - string
 	 *  - macro like {TRIGGER.VALUE}
@@ -559,7 +556,6 @@ class CExpressionParser extends CParser {
 			return true;
 		}
 
-		// LLD macro support for trigger prototypes.
 		if ($options['lldmacros']) {
 			$lld_macro_parser = new CLLDMacroParser();
 
@@ -593,6 +589,7 @@ class CExpressionParser extends CParser {
 		$hist_function_parser = new CHistFunctionParser([
 			'usermacros' => true,
 			'lldmacros' => $options['lldmacros'],
+			'calculated' => $options['calculated'],
 			'host_macro' => $options['host_macro']
 		]);
 
@@ -721,7 +718,7 @@ class CExpressionParser extends CParser {
 	}
 
 	/**
-	 * Parses a number constant in the trigger expression and moves a current position on a last symbol of the number.
+	 * Parses a number constant in the expression and moves a current position on a last symbol of the number.
 	 *
 	 * @param string  $source
 	 * @param int     $pos

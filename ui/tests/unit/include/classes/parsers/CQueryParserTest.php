@@ -28,72 +28,104 @@ class CQueryParserTest extends TestCase {
 			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]',
-				'length' => 72,
 				'host' => 'Zabbix server',
 				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
 			]],
 			['/h/i', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/h/i',
-				'length' => 4,
 				'host' => 'h',
 				'item' => 'i'
 			]],
 			['text /h/i text', 5, [], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '/h/i',
-				'length' => 4,
 				'host' => 'h',
 				'item' => 'i'
 			]],
 			['text /{HOST.HOST}/item[pam, "param"] text', 5, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'length' => 0,
 				'host' => '',
 				'item' => ''
 			]],
-			['text /{HOST.HOST}/item[pam, "param"] text', 5, ['host_macro' => ['{HOST.HOST}']], [
+			['text /{HOST.HOST}/item[pam, "param"] text', 5, ['host_macro' => true], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '/{HOST.HOST}/item[pam, "param"]',
-				'length' => 31,
 				'host' => '{HOST.HOST}',
 				'item' => 'item[pam, "param"]'
 			]],
 			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log,ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '/Zabbix server/logrt',
-				'length' => 20,
 				'host' => 'Zabbix server',
 				'item' => 'logrt'
 			]],
 			['/Zabbix server^/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'length' => 0,
 				'host' => '',
 				'item' => ''
 			]],
 			['/Zabbix server', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'length' => 0,
 				'host' => '',
 				'item' => ''
 			]],
 			['/Zabbix server/', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'length' => 0,
 				'host' => '',
 				'item' => ''
 			]],
 			['//logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'length' => 0,
 				'host' => '',
 				'item' => ''
+			]],
+			['/Zabbix server/*', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/Zabbix server/*', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/Zabbix server/*',
+				'host' => 'Zabbix server',
+				'item' => '*'
+			]],
+			['/*/key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/*/key', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/*/key',
+				'host' => '*',
+				'item' => 'key'
+			]],
+			['/*/*', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/*/*',
+				'host' => '*',
+				'item' => '*'
+			]],
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]', 0, [], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]',
+				'host' => 'Zabbix server',
+				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
+			]],
+			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]',
+				'host' => 'Zabbix server',
+				'item' => 'logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]'
 			]]
 		];
 	}
@@ -111,10 +143,10 @@ class CQueryParserTest extends TestCase {
 
 		$this->assertSame($expected, [
 			'rc' => $query_parser->parse($source, $pos),
-			'match' => $query_parser->result->match,
-			'length' => strlen($query_parser->result->match),
-			'host' => $query_parser->result->host,
-			'item' => $query_parser->result->item
+			'match' => $query_parser->getMatch(),
+			'host' => $query_parser->getHost(),
+			'item' => $query_parser->getItem()
 		]);
+		$this->assertSame(strlen($expected['match']), strlen($query_parser->getMatch()));
 	}
 }

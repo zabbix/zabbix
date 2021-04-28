@@ -50,7 +50,7 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key']
 			],
 			[
-				'last(/{HOST.HOST}/key)', 0, ['host_macro' => ['{HOST.HOST}']],
+				'last(/{HOST.HOST}/key)', 0, ['host_macro' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/{HOST.HOST}/key)',
@@ -132,6 +132,182 @@ class CHistFunctionParserTest extends TestCase {
 					]
 				],
 				['/host/key[ "param1", param2, "param3" ,"param4\""]']
+			],
+			[
+				'last(/host/*)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/host/*)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/host/*)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/*',
+							'length' => 7,
+							'data' => [
+								'host' => 'host',
+								'item' => '*'
+							]
+						]
+					]
+				],
+				['/host/*']
+			],
+			[
+				'last(/*/key)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/*/key)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/*/key)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/*/key',
+							'length' => 6,
+							'data' => [
+								'host' => '*',
+								'item' => 'key'
+							]
+						]
+					]
+				],
+				['/*/key']
+			],
+			[
+				'last(/'.'/key)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/'.'/key)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/'.'/key)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/'.'/key',
+							'length' => 5,
+							'data' => [
+								'host' => '',
+								'item' => 'key'
+							]
+						]
+					]
+				],
+				['/'.'/key']
+			],
+			[
+				'last(/'.'/*)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/'.'/*)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/'.'/*',
+							'length' => 3,
+							'data' => [
+								'host' => '',
+								'item' => '*'
+							]
+						]
+					]
+				],
+				['/'.'/*']
+			],
+			[
+				'last(/*/*)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/*/*)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/*/*)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/*/*',
+							'length' => 4,
+							'data' => [
+								'host' => '*',
+								'item' => '*'
+							]
+						]
+					]
+				],
+				['/*/*']
+			],
+			[
+				'last(/{HOST.HOST}/key)', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/{HOST.HOST}/key)', 0, ['host_macro' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/{HOST.HOST}/key)',
+					'function' => 'last',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/{HOST.HOST}/key',
+							'length' => 16,
+							'data' => [
+								'host' => '{HOST.HOST}',
+								'item' => 'key'
+							]
+						]
+					]
+				],
+				['/{HOST.HOST}/key']
 			],
 			[
 				'last(/host/key, #25)', 0, [],

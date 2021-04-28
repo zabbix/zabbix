@@ -681,6 +681,12 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 {
 	int	i, ret;
 
+	if (0 == token->opt)
+	{
+		*error = zbx_dsprintf(*error, "no arguments for function at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
