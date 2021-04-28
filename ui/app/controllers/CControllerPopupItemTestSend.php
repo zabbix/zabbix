@@ -256,7 +256,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$valuemap = ($this->getInput('valuemapid', 0) != 0)
 			? API::ValueMap()->get([
 				'output' => [],
-				'selectMappings' => ['newvalue', 'value'],
+				'selectMappings' => ['type', 'newvalue', 'value'],
 				'valuemapids' => $this->getInput('valuemapid')
 			])[0]
 			: [];

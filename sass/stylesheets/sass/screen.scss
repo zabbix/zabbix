@@ -1294,6 +1294,11 @@ form {
 	}
 }
 
+.td-drag-icon {
+	padding: 0 11px 0 0;
+	vertical-align: middle;
+}
+
 .table-forms {
 	display: table;
 	width: 100%;
@@ -1337,6 +1342,21 @@ form {
 		@extend tfoot;
 	}
 
+	td {
+		position: relative;
+
+		&.td-drag-icon {
+			padding: 0 11px 0 0;
+			vertical-align: middle;
+		}
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			margin-right: 5px;
+		}
+	}
+
 	.table-forms-td-left {
 		display: table-cell;
 		padding: 5px 0;
@@ -1368,14 +1388,7 @@ form {
 			position: relative;
 
 			&.td-drag-icon {
-				padding: 0 11px 0 0;
-				vertical-align: middle;
-			}
-
-			.drag-icon {
-				position: absolute;
-				top: 5px;
-				margin-right: 5px;
+				padding-right: 11px;
 			}
 
 			&.center {
@@ -4997,6 +5010,10 @@ svg {
 
 .display-none {
 	display: none;
+}
+
+.visibility-hidden {
+	visibility: hidden;
 }
 
 .checkbox-list {

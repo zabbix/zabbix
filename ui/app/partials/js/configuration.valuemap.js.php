@@ -111,6 +111,8 @@ var AddValueMap = class {
 
 		cell.classList.add('wordwrap');
 		for (let value of this.data.mappings) {
+			value = {value: '', ...value};
+
 			if (i <= this.MAX_MAPPINGS) {
 				cell.append((i < this.MAX_MAPPINGS)
 					? `${value.value} ⇒ ${value.newvalue}`
@@ -119,6 +121,7 @@ var AddValueMap = class {
 				);
 			}
 
+			cell.appendChild(this.createHiddenInput(`[mappings][${i}][type]`, value.type));
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, value.value));
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][newvalue]`, value.newvalue));
 			i++;

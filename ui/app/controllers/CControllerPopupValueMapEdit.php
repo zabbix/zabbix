@@ -86,22 +86,25 @@ class CControllerPopupValueMapEdit extends CController {
 			return false;
 		}
 
-		$values = [];
+		$type_values = [];
 
 		foreach ($mappings as $mapping) {
+			$mapping += ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
+			$type = $mapping['type'];
+
 			if ($mapping['newvalue'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Mapped to'), _('cannot be empty')));
 				return false;
 			}
 
-			if (array_key_exists($mapping['value'], $values)) {
+			if (array_key_exists($mapping['value'], $type_values[$type])) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
 					_s('value %1$s already exists', '('.$mapping['value'].')'))
 				);
 				return false;
 			}
 
-			$values[$mapping['value']] = 1;
+			$type_values[$type][$mapping['value']] = true;
 		}
 
 		return true;
@@ -123,7 +126,6 @@ class CControllerPopupValueMapEdit extends CController {
 	protected function update(): CControllerResponse {
 		$data = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
-		order_result($data['mappings'], 'value');
 		$data['mappings'] = array_values($data['mappings']);
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
@@ -146,7 +148,7 @@ class CControllerPopupValueMapEdit extends CController {
 		$this->getInputs($data, array_keys($data));
 
 		if (!$data['mappings']) {
-			$data['mappings'][] = ['value' => '', 'newvalue' => ''];
+			$data['mappings'][] = ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
 		}
 
 		$data += [
