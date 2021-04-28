@@ -17,6 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifdef _WINDOWS
+#	include <stdint.h>
+#endif
+
 #include "common.h"
 #include "modbtype.h"
 #include "mutexs.h"

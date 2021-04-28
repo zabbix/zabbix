@@ -83,6 +83,10 @@ typedef unsigned __int32	zbx_uint32_t;
 typedef uint32_t		zbx_uint32_t;
 #	endif
 
+#	ifndef UINT32_MAX
+#		define UINT32_MAX  (0xffffffff)
+#	endif
+
 #	define strcasecmp	lstrcmpiA
 
 typedef __int64	zbx_offset_t;
