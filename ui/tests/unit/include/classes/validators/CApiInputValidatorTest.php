@@ -107,19 +107,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_CALC_FORMULA],
 				'last(//agent.ping) = 1 or "text" = {$MACRO}',
 				'/1/formula',
-				'Incorrect trigger function "last(agent.ping)" provided in expression. Invalid first parameter.'
+				'last(//agent.ping) = 1 or "text" = {$MACRO}'
 			],
 			[
 				['type' => API_CALC_FORMULA],
 				'last(//agent.ping) = 1 or "text" = {#LLD}',
 				'/1/formula',
-				'Invalid parameter "/1/formula": incorrect calculated item formula starting from " {#LLD}".'
+				'Invalid parameter "/1/formula": incorrect expression starting from "{#LLD}".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
 				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, max(33, 1)))))))))))))))))))))))))))))))))',
 				'/1/formula',
-				'Invalid parameter "/1/formula": incorrect calculated item formula starting from "max(33, 1)))))))))))))))))))))))))))))))))".'
+				'Invalid parameter "/1/formula": incorrect expression starting from "max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, max(33, 1)))))))))))))))))))))))))))))))))".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
@@ -3603,7 +3603,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_TRIGGER_EXPRESSION],
 				'last(/host/item = 0',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from "last(/host/item = 0".'
+				'Invalid parameter "/1/expression": incorrect expression starting from "last(/host/item = 0".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3615,7 +3615,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_TRIGGER_EXPRESSION],
 				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+				'Invalid parameter "/1/expression": incorrect expression starting from "{#LLD_MACRO}".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
