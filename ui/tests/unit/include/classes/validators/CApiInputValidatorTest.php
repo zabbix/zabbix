@@ -105,12 +105,6 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_CALC_FORMULA],
-				'last(//agent.ping) = 1 or "text" = {$MACRO}',
-				'/1/formula',
-				'last(//agent.ping) = 1 or "text" = {$MACRO}'
-			],
-			[
-				['type' => API_CALC_FORMULA],
 				'last(//agent.ping) = 1 or "text" = {#LLD}',
 				'/1/formula',
 				'Invalid parameter "/1/formula": incorrect expression starting from "{#LLD}".'
