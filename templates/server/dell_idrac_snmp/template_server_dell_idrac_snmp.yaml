@@ -543,6 +543,8 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.30.1.{#SNMPINDEX}'
               key: 'network.nic.slot.[{#SNMPINDEX}]'
               delay: 1d
+              trends: '0'
+              value_type: CHAR
               applications:
                 -
                   name: 'Network Cards'
@@ -1319,6 +1321,33 @@ zabbix_export:
           value: '1'
           newvalue: failed
     -
+      name: 'IDRAC-MIB-SMIv2::NICConnectionStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: connected
+        -
+          value: '2'
+          newvalue: disconnected
+        -
+          value: '3'
+          newvalue: driverBad
+        -
+          value: '4'
+          newvalue: driverDisabled
+        -
+          value: '10'
+          newvalue: hardwareInitalizing
+        -
+          value: '11'
+          newvalue: hardwareResetting
+        -
+          value: '12'
+          newvalue: hardwareClosing
+        -
+          value: '13'
+          newvalue: hardwareNotReady
+    -
       name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
       mappings:
         -
@@ -1483,30 +1512,3 @@ zabbix_export:
         -
           value: '3'
           newvalue: 'Force Write Back'
-    -
-      name: 'IDRAC-MIB-SMIv2::NICConnectionStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'connected'
-        -
-          value: '2'
-          newvalue: 'disconnected'
-        -
-          value: '3'
-          newvalue: 'driverBad'
-        -
-          value: '4'
-          newvalue: 'driverDisabled'
-        -
-          value: '10'
-          newvalue: 'hardwareInitalizing'
-        -
-          value: '11'
-          newvalue: 'hardwareResetting'
-        -
-          value: '12'
-          newvalue: 'hardwareClosing'
-        -
-          value: '13'
-          newvalue: 'hardwareNotReady'
