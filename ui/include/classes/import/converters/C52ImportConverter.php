@@ -451,6 +451,10 @@ class C52ImportConverter extends CConverter {
 						}, $maps[$i]['selements'][$s]['tags']);
 					}
 					unset($maps[$i]['selements'][$s]['application']);
+
+					if (array_key_exists('elements', $selement)) {
+						$maps[$i]['selements'][$s]['elements'] = self::convertTriggers($selement['elements']);
+					}
 				}
 			}
 		}
@@ -494,11 +498,13 @@ class C52ImportConverter extends CConverter {
 		$event_name_converter = new C52EventNameConverter();
 
 		foreach ($triggers as &$trigger) {
-			$trigger['expression'] = $expression_converter->convert([
-				'expression' => $trigger['expression'],
-				'host' => $host,
-				'item' => $item
-			]);
+			if (array_key_exists('expression', $trigger)) {
+				$trigger['expression'] = $expression_converter->convert([
+					'expression' => $trigger['expression'],
+					'host' => $host,
+					'item' => $item
+				]);
+			}
 
 			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== '') {
 				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
