@@ -180,5 +180,16 @@ in:
 out:
   return: SUCCEED
   value: "Range (4)"
+---
+test case: range with suffix
+in:
+  value: -400
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-1,32,44,9.0e-1- 6.0e0, -5e-1K - -3e2"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (-400)"
 ...
 

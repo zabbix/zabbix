@@ -3383,17 +3383,58 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 				for (j = 0; j < num; j++)
 				{
-					int	scanned, found = 0;
+					int	found = 0;
+					char	*ptr, *threshold_min, *threshold_max, *delimiter_ptr;
+					size_t	min_size, max_size;
 
 					range_str = get_param_dyn(input_ptr, j + 1, NULL);
-					scanned = sscanf(range_str,"%lf-%lf", &min, &max);
+					ptr = range_str;
+					if (1 < strlen(ptr) && '-' == ptr[0])
+						ptr++;
 
-					if (1 == scanned && SUCCEED == zbx_double_compare(input_value, min))
-						found = 1;
-					else if (2 == scanned && input_value >= min && input_value <= max)
-						found = 1;
+					do
+					{
+						delimiter_ptr = strchr(ptr, '-');
+						if (NULL != delimiter_ptr && (delimiter_ptr > ptr && 'e' != delimiter_ptr[-1]))
+							break;
+						ptr = delimiter_ptr + 1;
+					} while (NULL != delimiter_ptr);
+
+					if (NULL == delimiter_ptr)
+					{
+						threshold_min = zbx_strdup(NULL, range_str);
+						threshold_max = NULL;
+					}
+					else
+					{
+						min_size = (size_t)(delimiter_ptr - range_str) + 1;
+						max_size = strlen(range_str) - (size_t)(delimiter_ptr - range_str);
+						threshold_min = zbx_malloc(NULL, min_size);
+						threshold_max = zbx_malloc(NULL, max_size);
+						memcpy(threshold_min, range_str, min_size - 1);
+						threshold_min[min_size - 1] = '\0';
+						memcpy(threshold_max, delimiter_ptr + 1, max_size);
+					}
 
 					zbx_free(range_str);
+
+					if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
+							(NULL == threshold_max || ZBX_INFINITY !=
+							(max = evaluate_string_to_double(threshold_max))))
+					{
+						if (NULL != threshold_max && input_value >= min && input_value <= max)
+						{
+							found = 1;
+						}
+						else if (NULL == threshold_max &&
+								SUCCEED == zbx_double_compare(input_value, min))
+						{
+							found = 1;
+						}
+					}
+
+					zbx_free(threshold_min);
+					zbx_free(threshold_max);
 
 					if (0 != found)
 						goto map_value;
