@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-23T15:11:29Z'
+  date: '2021-04-28T08:05:02Z'
   media_types:
     -
       name: Express.ms
@@ -177,13 +177,9 @@ zabbix_export:
                 throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
             }
         
-            // Forcing event_value for discovery and autoregistration events.
-            if (params.event_source === '1' || params.event_source === '2') {
-                params.event_value = '1';
-            }
-        
-            // Forcing event_update_status for non trigger-based events.
+            // Forcing event_value and event_update_status for non trigger-based events.
             if (params.event_source !== '0' ) {
+                params.event_value = '1';
                 params.event_update_status = '0';
             }
         
