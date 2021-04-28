@@ -3395,8 +3395,11 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 					do
 					{
 						delimiter_ptr = strchr(ptr, '-');
-						if (NULL != delimiter_ptr && (delimiter_ptr > ptr && 'e' != delimiter_ptr[-1]))
+						if (NULL != delimiter_ptr &&
+								(delimiter_ptr > ptr && 'e' != delimiter_ptr[-1]))
+						{
 							break;
+						}
 						ptr = delimiter_ptr + 1;
 					} while (NULL != delimiter_ptr);
 
