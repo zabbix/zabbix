@@ -43,7 +43,7 @@ class testDashboardCopyWidgets extends CWebTest {
 				' FROM dashboard_page dp'.
 				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
 					' AND dp.dashboardid='.self::DASHBOARD_ID.
-			') ORDER BY widgetid'
+			') ORDER BY w.widgetid DESC'
 		);
 	}
 
