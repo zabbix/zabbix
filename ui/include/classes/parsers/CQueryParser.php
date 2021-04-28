@@ -36,14 +36,17 @@ class CQueryParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'calculated' => false  Parse calculated item formula instead of trigger expression.
+	 *   'calculated' => false  Allow wildcards to be used in place of hostname and item key. Allow filter expression
+	 *                          for item.
 	 *   'host_macro' => false  Allow {HOST.HOST} macro as host name part in the query.
+	 *   'empty_host' => false  Allow empty hostname.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'calculated' => false,
-		'host_macro' => false
+		'host_macro' => false,
+		'empty_host' => false
 	];
 
 	/**
@@ -107,8 +110,7 @@ class CQueryParser extends CParser {
 			$p += $this->host_name_parser->getLength();
 			$host = $this->host_name_parser->getMatch();
 		}
-		// Allow an empty hostname for calculated item formula.
-		elseif ($this->options['calculated']) {
+		elseif ($this->options['empty_host']) {
 			$host = '';
 		}
 		else {

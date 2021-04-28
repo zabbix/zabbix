@@ -59,6 +59,11 @@ class CExpressionMacroParserTest extends TestCase {
 				'match' => '{? 1 + 1   }',
 				'length' => 12
 			]],
+			['text {?last(/'.'/system.cpu.load)}', 5, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{?last(/'.'/system.cpu.load)}',
+				'length' => 26
+			]],
 			['text {? last(/{HOST.HOST}/key, #25) } text', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '{? last(/{HOST.HOST}/key, #25) }',

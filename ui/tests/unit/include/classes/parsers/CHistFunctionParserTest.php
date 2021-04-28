@@ -208,6 +208,16 @@ class CHistFunctionParserTest extends TestCase {
 			[
 				'last(/'.'/key)', 0, ['calculated' => true],
 				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/'.'/key)', 0, ['empty_host' => true],
+				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/'.'/key)',
 					'function' => 'last',
@@ -228,6 +238,16 @@ class CHistFunctionParserTest extends TestCase {
 			],
 			[
 				'last(/'.'/*)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'last(/'.'/*)', 0, ['calculated' => true, 'empty_host' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/'.'/*)',

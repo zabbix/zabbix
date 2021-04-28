@@ -51,6 +51,7 @@ class CExpressionParser extends CParser {
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
 	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
+	 *   'empty_host' => false            Allow empty hostname in the query string.
 	 *
 	 * @var array
 	 */
@@ -58,7 +59,8 @@ class CExpressionParser extends CParser {
 		'lldmacros' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
-		'host_macro' => false
+		'host_macro' => false,
+		'empty_host' => false
 	];
 
 	/**
@@ -75,10 +77,6 @@ class CExpressionParser extends CParser {
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['lldmacros']
-	 * @param bool  $options['collapsed_expression']
-	 * @param bool  $options['calculated']
-	 * @param bool  $options['host_macro']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -590,7 +588,8 @@ class CExpressionParser extends CParser {
 			'usermacros' => true,
 			'lldmacros' => $options['lldmacros'],
 			'calculated' => $options['calculated'],
-			'host_macro' => $options['host_macro']
+			'host_macro' => $options['host_macro'],
+			'empty_host' => $options['empty_host']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {

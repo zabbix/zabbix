@@ -331,7 +331,8 @@ class CApiInputValidator {
 		$expression_parser = new CExpressionParser([
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
 			'calculated' => true,
-			'host_macro' => true
+			'host_macro' => true,
+			'empty_host' => true
 		]);
 
 		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {

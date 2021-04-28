@@ -162,7 +162,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				$expression_parser = new CExpressionParser([
 					'lldmacros' => $support_lldmacros,
 					'calculated' => true,
-					'host_macro' => true
+					'host_macro' => true,
+					'empty_host' => true
 				]);
 
 				if ($expression_parser->parse($inputs[$field]) == CParser::PARSE_SUCCESS) {
