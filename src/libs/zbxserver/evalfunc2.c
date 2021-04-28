@@ -2518,44 +2518,29 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: arithmetic_mean_dbl                                              *
+ * Function: arithmetic_mean                                                  *
  *                                                                            *
  * Purpose: calculate arithmetic mean (i.e. average)                          *
  *                                                                            *
  * Parameters: v - [IN] vector with input data                                *
  *             n - [IN] number of elements in 'v', must be > 0.               *
+ *    value_type - [IN] the value type of input data                          *
  *                                                                            *
  ******************************************************************************/
-static double	arithmetic_mean_dbl(const zbx_history_record_t *v, int n)
+static double	arithmetic_mean(const zbx_history_record_t *v, int n, unsigned char value_type)
 {
 	double	sum = 0;
 	int	i;
 
 	for (i = 0; i < n; i++)
-		sum += v[i].value.dbl;
+	{
+		if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			sum += v[i].value.dbl;
+		else
+			sum += (double)v[i].value.ui64;
+	}
 
 	return sum / n;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: arithmetic_mean_uint64                                           *
- *                                                                            *
- * Purpose: calculate arithmetic mean (i.e. average)                          *
- *                                                                            *
- * Parameters: v - [IN] vector with input data                                *
- *             n - [IN] number of elements in 'v', must be > 0.               *
- *                                                                            *
- ******************************************************************************/
-static double	arithmetic_mean_uint64(const zbx_history_record_t *v, int n)
-{
-	zbx_uint64_t	sum = 0;
-	int		i;
-
-	for (i = 0; i < n; i++)
-		sum += v[i].value.ui64;
-
-	return (double)sum / n;
 }
 
 /******************************************************************************
@@ -2589,35 +2574,22 @@ static int	evaluate_KURTOSIS(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		double	mean, second_moment = 0, fourth_moment = 0, second_moment2, result = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the second and the fourth moments */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the second and the fourth moments */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				second_moment += diff * diff;
-				fourth_moment += diff * diff * diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the second and the fourth moments */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				second_moment += diff * diff;
-				fourth_moment += diff * diff * diff * diff;
-			}
+			second_moment += diff * diff;
+			fourth_moment += diff * diff * diff * diff;
 		}
 
 		second_moment /= values.values_num;
@@ -2657,51 +2629,44 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: median_dbl                                                       *
+ * Function: find_median                                                      *
  *                                                                            *
  * Purpose: find median (helper function)                                     *
  *                                                                            *
  * Parameters: v - [IN/OUT] history data vector. NOTE: it will be modified    *
  *                 (sorted in place)                                          *
+ *    value_type - [IN] the value type of input data                          *
  *                                                                            *
  * Return value: median                                                       *
  *                                                                            *
  ******************************************************************************/
-static double	median_dbl(zbx_vector_history_record_t *v)
+static double	find_median(zbx_vector_history_record_t *v, unsigned char value_type)
 {
-	zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_float_compare);
+	if (ITEM_VALUE_TYPE_FLOAT == value_type)
+		zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_float_compare);
+	else
+		zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_uint64_compare);
 
 	if (0 == v->values_num % 2)	/* number of elements is even */
 	{
-		return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) / 2.0;
+		if (ITEM_VALUE_TYPE_FLOAT == value_type)
+		{
+			return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) /
+					2.0;
+		}
+		else
+		{
+			return (double)(v->values[v->values_num / 2 - 1].value.ui64 +
+					v->values[v->values_num / 2].value.ui64) / 2.0;
+		}
 	}
 	else
-		return v->values[v->values_num / 2].value.dbl;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: median_ui64                                                      *
- *                                                                            *
- * Purpose: find median (helper function)                                     *
- *                                                                            *
- * Parameters: v - [IN/OUT] history data vector. NOTE: it will be modified    *
- *                 (sorted in place)                                          *
- *                                                                            *
- * Return value: median                                                       *
- *                                                                            *
- ******************************************************************************/
-static double	median_ui64(zbx_vector_history_record_t *v)
-{
-	zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_uint64_compare);
-
-	if (0 == v->values_num % 2)	/* number of elements is even */
 	{
-		return (double)(v->values[v->values_num / 2 - 1].value.ui64 +
-				v->values[v->values_num / 2].value.ui64) / 2.0;
+		if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			return v->values[v->values_num / 2].value.dbl;
+		else
+			return (double)v->values[v->values_num / 2].value.ui64;
 	}
-	else
-		return (double)v->values[v->values_num / 2].value.ui64;
 }
 
 /******************************************************************************
@@ -2735,34 +2700,26 @@ static int	evaluate_MAD(zbx_variant_t *value, DC_ITEM *item, const char *paramet
 		double	median;
 		int	i;
 
+		/* step 1: find median of input data */
+		median = find_median(&values, item->value_type);
+
+		/* step 2: find absolute differences of input data and median. Reuse history data vector and */
+		/* take advantage of storage union of 'ui64' and 'dbl' elements of type 'history_value_t' in */
+		/* the history data vector. */
+
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			/* step 1: find median of input data */
-			median = median_dbl(&values);
-
-			/* step 2: find absolute differences of input data and median. Reuse history data vector. */
-
 			for (i = 0; i < values.values_num; i++)
 				values.values[i].value.dbl = fabs(values.values[i].value.dbl - median);
-
-			/* step 3: find median of the differences */
-			median = median_dbl(&values);
 		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
+		else
 		{
-			/* step 1: find median of input data */
-			median = median_ui64(&values);
-
-			/* step 2: find absolute differences of input data and median. Reuse history data vector and */
-			/* take advantage of storage union of 'ui64' and 'dbl' elements of type 'history_value_t' in */
-			/* the history data vector. */
-
 			for (i = 0; i < values.values_num; i++)
 				values.values[i].value.dbl = fabs((double)values.values[i].value.ui64 - median);
-
-			/* step 3: find median of the differences */
-			median = median_dbl(&values);
 		}
+
+		/* step 3: find median of the differences */
+		median = find_median(&values, ITEM_VALUE_TYPE_FLOAT);
 
 		zbx_variant_set_dbl(value, median);
 		ret = SUCCEED;
@@ -2808,35 +2765,22 @@ static int	evaluate_SKEWNESS(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		double	mean, std_dev = 0, sum_diff3 = 0, divisor, result = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the standard deviation and sum_diff3 */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the standard deviation and sum_diff3 */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				std_dev += diff * diff;
-				sum_diff3 += diff * diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the standard deviation and sum_diff3 */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				std_dev += diff * diff;
-				sum_diff3 += diff * diff * diff;
-			}
+			std_dev += diff * diff;
+			sum_diff3 += diff * diff * diff;
 		}
 
 		std_dev = sqrt(std_dev / values.values_num);
@@ -2903,33 +2847,21 @@ static int	evaluate_STDDEVPOP(zbx_variant_t *value, DC_ITEM *item, const char *p
 		double	mean, std_dev = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the standard deviation */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the standard deviation */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				std_dev += diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the standard deviation */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				std_dev += diff * diff;
-			}
+			std_dev += diff * diff;
 		}
 
 		std_dev = sqrt(std_dev / values.values_num);
@@ -2983,33 +2915,21 @@ static int	evaluate_STDDEVSAMP(zbx_variant_t *value, DC_ITEM *item, const char *
 		double	mean, std_dev = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the standard deviation */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the standard deviation */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				std_dev += diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the standard deviation */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				std_dev += diff * diff;
-			}
+			std_dev += diff * diff;
 		}
 
 		std_dev = sqrt(std_dev / (values.values_num - 1));	/* divided by 'n - 1' because */
@@ -3122,33 +3042,21 @@ static int	evaluate_VARPOP(zbx_variant_t *value, DC_ITEM *item, const char *para
 		double	mean, result = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the population variance */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the population variance */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				result += diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the population variance */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				result += diff * diff;
-			}
+			result += diff * diff;
 		}
 
 		result /= values.values_num;	/* divide by 'number of values' for population variance */
@@ -3204,33 +3112,21 @@ static int	evaluate_VARSAMP(zbx_variant_t *value, DC_ITEM *item, const char *par
 		double	mean, result = 0;
 		int	i;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		/* step 1: calculate arithmetic mean */
+		mean = arithmetic_mean(values.values, values.values_num, item->value_type);
+
+		/* step 2: calculate the sample variance */
+
+		for (i = 0; i < values.values_num; i++)
 		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_dbl(values.values, values.values_num);
+			double	diff;
 
-			/* step 2: calculate the sample variance */
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				diff = values.values[i].value.dbl - mean;
+			else
+				diff = (double)values.values[i].value.ui64 - mean;
 
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = values.values[i].value.dbl - mean;
-
-				result += diff * diff;
-			}
-		}
-		else	/* ITEM_VALUE_TYPE_UINT64 */
-		{
-			/* step 1: calculate arithmetic mean */
-			mean = arithmetic_mean_uint64(values.values, values.values_num);
-
-			/* step 2: calculate the sample variance */
-
-			for (i = 0; i < values.values_num; i++)
-			{
-				double	diff = (double)values.values[i].value.ui64 - mean;
-
-				result += diff * diff;
-			}
+			result += diff * diff;
 		}
 
 		result /= values.values_num - 1; /* divide by 'number of values' - 1 for unbiased sample variance */
