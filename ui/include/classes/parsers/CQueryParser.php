@@ -36,16 +36,18 @@ class CQueryParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'calculated' => false  Allow wildcards to be used in place of hostname and item key. Allow filter expression
-	 *                          for item.
-	 *   'host_macro' => false  Allow {HOST.HOST} macro as host name part in the query.
-	 *   'empty_host' => false  Allow empty hostname.
+	 *   'calculated' => false    Allow wildcards to be used in place of hostname and item key. Allow filter expression
+	 *                            for item.
+	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false    Allow empty hostname.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'calculated' => false,
 		'host_macro' => false,
+		'host_macro_n' => false,
 		'empty_host' => false
 	];
 
@@ -66,8 +68,13 @@ class CQueryParser extends CParser {
 		$this->options = $options + $this->options;
 
 		$this->host_name_parser = new CHostNameParser();
-		if ($this->options['host_macro']) {
-			$this->host_macro_parser = new CMacroParser(['macros' => ['{HOST.HOST}']]);
+		if ($this->options['host_macro'] || $this->options['host_macro_n']) {
+			$this->host_macro_parser = new CMacroParser([
+				'macros' => ['{HOST.HOST}'],
+				'ref_type' => $this->options['host_macro_n']
+					? CMacroParser::REFERENCE_NUMERIC
+					: CMacroParser::REFERENCE_NONE
+			]);
 		}
 		$this->item_key_parser = new CItemKey();
 		if ($this->options['calculated']) {
@@ -96,7 +103,8 @@ class CQueryParser extends CParser {
 		}
 		$p++;
 
-		if ($this->options['host_macro'] && $this->host_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+		if (($this->options['host_macro'] || $this->options['host_macro_n'])
+				&& $this->host_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->host_macro_parser->getLength();
 			$host = $this->host_macro_parser->getMatch();
 		}

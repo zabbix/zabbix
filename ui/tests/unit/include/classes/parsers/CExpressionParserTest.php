@@ -2160,7 +2160,10 @@ class CExpressionParserTest extends TestCase {
 			['"abc"="abc"and"abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['"abc"="abc" and abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_FAIL],
+			['min(last(/{HOST.HOST9}/key), 1)', null, CParser::PARSE_FAIL, ['host_macro' => true]],
 			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro' => true]],
+			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro_n' => true]],
+			['min(last(/{HOST.HOST2}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro_n' => true]],
 
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
 			['last(/'.'/agent.ping) = 1', null, CParser::PARSE_FAIL, ['calculated' => true]],
