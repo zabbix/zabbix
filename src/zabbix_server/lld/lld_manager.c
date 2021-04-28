@@ -350,7 +350,8 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 		if (NULL != data_last && 0 == data->meta && 0 == zbx_strcmp_null(data->error, data_last->error) &&
 				0 == zbx_strcmp_null(data->value, data_last->value))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "skip repeating discovery rule values: " ZBX_FS_UI64, data->itemid);
+			zabbix_log(LOG_LEVEL_DEBUG, "skip repeating values for discovery rule:" ZBX_FS_UI64,
+					data->itemid);
 
 			lld_data_free(data);
 			goto out;
@@ -360,7 +361,7 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 		rule->tail = data;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule: " ZBX_FS_UI64, data->itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule:" ZBX_FS_UI64, data->itemid);
 
 	rule->values_num++;
 	manager->queued_num++;
