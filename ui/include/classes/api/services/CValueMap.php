@@ -235,17 +235,7 @@ class CValueMap extends CApiService {
 						continue;
 					}
 
-					$update_fields = [];
-
-					/**
-					 * Use foreach instead of array_diff($mapping, $db_mapping), array_diff fails when value length
-					 * on both side is equal 1.
-					 */
-					foreach ($mapping as $key => $value) {
-						if ($db_mapping[$key] != $value) {
-							$update_fields[$key] = $value;
-						}
-					}
+					$update_fields = array_diff_assoc($mapping, $db_mapping);
 
 					if ($update_fields) {
 						$upd_mapings[] = [
