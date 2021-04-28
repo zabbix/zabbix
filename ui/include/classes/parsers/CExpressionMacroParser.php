@@ -27,7 +27,12 @@ class CExpressionMacroParser extends CParser {
 	/**
 	 * @var CExpressionParser
 	 */
-	protected $expression_parser;
+	private $expression_parser;
+
+	/**
+	 * @var string
+	 */
+	private $error = '';
 
 	/**
 	 * Set up necessary parsers.
@@ -48,6 +53,7 @@ class CExpressionMacroParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->error = '';
 
 		$p = $pos;
 
@@ -56,13 +62,23 @@ class CExpressionMacroParser extends CParser {
 		}
 		$p += 2;
 
-		if ($this->expression_parser->parse($source, $p) == CParser::PARSE_FAIL) {
-			return CParser::PARSE_FAIL;
+		switch ($this->expression_parser->parse($source, $p)) {
+			case CParser::PARSE_SUCCESS_CONT:
+				$this->error = $this->expression_parser->getError();
+				break;
+
+			case CParser::PARSE_FAIL:
+				$this->error = $this->expression_parser->getError();
+				return CParser::PARSE_FAIL;
 		}
 		$p += $this->expression_parser->getLength();;
 
 		while (isset($source[$p]) && strpos(CExpressionParser::WHITESPACES, $source[$p]) !== false) {
 			$p++;
+		}
+
+		if (!isset($source[$p])) {
+			$this->error = _('unexpected end of expression macro');
 		}
 
 		if (!isset($source[$p]) || $source[$p] !== '}') {
@@ -75,4 +91,14 @@ class CExpressionMacroParser extends CParser {
 
 		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
 	}
+
+	/**
+	 * Returns the error message if the expression macro is invalid.
+	 *
+	 * @return string
+	 */
+	public function getError(): string {
+		return $this->error;
+	}
+
 }

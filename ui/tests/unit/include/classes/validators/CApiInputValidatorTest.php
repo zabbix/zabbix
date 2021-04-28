@@ -3669,7 +3669,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_EVENT_NAME],
 				'event name {?{host:item.last() = 0}',
 				'/1/event_name',
-				'Invalid parameter "/1/event_name": incorrect syntax near "{host:item.last() = 0}".'
+				'Invalid parameter "/1/event_name": incorrect expression starting from "{host:item.last() = 0}".'
 			],
 			[
 				['type' => API_EVENT_NAME],

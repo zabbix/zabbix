@@ -89,8 +89,6 @@ class CQueryParser extends CParser {
 		$p = $pos;
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
-			$this->errorPos($source, $p);
-
 			return CParser::PARSE_FAIL;
 		}
 		$p++;
@@ -114,18 +112,10 @@ class CQueryParser extends CParser {
 			$host = '';
 		}
 		else {
-			$error = $this->host_name_parser->getErrorDetails();
-
-			if ($error) {
-				$this->errorPos($error[0], $error[1]);
-			}
-
 			return CParser::PARSE_FAIL;
 		}
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
-			$this->errorPos($source, $p);
-
 			return CParser::PARSE_FAIL;
 		}
 		$p++;
@@ -141,9 +131,6 @@ class CQueryParser extends CParser {
 			$item = $this->item_key_parser->getMatch();
 		}
 		else {
-			[$source, $p] = $this->item_key_parser->getErrorDetails();
-			$this->errorPos($source, $p);
-
 			return CParser::PARSE_FAIL;
 		}
 
