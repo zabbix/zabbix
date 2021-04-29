@@ -35,6 +35,8 @@ class CExpressionParser extends CParser {
 	private const STATE_END = 2;
 	private const STATE_END_OF_PARAMS = 3;
 
+	private const MAX_MATH_FUNCTION_DEPTH = 32;
+
 	/**
 	 * An error message if trigger expression is not valid
 	 *
@@ -51,6 +53,8 @@ class CExpressionParser extends CParser {
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
 	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false          Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false            Allow empty hostname in the query string.
 	 *
 	 * @var array
 	 */
@@ -58,7 +62,9 @@ class CExpressionParser extends CParser {
 		'lldmacros' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
-		'host_macro' => false
+		'host_macro' => false,
+		'host_macro_n' => false,
+		'empty_host' => false
 	];
 
 	/**
@@ -75,15 +81,12 @@ class CExpressionParser extends CParser {
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['lldmacros']
-	 * @param bool  $options['collapsed_expression']
-	 * @param bool  $options['calculated']
-	 * @param bool  $options['host_macro']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		if ($this->options['collapsed_expression'] && $this->options['host_macro']) {
+		if ($this->options['collapsed_expression']
+				&& ($this->options['host_macro'] || $this->options['host_macro_n'])) {
 			exit('Incompatible options.');
 		}
 	}
@@ -137,10 +140,26 @@ class CExpressionParser extends CParser {
 		return self::PARSE_FAIL;
 	}
 
+	/**
+	 * Parses an expression.
+	 *
+	 * @param string  $source
+	 * @param int     $pos
+	 * @param array   $tokens
+	 * @param array   $options
+	 * @param int     $parsed_pos
+	 * @param int     $depth
+	 *
+	 * @return bool  Returns true if parsed successfully, false otherwise.
+	 */
 	private static function parseExpression(string $source, int &$pos, array &$tokens, array $options,
-			int &$parsed_pos = null): bool {
+			int &$parsed_pos = null, int $depth = 0): bool {
 		$binary_operator_parser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$logical_operator_parser = new CSetParser(['and', 'or']);
+
+		if ($depth++ > self::MAX_MATH_FUNCTION_DEPTH) {
+			return false;
+		}
 
 		$state = self::STATE_AFTER_OPEN_BRACE;
 		$after_space = false;
@@ -184,7 +203,7 @@ class CExpressionParser extends CParser {
 							if (self::parseNot($source, $p, $_tokens)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
-							elseif (self::parseConstant($source, $p, $_tokens, $options)) {
+							elseif (self::parseConstant($source, $p, $_tokens, $options, $depth)) {
 								$state = self::STATE_AFTER_CONSTANT;
 
 								if ($level == 0) {
@@ -222,7 +241,7 @@ class CExpressionParser extends CParser {
 							break;
 
 						default:
-							if (self::parseConstant($source, $p, $_tokens, $options)) {
+							if (self::parseConstant($source, $p, $_tokens, $options, $depth)) {
 								$state = self::STATE_AFTER_CONSTANT;
 
 								if ($level == 0) {
@@ -275,7 +294,7 @@ class CExpressionParser extends CParser {
 							if (self::parseNot($source, $p, $_tokens)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
-							elseif (self::parseConstant($source, $p, $_tokens, $options)) {
+							elseif (self::parseConstant($source, $p, $_tokens, $options, $depth)) {
 								$state = self::STATE_AFTER_CONSTANT;
 
 								if ($level == 0) {
@@ -394,7 +413,7 @@ class CExpressionParser extends CParser {
 								break 3;
 							}
 
-							if (self::parseConstant($source, $p, $_tokens, $options)) {
+							if (self::parseConstant($source, $p, $_tokens, $options, $depth)) {
 								$state = self::STATE_AFTER_CONSTANT;
 
 								if ($level == 0) {
@@ -422,7 +441,7 @@ class CExpressionParser extends CParser {
 							break;
 
 						default:
-							if (self::parseConstant($source, $p, $_tokens, $options)) {
+							if (self::parseConstant($source, $p, $_tokens, $options, $depth)) {
 								$state = self::STATE_AFTER_CONSTANT;
 
 								if ($level == 0) {
@@ -441,9 +460,7 @@ class CExpressionParser extends CParser {
 			$p++;
 		}
 
-		if ($parsed_pos !== null) {
-			$parsed_pos = $p;
-		}
+		$parsed_pos = $p;
 
 		return (bool) $tokens;
 	}
@@ -520,10 +537,11 @@ class CExpressionParser extends CParser {
 	 * @param int     $pos
 	 * @param array   $tokens
 	 * @param array   $options
+	 * @param int     $depth
 	 *
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
-	private static function parseConstant(string $source, int &$pos, array &$tokens, array $options): bool {
+	private static function parseConstant(string $source, int &$pos, array &$tokens, array $options, int $depth): bool {
 		$user_macro_parser = new CUserMacroParser();
 
 		if (self::parseNumber($source, $pos, $tokens) || self::parseString($source, $pos, $tokens)
@@ -552,7 +570,7 @@ class CExpressionParser extends CParser {
 			return true;
 		}
 
-		if (self::parseMathFunction($source, $pos, $tokens, $options)) {
+		if (self::parseMathFunction($source, $pos, $tokens, $options, $depth)) {
 			return true;
 		}
 
@@ -590,7 +608,9 @@ class CExpressionParser extends CParser {
 			'usermacros' => true,
 			'lldmacros' => $options['lldmacros'],
 			'calculated' => $options['calculated'],
-			'host_macro' => $options['host_macro']
+			'host_macro' => $options['host_macro'],
+			'host_macro_n' => $options['host_macro_n'],
+			'empty_host' => $options['empty_host']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
@@ -620,10 +640,12 @@ class CExpressionParser extends CParser {
 	 * @param int     $pos
 	 * @param array   $tokens
 	 * @param array   $options
+	 * @param int     $depth
 	 *
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
-	private static function parseMathFunction(string $source, int &$pos, array &$tokens, array $options): bool {
+	private static function parseMathFunction(string $source, int &$pos, array &$tokens, array $options,
+			int $depth): bool {
 		$p = $pos;
 
 		if (!preg_match('/^([a-z]+)\(/', substr($source, $p), $matches)) {
@@ -652,8 +674,10 @@ class CExpressionParser extends CParser {
 						default:
 							$_p = $p;
 							$expression_tokens = [];
+							$parsed_pos = 0;
 
-							if (!self::parseExpression($source, $_p, $expression_tokens, $options)) {
+							if (!self::parseExpression($source, $_p, $expression_tokens, $options, $parsed_pos,
+									$depth)) {
 								break 3;
 							}
 

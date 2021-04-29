@@ -52,7 +52,7 @@ class C52EventNameConverter extends C52TriggerExpressionConverter {
 					if ($function['data']['host'] === '{HOST.HOST}' || $function['data']['host'] === '{HOST.HOST1}') {
 						$function['data']['host'] = '';
 					}
-					[$new_expr ] = $this->convertFunction($function['data'], '', '');
+					[$new_expr] = $this->convertFunction($function['data'], '', '');
 					$start = $pos + $function['pos'] + 2;
 					$event_name = substr_replace($event_name, $new_expr, $start, strlen($function['value']));
 				}
@@ -62,6 +62,13 @@ class C52EventNameConverter extends C52TriggerExpressionConverter {
 		return $event_name;
 	}
 
+	/**
+	 * Extract expression macros with position in given string.
+	 *
+	 * @param string $value  The string to search in.
+	 *
+	 * @return array
+	 */
 	private function getExpressionMacros(string $value): array {
 		$expr_macro = new C10ExpressionMacroParser();
 		$expression_macros = [];

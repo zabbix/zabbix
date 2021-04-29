@@ -21,7 +21,7 @@
 
 class C52ImportConverterTest extends CImportConverterTest {
 
-	public function testConvertProvider() {
+	public function importConvertProviderData() {
 		$calculated = ['type' => CXmlConstantName::CALCULATED, 'key' => ''];
 
 		return [
@@ -67,8 +67,170 @@ class C52ImportConverterTest extends CImportConverterTest {
 								$calculated + ['params' => 'last(/'.'/vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(/'.'/vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'],
 								$calculated + ['params' => 'last(/'.'/system.swap.size[,total]) - last(/'.'/system.swap.size[,total]) / 100 * last(/'.'/perf_counter_en["\\Paging file(_Total)\% Usage"])'],
 								$calculated + ['params' => 'avg(/zbxnext_6451/agent_numeric[wcache,values],600s)'],
-								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + band(/'.'/trap1,,12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,12) + count(/'.'/trap1,10m,"gt",12) + count(/'.'/trap1,#10,"gt",12) + count(/'.'/trap1,10m:now-1d,"gt",12) + count(/'.'/trap1,10m,"band","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
+								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,"","12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
 							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'key',
+									'triggers' => [
+										[
+											'expression' => '{min(5m)}=1'
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'key',
+									'triggers' => [
+										[
+											'expression' => 'min(/hostname/key,5m)=1'
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'expression' => '{hostname:key.min(5m)}=1'
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'expression' => 'min(/hostname/key,5m)=1'
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'AGGREGATE'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '{k:grpmin["host group","item",last,5m].last()}=5'
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'CALCULATED',
+									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => 'last(/k/grpmin["host group","item",last,5m])=5'
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'AGGREGATE'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '{k:grpmin["host group","item",last,5m].date()}=5'
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'CALCULATED',
+									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '(date()=5) or (last(/k/grpmin["host group","item",last,5m])<>last(/k/grpmin["host group","item",last,5m]))'
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}'
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}'
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}'
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?date()}'
 						]
 					]
 				]
@@ -77,7 +239,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 	}
 
 	/**
-	 * @dataProvider testConvertProvider
+	 * @dataProvider importConvertProviderData
 	 *
 	 * @param array $data
 	 * @param array $expected

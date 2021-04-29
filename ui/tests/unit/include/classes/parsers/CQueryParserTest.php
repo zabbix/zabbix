@@ -49,11 +49,35 @@ class CQueryParserTest extends TestCase {
 				'host' => '',
 				'item' => ''
 			]],
+			['text /{HOST.HOST1}/item[pam, "param"] text', 5, ['host_macro' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
 			['text /{HOST.HOST}/item[pam, "param"] text', 5, ['host_macro' => true], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '/{HOST.HOST}/item[pam, "param"]',
 				'host' => '{HOST.HOST}',
 				'item' => 'item[pam, "param"]'
+			]],
+			['text /{HOST.HOST}/item text', 5, ['host_macro_n' => true], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/{HOST.HOST}/item',
+				'host' => '{HOST.HOST}',
+				'item' => 'item'
+			]],
+			['text /{HOST.HOST1}/item text', 5, ['host_macro_n' => true], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/{HOST.HOST1}/item',
+				'host' => '{HOST.HOST1}',
+				'item' => 'item'
+			]],
+			['text /{HOST.HOST7}/item text', 5, ['host_macro_n' => true], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '/{HOST.HOST7}/item',
+				'host' => '{HOST.HOST7}',
+				'item' => 'item'
 			]],
 			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log,ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
@@ -79,7 +103,7 @@ class CQueryParserTest extends TestCase {
 				'host' => '',
 				'item' => ''
 			]],
-			['//logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
+			['/'.'/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'host' => '',
@@ -103,6 +127,18 @@ class CQueryParserTest extends TestCase {
 				'host' => '',
 				'item' => ''
 			]],
+			['/'.'/key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/'.'/key', 0, ['calculated' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
 			['/*/key', 0, ['calculated' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/*/key',
@@ -113,6 +149,24 @@ class CQueryParserTest extends TestCase {
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '/*/*',
 				'host' => '*',
+				'item' => '*'
+			]],
+			['/'.'/key', 0, ['empty_host' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/'.'/key',
+				'host' => '',
+				'item' => 'key'
+			]],
+			['/'.'/*', 0, ['empty_host' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'host' => '',
+				'item' => ''
+			]],
+			['/'.'/*', 0, ['calculated' => true, 'empty_host' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '/'.'/*',
+				'host' => '',
 				'item' => '*'
 			]],
 			['/Zabbix server/logrt["/home/zabbix32/test[0-9].log",ERROR,,1000,,,120.0]?[tag = "tag" and group = "group"]', 0, [], [

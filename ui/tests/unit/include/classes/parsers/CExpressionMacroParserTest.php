@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 use PHPUnit\Framework\TestCase;
 
 class CExpressionMacroParserTest extends TestCase {
@@ -59,10 +60,20 @@ class CExpressionMacroParserTest extends TestCase {
 				'match' => '{? 1 + 1   }',
 				'length' => 12
 			]],
+			['text {?last(/'.'/system.cpu.load)}', 5, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{?last(/'.'/system.cpu.load)}',
+				'length' => 26
+			]],
 			['text {? last(/{HOST.HOST}/key, #25) } text', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '{? last(/{HOST.HOST}/key, #25) }',
 				'length' => 32
+			]],
+			['text {? last(/{HOST.HOST6}/key, #25) } text', 5, [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '{? last(/{HOST.HOST6}/key, #25) }',
+				'length' => 33
 			]],
 			['text {? last(/host/key, #25) + max(sum(/host/key, 1d:now/d), sum(/host/key, 1d:now/d-1d)) } text', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,

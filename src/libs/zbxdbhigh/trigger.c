@@ -698,6 +698,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 	zbx_eval_context_t	local_ctx;
 
 	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+	local_ctx.rules |= ZBX_EVAL_COMPOSE_MASK_ERROR;
 
 	for (i = 0; i < local_ctx.stack.values_num; i++)
 	{

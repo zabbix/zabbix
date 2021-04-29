@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 use PHPUnit\Framework\TestCase;
 
 class CExpressionParserTest extends TestCase {
@@ -2160,9 +2161,17 @@ class CExpressionParserTest extends TestCase {
 			['"abc"="abc"and"abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['"abc"="abc" and abc"', null, CParser::PARSE_SUCCESS_CONT],
 			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_FAIL],
+			['min(last(/{HOST.HOST9}/key), 1)', null, CParser::PARSE_FAIL, ['host_macro' => true]],
 			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro' => true]],
+			['min(last(/{HOST.HOST}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro_n' => true]],
+			['min(last(/{HOST.HOST2}/key), 1)', null, CParser::PARSE_SUCCESS, ['host_macro_n' => true]],
 
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/'.'/agent.ping) = 1', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['last(/'.'/agent.ping) = 1', null, CParser::PARSE_SUCCESS, ['empty_host' => true]],
+			['last(/'.'/*) = 1', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['last(/'.'/*) = 1', null, CParser::PARSE_FAIL, ['empty_host' => true]],
+			['last(/'.'/*) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'empty_host' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = "tag1" or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'host_macro' => true]],

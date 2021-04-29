@@ -28,7 +28,7 @@ class CFilterParser extends CParser {
 	private const STATE_AFTER_CLOSE_BRACE = 4;
 	private const STATE_AFTER_PAIR = 5;
 
-	// For parsing od keyword/string pairs.
+	// For parsing of keyword/string pairs.
 	private const TOKEN_STRING = 1;
 	private const TOKEN_KEYWORD = 2;
 

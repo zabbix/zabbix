@@ -319,7 +319,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'find' => [
-				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
+				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param_find,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
@@ -549,16 +549,16 @@ class CControllerPopupTriggerExpr extends CController {
 								foreach ($parameter['data']['tokens'] as $parameter_token) {
 									if ($parameter_token['type'] == CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
 										$hist_function_token = $parameter_token;
-										break;
+										break 2;
 									}
 								}
 							}
-							break;
+							break 2;
 
 						case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
 							$hist_function_token = $token;
 							$function_token_index = $index;
-							break;
+							break 2;
 					}
 				}
 
@@ -640,7 +640,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 					$params = [];
 
-					if (array_key_exists(1, $parameters)) {
+					if ($parameters !== null && array_key_exists(1, $parameters)) {
 						if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
 							$sec_num = $parameters[1]['data']['sec_num'];
 							if ($sec_num !== '' && $sec_num[0] === '#') {
@@ -657,12 +657,13 @@ class CControllerPopupTriggerExpr extends CController {
 							$params[] = '';
 							$params[] = '';
 						}
-					}
-					for ($i = 2; $i < count($parameters); $i++) {
-						$parameter = $parameters[$i];
-						$params[] = $parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
-							? CHistFunctionParser::unquoteParam($parameter['match'])
-							: $parameter['match'];
+
+						for ($i = 2; $i < count($parameters); $i++) {
+							$parameter = $parameters[$i];
+							$params[] = $parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+								? CHistFunctionParser::unquoteParam($parameter['match'])
+								: $parameter['match'];
+						}
 					}
 				}
 			}

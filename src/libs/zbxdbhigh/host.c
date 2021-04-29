@@ -1833,8 +1833,6 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 	{
 		zbx_eval_context_t	ctx, ctx_r;
 
-		res = SUCCEED;
-
 		*new_triggerid = DBget_maxid("triggers");
 		*cur_triggerid = 0;
 

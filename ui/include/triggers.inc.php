@@ -1199,6 +1199,7 @@ function analyzeExpression(string $expression, int $type, string &$error = null)
 
 	if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
 		$error = $expression_parser->getError();
+
 		return false;
 	}
 
@@ -1461,8 +1462,10 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 					break;
 
 				default:
-					// We've reached the end of a complete expression, parse the expression on the left side of
-					// the operator.
+					/*
+					 * Once reached the end of a complete expression, parse the expression on the left side of the
+					 * operator.
+					 */
 					if ($level == 0 && array_key_exists($i, $tokens)
 							&& $tokens[$i]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
 							&& $tokens[$i]['match'] === $operator) {
@@ -1481,24 +1484,26 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 			}
 		}
 
-		// trim blank symbols in the end of the trigger expression
+		// Trim blank symbols in the end of the trigger expression.
 		$closeSymbolNum = $end;
 		while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
 			$closeSymbolNum--;
 		}
 
-		// we've found a whole expression and parsed the expression on the left side of the operator,
-		// parse the expression on the right
+		/*
+		 * Once found a whole expression and parsed the expression on the left side of the operator, parse the
+		 * expression on the right.
+		 */
 		if ($operatorFound) {
 			$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
 
-			// trim blank symbols in the beginning of the trigger expression
+			// Trim blank symbols in the beginning of the trigger expression.
 			$openSymbolNum = $start;
 			while (strpos(CExpressionParser::WHITESPACES, $expression[$openSymbolNum]) !== false) {
 				$openSymbolNum++;
 			}
 
-			// trim blank symbols in the end of the trigger expression
+			// Trim blank symbols in the end of the trigger expression.
 			$closeSymbolNum = $end;
 			while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
 				$closeSymbolNum--;
@@ -1513,17 +1518,16 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 			];
 			break;
 		}
-		// if we've tried both operators and didn't find anything, it means there's only one expression
-		// return the result
+		// If finding both operators failed, it means there's only one expression return the result.
 		elseif ($operator === 'and') {
-			// trim extra parentheses
+			// Trim extra parentheses.
 			if ($openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
 				$openSymbolNum++;
 				$closeSymbolNum--;
 
 				$expressionTree = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
 			}
-			// no extra parentheses remain, return the result
+			// No extra parentheses remain, return the result.
 			else {
 				$expressionTree = [
 					'id' => $openSymbolNum.'_'.$closeSymbolNum,

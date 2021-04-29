@@ -1149,30 +1149,52 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$expression = [];
 				$pos_left = 0;
 
-				$tokens = $expression_parser->getResult()->getTokensOfTypes([
-					CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO,
+				$token_types = [
 					CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
 					CExpressionParserResult::TOKEN_TYPE_STRING
-				]);
+				];
+				if ($options['resolve_functionids']) {
+					$token_types[] = CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO;
+				}
+				if ($options['html']) {
+					$token_types[] = CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION;
+				}
+
+				$rigth_parentheses = [];
+				$tokens = $expression_parser->getResult()->getTokensOfTypes($token_types);
 
 				foreach ($tokens as $token) {
 					switch ($token['type']) {
+						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
-							if (!$options['resolve_functionids']) {
-								continue 2;
-							}
-							// break; is not missing here
-
 						case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
 						case CExpressionParserResult::TOKEN_TYPE_STRING:
+							foreach ($rigth_parentheses as $pos => $value) {
+								if ($pos < $token['pos']) {
+									if ($pos_left != $pos) {
+										$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+									}
+									$expression[] = bold($value);
+									$pos_left = $pos + strlen($value);
+									unset($rigth_parentheses[$pos]);
+								}
+							}
 							if ($pos_left != $token['pos']) {
 								$expression[] = substr($trigger[$source], $pos_left, $token['pos'] - $pos_left);
 							}
-							$pos_left = $token['pos'] + $token['length'];
+							$pos_left = ($token['type'] == CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION)
+								? $token['pos'] + strlen($token['data']['function']) + 1
+								: $token['pos'] + $token['length'];
 							break;
 					}
 
 					switch ($token['type']) {
+						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+							$expression[] = bold($token['data']['function'].'(');
+							$rigth_parentheses[$token['pos'] + $token['length'] - 1] = ')';
+							ksort($rigth_parentheses, SORT_NUMERIC);
+							break;
+
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
 							$expression[] = $macro_values[$key][$token['match']];
 							break;
@@ -1196,7 +1218,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
-				if ($pos_left != strlen($trigger[$source])) {
+				$len = strlen($trigger[$source]);
+				foreach ($rigth_parentheses as $pos => $value) {
+					if ($pos_left != $pos) {
+						$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+					}
+					$expression[] = bold($value);
+					$pos_left = $pos + strlen($value);
+					unset($rigth_parentheses[$pos]);
+				}
+				if ($pos_left != $len) {
 					$expression[] = substr($trigger[$source], $pos_left);
 				}
 

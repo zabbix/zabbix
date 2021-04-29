@@ -305,14 +305,11 @@ class CTextTriggerConstructorTest extends TestCase {
 	 * @param string $host
 	 * @param string $item_key
 	 * @param array  $expressions
-	 * @param string $expected_expressions
+	 * @param string $expected
 	 */
 	public function testGetExpressionFromPartsValid(string $host, string $item_key, array $expressions,
-			string $expected_expressions
-	) {
-		$expression = $this->constructor->getExpressionFromParts($host, $item_key, $expressions);
-
-		$this->assertSame($expected_expressions, $expression);
+			string $expected) {
+		$this->assertSame($expected, $this->constructor->getExpressionFromParts($host, $item_key, $expressions));
 	}
 
 	public function dataProviderGetPartsFromExpression() {
@@ -538,11 +535,6 @@ class CTextTriggerConstructorTest extends TestCase {
 	 * @param array  $expected_parts
 	 */
 	public function testGetPartsFromExpression(string $expression, array $expected_parts) {
-		$parts = $this->constructor->getPartsFromExpression($expression);
-
-		$this->assertTrue(is_array($parts));
-		unset($parts[0]['details'], $parts[1]['details'], $parts[2]['details']);
-
-		$this->assertSame($expected_parts, $parts);
+		$this->assertSame($expected_parts, $this->constructor->getPartsFromExpression($expression));
 	}
 }

@@ -1069,7 +1069,8 @@ abstract class CControllerPopupItemTest extends CController {
 		$expression_parser = new CExpressionParser([
 			'lldmacros' => ($this->preproc_item instanceof CItemPrototype),
 			'calculated' => true,
-			'host_macro' => true
+			'host_macro' => true,
+			'empty_host' => true
 		]);
 
 		if ($expression_parser->parse($formula) != CParser::PARSE_SUCCESS) {

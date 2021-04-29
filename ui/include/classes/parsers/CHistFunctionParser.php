@@ -38,9 +38,11 @@ class CHistFunctionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false  Enable user macros usage in function parameters.
-	 *   'lldmacros' => false   Enable low-level discovery macros usage in function parameters.
-	 *   'host_macro' => false  Allow {HOST.HOST} macro as host name part in the query.
+	 *   'usermacros' => false    Enable user macros usage in function parameters.
+	 *   'lldmacros' => false     Enable low-level discovery macros usage in function parameters.
+	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false    Allow empty hostname in the query string.
 	 *
 	 * @var array
 	 */
@@ -48,7 +50,9 @@ class CHistFunctionParser extends CParser {
 		'usermacros' => false,
 		'lldmacros' => false,
 		'calculated' => false,
-		'host_macro' => false
+		'host_macro' => false,
+		'host_macro_n' => false,
+		'empty_host' => false
 	];
 
 	private $query_parser;
@@ -80,7 +84,9 @@ class CHistFunctionParser extends CParser {
 
 		$this->query_parser = new CQueryParser([
 			'calculated' => $this->options['calculated'],
-			'host_macro' => $this->options['host_macro']
+			'host_macro' => $this->options['host_macro'],
+			'host_macro_n' => $this->options['host_macro_n'],
+			'empty_host' => $this->options['empty_host']
 		]);
 		$this->period_parser = new CPeriodParser([
 			'usermacros' => $this->options['usermacros'],
