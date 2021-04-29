@@ -460,7 +460,7 @@ class CDashboardHelper {
 	 */
 	public static function prepareForClone(array $dashboards, $templateid): array {
 		foreach ($dashboards as &$dashboard) {
-			unset($dashboard['dashboardid']);
+			unset($dashboard['dashboardid'], $dashboard['uuid']);
 
 			$dashboard['templateid'] = $templateid;
 

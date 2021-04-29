@@ -265,15 +265,7 @@ class CHttpTest extends CApiService {
 	 * @throws APIException
 	 */
 	public function create($httptests) {
-		$this->validateCreate($httptests, $db_hosts);
-
-		foreach ($httptests as &$httptest) {
-			if (!array_key_exists('uuid', $httptest)
-				&& $db_hosts[$httptest['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-				$httptest['uuid'] = generateUuidV4();
-			}
-		}
-		unset($httptest);
+		$this->validateCreate($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
 
@@ -284,14 +276,13 @@ class CHttpTest extends CApiService {
 
 	/**
 	 * @param array $httptests
-	 * @param array $db_hosts
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$httptests, &$db_hosts): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
+	protected function validateCreate(array &$httptests): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'uuid' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'uuid')],
+			'uuid' =>				['type' => API_UUID, 'flags' => API_NOT_EMPTY],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
@@ -353,28 +344,54 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
-		$db_hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => array_keys($names_by_hostid),
-			'templated_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('uuid', $httptest)
-				&& $db_hosts[$httptest['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
-			}
-		}
-
+		$this->checkAndAddUuid($httptests);
 		$this->checkHostPermissions(array_keys($names_by_hostid));
 		$this->checkDuplicates($names_by_hostid);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
 		$this->validateSteps($httptests, __FUNCTION__);
+	}
+
+	/**
+	 * Check that only httptests on templates have UUID. Add UUID to all httptests on templates, if it does not exists.
+	 *
+	 * @param array $httptests_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$httptests_to_create): void {
+		$db_templateids = API::Template()->get([
+			'output' => [],
+			'templateids' => array_column($httptests_to_create, 'hostid'),
+			'preservekeys' => true
+		]);
+
+		foreach ($httptests_to_create as $index => &$httptest) {
+			if (!array_key_exists($httptest['hostid'], $db_templateids) && array_key_exists('uuid', $httptest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					// TODO VM: check, if this message is correct
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if (array_key_exists($httptest['hostid'], $db_templateids) && !array_key_exists('uuid', $httptest)) {
+				$httptest['uuid'] = generateUuidV4();
+			}
+		}
+		unset($httptest);
+
+		$db_uuid = DB::select('httptest', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($httptests_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				// TODO VM: check, if this message is correct
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

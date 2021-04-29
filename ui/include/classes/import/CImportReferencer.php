@@ -195,7 +195,7 @@ class CImportReferencer {
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if (array_key_exists('uuid', $item) && $item['uuid'] === $uuid) {
+			if ($item['uuid'] === $uuid) {
 				return $itemid;
 			}
 		}
@@ -647,12 +647,9 @@ class CImportReferencer {
 	public function setDbItem(array $item): void {
 		$this->db_items[$item['itemid']] = [
 			'hostid' => $item['hostid'],
+			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
 			'key_' => $item['key_']
 		];
-
-		if (array_key_exists('uuid', $item)) {
-			$this->db_items[$item['itemid']]['uuid'] = $item['uuid'];
-		}
 	}
 
 	/**
@@ -726,7 +723,7 @@ class CImportReferencer {
 	 */
 	public function setDbTrigger(array $trigger): void {
 		$this->db_triggers[$trigger['triggerid']] = [
-			'uuid' => $trigger['uuid'],
+			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
 			'recovery_expression' => $trigger['recovery_expression']

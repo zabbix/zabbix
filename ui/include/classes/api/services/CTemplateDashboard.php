@@ -190,7 +190,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		foreach ($dashboards as $dashboard) {
 			unset($dashboard['pages']);
-			$dashboard['uuid'] = generateUuidV4();
 			$ins_dashboards[] = $dashboard;
 		}
 
@@ -246,7 +245,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$dashboards): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid', 'name']], 'fields' => [
+			'uuid' =>			['type' => API_UUID, 'flags' => API_NOT_EMPTY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
@@ -290,9 +290,39 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$this->checkAndAddUuid($dashboards);
 		$this->checkDuplicates($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
+	}
+
+	/**
+	 * Check that no duplicate UUID is being added. Add UUID to all template dashboards, if it doesn't exist.
+	 *
+	 * @param array $dashboards_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$dashboards_to_create): void {
+		foreach ($dashboards_to_create as &$dashboard) {
+			if (!array_key_exists('uuid', $dashboard)) {
+				$dashboard['uuid'] = generateUuidV4();
+			}
+		}
+		unset($dashboard);
+
+		$db_uuid = DB::select('dashboard', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($dashboards_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				// TODO VM: check, if this message is correct
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

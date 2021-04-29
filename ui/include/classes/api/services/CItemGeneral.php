@@ -380,20 +380,6 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $dbHosts[$fullItem['hostid']];
 
-			// Validate UUID.
-			if (array_key_exists('uuid', $item)
-				&& ($update || (!$update && $host['status'] != HOST_STATUS_TEMPLATE))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($inum + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
-			}
-
-			// UUID should be added only for items on template.
-			if (!$update && $host['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
-				$item['uuid'] = generateUuidV4();
-			}
-
 			// Validate update interval.
 			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
@@ -601,7 +587,62 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->validateValueMaps($items);
 
+		$this->checkAndAddUuid($items, $dbHosts, $update);
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
+	 *   if it doesn't exist.
+	 *
+	 * @param array $items_to_create
+	 * @param array $db_hosts
+	 * @param bool $is_update
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
+		if ($is_update) {
+			foreach ($items_to_create as $index => &$item) {
+				if (array_key_exists('uuid', $item)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						// TODO VM: check, if this message is correct
+						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
+							_s('unexpected parameter "%1$s"', 'uuid')
+						)
+					);
+				}
+			}
+
+			return;
+		}
+
+		foreach ($items_to_create as $index => &$item) {
+			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					// TODO VM: check, if this message is correct
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+				$item['uuid'] = generateUuidV4();
+			}
+		}
+		unset($item);
+
+		$db_uuid = DB::select('items', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				// TODO VM: check, if this message is correct
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

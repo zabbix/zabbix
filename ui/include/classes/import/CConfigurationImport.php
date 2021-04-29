@@ -1163,7 +1163,7 @@ class CConfigurationImport {
 						}
 
 						$host_prototype['hostid'] = $host_prototypeid;
-						unset($host_prototypeid['uuid']);
+						unset($host_prototype['uuid']);
 						$host_prototypes_to_update[] = $host_prototype;
 					}
 					else {

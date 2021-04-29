@@ -791,6 +791,7 @@ class CConfigurationExport {
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
+			'selectHosts' => ['status'],
 			'selectItems' => ['itemid', 'flags', 'type'],
 			'selectTags' => ['tag', 'value'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),

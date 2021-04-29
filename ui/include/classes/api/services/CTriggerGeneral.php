@@ -866,8 +866,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$descriptions = $this->populateHostIds($descriptions);
-		$this->checkDuplicates($descriptions);
 		$this->checkAndAddUuid($triggers, $descriptions);
+		$this->checkDuplicates($descriptions);
 	}
 
 	/**
