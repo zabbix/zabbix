@@ -23,7 +23,6 @@
  * @var CView $this
  */
 $form = (new CForm())
-	->cleanItems()
 	->setId('valuemap-edit-form')
 	->setName('valuemap-edit-form')
 	->addVar('action', $data['action'])
