@@ -63,7 +63,7 @@ class CConfigurationImport {
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
 	 */
-	public function __construct(array $options = [], CImportReferencer $referencer,
+	public function __construct(array $options, CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {
 		$default_options = [
 			'groups' => ['updateExisting' => false, 'createMissing' => false],
@@ -146,7 +146,7 @@ class CConfigurationImport {
 		$this->processItems();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
-//		$this->processGraphs();
+		$this->processGraphs();
 		$this->processImages();
 //		$this->processMaps();
 //		$this->processTemplateDashboards();
@@ -915,6 +915,7 @@ class CConfigurationImport {
 									$template['templateid'] = $templateid;
 									unset($template['name']);
 								}
+								unset($template);
 							}
 						}
 						unset($operation);
@@ -1077,9 +1078,9 @@ class CConfigurationImport {
 
 					$item_prototype['rule'] = [
 						'hostid' => $hostid,
-						'key' => $discovery_rule['key_'],
-						'ruleid' => $itemid
+						'key' => $discovery_rule['key_']
 					];
+					$item_prototype['ruleid'] = $itemid;
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
 						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
@@ -1425,6 +1426,8 @@ class CConfigurationImport {
 
 	/**
 	 * Import web scenarios.
+	 *
+	 * @throws APIException
 	 */
 	protected function processHttpTests(): void {
 		if (!$this->options['httptests']['createMissing'] && !$this->options['httptests']['updateExisting']) {
@@ -1485,26 +1488,22 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 */
-	protected function processGraphs() {
+	protected function processGraphs(): void {
 		if (!$this->options['graphs']['createMissing'] && !$this->options['graphs']['updateExisting']) {
 			return;
 		}
 
-		$allGraphs = $this->getFormattedGraphs();
+		$graphs_to_create = [];
+		$graphs_to_update = [];
 
-		if (!$allGraphs) {
-			return;
-		}
-
-		$graphsToCreate = [];
-		$graphsToUpdate = [];
-
-		foreach ($allGraphs as $graph) {
+		foreach ($this->getFormattedGraphs() as $graph) {
 			if ($graph['ymin_item_1']) {
-				$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
-				$itemId = $hostId ? $this->referencer->findItemidByKey($hostId, $graph['ymin_item_1']['key']) : false;
+				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
+				$itemid = ($hostid !== null)
+					? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+					: null;
 
-				if (!$itemId) {
+				if ($itemid === null) {
 					throw new Exception(_s(
 						'Cannot find item "%1$s" on "%2$s" used as the Y axis MIN value for graph "%3$s".',
 						$graph['ymin_item_1']['key'],
@@ -1513,14 +1512,16 @@ class CConfigurationImport {
 					));
 				}
 
-				$graph['ymin_itemid'] = $itemId;
+				$graph['ymin_itemid'] = $itemid;
 			}
 
 			if ($graph['ymax_item_1']) {
-				$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
-				$itemId = $hostId ? $this->referencer->findItemidByKey($hostId, $graph['ymax_item_1']['key']) : false;
+				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
+				$itemid = ($hostid !== null)
+					? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+					: null;
 
-				if (!$itemId) {
+				if ($itemid === null) {
 					throw new Exception(_s(
 						'Cannot find item "%1$s" on "%2$s" used as the Y axis MAX value for graph "%3$s".',
 						$graph['ymax_item_1']['key'],
@@ -1529,42 +1530,48 @@ class CConfigurationImport {
 					));
 				}
 
-				$graph['ymax_itemid'] = $itemId;
+				$graph['ymax_itemid'] = $itemid;
 			}
 
-			foreach ($graph['gitems'] as &$gitem) {
-				$gitemHostId = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
-				$gitem['itemid'] = $gitemHostId
-					? $this->referencer->findItemidByKey($gitemHostId, $gitem['item']['key'])
-					: false;
+			$hostid = null;
 
-				if (!$gitem['itemid']) {
+			foreach ($graph['gitems'] as &$item) {
+				$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
+				$item['itemid'] = ($hostid !== null)
+					? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+					: null;
+
+				if ($item['itemid'] === null) {
 					throw new Exception(_s(
 						'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
-						$gitem['item']['key'],
-						$gitem['item']['host'],
+						$item['item']['key'],
+						$item['item']['host'],
 						$graph['name']
 					));
 				}
 			}
-			unset($gitem);
+			unset($item);
 
-			$graphId = $this->referencer->findGraphidByName($gitemHostId, $graph['name']);
+			$graphid = (array_key_exists('uuid', $graph))
+				? $this->referencer->findGraphidByUuid($graph['uuid'])
+				: $this->referencer->findGraphidByName($hostid, $graph['name']);
 
-			if ($graphId) {
-				$graph['graphid'] = $graphId;
-				$graphsToUpdate[] = $graph;
+			if ($graphid !== null) {
+				$graph['graphid'] = $graphid;
+				unset($graph['uuid']);
+				$graphs_to_update[] = $graph;
 			}
 			else {
-				$graphsToCreate[] = $graph;
+				$graphs_to_create[] = $graph;
 			}
 		}
 
-		if ($this->options['graphs']['createMissing'] && $graphsToCreate) {
-			API::Graph()->create($graphsToCreate);
+		if ($this->options['graphs']['updateExisting'] && $graphs_to_update) {
+			API::Graph()->update($graphs_to_update);
 		}
-		if ($this->options['graphs']['updateExisting'] && $graphsToUpdate) {
-			API::Graph()->update($graphsToUpdate);
+
+		if ($this->options['graphs']['createMissing'] && $graphs_to_create) {
+			API::Graph()->create($graphs_to_create);
 		}
 
 		$this->referencer->refreshGraphs();
@@ -2263,8 +2270,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedGroups() {
-		if (!isset($this->formattedData['groups'])) {
+	protected function getFormattedGroups(): array {
+		if (!array_key_exists('groups', $this->formattedData)) {
 			$this->formattedData['groups'] = $this->adapter->getGroups();
 		}
 
@@ -2652,9 +2659,10 @@ class CConfigurationImport {
 							&& array_key_exists($master_key, $resolved_masters_cache[$host_name])) {
 						$item = $resolved_masters_cache[$host_name][$master_key];
 
-						if (in_array($master_key, $traversal_path) || ($item['type'] == ITEM_TYPE_DEPENDENT
-								&& $item[$master_item_key]
-								&& $master_key == $item[$master_item_key]['key'])) {
+						if (($item['type'] == ITEM_TYPE_DEPENDENT
+									&& $item[$master_item_key]
+									&& $master_key === $item[$master_item_key]['key'])
+								|| in_array($master_key, $traversal_path)) {
 							throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 								_('circular item dependency is not allowed')
 							));

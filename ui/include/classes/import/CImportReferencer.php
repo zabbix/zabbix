@@ -1158,8 +1158,6 @@ class CImportReferencer {
 			$graph['hosts'] = array_column($graph['hosts'], 'hostid');
 			$this->db_graphs[$graph['graphid']] = $graph;
 		}
-
-		$this->graphs = [];
 	}
 
 	/**
