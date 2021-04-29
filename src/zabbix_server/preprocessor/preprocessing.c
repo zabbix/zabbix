@@ -994,9 +994,10 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                                                                            *
  * Function: zbx_preprocess_item_value                                        *
  *                                                                            *
- * Purpose: perform item value preprocessing and dependend item processing    *
+ * Purpose: perform item value preprocessing and dependent item processing    *
  *                                                                            *
  * Parameters: itemid          - [IN] the itemid                              *
+ *             itemid          - [IN] the hostid                              *
  *             item_value_type - [IN] the item value type                     *
  *             item_flags      - [IN] the item flags (e. g. lld rule)         *
  *             result          - [IN] agent result containing the value       *
@@ -1007,8 +1008,8 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
+		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	zbx_preproc_item_value_t	value = {.itemid = itemid, .hostid = hostid, .item_value_type = item_value_type,
 					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
