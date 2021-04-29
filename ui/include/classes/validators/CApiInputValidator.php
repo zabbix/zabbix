@@ -2193,7 +2193,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$parser = new CRangesParser(['with_minus' => true, 'with_float' => true]);
+		$parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
 
 		return $parser->parse($data) == CParser::PARSE_SUCCESS;
 	}
