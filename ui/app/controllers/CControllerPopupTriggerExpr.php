@@ -549,16 +549,16 @@ class CControllerPopupTriggerExpr extends CController {
 								foreach ($parameter['data']['tokens'] as $parameter_token) {
 									if ($parameter_token['type'] == CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
 										$hist_function_token = $parameter_token;
-										break;
+										break 2;
 									}
 								}
 							}
-							break;
+							break 2;
 
 						case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
 							$hist_function_token = $token;
 							$function_token_index = $index;
-							break;
+							break 2;
 					}
 				}
 
