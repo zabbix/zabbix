@@ -1877,10 +1877,6 @@ static int	eval_execute_function_bytelength(const zbx_eval_context_t *ctx, const
 
 		zbx_variant_set_dbl(&value, i);
 	}
-	else if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_DBL))
-	{
-		zbx_variant_set_dbl(&value, sizeof(arg->data.dbl));
-	}
 	else if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
 	{
 		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
@@ -1940,10 +1936,6 @@ static int	eval_execute_function_bitlength(const zbx_eval_context_t *ctx, const 
 		}
 
 		zbx_variant_set_dbl(&value, ++i);
-	}
-	else if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_DBL))
-	{
-		zbx_variant_set_dbl(&value, sizeof(arg->data.dbl) * 8);
 	}
 	else if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
 	{
