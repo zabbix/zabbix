@@ -24,6 +24,9 @@
 
 typedef struct zbx_lld_value
 {
+	/* the LLD rule id */
+	zbx_uint64_t		itemid;
+
 	char			*value;
 	char			*error;
 	zbx_timespec_t		ts;
@@ -31,27 +34,37 @@ typedef struct zbx_lld_value
 	zbx_uint64_t		lastlogsize;
 	int			mtime;
 	unsigned char		meta;
-
+	struct	zbx_lld_value	*prev;
 	struct	zbx_lld_value	*next;
 }
 zbx_lld_data_t;
 
-/* queue of values for one LLD rule */
+/* queue of values for one host */
 typedef struct
 {
-	/* the LLD rule id */
-	zbx_uint64_t	itemid;
+	/* the LLD rule host id */
+	zbx_uint64_t	hostid;
 
 	/* the number of queued values */
 	int		values_num;
 
-	/* the oldest value in queue */
+	/* the newest value in queue */
 	zbx_lld_data_t	*tail;
 
-	/* the newest value in queue */
+	/* the oldest value in queue */
 	zbx_lld_data_t	*head;
 }
 zbx_lld_rule_t;
+
+typedef struct
+{
+	/* the LLD rule item id */
+	zbx_uint64_t	itemid;
+
+	/* the number of queued values */
+	int		values_num;
+}
+zbx_lld_rule_info_t;
 
 ZBX_THREAD_ENTRY(lld_manager_thread, args);
 
