@@ -1860,6 +1860,7 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 	zbx_variant_t	*str, *num, value;
 	char		*strval = NULL;
 	zbx_uint64_t	i;
+	size_t		len_utf8;
 
 	if (2 != token->opt)
 	{
@@ -1888,10 +1889,12 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (num->data.ui64 * strlen(str->data.str) >= MAX_STRING_LEN)
+	len_utf8 = zbx_strlen_utf8(str->data.str);
+
+	if (num->data.ui64 * len_utf8 >= MAX_STRING_LEN)
 	{
 		*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
-				MAX_STRING_LEN, num->data.ui64 * strlen(str->data.str));
+				MAX_STRING_LEN, num->data.ui64 * len_utf8);
 		return FAIL;
 	}
 
@@ -2189,8 +2192,8 @@ static int	eval_execute_function_between(const zbx_eval_context_t *ctx, const zb
 static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
+	int		i, arg_idx, found = 0, ret;
 	zbx_variant_t	value;
-	int		i, ret;
 
 	if (2 > token->opt)
 	{
@@ -2199,59 +2202,71 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 		return FAIL;
 	}
 
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
 	zbx_variant_set_dbl(&value, 0);
 
-	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+	for (i = arg_idx = output->values_num - token->opt; i < output->values_num; i++)
 	{
-		zbx_variant_t	*cmpr, *arg;
+		zbx_variant_t	val_copy;
+		double		ref;
 
-		if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
-			return ret;
-
-		cmpr = &output->values[0];
-
-		if (SUCCEED != zbx_variant_convert(cmpr, ZBX_VARIANT_STR))
+		if (SUCCEED != variant_convert_suffixed_num(&val_copy, &output->values[i]))
 		{
-			*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-					ctx->expression + token->loc.l);
+			zbx_variant_copy(&val_copy, &output->values[i]);
+
+			if (SUCCEED != zbx_variant_convert(&val_copy, ZBX_VARIANT_DBL))
+			{
+				zbx_variant_clear(&val_copy);
+				break;
+			}
+		}
+
+		if (i == arg_idx)
+		{
+			ref = val_copy.data.dbl;
+			continue;
+		}
+
+		if (0 == found && SUCCEED == zbx_double_compare(ref, val_copy.data.dbl))
+			found = 1;
+	}
+
+	if (i == output->values_num)
+	{
+		if (1 == found)
+			zbx_variant_set_dbl(&value, 1);
+
+		goto out;
+	}
+
+	for (i = arg_idx; i < output->values_num; i++)
+	{
+		zbx_variant_t	*arg, *ref;
+
+		arg = &output->values[i];
+
+		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
+		{
+			*error = zbx_dsprintf(*error, "invalid function argument \"%s\" at \"%s\"",
+					zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
 			return FAIL;
 		}
 
-		for (i = 1; i < output->values_num; i++)
+		if (i == arg_idx)
 		{
-			arg = &output->values[i];
+			ref = arg;
+			continue;
+		}
 
-			if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
-			{
-				*error = zbx_dsprintf(*error, "invalid function argument \"%s\" at \"%s\"",
-						zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
-				return FAIL;
-			}
-
-			if (0 == strcmp(cmpr->data.str, arg->data.str))
-			{
-				zbx_variant_set_dbl(&value, 1);
-				break;
-			}
+		if (0 == strcmp(ref->data.str, arg->data.str))
+		{
+			zbx_variant_set_dbl(&value, 1);
+			break;
 		}
 	}
-	else
-	{
-		double	in;
-
-		i = output->values_num - token->opt;
-		in = output->values[i++].data.dbl;
-
-		for (; i < output->values_num; i++)
-		{
-			if (in == output->values[i].data.dbl)
-			{
-				zbx_variant_set_dbl(&value, 1);
-				break;
-			}
-		}
-	}
-
+out:
 	eval_function_return(token->opt, &value, output);
 
 	return SUCCEED;
