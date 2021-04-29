@@ -343,20 +343,17 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 	{
 		if (0 == data->meta)
 		{
-			zbx_lld_data_t	*data_ptr, *data_last = NULL;
+			zbx_lld_data_t	*data_ptr;
 
 			for (data_ptr = rule->tail; NULL != data_ptr; data_ptr = data_ptr->prev)
 			{
 				/* if there are multiple values then they should be different, check only last one */
 				if (data_ptr->itemid == data->itemid)
-				{
-					data_last = data_ptr;
 					break;
-				}
 			}
 
-			if (NULL != data_last && 0 == zbx_strcmp_null(data->error, data_last->error) &&
-					0 == zbx_strcmp_null(data->value, data_last->value))
+			if (NULL != data_ptr && 0 == zbx_strcmp_null(data->error, data_ptr->error) &&
+					0 == zbx_strcmp_null(data->value, data_ptr->value))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "skip repeating values for discovery rule:" ZBX_FS_UI64,
 						data->itemid);
