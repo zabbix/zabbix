@@ -277,7 +277,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 		r := &LogResult{
 			Value:       &value,
-			Ts:          time.Now(),
+			Ts:          time.Now().Add(time.Duration(i) * time.Nanosecond),
 			Error:       err,
 			LastLogsize: uint64(clastlogsize),
 			Mtime:       int(cmtime),

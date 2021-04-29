@@ -197,7 +197,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 				EventID:        &logeventid,
 				EventSeverity:  &severity,
 				EventTimestamp: &timestamp,
-				Ts:             time.Now(),
+				Ts:             time.Now().Add(time.Duration(i) * time.Nanosecond),
 				LastLogsize:    uint64(clastlogsize),
 			}
 
