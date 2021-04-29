@@ -14017,7 +14017,7 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t hostid, zbx_agent_availab
  *                                                                               *
  * Purpose: resolve user macros in parsed expression                             *
  *                                                                               *
- * Parameters: ctx - [IN] the expression evalution context                       *
+ * Parameters: ctx - [IN] the expression evaluation context                      *
  *                                                                               *
  ********************************************************************************/
 void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)

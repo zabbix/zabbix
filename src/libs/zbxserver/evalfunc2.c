@@ -302,9 +302,9 @@ out:
  * Parameters: item       - [IN] item (performance metric)                    *
  *             parameters - [IN] the parameter string with #sec|num/timeshift *
  *                          in first parameter                                *
- *             ts         - [IN] the starting timestmap                       *
+ *             ts         - [IN] the starting timestamp                       *
  *             value      - [OUT] the Nth value                               *
- *             error      - [OUT] the error emssage                           *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - value was found successfully copied                *
  *               FAIL    - otherwise                                          *
