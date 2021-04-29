@@ -319,7 +319,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'find' => [
-				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
+				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param_find,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']

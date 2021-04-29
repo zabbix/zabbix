@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class to convert calculated item keys.
+ */
 class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 
 	/**
@@ -46,9 +49,10 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	}
 
 	/**
-	 * Convert calculated item formula to 5.2 syntax.
+	 * Convert calculated item formula to 5.4 syntax.
 	 *
 	 * @param string $formula  Calculated item formula to convert.
+	 *
 	 * @return string
 	 */
 	public function convert($item) {
@@ -79,6 +83,13 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 		return $item;
 	}
 
+	/**
+	 * Convert expression part.
+	 *
+	 * @param string $expression         Expression string.
+	 * @param array $expression_element  Expression part to convert.
+	 * @param array $extra_expr          Unused parameter to match parent class function signature.
+	 */
 	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		if (($this->parser->parse($expression_element['expression'])) === false) {
 			return;

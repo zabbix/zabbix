@@ -56,7 +56,6 @@ class CControllerPopupTestTriggerExpr extends CController {
 		}
 
 		$expression_parser = new CExpressionParser(['lldmacros' => true]);
-
 		if ($expression_parser->parse($this->expression) == CParser::PARSE_SUCCESS) {
 			$this->macros_data = [];
 
