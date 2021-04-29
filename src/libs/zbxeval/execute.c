@@ -1250,17 +1250,9 @@ static int	eval_execute_function_bitwise(const zbx_eval_context_t *ctx, const zb
 	left = &output->values[output->values_num - 2];
 	right = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(left, ZBX_VARIANT_UI64))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, left, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, right, error))
 	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(left), ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(right), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1320,12 +1312,8 @@ static int	eval_execute_function_bitnot(const zbx_eval_context_t *ctx, const zbx
 
 	arg = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, arg, error))
 		return FAIL;
-	}
 
 	zbx_variant_set_ui64(&value, ~arg->data.ui64);
 	eval_function_return(1, &value, output);
@@ -1369,17 +1357,9 @@ static int	eval_execute_function_left(const zbx_eval_context_t *ctx, const zbx_e
 	arg = &output->values[output->values_num - 2];
 	len = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, len, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1429,17 +1409,9 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
 	arg = &output->values[output->values_num - 2];
 	len = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, len, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1498,27 +1470,19 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 	start = &output->values[output->values_num - 2];
 	len = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, start, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, len, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
 	srclen = zbx_strlen_utf8(arg->data.str);
 
-	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64) || 0 == start->data.ui64 ||
-			start->data.ui64 > srclen)
+	if (0 == start->data.ui64 || start->data.ui64 > srclen)
 	{
 		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
 				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1576,12 +1540,8 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 		arg = &output->values[output->values_num - 2];
 		sym = &output->values[output->values_num - 1];
 
-		if (SUCCEED != zbx_variant_convert(sym, ZBX_VARIANT_STR))
-		{
-			*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
-					ctx->expression + token->loc.l);
+		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, sym, error))
 			return FAIL;
-		}
 	}
 	else
 	{
@@ -1590,12 +1550,8 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 		sym = &sym_val;
 	}
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
 		return FAIL;
-	}
 
 	switch (type)
 	{
@@ -1653,17 +1609,9 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 	str1 = &output->values[output->values_num - 2];
 	str2 = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(str1, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str1, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str2, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(str2, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
-				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1712,33 +1660,26 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 	len = &output->values[output->values_num - 2];
 	replacement = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, start, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, len, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, replacement, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
 	src_len = zbx_strlen_utf8(arg->data.str);
 
-	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64) || 0 == start->data.ui64 ||
-			start->data.ui64 > src_len)
+	if (0 == start->data.ui64 || start->data.ui64 > src_len)
 	{
 		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
 				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64) || src_len < start->data.ui64 + len->data.ui64)
+	if (src_len < start->data.ui64 + len->data.ui64)
 	{
 		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(replacement, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function fourth argument at \"%s\"",
 				ctx->expression + token->loc.l);
 		return FAIL;
 	}
@@ -1794,24 +1735,10 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 	pattern = &output->values[output->values_num - 2];
 	replacement = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, pattern, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, replacement, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(pattern, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(replacement, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
-				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1875,17 +1802,9 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 	str = &output->values[output->values_num - 2];
 	num = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(str, ZBX_VARIANT_STR))
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str, error) ||
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, num, error))
 	{
-		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_variant_convert(num, ZBX_VARIANT_UI64))
-	{
-		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
-				zbx_variant_value_desc(num), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -2072,9 +1991,13 @@ static int	eval_execute_function_char(const zbx_eval_context_t *ctx, const zbx_e
 
 	arg = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_UI64) || 255 < arg->data.ui64)
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, arg, error))
+		return FAIL;
+
+	if (255 < arg->data.ui64)
 	{
-		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is out of allowed range at \"%s\"",
+				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -2246,11 +2169,7 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 		arg = &output->values[i];
 
 		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
-		{
-			*error = zbx_dsprintf(*error, "invalid function argument \"%s\" at \"%s\"",
-					zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
 			return FAIL;
-		}
 
 		if (i == arg_idx)
 		{
