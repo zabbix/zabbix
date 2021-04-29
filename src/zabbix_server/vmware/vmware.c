@@ -631,6 +631,7 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	xmlDoc		*doc;
 	ZBX_HTTPPAGE	*resp;
 	int		ret = SUCCEED;
+	char		*val = NULL;
 
 	if (SUCCEED != zbx_http_post(easyhandle, request, &resp, error))
 		return FAIL;
@@ -638,9 +639,14 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
 
-	if (SUCCEED != zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, error, error)
-			|| NULL != *error)
+	if (SUCCEED != zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
 	{
+		ret = FAIL;
+	}
+	else if (NULL != val)
+	{
+		zbx_free(*error);
+		*error = val;
 		ret = FAIL;
 	}
 
@@ -3236,7 +3242,15 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		zbx_vmware_vm_t	*vm;
 
 		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], error)))
+		{
 			zbx_vector_ptr_append(&hv->vms, vm);
+		}
+		else if (NULL != *error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable initialize vm %s: %s.", vms.values[i], *error);
+			zbx_free(*error);
+		}
+
 	}
 
 	ret = SUCCEED;
@@ -3958,7 +3972,7 @@ clean:
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
-	char		*event_session = NULL;
+	char		*event_session = NULL, *err = NULL;
 	int		ret = FAIL, soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 	zbx_uint64_t	eventlog_last_key;
@@ -4007,8 +4021,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	ret = SUCCEED;
 end_session:
-	if (SUCCEED != vmware_service_destroy_event_session(easyhandle, event_session, error))
+	if (SUCCEED != vmware_service_destroy_event_session(easyhandle, event_session, &err))
+	{
+		*error = zbx_strdcatf(*error, "%s%s", NULL != *error ? "; " : "", err);
+		zbx_free(err);
 		ret = FAIL;
+	}
 out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
@@ -4833,6 +4851,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 				&data->error))
 		{
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
+		}
+		else if (NULL != data->error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable initialize hv %s: %s.", hvs.values[i], data->error);
+			zbx_free(data->error);
 		}
 	}
 
