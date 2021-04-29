@@ -1261,6 +1261,78 @@ static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx
 	return SUCCEED;
 }
 
+static int	eval_validate_statistical_function_args(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int	i, ret;
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	i = output->values_num - 1;
+
+	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	{
+		*error = zbx_dsprintf(*error, "invalid argument type \"%s\" for function at \"%s\"",
+				zbx_variant_type_desc(&output->values[i]), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (0 == output->values[i].data.dbl_vector->values_num)
+	{
+		*error = zbx_dsprintf(*error, "empty vector argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	return UNKNOWN;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_statistical_function                                *
+ *                                                                            *
+ * Purpose: common operations for aggregate function calculation              *
+ *                                                                            *
+ * Parameters: ctx       - [IN] the evaluation context                        *
+ *             token     - [IN] the function token                            *
+ *             stat_func - [IN] pointer to aggregate function to be called    *
+ *             output    - [IN/OUT] the output value stack                    *
+ *             error     - [OUT] the error message in the case of failure     *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_statistical_function(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_statistical_func_t stat_func, zbx_vector_var_t *output, char **error)
+{
+	int			ret;
+	double			result;
+	zbx_variant_t		value;
+	zbx_vector_dbl_t	*dbl_vector;
+
+	if (UNKNOWN != (ret = eval_validate_statistical_function_args(ctx, token, output, error)))
+		return ret;
+
+	dbl_vector = output->values[output->values_num - (int)token->opt].data.dbl_vector;
+
+	if (FAIL == stat_func(dbl_vector, &result, error))
+		return FAIL;
+
+	zbx_variant_set_dbl(&value, result);
+	eval_function_return((int)token->opt, &value, output);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_cb_function                                         *
@@ -1352,6 +1424,22 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_function_dayofmonth(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitand", ZBX_CONST_STRLEN("bitand")))
 		return eval_execute_function_bitand(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "kurtosis", ZBX_CONST_STRLEN("kurtosis")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_kurtosis, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mad", ZBX_CONST_STRLEN("mad")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_mad, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "skewness", ZBX_CONST_STRLEN("skewness")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_skewness, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "stddevpop", ZBX_CONST_STRLEN("stddevpop")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_stddevpop, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "stddevsamp", ZBX_CONST_STRLEN("stddevsamp")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_stddevsamp, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sumofsquares", ZBX_CONST_STRLEN("sumofsquares")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_sumofsquares, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "varpop", ZBX_CONST_STRLEN("varpop")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varpop, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "varsamp", ZBX_CONST_STRLEN("varsamp")))
+		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varsamp, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
