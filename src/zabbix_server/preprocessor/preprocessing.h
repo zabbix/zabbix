@@ -48,6 +48,7 @@ typedef struct {
 typedef struct
 {
 	zbx_uint64_t		itemid;		 /* item id */
+	zbx_uint64_t		hostid;		 /* host id */
 	unsigned char		item_value_type; /* item value type */
 	zbx_result_ptr_t	*result_ptr;	 /* item value (if any) to be shared between master and dependent items */
 	zbx_timespec_t		*ts;		 /* timestamp of a value */

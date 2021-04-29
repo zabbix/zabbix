@@ -3001,14 +3001,15 @@ static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_ti
 {
 	if (0 == item->host.proxy_hostid)
 	{
-		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
+		zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
+				item->state, error);
 		*h_num = 0;
 	}
 	else
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
-			zbx_lld_process_agent_result(item->itemid, result, ts, error);
+			zbx_lld_process_agent_result(item->itemid, item->host.hostid, result, ts, error);
 			*h_num = 0;
 		}
 		else

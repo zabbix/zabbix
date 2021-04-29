@@ -2834,9 +2834,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				item_hk_local.hostid = item->hostid;
 				item_hk_local.key = item->key;
-				item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-				if (item == item_hk->item_ptr)
+				if (NULL == (item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk,
+						&item_hk_local)))
+				{
+					/* item keys should be unique for items within a host, otherwise items with  */
+					/* same key share index and removal of last added item already cleared index */
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+				else if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
 					zbx_hashset_remove_direct(&config->items_hk, item_hk);
@@ -3521,9 +3527,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		item_hk_local.hostid = item->hostid;
 		item_hk_local.key = item->key;
-		item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (item == item_hk->item_ptr)
+		if (NULL == (item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local)))
+		{
+			/* item keys should be unique for items within a host, otherwise items with  */
+			/* same key share index and removal of last added item already cleared index */
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+		else if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove_direct(&config->items_hk, item_hk);
