@@ -1940,7 +1940,7 @@ static	int	postpone_escalation(const DB_ESCALATION *escalation)
 	DB_ROW		row;
 
 	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
-			" and status in (0,3);", escalation->eventid, escalation->actionid);
+			" and status in (0,3)", escalation->eventid, escalation->actionid);
 
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
