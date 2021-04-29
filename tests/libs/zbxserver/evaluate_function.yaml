@@ -672,7 +672,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate logeventid("^12")
+test case: Evaluate logeventid(,"^12")
 in:
   history:
   - itemid: 1
@@ -686,12 +686,12 @@ in:
       ts: 2017-01-10 10:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
   function: logeventid
-  params: '"^12"'
+  params: ',"^12"'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate logeventid("^34")
+test case: Evaluate logeventid(,"^34")
 in:
   history:
   - itemid: 1
@@ -705,7 +705,7 @@ in:
       ts: 2017-01-10 10:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
   function: logeventid
-  params: '"^34"'
+  params: ',"^34"'
 out:
   return: SUCCEED
   value: 0
@@ -729,7 +729,7 @@ out:
   return: SUCCEED
   value: 4
 ---
-test case: Evaluate logsource("(Application|System)") <- Application
+test case: Evaluate logsource(,"(Application|System)") <- Application
 in:
   history:
   - itemid: 1
@@ -743,12 +743,12 @@ in:
       ts: 2017-01-10 10:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
   function: logsource
-  params: '"(Application|System)"'
+  params: ',"(Application|System)"'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate logsource("(Application|System)") <- Security
+test case: Evaluate logsource(,"(Application|System)") <- Security
 in:
   history:
   - itemid: 1
@@ -762,7 +762,7 @@ in:
       ts: 2017-01-10 10:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
   function: logsource
-  params: '"(Application|System)"'
+  params: ',"(Application|System)"'
 out:
   return: SUCCEED
   value: 0
