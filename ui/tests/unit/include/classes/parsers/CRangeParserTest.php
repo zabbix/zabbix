@@ -29,6 +29,7 @@ class CRangeParserTest extends TestCase {
 	public static function dataProvider() {
 		$negative = ['with_minus' => true];
 		$float = ['with_float' => true];
+		$suffix= ['with_suffix' => true];
 
 		return [
 			// success
@@ -356,6 +357,62 @@ class CRangeParserTest extends TestCase {
 					'range' => ['-20.0', '-10.0']
 				]
 			],
+			[
+				'-2.0K--1.0K', 0, $float + $negative + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-2.0K--1.0K',
+					'range' => [strval(ZBX_KIBIBYTE * -2), strval(ZBX_KIBIBYTE * -1)]
+				]
+			],
+			[
+				'1h-1.5h', 0, $float + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '1h-1.5h',
+					'range' => [strval(SEC_PER_HOUR), strval(SEC_PER_HOUR * 1.5)]
+				]
+			],
+			[
+				'.5K-1K', 0, $float + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '.5K-1K',
+					'range' => [strval(ZBX_KIBIBYTE * 0.5), strval(ZBX_KIBIBYTE * 1)]
+				]
+			],
+			[
+				'.2-10', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '.2-10',
+					'range' => ['.2', '10']
+				]
+			],
+			[
+				'0.2-10', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '0.2-10',
+					'range' => ['0.2', '10']
+				]
+			],
+			[
+				'{$M}-10', 0, ['usermacros' => true] + $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M}-10',
+					'range' => ['{$M}', '10']
+				]
+			],
+			[
+				'{#M}-10.0', 0, ['lldmacros' => true] + $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#M}-10.0',
+					'range' => ['{#M}', '10.0']
+				]
+			],
 			// partial success
 			[
 				'random text.....0....text', 16, [],
@@ -676,6 +733,22 @@ class CRangeParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '10',
 					'range' => ['10']
+				]
+			],
+			[
+				'{$M}-10.0', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$M}-10',
+					'range' => ['{$M}', '10']
+				]
+			],
+			[
+				'{#M}-10K', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#M}-10',
+					'range' => ['{#M}', '10']
 				]
 			],
 			// fail

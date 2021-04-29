@@ -53,7 +53,8 @@ class CRangeParser extends CParser {
 	private $number_parser;
 
 	/**
-	 * Range.
+	 * Array of range strings. Range value with suffix will be stored as string of calculated value, value "1K"
+	 * will be stored as "1024".
 	 *
 	 * @var array
 	 */
@@ -62,13 +63,20 @@ class CRangeParser extends CParser {
 	/**
 	 * Options to initialize other parsers.
 	 *
+	 * usermacros   Allow usermacros in ranges.
+	 * lldmacros    Allow lldmacros in ranges.
+	 * with_minus   Allow negative ranges.
+	 * with_float   Allow float number ranges.
+	 * with_suffix  Allow number ranges with suffix, supported suffixes see CNumberParser::$suffixes.
+	 *
 	 * @var array
 	 */
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
 		'with_minus' => false,
-		'with_float' => false
+		'with_float' => false,
+		'with_suffix' => false
 	];
 
 	/**
@@ -76,7 +84,11 @@ class CRangeParser extends CParser {
 	 */
 	public function __construct($options = []) {
 		$this->options = $options + $this->options;
-		$this->number_parser = new CNumberParser($this->options);
+		$this->number_parser = new CNumberParser([
+			'with_minus' => $this->options['with_minus'],
+			'with_float' => $this->options['with_float'],
+			'with_suffix' => $this->options['with_suffix']
+		]);
 
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
@@ -207,26 +219,9 @@ class CRangeParser extends CParser {
 			return false;
 		}
 
-		$value = $this->number_parser->getMatch();
+		$value = $this->number_parser->calcValue();
 
 		if ($value > ZBX_MAX_INT32) {
-			return false;
-		}
-
-		if (!$this->options['with_minus'] && $value < 0) {
-			return false;
-		}
-
-		if ($value !== '' && $value[0] === '.') {
-			return false;
-		}
-
-		if (!$this->options['with_float'] && strpos($value, '.') !== false) {
-			// Do not count dot character and float part parsed by CNumberParser when float is not allowed.
-			$value = substr($value, 0, strpos($value, '.'));
-		}
-
-		if (filter_var($value, FILTER_VALIDATE_INT) === false && !$this->options['with_float']) {
 			return false;
 		}
 
@@ -235,8 +230,10 @@ class CRangeParser extends CParser {
 			return false;
 		}
 
-		$pos += strlen($value);
-		$this->range[] = $value;
+		$pos += $this->number_parser->getLength();
+		$this->range[] = ($this->number_parser->getSuffix() === null)
+			? $this->number_parser->getMatch()
+			: strval($value);
 
 		return true;
 	}
