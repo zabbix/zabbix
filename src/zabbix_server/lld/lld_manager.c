@@ -326,6 +326,7 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 
 	data = (zbx_lld_data_t *)zbx_malloc(NULL, sizeof(zbx_lld_data_t));
 	data->next = NULL;
+
 	zbx_lld_deserialize_item_value(message->data, &data->itemid, &hostid, &data->value, &data->ts, &data->meta,
 			&data->lastlogsize, &data->mtime, &data->error);
 
@@ -333,30 +334,39 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 	{
 		zbx_lld_rule_t	rule_local = {.hostid = hostid, .values_num = 0, .tail = data, .head = data};
 
+		data->prev = NULL;
+
 		rule = zbx_hashset_insert(&manager->rule_index, &rule_local, sizeof(rule_local));
 		lld_queue_rule(manager, rule);
 	}
 	else
 	{
-		zbx_lld_data_t	*data_ptr, *data_last = NULL;
-
-		for (data_ptr = rule->head; NULL != data_ptr; data_ptr = data_ptr->next)
+		if (0 == data->meta)
 		{
-			/* if there are multiple values already then they should be different, only check last one */
-			if (data_ptr->itemid == data->itemid)
-				data_last = data_ptr;
+			zbx_lld_data_t	*data_ptr, *data_last = NULL;
+
+			for (data_ptr = rule->tail; NULL != data_ptr; data_ptr = data_ptr->prev)
+			{
+				/* if there are multiple values then they should be different, check only last one */
+				if (data_ptr->itemid == data->itemid)
+				{
+					data_last = data_ptr;
+					break;
+				}
+			}
+
+			if (NULL != data_last && 0 == zbx_strcmp_null(data->error, data_last->error) &&
+					0 == zbx_strcmp_null(data->value, data_last->value))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "skip repeating values for discovery rule:" ZBX_FS_UI64,
+						data->itemid);
+
+				lld_data_free(data);
+				goto out;
+			}
 		}
 
-		if (NULL != data_last && 0 == data->meta && 0 == zbx_strcmp_null(data->error, data_last->error) &&
-				0 == zbx_strcmp_null(data->value, data_last->value))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "skip repeating values for discovery rule:" ZBX_FS_UI64,
-					data->itemid);
-
-			lld_data_free(data);
-			goto out;
-		}
-
+		data->prev = rule->tail;
 		rule->tail->next = data;
 		rule->tail = data;
 	}
@@ -453,6 +463,7 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	}
 	else
 	{
+		rule->head->prev = NULL;
 		rule->values_num--;
 		lld_queue_rule(manager, rule);
 	}

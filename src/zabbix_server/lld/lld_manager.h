@@ -34,7 +34,7 @@ typedef struct zbx_lld_value
 	zbx_uint64_t		lastlogsize;
 	int			mtime;
 	unsigned char		meta;
-
+	struct	zbx_lld_value	*prev;
 	struct	zbx_lld_value	*next;
 }
 zbx_lld_data_t;
@@ -48,10 +48,10 @@ typedef struct
 	/* the number of queued values */
 	int		values_num;
 
-	/* the oldest value in queue */
+	/* the newest value in queue */
 	zbx_lld_data_t	*tail;
 
-	/* the newest value in queue */
+	/* the oldest value in queue */
 	zbx_lld_data_t	*head;
 }
 zbx_lld_rule_t;
