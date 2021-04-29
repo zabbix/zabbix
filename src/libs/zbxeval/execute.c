@@ -2193,7 +2193,8 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, arg_idx, found = 0, ret;
-	zbx_variant_t	value;
+	zbx_variant_t	value, *arg, *ref_str = NULL;
+	double		ref = 0;
 
 	if (2 > token->opt)
 	{
@@ -2210,7 +2211,6 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 	for (i = arg_idx = output->values_num - token->opt; i < output->values_num; i++)
 	{
 		zbx_variant_t	val_copy;
-		double		ref;
 
 		if (SUCCEED != variant_convert_suffixed_num(&val_copy, &output->values[i]))
 		{
@@ -2243,8 +2243,6 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 
 	for (i = arg_idx; i < output->values_num; i++)
 	{
-		zbx_variant_t	*arg, *ref;
-
 		arg = &output->values[i];
 
 		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
@@ -2256,11 +2254,11 @@ static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eva
 
 		if (i == arg_idx)
 		{
-			ref = arg;
+			ref_str = arg;
 			continue;
 		}
 
-		if (0 == strcmp(ref->data.str, arg->data.str))
+		if (0 == strcmp(ref_str->data.str, arg->data.str))
 		{
 			zbx_variant_set_dbl(&value, 1);
 			break;
