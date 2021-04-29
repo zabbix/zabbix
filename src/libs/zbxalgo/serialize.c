@@ -46,7 +46,7 @@ zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value
 		unsigned char	buf[6];
 		zbx_uint32_t	len, pos = (zbx_uint32_t)(sizeof(buf) - 1);
 
-		while (value > (zbx_uint32_t)(0x3f >> (sizeof(buf) - pos)))
+		while (value > (zbx_uint32_t)(0x7f >> (sizeof(buf) - pos)))
 		{
 			buf[pos] = (unsigned char)(0x80 | (value & 0x3f));
 			value >>= 6;
