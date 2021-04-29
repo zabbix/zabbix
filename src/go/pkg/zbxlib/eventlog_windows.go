@@ -178,6 +178,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	var cvalue, csource *C.char
 	var clogeventid, cseverity, ctimestamp C.int
 	var clastlogsize C.zbx_uint64_t
+	logTs := time.Now()
 	for i := 0; C.get_eventlog_value(result, C.int(i), &cvalue, &csource, &clogeventid, &cseverity, &ctimestamp, &cstate,
 		&clastlogsize) != C.FAIL; i++ {
 
@@ -197,19 +198,21 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 				EventID:        &logeventid,
 				EventSeverity:  &severity,
 				EventTimestamp: &timestamp,
-				Ts:             time.Now(),
+				Ts:             logTs,
 				LastLogsize:    uint64(clastlogsize),
 			}
 
 		} else {
 			r = EventLogResult{
 				Error:       errors.New(C.GoString(cvalue)),
-				Ts:          time.Now(),
+				Ts:          logTs,
 				LastLogsize: uint64(clastlogsize),
 			}
 
 		}
+
 		item.Results = append(item.Results, &r)
+		logTs = logTs.Add(time.Nanosecond)
 	}
 	C.free_eventlog_result(result)
 
