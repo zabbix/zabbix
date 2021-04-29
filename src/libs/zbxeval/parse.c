@@ -210,11 +210,11 @@ static int	eval_parse_number(zbx_eval_context_t *ctx, size_t pos, size_t *pos_r)
 
 	len += offset;
 
-	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
+	tmp = strtod(ctx->expression + pos, &end) * (double)suffix2factor(ctx->expression[(int)pos + len - 1]);
 	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
 		return FAIL;
 
-	*pos_r = pos + len - 1;
+	*pos_r = pos + (size_t)len - 1;
 
 	return SUCCEED;
 }
@@ -248,7 +248,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 	{
 		if ('{' == (ctx->expression[offset]))
 		{
-			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
+			if (SUCCEED != eval_parse_macro(ctx, (int)offset, &tok))
 				break;
 
 			if (pos == offset)

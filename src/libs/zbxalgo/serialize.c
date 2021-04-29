@@ -44,19 +44,18 @@ zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value
 	else
 	{
 		unsigned char	buf[6];
-		int		pos = sizeof(buf) - 1;
-		zbx_uint32_t	len;
+		zbx_uint32_t	len, pos = (zbx_uint32_t)(sizeof(buf) - 1);
 
 		while (value > (zbx_uint32_t)(0x3f >> (sizeof(buf) - pos)))
 		{
-			buf[pos] = 0x80 | (value & 0x3f);
+			buf[pos] = (unsigned char)(0x80 | (value & 0x3f));
 			value >>= 6;
 			pos--;
 		}
 
-		buf[pos] = value | (0xfe << (pos + 1));
+		buf[pos] = (unsigned char)(value | (0xfe << (pos + 1)));
 
-		len = sizeof(buf) - pos;
+		len = (zbx_uint32_t)(sizeof(buf) - pos);
 		memcpy(ptr, buf + pos, len);
 		return len;
 	}
@@ -83,7 +82,7 @@ zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32
 	}
 	else
 	{
-		int	pos = 2, i;
+		zbx_uint32_t	pos = 2, i;
 
 		while (0 != (*ptr & (0x80 >> pos)))
 			pos++;
