@@ -280,11 +280,11 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[3].strlen(60,3600)} > 4'.
 				' and {Trapper:trap[3].strlen(1m,1h)} > 5',
 
-				'length(last(/Trapper/trap[3],30m)) > 0'.
-				' and length(last(/Trapper/trap[3],60s)) > 1'.
+				'length(last(/Trapper/trap[3])) > 0'.
+				' and length(last(/Trapper/trap[3])) > 1'.
 				' and length(last(/Trapper/trap[3],#10)) > 3'.
-				' and length(last(/Trapper/trap[3],60s:now-3600s)) > 4'.
-				' and length(last(/Trapper/trap[3],1m:now-1h)) > 5'
+				' and length(last(/Trapper/trap[3],#1:now-3600s)) > 4'.
+				' and length(last(/Trapper/trap[3],#1:now-1h)) > 5'
 			],
 			[
 				'{Trapper:trap[4].logeventid("^error")} > 0',
