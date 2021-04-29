@@ -487,6 +487,7 @@ class C52TriggerExpressionConverter extends CConverter {
 		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
+
 		return ($param !== '') ? 'now-'.$param : '';
 	}
 
@@ -499,6 +500,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 */
 	private static function paramsToString(array $parameters): string {
 		$parameters = rtrim(implode(',', $parameters), ',');
+
 		return ($parameters === '') ? '' : ','.$parameters;
 	}
 
@@ -595,7 +597,7 @@ class C52TriggerExpressionConverter extends CConverter {
 							// Operator found.
 							if ($operator_token === $operator) {
 								/*
-								 * We've reached the end of a complete expression, parse the expression on the left side
+								 * Once reached the end of a complete expression, parse the expression on the left side
 								 * of the operator.
 								 */
 								if ($level == 0) {
