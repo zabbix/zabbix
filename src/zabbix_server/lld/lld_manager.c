@@ -537,7 +537,7 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 
 	zbx_lld_deserialize_top_items_request(message->data, &limit);
 
-	zbx_hashset_create(&rule_infos, MAX(1000, manager->rule_index.num_data), ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&rule_infos, MAX(1000, (size_t)manager->rule_index.num_data), ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_ptr_create(&view);
 
