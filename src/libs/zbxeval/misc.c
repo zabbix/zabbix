@@ -284,7 +284,10 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 
 	if (ZBX_VARIANT_ERR == token->value.type)
 	{
-		zbx_snprintf_alloc(str, str_alloc, str_offset, "ERROR(%s)", token->value.data.err);
+		if (0 == (ctx->rules & ZBX_EVAL_COMPOSE_MASK_ERROR))
+			zbx_snprintf_alloc(str, str_alloc, str_offset, "ERROR(%s)", token->value.data.err);
+		else
+			zbx_strcpy_alloc(str, str_alloc, str_offset, "*ERROR*");
 		return;
 	}
 
