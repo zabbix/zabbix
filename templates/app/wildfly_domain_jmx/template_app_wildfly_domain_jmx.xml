@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-04-14T11:32:43Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template APP WildFly Domain by JMX</template>
+         <name>Template APP WildFly Domain by JMX</name>
+         <description>Official JMX Template for WildFly.&#13;
+The metrics are collected by JMX. This template works with Domain Controller.&#13;
+You can set {$WILDFLY.USER} and {$WILDFLY.PASSWORD} macros in the template for using on the host level.&#13;
+&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>WildFly</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>WildFly: Uptime</name>
+               <type>JMX</type>
+               <key>jmx["java.lang:type=Runtime","Uptime"]</key>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <units>s</units>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <description>WildFly server uptime.</description>
+               <applications>
+                  <application>
+                     <name>WildFly</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>WildFly: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>WildFly: Launch type</name>
+               <type>JMX</type>
+               <key>jmx["jboss.as:management-root=server","launchType"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <description>The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.</description>
+               <applications>
+                  <application>
+                     <name>WildFly</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+            </item>
+            <item>
+               <name>WildFly: Name</name>
+               <type>JMX</type>
+               <key>jmx["jboss.as:management-root=server","name"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <description>For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().&#13;
+For domain mode: The name given to this domain</description>
+               <applications>
+                  <application>
+                     <name>WildFly</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+            </item>
+            <item>
+               <name>WildFly: Process type</name>
+               <type>JMX</type>
+               <key>jmx["jboss.as:management-root=server","processType"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <description>The type of process represented by this root resource.</description>
+               <applications>
+                  <application>
+                     <name>WildFly</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+            </item>
+            <item>
+               <name>WildFly: Version</name>
+               <type>JMX</type>
+               <key>jmx["jboss.as:management-root=server","productVersion"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <description>The version of the WildFly Core based product release</description>
+               <applications>
+                  <application>
+                     <name>WildFly</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>WildFly: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>WildFly version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Servers discovery</name>
+               <type>JMX</type>
+               <key>jmx.get[beans,"jboss.as:host=master,server-config=*"]</key>
+               <delay>1h</delay>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SERVER}</macro>
+                        <value>{$WILDFLY.SERVER.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SERVER}</macro>
+                        <value>{$WILDFLY.SERVER.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery instances in domain.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>WildFly domain: Server {#SERVER}: Autostart</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",autoStart]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$WILDFLY.USER}</username>
+                     <password>{$WILDFLY.PASSWORD}</password>
+                     <description>Whether or not this server should be started when the Host Controller starts.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>WildFly domain: Server [{#SERVER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>WildFly flag</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>BOOL_TO_DECIMAL</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>WildFly domain: Server {#SERVER}: Server group</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",group]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$WILDFLY.USER}</username>
+                     <password>{$WILDFLY.PASSWORD}</password>
+                     <description>The name of a server group from the domain model.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>WildFly domain: Server [{#SERVER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>Server group has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>WildFly domain: Server {#SERVER}: Status</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",status]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$WILDFLY.USER}</username>
+                     <password>{$WILDFLY.PASSWORD}</password>
+                     <description>The current status of the server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>WildFly domain: Server [{#SERVER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})</name>
+                           <priority>WARNING</priority>
+                           <description>Server status has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <lld_macro_paths>
+                  <lld_macro_path>
+                     <lld_macro>{#SERVER}</lld_macro>
+                     <path>$.properties.["server-config"]</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#JMXOBJ}</lld_macro>
+                     <path>$.object</path>
+                  </lld_macro_path>
+               </lld_macro_paths>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Deployments discovery</name>
+               <type>JMX</type>
+               <key>jmx.get[beans,"jboss.as.expr:deployment=*,server-group=*"]</key>
+               <delay>1h</delay>
+               <username>{$WILDFLY.USER}</username>
+               <password>{$WILDFLY.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#DEPLOYMENT}</macro>
+                        <value>{$WILDFLY.DEPLOYMENT.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#DEPLOYMENT}</macro>
+                        <value>{$WILDFLY.DEPLOYMENT.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery deployments metrics.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>WildFly deployment [{#DEPLOYMENT}]: Enabled</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",enabled]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$WILDFLY.USER}</username>
+                     <password>{$WILDFLY.PASSWORD}</password>
+                     <description>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts.)</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>WildFly deployment [{#DEPLOYMENT}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>WildFly flag</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>BOOL_TO_DECIMAL</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>WildFly deployment [{#DEPLOYMENT}]: Managed</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",managed]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$WILDFLY.USER}</username>
+                     <password>{$WILDFLY.PASSWORD}</password>
+                     <description>Indicates if the deployment is managed (aka uses the ContentRepository).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>WildFly deployment [{#DEPLOYMENT}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>WildFly flag</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>BOOL_TO_DECIMAL</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <lld_macro_paths>
+                  <lld_macro_path>
+                     <lld_macro>{#SERVER_GROUP}</lld_macro>
+                     <path>$.properties.["server-group"]</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#DEPLOYMENT}</lld_macro>
+                     <path>$.properties.deployment</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#JMXOBJ}</lld_macro>
+                     <path>$.object</path>
+                  </lld_macro_path>
+               </lld_macro_paths>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$WILDFLY.DEPLOYMENT.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable deployments</description>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.DEPLOYMENT.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered deployments</description>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.JMX.PROTOCOL}</macro>
+               <value>remote+http</value>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.PASSWORD}</macro>
+               <value>zabbix</value>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.SERVER.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable servers</description>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.SERVER.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered servers</description>
+            </macro>
+            <macro>
+               <macro>{$WILDFLY.USER}</macro>
+               <value>zabbix</value>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>WildFly flag</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>False</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
