@@ -95,8 +95,13 @@ class CExpressionValidator extends CValidator {
 					}
 
 					if (CHistFunctionData::isCalculated($token['data']['function'])) {
-						if ($parent_token === null
-								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
+						if ($parent_token === null) {
+							$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']));
+
+							return false;
+						}
+
+						if ($parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
 								|| !in_array($parent_token['data']['function'], self::AGGREGATE_MATH_FUNCTIONS)
 								|| count($parent_token['data']['parameters']) != 1) {
 							$this->setError(_s('Incorrect usage of function "%1$s".',
