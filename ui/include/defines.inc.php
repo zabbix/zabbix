@@ -1320,6 +1320,7 @@ define('API_TRIGGER_EXPRESSION',	36);
 define('API_EVENT_NAME',			37);
 define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
+define('API_UUID',					40);
 
 // flags
 define('API_REQUIRED',					0x0001);

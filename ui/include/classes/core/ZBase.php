@@ -145,7 +145,6 @@ class ZBase {
 		require_once 'include/hostgroups.inc.php';
 		require_once 'include/hosts.inc.php';
 		require_once 'include/httptest.inc.php';
-		require_once 'include/ident.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
 		require_once 'include/maintenances.inc.php';

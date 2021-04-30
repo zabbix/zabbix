@@ -37,7 +37,8 @@ class CImportReferencer {
 	protected $valuemaps = [];
 	protected $triggers = [];
 	protected $graphs = [];
-	protected $iconMaps = [];
+	protected $iconmaps = [];
+	protected $images = [];
 	protected $maps = [];
 	protected $templateDashboards = [];
 	protected $macros = [];
@@ -53,8 +54,9 @@ class CImportReferencer {
 	protected $db_valuemaps;
 	protected $db_triggers;
 	protected $db_graphs;
-	protected $iconMapsRefs;
-	protected $mapsRefs;
+	protected $db_iconmaps;
+	protected $db_images;
+	protected $db_maps;
 	protected $templateDashboardsRefs;
 	protected $db_macros;
 	protected $db_proxies;
@@ -62,6 +64,13 @@ class CImportReferencer {
 	protected $db_httptests;
 	protected $db_httpsteps;
 
+	/**
+	 * Get group ID by group UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
 	public function findGroupidByUuid(string $uuid): ?string {
 		if ($this->db_groups === null) {
 			$this->selectGroups();
@@ -76,6 +85,13 @@ class CImportReferencer {
 		return null;
 	}
 
+	/**
+	 * Get group ID by group name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
 	public function findGroupidByName(string $name): ?string {
 		if ($this->db_groups === null) {
 			$this->selectGroups();
@@ -90,6 +106,13 @@ class CImportReferencer {
 		return null;
 	}
 
+	/**
+	 * Get template ID by group UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
 	public function findTemplateidByUuid(string $uuid): ?string {
 		if ($this->db_templates === null) {
 			$this->selectTemplates();
@@ -104,6 +127,13 @@ class CImportReferencer {
 		return null;
 	}
 
+	/**
+	 * Get template ID by template host.
+	 *
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
 	public function findTemplateidByHost(string $host): ?string {
 		if ($this->db_templates === null) {
 			$this->selectTemplates();
@@ -119,7 +149,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get host id by host.
+	 * Get host ID by host.
 	 *
 	 * @param string $name
 	 *
@@ -140,7 +170,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get host or template id by host.
+	 * Get host ID or template ID by host.
 	 *
 	 * @param string $host
 	 *
@@ -183,7 +213,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get item id by uuid.
+	 * Get item ID by uuid.
 	 *
 	 * @param string $uuid
 	 *
@@ -204,7 +234,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get item id by host id and item key_.
+	 * Get item ID by host ID and item key_.
 	 *
 	 * @param string $hostid
 	 * @param string $key
@@ -226,7 +256,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get value map id by value map name.
+	 * Get valuemap ID by valuemap name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
@@ -241,6 +271,27 @@ class CImportReferencer {
 		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
 			if ($valuemap['hostid'] === $hostid && $valuemap['name'] === $name) {
 				return $valuemapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get image ID by image name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findImageidByName(string $name): ?string {
+		if ($this->db_images === null) {
+			$this->selectImages();
+		}
+
+		foreach ($this->db_images as $imageid => $image) {
+			if ($image['name'] === $name) {
+				return $imageid;
 			}
 		}
 
@@ -267,7 +318,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get trigger ID by trigger uuid.
+	 * Get trigger ID by trigger UUID.
 	 *
 	 * @param string $uuid
 	 *
@@ -313,7 +364,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get graph ID by uuid.
+	 * Get graph ID by UUID.
 	 *
 	 * @param string $uuid
 	 *
@@ -356,33 +407,45 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get icon map id by name.
+	 * Get iconmap ID by name.
 	 *
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveIconMap($name) {
-		if ($this->iconMapsRefs === null) {
-			$this->selectIconMaps();
+	public function findIconmapidByName(string $name): ?string {
+		if ($this->db_iconmaps === null) {
+			$this->selectIconmaps();
 		}
 
-		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;
+		foreach ($this->db_iconmaps as $iconmapid => $iconmap) {
+			if ($iconmap['name'] === $name) {
+				return $iconmapid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get map id by name.
+	 * Get map ID by name.
 	 *
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveMap($name) {
-		if ($this->mapsRefs === null) {
+	public function findMapidByName(string $name): ?string {
+		if ($this->db_maps === null) {
 			$this->selectMaps();
 		}
 
-		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
+		foreach ($this->db_maps as $mapid => $map) {
+			if ($map['name'] === $name) {
+				return $mapid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -426,7 +489,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get proxy id by name.
+	 * Get proxy ID by name.
 	 *
 	 * @param string $host
 	 *
@@ -447,7 +510,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get host prototype ID by uuid.
+	 * Get host prototype ID by UUID.
 	 *
 	 * @param string $uuid
 	 *
@@ -493,7 +556,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get httptestid by web scenario uuid.
+	 * Get httptest ID by web scenario UUID.
 	 *
 	 * @param string $uuid
 	 *
@@ -514,7 +577,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get httptestid by hostid and web scenario name.
+	 * Get httptest ID by hostid and web scenario name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
@@ -536,7 +599,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get httpstepid by hostid, httptestid and web scenario step name.
+	 * Get httpstep ID by hostid, httptestid and web scenario step name.
 	 *
 	 * @param string $hostid
 	 * @param string $httptestid
@@ -560,78 +623,72 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add group names that need association with a database group id.
+	 * Add group names that need association with a database group ID.
 	 *
 	 * @param array $groups
 	 */
-	public function addGroups(array $groups) {
-// TODO VM: can this lead to error?
-//		$this->groups = array_unique(array_merge($this->groups, $groups));
+	public function addGroups(array $groups): void {
 		$this->groups = $groups;
 	}
 
 	/**
-	 * Add group name association with group id.
+	 * Add group name association with group ID.
 	 *
-	 * @param string $id
+	 * @param string $groupid
 	 * @param array  $group
 	 */
-	public function setDbGroup(string $id, array $group): void {
-		$this->db_groups[$id] = [
+	public function setDbGroup(string $groupid, array $group): void {
+		$this->db_groups[$groupid] = [
 			'uuid' => $group['uuid'],
 			'name' => $group['name']
 		];
 	}
 
 	/**
-	 * Add templates names that need association with a database template id.
+	 * Add templates names that need association with a database template ID.
 	 *
 	 * @param array $templates
 	 */
-	public function addTemplates(array $templates) {
-//		$this->templates = array_unique(array_merge($this->templates, $templates));
+	public function addTemplates(array $templates): void {
 		$this->templates = $templates;
 	}
 
 	/**
-	 * Add template name association with template id.
+	 * Add template name association with template ID.
 	 *
-	 * @param string $id
+	 * @param string $templateid
 	 * @param array  $template
 	 */
-	public function setDbTemplate(string $id, array $template): void {
-		$this->db_templates[$id] = [
+	public function setDbTemplate(string $templateid, array $template): void {
+		$this->db_templates[$templateid] = [
 			'uuid' => $template['uuid'],
 			'host' => $template['host']
 		];
 	}
 
 	/**
-	 * Add hosts names that need association with a database host id.
+	 * Add hosts names that need association with a database host ID.
 	 *
 	 * @param array $hosts
 	 */
-	public function addHosts(array $hosts) {
-//		$this->hosts = array_unique(array_merge($this->hosts, $hosts));
+	public function addHosts(array $hosts): void {
 		$this->hosts = $hosts;
 	}
 
 	/**
-	 * Add host name association with host id.
+	 * Add host name association with host ID.
 	 *
-	 * @param string $id
+	 * @param string $hostid
 	 * @param array  $host
 	 */
-	public function setDbHost(string $id, array $host): void {
-		$this->db_hosts[$id] = [
+	public function setDbHost(string $hostid, array $host): void {
+		$this->db_hosts[$hostid] = [
 			'host' => $host['host']
 		];
 	}
 
 	/**
-	 * Add item keys that need association with a database item id.
-	 * Input array has format:
-	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
+	 * Add item keys that need association with a database item ID.
 	 *
 	 * @param array $items
 	 */
@@ -640,12 +697,13 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add item key association with item id.
+	 * Add item key association with item ID.
 	 *
-	 * @param array $item
+	 * @param string $itemid
+	 * @param array  $item
 	 */
-	public function setDbItem(array $item): void {
-		$this->db_items[$item['itemid']] = [
+	public function setDbItem(string $itemid, array $item): void {
+		$this->db_items[$itemid] = [
 			'hostid' => $item['hostid'],
 			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
 			'key_' => $item['key_']
@@ -655,74 +713,38 @@ class CImportReferencer {
 	/**
 	 * Add value map names that need association with a database value map ID.
 	 *
-	 * @param array $valueMaps
+	 * @param array $valuemaps
 	 */
-	public function addValueMaps(array $valueMaps) {
-//		foreach ($valueMaps as $host => $valuemap_names) {
-//			if (!array_key_exists($host, $this->valueMaps)) {
-//				$this->valueMaps[$host] = [];
-//			}
-//			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
-//		}
-
-		$this->valuemaps = $valueMaps;
+	public function addValuemaps(array $valuemaps): void {
+		$this->valuemaps = $valuemaps;
 	}
 
 	/**
-	 * Add trigger description/expression/recovery_expression that need association with a database trigger id.
+	 * Add trigger description/expression/recovery_expression that need association with a database trigger ID.
 	 *
 	 * @param array $triggers
-	 * @param array $triggers[<description>]
-	 * @param array $triggers[<description>][<expression>]
-	 * @param bool  $triggers[<description>][<expression>][<recovery_expression>]
 	 */
-	public function addTriggers(array $triggers) {
-//		foreach ($triggers as $description => $expressions) {
-//			if (!array_key_exists($description, $this->triggers)) {
-//				$this->triggers[$description] = [];
-//			}
-
-//			foreach ($expressions as $expression => $recovery_expressions) {
-//				if (!array_key_exists($expression, $this->triggers[$description])) {
-//					$this->triggers[$description][$expression] = [];
-//				}
-
-//				foreach ($recovery_expressions as $recovery_expression => $foo) {
-//					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
-//						$this->triggers[$description][$expression][$recovery_expression] = true;
-//					}
-//				}
-//			}
-//		}
-
+	public function addTriggers(array $triggers): void {
 		$this->triggers = $triggers;
 	}
 
 	/**
 	 * Add graph names that need association with a database graph ID.
-	 * Input array has format:
-	 * array('hostname1' => array('graphname1', 'graphname2'), 'hostname2' => array('graphname1'), ...)
 	 *
 	 * @param array $graphs
 	 */
-	public function addGraphs(array $graphs) {
-//		foreach ($graphs as $host => $hostGraphs) {
-//			if (!isset($this->graphs[$host])) {
-//				$this->graphs[$host] = [];
-//			}
-//			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
-//		}
-
+	public function addGraphs(array $graphs): void {
 		$this->graphs = $graphs;
 	}
 
 	/**
-	 * Add trigger name/expression association with trigger id.
+	 * Add trigger name/expression association with trigger ID.
 	 *
-	 * @param array $trigger
+	 * @param string $triggerid
+	 * @param array  $trigger
 	 */
-	public function setDbTrigger(array $trigger): void {
-		$this->db_triggers[$trigger['triggerid']] = [
+	public function setDbTrigger(string $triggerid, array $trigger): void {
+		$this->db_triggers[$triggerid] = [
 			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
@@ -731,17 +753,37 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add icon map names that need association with a database icon map id.
+	 * Add icon map names that need association with a database icon map ID.
 	 *
-	 * @param array $iconMaps
+	 * @param array $iconmaps
 	 */
-	public function addIconMaps(array $iconMaps) {
-//		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
-		$this->iconMaps = $iconMaps;
+	public function addIconmaps(array $iconmaps): void {
+		$this->iconmaps = $iconmaps;
 	}
 
 	/**
-	 * Add map names that need association with a database map id.
+	 * Add icon map names that need association with a database icon map ID.
+	 *
+	 * @param array $images
+	 */
+	public function addImages(array $images): void {
+		$this->images = $images;
+	}
+
+	/**
+	 * Add image name association with image ID.
+	 *
+	 * @param string $imageid
+	 * @param array  $image
+	 */
+	public function setDbImage(string $imageid, array $image): void {
+		$this->db_images[$imageid] = [
+			'name' => $image['name']
+		];
+	}
+
+	/**
+	 * Add map names that need association with a database map ID.
 	 *
 	 * @param array $maps
 	 */
@@ -751,13 +793,15 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add map name association with map id.
+	 * Add map name association with map ID.
 	 *
-	 * @param string $name
-	 * @param string $mapId
+	 * @param string $mapid
+	 * @param array  $map
 	 */
-	public function addMapRef($name, $mapId) {
-		$this->mapsRefs[$name] = $mapId;
+	public function setDbMap(string $mapid, array $map): void {
+		$this->db_maps[$mapid] =[
+			'name' => $map['name']
+		];
 	}
 
 	/**
@@ -781,115 +825,47 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add macros names that need association with a database macro id.
+	 * Add macros names that need association with a database macro ID.
 	 *
 	 * @param array $macros
 	 */
-	public function addMacros(array $macros) {
-//		foreach ($macros as $host => $ms) {
-//			if (!isset($this->macros[$host])) {
-//				$this->macros[$host] = [];
-//			}
-//			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
-//		}
-
+	public function addMacros(array $macros): void {
 		$this->macros = $macros;
 	}
 
 	/**
-	 * Add macro name association with macro id.
-	 *
-	 * @param string $hostId
-	 * @param string $macro
-	 * @param string $macroId
-	 */
-	public function addMacroRef($hostId, $macro, $macroId) {
-		$this->db_macros[$hostId][$macro] = $macroId;
-	}
-
-	/**
-	 * Add proxy names that need association with a database proxy id.
+	 * Add proxy names that need association with a database proxy ID.
 	 *
 	 * @param array $proxies
 	 */
-	public function addProxies(array $proxies) {
-//		$this->proxies = array_unique(array_merge($this->proxies, $proxies));
+	public function addProxies(array $proxies): void {
 		$this->proxies = $proxies;
 	}
 
 	/**
-	 * Add proxy name association with proxy id.
-	 *
-	 * @param string $name
-	 * @param string $proxyId
-	 */
-	public function addProxyRef($name, $proxyId) {
-		$this->db_proxies[$name] = $proxyId;
-	}
-
-	/**
-	 * Add host prototypes that need association with a database host prototype id.
+	 * Add host prototypes that need association with a database host prototype ID.
 	 *
 	 * @param array $hostPrototypes
 	 */
-	public function addHostPrototypes(array $hostPrototypes) {
-//		foreach ($hostPrototypes as $host => $discoveryRule) {
-//			if (!isset($this->hostPrototypes[$host])) {
-//				$this->hostPrototypes[$host] = [];
-//			}
-//			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-//				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
-//					$this->hostPrototypes[$host][$discoveryRuleKey] = [];
-//				}
-//				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
-//					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
-//				);
-//			}
-//		}
-
+	public function addHostPrototypes(array $hostPrototypes): void {
 		$this->host_prototypes = $hostPrototypes;
 	}
 
 	/**
-	 * Add web scenario names that need association with a database httptestid.
+	 * Add web scenario names that need association with a database httptest ID.
 	 *
 	 * @param array  $httptests
-	 * @param string $httptests[<host>][]	web scenario name
 	 */
-	public function addHttpTests(array $httptests) {
-//		foreach ($httptests as $host => $names) {
-//			if (!array_key_exists($host, $this->httptests)) {
-//				$this->httptests[$host] = [];
-//			}
-
-//			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
-//		}
-
+	public function addHttpTests(array $httptests): void {
 		$this->httptests = $httptests;
 	}
 
 	/**
-	 * Add web scenario step names that need association with a database httpstepid.
+	 * Add web scenario step names that need association with a database httpstep ID.
 	 *
 	 * @param array  $httpsteps
-	 * @param string $httpsteps[<host>][<httptest_name>][]	web scenario step name
 	 */
-	public function addHttpSteps(array $httpsteps) {
-//		foreach ($httpsteps as $host => $httptests) {
-//			if (!array_key_exists($host, $this->httpsteps)) {
-//				$this->httpsteps[$host] = [];
-//			}
-
-//			foreach ($httptests as $httptest_name => $httpstep_names) {
-//				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
-//					$this->httpsteps[$host][$httptest_name] = [];
-//				}
-
-//				$this->httpsteps[$host][$httptest_name] =
-//					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
-//			}
-//		}
-
+	public function addHttpSteps(array $httpsteps): void {
 		$this->httpsteps = $httpsteps;
 	}
 
@@ -1113,7 +1089,14 @@ class CImportReferencer {
 		}
 
 		// TODO VM: How to check, if nonexisting trigger is from a template? Probably it can only be done by parsing the trigger expressions.
-		// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid seraching them by name.
+		// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid searching them by name.
+	}
+
+	/**
+	 * Unset trigger refs to make referencer select them from db again.
+	 */
+	public function refreshTriggers(): void {
+		$this->db_triggers = null;
 	}
 
 	/**
@@ -1161,13 +1144,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Unset trigger refs to make referencer select them from db again.
-	 */
-	public function refreshTriggers(): void {
-		$this->db_triggers = null;
-	}
-
-	/**
 	 * Unset graph refs to make referencer select them from DB again.
 	 */
 	public function refreshGraphs(): void {
@@ -1177,43 +1153,76 @@ class CImportReferencer {
 	/**
 	 * Select icon map ids for previously added icon maps names.
 	 */
-	protected function selectIconMaps() {
-		if (!empty($this->iconMaps)) {
-			$this->iconMapsRefs = [];
-			$dbIconMaps = API::IconMap()->get([
-				'filter' => ['name' => $this->iconMaps],
-				'output' => ['iconmapid', 'name'],
-				'preservekeys' => true
-			]);
-			foreach ($dbIconMaps as $iconMap) {
-				$this->iconMapsRefs[$iconMap['name']] = $iconMap['iconmapid'];
-			}
+	protected function selectIconmaps(): void {
+		$this->db_iconmaps = [];
 
-			$this->iconMaps = [];
+		if (!$this->iconmaps) {
+			return;
 		}
+
+		$db_iconmaps = API::IconMap()->get([
+			'filter' => ['name' => array_keys($this->iconmaps)],
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_iconmaps as $iconmapid => $iconmap) {
+			$this->db_iconmaps[$iconmapid] = $iconmap;
+		}
+
+		$this->iconmaps = [];
+	}
+
+	/**
+	 * Select icon map ids for previously added icon maps names.
+	 */
+	protected function selectImages(): void {
+		$this->db_images = [];
+
+		if (!$this->images) {
+			return;
+		}
+
+		$db_images = API::Image()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->images)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_images as $imageid => $image) {
+			$this->db_images[$imageid] = $image;
+		}
+
+		$this->images = [];
 	}
 
 	/**
 	 * Select map ids for previously added maps names.
 	 */
-	protected function selectMaps() {
-		if (!empty($this->maps)) {
-			$this->mapsRefs = [];
-			$dbMaps = API::Map()->get([
-				'filter' => ['name' => $this->maps],
-				'output' => ['sysmapid', 'name'],
-				'preservekeys' => true
-			]);
-			foreach ($dbMaps as $dbMap) {
-				$this->mapsRefs[$dbMap['name']] = $dbMap['sysmapid'];
-			}
+	protected function selectMaps(): void {
+		$this->db_maps = [];
 
-			$this->maps = [];
+		if (!$this->maps) {
+			return;
 		}
+
+		$db_maps = API::Map()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->maps)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_maps as $mapid => $map) {
+			$this->db_maps[$mapid] = $map;
+		}
+
+		$this->maps = [];
 	}
 
 	/**
 	 * Select template dashboard IDs for previously added dashboard names and template IDs.
+	 *
+	 * @throws APIException
 	 */
 	protected function selectTemplateDashboards() {
 		if ($this->templateDashboards) {

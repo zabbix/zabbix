@@ -148,7 +148,7 @@ class CConfigurationImport {
 		$this->processDiscoveryRules();
 		$this->processGraphs();
 		$this->processImages();
-//		$this->processMaps();
+		$this->processMaps();
 //		$this->processTemplateDashboards();
 		$this->processMediaTypes();
 
@@ -171,6 +171,7 @@ class CConfigurationImport {
 		$triggers_refs = [];
 		$graphs_refs = [];
 		$iconmaps_refs = [];
+		$images_refs = [];
 		$maps_refs = [];
 		$template_dashboards_refs = [];
 		$macros_refs = [];
@@ -180,16 +181,13 @@ class CConfigurationImport {
 		$httpsteps_refs = [];
 
 		foreach ($this->getFormattedGroups() as $group) {
-//			$groupsRefs[$group['name']] = $group['name'];
 			$groups_refs[$group['name']] = ['uuid' => $group['uuid']];
 		}
 
 		foreach ($this->getFormattedTemplates() as $template) {
-//			$templatesRefs[$template['host']] = $template['host'];
 			$templates_refs[$template['host']] = ['uuid' => $template['uuid']];
 
 			foreach ($template['groups'] as $group) {
-//				$groupsRefs[$group['name']] = $group['name'];
 				$groups_refs += [$group['name'] => []];
 			}
 
@@ -201,7 +199,6 @@ class CConfigurationImport {
 
 			if ($template['templates']) {
 				foreach ($template['templates'] as $linked_template) {
-//					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 					$templates_refs += [$linked_template['name'] => []];
 				}
 			}
@@ -274,28 +271,50 @@ class CConfigurationImport {
 							$expression = $dependency['expression'];
 							$recovery_expression = $dependency['recovery_expression'];
 
-							// TODO VM: make sure $triggers_refs[$name][$expression] exists. (also in similar places)
-							$triggers_refs[$name][$expression] += [$recovery_expression => []];
+							if (!array_key_exists($name, $triggers_refs)
+									|| !array_key_exists($expression, $triggers_refs[$name])
+									|| !array_key_exists($recovery_expression, $triggers_refs[$name][$expression])) {
+								$triggers_refs[$name][$expression] = [];
+							}
 						}
 					}
 				}
 
 				foreach ($discovery_rule['graph_prototypes'] as $graph) {
 					if ($graph['ymin_item_1']) {
-						$items_refs[$graph['ymin_item_1']['host']] += [$graph['ymin_item_1']['key'] => []];
+						$item_host = $graph['ymin_item_1']['host'];
+						$item_key = $graph['ymin_item_1']['key'];
+
+						if (!array_key_exists($item_host, $items_refs)
+								|| !array_key_exists($item_key, $items_refs[$item_host])) {
+							$items_refs[$item_host][$item_key] = [];
+						}
 					}
 
 					if ($graph['ymax_item_1']) {
-						$items_refs[$graph['ymax_item_1']['host']] += [$graph['ymax_item_1']['key'] => []];
+						$item_host = $graph['ymax_item_1']['host'];
+						$item_key = $graph['ymax_item_1']['key'];
+
+						if (!array_key_exists($item_host, $items_refs)
+								|| !array_key_exists($item_key, $items_refs[$item_host])) {
+							$items_refs[$item_host][$item_key] = [];
+						}
 					}
 
 					foreach ($graph['gitems'] as $gitem) {
-						if (!array_key_exists($gitem['item']['host'], $templates_refs)) {
-							$hosts_refs[$gitem['item']['host']] = [];
+						$item_host = $gitem['item']['host'];
+						$item_key = $gitem['item']['key'];
+
+						if (!array_key_exists($item_host, $templates_refs)) {
+							$hosts_refs[$item_host] = [];
 						}
 
-						$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
-						$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
+						if (!array_key_exists($item_host, $items_refs)
+								|| !array_key_exists($item_key, $items_refs[$item_host])) {
+							$items_refs[$item_host][$item_key] = [];
+						}
+
+						$graphs_refs[$item_host][$graph['name']] = array_key_exists('uuid', $graph)
 							? ['uuid' => $graph['uuid']]
 							: [];
 					}
@@ -340,28 +359,47 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedGraphs() as $graph) {
 			if ($graph['ymin_item_1']) {
-				if (!array_key_exists($graph['ymin_item_1']['host'], $templates_refs)) {
-					$hosts_refs[$graph['ymin_item_1']['host']] = [];
+				$item_host = $graph['ymin_item_1']['host'];
+				$item_key = $graph['ymin_item_1']['key'];
+
+				if (!array_key_exists($item_host, $templates_refs)) {
+					$hosts_refs[$item_host] = [];
 				}
 
-				$items_refs[$graph['ymin_item_1']['host']] += [$graph['ymin_item_1']['key'] => []];
+				if (!array_key_exists($item_host, $items_refs)
+						|| !array_key_exists($item_key, $items_refs[$item_host])) {
+					$items_refs[$item_host][$item_key] = [];
+				}
 			}
 
 			if ($graph['ymax_item_1']) {
-				if (!array_key_exists($graph['ymax_item_1']['host'], $templates_refs)) {
-					$hosts_refs[$graph['ymax_item_1']['host']] = [];
+				$item_host = $graph['ymax_item_1']['host'];
+				$item_key = $graph['ymax_item_1']['key'];
+
+				if (!array_key_exists($item_host, $templates_refs)) {
+					$hosts_refs[$item_host] = [];
 				}
 
-				$items_refs[$graph['ymax_item_1']['host']] += [$graph['ymax_item_1']['key'] => []];
+				if (!array_key_exists($item_host, $items_refs)
+						|| !array_key_exists($item_key, $items_refs[$item_host])) {
+					$items_refs[$item_host][$item_key] = [];
+				}
 			}
 
 			if (array_key_exists('gitems', $graph) && $graph['gitems']) {
 				foreach ($graph['gitems'] as $gitem) {
-					if (!array_key_exists($gitem['item']['host'], $templates_refs)) {
-						$hosts_refs[$gitem['item']['host']] = [];
+					$item_host = $gitem['item']['host'];
+					$item_key = $gitem['item']['key'];
+
+					if (!array_key_exists($item_host, $templates_refs)) {
+						$hosts_refs[$item_host] = [];
 					}
 
-					$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
+					if (!array_key_exists($item_host, $items_refs)
+							|| !array_key_exists($item_key, $items_refs[$item_host])) {
+						$items_refs[$item_host][$item_key] = [];
+					}
+
 					$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
 						? ['uuid' => $graph['uuid']]
 						: [];
@@ -393,8 +431,13 @@ class CConfigurationImport {
 		foreach ($this->getFormattedMaps() as $map) {
 			$maps_refs[$map['name']] = [];
 
-			if (!$map['iconmap']) {
+			if ($map['iconmap'] && array_key_exists('name', $map['iconmap']) && $map['iconmap']['name'] !== '') {
 				$iconmaps_refs[$map['iconmap']['name']] = [];
+			}
+
+			if ($map['background'] && array_key_exists('name', $map['background'])
+					&& $map['background']['name'] !== '') {
+				$images_refs[$map['background']['name']] = [];
 			}
 
 			if (array_key_exists('selements', $map)) {
@@ -414,8 +457,16 @@ class CConfigurationImport {
 
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
 							foreach ($selement['elements'] as $element) {
-								$triggers_refs[$element['description']][$element['expression']]
-									+= [$element['recovery_expression'] => []];
+								$description = $element['description'];
+								$expression = $element['expression'];
+								$recovery_expression = $element['recovery_expression'];
+
+								if (!array_key_exists($description, $triggers_refs)
+										|| !array_key_exists($expression, $triggers_refs[$description])
+										|| !array_key_exists($recovery_expression,
+											$triggers_refs[$description][$expression])) {
+									$triggers_refs[$description][$expression][$recovery_expression] = [];
+								}
 							}
 							break;
 					}
@@ -426,8 +477,17 @@ class CConfigurationImport {
 				foreach ($map['links'] as $link) {
 					if (array_key_exists('linktriggers', $link)) {
 						foreach ($link['linktriggers'] as $link_trigger) {
-							$t = $link_trigger['trigger'];
-							$triggers_refs[$t['description']][$t['expression']] += [$t['recovery_expression'] => []];
+							$description = $link_trigger['trigger']['description'];
+							$expression = $link_trigger['trigger']['expression'];
+							$recovery_expression = $link_trigger['trigger']['recovery_expression'];
+
+							if (!array_key_exists($description, $triggers_refs)
+									|| !array_key_exists($expression, $triggers_refs[$description])
+									|| !array_key_exists($recovery_expression,
+										$triggers_refs[$description][$expression])) {
+								$triggers_refs[$description][$expression][$recovery_expression] = [];
+							}
+
 						}
 					}
 				}
@@ -455,13 +515,21 @@ class CConfigurationImport {
 								case ZBX_WIDGET_FIELD_TYPE_ITEM:
 								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 									$templates_refs += [$value['host'] => []];
-									$items_refs[$value['host']] += [$value['key'] => []];
+
+									if (!array_key_exists($value['host'], $items_refs)
+											|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
+										$items_refs[$value['host']][$value['key']] = [];
+									}
 									break;
 
 								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 									$templates_refs += [$value['host'] => []];
-									$graphs_refs[$value['host']] += [$value['name'] => []];
+
+									if (!array_key_exists($value['host'], $graphs_refs)
+											|| !array_key_exists($value['key'], $graphs_refs[$value['host']])) {
+										$graphs_refs[$value['host']][$value['key']] = [];
+									}
 									break;
 							}
 						}
@@ -486,14 +554,19 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedImages() as $image) {
+			$images_refs[$image['name']] = [];
+		}
+
 		$this->referencer->addGroups($groups_refs);
 		$this->referencer->addTemplates($templates_refs);
 		$this->referencer->addHosts($hosts_refs);
 		$this->referencer->addItems($items_refs);
-		$this->referencer->addValueMaps($valuemaps_refs);
+		$this->referencer->addValuemaps($valuemaps_refs);
 		$this->referencer->addTriggers($triggers_refs);
 		$this->referencer->addGraphs($graphs_refs);
-		$this->referencer->addIconMaps($iconmaps_refs);
+		$this->referencer->addIconmaps($iconmaps_refs);
+		$this->referencer->addImages($images_refs);
 		$this->referencer->addMaps($maps_refs);
 		$this->referencer->addTemplateDashboards($template_dashboards_refs);
 		$this->referencer->addMacros($macros_refs);
@@ -754,8 +827,7 @@ class CConfigurationImport {
 			$created_items = $api_service->create($items_to_create);
 
 			foreach ($items_to_create as $index => $item) {
-				$item['itemid'] = $created_items['itemids'][$index];
-				$this->referencer->setDbItem($item);
+				$this->referencer->setDbItem($created_items['itemids'][$index], $item);
 			}
 		}
 	}
@@ -795,8 +867,7 @@ class CConfigurationImport {
 			}, $items_to_update));
 
 			foreach ($items_to_update as $index => $item) {
-				$item['itemid'] = $updated_items['itemids'][$index];
-				$this->referencer->setDbItem($item);
+				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
 			}
 		}
 	}
@@ -1352,7 +1423,7 @@ class CConfigurationImport {
 
 			foreach ($updated_triggers['triggerids'] as $index => $triggerid) {
 				$trigger = $triggers_to_update[$index];
-				$this->referencer->setDbTrigger($trigger + ['triggerid' => $triggerid]);
+				$this->referencer->setDbTrigger($triggerid, $trigger);
 			}
 		}
 
@@ -1361,7 +1432,7 @@ class CConfigurationImport {
 
 			foreach ($created_triggers['triggerids'] as $index => $triggerid) {
 				$trigger = $triggers_to_create[$index];
-				$this->referencer->setDbTrigger($trigger + ['triggerid' => $triggerid]);
+				$this->referencer->setDbTrigger($triggerid, $trigger);
 			}
 		}
 
@@ -1711,20 +1782,14 @@ class CConfigurationImport {
 			return;
 		}
 
-		$images_to_import = zbx_toHash($images_to_import, 'name');
-
-		$db_images = API::Image()->get([
-			'output' => ['imageid', 'name'],
-			'filter' => ['name' => array_keys($images_to_import)]
-		]);
-		$db_images = zbx_toHash($db_images, 'name');
-
 		$images_to_update = [];
 		$images_to_create = [];
 
-		foreach ($images_to_import as $image_name => $image) {
-			if (array_key_exists($image_name, $db_images)) {
-				$image['imageid'] = $db_images[$image_name]['imageid'];
+		foreach ($images_to_import as $image) {
+			$imageid = $this->referencer->findImageidByName($image['name']);
+
+			if ($imageid !== null) {
+				$image['imageid'] = $imageid;
 				unset($image['imagetype']);
 				$images_to_update[] = $image;
 			}
@@ -1738,16 +1803,23 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['images']['createMissing'] && $images_to_create) {
-			API::Image()->create($images_to_create);
+			$created_images = API::Image()->create($images_to_create);
+
+			foreach ($images_to_create as $index => $image) {
+				$this->referencer->setDbImage($created_images['imageids'][$index], $image);
+			}
 		}
 	}
 
 	/**
 	 * Import maps.
+	 *
+	 * @throws Exception
 	 */
-	protected function processMaps() {
+	protected function processMaps(): void {
 		if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
 			$maps = $this->getFormattedMaps();
+
 			if ($maps) {
 				$mapImporter = new CMapImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$mapImporter->import($maps);
@@ -2561,7 +2633,7 @@ class CConfigurationImport {
 				foreach ($db_items as $itemid => $item) {
 					$host_name = array_search($item['hostid'], $host_name_to_hostid);
 
-					$this->referencer->setDbItem($item);
+					$this->referencer->setDbItem($itemid, $item);
 
 					$item['key'] = $item['key_'];
 					unset($item['key_']);
