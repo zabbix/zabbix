@@ -79,23 +79,23 @@ class CValueMapHelper {
 	 */
 	static public function matchMapping($value_type, string $value, array $mapping): bool {
 		$match_numeric = ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64);
-		$return = false;
+		$result = false;
 
 		switch ($mapping['type']) {
 			case VALUEMAP_MAPPING_TYPE_EQUAL:
-				$return = $match_numeric
+				$result = $match_numeric
 					? (floatval($value) == floatval($mapping['value']))
 					: ($value === $mapping['value']);
 
 				break;
 
 			case VALUEMAP_MAPPING_TYPE_GREATER_EQUAL:
-				$return = ($match_numeric && floatval($value) >= floatval($mapping['value']));
+				$result = ($match_numeric && floatval($value) >= floatval($mapping['value']));
 
 				break;
 
 			case VALUEMAP_MAPPING_TYPE_LESS_EQUAL:
-				$return = ($match_numeric && floatval($value) <= floatval($mapping['value']));
+				$result = ($match_numeric && floatval($value) <= floatval($mapping['value']));
 
 				break;
 
@@ -113,7 +113,7 @@ class CValueMapHelper {
 						if ($value == floatval($ranges[0])
 								|| (count($ranges) == 2 && $value >= floatval($ranges[0])
 								&& $value <= floatval($ranges[1]))) {
-							$return = true;
+							$result = true;
 
 							break;
 						}
@@ -123,17 +123,17 @@ class CValueMapHelper {
 				break;
 
 			case VALUEMAP_MAPPING_TYPE_REGEXP:
-				$return = (!$match_numeric
+				$result = (!$match_numeric
 					&& @preg_match('/'.str_replace('/', '\/', $mapping['value']).'/', $value) == 1);
 
 				break;
 
 			case VALUEMAP_MAPPING_TYPE_DEFAULT:
-				$return = true;
+				$result = true;
 
 				break;
 		}
 
-		return $return;
+		return $result;
 	}
 }

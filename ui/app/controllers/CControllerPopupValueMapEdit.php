@@ -67,9 +67,27 @@ class CControllerPopupValueMapEdit extends CController {
 		$this->getInputs($data, array_keys($data));
 
 		if (!$data['mappings']) {
-			$data['mappings'][] = ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
+			$mappings = ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
+		}
+		else {
+			$mappings = [];
+			$default = [];
+
+			foreach ($data['mappings'] as $mapping) {
+				if ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {
+					$default = $mapping;
+				}
+				else {
+					$mappings[] = $mapping;
+				}
+			}
+
+			if ($default) {
+				$mappings[] = $default;
+			}
 		}
 
+		$data['mappings'] = $mappings;
 		$data += [
 			'title' => _('Value mapping'),
 			'user' => [

@@ -1360,7 +1360,7 @@ class CControllerPopupGeneric extends CController {
 						'id' => $db_valuemap['valuemapid'],
 						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
-						'mappings' => $db_valuemap['mappings'],
+						'mappings' => array_values($db_valuemap['mappings']),
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
 					];
 
