@@ -51,6 +51,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	int				ret, expected_ret;
 	char				value[ZBX_VALUEMAP_STRING_LEN], *newvalue;
+	unsigned char			value_type;
 	zbx_vector_valuemaps_ptr_t	valuemaps;
 	zbx_valuemaps_t			*valuemap;
 	zbx_mock_handle_t		hvaluemaps, handle;
@@ -78,10 +79,11 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_snprintf(value, ZBX_VALUEMAP_STRING_LEN, "%s", zbx_mock_get_parameter_string("in.value"));
+	value_type = (unsigned char)zbx_mock_get_parameter_uint64("in.type");
 	newvalue = (char *)zbx_mock_get_parameter_string("out.value");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	ret = evaluate_value_by_map_test(value, sizeof(value), &valuemaps);
+	ret = evaluate_value_by_map_test(value, sizeof(value), &valuemaps, value_type);
 
 	zbx_mock_assert_int_eq("valuemaps return value", expected_ret, ret);
 	zbx_mock_assert_str_eq("new value", newvalue, value);

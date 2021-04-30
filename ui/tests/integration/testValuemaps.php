@@ -135,7 +135,6 @@ class testValuemaps extends CIntegrationTest {
 				'mappings' => [
 					[
 						'value' => '-1.2e-1K--3e1, -10, -7--5, -1-1, 5-7.8K',
-						///'value' => '-1.2288e2--30, -10, -7--5, -1-1, 5-7987.2',
 						'newvalue' => 'Range',
 						'type' => VALUEMAP_MAPPING_TYPE_IN_RANGE
 					],
@@ -150,86 +149,103 @@ class testValuemaps extends CIntegrationTest {
 		return [
 			[
 				'inputData' => '1',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['exactMatch'],
 				'outputData' => 'Value 1 (1)'
 			],
 			[
 				'inputData' => '0',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['exactMatch'],
 				'outputData' => 'Value 0 (0)'
 			],
 			[
 				'inputData' => '2',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['exactMatch'],
 				'outputData' => '2'
 			],
 			[
 				'inputData' => '0',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Value 0 (0)'
 			],
 			[
 				'inputData' => '1',
+				'inputType'=> ITEM_VALUE_TYPE_STR,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Regexp 1 (1)'
 			],
 			[
 				'inputData' => '3',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Value <= 3 (3)'
 			],
 			[
 				'inputData' => '5',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Range 5-7,8 (5)'
 			],
 			[
 				'inputData' => '8',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Range 5-7,8 (8)'
 			],
 			[
 				'inputData' => '9',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => '9'
 			],
 			[
 				'inputData' => '10',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
 				'outputData' => 'Value >= 10 (10)'
 			],
 			[
 				'inputData' => '-123',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Default (-123)'
 			],
 			[
 				'inputData' => '-122.88',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Range (-122.88)'
 			],
 			[
 				'inputData' => '-30',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Range (-30)'
 			],
 			[
 				'inputData' => '0',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Range (0)'
 			],
 			[
 				'inputData' => '7987.2',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Range (7987.2)'
 			],
 			[
 				'inputData' => '7988',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Default (7988)'
 			],
 			[
 				'inputData' => '4',
+				'inputType'=> ITEM_VALUE_TYPE_FLOAT,
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
 				'outputData' => 'Default (4)'
 			]
@@ -241,7 +257,7 @@ class testValuemaps extends CIntegrationTest {
 	 *
 	 * @dataProvider getValuemaps
 	 */
-	public function testValuemaps_checkProblemName($inputData, $valuemap, $outputData) {
+	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {
 		$valuemap['hostid'] = self::$hostid;
 		$response = $this->call('valuemap.create', $valuemap);
 		$this->assertArrayHasKey('valuemapids', $response['result']);
@@ -250,7 +266,8 @@ class testValuemaps extends CIntegrationTest {
 
 		$response = $this->call('item.update', [
 				'itemid' => self::$itemid[0],
-				'valuemapid' => $valuemapid[0]
+				'valuemapid' => $valuemapid[0],
+				'value_type' => $inputType
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));

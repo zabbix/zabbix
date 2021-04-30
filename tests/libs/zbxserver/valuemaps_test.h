@@ -20,6 +20,7 @@
 #ifndef VALUEMAPS_TEST_H
 #define VALUEMAPS_TEST_H
 
-int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps);
+int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
+		unsigned char value_type);
 
 #endif

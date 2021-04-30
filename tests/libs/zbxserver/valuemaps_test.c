@@ -19,8 +19,9 @@
 
 #include "valuemaps_test.h"
 
-int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps)
+int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
+		unsigned char value_type)
 {
-	return evaluate_value_by_map(value, max_len, valuemaps);
+	return evaluate_value_by_map(value, max_len, valuemaps, value_type);
 }
 

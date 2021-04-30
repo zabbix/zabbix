@@ -3316,12 +3316,14 @@ static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
  * Parameters: value - value for replacing                                    *
  *             max_len - maximal length of output value                       *
  *             valuemaps - vector of vales mapped                             *
+ *             value_type - type of input value                               *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps)
+static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
+		unsigned char value_type)
 {
 	char		*value_tmp;
 	int		i, ret = FAIL;
@@ -3336,10 +3338,24 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
-		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type && 0 == strcmp(valuemap->value, value))
-			goto map_value;
+		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type)
+		{
+			if (ITEM_VALUE_TYPE_STR != value_type)
+			{
+				double	num1, num2;
 
-		if (ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
+				if (ZBX_INFINITY != (num1 = evaluate_string_to_double(value)) &&
+						ZBX_INFINITY != (num2 = evaluate_string_to_double(valuemap->value)) &&
+						SUCCEED == zbx_double_compare(num1, num2))
+				{
+					goto map_value;
+				}
+			}
+			else if (0 == strcmp(valuemap->value, value))
+				goto map_value;
+		}
+
+		if (ITEM_VALUE_TYPE_STR == value_type && ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
 		{
 			zbx_vector_ptr_create(&regexps);
 
@@ -3354,7 +3370,8 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 				goto map_value;
 		}
 
-		if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
+		if (ITEM_VALUE_TYPE_STR != value_type &&
+				ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
 		{
 			double	min, max;
 
@@ -3474,12 +3491,13 @@ map_value:
  * Parameters: value - value for replacing                                    *
  *             max_len - maximal length of output value                       *
  *             valuemapid - index of value map                                *
+ *             value_type - type of input value                               *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  ******************************************************************************/
-static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
+static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid, unsigned char value_type)
 {
 	int				ret = FAIL;
 	DB_RESULT			result;
@@ -3514,7 +3532,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	DBfree_result(result);
 
-	ret = evaluate_value_by_map(value, max_len, &valuemaps);
+	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
 
 	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
 	zbx_vector_valuemaps_ptr_destroy(&valuemaps);
@@ -3544,13 +3562,13 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
-			replace_value_by_map(value, max_len, valuemapid);
+			replace_value_by_map(value, max_len, valuemapid, value_type);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeros(value);
 			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
+			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid, value_type))
 				add_value_suffix(value, max_len, units, value_type);
 			break;
 		default:
