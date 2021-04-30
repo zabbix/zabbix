@@ -81,7 +81,9 @@ final class CHistFunctionData {
 		],
 		'last_foreach' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false,
+				'mode' => self::PERIOD_MODE_SEC_POSITIVE
+			]
 		],
 		'logeventid' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
