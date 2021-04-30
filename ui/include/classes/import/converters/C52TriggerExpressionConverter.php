@@ -311,9 +311,10 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'strlen':
 			case 'last':
 				$parameters += ['', ''];
-				if (substr($parameters[0], 0, 1) !== '#'
-						|| !ctype_digit(substr($parameters[0], 1))
-						|| (int) substr($parameters[0], 1) === 0) {
+				if (!self::isUserMacro($parameters[0])
+						&& (substr($parameters[0], 0, 1) !== '#'
+							|| !ctype_digit(substr($parameters[0], 1))
+							|| (int) substr($parameters[0], 1) === 0)) {
 					$parameters[0] = '';
 				}
 
@@ -341,9 +342,10 @@ class C52TriggerExpressionConverter extends CConverter {
 			// (<sec|#num>,mask,<time_shift>)
 			case 'band':
 				$parameters += ['', '', ''];
-				if (substr($parameters[0], 0, 1) !== '#'
-						|| !ctype_digit(substr($parameters[0], 1))
-						|| (int) substr($parameters[0], 1) === 0) {
+				if (!self::isUserMacro($parameters[0])
+						&& (substr($parameters[0], 0, 1) !== '#'
+							|| !ctype_digit(substr($parameters[0], 1))
+							|| (int) substr($parameters[0], 1) === 0)) {
 					$parameters[0] = '';
 				}
 
@@ -398,7 +400,12 @@ class C52TriggerExpressionConverter extends CConverter {
 					($fn_name === 'str') ? 'like' : $fn_name,
 					$parameters[0]
 				];
-				unset($param_dets['unquotable'][1], $param_dets['indicated'][1]);
+				unset($param_dets['unquotable'][1]);
+				if (array_key_exists(0, $param_dets['indicated'])) {
+					$param_dets['indicated'][2] = true;
+					unset($param_dets['indicated'][0]);
+				}
+
 				break;
 
 			// (period,period_shift)
@@ -706,5 +713,18 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check if given string is valid user macro.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private static function isUserMacro(string $param): bool {
+		$user_macro_parser = new CUserMacroParser();
+
+		return ($user_macro_parser->parse($param) == CParser::PARSE_SUCCESS);
 	}
 }
