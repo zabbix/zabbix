@@ -22,7 +22,7 @@ This template works with standalone and domain instances.
 2. Copy jboss-client.jar from `/(wildfly,EAP,Jboss,AS)/bin/client` in to directory `/usr/share/zabbix-java-gateway/lib`
 3. Restart Zabbix Java gateway
 4. Set the user name and password in host macros {$WILDFLY.USER} and {$WILDFLY.PASSWORD}.
-Depending on your server setup, you may need to specify a custom JMX scheme in macro {$WILDFLY.JMX.PROTOCOL} (defailt: remote+http)
+Depending on your server setup, you may need to specify a custom JMX scheme in macro {$WILDFLY.JMX.PROTOCOL} (default: remote+http)
 
 
 ## Zabbix configuration
