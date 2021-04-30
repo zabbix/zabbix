@@ -60,7 +60,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*uri, newTlsDetails(params["sessionName"], params["DBTLSConnect"],
+		params["TLSCaFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"]))
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.

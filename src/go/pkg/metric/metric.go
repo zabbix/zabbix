@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -393,6 +394,8 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 		if err = mergeWithSessionData(params, m.params, session); err != nil {
 			return nil, err
 		}
+
+		params["sessionName"] = rawParams[0]
 	}
 
 	return params, nil

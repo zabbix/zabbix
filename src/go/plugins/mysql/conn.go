@@ -21,7 +21,11 @@ package mysql
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
+	"errors"
+	"io/ioutil"
 	"sync"
 	"time"
 
@@ -41,6 +45,15 @@ type MyClient interface {
 type MyConn struct {
 	client         *sql.DB
 	lastTimeAccess time.Time
+}
+
+type tlsDetails struct {
+	sessionName string
+	tlsConnect  string
+	tlsCaFile   string
+	tlsCertFile string
+	tlsKeyFile  string
+	rawUri      string
 }
 
 func (conn *MyConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
@@ -140,7 +153,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsDetails) (*MyConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -157,6 +170,10 @@ func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
 	config.Timeout = c.connectTimeout
 	config.ReadTimeout = c.callTimeout
 	config.InterpolateParams = true
+
+	if err := registerTLSConfig(config, details); err != nil {
+		return nil, err
+	}
 
 	connector, err := mysql.NewConnector(config)
 
@@ -176,6 +193,58 @@ func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
 	return c.connections[uri], nil
 }
 
+func registerTLSConfig(config *mysql.Config, details tlsDetails) error {
+	switch details.tlsConnect {
+	case "required":
+		mysql.RegisterTLSConfig(details.sessionName, &tls.Config{InsecureSkipVerify: true})
+	case "verify_ca":
+		conf, err := createTlsConfig(details, true)
+		if err != nil {
+			return err
+		}
+
+		mysql.RegisterTLSConfig(details.sessionName, conf)
+	case "verify_full":
+		conf, err := createTlsConfig(details, false)
+		if err != nil {
+			return err
+		}
+
+		mysql.RegisterTLSConfig(details.sessionName, conf)
+	default:
+		return nil
+	}
+
+	config.TLSConfig = details.sessionName
+	return nil
+}
+
+func createTlsConfig(details tlsDetails, skipVerify bool) (*tls.Config, error) {
+	rootCertPool := x509.NewCertPool()
+	pem, err := ioutil.ReadFile(details.tlsCaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		return nil, errors.New("Failed to append PEM")
+	}
+
+	clientCerts := make([]tls.Certificate, 0, 1)
+	certs, err := tls.LoadX509KeyPair(details.tlsCertFile, details.tlsKeyFile)
+	if err != nil {
+		return nil, err
+	}
+
+	clientCerts = append(clientCerts, certs)
+
+	if skipVerify {
+		return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify}, nil
+	}
+
+	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: details.rawUri}, nil
+}
+
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
 func (c *ConnManager) get(uri uri.URI) *MyConn {
 	c.connMutex.Lock()
@@ -190,14 +259,14 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsDetails) (conn *MyConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri)
+		conn, err = c.create(uri, details)
 	}
 
 	if err != nil {
@@ -205,4 +274,9 @@ func (c *ConnManager) GetConnection(uri uri.URI) (conn *MyConn, err error) {
 	}
 
 	return
+}
+
+func newTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) tlsDetails {
+	//TODO add validation here
+	return tlsDetails{session, dbConnect, caFile, certFile, keyFile, uri}
 }
