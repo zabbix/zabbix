@@ -5345,9 +5345,24 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	}
 	else if (0 == strcmp(function->name, "strlen"))
 	{
+		int	secnum = 0;
+
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
+
 		dbpatch_convert_params(&parameter, function->parameter, &params,
-				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_HIST, secnum, 1,
 				ZBX_DBPATCH_ARG_NONE);
+
 		dbpatch_update_func_strlen(function, parameter, replace);
 	}
 	else if (0 == strcmp(function->name, "logeventid") || 0 == strcmp(function->name, "logsource"))
