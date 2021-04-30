@@ -794,6 +794,12 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		foreach ($triggers as $trigger) {
+			if (!check_db_fields(['triggerid' => null], $trigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+		}
+
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$triggerids = array_keys(array_flip($triggerids));
 
@@ -842,7 +848,7 @@ class CTrigger extends CTriggerGeneral {
 
 		try {
 			// delete the dependencies from the child triggers
-			$childTriggers = API::getApiService()->select($this->tableName(), [
+			$childTriggers = DB::select($this->tableName(), [
 				'output' => ['triggerid'],
 				'filter' => [
 					'templateid' => $triggerids
