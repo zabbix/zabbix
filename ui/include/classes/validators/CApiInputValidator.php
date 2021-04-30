@@ -344,25 +344,12 @@ class CApiInputValidator {
 			return false;
 		}
 
-//		$validator = new CFunctionValidator(['calculated' => true]);
-//		$math_validator = new CMathFunctionValidator(['calculated' => true]);
-//		$skip_valid = $data;
+		$expression_validator = new CExpressionValidator(['calculated' => true]);
 
-//		foreach ($result->getFunctions() as $func) {
-//			if ($math_validator->validate($func)) {
-//				/**
-//				 * Replace validated math functions with space to not validate functions in parameters
-//				 * as standalone functions. Example:
-//				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
-//				 */
-//				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
-//			}
-//			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
-//				$error = $validator->getError();
-
-//				return false;
-//			}
-//		}
+		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
+			return false;
+		}
 
 		return true;
 	}

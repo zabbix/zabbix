@@ -166,6 +166,44 @@ final class CHistFunctionData {
 		]
 	];
 
+	private const ITEM_VALUE_TYPES_INT = [ITEM_VALUE_TYPE_UINT64];
+	private const ITEM_VALUE_TYPES_NUM = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+	private const ITEM_VALUE_TYPES_STR = [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG];
+	private const ITEM_VALUE_TYPES_LOG = [ITEM_VALUE_TYPE_LOG];
+	private const ITEM_VALUE_TYPES_ALL = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG
+	];
+
+	private const VALUE_TYPES = [
+		'avg' => self::ITEM_VALUE_TYPES_NUM,
+		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'count' => self::ITEM_VALUE_TYPES_ALL,
+		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
+		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'find' => self::ITEM_VALUE_TYPES_STR,
+		'forecast' => self::ITEM_VALUE_TYPES_NUM,
+		'fuzzytime' => self::ITEM_VALUE_TYPES_NUM,
+		'last' => self::ITEM_VALUE_TYPES_ALL,
+		'last_foreach' => self::ITEM_VALUE_TYPES_ALL,
+		'logeventid' => self::ITEM_VALUE_TYPES_LOG,
+		'logseverity' => self::ITEM_VALUE_TYPES_LOG,
+		'logsource' => self::ITEM_VALUE_TYPES_LOG,
+		'max' => self::ITEM_VALUE_TYPES_NUM,
+		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'min' => self::ITEM_VALUE_TYPES_NUM,
+		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'nodata' => self::ITEM_VALUE_TYPES_ALL,
+		'percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'sum' => self::ITEM_VALUE_TYPES_NUM,
+		'sum_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
+		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'trendcount' => self::ITEM_VALUE_TYPES_ALL,
+		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
+		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendsum' => self::ITEM_VALUE_TYPES_NUM
+	];
+
 	/**
 	 * An options array.
 	 *
@@ -214,6 +252,24 @@ final class CHistFunctionData {
 			}
 
 			$result[$function] = $parameters;
+		}
+
+		return $result;
+	}
+
+	public function getValueTypes(): array {
+		if ($this->options['calculated']) {
+			return self::VALUE_TYPES;
+		}
+
+		$result = [];
+
+		foreach (self::VALUE_TYPES as $function => $value_types) {
+			if (self::isCalculated($function)) {
+				continue;
+			}
+
+			$result[$function] = $value_types;
 		}
 
 		return $result;

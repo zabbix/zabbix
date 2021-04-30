@@ -845,30 +845,13 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 
 				if (array_key_exists('expression', $data)) {
-					// Validate trigger expression.
+					// Parse and validate trigger expression.
 					if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-						// Validate trigger function.
-//						$math_function_validator = new CMathFunctionValidator();
-//						$trigger_function_validator = new CFunctionValidator();
-//						$fn = $result->getTokens()[0];
-//						$errors = [];
+						$expression_validator = new CExpressionValidator();
 
-//						if (!$math_function_validator->validate($fn)) {
-//							$errors[$math_function_validator->error_pos] = $math_function_validator->getError();
-
-//							if (!$trigger_function_validator->validate($fn)
-//									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
-//								$errors[$trigger_function_validator->error_pos]
-//									= $trigger_function_validator->getError();
-//							}
-//							else {
-//								$errors = [];
-//							}
-//						}
-
-//						if ($errors) {
-//							error($errors[max(array_keys($errors))]);
-//						}
+						if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+							error($expression_validator->getError());
+						}
 					}
 					else {
 						error($expression_parser->getError());

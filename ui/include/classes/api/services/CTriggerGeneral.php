@@ -1368,24 +1368,22 @@ abstract class CTriggerGeneral extends CApiService {
 
 		switch ($class) {
 			case 'CTrigger':
-				$expression_parser = new CExpressionParser([]);
+				$expression_parser = new CExpressionParser();
 				$error_wrong_host = _('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.');
-//				$trigger_function_validator = new CFunctionValidator(['lldmacros' => false]);
-//				$math_function_validator = new CMathFunctionValidator(['lldmacros' => false]);
 				break;
 
 			case 'CTriggerPrototype':
 				$expression_parser = new CExpressionParser(['lldmacros' => true]);
 				$error_wrong_host = _('Incorrect trigger prototype expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously.');
-//				$trigger_function_validator = new CFunctionValidator();
-//				$math_function_validator = new CMathFunctionValidator();
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
+
+		$hist_function_value_types = (new CHistFunctionData())->getValueTypes();
 
 		/*
 		 * [
@@ -1599,15 +1597,13 @@ abstract class CTriggerGeneral extends CApiService {
 						$host_keys['host']
 					));
 				}
-/*
-				if (!$triggerFunctionValidator->validate([
-						'function' => $exprPart['function'],
-						'functionName' => $exprPart['functionName'],
-						'functionParamList' => $exprPart['functionParamList'],
-						'valueType' => $key['value_type']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerFunctionValidator->getError());
+
+				if (!in_array($key['value_type'], $hist_function_value_types[$hist_function['data']['function']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect item value type "%1$s" provided for trigger function "%2$s".',
+						itemValueTypeString($key['value_type']), $hist_function['data']['function']
+					));
 				}
-*/
 
 				if (!array_key_exists($hist_function['match'], $triggers_functions[$tnum])) {
 					$query_parameter = $hist_function['data']['parameters'][0];
