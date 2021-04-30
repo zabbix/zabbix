@@ -40,7 +40,8 @@ class CRelativeTimeParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => false  Enable low-level discovery macros usage in the periods.
+	 *   'usermacros' => false  Enable user macros usage in the periods.
+	 *   'lldmacros' => false   Enable low-level discovery macros usage in the periods.
 	 *
 	 * @var array
 	 */
