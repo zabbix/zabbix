@@ -93,7 +93,6 @@ if ($hostId > 0) {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectInventory' => $inventoryFields,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'hostids' => $hostId,

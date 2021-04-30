@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-03-02T19:42:22Z'
+  date: '2021-04-22T11:27:23Z'
   groups:
     -
       name: Templates/Applications
@@ -26,11 +26,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: HAProxy
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'HAProxy: Get stats'
@@ -43,9 +38,6 @@ zabbix_export:
           username: '{$HAPROXY.USERNAME}'
           password: '{$HAPROXY.PASSWORD}'
           description: 'HAProxy Statistics Report in CSV format'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: REGEX
@@ -59,6 +51,10 @@ zabbix_export:
                 - ''
                 - '1'
           url: '{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'HAProxy: Get stats page'
           type: HTTP_AGENT
@@ -70,10 +66,11 @@ zabbix_export:
           username: '{$HAPROXY.USERNAME}'
           password: '{$HAPROXY.PASSWORD}'
           description: 'HAProxy Statistics Report HTML'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'HAProxy: Uptime'
           type: DEPENDENT
@@ -82,9 +79,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
-            -
-              name: HAProxy
           preprocessing:
             -
               type: JAVASCRIPT
@@ -99,6 +93,10 @@ zabbix_export:
                   }
           master_item:
             key: haproxy.get_html
+          tags:
+            -
+              tag: Application
+              value: HAProxy
           triggers:
             -
               expression: '{last()}<10m'
@@ -113,9 +111,6 @@ zabbix_export:
           delay: '0'
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: HAProxy
           preprocessing:
             -
               type: REGEX
@@ -130,6 +125,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: haproxy.get_html
+          tags:
+            -
+              tag: Application
+              value: HAProxy
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -144,9 +143,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: HAProxy
+              tag: Application
+              value: HAProxy
           triggers:
             -
               expression: '{min(5m)}>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
@@ -162,9 +162,6 @@ zabbix_export:
           type: SIMPLE
           key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
           history: 7d
-          applications:
-            -
-              name: HAProxy
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -172,6 +169,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: HAProxy
           triggers:
             -
               expression: '{last()}=0'
@@ -204,9 +205,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Responses denied due to security concerns (ACL-restricted).'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -218,6 +216,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
             -
               name: 'HAProxy Backend {#PXNAME}: Errors connection per second'
               type: DEPENDENT
@@ -225,9 +227,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -239,6 +238,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
             -
               name: 'HAProxy Backend {#PXNAME}: Response errors per second'
               type: DEPENDENT
@@ -246,9 +249,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests whose responses yielded an error'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -260,6 +260,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
@@ -273,9 +277,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Current number of requests unassigned in queue.'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -283,6 +284,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
@@ -298,9 +303,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -312,6 +314,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
@@ -327,9 +333,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average backend response time (in ms) for the last 1,024 requests'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -341,6 +344,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
@@ -353,9 +360,6 @@ zabbix_export:
               key: 'haproxy.backend.status[{#PXNAME}:{#SVNAME}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -373,6 +377,10 @@ zabbix_export:
                     - 10m
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{max(#5)}=0'
@@ -386,9 +394,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a request was redispatched to a different backend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -400,6 +405,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
             -
               name: 'HAProxy Backend {#PXNAME}: Retried connections per second'
               type: DEPENDENT
@@ -407,9 +416,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a connection was retried.'
-              application_prototypes:
-                -
-                  name: 'HAProxy backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -421,6 +427,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy backend {#PXNAME}'
           graph_prototypes:
             -
               name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
@@ -473,9 +483,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Responses denied due to security concerns (ACL-restricted).'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -487,6 +494,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
             -
               name: 'HAProxy TCP Backend {#PXNAME}: Errors connection per second'
               type: DEPENDENT
@@ -494,9 +505,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -508,6 +516,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
             -
               name: 'HAProxy TCP Backend {#PXNAME}: Response errors per second'
               type: DEPENDENT
@@ -515,9 +527,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests whose responses yielded an error'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -529,6 +538,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
@@ -542,9 +555,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Current number of requests unassigned in queue.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -552,6 +562,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
@@ -567,9 +581,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -581,6 +592,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
@@ -596,9 +611,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average backend response time (in ms) for the last 1,024 requests'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -610,6 +622,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
@@ -622,9 +638,6 @@ zabbix_export:
               key: 'haproxy.backend_tcp.status[{#PXNAME}:{#SVNAME}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -642,6 +655,10 @@ zabbix_export:
                     - 10m
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{max(#5)}=0'
@@ -655,9 +672,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a request was redispatched to a different backend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -669,6 +683,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
             -
               name: 'HAProxy TCP Backend {#PXNAME}: Retried connections per second'
               type: DEPENDENT
@@ -676,9 +694,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a connection was retried.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Backend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -690,6 +705,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Backend {#PXNAME}'
           graph_prototypes:
             -
               name: 'HAProxy: TCP Backend {#PXNAME} Redispatched requests and retried connections per second'
@@ -744,9 +763,6 @@ zabbix_export:
               value_type: FLOAT
               units: bps
               description: 'Number of bits received by the frontend'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -762,6 +778,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Outgoing traffic'
               type: DEPENDENT
@@ -770,9 +790,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'Number of bits sent by the frontend'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -788,6 +805,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Denied requests per second'
               type: DEPENDENT
@@ -795,9 +816,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Requests denied due to security concerns (ACL-restricted) per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -809,6 +827,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
@@ -822,9 +844,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of request errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -836,6 +855,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
@@ -849,9 +872,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of informational HTTP responses per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -863,6 +883,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 2xx per second'
               type: DEPENDENT
@@ -870,9 +894,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of successful HTTP responses per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -884,6 +905,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 3xx per second'
               type: DEPENDENT
@@ -891,9 +916,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of HTTP redirections per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -905,6 +927,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 4xx per second'
               type: DEPENDENT
@@ -912,9 +938,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of HTTP client errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -926,6 +949,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 5xx per second'
               type: DEPENDENT
@@ -933,9 +960,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of HTTP server errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -947,6 +971,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Sessions rate'
               type: DEPENDENT
@@ -954,9 +982,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of sessions created per second'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -964,6 +989,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].rate.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Requests rate'
               type: DEPENDENT
@@ -971,9 +1000,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'HTTP requests per second'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -981,6 +1007,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].req_rate.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Established sessions'
               type: DEPENDENT
@@ -988,9 +1018,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The current number of established sessions.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -998,6 +1025,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].scur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Session limits'
               type: DEPENDENT
@@ -1005,9 +1036,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The most simultaneous sessions that are allowed, as defined by the maxconn setting in the frontend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1019,6 +1047,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
             -
               name: 'HAProxy Frontend {#PXNAME}: Session utilization'
               type: CALCULATED
@@ -1028,9 +1060,10 @@ zabbix_export:
               units: '%'
               params: 'last(haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
-              application_prototypes:
+              tags:
                 -
-                  name: 'HAProxy frontend {#PXNAME}'
+                  tag: Application
+                  value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
@@ -1154,9 +1187,6 @@ zabbix_export:
               value_type: FLOAT
               units: bps
               description: 'Number of bits received by the frontend'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1172,6 +1202,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Outgoing traffic'
               type: DEPENDENT
@@ -1180,9 +1214,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'Number of bits sent by the frontend'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1198,6 +1229,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Denied requests per second'
               type: DEPENDENT
@@ -1205,9 +1240,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Requests denied due to security concerns (ACL-restricted) per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1219,6 +1251,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
@@ -1232,9 +1268,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of request errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1246,6 +1279,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
@@ -1259,9 +1296,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of sessions created per second'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1269,6 +1303,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].rate.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Requests rate'
               type: DEPENDENT
@@ -1276,9 +1314,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'HTTP requests per second'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1286,6 +1321,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].req_rate.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Established sessions'
               type: DEPENDENT
@@ -1293,9 +1332,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The current number of established sessions.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1303,6 +1339,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].scur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Session limits'
               type: DEPENDENT
@@ -1310,9 +1350,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The most simultaneous sessions that are allowed, as defined by the maxconn setting in the frontend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1324,6 +1361,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
             -
               name: 'HAProxy TCP Frontend {#PXNAME}: Session utilization'
               type: CALCULATED
@@ -1333,9 +1374,10 @@ zabbix_export:
               units: '%'
               params: 'last(haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
-              application_prototypes:
+              tags:
                 -
-                  name: 'HAProxy TCP Frontend {#PXNAME}'
+                  tag: Application
+                  value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
@@ -1425,9 +1467,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Responses denied due to security concerns (ACL-restricted).'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1439,6 +1478,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy {#PXNAME} {#SVNAME}: Errors connection per second'
               type: DEPENDENT
@@ -1446,9 +1489,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1460,6 +1500,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy {#PXNAME} {#SVNAME}: Response errors per second'
               type: DEPENDENT
@@ -1467,9 +1511,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests whose responses yielded an error.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1481,6 +1522,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
@@ -1494,9 +1539,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of HTTP client errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1508,6 +1550,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 5xx per second'
               type: DEPENDENT
@@ -1515,9 +1561,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of HTTP server errors per second.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1529,6 +1572,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy {#PXNAME} {#SVNAME}: Unassigned requests'
               type: DEPENDENT
@@ -1536,9 +1583,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Current number of requests unassigned in queue.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1546,6 +1590,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
@@ -1561,9 +1609,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1575,6 +1620,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
@@ -1590,9 +1639,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average server response time (in ms) for the last 1,024 requests.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1604,6 +1650,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
@@ -1616,9 +1666,6 @@ zabbix_export:
               key: 'haproxy.server.status[{#PXNAME}:{#SVNAME}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -1636,6 +1683,10 @@ zabbix_export:
                     - 10m
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{max(#5)}=0'
@@ -1649,9 +1700,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a request was redispatched to a different backend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1663,6 +1711,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy {#PXNAME} {#SVNAME}: Retried connections per second'
               type: DEPENDENT
@@ -1670,9 +1722,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a connection was retried.'
-              application_prototypes:
-                -
-                  name: 'HAProxy {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1684,6 +1733,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy {#PXNAME} {#SVNAME}'
           graph_prototypes:
             -
               name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
@@ -1737,9 +1790,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Responses denied due to security concerns (ACL-restricted).'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1751,6 +1801,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Errors connection per second'
               type: DEPENDENT
@@ -1758,9 +1812,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1772,6 +1823,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Response errors per second'
               type: DEPENDENT
@@ -1779,9 +1834,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of requests whose responses yielded an error.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1793,6 +1845,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
@@ -1806,9 +1862,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Current number of requests unassigned in queue.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1816,6 +1869,10 @@ zabbix_export:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
@@ -1831,9 +1888,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1845,6 +1899,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
@@ -1860,9 +1918,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Average server response time (in ms) for the last 1,024 requests.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1874,6 +1929,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
@@ -1886,9 +1945,6 @@ zabbix_export:
               key: 'haproxy.server_tcp.status[{#PXNAME}:{#SVNAME}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -1906,6 +1962,10 @@ zabbix_export:
                     - 10m
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
                   expression: '{max(#5)}=0'
@@ -1919,9 +1979,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a request was redispatched to a different backend.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1933,6 +1990,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Retried connections per second'
               type: DEPENDENT
@@ -1940,9 +2001,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of times a connection was retried.'
-              application_prototypes:
-                -
-                  name: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1954,6 +2012,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: haproxy.get
+              tags:
+                -
+                  tag: Application
+                  value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
           graph_prototypes:
             -
               name: 'HAProxy: TCP {#PXNAME} {#SVNAME} Response time and time in queue'
@@ -2051,131 +2113,137 @@ zabbix_export:
       dashboards:
         -
           name: 'HAProxy Backend performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '24'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
-                    host: 'HAProxy by HTTP'
+                  width: '24'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
+                        host: 'HAProxy by HTTP'
         -
           name: 'HAProxy Frontend performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
-                    host: 'HAProxy by HTTP'
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
-                    host: 'HAProxy by HTTP'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
+                        host: 'HAProxy by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
-                    host: 'HAProxy by HTTP'
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  x: '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
+                        host: 'HAProxy by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
-                    host: 'HAProxy by HTTP'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
+                        host: 'HAProxy by HTTP'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
+                        host: 'HAProxy by HTTP'
         -
           name: 'HAProxy Server performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '24'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
-                    host: 'HAProxy by HTTP'
+                  width: '24'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
+                        host: 'HAProxy by HTTP'
       valuemaps:
         -
           name: 'Service state'

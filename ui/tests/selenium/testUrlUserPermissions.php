@@ -130,56 +130,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'screens.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screenconf.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200001',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200000',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'slideconf.php',
-				'title' =>	'Configuration of slide shows',
-				'header' =>	'Slide shows',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=map.view',
 				'title' =>	'Configuration of network maps',
 				'header' =>	'Maps',
@@ -371,16 +321,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'url' => 'hosts.php?groupid=0&form=Create+host',
 				'title' =>	'Configuration of hosts',
 				'header' => 'Hosts',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=application.list',
-				'title' =>	'Configuration of applications',
-				'header' => 'Applications',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

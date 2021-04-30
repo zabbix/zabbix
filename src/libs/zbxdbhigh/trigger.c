@@ -127,7 +127,8 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 	{
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL,
+				&trigger->timespec, new_state, NULL, trigger->expression,
+				trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
 				new_error);
 	}
 
@@ -697,6 +698,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 	zbx_eval_context_t	local_ctx;
 
 	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+	local_ctx.rules |= ZBX_EVAL_COMPOSE_MASK_ERROR;
 
 	for (i = 0; i < local_ctx.stack.values_num; i++)
 	{
@@ -731,30 +733,42 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 
 		DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
 
-		if (SUCCEED != err_func)
-			continue;
-
-		DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
-
-		if (SUCCEED == err_item)
+		if (SUCCEED == err_func)
 		{
-			char	*func = NULL;
-			size_t	func_alloc = 0, func_offset = 0;
+			DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
 
-			zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s",
-					function.function, item.host.host, item.key_orig);
+			if (SUCCEED == err_item)
+			{
+				char	*func = NULL;
+				size_t	func_alloc = 0, func_offset = 0;
 
-			if ('\0' != *function.parameter)
-				zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", function.parameter);
+				zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s",
+						function.function, item.host.host, item.key_orig);
 
-			zbx_chrcpy_alloc(&func, &func_alloc, &func_offset,')');
+				if ('\0' != *function.parameter)
+					zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", function.parameter);
 
-			zbx_variant_clear(&token->value);
-			zbx_variant_set_str(&token->value, func);
-			DCconfig_clean_items(&item, &err_item, 1);
+				zbx_chrcpy_alloc(&func, &func_alloc, &func_offset,')');
+
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_str(&token->value, func);
+				DCconfig_clean_items(&item, &err_item, 1);
+			}
+			else
+			{
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_error(&token->value, zbx_dsprintf(NULL, "item id:" ZBX_FS_UI64
+						" deleted", function.itemid));
+			}
+
+			DCconfig_clean_functions(&function, &err_func, 1);
 		}
-
-		DCconfig_clean_functions(&function, &err_func, 1);
+		else
+		{
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_error(&token->value, zbx_dsprintf(NULL, "function id:" ZBX_FS_UI64 " deleted",
+					functionid));
+		}
 	}
 
 	zbx_eval_compose_expression(&local_ctx, expression);

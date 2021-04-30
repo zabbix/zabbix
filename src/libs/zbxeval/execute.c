@@ -229,7 +229,7 @@ static int	eval_variant_compare(const zbx_variant_t *left, const zbx_variant_t *
  *             output   - [IN/OUT] the output value stack                     *
  *             error    - [OUT] the error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED - the oeprator was evaluated successfully            *
+ * Return value: SUCCEED - the operator was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -280,6 +280,13 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 	}
 
 	/* check logical equal, not equal operators */
+
+	if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+	{
+		*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
 
 	switch (token->type)
 	{
@@ -693,6 +700,12 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 		zbx_vector_var_t *output, char **error)
 {
 	int	i, ret;
+
+	if (0 == token->opt)
+	{
+		*error = zbx_dsprintf(*error, "no arguments for function at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
 
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;

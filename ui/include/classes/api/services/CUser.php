@@ -1253,36 +1253,6 @@ class CUser extends CApiService {
 			);
 		}
 
-		// Check if deleted users have a screen.
-		$db_screens = API::Screen()->get([
-			'output' => ['name', 'userid'],
-			'userids' => $userids,
-			'limit' => 1
-		]);
-
-		if ($db_screens) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User "%1$s" is screen "%2$s" owner.', $db_users[$db_screens[0]['userid']]['username'],
-					$db_screens[0]['name']
-				)
-			);
-		}
-
-		// Check if deleted users have a slide show.
-		$db_slideshows = DB::select('slideshows', [
-			'output' => ['name', 'userid'],
-			'filter' => ['userid' => $userids],
-			'limit' => 1
-		]);
-
-		if ($db_slideshows) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User "%1$s" is slide show "%2$s" owner.', $db_users[$db_slideshows[0]['userid']]['username'],
-					$db_slideshows[0]['name']
-				)
-			);
-		}
-
 		// Check if deleted users have dashboards.
 		$db_dashboards = API::Dashboard()->get([
 			'output' => ['name', 'userid'],
@@ -1296,6 +1266,51 @@ class CUser extends CApiService {
 					$db_dashboards[0]['name']
 				)
 			);
+		}
+
+		// Check if deleted users used in scheduled reports.
+		$db_reports = DBselect(
+			'SELECT r.name,r.userid,ru.userid AS recipientid,ru.access_userid AS user_creatorid,'.
+					'rug.access_userid AS usrgrp_creatorid'.
+			' FROM report r'.
+				' LEFT JOIN report_user ru ON r.reportid=ru.reportid'.
+				' LEFT JOIN report_usrgrp rug ON r.reportid=rug.reportid'.
+			' WHERE '.dbConditionInt('r.userid', $userids).
+				' OR '.dbConditionInt('ru.userid', $userids).
+				' OR '.dbConditionInt('ru.access_userid', $userids).
+				' OR '.dbConditionInt('rug.access_userid', $userids),
+			1
+		);
+
+		if ($db_report = DBfetch($db_reports)) {
+			if (array_key_exists($db_report['userid'], $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is report "%2$s" owner.', $db_users[$db_report['userid']]['username'],
+						$db_report['name']
+					)
+				);
+			}
+
+			if (array_key_exists($db_report['recipientid'], $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is report "%2$s" recipient.', $db_users[$db_report['recipientid']]['username'],
+						$db_report['name']
+					)
+				);
+			}
+
+			if (array_key_exists($db_report['user_creatorid'], $db_users)
+					|| array_key_exists($db_report['usrgrp_creatorid'], $db_users)) {
+				$creator = array_key_exists($db_report['user_creatorid'], $db_users)
+					? $db_users[$db_report['user_creatorid']]
+					: $db_users[$db_report['usrgrp_creatorid']];
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is user on whose behalf report "%2$s" is created.', $creator['username'],
+						$db_report['name']
+					)
+				);
+			}
 		}
 	}
 

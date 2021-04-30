@@ -170,7 +170,8 @@ loop:
 }
 
 var (
-	confDefault string
+	confDefault     string
+	applicationName string
 
 	argConfig  bool
 	argTest    bool
@@ -180,6 +181,8 @@ var (
 )
 
 func main() {
+	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
+
 	var confFlag string
 	const (
 		confDescription = "Path to the configuration file"

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:42Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:52Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -21,11 +21,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: Fans
-        -
-          name: Temperature
       discovery_rules:
         -
           name: 'FAN Discovery'
@@ -56,9 +51,10 @@ zabbix_export:
                 MIB: ATEN-IPMI-MIB
                 A textual string containing information about the interface.
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
         -
           name: 'Temperature Discovery'
           type: SNMP_AGENT
@@ -90,9 +86,10 @@ zabbix_export:
                 MIB: ATEN-IPMI-MIB
                 A textual string containing information about the interface.
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'

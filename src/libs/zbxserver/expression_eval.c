@@ -1050,7 +1050,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, params, ts, error);
+	ret = evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
@@ -1310,125 +1310,6 @@ static DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 
 	return dcitem_refs->values[index];
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_aggregate                                               *
- *                                                                            *
- * Parameters: item      - [IN] aggregated item                               *
- *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *
- *             groups    - [IN] list of host groups                           *
- *             itemkey   - [IN] item key to aggregate                         *
- *             item_func - [IN] one of ZBX_VALUE_FUNC_*                       *
- *             param     - [IN] item_func parameter (optional)                *
- *                                                                            *
- * Return value: SUCCEED - aggregate item evaluated successfully              *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	evaluate_aggregate(zbx_vector_uint64_t *itemids, zbx_vector_ptr_t *dcitem_refs, const zbx_timespec_t *ts,
-		const char *func_name, size_t len, int args_num, const zbx_variant_t *args, zbx_variant_t *value,
-		char **error)
-{
-	int				ret = FAIL, i, count, seconds, item_func;
-	zbx_vector_history_record_t	values;
-	zbx_vector_dbl_t		*results;
-	double				result;
-	zbx_variant_t			arg;
-
-	if (ZBX_VALUE_FUNC_UNKNOWN == (item_func = get_function_by_name(func_name, len)))
-	{
-		*error = zbx_strdup(NULL, "unsupported function");
-		return FAIL;
-	}
-
-	if (ZBX_VALUE_FUNC_LAST == item_func)
-	{
-		count = 1;
-		seconds = 0;
-	}
-	else
-	{
-		if (1 != args_num)
-		{
-			*error = zbx_strdup(NULL, "invalid number of function parameters");
-			return FAIL;
-		}
-
-		if (ZBX_VARIANT_STR == args[0].type)
-		{
-			if (FAIL == is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
-			{
-				*error = zbx_strdup(NULL, "invalid second parameter");
-				goto out;
-			}
-		}
-		else
-		{
-			zbx_variant_copy(&arg, &args[0]);
-
-			if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_DBL))
-			{
-				zbx_variant_clear(&arg);
-				*error = zbx_strdup(NULL, "invalid second parameter");
-				return FAIL;
-			}
-
-			seconds = arg.data.dbl;
-			zbx_variant_clear(&arg);
-		}
-		count = 0;
-	}
-
-	results = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
-	zbx_vector_dbl_create(results);
-
-	for (i = 0; i < itemids->values_num; i++)
-	{
-		DC_ITEM	*dcitem;
-
-		if (NULL == (dcitem = get_dcitem(dcitem_refs, itemids->values[i])))
-			continue;
-
-		if (ITEM_STATUS_ACTIVE != dcitem->status)
-			continue;
-
-		if (HOST_STATUS_MONITORED != dcitem->host.status)
-			continue;
-
-		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
-			continue;
-
-		zbx_history_record_vector_create(&values);
-
-		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts) &&
-				0 < values.values_num)
-		{
-			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
-			zbx_vector_dbl_append(results, result);
-		}
-
-		zbx_history_record_vector_destroy(&values, dcitem->value_type);
-	}
-
-	if (0 == results->values_num)
-	{
-		zbx_vector_dbl_destroy(results);
-		zbx_free(results);
-
-		*error = zbx_strdup(NULL, "no data for query");
-		goto out;
-	}
-
-	zbx_variant_set_dbl_vector(value, results);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 
 /******************************************************************************
  *                                                                            *
@@ -1957,6 +1838,8 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 
 	ret = zbx_eval_execute_ext(eval->ctx, ts, expression_eval_common, expression_eval_history, (void *)eval, value,
 			error);
+
+	zbx_vc_flush_stats();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s error:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value), ZBX_NULL2EMPTY_STR(*error));

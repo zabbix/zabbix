@@ -1089,7 +1089,8 @@ insert_javascript_for_visibilitybox();
 
 		// Override actions available per override object.
 		var available_actions = {
-			'<?= OPERATION_OBJECT_ITEM_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends'],
+			'<?= OPERATION_OBJECT_ITEM_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends',
+														'optag'],
 			'<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opseverity', 'optag'],
 			'<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>': ['opdiscover'],
 			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory']

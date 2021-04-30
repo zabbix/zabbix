@@ -20,7 +20,7 @@
 
 
 /**
- * Class is used to validate and parse the trigger function.
+ * Class is used to validate and parse a trigger function.
  */
 class C10FunctionParser extends CParser {
 

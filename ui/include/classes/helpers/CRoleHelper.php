@@ -29,7 +29,6 @@ class CRoleHelper {
 	public const UI_MONITORING_HOSTS = 'ui.monitoring.hosts';
 	public const UI_MONITORING_OVERVIEW = 'ui.monitoring.overview';
 	public const UI_MONITORING_LATEST_DATA = 'ui.monitoring.latest_data';
-	public const UI_MONITORING_SCREENS = 'ui.monitoring.screens';
 	public const UI_MONITORING_MAPS = 'ui.monitoring.maps';
 	public const UI_MONITORING_DISCOVERY = 'ui.monitoring.discovery';
 	public const UI_MONITORING_SERVICES = 'ui.monitoring.services';
@@ -41,6 +40,7 @@ class CRoleHelper {
 	public const UI_REPORTS_AUDIT = 'ui.reports.audit';
 	public const UI_REPORTS_ACTION_LOG = 'ui.reports.action_log';
 	public const UI_REPORTS_NOTIFICATIONS = 'ui.reports.notifications';
+	public const UI_REPORTS_SCHEDULED_REPORTS = 'ui.reports.scheduled_reports';
 	public const UI_CONFIGURATION_HOST_GROUPS = 'ui.configuration.host_groups';
 	public const UI_CONFIGURATION_TEMPLATES = 'ui.configuration.templates';
 	public const UI_CONFIGURATION_HOSTS = 'ui.configuration.hosts';
@@ -77,6 +77,7 @@ class CRoleHelper {
 	public const ACTIONS_CLOSE_PROBLEMS = 'actions.close_problems';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
+	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
 	public const DEFAULT_ACCESS_ENABLED = 1;
@@ -283,16 +284,17 @@ class CRoleHelper {
 	public static function getAllUiElements(int $user_type): array {
 		$rules = [
 			self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
-			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_SCREENS,
-			self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW,
-			self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS
+			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_MAPS,
+			self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW, self::UI_INVENTORY_HOSTS,
+			self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_CONFIGURATION_HOST_GROUPS,
-				self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS, self::UI_CONFIGURATION_MAINTENANCE,
-				self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY, self::UI_CONFIGURATION_SERVICES
+				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_REPORTS_SCHEDULED_REPORTS,
+				self::UI_CONFIGURATION_HOST_GROUPS, self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS,
+				self::UI_CONFIGURATION_MAINTENANCE, self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY,
+				self::UI_CONFIGURATION_SERVICES
 			]);
 		}
 
@@ -327,6 +329,7 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
+			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
 		}
 
 		return $rules;
@@ -378,7 +381,6 @@ class CRoleHelper {
 					self::UI_MONITORING_HOSTS => _('Hosts'),
 					self::UI_MONITORING_OVERVIEW => _('Overview'),
 					self::UI_MONITORING_LATEST_DATA => _('Latest data'),
-					self::UI_MONITORING_SCREENS => _('Screens'),
 					self::UI_MONITORING_MAPS => _('Maps')
 				];
 
@@ -414,7 +416,10 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_REPORTS_NOTIFICATIONS => _('Notifications')];
+					$labels += [
+						self::UI_REPORTS_NOTIFICATIONS => _('Notifications'),
+						self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')
+					];
 				}
 
 				return $labels;
@@ -478,7 +483,7 @@ class CRoleHelper {
 	 */
 	public static function getActionsLabels(int $user_type): array {
 		$labels = [
-			self::ACTIONS_EDIT_DASHBOARDS => _('Create and edit dashboards and screens'),
+			self::ACTIONS_EDIT_DASHBOARDS => _('Create and edit dashboards'),
 			self::ACTIONS_EDIT_MAPS => _('Create and edit maps')
 		];
 
@@ -494,6 +499,10 @@ class CRoleHelper {
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),
 			self::ACTIONS_MANAGE_API_TOKENS => _('Manage API tokens')
 		];
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports')];
+		}
 
 		return $labels;
 	}

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-04-22T11:27:50Z'
   groups:
     -
       name: Templates/Applications
@@ -19,11 +19,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Nginx
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Nginx: Service response time'
@@ -32,9 +27,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}'
@@ -50,9 +46,6 @@ zabbix_export:
           type: SIMPLE
           key: 'net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]'
           history: 7d
-          applications:
-            -
-              name: Nginx
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -60,6 +53,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{last()}=0'
@@ -74,9 +71,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of accepted client connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -89,6 +83,10 @@ zabbix_export:
                 - ''
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections active'
           type: DEPENDENT
@@ -96,9 +94,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of active client connections including Waiting connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -107,6 +102,10 @@ zabbix_export:
                 - \1
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections dropped per second'
           type: DEPENDENT
@@ -115,9 +114,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of dropped client connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: JAVASCRIPT
@@ -133,6 +129,10 @@ zabbix_export:
                 - ''
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}'
@@ -152,9 +152,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -167,6 +164,10 @@ zabbix_export:
                 - ''
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections reading'
           type: DEPENDENT
@@ -174,9 +175,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of connections where nginx is reading the request header.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -185,6 +183,10 @@ zabbix_export:
                 - \1
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections waiting'
           type: DEPENDENT
@@ -192,9 +194,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of idle client connections waiting for a request.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -203,6 +202,10 @@ zabbix_export:
                 - \3
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections writing'
           type: DEPENDENT
@@ -210,9 +213,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of connections where nginx is writing the response back to the client.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -221,6 +221,10 @@ zabbix_export:
                 - \2
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Get stub status page'
           type: HTTP_AGENT
@@ -238,11 +242,12 @@ zabbix_export:
             Writing - the current number of connections where nginx is writing the response back to the client.
             Waiting - the current number of idle client connections waiting for a request.
             https://nginx.org/en/docs/http/ngx_http_stub_status_module.html
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$NGINX.STUB_STATUS.SCHEME}://{HOST.CONN}:{$NGINX.STUB_STATUS.PORT}/{$NGINX.STUB_STATUS.PATH}'
           retrieve_mode: BOTH
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: |
@@ -263,9 +268,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of client requests.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -274,6 +276,10 @@ zabbix_export:
                 - \3
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Requests per second'
           type: DEPENDENT
@@ -282,9 +288,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of client requests.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -297,6 +300,10 @@ zabbix_export:
                 - ''
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Version'
           type: DEPENDENT
@@ -305,9 +312,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -320,6 +324,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: nginx.get_stub_status
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -351,54 +359,56 @@ zabbix_export:
       dashboards:
         -
           name: 'Nginx performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Nginx: Connections by state'
+                        host: 'Nginx by HTTP'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Nginx: Connections by state'
-                    host: 'Nginx by HTTP'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Nginx: Requests per second'
+                        host: 'Nginx by HTTP'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Nginx: Requests per second'
-                    host: 'Nginx by HTTP'
-            -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Nginx: Connections per second'
-                    host: 'Nginx by HTTP'
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Nginx: Connections per second'
+                        host: 'Nginx by HTTP'
       valuemaps:
         -
           name: 'Service state'

@@ -44,8 +44,8 @@ class CConfiguration extends CApiService {
 				'images' =>		['type' => API_IDS],
 				'maps' =>		['type' => API_IDS],
 				'mediaTypes' =>	['type' => API_IDS],
-				'screens' =>	['type' => API_IDS],
-				'templates' =>	['type' => API_IDS]
+				'templates' =>	['type' => API_IDS],
+				'valueMaps' =>	['type' => API_IDS]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
@@ -91,10 +91,6 @@ class CConfiguration extends CApiService {
 			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'applications' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
-				]],
 				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
@@ -134,10 +130,6 @@ class CConfiguration extends CApiService {
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'screens' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
-				]],
 				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
@@ -171,13 +163,6 @@ class CConfiguration extends CApiService {
 				&& ($params['rules']['maps']['createMissing'] || $params['rules']['maps']['updateExisting'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'rules',
 				_('no permissions to create and edit maps')
-			));
-		}
-
-		if (array_key_exists('screens', $params['rules']) && !self::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
-				&& ($params['rules']['screens']['createMissing'] || $params['rules']['screens']['updateExisting'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'rules',
-				_('no permissions to create and edit screens')
 			));
 		}
 

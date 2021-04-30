@@ -1066,12 +1066,14 @@ abstract class CControllerPopupItemTest extends CController {
 			return $formula;
 		}
 
-		$expression_data = new CTriggerExpression([
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($this->preproc_item instanceof CItemPrototype),
 			'calculated' => true,
-			'lldmacros' => ($this->preproc_item instanceof CItemPrototype)
+			'host_macro' => true,
+			'empty_host' => true
 		]);
 
-		if (($result = $expression_data->parse($formula)) === false) {
+		if ($expression_parser->parse($formula) != CParser::PARSE_SUCCESS) {
 			// Cannot parse a calculated item formula. Return as is.
 			return $formula;
 		}
@@ -1079,29 +1081,29 @@ abstract class CControllerPopupItemTest extends CController {
 		$expression = [];
 		$pos_left = 0;
 
-		foreach ($result->getTokens() as $token) {
-			switch ($token->type) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					if ($pos_left != $token->pos) {
-						$expression[] = substr($formula, $pos_left, $token->pos - $pos_left);
+		foreach ($expression_parser->getResult()->getTokens() as $token) {
+			switch ($token['type']) {
+				case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+				case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
+				case CExpressionParserResult::TOKEN_TYPE_STRING:
+					if ($pos_left != $token['pos']) {
+						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
 					}
-					$pos_left = $token->pos + $token->length;
+					$pos_left = $token['pos'] + $token['length'];
 					break;
 			}
 
-			switch ($token->type) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-					$expression[] = array_key_exists($token->match, $macros_posted)
-						? CTriggerExpression::quoteString($macros_posted[$token->match], false)
-						: $token->match;
+			switch ($token['type']) {
+				case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+				case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
+					$expression[] = array_key_exists($token['match'], $macros_posted)
+						? CExpressionParser::quoteString($macros_posted[$token['match']], false)
+						: $token['match'];
 					break;
 
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					$string = strtr($token->data['string'], $macros_posted);
-					$expression[] = CTriggerExpression::quoteString($string, false, true);
+				case CExpressionParserResult::TOKEN_TYPE_STRING:
+					$string = strtr(CExpressionParser::unquoteString($token['match']), $macros_posted);
+					$expression[] = CExpressionParser::quoteString($string, false, true);
 					break;
 			}
 		}

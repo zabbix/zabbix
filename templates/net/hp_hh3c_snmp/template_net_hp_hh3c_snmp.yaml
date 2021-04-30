@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:31Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -32,19 +32,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       discovery_rules:
         -
           name: 'Entity Discovery'
@@ -69,14 +56,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -95,14 +83,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
@@ -113,14 +102,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -138,14 +128,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Operating system'
               type: SNMP_AGENT
@@ -156,14 +147,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -197,11 +189,12 @@ zabbix_export:
                 MIB: HH3C-ENTITY-EXT-MIB
                 Indicate the error state of this entity object.
                 fanError(41) means that the fan stops working.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS:"fanError"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
@@ -241,9 +234,10 @@ zabbix_export:
                 The CPU usage for this entity. Generally, the CPU usage
                 will calculate the overall CPU usage on the entity, and it
                 is not sensible with the number of CPU on the entity
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -263,9 +257,10 @@ zabbix_export:
                 MIB: HH3C-ENTITY-EXT-MIB
                 The memory usage for the entity. This object indicates what
                 percent of memory are used.
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -322,11 +317,12 @@ zabbix_export:
                 Indicate the error state of this entity object.
                 psuError(51) means that the Power Supply Unit is in the state of fault.
                 rpsError(61) means the Redundant Power Supply is in the state of fault.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS:"psuError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"rpsError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
@@ -368,9 +364,10 @@ zabbix_export:
               description: |
                 MIB: HH3C-ENTITY-EXT-MIB
                 The temperature for the {#SNMPVALUE}.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'

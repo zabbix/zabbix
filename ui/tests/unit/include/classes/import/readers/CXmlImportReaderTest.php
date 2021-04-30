@@ -72,7 +72,6 @@ class CXmlImportReaderTest extends TestCase {
 				'        <status>0</status>'."\n".
 				'    </host>'."\n".
 				'</hosts>'."\n".
-				'<screens/>'."\n".
 				'<images/>'."\n".
 				'</zabbix_export>',
 				[
@@ -90,7 +89,6 @@ class CXmlImportReaderTest extends TestCase {
 								'status' => '0'
 							]
 						],
-						'screens' => '',
 						'images' => ''
 					]
 				]
@@ -123,7 +121,7 @@ class CXmlImportReaderTest extends TestCase {
 				'<'.'?xml version="1.0"?'.'>'."\n".
 				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
 				'<hosts></hosts>'."\n".
-				'<screens></screens>text'."\n".
+				'text'."\n".
 				'<images></images>'."\n".
 				'</zabbix_export>',
 				'Invalid tag "/zabbix_export": unexpected text "text".'

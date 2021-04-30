@@ -84,10 +84,11 @@ class CControllerMenuPopup extends CController {
 	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
 	 * @param int    $data['severity_min']       (optional)
 	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['tags']               (optional)
+	 * @param array  $data['evaltype']           (optional)
 	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
-	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */
@@ -205,8 +206,9 @@ class CControllerMenuPopup extends CController {
 				$menu_data['urls'] = $data['urls'];
 			}
 
-			if (array_key_exists('filter_application', $data)) {
-				$menu_data['filter_application'] = $data['filter_application'];
+			if (array_key_exists('tags', $data)) {
+				$menu_data['tags'] = $data['tags'];
+				$menu_data['evaltype'] = $data['evaltype'];
 			}
 
 			return $menu_data;
@@ -363,20 +365,22 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for map element context menu popup.
 	 *
-	 * @param array  $data
-	 * @param string $data['sysmapid']
-	 * @param string $data['selementid']
-	 * @param array  $data['options']        (optional)
-	 * @param int    $data['severity_min']   (optional)
-	 * @param string $data['widget_uniqueid] (optional)
-	 * @param string $data['hostid']         (optional)
+	 * @param array   $data
+	 * @param string  $data['sysmapid']
+	 * @param string  $data['selementid']
+	 * @param array   $data['options']       (optional)
+	 * @param int     $data['severity_min']  (optional)
+	 * @param int     $data['unique_id']     (optional)
+	 * @param string  $data['hostid']        (optional)
 	 *
 	 * @return mixed
 	 */
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'tags',
+				'evaltype'
+			],
 			'selectUrls' => ['name', 'url', 'elementtype'],
 			'sysmapids' => $data['sysmapid']
 		]);
@@ -413,9 +417,10 @@ class CControllerMenuPopup extends CController {
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
 						}
-						if (array_key_exists('widget_uniqueid', $data)) {
-							$menu_data['widget_uniqueid'] = $data['widget_uniqueid'];
+						if (array_key_exists('unique_id', $data)) {
+							$menu_data['unique_id'] = $data['unique_id'];
 						}
+
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
@@ -436,8 +441,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$menu_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$menu_data['evaltype'] = $selement['evaltype'];
+							$menu_data['tags'] = $selement['tags'];
 						}
 						return $menu_data;
 
@@ -454,8 +460,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$host_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$host_data['evaltype'] = $selement['evaltype'];
+							$host_data['tags'] = $selement['tags'];
 						}
 						return self::getMenuDataHost($host_data);
 
@@ -491,32 +498,6 @@ class CControllerMenuPopup extends CController {
 		error(_('No permissions to referred object or it does not exist!'));
 
 		return null;
-	}
-
-	/**
-	 * Prepare data for refresh menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widgetName']
-	 * @param string $data['currentRate']
-	 * @param bool   $data['multiplier']   Multiplier or time mode.
-	 * @param array  $data['params']       (optional) URL parameters.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataRefresh(array $data) {
-		$menu_data = [
-			'type' => 'refresh',
-			'widgetName' => $data['widgetName'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		return $menu_data;
 	}
 
 	/**
@@ -742,57 +723,6 @@ class CControllerMenuPopup extends CController {
 		return ['type' => 'trigger_macro'];
 	}
 
-	/**
-	 * Prepare data for widget actions menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widget_uniqueid']  Widget instance unique id.
-	 * @param string $data['currentRate']      Refresh rate for widget.
-	 * @param bool   $data['multiplier']       Multiplier or time mode.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataWidgetActions(array $data) {
-		$menu_data = [
-			'type' => 'widget_actions',
-			'widget_uniqueid' => $data['widget_uniqueid'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if ($data['widgetType'] == WIDGET_SVG_GRAPH) {
-			$menu_data['download'] = true;
-		}
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		if ($data['widgetType'] == WIDGET_GRAPH) {
-			$options = [];
-
-			if (array_key_exists('dynamic_hostid', $data)) {
-				$options['hostids'] = $data['dynamic_hostid'];
-			}
-
-			if (array_key_exists('graphid', $data) && $data['graphid']) {
-				$menu_data['download'] = (bool) API::Graph()->get($options + [
-					'output' => ['graphid'],
-					'graphids' => $data['graphid']
-				]);
-			}
-			elseif (array_key_exists('itemid', $data) && $data['itemid']) {
-				$menu_data['download'] = (bool) API::Item()->get($options + [
-					'output' => ['itemid'],
-					'itemids' => $data['itemid'],
-					'webitems' => true
-				]);
-			}
-		}
-
-		return $menu_data;
-	}
-
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -817,20 +747,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataMapElement($data);
 				break;
 
-			case 'refresh':
-				$menu_data = self::getMenuDataRefresh($data);
-				break;
-
 			case 'trigger':
 				$menu_data = self::getMenuDataTrigger($data);
 				break;
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
-				break;
-
-			case 'widget_actions':
-				$menu_data = self::getMenuDataWidgetActions($data);
 				break;
 		}
 

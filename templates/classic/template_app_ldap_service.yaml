@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:46Z'
   groups:
     -
       name: Templates/Modules
@@ -11,20 +11,18 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: 'LDAP service'
       items:
         -
           name: 'LDAP service is running'
           type: SIMPLE
           key: 'net.tcp.service[ldap]'
           history: 1w
-          applications:
-            -
-              name: 'LDAP service'
           valuemap:
             name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: 'LDAP service'
           triggers:
             -
               expression: '{max(#3)}=0'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-04T09:01:23Z'
+  date: '2021-02-23T11:04:54Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -23,21 +23,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: 'Disk arrays'
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: 'Virtual disks'
       items:
         -
           name: 'System: Temperature status'
@@ -54,9 +39,6 @@ zabbix_export:
             ok(2)  The temperature sensor is within normal operating range.
             degraded(3)  The temperature sensor is outside of normal operating range.
             failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
-          applications:
-            -
-              name: Temperature
           valuemap:
             name: 'CPQSINFO-MIB::status'
           preprocessing:
@@ -64,6 +46,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Temperature
         -
           name: 'Hardware model name'
           type: SNMP_AGENT
@@ -76,14 +62,15 @@ zabbix_export:
             MIB: CPQSINFO-MIB
             The machine product name.The name of the machine used in this system.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -96,14 +83,15 @@ zabbix_export:
             MIB: CPQSINFO-MIB
             The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -121,9 +109,6 @@ zabbix_export:
           description: |
             MIB: CPQHLTH-MIB
             The overall condition. This object represents the overall status of the server information represented by this MIB.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'CPQSINFO-MIB::status'
           preprocessing:
@@ -131,6 +116,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
@@ -186,9 +175,6 @@ zabbix_export:
                 NotPresent (6)  A backup power source is not present on the cache module board. Some controllers do not have backup power sources.
                 
                 Capacitor Failed (7)  The flash backed cache module capacitor is below the sufficient voltage level and has not recharged in 10 minutes.  Your Cache Module board needs to be serviced.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelBattery'
               preprocessing:
@@ -196,6 +182,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
@@ -252,9 +242,6 @@ zabbix_export:
                 
                 Read Cache Could Not Be Mapped (9)
                  Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelStatus'
               preprocessing:
@@ -262,6 +249,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
@@ -315,9 +306,6 @@ zabbix_export:
               description: |
                 MIB: CPQIDA-MIB
                 Array Controller Model. The type of controller card.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaCntlrModel'
               preprocessing:
@@ -325,6 +313,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
             -
               name: '{#CNTLR_LOCATION}: Disk array controller status'
               type: SNMP_AGENT
@@ -336,9 +328,6 @@ zabbix_export:
                 MIB: CPQIDA-MIB
                 This value represents the overall condition of this controller,
                 and any associated logical drives,physical drives, and array accelerators.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -346,6 +335,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
@@ -391,9 +384,6 @@ zabbix_export:
                 ok(2)  The fan is operating properly.
                 degraded(2)  A redundant fan is not operating properly.
                 failed(4)  A non-redundant fan is not operating properly.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -401,6 +391,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -444,9 +438,6 @@ zabbix_export:
                 other(1)  The instrument agent is unable to determine the physical drive’s media type.
                 rotatingPlatters(2)  The physical drive media is composed of rotating platters.
                 solidState(3)  The physical drive media is composed of solid state electronics.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
               preprocessing:
@@ -454,6 +445,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Physical disk model name'
               type: SNMP_AGENT
@@ -468,14 +463,15 @@ zabbix_export:
                 The text that appears depends upon who manufactured the drive and the drive type.
                 If a drive fails, note the model to identify the type of drive necessary for replacement.
                 If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Physical disk serial number'
               type: SNMP_AGENT
@@ -490,14 +486,15 @@ zabbix_export:
                 This is the serial number assigned to the physical drive.
                 This value is based upon the serial number as returned by the SCSI inquiry command
                 but may have been modified due to space limitations.  This can be used for identification purposes.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -522,9 +519,6 @@ zabbix_export:
                 from the advertised size of a drive. This field is only applicable for controllers which support SCSI drives,
                 and therefore is not supported by the IDA or IDA-2 controllers. The field will contain 0xFFFFFFFF if the drive capacity cannot be calculated
                 or if the controller does not support SCSI drives.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -534,6 +528,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
               type: SNMP_AGENT
@@ -547,9 +545,6 @@ zabbix_export:
                 other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.
                 ok(2)  Indicates the drive is functioning properly.
                 replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
               preprocessing:
@@ -557,6 +552,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDrive"},eq)}=1 or {count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"},eq)}=1'
@@ -583,9 +582,6 @@ zabbix_export:
                 ok (2)  Indicates the drive is functioning properly.
                 failed (3)  Indicates that the drive is no longer operating and  should be replaced.
                 predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
               preprocessing:
@@ -593,6 +589,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_FAIL_STATUS},eq)}=1'
@@ -637,9 +637,6 @@ zabbix_export:
                 ok(2)  The power supply is operating normally.
                 degraded(3)  A temperature sensor, fan or other power supply component is  outside of normal operating range.
                 failed(4)  A power supply component detects a condition that could  permanently damage the system.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -647,6 +644,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -703,9 +704,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -713,6 +711,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -740,9 +742,6 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 This specifies the location of the temperature sensor present in the system.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
               preprocessing:
@@ -750,6 +749,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
@@ -761,14 +764,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: {#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -812,9 +816,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -822,6 +823,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -850,14 +855,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: Ambient
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -897,9 +903,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -907,6 +910,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -935,14 +942,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: CPU-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -982,9 +990,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -992,6 +997,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -1020,14 +1029,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: I/O-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1067,9 +1077,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1077,6 +1084,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -1105,14 +1116,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: Memory-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1152,9 +1164,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1162,6 +1171,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -1190,14 +1203,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: PSU-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1237,9 +1251,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1247,6 +1258,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{last()} = 1'
@@ -1275,14 +1290,15 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: System-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1305,9 +1321,6 @@ zabbix_export:
               description: |
                 Logical Drive Fault Tolerance.
                 This shows the fault tolerance mode of the logical drive.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
               preprocessing:
@@ -1315,6 +1328,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
               type: SNMP_AGENT
@@ -1330,9 +1347,6 @@ zabbix_export:
                 Drive manufacturers sometimes use the number 1,000,000 as a
                 megabyte when giving drive capacities so this value may
                 differ from the advertised size of a drive.
-              applications:
-                -
-                  name: 'Virtual disks'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1342,6 +1356,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
               type: SNMP_AGENT
@@ -1349,9 +1367,6 @@ zabbix_export:
               key: 'system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
               history: 7d
               description: 'Logical Drive Status.'
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
               preprocessing:
@@ -1359,6 +1374,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$VDISK_CRIT_STATUS},eq)}=1'

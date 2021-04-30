@@ -36,7 +36,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 *
 	 * @var array
 	 */
-	protected $hanged_refs;
+	protected $hanged_refs = [];
 
 	/**
 	 * Host for simplified functions.
@@ -83,7 +83,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($trigger_data) {
-		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : '';
+		$this->item = (array_key_exists('item', $trigger_data) && $trigger_data['item']) ? $trigger_data['item'] : '';
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : '';
 
 		if (($this->parser->parse($trigger_data['expression'])) !== false) {
@@ -108,7 +108,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		return $trigger_data['expression'];
 	}
 
-	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
+	/**
+	 * Convert expressions parts.
+	 *
+	 * @param string $expression          Expression string.
+	 * @param array $expression_elements  Expression tree.
+	 * @param array $extra_expr           Array to accumulate strings to add at the end of converted expression.
+	 */
+	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr
+			): void {
 		for ($i = count($expression_elements) - 1; $i >= 0; $i--) {
 			$part = $expression_elements[$i];
 
@@ -121,6 +129,13 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
+	/**
+	 * Convert expression part.
+	 *
+	 * @param string $expression         Expression string.
+	 * @param array $expression_element  Expression part to convert.
+	 * @param array $extra_expr          Array to accumulate strings to add at the end of converted expression.
+	 */
 	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
 
@@ -148,6 +163,15 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
+	/**
+	 * Convert function to new syntax.
+	 *
+	 * @param array $fn          Function to convert.
+	 * @param string $host_name  Host name.
+	 * @param string $item_key   Item key.
+	 *
+	 * @return array
+	 */
 	protected function convertFunction(array $fn, string $host_name, string $item_key): array {
 		if ($fn['item'] === '' && $fn['host'] === '') {
 			$query = sprintf('/%s/%s', $host_name, $item_key);
@@ -155,15 +179,22 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 		else {
 			$query = sprintf('/%s/%s', $fn['host'], $fn['item']);
-			$has_hanged_functions = $this->hanged_refs[$fn['host']];
+			$has_hanged_functions = array_key_exists($fn['host'], $this->hanged_refs)
+				? $this->hanged_refs[$fn['host']]
+				: false;
 		}
 
 		$extra_expr = '';
 
 		$this->function_parser->parse($fn['function']);
-		$unquotable_parameters = array_filter($this->function_parser->getParamsRaw()['parameters'], function ($param) {
-			return ($param['type'] == C10FunctionParser::PARAM_UNQUOTED && $param['raw'] === '');
-		});
+		$parameters = [
+			'unquotable' => array_filter($this->function_parser->getParamsRaw()['parameters'], function ($param) {
+				return ($param['type'] == C10FunctionParser::PARAM_UNQUOTED && $param['raw'] === '');
+			}),
+			'indicated' => array_filter($this->function_parser->getParamsRaw()['parameters'], function ($param) {
+				return ($param['type'] == C10FunctionParser::PARAM_QUOTED || $param['raw'] !== '');
+			})
+		];
 
 		switch ($fn['functionName']) {
 			case 'abschange':
@@ -171,7 +202,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 
 			case 'band':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
+				$params = self::convertParameters($fn['functionParams'], $parameters, $fn['functionName']);
 				$timeshift = self::paramsToString([$params[0]]);
 				$mask = self::paramsToString([$params[1]]);
 				$new_expression = sprintf('bitand(last(%1$s%2$s)%3$s)', $query, $timeshift, $mask);
@@ -182,7 +213,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 
 			case 'delta':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
+				$params = self::convertParameters($fn['functionParams'], $parameters, $fn['functionName']);
 				$params = self::paramsToString($params);
 				$new_expression = sprintf('(max(%1$s%2$s)-min(%1$s%2$s))', $query, $params);
 				break;
@@ -196,26 +227,21 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 
 			case 'trenddelta':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
+				$params = self::convertParameters($fn['functionParams'], $parameters, $fn['functionName']);
 				$params = self::paramsToString($params);
 				$new_expression = sprintf('(trendmax(%1$s%2$s)-trendmin(%1$s%2$s))', $query, $params);
 				break;
 
 			case 'iregexp':
 			case 'regexp':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
-				$new_expression = sprintf('find(%1$s,%2$s,"%3$s",%4$s)', $query, $params[0], $fn['functionName'],
-					$params[1]
-				);
-				break;
-
 			case 'str':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
-				$new_expression = sprintf('find(%1$s,%2$s,"like",%3$s)', $query, $params[0], $params[1]);
+				$params = self::convertParameters($fn['functionParams'], $parameters, $fn['functionName']);
+				$params = self::paramsToString($params);
+				$new_expression = sprintf('find(%1$s%2$s)', $query, $params);
 				break;
 
 			case 'strlen':
-				$params = self::convertParameters($fn['functionParams'], $unquotable_parameters, $fn['functionName']);
+				$params = self::convertParameters($fn['functionParams'], $parameters, $fn['functionName']);
 				$params = self::paramsToString($params);
 				$new_expression = sprintf('length(last(%1$s%2$s))', $query, $params);
 				break;
@@ -237,7 +263,7 @@ class C52TriggerExpressionConverter extends CConverter {
 
 			default:
 				$new_expression = sprintf('%s(%s%s)', $fn['functionName'], $query,
-					self::paramsToString(self::convertParameters($fn['functionParams'], $unquotable_parameters,
+					self::paramsToString(self::convertParameters($fn['functionParams'], $parameters,
 						$fn['functionName']
 					))
 				);
@@ -247,7 +273,19 @@ class C52TriggerExpressionConverter extends CConverter {
 		return [$new_expression, $extra_expr];
 	}
 
-	private static function convertParameters(array $parameters, array $unquotable_parameters, string $fn_name): array {
+	/**
+	 * Convert function parameters to new syntax.
+	 *
+	 * @param array $parameters                List of parameters according previous syntax.
+	 * @param array $param_dets
+	 * @param array $param_dets['unquotable']  List of numeric indexes for parameters that don't need to be quoted.
+	 * @param array $param_dets['indicated']   List of numeric indexes for parameters that are especially indicated and
+	 *                                         must be kept.
+	 * @param string $fn_name                  Function name.
+	 *
+	 * @return array
+	 */
+	private static function convertParameters(array $parameters, array $param_dets, string $fn_name): array {
 		switch ($fn_name) {
 			// (sec|#num,<time_shift>)
 			case 'delta':
@@ -255,8 +293,6 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'max':
 			case 'min':
 			case 'sum':
-			// (<sec|#num>,<time_shift>)
-			case 'strlen':
 			// (sec|#num,<time_shift>,percentage)
 			case 'percentile':
 			// (sec|#num,<time_shift>,threshold,<fit>)
@@ -264,28 +300,29 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
-				unset($parameters[1], $unquotable_parameters[1]);
+				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
 				break;
 
 			// (<#num>,<time_shift>)
+			case 'strlen':
 			case 'last':
 				$parameters += ['', ''];
-				if (ctype_digit($parameters[0])) {
-					$parameters[0] = '#'.$parameters[0];
-				}
-				elseif (substr($parameters[0], 0, 1) !== '#') {
-					$parameters[0] = '#1';
+				if (substr($parameters[0], 0, 1) !== '#'
+						|| !ctype_digit(substr($parameters[0], 1))
+						|| (int) substr($parameters[0], 1) === 0) {
+					$parameters[0] = '';
 				}
 
 				$parameters[1] = self::convertTimeshift($parameters[1]);
 				if ($parameters[1] !== '') {
+					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[1];
 				}
-				unset($parameters[1], $unquotable_parameters[1]);
+				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
 				break;
 
 			// (sec|#num,<time_shift>,time,<fit>,<mode>)
@@ -293,24 +330,29 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
-				unset($parameters[1], $unquotable_parameters[1]);
+				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
 				$parameters[2] = self::convertParamSec($parameters[2]);
 				break;
 
 			// (<sec|#num>,mask,<time_shift>)
 			case 'band':
 				$parameters += ['', '', ''];
-				$parameters[0] = self::convertParamSec($parameters[0]);
+				if (substr($parameters[0], 0, 1) !== '#'
+						|| !ctype_digit(substr($parameters[0], 1))
+						|| (int) substr($parameters[0], 1) === 0) {
+					$parameters[0] = '';
+				}
+
 				$parameters[2] = self::convertTimeshift($parameters[2]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[2] !== '') {
+					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[2];
 				}
-				unset($parameters[2], $unquotable_parameters[2]);
+				unset($parameters[2], $param_dets['unquotable'][2], $param_dets['indicated'][2]);
 				break;
 
 			// (sec|#num,<pattern>,<operator>,<time_shift>)
@@ -318,7 +360,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[3] = self::convertTimeshift($parameters[3]);
-				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[3] !== '') {
 					$parameters[0] .= ':'.$parameters[3];
 				}
@@ -327,10 +369,14 @@ class C52TriggerExpressionConverter extends CConverter {
 				}
 
 				$parameters[3] = $parameters[1];
-				unset($unquotable_parameters[3], $parameters[1]);
-				if (array_key_exists(1, $unquotable_parameters)) {
-					$unquotable_parameters[3] = true;
-					unset($unquotable_parameters[1]);
+				unset($param_dets['unquotable'][3], $param_dets['indicated'][3], $parameters[1]);
+				if (array_key_exists(1, $param_dets['unquotable'])) {
+					$param_dets['unquotable'][3] = true;
+					unset($param_dets['unquotable'][1]);
+				}
+				if (array_key_exists(1, $param_dets['indicated'])) {
+					$param_dets['indicated'][3] = true;
+					unset($param_dets['indicated'][1]);
 				}
 				break;
 
@@ -347,9 +393,12 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'regexp':
 			case 'str':
 				$parameters += ['', ''];
-				$parameters[1] = self::convertParamSec($parameters[1]);
-				array_unshift($parameters, $parameters[1]);
-				unset($parameters[2], $unquotable_parameters[2]);
+				$parameters = [
+					self::convertParamSec($parameters[1]),
+					($fn_name === 'str') ? 'like' : $fn_name,
+					$parameters[0]
+				];
+				unset($param_dets['unquotable'][1], $param_dets['indicated'][1]);
 				break;
 
 			// (period,period_shift)
@@ -364,31 +413,41 @@ class C52TriggerExpressionConverter extends CConverter {
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
-				unset($parameters[1], $unquotable_parameters[1]);
+				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
+				break;
+
+			case 'logeventid':
+			case 'logsource':
+				array_unshift($parameters, '');
+				if (array_key_exists(0, $param_dets['indicated'])) {
+					$param_dets['indicated'][1] = true;
+					unset($param_dets['indicated'][0]);
+				}
 				break;
 		}
 
 		// Keys in $parameters array to skip from quoting.
-		$unquotable_parameters = array_keys($unquotable_parameters);
+		$param_dets['unquotable'] = array_keys($param_dets['unquotable']);
+		$param_dets['indicated'] = array_keys($param_dets['indicated']);
 		$functions_with_period_parameter = ['delta', 'avg', 'max', 'min', 'sum', 'last', 'strlen', 'percentile',
 			'timeleft', 'forecast', 'band', 'count', 'fuzzytime', 'nodata', 'iregexp', 'regexp', 'str', 'trendavg',
-			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'
+			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum', 'logeventid', 'logsource'
 		];
 		if (in_array($fn_name, $functions_with_period_parameter)) {
-			$unquotable_parameters[] = 0;
+			$param_dets['unquotable'][] = 0;
 		}
 
 		if (in_array($fn_name, ['forecast', 'timeleft', 'percentile'])) {
 			// Time parameter don't need to be quoted for forecast() function.
-			$unquotable_parameters[] = 2;
+			$param_dets['unquotable'][] = 2;
 		}
 		elseif ($fn_name === 'band') {
 			// Mask parameter don't need to be quoted for bitand() function.
-			$unquotable_parameters[] = 1;
+			$param_dets['unquotable'][] = 1;
 		}
 
-		array_walk($parameters, function (&$param, $i) use ($unquotable_parameters) {
-			if (in_array($i, $unquotable_parameters)) {
+		array_walk($parameters, function (&$param, $i) use ($param_dets) {
+			if (in_array($i, $param_dets['unquotable'])) {
 				return;
 			}
 
@@ -399,30 +458,73 @@ class C52TriggerExpressionConverter extends CConverter {
 			$param = '"'.str_replace('"', '\\"', $param).'"';
 		});
 
+		// Remove empty parameters from the end of the parameters array.
+		foreach (array_reverse(array_keys($parameters)) as $i) {
+			if (in_array($i, $param_dets['indicated'])) {
+				break;
+			}
+
+			if ($parameters[$i] !== '""' && $parameters[$i] !== '') {
+				break;
+			}
+
+			unset($parameters[$i]);
+		}
+
 		return array_values($parameters);
 	}
 
+	/**
+	 * Convert seconds.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertParamSec(string $param): string {
 		return (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
 	}
 
+	/**
+	 * Convert period.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertParamPeriod(string $param): string {
 		return (preg_match('/^(?<num>\d+)(?<suffix>[hdwMy]{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
 	}
 
+	/**
+	 * Convert time shift.
+	 *
+	 * @param string $param  Parameter to convert.
+	 *
+	 * @return string
+	 */
 	private static function convertTimeshift(string $param): string {
 		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
+
 		return ($param !== '') ? 'now-'.$param : '';
 	}
 
+	/**
+	 * Concatenate parameters into comma separated string.
+	 *
+	 * @param array $parameters  Parameter to concatenate.
+	 *
+	 * @return string
+	 */
 	private static function paramsToString(array $parameters): string {
 		$parameters = rtrim(implode(',', $parameters), ',');
+
 		return ($parameters === '') ? '' : ','.$parameters;
 	}
 
@@ -509,6 +611,7 @@ class C52TriggerExpressionConverter extends CConverter {
 							}
 						}
 						break;
+
 					default:
 						// Try to parse an operator.
 						if ($operator[$operator_pos] === $this->parser->expression[$i]) {
@@ -517,8 +620,10 @@ class C52TriggerExpressionConverter extends CConverter {
 
 							// Operator found.
 							if ($operator_token === $operator) {
-								// We've reached the end of a complete expression, parse the expression on the left side
-								// of the operator.
+								/*
+								 * Once reached the end of a complete expression, parse the expression on the left side
+								 * of the operator.
+								 */
 								if ($level == 0) {
 									// Find the last symbol of the expression before the operator.
 									$close_symbol_pos = $i - strlen($operator);
@@ -545,8 +650,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				$close_symbol_pos--;
 			}
 
-			// We've found a whole expression and parsed the expression on the left side of the operator, parse the
-			// expression on the right.
+			/*
+			 * We've found a whole expression and parsed the expression on the left side of the operator, parse the
+			 * expression on the right.
+			 */
 			if ($operator_found) {
 				$expressions[] = $this->getExpressionParts($open_symbol_pos, $close_symbol_pos);
 
@@ -572,8 +679,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				];
 				break;
 			}
-			// If we've tried both operators and didn't find anything, it means there's only one expression return the
-			// result.
+			/*
+			 * If we've tried both operators and didn't find anything, it means there's only one expression return the
+			 * result.
+			 */
 			elseif ($operator === 'and') {
 				// Trim extra parentheses.
 				if ($open_symbol_pos == $left_parentheses && $close_symbol_pos == $right_parentheses) {
@@ -598,5 +707,4 @@ class C52TriggerExpressionConverter extends CConverter {
 
 		return $result;
 	}
-
 }

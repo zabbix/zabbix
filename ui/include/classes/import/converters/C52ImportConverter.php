@@ -25,31 +25,6 @@
 class C52ImportConverter extends CConverter {
 
 	/**
-	 * Converter used to convert trigger expressions from 5.2 to 5.4 syntax.
-	 *
-	 * @var C52TriggerExpressionConverter
-	 */
-	protected $trigger_expression_converter;
-
-	/**
-	 * @var C52AggregateItemKeyConverter
-	 */
-	protected $aggregate_item_key_converter;
-
-	/**
-	 * Converter used to convert calculated item formula from 5.2 to 5.4 syntax.
-	 *
-	 * @var C52CalculatedItemConverter
-	 */
-	protected $calculated_item_converter;
-
-	public function __construct() {
-		$this->trigger_expression_converter = new C52TriggerExpressionConverter();
-		$this->aggregate_item_key_converter = new C52AggregateItemKeyConverter();
-		$this->calculated_item_converter = new C52CalculatedItemConverter();
-	}
-
-	/**
 	 * Convert import data from 5.2 to 5.4 version.
 	 *
 	 * @param array $data
@@ -60,22 +35,23 @@ class C52ImportConverter extends CConverter {
 		$data['zabbix_export']['version'] = '5.4';
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
-			$data['zabbix_export']['hosts'] = $this->convertHosts($data['zabbix_export']['hosts']);
+			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
-			$data['zabbix_export']['templates'] = $this->convertTemplates($data['zabbix_export']['templates']);
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
-		if (array_key_exists('triggers', $data['zabbix_export'])) {
-			foreach ($data['zabbix_export']['triggers'] as &$trigger) {
-				$trigger = $this->convertTrigger($trigger);
-			}
-			unset($trigger);
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
 		}
 
 		if (array_key_exists('value_maps', $data['zabbix_export'])) {
 			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		}
+
+		if (array_key_exists('triggers', $data['zabbix_export'])) {
+			$data['zabbix_export']['triggers'] = self::convertTriggers($data['zabbix_export']['triggers']);
 		}
 
 		return $data;
@@ -88,7 +64,7 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function convertHosts(array $hosts): array {
+	private static function convertHosts(array $hosts): array {
 		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 			'tls_psk'
 		]);
@@ -97,23 +73,7 @@ class C52ImportConverter extends CConverter {
 			$host = array_diff_key($host, $tls_fields);
 
 			if (array_key_exists('items', $host)) {
-				foreach ($host['items'] as &$item) {
-					if (array_key_exists('triggers', $item)) {
-						foreach ($item['triggers'] as &$trigger) {
-							$trigger = $this->convertTrigger($trigger, $host['host'], $item['key']);
-						}
-						unset($trigger);
-					}
-
-					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $this->calculated_item_converter->convert($item);
-					}
-					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
-						$item['type'] = CXmlConstantName::CALCULATED;
-						$item['params'] = $this->aggregate_item_key_converter->convert($item['key']);
-					}
-				}
-				unset($item);
+				$host['items'] = self::convertItems($host['items'], $host['host']);
 			}
 
 			if (array_key_exists('interfaces', $host)) {
@@ -121,8 +81,14 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules'], $host['host']);
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules'], $host['host']);
 			}
+
+			if (array_key_exists('httptests', $host)) {
+				$host['httptests'] = self::convertHttpTests($host['httptests']);
+			}
+
+			unset($host['applications']);
 		}
 		unset($host);
 
@@ -136,37 +102,62 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function convertTemplates(array $templates): array {
+	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
-				foreach ($template['items'] as &$item) {
-					if (array_key_exists('triggers', $item)) {
-						foreach ($item['triggers'] as &$trigger) {
-							$trigger = $this->convertTrigger($trigger, $template['template'], $item['key']);
-						}
-						unset($trigger);
-					}
-
-					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $this->calculated_item_converter->convert($item);
-					}
-					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
-						$item['type'] = CXmlConstantName::CALCULATED;
-						$item['params'] = $this->aggregate_item_key_converter->convert($item['key']);
-					}
-				}
-				unset($item);
+				$template['items'] = self::convertItems($template['items'], $template['template']);
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
-				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules'],
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'],
 					$template['template']
 				);
+			}
+
+			if (array_key_exists('httptests', $template)) {
+				$template['httptests'] = self::convertHttpTests($template['httptests']);
+			}
+
+			unset($template['applications']);
+
+			if (array_key_exists('dashboards', $template)) {
+				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards']);
 			}
 		}
 		unset($template);
 
 		return $templates;
+	}
+
+
+	/**
+	 * Convert template dashboards.
+	 *
+	 * @static
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	private static function convertTemplateDashboards(array $dashboards): array {
+		$result = [];
+
+		foreach ($dashboards as $dashboard) {
+			$dashboard_page = [];
+
+			if (array_key_exists('widgets', $dashboard)) {
+				$dashboard_page['widgets'] = $dashboard['widgets'];
+			}
+
+			$dashboard = [
+				'name' => $dashboard['name'],
+				'pages' => [$dashboard_page]
+			];
+
+			$result[] = $dashboard;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -214,7 +205,7 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function convertDiscoveryRules(array $discovery_rules, string $hostname): array {
+	private static function convertDiscoveryRules(array $discovery_rules, string $hostname): array {
 		$result = [];
 
 		foreach ($discovery_rules as $discovery_rule) {
@@ -223,15 +214,13 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
-				$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes'],
+				$discovery_rule['item_prototypes'] = self::convertItemPrototypes($discovery_rule['item_prototypes'],
 					$hostname
 				);
 			}
+
 			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
-				foreach ($discovery_rule['trigger_prototypes'] as &$trigger_prototype) {
-					$trigger_prototype = $this->convertTrigger($trigger_prototype);
-				}
-				unset($trigger_prototype);
+				$discovery_rule['trigger_prototypes'] = self::convertTriggers($discovery_rule['trigger_prototypes']);
 			}
 
 			$result[] = $discovery_rule;
@@ -248,26 +237,95 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function convertItemPrototypes(array $item_prototypes, string $hostname): array {
+	private static function convertItemPrototypes(array $item_prototypes, string $hostname): array {
 		$result = [];
+		$calculated_item_converter = new C52CalculatedItemConverter();
+		$aggregate_item_key_converter = new C52AggregateItemKeyConverter();
 
 		foreach ($item_prototypes as $item_prototype) {
-			if ($item_prototype['type'] === CXmlConstantName::AGGREGATE) {
-				$item_prototype['type'] = CXmlConstantName::CALCULATED;
-				$item_prototype['params'] = $this->aggregate_item_key_converter->convert($item_prototype['key']);
+			if (array_key_exists('trigger_prototypes', $item_prototype)) {
+				$item_prototype['trigger_prototypes'] = self::convertTriggers($item_prototype['trigger_prototypes'],
+					$hostname, $item_prototype['key']
+				);
 			}
 
-			if (array_key_exists('trigger_prototypes', $item_prototype)) {
-				foreach ($item_prototype['trigger_prototypes'] as &$trigger_prototype) {
-					$trigger_prototype = $this->convertTrigger($trigger_prototype, $hostname, $item_prototype['key']);
+			$applications = array_key_exists('applications', $item_prototype) ? $item_prototype['applications'] : [];
+
+			if (array_key_exists('application_prototypes', $item_prototype)) {
+				$applications = array_merge($applications, $item_prototype['application_prototypes']);
+			}
+
+			if ($applications) {
+				$i = 0;
+				$item_prototype['tags'] = [];
+
+				foreach (self::convertApplicationsToTags($applications) as $tag) {
+					$item_prototype['tags']['tag'.($i ? $i : '')] = $tag;
+					$i++;
 				}
-				unset($trigger_prototype);
+
+				unset($item_prototype['applications'], $item_prototype['application_prototypes']);
+			}
+
+			if (array_key_exists('type', $item_prototype)) {
+				if ($item_prototype['type'] === CXmlConstantName::CALCULATED) {
+					$item_prototype = $calculated_item_converter->convert($item_prototype);
+				}
+				else if ($item_prototype['type'] === CXmlConstantName::AGGREGATE) {
+					$item_prototype['type'] = CXmlConstantName::CALCULATED;
+					$item_prototype['params'] = $aggregate_item_key_converter->convert($item_prototype['key']);
+				}
 			}
 
 			$result[] = $item_prototype;
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Convert items.
+	 *
+	 * @static
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	private static function convertItems(array $items, string $hostname): array {
+		$calculated_item_converter = new C52CalculatedItemConverter();
+		$aggregate_item_key_converter = new C52AggregateItemKeyConverter();
+
+		foreach ($items as &$item) {
+			if (array_key_exists('applications', $item)) {
+				$i = 0;
+				$item['tags'] = [];
+
+				foreach (self::convertApplicationsToTags($item['applications']) as $tag) {
+					$item['tags']['tag'.($i ? $i : '')] = $tag;
+					$i++;
+				}
+
+				unset($item['applications']);
+			}
+
+			if (array_key_exists('triggers', $item)) {
+				$item['triggers'] = self::convertTriggers($item['triggers'], $hostname, $item['key']);
+			}
+
+			if (array_key_exists('type', $item)) {
+				if ($item['type'] === CXmlConstantName::CALCULATED) {
+					$item = $calculated_item_converter->convert($item);
+				}
+				else if ($item['type'] === CXmlConstantName::AGGREGATE) {
+					$item['type'] = CXmlConstantName::CALCULATED;
+					$item['params'] = $aggregate_item_key_converter->convert($item['key']);
+				}
+			}
+		}
+		unset($item);
+
+		return $items;
 	}
 
 	/**
@@ -347,36 +405,125 @@ class C52ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert trigger expression to new syntax.
+	 * Convert applications to item tags.
 	 *
-	 * @param array  $trigger
+	 * @static
+	 *
+	 * @param array $applications
+	 *
+	 * @return array
+	 */
+	private static function convertApplicationsToTags(array $applications): array {
+		$tags = [];
+
+		foreach (array_values($applications) as $i => $app) {
+			$tags['tag'.($i ? $i : '')] = [
+				'tag' => 'Application',
+				'value' => $app['name']
+			];
+		}
+
+		return $tags;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @static
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	private static function convertMaps(array $maps): array {
+		foreach ($maps as $i => $map) {
+			if (array_key_exists('selements', $map)) {
+				foreach ($map['selements'] as $s => $selement) {
+					$maps[$i]['selements'][$s]['evaltype'] = (string) CONDITION_EVAL_TYPE_AND_OR;
+
+					if (array_key_exists('application', $selement) && $selement['application'] !== '') {
+						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToTags([[
+							'name' => $selement['application']
+						]]);
+
+						$maps[$i]['selements'][$s]['tags'] = array_map(function ($tag) {
+							return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
+						}, $maps[$i]['selements'][$s]['tags']);
+					}
+					unset($maps[$i]['selements'][$s]['application']);
+
+					if (array_key_exists('elements', $selement)) {
+						$maps[$i]['selements'][$s]['elements'] = self::convertTriggers($selement['elements']);
+					}
+				}
+			}
+		}
+
+		return $maps;
+	}
+
+
+	/**
+	 * Convert http tests.
+	 *
+	 * @static
+	 *
+	 * @param array $http_tests
+	 *
+	 * @return array
+	 */
+	private static function convertHttpTests(array $http_tests): array {
+		foreach ($http_tests as &$http_test) {
+			if (array_key_exists('application', $http_test)) {
+				$http_test['tags'] = self::convertApplicationsToTags([$http_test['application']]);
+				unset($http_test['application']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
+	}
+
+	/**
+	 * Convert array of triggers.
+	 *
+	 * @param array  $triggers
 	 * @param string $host     (optional)
 	 * @param string $item     (optional)
 	 *
 	 * @return array
 	 */
-	private function convertTrigger(array $trigger, ?string $host = null, ?string $item = null): array {
-		$trigger['expression'] = $this->trigger_expression_converter->convert([
-			'expression' => $trigger['expression'],
-			'host' => $host,
-			'item' => $item
-		]);
+	private static function convertTriggers(array $triggers, ?string $host = null, ?string $item = null): array {
+		$expression_converter = new C52TriggerExpressionConverter();
+		$event_name_converter = new C52EventNameConverter();
 
-		if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
-			$trigger['recovery_expression'] = $this->trigger_expression_converter->convert([
-				'expression' => $trigger['recovery_expression'],
-				'host' => $host,
-				'item' => $item
-			]);
-		}
-
-		if (array_key_exists('dependencies', $trigger)) {
-			foreach ($trigger['dependencies'] as &$dep_trigger) {
-				$dep_trigger = $this->convertTrigger($dep_trigger);
+		foreach ($triggers as &$trigger) {
+			if (array_key_exists('expression', $trigger)) {
+				$trigger['expression'] = $expression_converter->convert([
+					'expression' => $trigger['expression'],
+					'host' => $host,
+					'item' => $item
+				]);
 			}
-			unset($dep_trigger);
-		}
 
-		return $trigger;
+			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== '') {
+				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
+			}
+
+			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
+				$trigger['recovery_expression'] = $expression_converter->convert([
+					'expression' => $trigger['recovery_expression'],
+					'host' => $host,
+					'item' => $item
+				]);
+			}
+
+			if (array_key_exists('dependencies', $trigger)) {
+				$trigger['dependencies'] = self::convertTriggers($trigger['dependencies']);
+			}
+		}
+		unset($trigger);
+
+		return $triggers;
 	}
 }

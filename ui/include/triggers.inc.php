@@ -589,57 +589,25 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
  * @return string
  */
 function triggerExpressionReplaceHost(string $expression, string $src_host, string $dst_host): string {
-	$trigger_expression_parser = new CTriggerExpression();
-	if (($result = $trigger_expression_parser->parse($expression)) !== false) {
-		$queries = $result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
-		for ($i = count($queries) - 1; $i >= 0; $i--) {
-			if ($queries[$i]->host === $src_host) {
-				$expression = substr_replace($expression, '/'.$dst_host.'/'.$queries[$i]->item, $queries[$i]->pos,
-					$queries[$i]->length
+	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+
+	if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+		$hist_functions = $expression_parser->getResult()->getTokensOfTypes(
+			[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
+		);
+		$hist_function = end($hist_functions);
+		do {
+			$query_parameter = $hist_function['data']['parameters'][0];
+			if ($query_parameter['data']['host'] === $src_host) {
+				$expression = substr_replace($expression, '/'.$dst_host.'/'.$query_parameter['data']['item'],
+					$query_parameter['pos'], $query_parameter['length']
 				);
 			}
 		}
+		while ($hist_function = prev($hist_functions));
 	}
 
 	return $expression;
-}
-
-/**
- * Check permissions for all hosts used in expression and returns unique /host/key references of expression.
- *
- * @param int    $permission
- * @param string $expression
- *
- * @return array
- */
-function check_right_on_trigger_by_expression(int $permission, string $expression): array {
-	$expressionData = new CTriggerExpression();
-	if (!$expressionData->parse($expression)) {
-		error($expressionData->error);
-		return [false, []];
-	}
-	$expression_hosts = $expressionData->result->getHosts();
-
-	$hosts = API::Host()->get([
-		'filter' => ['host' => $expression_hosts],
-		'editable' => ($permission == PERM_READ_WRITE),
-		'output' => ['hostid', 'host'],
-		'templated_hosts' => true,
-		'preservekeys' => true
-	]);
-	$hosts = zbx_toHash($hosts, 'host');
-
-	foreach ($expression_hosts as $host) {
-		if (!isset($hosts[$host])) {
-			error(_s('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.', $host));
-			return [false, []];
-		}
-	}
-
-	$queries = $expressionData->result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
-	$queries = array_keys(array_flip(array_column($queries, 'match')));
-
-	return [true, $queries];
 }
 
 function replace_template_dependencies($deps, $hostid) {
@@ -703,19 +671,23 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 }
 
 /**
- * @param array  $groupids
- * @param string $application
- * @param array  $host_options
- * @param array  $trigger_options
- * @param array  $problem_options
- * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
- * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
- * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param array   $groupids
+ * @param array   $host_options
+ * @param array   $trigger_options
+ * @param array   $problem_options
+ * @param int     $problem_options['min_severity']         (optional) Minimal problem severity.
+ * @param int     $problem_options['show_suppressed']      (optional) Whether to show triggers with suppressed problems.
+ * @param int     $problem_options['time_from']            (optional) The time starting from which the problems were created.
+ * @param array   $problem_options['tags']                 (optional)
+ * @param string  $problem_options['tags'][]['tag']        (optional)
+ * @param int     $problem_options['tags'][]['operation']  (optional)
+ * @param string  $problem_options['tags'][]['value']      (optional)
+ * @param int     $problem_options['evaltype']		       (optional)
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, string $application, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []): array {
+function getTriggersOverviewData(array $groupids, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []): array {
 
 	$host_options = [
 		'output' => ['hostid', 'name'],
@@ -743,17 +715,7 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 		$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
 		$fetch_hosts = (count($db_hosts) > $limit);
 
-		$applicationids = ($application !== '')
-			? array_keys(API::Application()->get([
-				'output' => [],
-				'hostids' => array_keys($db_hosts),
-				'search' => ['name' => $application],
-				'preservekeys' => true
-			]))
-			: null;
-
 		$db_triggers = getTriggersWithActualSeverity([
-			'applicationids' => $applicationids,
 			'hostids' => array_keys($db_hosts)
 		] + $trigger_options, $problem_options);
 
@@ -794,13 +756,20 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 /**
  * Get triggers data with priority set to highest priority of unresolved problems generated by this trigger.
  *
- * @param array $trigger_options                     API options. Array 'output' should contain 'value', option
- *                                                   'preservekeys' should be set to true.
- * @param array $problem_options
- * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
- * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
- * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
- * @param bool  $problem_options['acknowledged']     (optional) Whether to show triggers with acknowledged problems.
+ * @param array $trigger_options                           API options. Array 'output' should contain 'value', option
+ *                                                         'preservekeys' should be set to true.
+ * @param array   $problem_options
+ * @param int     $problem_options['show_suppressed']      Whether to show triggers with suppressed problems.
+ * @param int     $problem_options['min_severity']         (optional) Minimal problem severity.
+ * @param int     $problem_options['time_from']            (optional) The time starting from which the problems were
+ *                                                         created.
+ * @param bool    $problem_options['acknowledged']         (optional) Whether to show triggers with acknowledged
+ *                                                         problems.
+ * @param array   $problem_options['tags']                 (optional)
+ * @param string  $problem_options['tags'][]['tag']        (optional)
+ * @param int     $problem_options['tags'][]['operation']  (optional)
+ * @param string  $problem_options['tags'][]['value']      (optional)
+ * @param int     $problem_options['evaltype']		       (optional)
  *
  * @return array
  */
@@ -852,7 +821,11 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
-			'time_from' => $problem_options['time_from']
+			'time_from' => $problem_options['time_from'],
+			'tags' => array_key_exists('tags', $problem_options) ? $problem_options['tags'] : null,
+			'evaltype' => array_key_exists('evaltype', $problem_options)
+				? $problem_options['evaltype']
+				: TAG_EVAL_TYPE_AND_OR
 		]);
 
 		foreach ($problems as $problem) {
@@ -1213,22 +1186,24 @@ function make_trigger_details($trigger, $eventid) {
  *
  * @param string $expression  Trigger expression or recovery expression string.
  * @param int    $type        Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param string $error       [OUT] An error message.
  *
  * @return array|bool
  */
-function analyzeExpression($expression, $type) {
+function analyzeExpression(string $expression, int $type, string &$error = null) {
 	if ($expression === '') {
 		return ['', null];
 	}
 
-	$expression_data = new CTriggerExpression();
-	if (!$expression_data->parse($expression)) {
-		error($expression_data->error);
+	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+
+	if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
+		$error = $expression_parser->getError();
 
 		return false;
 	}
 
-	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_parser, 0, $expression_parser->getLength() - 1);
 
 	$next = [];
 	$letter_num = 0;
@@ -1273,7 +1248,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				];
 
 				$levelErrors = expressionHighLevelErrors($element['expression']);
-				if (count($levelErrors) > 0) {
+				if ($levelErrors) {
 					$levelDetails['expression']['levelErrors'] = $levelErrors;
 				}
 				$treeList[] = $levelDetails;
@@ -1328,7 +1303,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				];
 
 				$levelErrors = expressionHighLevelErrors($element['expression']);
-				if (count($levelErrors) > 0) {
+				if ($levelErrors) {
 					$levelDetails['expression']['levelErrors'] = $levelErrors;
 				}
 				$treeList[] = $levelDetails;
@@ -1355,14 +1330,18 @@ function expressionHighLevelErrors($expression) {
 
 	if (!isset($errors[$expression])) {
 		$errors[$expression] = [];
-		$expressionData = new CTriggerExpression();
-		if ($expressionData->parse($expression)) {
-			foreach ($expressionData->expressions as $exprPart) {
-				$info = get_item_function_info($exprPart['expression']);
+		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+			$tokens = $expression_parser->getResult()->getTokensOfTypes([
+				CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION,
+				CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+			]);
+			foreach ($tokens as $token) {
+				$info = get_item_function_info($token['match']);
 
 				if (!is_array($info) && isset($definedErrorPhrases[$info])) {
-					if (!isset($errors[$expression][$exprPart['expression']])) {
-						$errors[$expression][$exprPart['expression']] = $definedErrorPhrases[$info];
+					if (!isset($errors[$expression][$token['match']])) {
+						$errors[$expression][$token['match']] = $definedErrorPhrases[$info];
 					}
 				}
 			}
@@ -1370,18 +1349,23 @@ function expressionHighLevelErrors($expression) {
 	}
 
 	$ret = [];
-	if (count($errors[$expression]) == 0) {
+	if (!$errors[$expression]) {
 		return $ret;
 	}
 
-	$expressionData = new CTriggerExpression();
-	if ($expressionData->parse($expression)) {
-		foreach ($expressionData->expressions as $exprPart) {
-			if (isset($errors[$expression][$exprPart['expression']])) {
-				$ret[$exprPart['expression']] = $errors[$expression][$exprPart['expression']];
+	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+		$tokens = $expression_parser->getResult()->getTokensOfTypes([
+			CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION,
+			CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+		]);
+		foreach ($tokens as $token) {
+			if (isset($errors[$expression][$token['match']])) {
+				$ret[$token['match']] = $errors[$expression][$token['match']];
 			}
 		}
 	}
+
 	return $ret;
 }
 
@@ -1434,28 +1418,15 @@ function expressionLevelDraw(array $next, $level) {
  *     ]
  *   ]
  *
- * @param CTriggerExpression $expressionData
+ * @param CExpressionParser $expression_parser
  * @param int $start
  * @param int $end
  *
  * @return array
  */
-function getExpressionTree(CTriggerExpression $expressionData, int $start, int $end) {
-	$blankSymbols = [' ', "\r", "\n", "\t"];
-
-	$tokens = $expressionData->result->getTokensOfTypes([
-		CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
-		CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
-		CTriggerExprParserResult::TOKEN_TYPE_MACRO,
-		CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
-		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
-		CTriggerExprParserResult::TOKEN_TYPE_STRING,
-		CTriggerExprParserResult::TOKEN_TYPE_FUNCTION
-	]);
-	$tokens_by_position = [];
-	foreach ($tokens as $token) {
-		$tokens_by_position[$token->pos] = $token;
-	}
+function getExpressionTree(CExpressionParser $expression_parser, int $start, int $end) {
+	$tokens = array_column($expression_parser->getResult()->getTokens(), null, 'pos');
+	$expression = $expression_parser->getMatch();
 
 	$expressionTree = [];
 	foreach (['or', 'and'] as $operator) {
@@ -1464,11 +1435,9 @@ function getExpressionTree(CTriggerExpression $expressionData, int $start, int $
 		$rParentheses = -1;
 		$expressions = [];
 		$openSymbolNum = $start;
-		$operatorPos = 0;
-		$operatorToken = '';
 
 		for ($i = $start, $level = 0; $i <= $end; $i++) {
-			switch ($expressionData->expression[$i]) {
+			switch ($expression[$i]) {
 				case ' ':
 				case "\r":
 				case "\n":
@@ -1477,12 +1446,14 @@ function getExpressionTree(CTriggerExpression $expressionData, int $start, int $
 						$openSymbolNum++;
 					}
 					break;
+
 				case '(':
 					if ($level == 0) {
 						$lParentheses = $i;
 					}
 					$level++;
 					break;
+
 				case ')':
 					$level--;
 					if ($level == 0) {
@@ -1491,81 +1462,76 @@ function getExpressionTree(CTriggerExpression $expressionData, int $start, int $
 					break;
 
 				default:
-					if (array_key_exists($i, $tokens_by_position)) {
-						$token = $tokens_by_position[$i];
+					/*
+					 * Once reached the end of a complete expression, parse the expression on the left side of the
+					 * operator.
+					 */
+					if ($level == 0 && array_key_exists($i, $tokens)
+							&& $tokens[$i]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
+							&& $tokens[$i]['match'] === $operator) {
+						// Find the last symbol of the expression before the operator.
+						$closeSymbolNum = $i - 1;
 
-						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-								&& $token->match === $operator
-								&& $end > $token->pos
-								&& $level == 0) {
-							$closeSymbolNum = $token->pos;
-
-							// Trim blank symbols after the expression.
-							while (in_array($expressionData->expression[$closeSymbolNum - 1], $blankSymbols)) {
-								$closeSymbolNum--;
-							}
-
-							$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
-
-							$openSymbolNum = $i + $token->length;
-							$operatorFound = true;
+						// Trim blank symbols after the expression.
+						while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
+							$closeSymbolNum--;
 						}
-						// Jump over the token.
-						else {
-							$i += $token->length - 1;
-						}
+
+						$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
+						$openSymbolNum = $i + $tokens[$i]['length'];
+						$operatorFound = true;
 					}
-				break;
 			}
 		}
 
-		// trim blank symbols in the end of the trigger expression
+		// Trim blank symbols in the end of the trigger expression.
 		$closeSymbolNum = $end;
-		while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
+		while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
 			$closeSymbolNum--;
 		}
 
-		// we've found a whole expression and parsed the expression on the left side of the operator,
-		// parse the expression on the right
+		/*
+		 * Once found a whole expression and parsed the expression on the left side of the operator, parse the
+		 * expression on the right.
+		 */
 		if ($operatorFound) {
-			$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+			$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
 
-			// trim blank symbols in the beginning of the trigger expression
+			// Trim blank symbols in the beginning of the trigger expression.
 			$openSymbolNum = $start;
-			while (in_array($expressionData->expression[$openSymbolNum], $blankSymbols)) {
+			while (strpos(CExpressionParser::WHITESPACES, $expression[$openSymbolNum]) !== false) {
 				$openSymbolNum++;
 			}
 
-			// trim blank symbols in the end of the trigger expression
+			// Trim blank symbols in the end of the trigger expression.
 			$closeSymbolNum = $end;
-			while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
+			while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
 				$closeSymbolNum--;
 			}
 
 			$expressionTree = [
 				'id' => $openSymbolNum.'_'.$closeSymbolNum,
-				'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+				'expression' => substr($expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 				'type' => 'operator',
 				'operator' => $operator,
 				'elements' => $expressions
 			];
 			break;
 		}
-		// if we've tried both operators and didn't find anything, it means there's only one expression
-		// return the result
+		// If finding both operators failed, it means there's only one expression return the result.
 		elseif ($operator === 'and') {
-			// trim extra parentheses
+			// Trim extra parentheses.
 			if ($openSymbolNum == $lParentheses && $closeSymbolNum == $rParentheses) {
 				$openSymbolNum++;
 				$closeSymbolNum--;
 
-				$expressionTree = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+				$expressionTree = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
 			}
-			// no extra parentheses remain, return the result
+			// No extra parentheses remain, return the result.
 			else {
 				$expressionTree = [
 					'id' => $openSymbolNum.'_'.$closeSymbolNum,
-					'expression' => substr($expressionData->expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+					'expression' => substr($expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
 					'type' => 'expression'
 				];
 			}
@@ -1588,28 +1554,27 @@ function getExpressionTree(CTriggerExpression $expressionData, int $start, int $
  * @param string $expression_id   Element identifier like "0_55".
  * @param string $action          Action to perform.
  * @param string $new_expression  Expression for AND, OR or replace actions.
+ * @param string $error           [OUT] An error message.
  *
  * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expression_id, $action, $new_expression) {
+function remakeExpression($expression, $expression_id, $action, $new_expression, string &$error = null) {
 	if ($expression === '') {
 		return false;
 	}
 
-	$expression_data = new CTriggerExpression();
-	if ($action !== 'R' && !$expression_data->parse($new_expression)) {
-		error($expression_data->error);
-
+	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	if ($action !== 'R' && $expression_parser->parse($new_expression) != CParser::PARSE_SUCCESS) {
+		$error = $expression_parser->getError();
 		return false;
 	}
 
-	if (!$expression_data->parse($expression)) {
-		error($expression_data->error);
-
+	if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
+		$error = $expression_parser->getError();
 		return false;
 	}
 
-	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_parser, 0, $expression_parser->getLength() - 1);
 
 	if (rebuildExpressionTree($expression_tree, $expression_id, $action, $new_expression)) {
 		$expression = makeExpression($expression_tree);
@@ -1802,7 +1767,7 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 	return $expression;
 }
 
-function get_item_function_info($expr) {
+function get_item_function_info(string $expr) {
 	$rule_float = ['value_type' => _('Numeric (float)'), 'values' => null];
 	$rule_int = ['value_type' => _('Numeric (integer)'), 'values' => null];
 	$rule_str = ['value_type' => _('String'), 'values' => null];
@@ -1849,33 +1814,13 @@ function get_item_function_info($expr) {
 		],
 		'log_as_0or1' => [
 			ITEM_VALUE_TYPE_LOG => $rule_0or1
-		],
-		'date' => [
-			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
-		],
-		'time' => [
-			'any' => ['value_type' => 'HHMMSS', 'values' => null]
-		],
-		'day_of_month' => [
-			'any' => ['value_type' => '1-31', 'values' => null]
-		],
-		'day_of_week' => [
-			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
-		],
-		'now' => [
-			'any' => ['value_type' => 'Numeric (integer)', 'values' => null]
 		]
 	];
 
-	$functions = [
-		'abs' => $rules['numeric_as_float'],
+	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
-		'bitand' => $rules['integer'],
-		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
-		'date' => $rules['date'],
-		'dayofmonth' => $rules['day_of_month'],
-		'dayofweek' => $rules['day_of_week'],
+		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'find' => $rules['string_as_0or1'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
@@ -1887,10 +1832,8 @@ function get_item_function_info($expr) {
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
-		'now' => $rules['now'],
 		'percentile' => $rules['numeric'],
 		'sum' => $rules['numeric'],
-		'time' => $rules['time'],
 		'timeleft' => $rules['numeric_as_float'],
 		'trendavg' => $rules['numeric'],
 		'trendcount' => $rules['numeric'],
@@ -1899,98 +1842,111 @@ function get_item_function_info($expr) {
 		'trendsum' => $rules['numeric']
 	];
 
-	$expr_data = new CTriggerExpression();
-	$expression = $expr_data->parse($expr);
+	$math_functions = [
+		'abs' => ['any' => $rule_float],
+		'avg' => ['any' => $rule_float],
+		'bitand' => ['any' => $rule_int],
+		'date' => [
+			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
+		],
+		'dayofmonth' => [
+			'any' => ['value_type' => '1-31', 'values' => null]
+		],
+		'dayofweek' => [
+			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
+		],
+		'length' => ['any' => $rule_int],
+		'max' => ['any' => $rule_float],
+		'min' => ['any' => $rule_float],
+		'now' => ['any' => $rule_int],
+		'sum' => ['any' => $rule_float],
+		'time' => [
+			'any' => ['value_type' => 'HHMMSS', 'values' => null]
+		]
+	];
 
-	if (!$expression) {
-		return EXPRESSION_NOT_A_MACRO_ERROR;
-	}
+	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser->parse($expr);
+	$token = $expression_parser->getResult()->getTokens()[0];
 
-	switch (true) {
-		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
+	switch ($token['type']) {
+		case CExpressionParserResult::TOKEN_TYPE_MACRO:
 			$result = $rule_0or1;
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
-		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
+		case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+		case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
 			$result = $rule_any;
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION)):
-			$expr_part = reset($expr_data->expressions);
-			$is_standalone = in_array($expr_part['functionName'], getStandaloneFunctions());
-			$hosts = $expr_data->result->getHosts();
-			$items = $expr_data->result->getItems();
-
-			if (!array_key_exists($expr_part['functionName'], $functions)) {
+		case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+			if (!array_key_exists($token['data']['function'], $hist_functions)) {
 				$result = EXPRESSION_FUNCTION_UNKNOWN;
 				break;
 			}
-			elseif (!$is_standalone && !$hosts) {
-				$result = EXPRESSION_HOST_UNKNOWN;
-				break;
-			}
-			elseif (!$is_standalone && !$items) {
-				$result = EXPRESSION_HOST_ITEM_UNKNOWN;
-				break;
-			}
-			elseif ($is_standalone) {
-				$result = $functions[$expr_part['functionName']]['any'];
-				break;
-			}
 
-			$host = API::Host()->get([
+			$hosts = API::Host()->get([
 				'output' => ['hostid'],
-				'filter' => ['host' => $hosts[0]],
+				'filter' => [
+					'host' => $token['data']['parameters'][0]['data']['host']
+				],
 				'templated_hosts' => true
 			]);
 
-			if (!$host) {
+			if (!$hosts) {
 				$result = EXPRESSION_HOST_UNKNOWN;
 				break;
 			}
 
-			$item = API::Item()->get([
+			$items = API::Item()->get([
 				'output' => ['value_type'],
-				'hostids' => $host[0]['hostid'],
+				'hostids' => $hosts[0]['hostid'],
 				'filter' => [
-					'key_' => $items[0]
+					'key_' => $token['data']['parameters'][0]['data']['item']
 				],
 				'webitems' => true
 			]);
 
-			if (!$item) {
-				$item = API::ItemPrototype()->get([
+			if (!$items) {
+				$items = API::ItemPrototype()->get([
 					'output' => ['value_type'],
-					'hostids' => $host[0]['hostid'],
+					'hostids' => $hosts[0]['hostid'],
 					'filter' => [
-						'key_' => $expr_data->result->getItems()[0]
+						'key_' => $token['data']['parameters'][0]['data']['item']
 					]
 				]);
 			}
 
-			if (!$item) {
+			if (!$items) {
 				$result = EXPRESSION_HOST_ITEM_UNKNOWN;
 				break;
 			}
 
-			$function = $functions[$expr_part['functionName']];
-			$value_type = $item[0]['value_type'];
+			$hist_function = $hist_functions[$token['data']['function']];
+			$value_type = $items[0]['value_type'];
 
-			if (array_key_exists('any', $function)) {
+			if (array_key_exists('any', $hist_function)) {
 				$value_type = 'any';
 			}
-			elseif (!array_key_exists($value_type, $function)) {
+			elseif (!array_key_exists($value_type, $hist_function)) {
 				$result = EXPRESSION_UNSUPPORTED_VALUE_TYPE;
 				break;
 			}
 
-			$result = $function[$value_type];
+			$result = $hist_function[$value_type];
+			break;
+
+		case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+			if (!array_key_exists($token['data']['function'], $math_functions)) {
+				$result = EXPRESSION_FUNCTION_UNKNOWN;
+				break;
+			}
+
+			$result = $math_functions[$token['data']['function']]['any'];
 			break;
 
 		default:
 			$result = EXPRESSION_NOT_A_MACRO_ERROR;
-			break;
 	}
 
 	return $result;

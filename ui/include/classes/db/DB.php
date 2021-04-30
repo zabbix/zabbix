@@ -304,6 +304,53 @@ class DB {
 		return isset($field['default']) ? $field['default'] : null;
 	}
 
+	/**
+	 * Get the updated values of a record by correctly comparing the new and old ones, taking field types into account.
+	 *
+	 * @param string $table_name
+	 * @param array  $new_values
+	 * @param array  $old_values
+	 *
+	 * @return array
+	 */
+	public static function getUpdatedValues(string $table_name, array $new_values, array $old_values): array {
+		$updated_values = [];
+
+		// Discard field names not existing in the target table.
+		$fields = array_intersect_key(DB::getSchema($table_name)['fields'], $new_values);
+
+		foreach ($fields as $name => $spec) {
+			if (!array_key_exists($name, $old_values)) {
+				$updated_values[$name] = $new_values[$name];
+				continue;
+			}
+
+			switch ($spec['type']) {
+				case DB::FIELD_TYPE_ID:
+					if (bccomp($new_values[$name], $old_values[$name]) != 0) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+
+				case DB::FIELD_TYPE_INT:
+				case DB::FIELD_TYPE_UINT:
+				case DB::FIELD_TYPE_FLOAT:
+					if ($new_values[$name] != $old_values[$name]) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+
+				default:
+					if ($new_values[$name] !== $old_values[$name]) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+			}
+		}
+
+		return $updated_values;
+	}
+
 	private static function checkValueTypes($tableSchema, &$values) {
 		global $DB;
 
@@ -847,11 +894,11 @@ class DB {
 	 * Delete data from DB.
 	 *
 	 * Example:
-	 * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
-	 * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
+	 * DB::delete('items', ['itemid' => [1, 8, 6]]);
+	 * DELETE FROM items WHERE itemid IN (1, 8, 6)
 	 *
-	 * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
-	 * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
+	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10]]);
+	 * DELETE FROM items WHERE itemid IN (1) AND templateid IN (10)
 	 *
 	 * @param string $table
 	 * @param array  $wheres pair of fieldname => fieldvalues

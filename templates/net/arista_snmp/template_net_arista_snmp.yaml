@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:34Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -29,19 +29,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: Voltage
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Get sensors'
@@ -53,9 +40,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Gets sensors with type, description, and thresholds.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -74,6 +58,10 @@ zabbix_export:
                       });
                   });
                   return JSON.stringify(data);
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
       discovery_rules:
         -
           name: 'Entity discovery'
@@ -98,14 +86,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
@@ -116,14 +105,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -156,9 +146,10 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
@@ -217,11 +208,12 @@ zabbix_export:
               description: |
                 MIB: ENTITY-SENSORS-MIB
                 The operational status of the sensor {#SENSOR_INFO}
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -318,11 +310,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: ENTITY-STATE-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -359,11 +352,12 @@ zabbix_export:
               description: |
                 MIB: ENTITY-SENSORS-MIB
                 The operational status of the sensor {#SENSOR_INFO}
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
@@ -377,14 +371,15 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
@@ -511,9 +506,10 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
+              tags:
                 -
-                  name: Voltage
+                  tag: Application
+                  value: Voltage
               trigger_prototypes:
                 -
                   expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
@@ -621,7 +617,7 @@ zabbix_export:
         -
           macro: '{$MEMORY.NAME.NOT_MATCHES}'
           value: (Buffer|Cache)
-          description: 'Filter is overriden to ignore RAM(Cache) and RAM(Buffers) memory objects.'
+          description: 'Filter is overridden to ignore RAM(Cache) and RAM(Buffers) memory objects.'
         -
           macro: '{$PSU_CRIT_STATUS}'
           value: '2'

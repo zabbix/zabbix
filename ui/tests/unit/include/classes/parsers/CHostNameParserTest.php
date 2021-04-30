@@ -53,14 +53,6 @@ class CHostNameParserTest extends TestCase {
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}']
 				]
 			],
-			[
-				'*', 0, ['allow_host_all' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '*',
-					'macros' => []
-				]
-			],
 			// partial success
 			[
 				'Host Name Two ', 0, [],
@@ -150,22 +142,6 @@ class CHostNameParserTest extends TestCase {
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}', '{#D}']
 				]
 			],
-			[
-				'/', 0, ['allow_host_current' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '',
-					'macros' => []
-				]
-			],
-			[
-				'*/', 0, ['allow_host_all' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '*',
-					'macros' => []
-				]
-			],
 			// fail
 			[
 				'', 0, [],
@@ -225,22 +201,6 @@ class CHostNameParserTest extends TestCase {
 			],
 			[
 				'{#ABC}', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'macros' => []
-				]
-				],
-			[
-				'*', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'macros' => []
-				]
-			],
-			[
-				'/', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',

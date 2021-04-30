@@ -30,15 +30,15 @@ class CTextTriggerConstructor {
 	/**
 	 * Parser used for parsing trigger expressions.
 	 *
-	 * @var CTriggerExpression
+	 * @var CExpressionParser
 	 */
-	protected $triggerExpression;
+	protected $expression_parser;
 
 	/**
-	 * @param CTriggerExpression $triggerExpression     trigger expression parser
+	 * @param CExpressionParser $expression_parser
 	 */
-	public function __construct(CTriggerExpression $triggerExpression) {
-		$this->triggerExpression = $triggerExpression;
+	public function __construct(CExpressionParser $expression_parser) {
+		$this->expression_parser = $expression_parser;
 	}
 
 	/**
@@ -47,6 +47,8 @@ class CTextTriggerConstructor {
 	 * Most of this function was left unchanged to preserve the current behavior of the constructor.
 	 * Feel free to rewrite and correct it if necessary.
 	 *
+	 * @param string    $host                       host name
+	 * @param string    $item_key                    item key
 	 * @param array     $expressions                array of expression parts
 	 * @param string    $expressions[]['value']     expression string
 	 * @param int       $expressions[]['type']      whether the string should match the expression; supported values:
@@ -54,16 +56,19 @@ class CTextTriggerConstructor {
 	 *
 	 * @return bool|string
 	 */
-	public function getExpressionFromParts(array $expressions) {
+	public function getExpressionFromParts(string $host, string $item_key, array $expressions) {
 		$result = '';
+		$query = '/'.$host.'/'.$item_key;
 
 		if (empty($expressions)) {
 			error(_('Expression cannot be empty'));
+
 			return false;
 		}
 
 		// regexp used to split an expressions into tokens
-		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?(-)? ?[(]*((find)(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?(-)? ?[(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+		$functions = ['regexp' => 1, 'iregexp' => 1];
 		$expr_array = [];
 		$cexpor = 0;
 		$startpos = -1;
@@ -106,15 +111,16 @@ class CTextTriggerConstructor {
 			// start from the first part of the expression, then move to the next one
 			while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
 				$arr[6] = strtolower($arr[6]);
-				if ($arr[6] !== 'find') {
+				if (!isset($functions[$arr[6]])) {
 					error(_('Incorrect function is used').'. ['.$expression['value'].']');
+
 					return false;
 				}
-
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
 				$expr_array[$sub_expr_count]['not'] = trim($arr[3]);
 				$expr_array[$sub_expr_count]['minus'] = trim($arr[4]);
-				$expr_array[$sub_expr_count]['regexp'] = $arr[6].$arr[7];
+				$expr_array[$sub_expr_count]['func'] = $arr[6];
+				$expr_array[$sub_expr_count]['pattern'] = $arr[8];
 
 				$sub_expr_count++;
 				$expr = $arr[1];
@@ -122,6 +128,7 @@ class CTextTriggerConstructor {
 
 			if (empty($expr_array)) {
 				error(_('Incorrect trigger expression').'. ['.$expression['value'].']');
+
 				return false;
 			}
 
@@ -135,11 +142,12 @@ class CTextTriggerConstructor {
 			foreach ($expr_array as $id => $expr) {
 				$eq = ($expr['eq'] === '') ? '' : ' '.$expr['eq'].' ';
 				$not = ($expr['not'] === '') ? '' : $expr['not'].' ';
+				$function = 'find('.$query.',,"'.$expr['func'].'","'.$expr['pattern'].'")';
 				if ($multi > 0) {
-					$sub_expr = $eq.'('.$not.$expr['minus'].$expr['regexp'].')'.$sub_eq.$sub_expr;
+					$sub_expr = $eq.'('.$not.$expr['minus'].$function.')'.$sub_eq.$sub_expr;
 				}
 				else {
-					$sub_expr = $eq.$expr['eq'].$not.$expr['minus'].$expr['regexp'].$sub_eq.$sub_expr;
+					$sub_expr = $eq.$expr['eq'].$not.$expr['minus'].$function.')'.$sub_eq.$sub_expr;
 				}
 			}
 
@@ -179,33 +187,36 @@ class CTextTriggerConstructor {
 		$expression = preg_replace('/\(\(\((.+?)\)\) and/i', '(($1) and', $expression);
 		$expression = preg_replace('/\(\(\((.+?)\)\)$/i', '(($1)', $expression);
 
-		$parseResult = $this->triggerExpression->parse($expression);
+		$this->expression_parser->parse($expression);
 
 		$expressions = [];
-		$splitTokens = $this->splitTokensByFirstLevel($parseResult->getTokens());
-		foreach($splitTokens as $key => $tokens) {
+		$splitTokens = $this->splitTokensByFirstLevel($this->expression_parser->getResult()->getTokens());
+		foreach ($splitTokens as $key => $tokens) {
 			$expr = [];
-			$parts = [];
-			$logical_operator = '';
 
 			// replace whole function macros with their functions
 			foreach ($tokens as $token) {
-				if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION) {
-					$params = $token->params_raw['parameters'];
-					$parts[] = [
-						'operator' => array_key_exists(2, $params) ? $params[2]->match : '',
-						'pattern' => array_key_exists(3, $params) ? $params[3]->match : ''
-					];
-				}
-				elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-						&& ($token->match === 'and' || $token->match === 'or')
-						&& $logical_operator === '') {
-					$logical_operator = ' '.$token->match.' ';
+				switch ($token['type']) {
+					case CExpressionParserResult::TOKEN_TYPE_OPERATOR:
+						$value = ($token['match'] === 'and' || $token['match'] === 'or' || $token['match'] === 'not')
+							? ' '.$token['match'].' '
+							: $token['match'];
+						break;
+
+					case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+						if ($token['data']['function'] === 'find' && count($token['data']['parameters']) == 4) {
+							$function = CExpressionParser::unquoteString($token['data']['parameters'][2]['match']);
+							$pattern = CExpressionParser::unquoteString($token['data']['parameters'][3]['match']);
+							$value = $function.'('.$pattern.')';
+							break;
+						}
+						// break; is not missing here
+
+					default:
+						$value = $token['match'];
 				}
 
-				$is_operator = ($token->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-					&& in_array($token->match, ['and', 'or', 'not']));
-				$expr[] = $is_operator ? ' '.$token->match.' ' : $token->match;
+				$expr[] = $value;
 			}
 
 			$expr = implode($expr);
@@ -223,10 +234,6 @@ class CTextTriggerConstructor {
 			$expressions[$key]['type'] = (strpos($expr, '<>0', mb_strlen($expr) - 4) === false)
 				? self::EXPRESSION_TYPE_NO_MATCH
 				: self::EXPRESSION_TYPE_MATCH;
-			$expressions[$key]['details'] = [
-				'logical_operator' => $logical_operator,
-				'parts' => $parts
-			];
 		}
 
 		return $expressions;
@@ -237,7 +244,7 @@ class CTextTriggerConstructor {
 	 *
 	 * The tokens are split at the first occurrence of the "and" or "or" operators with respect to parentheses.
 	 *
-	 * @param array $tokens     an array of tokens from the CTriggerExprParserResult
+	 * @param array $tokens     an array of tokens from the CExpressionParserResult
 	 *
 	 * @return array    an array of token arrays grouped by expression
 	 */
@@ -247,11 +254,11 @@ class CTextTriggerConstructor {
 
 		$level = 0;
 		foreach ($tokens as $token) {
-			switch ($token->type) {
-				case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
+			switch ($token['type']) {
+				case CExpressionParserResult::TOKEN_TYPE_OPERATOR:
 					// look for an "or" or "and" operator on the top parentheses level
 					// if such an expression is found, save all of the tokens before it as a separate expression
-					if ($level == 0 && ($token->match === 'or' || $token->match === 'and')) {
+					if ($level == 0 && ($token['match'] === 'or' || $token['match'] === 'and')) {
 						$expressions[] = $currentExpression;
 						$currentExpression = [];
 
@@ -260,11 +267,11 @@ class CTextTriggerConstructor {
 					}
 
 					break;
-				case CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE:
+				case CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE:
 					$level++;
 
 					break;
-				case CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE:
+				case CExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE:
 					$level--;
 
 					break;

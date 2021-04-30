@@ -41,10 +41,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	trigger_eventids, triggerids;
+	zbx_vector_uint64_t	tagged_eventids, triggerids;
 	int			i, index;
 
-	zbx_vector_uint64_create(&trigger_eventids);
+	zbx_vector_uint64_create(&tagged_eventids);
 	zbx_vector_uint64_create(&triggerids);
 
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -80,10 +80,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 		event->trigger.triggerid = 0;
 
-		if (EVENT_SOURCE_TRIGGERS == event->source)
+		if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 		{
 			zbx_vector_ptr_create(&event->tags);
-			zbx_vector_uint64_append(&trigger_eventids, event->eventid);
+			zbx_vector_uint64_append(&tagged_eventids, event->eventid);
 		}
 
 		if (EVENT_OBJECT_TRIGGER == event->object)
@@ -118,13 +118,13 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	}
 	DBfree_result(result);
 
-	if (0 != trigger_eventids.values_num)	/* EVENT_SOURCE_TRIGGERS */
+	if (0 != tagged_eventids.values_num)	/* EVENT_SOURCE_TRIGGERS || EVENT_SOURCE_INTERNAL */
 	{
 		DB_EVENT	*event = NULL;
 
 		sql_offset = 0;
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", trigger_eventids.values,
-				trigger_eventids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", tagged_eventids.values,
+				tagged_eventids.values_num);
 
 		result = DBselect("select eventid,tag,value from event_tag where%s order by eventid", sql);
 
@@ -207,7 +207,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&trigger_eventids);
+	zbx_vector_uint64_destroy(&tagged_eventids);
 	zbx_vector_uint64_destroy(&triggerids);
 }
 
@@ -222,7 +222,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
  ******************************************************************************/
 void	zbx_db_free_event(DB_EVENT *event)
 {
-	if (EVENT_SOURCE_TRIGGERS == event->source)
+	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 	{
 		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
 		zbx_vector_ptr_destroy(&event->tags);

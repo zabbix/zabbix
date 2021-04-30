@@ -48,7 +48,7 @@ class C10FunctionMacroParser extends CParser {
 	/**
 	 * Parser for trigger functions.
 	 *
-	 * @var CFunctionParser
+	 * @var C10FunctionParser
 	 */
 	private $function_parser;
 

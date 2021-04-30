@@ -29,22 +29,40 @@ class CPeriodParserTest extends TestCase {
 	public static function dataProvider() {
 		return [
 			['', 0, [], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['', 0, ['lldmacros' => true], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			[':', 0, [], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['#', 0, [], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['{#M}', 0, [], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['{#M}', 0, ['usermacros' => true], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['{#M}', 0, ['lldmacros' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
@@ -59,10 +77,16 @@ class CPeriodParserTest extends TestCase {
 				'time_shift' => ''
 			]],
 			['{$M}', 0, [], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['{$M}', 0, ['lldmacros' => true], [
-				'rc' => CParser::PARSE_FAIL
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]],
 			['{$M}', 0, ['usermacros' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
@@ -189,6 +213,12 @@ class CPeriodParserTest extends TestCase {
 				'match' => '#1',
 				'sec_num' => '#1',
 				'time_shift' => ''
+			]],
+			[':now/y', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'sec_num' => '',
+				'time_shift' => ''
 			]]
 		];
 	}
@@ -204,20 +234,12 @@ class CPeriodParserTest extends TestCase {
 	public function testParse(string $source, int $pos, array $options, array $expected) {
 		$period_parser = new CPeriodParser($options);
 
-		$rc = $period_parser->parse($source, $pos);
-
-		if ($expected['rc'] == CParser::PARSE_FAIL || $rc == CParser::PARSE_FAIL) {
-			$this->assertSame($expected, [
-				'rc' => $rc
-			]);
-		}
-		else {
-			$this->assertSame($expected, [
-				'rc' => $rc,
-				'match' => $period_parser->result->match,
-				'sec_num' => $period_parser->result->sec_num,
-				'time_shift' => $period_parser->result->time_shift
-			]);
-		}
+		$this->assertSame($expected, [
+			'rc' => $period_parser->parse($source, $pos),
+			'match' => $period_parser->getMatch(),
+			'sec_num' => $period_parser->getSecNum(),
+			'time_shift' => $period_parser->getTimeshift()
+		]);
+		$this->assertSame(strlen($expected['match']), strlen($period_parser->getMatch()));
 	}
 }

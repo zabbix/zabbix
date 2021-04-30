@@ -24,41 +24,61 @@
  */
 class CQueryParser extends CParser {
 
-	/**
-	 * Parser for item keys.
-	 *
-	 * @var CItemKey
-	 */
-	private $item_key_parser;
+	// Wildcard character to define host or item key.
+	const HOST_ITEMKEY_WILDCARD = '*';
 
-	/**
-	 * Parser for host names.
-	 *
-	 * @var CHostNameParser
-	 */
 	private $host_name_parser;
+	private $host_macro_parser;
+	private $item_key_parser;
+	private $filter_parser;
 
 	/**
-	 * Parsed data.
+	 * An options array.
 	 *
-	 * @var CQueryParserResult
+	 * Supported options:
+	 *   'calculated' => false    Allow wildcards to be used in place of hostname and item key. Allow filter expression
+	 *                            for item.
+	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false    Allow empty hostname.
+	 *
+	 * @var array
 	 */
-	public $result;
+	private $options = [
+		'calculated' => false,
+		'host_macro' => false,
+		'host_macro_n' => false,
+		'empty_host' => false
+	];
+
+	/**
+	 * @var string
+	 */
+	private $host = '';
+
+	/**
+	 * @var string
+	 */
+	private $item = '';
 
 	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		if (array_key_exists('calculated', $options) && $options['calculated']) {
-			$this->item_key_parser = new CItemKey(['with_filter' => true, 'allow_wildcard' => true]);
-			$this->host_name_parser = new CHostNameParser([
-				'allow_host_all' => true,
-				'allow_host_current' => true
+		$this->options = $options + $this->options;
+
+		$this->host_name_parser = new CHostNameParser();
+		if ($this->options['host_macro'] || $this->options['host_macro_n']) {
+			$this->host_macro_parser = new CMacroParser([
+				'macros' => ['{HOST.HOST}'],
+				'ref_type' => $this->options['host_macro_n']
+					? CMacroParser::REFERENCE_NUMERIC
+					: CMacroParser::REFERENCE_NONE
 			]);
 		}
-		else {
-			$this->item_key_parser = new CItemKey();
-			$this->host_name_parser = new CHostNameParser();
+		$this->item_key_parser = new CItemKey();
+		if ($this->options['calculated']) {
+			$this->filter_parser = new CFilterParser();
 		}
 	}
 
@@ -71,50 +91,88 @@ class CQueryParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
-		$this->errorClear();
-		$this->result = new CQueryParserResult();
-		$start_pos = $pos;
+		$this->match = '';
+		$this->length = 0;
+		$this->host = '';
+		$this->item = '';
 
-		if (!isset($source[$pos]) || $source[$pos] !== '/') {
-			$this->errorPos($source, $pos);
+		$p = $pos;
 
+		if (!isset($source[$p]) || $source[$p] !== '/') {
 			return CParser::PARSE_FAIL;
 		}
-		$pos++;
+		$p++;
 
-		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			$error = $this->host_name_parser->getErrorDetails();
-
-			if ($error) {
-				$this->errorPos($error[0], $error[1]);
-			}
-
+		if (($this->options['host_macro'] || $this->options['host_macro_n'])
+				&& $this->host_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->host_macro_parser->getLength();
+			$host = $this->host_macro_parser->getMatch();
+		}
+		// Allow wildcard for calculated item formula.
+		elseif ($this->options['calculated'] && isset($source[$p])
+				&& $source[$p] === self::HOST_ITEMKEY_WILDCARD) {
+			$p++;
+			$host = self::HOST_ITEMKEY_WILDCARD;
+		}
+		elseif ($this->host_name_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->host_name_parser->getLength();
+			$host = $this->host_name_parser->getMatch();
+		}
+		elseif ($this->options['empty_host']) {
+			$host = '';
+		}
+		else {
 			return CParser::PARSE_FAIL;
 		}
-		$pos += $this->host_name_parser->getLength();
 
-		if (!isset($source[$pos]) || $source[$pos] !== '/') {
-			$this->errorPos($source, $pos);
-
+		if (!isset($source[$p]) || $source[$p] !== '/') {
 			return CParser::PARSE_FAIL;
 		}
-		$pos++;
+		$p++;
 
-		if ($this->item_key_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->item_key_parser->getErrorDetails();
-			$this->errorPos($source, $pos);
-
+		// Allow wildcard for calculated item formula.
+		if ($this->options['calculated'] && isset($source[$p])
+				&& $source[$p] === self::HOST_ITEMKEY_WILDCARD) {
+			$p++;
+			$item = self::HOST_ITEMKEY_WILDCARD;
+		}
+		elseif ($this->item_key_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->item_key_parser->getLength();
+			$item = $this->item_key_parser->getMatch();
+		}
+		else {
 			return CParser::PARSE_FAIL;
 		}
-		$pos += $this->item_key_parser->getLength();
 
-		$this->length = $pos - $start_pos;
-		$this->result->match = substr($source, $start_pos, $this->length);
-		$this->result->host = $this->host_name_parser->getMatch();
-		$this->result->item = $this->item_key_parser->getMatch();
-		$this->result->length = $this->length;
-		$this->result->pos = $start_pos;
+		if ($this->options['calculated'] && $this->filter_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->filter_parser->getLength();
+		}
 
-		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+		$this->host = $host;
+		$this->item = $item;
+
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Returns the hostname.
+	 *
+	 * @return string
+	 */
+	public function getHost(): string {
+		return $this->host;
+	}
+
+	/**
+	 * Returns the item key.
+	 *
+	 * @return string
+	 */
+	public function getItem(): string {
+		return $this->item;
 	}
 }
+
+

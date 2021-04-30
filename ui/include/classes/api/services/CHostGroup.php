@@ -78,7 +78,6 @@ class CHostGroup extends CApiService {
 			'with_monitored_httptests'				=> null,
 			'with_graphs'							=> null,
 			'with_graph_prototypes'					=> null,
-			'with_applications'						=> null,
 			'editable'								=> false,
 			'nopermissions'							=> null,
 			// filter
@@ -291,12 +290,6 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
-		}
-
-		// with_applications
-		if ($options['with_applications'] !== null) {
-			$sub_sql_parts['from']['a'] = 'applications a';
-			$sub_sql_parts['where']['hg-a'] = 'hg.hostid=a.hostid';
 		}
 
 		if ($sub_sql_parts) {
@@ -598,19 +591,6 @@ class CHostGroup extends CApiService {
 	 */
 	public function delete(array $groupids, $nopermissions = false) {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
-
-		// delete screens items
-		$resources = [
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-			SCREEN_RESOURCE_HOST_INFO,
-			SCREEN_RESOURCE_TRIGGER_INFO,
-			SCREEN_RESOURCE_TRIGGER_OVERVIEW,
-			SCREEN_RESOURCE_DATA_OVERVIEW
-		];
-		DB::delete('screens_items', [
-			'resourceid' => $groupids,
-			'resourcetype' => $resources
-		]);
 
 		// delete sysmap element
 		if (!empty($groupids)) {

@@ -994,9 +994,16 @@ out:
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
 --- # logical not
+test case: Fail 'not 1'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: 'not 1'
+out:
+  result: FAIL
+---  
 test case: Succeed 'not 1'
 in:
-  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
   expression: 'not 1'
 out:
   stack:
@@ -1099,7 +1106,7 @@ out:
 --- # logical and/or
 test case: Succeed '1=2 or 3<4'
 in:
-  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_COMPARE]
+  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_LOGIC]
   expression: '1=2 or 3<4'
 out:
   stack:

@@ -203,12 +203,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Simple form test host',
-					'type' => 'Zabbix aggregate'
-				]
-			],
-			[
-				[
-					'host' => 'Simple form test host',
 					'type' => 'External check'
 				]
 			],
@@ -418,12 +412,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'type' => 'Zabbix aggregate'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
 					'type' => 'External check'
 				]
 			],
@@ -594,7 +582,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'SNMP trap',
 				'Zabbix internal',
 				'Zabbix trapper',
-				'Zabbix aggregate',
 				'External check',
 				'Database monitor',
 				'IPMI agent',
@@ -820,7 +807,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case 'Simple check':
 			case 'SNMP agent':
 			case 'Zabbix internal':
-			case 'Zabbix aggregate':
 			case 'External check':
 			case 'Database monitor':
 			case 'IPMI agent':
@@ -852,7 +838,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'Text'
 			]);
 
-			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
+			if ($type == 'Calculated') {
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
@@ -1019,14 +1005,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('logtimefmt');
 		}
 
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
-
-		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestAssertVisibleId('applications_');
-		$this->zbxTestDropdownAssertSelected('applications[]', '-None-');
+		$this->zbxTestTextNotPresent(['Applications','New application']);
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('description');
@@ -1831,28 +1810,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'allowed_hosts' => '{$MACRO},127.0.0.1',
 					'dbCheck' => true,
 					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'item-zabbix-aggregate',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Key "item-zabbix-aggregate" does not match'
-					]
 				]
 			],
 			[

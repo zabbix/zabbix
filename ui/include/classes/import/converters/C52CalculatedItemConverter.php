@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class to convert calculated item keys.
+ */
 class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 
 	/**
@@ -28,23 +31,34 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	 */
 	protected $item_key_parser;
 
+	/**
+	 * Function parser.
+	 *
+	 * @var C10FunctionParser
+	 */
+	protected $function_parser;
+
 	public function __construct() {
 		$this->parser = new C10TriggerExpression([
 			'allow_func_only' => true,
 			'calculated' => true
 		]);
 		$this->item_key_parser = new CItemKey();
+		$this->function_parser = new C10FunctionParser();
 		$this->standalone_functions = getStandaloneFunctions();
 	}
 
 	/**
-	 * Convert calculated item formula to 5.2 syntax.
+	 * Convert calculated item formula to 5.4 syntax.
 	 *
 	 * @param string $formula  Calculated item formula to convert.
+	 *
 	 * @return string
 	 */
 	public function convert($item) {
-		if ($this->parser->parse($item['params']) === false) {
+		$expression = preg_replace("/[\\r\\n\\t]/", '', $item['params']);
+
+		if ($this->parser->parse($expression) === false) {
 			return $item;
 		}
 
@@ -53,19 +67,29 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 		$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
 		$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
 		$this->wrap_subexpressions = ($parts['type'] === 'operator');
-		$this->convertExpressionParts($item['params'], [$parts], $extra_expressions);
+		$this->convertExpressionParts($expression, [$parts], $extra_expressions);
 		$extra_expressions = array_filter($extra_expressions);
 
 		if ($extra_expressions) {
 			$extra_expressions = array_keys(array_flip($extra_expressions));
-			$item['params'] = '('.$item['params'].')';
+			$item['params'] = '('.$expression.')';
 			$extra_expressions = array_reverse($extra_expressions);
 			$item['params'] .= ' or '.implode(' or ', $extra_expressions);
+		}
+		else {
+			$item['params'] = $expression;
 		}
 
 		return $item;
 	}
 
+	/**
+	 * Convert expression part.
+	 *
+	 * @param string $expression         Expression string.
+	 * @param array $expression_element  Expression part to convert.
+	 * @param array $extra_expr          Unused parameter to match parent class function signature.
+	 */
 	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		if (($this->parser->parse($expression_element['expression'])) === false) {
 			return;
@@ -74,7 +98,7 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
 
 		for ($i = count($functions) - 1; $i >= 0; $i--) {
-			$fn = $functions[$i]['data'] + ['host' => '', 'item' => ''];
+			$fn = $functions[$i]['data'] + ['host' => '', 'item' => '', 'function' => $functions[$i]['value']];
 			$key_param = $fn['functionParams'][0];
 			$host_delimiter_pos = strpos($key_param, ':');
 			$key_param_pos = strpos($key_param, '[');
@@ -86,7 +110,7 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 
 			if ($this->item_key_parser->parse($key_param) === CParser::PARSE_SUCCESS) {
 				array_shift($fn['functionParams']);
-				[$new_expression,] = $this->convertFunction($fn, $host_name, $key_param);
+				[$new_expression] = $this->convertFunction($fn, $host_name, $key_param);
 
 				$expression_element['expression'] = substr_replace($expression_element['expression'], $new_expression,
 					$functions[$i]['pos'], $functions[$i]['length']

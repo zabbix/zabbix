@@ -37,12 +37,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '()',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 1
 							]
@@ -59,12 +59,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'func',
 					'parameters' => '',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '()',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 1
 							]
@@ -81,12 +81,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '""',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '("")',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 1
 							]
@@ -103,12 +103,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => ' ',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '( )',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 2
 							]
@@ -125,12 +125,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => ' ""',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '( "")',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 2
 							]
@@ -147,12 +147,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => ' "" ',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '( "" )',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 2
 							]
@@ -169,12 +169,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => 'a',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '(a)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'a',
 								'pos' => 1
 							]
@@ -191,12 +191,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => ' a',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '( a)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'a',
 								'pos' => 2
 							]
@@ -213,17 +213,17 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '"a",',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '("a",)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"a"',
 								'pos' => 1
 							],
 							1 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 5
 							]
@@ -240,22 +240,22 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => 'a,b,c',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '(a,b,c)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'a',
 								'pos' => 1
 							],
 							1 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'b',
 								'pos' => 3
 							],
 							2 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'c',
 								'pos' => 5
 							]
@@ -272,22 +272,22 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '"a","b","c"',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '("a","b","c")',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"a"',
 								'pos' => 1
 							],
 							1 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"b"',
 								'pos' => 5
 							],
 							2 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"c"',
 								'pos' => 9
 							]
@@ -304,82 +304,82 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '"\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '("\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" )',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"\"aaa\""',
 								'pos' => 1
 							],
 							1 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"bbb"',
 								'pos' => 12
 							],
 							2 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"ccc"',
 								'pos' => 18
 							],
 							3 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '"ddd"',
 								'pos' => 26
 							],
 							4 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 33
 							],
 							5 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 37
 							],
 							6 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 40
 							],
 							7 => [
-								'type' => CFunctionParser::PARAM_QUOTED,
+								'type' => C10FunctionParser::PARAM_QUOTED,
 								'raw' => '""',
 								'pos' => 45
 							],
 							8 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 49
 							],
 							9 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 51
 							],
 							10 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 54
 							],
 							11 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'eee',
 								'pos' => 55
 							],
 							12 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'fff',
 								'pos' => 60
 							],
 							13 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'ggg ',
 								'pos' => 64
 							],
 							14 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'hhh" ',
 								'pos' => 70
 							]
@@ -396,17 +396,17 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => '("a",',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '(("a",)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '("a"',
 								'pos' => 1
 							],
 							1 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => '',
 								'pos' => 6
 							]
@@ -423,12 +423,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => 'ГУГЛ',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '(ГУГЛ)',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'ГУГЛ',
 								'pos' => 1
 							]
@@ -445,12 +445,12 @@ class C10FunctionParserTest extends TestCase {
 					'function' => 'last',
 					'parameters' => 'ГУГЛ]',
 					'params_raw' => [
-						'type' => CFunctionParser::PARAM_ARRAY,
+						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '(ГУГЛ])',
 						'pos' => 4,
 						'parameters' => [
 							0 => [
-								'type' => CFunctionParser::PARAM_UNQUOTED,
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
 								'raw' => 'ГУГЛ]',
 								'pos' => 1
 							]

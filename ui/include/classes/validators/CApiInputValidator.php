@@ -192,6 +192,9 @@ class CApiInputValidator {
 
 			case API_JSONRPC_ID:
 				return self::validateJsonRpcId($rule, $data, $path, $error);
+
+			case API_DATE:
+				return self::validateDate($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -247,6 +250,7 @@ class CApiInputValidator {
 			case API_EVENT_NAME:
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
+			case API_DATE:
 				return true;
 
 			case API_OBJECT:
@@ -309,6 +313,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -322,34 +327,42 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$parser = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		$result = $parser->parse($data);
-
-		if (!$result) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $parser->error);
-
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 
-		$validator = new CFunctionValidator(['calculated' => true]);
-		$math_validator = new CMathFunctionValidator(['calculated' => true]);
-		$skip_valid = $data;
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'calculated' => true,
+			'host_macro' => true,
+			'empty_host' => true
+		]);
 
-		foreach ($result->getFunctions() as $func) {
-			if ($math_validator->validate($func)) {
-				/**
-				 * Replace validated math functions with space to not validate functions in parameters
-				 * as standalone functions. Example:
-				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
-				 */
-				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
-			}
-			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
-				$error = $validator->getError();
-
-				return false;
-			}
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
+			return false;
 		}
+
+//		$validator = new CFunctionValidator(['calculated' => true]);
+//		$math_validator = new CMathFunctionValidator(['calculated' => true]);
+//		$skip_valid = $data;
+
+//		foreach ($result->getFunctions() as $func) {
+//			if ($math_validator->validate($func)) {
+//				/**
+//				 * Replace validated math functions with space to not validate functions in parameters
+//				 * as standalone functions. Example:
+//				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
+//				 */
+//				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
+//			}
+//			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
+//				$error = $validator->getError();
+
+//				return false;
+//			}
+//		}
 
 		return true;
 	}
@@ -1165,6 +1178,7 @@ class CApiInputValidator {
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
 	 * @param array  $rule['fields']
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1185,6 +1199,11 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) && !$data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && count($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 
@@ -2044,17 +2063,16 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression([
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'lowercase_errors' => true
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
 			return false;
 		}
 
-		if (!$expression_data->result->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_QUERY)) {
+		if (!$expression_parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION])) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('trigger expression must contain at least one /host/key reference')
 			);
@@ -2133,5 +2151,44 @@ class CApiInputValidator {
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
 
 		return false;
+	}
+
+	/**
+	 * Date validator in YYYY-MM-DD format.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateDate(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		[$year, $month, $day] = sscanf($data, '%d-%d-%d');
+
+		if (!checkdate($month, $day, $year)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a date in YYYY-MM-DD format is expected'));
+			return false;
+		}
+
+		if (!validateDateInterval($year, $month, $day)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
+			);
+			return false;
+		}
+
+		return true;
 	}
 }

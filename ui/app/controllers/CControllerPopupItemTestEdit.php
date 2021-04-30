@@ -159,23 +159,27 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		foreach (array_keys(array_intersect_key($inputs, $this->macros_by_item_props)) as $field) {
 			// Special processing for calculated item formula.
 			if ($field === 'params_f') {
-				$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => $support_lldmacros]);
-				$result = $expression_data->parse($inputs[$field]);
+				$expression_parser = new CExpressionParser([
+					'lldmacros' => $support_lldmacros,
+					'calculated' => true,
+					'host_macro' => true,
+					'empty_host' => true
+				]);
 
-				if ($result instanceof CTriggerExprParserResult) {
-					foreach ($result->getTokens() as $token) {
-						switch ($token->type) {
-							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-								$texts_support_user_macros[] = $token->match;
+				if ($expression_parser->parse($inputs[$field]) == CParser::PARSE_SUCCESS) {
+					foreach ($expression_parser->getResult()->getTokens() as $token) {
+						switch ($token['type']) {
+							case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+								$texts_support_user_macros[] = $token['match'];
 								break;
 
-							case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-								$texts_support_lld_macros[] = $token->match;
+							case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
+								$texts_support_lld_macros[] = $token['match'];
 								break;
 
-							case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-								$texts_support_user_macros[] = $token->data['string'];
-								$texts_support_lld_macros[] = $token->data['string'];
+							case CExpressionParserResult::TOKEN_TYPE_STRING:
+								$texts_support_user_macros[] = CExpressionParser::unquoteString($token['match']);
+								$texts_support_lld_macros[] = CExpressionParser::unquoteString($token['match']);
 								break;
 						}
 					}

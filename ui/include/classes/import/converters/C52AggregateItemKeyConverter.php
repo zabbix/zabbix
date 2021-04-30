@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Convert aggregate item key to calculated item function.
+ */
 class C52AggregateItemKeyConverter extends CConverter {
 
 	/**
