@@ -1537,11 +1537,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @backup items
 	 */
-	// TODO: uncomment after fix ZBX-18271
-/*	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
 	}
-*/
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
@@ -2024,17 +2022,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($condition_text);
 
 				// Compare Conditions from table with data.
 				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
 					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($actual_conditions);
-
 				$this->assertEquals($condition_text, $actual_conditions);
 
 				foreach($override['Operations'] as $i => $operation) {
