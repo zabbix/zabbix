@@ -1383,6 +1383,7 @@ abstract class CTriggerGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
+		$expression_validator = new CExpressionValidator();
 		$hist_function_value_types = (new CHistFunctionData())->getValueTypes();
 
 		/*
@@ -1553,13 +1554,24 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$expression_parser->parse($trigger['expression']);
+
+			if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $expression_validator->getError());
+			}
+
 			$hist_functions1 = $expression_parser->getResult()->getTokensOfTypes(
 				[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 			);
+
 			$hist_functions2 = [];
 
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expression_parser->parse($trigger['recovery_expression']);
+
+				if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expression_validator->getError());
+				}
+
 				$hist_functions2 = $expression_parser->getResult()->getTokensOfTypes(
 					[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 				);
