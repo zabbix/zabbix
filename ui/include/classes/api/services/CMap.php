@@ -2684,20 +2684,25 @@ class CMap extends CMapElement {
 
 		// Adding user shares.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$userids = [];
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
-			// Get all allowed users.
-			$related_users = API::User()->get([
-				'output' => ['userid'],
-				'userids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
 
-			$related_userids = zbx_objectValues($related_users, 'userid');
+			if ($related_ids) {
+				// Get all allowed users.
+				$users = API::User()->get([
+					'output' => ['userid'],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
 
-			if ($related_userids) {
+				$userids = zbx_objectValues($users, 'userid');
+			}
+
+			if ($userids) {
 				$users = API::getApiService()->select('sysmap_user', [
 					'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),
-					'filter' => ['sysmapid' => $sysmapIds, 'userid' => $related_userids],
+					'filter' => ['sysmapid' => $sysmapIds, 'userid' => $userids],
 					'preservekeys' => true
 				]);
 
@@ -2724,20 +2729,25 @@ class CMap extends CMapElement {
 
 		// Adding user group shares.
 		if ($options['selectUserGroups'] !== null && $options['selectUserGroups'] != API_OUTPUT_COUNT) {
+			$groupids = [];
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'usrgrpid', 'sysmap_usrgrp');
-			// Get all allowed groups.
-			$related_groups = API::UserGroup()->get([
-				'output' => ['usrgrpid'],
-				'usrgrpids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
 
-			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
+			if ($related_ids) {
+				// Get all allowed groups.
+				$groups = API::UserGroup()->get([
+					'output' => ['usrgrpid'],
+					'usrgrpids' => $related_ids,
+					'preservekeys' => true
+				]);
 
-			if ($related_groupids) {
+				$groupids = zbx_objectValues($groups, 'usrgrpid');
+			}
+
+			if ($groupids) {
 				$user_groups = API::getApiService()->select('sysmap_usrgrp', [
 					'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid']),
-					'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $related_groupids],
+					'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $groupids],
 					'preservekeys' => true
 				]);
 

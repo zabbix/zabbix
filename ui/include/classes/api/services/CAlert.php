@@ -400,6 +400,9 @@ class CAlert extends CApiService {
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			$hosts = [];
+			$relationMap = new CRelationMap();
+
 			// trigger events
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$query = DBselect(
@@ -426,15 +429,20 @@ class CAlert extends CApiService {
 				);
 			}
 
-			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['alertid'], $relation['hostid']);
 			}
-			$hosts = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 

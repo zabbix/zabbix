@@ -1399,15 +1399,21 @@ class CHostGroup extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
@@ -1428,15 +1434,21 @@ class CHostGroup extends CApiService {
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
 			}
 			else {

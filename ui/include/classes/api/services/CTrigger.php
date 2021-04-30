@@ -1161,21 +1161,27 @@ class CTrigger extends CTriggerGeneral {
 
 		// adding trigger dependencies
 		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
+			$dependencies = [];
+			$relationMap = new CRelationMap();
 			$res = DBselect(
 				'SELECT td.triggerid_up,td.triggerid_down'.
 				' FROM trigger_depends td'.
 				' WHERE '.dbConditionInt('td.triggerid_down', $triggerids)
 			);
-			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation['triggerid_down'], $relation['triggerid_up']);
 			}
 
-			$dependencies = $this->get([
-				'output' => $options['selectDependencies'],
-				'triggerids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$dependencies = $this->get([
+					'output' => $options['selectDependencies'],
+					'triggerids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
 		}
 
@@ -1194,6 +1200,8 @@ class CTrigger extends CTriggerGeneral {
 
 		// adding discoveryrule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$discoveryRules = [];
+			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,td.triggerid'.
 				' FROM trigger_discovery td,item_discovery id,functions f'.
@@ -1201,17 +1209,21 @@ class CTrigger extends CTriggerGeneral {
 					' AND td.parent_triggerid=f.triggerid'.
 					' AND f.itemid=id.itemid'
 			);
-			$relationMap = new CRelationMap();
 			while ($rule = DBfetch($dbRules)) {
 				$relationMap->addRelation($rule['triggerid'], $rule['parent_itemid']);
 			}
 
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$discoveryRules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRule'],
+					'itemids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 

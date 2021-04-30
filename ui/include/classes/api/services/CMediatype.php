@@ -1228,12 +1228,18 @@ class CMediatype extends CApiService {
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$users = [];
 			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$users = API::User()->get([
-				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$users = API::User()->get([
+					'output' => $options['selectUsers'],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 

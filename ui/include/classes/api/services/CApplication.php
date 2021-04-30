@@ -654,18 +654,25 @@ class CApplication extends CApiService {
 
 		// adding items
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
+			$items = [];
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'itemid', 'items_applications');
-			$items = API::Item()->get([
-				'output' => $options['selectItems'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$items = API::Item()->get([
+					'output' => $options['selectItems'],
+					'itemids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 
 		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$discoveryRules = [];
 			$relationMap = new CRelationMap();
 
 			$dbRules = DBselect(
@@ -681,12 +688,16 @@ class CApplication extends CApiService {
 				$relationMap->addRelation($rule['applicationid'], $rule['itemid']);
 			}
 
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$discoveryRules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRule'],
+					'itemids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
 
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
