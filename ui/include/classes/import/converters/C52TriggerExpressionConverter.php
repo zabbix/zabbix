@@ -295,8 +295,6 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'sum':
 			// (sec|#num,<time_shift>,percentage)
 			case 'percentile':
-			// (sec|#num,<time_shift>,threshold,<fit>)
-			case 'timeleft':
 				$parameters += ['', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
@@ -305,6 +303,23 @@ class C52TriggerExpressionConverter extends CConverter {
 					$parameters[0] .= ':'.$parameters[1];
 				}
 				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
+				break;
+
+			// (sec|#num,<time_shift>,threshold,<fit>)
+			case 'timeleft':
+				$parameters += ['', '', '', ''];
+				$parameters[0] = self::convertParamSec($parameters[0]);
+				$parameters[1] = self::convertTimeshift($parameters[1]);
+				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				if ($parameters[1] !== '') {
+					$parameters[0] .= ':'.$parameters[1];
+				}
+				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
+
+				if ($parameters[3] === '') {
+					// Don't quote unspecified <fit>.
+					$param_dets['unquotable'][3] = true;
+				}
 				break;
 
 			// (<#num>,<time_shift>)
@@ -328,7 +343,7 @@ class C52TriggerExpressionConverter extends CConverter {
 
 			// (sec|#num,<time_shift>,time,<fit>,<mode>)
 			case 'forecast':
-				$parameters += ['', '', ''];
+				$parameters += ['', '', '', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
 				$parameters[0] = ((string) $parameters[0] === '0') ? '#1' : $parameters[0];
@@ -337,6 +352,15 @@ class C52TriggerExpressionConverter extends CConverter {
 				}
 				unset($parameters[1], $param_dets['unquotable'][1], $param_dets['indicated'][1]);
 				$parameters[2] = self::convertParamSec($parameters[2]);
+
+				if ($parameters[3] === '') {
+					// Don't quote unspecified <fit>.
+					$param_dets['unquotable'][3] = true;
+				}
+				if ($parameters[4] === '') {
+					// Don't quote unspecified <mode>.
+					$param_dets['unquotable'][4] = true;
+				}
 				break;
 
 			// (<sec|#num>,mask,<time_shift>)
@@ -369,6 +393,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				if ($parameters[2] === 'band') {
 					$parameters[2] = 'bitand';
 				}
+				elseif ($parameters[2] === '') {
+					// Don't quote unspecified <operator>.
+					$param_dets['unquotable'][2] = true;
+				}
 
 				$parameters[3] = $parameters[1];
 				unset($param_dets['unquotable'][3], $param_dets['indicated'][3], $parameters[1]);
@@ -382,10 +410,18 @@ class C52TriggerExpressionConverter extends CConverter {
 				}
 				break;
 
-			// (sec)
-			case 'fuzzytime':
 			// (sec,<mode>)
 			case 'nodata':
+				$parameters += ['', ''];
+				$parameters[0] = self::convertParamSec($parameters[0]);
+				if ($parameters[1] === '') {
+					// Don't quote unspecified <mode>.
+					$param_dets['unquotable'][1] = true;
+				}
+				break;
+
+			// (sec)
+			case 'fuzzytime':
 				$parameters += [''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				break;
