@@ -149,13 +149,11 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_activateGraph() {
-		const time_period = this._getTimePeriod();
-
 		if (this._graph_url !== null) {
 			const curl = new Curl(this._graph_url, false);
 
-			curl.setArgument('from', time_period.from);
-			curl.setArgument('to', time_period.to);
+			curl.setArgument('from', this._time_period.from);
+			curl.setArgument('to', this._time_period.to);
 
 			this._flickerfreescreen_container.href = curl.getUrl();
 		}
@@ -167,14 +165,14 @@ class CWidgetGraph extends CWidget {
 
 		const curl = new Curl(this._time_control_data.src, false);
 
-		curl.setArgument('from', time_period.from);
-		curl.setArgument('to', time_period.to);
+		curl.setArgument('from', this._time_period.from);
+		curl.setArgument('to', this._time_period.to);
 
 		this._time_control_data.src = curl.getUrl();
 
-		this._flickerfreescreen_data.timeline = time_period;
+		this._flickerfreescreen_data.timeline = this._time_period;
 
-		timeControl.addObject('graph_' + this._unique_id, time_period, this._time_control_data);
+		timeControl.addObject('graph_' + this._unique_id, this._time_period, this._time_control_data);
 		timeControl.processObjects();
 
 		flickerfreeScreen.add(this._flickerfreescreen_data);

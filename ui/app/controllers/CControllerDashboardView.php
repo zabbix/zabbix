@@ -87,6 +87,8 @@ class CControllerDashboardView extends CController {
 		}
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		$dashboard['can_view_reports'] = $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
+		$dashboard['can_create_reports'] = $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
@@ -159,7 +161,8 @@ class CControllerDashboardView extends CController {
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
-				]
+				],
+				'has_related_reports' => false
 			];
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
@@ -190,7 +193,8 @@ class CControllerDashboardView extends CController {
 						'private' => $dashboards[0]['private'],
 						'users' => $dashboards[0]['users'],
 						'userGroups' => $dashboards[0]['userGroups']
-					]
+					],
+					'has_related_reports' => false
 				];
 			}
 			else {
@@ -233,6 +237,11 @@ class CControllerDashboardView extends CController {
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 					];
+					$dashboard['has_related_reports'] = (bool) API::Report()->get([
+						'output' => [],
+						'filter' => ['dashboardid' => $dashboard['dashboardid']],
+						'limit' => 1
+					]);
 
 					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}

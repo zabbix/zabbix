@@ -21,10 +21,10 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
-#include "sysinfo.h"
 
 /*
  * 5.4 development database patches
@@ -4440,6 +4440,219 @@ static int	DBpatch_5030142(void)
 	return DBdrop_table("applications");
 }
 
+static int	DBpatch_5030143(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030144(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030145(void)
+{
+	const ZBX_TABLE	table =
+			{"report", "reportid", 0,
+				{
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"cycle", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"weekdays", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"start_time", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_since", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_till", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastsent", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030146(void)
+{
+	return DBcreate_index("report", "report_1", "name", 1);
+}
+
+static int	DBpatch_5030147(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 1, &field);
+}
+
+static int	DBpatch_5030148(void)
+{
+	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 2, &field);
+}
+
+static int	DBpatch_5030149(void)
+{
+	const ZBX_TABLE	table =
+			{"report_param", "reportparamid", 0,
+				{
+					{"reportparamid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030150(void)
+{
+	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
+}
+
+static int	DBpatch_5030151(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_param", 1, &field);
+}
+
+static int	DBpatch_5030152(void)
+{
+	const ZBX_TABLE	table =
+			{"report_user", "reportuserid", 0,
+				{
+					{"reportuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"exclude", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030153(void)
+{
+	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
+}
+
+static int	DBpatch_5030154(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 1, &field);
+}
+
+static int	DBpatch_5030155(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 2, &field);
+}
+
+static int	DBpatch_5030156(void)
+{
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_user", 3, &field);
+}
+
+static int	DBpatch_5030157(void)
+{
+	const ZBX_TABLE	table =
+			{"report_usrgrp", "reportusrgrpid", 0,
+				{
+					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030158(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
+}
+
+static int	DBpatch_5030159(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 1, &field);
+}
+
+static int	DBpatch_5030160(void)
+{
+	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 2, &field);
+}
+
+static int	DBpatch_5030161(void)
+{
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_usrgrp", 3, &field);
+}
+
+static int	DBpatch_5030162(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5030163(void)
+{
+	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 /* trigger function conversion to new syntax */
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
@@ -5382,7 +5595,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
-static int	DBpatch_5030143(void)
+static int	DBpatch_5030164(void)
 {
 	int			i, ret = SUCCEED;
 	DB_ROW			row;
@@ -5526,7 +5739,7 @@ static int	DBpatch_5030143(void)
 	return ret;
 }
 
-static int	DBpatch_5030144(void)
+static int	DBpatch_5030165(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -5716,7 +5929,7 @@ static int	dbpatch_convert_expression_macro(const char *expression, const zbx_st
 	return SUCCEED;
 }
 
-static int	DBpatch_5030145(void)
+static int	DBpatch_5030166(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -5910,7 +6123,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 	return exp;
 }
 
-static int	DBpatch_5030146(void)
+static int	DBpatch_5030167(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -6120,7 +6333,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	return SUCCEED;
 }
 
-static int	DBpatch_5030147(void)
+static int	DBpatch_5030168(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -6179,7 +6392,7 @@ static int	DBpatch_5030147(void)
 	return ret;
 }
 
-static int	DBpatch_5030148(void)
+static int	DBpatch_5030169(void)
 {
 #ifdef HAVE_MYSQL
 	return DBcreate_index("items", "items_8", "key_(1024)", 0);
@@ -6343,5 +6556,26 @@ DBPATCH_ADD(5030145, 0, 1)
 DBPATCH_ADD(5030146, 0, 1)
 DBPATCH_ADD(5030147, 0, 1)
 DBPATCH_ADD(5030148, 0, 1)
+DBPATCH_ADD(5030149, 0, 1)
+DBPATCH_ADD(5030150, 0, 1)
+DBPATCH_ADD(5030151, 0, 1)
+DBPATCH_ADD(5030152, 0, 1)
+DBPATCH_ADD(5030153, 0, 1)
+DBPATCH_ADD(5030154, 0, 1)
+DBPATCH_ADD(5030155, 0, 1)
+DBPATCH_ADD(5030156, 0, 1)
+DBPATCH_ADD(5030157, 0, 1)
+DBPATCH_ADD(5030158, 0, 1)
+DBPATCH_ADD(5030159, 0, 1)
+DBPATCH_ADD(5030160, 0, 1)
+DBPATCH_ADD(5030161, 0, 1)
+DBPATCH_ADD(5030162, 0, 1)
+DBPATCH_ADD(5030163, 0, 1)
+DBPATCH_ADD(5030164, 0, 1)
+DBPATCH_ADD(5030165, 0, 1)
+DBPATCH_ADD(5030166, 0, 1)
+DBPATCH_ADD(5030167, 0, 1)
+DBPATCH_ADD(5030168, 0, 1)
+DBPATCH_ADD(5030169, 0, 1)
 
 DBPATCH_END()

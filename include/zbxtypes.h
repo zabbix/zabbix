@@ -214,7 +214,7 @@ zbx_uint128_t;
 /* macro to test if a signed value has been assigned to unsigned type (char, short, int, long long) */
 #define ZBX_IS_TOP_BIT_SET(x)	(0 != ((__UINT64_C(1) << ((sizeof(x) << 3) - 1)) & (x)))
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	#define localtime_r(x, y)	localtime_s(y, x)
 #endif
 

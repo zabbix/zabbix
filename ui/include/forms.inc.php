@@ -188,7 +188,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_tags') {
+				if ($name === 'subfilter_tags') {
 					continue;
 				}
 				$show_item &= $value;

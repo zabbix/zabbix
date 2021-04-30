@@ -212,6 +212,8 @@ struct	_DC_TRIGGER;
 #define FUNCTION_NAME_LEN		12
 #define FUNCTION_PARAM_LEN		255
 
+#define REPORT_ERROR_LEN		2048
+
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
@@ -362,11 +364,10 @@ typedef struct
 }
 DB_EVENT;
 
-typedef struct
+typedef struct DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char			*description;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;
@@ -375,13 +376,24 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
+	char			*script;
+	char			*attempt_interval;
+	char			*timeout;
 	unsigned short		smtp_port;
 	unsigned char		smtp_security;
 	unsigned char		smtp_verify_peer;
 	unsigned char		smtp_verify_host;
 	unsigned char		smtp_authentication;
+	unsigned char		content_type;
+	int			maxsessions;
+	int			maxattempts;
 }
 DB_MEDIATYPE;
+
+void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
+		const DB_MEDIATYPE *mt);
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
 
 typedef struct
 {
@@ -887,6 +899,8 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_ptr_t *ops);
+
+#define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
 void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);

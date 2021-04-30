@@ -55,6 +55,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								.prev('.msg-bad')
 								.remove();
 
+							$('#url').val("<?= DB::getDefault('config', 'url') ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
 								.prop('checked', true);
@@ -92,6 +93,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 							);
 							$('#script_timeout').val("<?= DB::getDefault('config', 'script_timeout') ?>");
 							$('#item_test_timeout').val("<?= DB::getDefault('config', 'item_test_timeout') ?>");
+							$('#report_test_timeout').val("<?= DB::getDefault('config', 'report_test_timeout') ?>");
 						}
 					}
 				]

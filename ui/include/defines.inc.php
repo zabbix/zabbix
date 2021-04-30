@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030148);
+define('ZABBIX_DB_VERSION',		5030169);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -47,7 +47,7 @@ define('ZBX_FLOAT_DIG', PHP_FLOAT_DIG);
 define('ZBX_FLOAT_MIN', PHP_FLOAT_MIN);
 define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
 
-define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
+define('ZBX_MAX_DATE',		ZBX_MAX_INT32); // 19 Jan 2038 03:14:07 UTC
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
@@ -56,6 +56,7 @@ define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
+define('ZBX_DATE',				'Y-m-d'); // Time selector date without minutes and seconds presentation format.
 
 // TTL timeout in seconds used to invalidate data cache of Vault response. Set 0 to disable Vault response caching.
 define('ZBX_DATA_CACHE_TTL', 60);
@@ -255,6 +256,7 @@ define('AUDIT_RESOURCE_AUTHENTICATION',		42);
 define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
 define('AUDIT_RESOURCE_USER_ROLE',			44);
 define('AUDIT_RESOURCE_AUTH_TOKEN',			45);
+define('AUDIT_RESOURCE_SCHEDULED_REPORT',	46);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -398,6 +400,38 @@ define('REPORT_PERIOD_CURRENT_YEAR',	4);
 define('REPORT_PERIOD_LAST_WEEK',		5);
 define('REPORT_PERIOD_LAST_MONTH',		6);
 define('REPORT_PERIOD_LAST_YEAR',		7);
+
+// scheduled reports
+define('ZBX_REPORT_FILTER_SHOW_ALL',	0);
+define('ZBX_REPORT_FILTER_SHOW_MY',		1);
+
+define('ZBX_REPORT_STATUS_ENABLED',		0);
+define('ZBX_REPORT_STATUS_DISABLED',	1);
+define('ZBX_REPORT_STATUS_EXPIRED',		2);
+
+define('ZBX_REPORT_PERIOD_DAY',		0);
+define('ZBX_REPORT_PERIOD_WEEK',	1);
+define('ZBX_REPORT_PERIOD_MONTH',	2);
+define('ZBX_REPORT_PERIOD_YEAR',	3);
+
+define('ZBX_REPORT_CYCLE_DAILY',	0);
+define('ZBX_REPORT_CYCLE_WEEKLY',	1);
+define('ZBX_REPORT_CYCLE_MONTHLY',	2);
+define('ZBX_REPORT_CYCLE_YEARLY',	3);
+
+define('ZBX_REPORT_STATE_UNKNOWN',		0);
+define('ZBX_REPORT_STATE_SENT',			1);
+define('ZBX_REPORT_STATE_ERROR',		2);
+define('ZBX_REPORT_STATE_SUCCESS_INFO',	3);
+
+define('ZBX_REPORT_RECIPIENT_TYPE_USER',		0);
+define('ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP',	1);
+
+define('ZBX_REPORT_CREATOR_TYPE_USER',		0);
+define('ZBX_REPORT_CREATOR_TYPE_RECIPIENT',	1);
+
+define('ZBX_REPORT_EXCLUDE_USER_FALSE',	0);
+define('ZBX_REPORT_EXCLUDE_USER_TRUE',	1);
 
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
@@ -1322,6 +1356,7 @@ define('API_TRIGGER_EXPRESSION',	36);
 define('API_EVENT_NAME',			37);
 define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
+define('API_DATE',					40);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1373,8 +1408,8 @@ define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secre
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
-define('ZBX_LAYOUT_NORMAL',     0);
-define('ZBX_LAYOUT_KIOSKMODE',  1);
+define('ZBX_LAYOUT_NORMAL',		0);
+define('ZBX_LAYOUT_KIOSKMODE',	1);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
 // Sidebar
@@ -1738,6 +1773,8 @@ define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
+define('ZBX_STYLE_ICON_USER', 'icon-user');
+define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');

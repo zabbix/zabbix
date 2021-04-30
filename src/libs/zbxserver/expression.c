@@ -4552,6 +4552,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 			}
 		}
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_REPORT))
+		{
+			if (0 == strcmp(m, MVAR_TIME))
+			{
+				replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+			}
+		}
 
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);

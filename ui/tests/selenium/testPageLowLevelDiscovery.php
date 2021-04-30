@@ -441,11 +441,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Type' => 'Database monitor',
 						'Update interval' => '1h',
-						'Name'=> 'Databases'
+						'Name'=> 'Non-local database'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Databases discovery'
+						'Non-local database discovery'
 					]
 				]
 			],
