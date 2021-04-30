@@ -136,6 +136,7 @@ class CConfigurationImport {
 
 		// Delete missing objects from processed hosts and templates.
 		$this->deleteMissingHttpTests();
+		$this->deleteMissingTemplateDashboards();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
@@ -149,7 +150,7 @@ class CConfigurationImport {
 		$this->processGraphs();
 		$this->processImages();
 		$this->processMaps();
-//		$this->processTemplateDashboards();
+		$this->processTemplateDashboards();
 		$this->processMediaTypes();
 
 		return true;
@@ -494,9 +495,9 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedTemplateDashboards() as $dashboards) {
+		foreach ($this->getFormattedTemplateDashboards() as $host => $dashboards) {
 			foreach ($dashboards as $dashboard) {
-				$template_dashboards_refs[$dashboard['name']] = ['uuid' => $dashboard['uuid']];
+				$template_dashboards_refs[$dashboard['uuid']] = [];
 
 				if (!$dashboard['pages']) {
 					continue;
@@ -527,8 +528,8 @@ class CConfigurationImport {
 									$templates_refs += [$value['host'] => []];
 
 									if (!array_key_exists($value['host'], $graphs_refs)
-											|| !array_key_exists($value['key'], $graphs_refs[$value['host']])) {
-										$graphs_refs[$value['host']][$value['key']] = [];
+											|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
+										$graphs_refs[$value['host']][$value['name']] = [];
 									}
 									break;
 							}
@@ -1821,8 +1822,8 @@ class CConfigurationImport {
 			$maps = $this->getFormattedMaps();
 
 			if ($maps) {
-				$mapImporter = new CMapImporter($this->options, $this->referencer, $this->importedObjectContainer);
-				$mapImporter->import($maps);
+				$map_importer = new CMapImporter($this->options, $this->referencer, $this->importedObjectContainer);
+				$map_importer->import($maps);
 			}
 		}
 	}
@@ -1830,16 +1831,18 @@ class CConfigurationImport {
 	/**
 	 * Import template dashboards.
 	 */
-	protected function processTemplateDashboards() {
+	protected function processTemplateDashboards(): void {
 		if ($this->options['templateDashboards']['updateExisting']
-				|| $this->options['templateDashboards']['createMissing']
-				|| $this->options['templateDashboards']['deleteMissing']) {
+				|| $this->options['templateDashboards']['createMissing']) {
 			$dashboards = $this->getFormattedTemplateDashboards();
-			$dashboardImporter = new CTemplateDashboardImporter($this->options, $this->referencer,
-				$this->importedObjectContainer
-			);
-			$dashboardImporter->delete($dashboards);
-			$dashboardImporter->import($dashboards);
+
+			if ($dashboards) {
+				$dashboard_importer = new CTemplateDashboardImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
+
+				$dashboard_importer->import($dashboards);
+			}
 		}
 	}
 
@@ -1888,7 +1891,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes items from DB that are missing in XML.
+	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
 		if (!$this->options['items']['deleteMissing']) {
@@ -1943,7 +1946,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes triggers from DB that are missing in XML.
+	 * Deletes triggers from DB that are missing in import file.
 	 */
 	protected function deleteMissingTriggers(): void {
 		if (!$this->options['triggers']['deleteMissing']) {
@@ -2021,7 +2024,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes graphs from DB that are missing in XML.
+	 * Deletes graphs from DB that are missing in import file.
 	 */
 	protected function deleteMissingGraphs(): void {
 		if (!$this->options['graphs']['deleteMissing']) {
@@ -2093,7 +2096,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes prototypes from DB that are missing in XML.
+	 * Deletes prototypes from DB that are missing in import file.
 	 *
 	 * @param array $discovery_rules_by_hosts
 	 *
@@ -2230,7 +2233,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes web scenarios from DB that are missing in XML.
+	 * Deletes web scenarios from DB that are missing in import file.
 	 */
 	protected function deleteMissingHttpTests(): void {
 		if (!$this->options['httptests']['deleteMissing']) {
@@ -2284,7 +2287,28 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes discovery rules from DB that are missing in XML.
+	 * Deletes template dashboards from DB that are missing in import file.
+	 *
+	 * @throws APIException
+	 */
+	protected function deleteMissingTemplateDashboards(): void {
+		if (!$this->options['templateDashboards']['deleteMissing']) {
+			return;
+		}
+
+		$dashboards = $this->getFormattedTemplateDashboards();
+
+		if ($dashboards) {
+			$dashboard_importer = new CTemplateDashboardImporter($this->options, $this->referencer,
+				$this->importedObjectContainer
+			);
+
+			$dashboard_importer->delete($dashboards);
+		}
+	}
+
+	/**
+	 * Deletes discovery rules from DB that are missing in import file.
 	 */
 	protected function deleteMissingDiscoveryRules(): void {
 		if (!$this->options['discoveryRules']['deleteMissing']) {
@@ -2472,8 +2496,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedMaps() {
-		if (!isset($this->formattedData['maps'])) {
+	protected function getFormattedMaps(): array {
+		if (!array_key_exists('maps', $this->formattedData)) {
 			$this->formattedData['maps'] = $this->adapter->getMaps();
 		}
 
@@ -2485,8 +2509,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedTemplateDashboards() {
-		if (!isset($this->formattedData['templateDashboards'])) {
+	protected function getFormattedTemplateDashboards(): array {
+		if (!array_key_exists('templateDashboards', $this->formattedData)) {
 				$this->formattedData['templateDashboards'] = $this->adapter->getTemplateDashboards();
 		}
 

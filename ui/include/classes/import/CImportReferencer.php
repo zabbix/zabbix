@@ -40,7 +40,7 @@ class CImportReferencer {
 	protected $iconmaps = [];
 	protected $images = [];
 	protected $maps = [];
-	protected $templateDashboards = [];
+	protected $template_dashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
 	protected $host_prototypes = [];
@@ -57,7 +57,7 @@ class CImportReferencer {
 	protected $db_iconmaps;
 	protected $db_images;
 	protected $db_maps;
-	protected $templateDashboardsRefs;
+	protected $db_template_dashboards;
 	protected $db_macros;
 	protected $db_proxies;
 	protected $db_host_prototypes;
@@ -449,21 +449,26 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get template dashboard ID by template ID and dashboard name.
+	 * Get template dashboard ID by dashboard UUID.
 	 *
-	 * @param string $templateid
-	 * @param string $name
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
+	 *
+	 * @throws APIException
 	 */
-	public function resolveTemplateDashboards($templateid, $name) {
-		if ($this->templateDashboardsRefs === null) {
+	public function findTemplateDashboardidByUuid(string $uuid): ?string {
+		if ($this->db_template_dashboards === null) {
 			$this->selectTemplateDashboards();
 		}
 
-		return isset($this->templateDashboardsRefs[$templateid][$name])
-			? $this->templateDashboardsRefs[$templateid][$name]
-			: false;
+		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
+			if ($dashboard['uuid'] === $uuid) {
+				return $dashboardid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -805,23 +810,12 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add templated dashboard names that need association with a database dashboard id.
+	 * Add templated dashboard names that need association with a database dashboard ID.
 	 *
 	 * @param array $dashboards
 	 */
-	public function addTemplateDashboards(array $dashboards) {
-//		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
-		$this->templateDashboards = $dashboards;
-	}
-
-	/**
-	 * Add template dashboard name association with template dashboard ID.
-	 *
-	 * @param string $name
-	 * @param string $template_dashboardid
-	 */
-	public function addTemplateDashboardsRef($name, $template_dashboardid) {
-		$this->templateDashboardsRefs[$name] = $template_dashboardid;
+	public function addTemplateDashboards(array $dashboards): void {
+		$this->template_dashboards = $dashboards;
 	}
 
 	/**
@@ -1224,20 +1218,26 @@ class CImportReferencer {
 	 *
 	 * @throws APIException
 	 */
-	protected function selectTemplateDashboards() {
-		if ($this->templateDashboards) {
-			$this->templateDashboardsRefs = [];
+	protected function selectTemplateDashboards(): void {
+		$this->db_template_dashboards = [];
 
-			$db_template_dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
-				'filter' => ['name' => $this->templateDashboards]
-			]);
-			foreach ($db_template_dashboards as $dashboard) {
-				$this->templateDashboardsRefs[$dashboard['templateid']][$dashboard['name']] = $dashboard['dashboardid'];
-			}
-
-			$this->templateDashboards = [];
+		if (!$this->template_dashboards) {
+			return;
 		}
+
+		$db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_keys($this->template_dashboards)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_template_dashboards as $dashboardid => $dashboard) {
+			$this->db_template_dashboards[$dashboardid] = [
+				'uuid' => $dashboard['uuid']
+			];
+		}
+
+		$this->template_dashboards = [];
 	}
 
 	/**
