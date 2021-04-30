@@ -149,7 +149,11 @@ abstract class CHostGeneral extends CHostBase {
 			$this->unlink(zbx_toArray($data['templateids_clear']), $allHostIds, true);
 		}
 
-		if (isset($data['macros'])) {
+		if (array_key_exists('macros', $data)) {
+			if (!$data['macros']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
+
 			$hostMacros = API::UserMacro()->get([
 				'output' => ['hostmacroid'],
 				'hostids' => $allHostIds,
