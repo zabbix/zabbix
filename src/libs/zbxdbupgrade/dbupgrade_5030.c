@@ -5309,9 +5309,17 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	{
 		int	secnum = 0;
 
-		if (0 < params.values_num && '#' != function->parameter[params.values[0].l] &&
-				'{' != function->parameter[params.values[0].l])
-			secnum = -1;
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
 
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, secnum, 1,
