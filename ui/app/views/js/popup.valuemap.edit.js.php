@@ -28,6 +28,7 @@ $(() => {
 	let table = document.querySelector('#mappings_table');
 	let observer = new MutationObserver(mutationHandler);
 
+	// Observe changes for form fields: type, value.
 	observer.observe(table, {
 		childList: true,
 		subtree: true,
@@ -58,7 +59,7 @@ $(() => {
 			if (mutation.target.tagName === 'INPUT' && mutation.target.getAttribute('name').substr(-6) === '[type]') {
 				updateOnTypeChange();
 			}
-			else if (mutation.type === 'childList' && mutation.removedNodes.length > 0) {
+			else if (mutation.target.tagName === 'TBODY' && mutation.removedNodes.length > 0) {
 				updateOnTypeChange();
 			}
 		});

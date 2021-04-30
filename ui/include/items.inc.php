@@ -1420,7 +1420,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 	// apply value mapping
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_STR:
-			$mapping = CValueMapHelper::getMappedValue($value, $item['valuemap']);
+			$mapping = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
 			// break; is not missing here
 
 		case ITEM_VALUE_TYPE_TEXT:
@@ -1436,7 +1436,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			break;
 
 		default:
-			$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
+			$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 	}
 
 	return $value;

@@ -69,15 +69,19 @@ $mappings->addItem(
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->addItem((new CRow([
-			(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSelect('mappings[#{index}][type]'))->addOptions([
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_EQUAL, _('equals')),
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, _('is greater than or equals')),
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_LESS_EQUAL, _('is less than or equals')),
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_IN_RANGE, _('in range')),
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_REGEXP, _('regexp')),
-				new CSelectOption(VALUEMAP_MAPPING_TYPE_DEFAULT, _('default'))
-			])->setValue('#{type}'),
+			(new CCol((new CDiv)
+				->addClass(ZBX_STYLE_DRAG_ICON)))
+				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CSelect('mappings[#{index}][type]'))
+				->setValue('#{type}')
+				->addOptions(CSelect::createOptionsFromArray([
+					VALUEMAP_MAPPING_TYPE_EQUAL => _('equals'),
+					VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('is greater than or equals'),
+					VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('is less than or equals'),
+					VALUEMAP_MAPPING_TYPE_IN_RANGE => _('in range'),
+					VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
+					VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
+				])),
 			(new CTextBox('mappings[#{index}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'&rArr;',
@@ -86,8 +90,7 @@ $mappings->addItem(
 				->setAriaRequired(),
 			(new CButton('mappings[#{index}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->setAttribute('data-row-action', 'remove_row'),
-			''
+				->setAttribute('data-row-action', 'remove_row')
 		])))
 );
 
