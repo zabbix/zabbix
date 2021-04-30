@@ -660,6 +660,10 @@ class CHostInterface extends CApiService {
 	 * @return array
 	 */
 	public function massRemove(array $data) {
+		if (!array_key_exists('hostids', $data) || !array_key_exists('interfaces', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		}
+
 		$data['interfaces'] = zbx_toArray($data['interfaces']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
