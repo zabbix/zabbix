@@ -32,10 +32,10 @@ class testValuemaps extends CIntegrationTest {
 	const VALUEMAP_NAME = 'valuemap';
 	const HOST_NAME = 'test_valuemaps';
 	const ITEM_NAME = 'trap';
-	
+
 	private static $hostid;
 	private static $itemid;
-	
+
 	/**
 	 * @inheritdoc
 	 */
@@ -74,18 +74,18 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemid = $response['result']['itemids'];
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Data provider (valuemaps).
 	 *
 	 * @return array
 	 */
-	 public function getValuemaps() {
-		 $valuemap_patterns = [
-			 'exactMatch' => [
+	public function getValuemaps() {
+		$valuemap_patterns = [
+			'exactMatch' => [
 				'name' => self::VALUEMAP_NAME,
 				'hostid' => null,
 				'mappings' => [
@@ -146,96 +146,96 @@ class testValuemaps extends CIntegrationTest {
 				]
 			]
 		];
-		
+
 		return [
 			[
 				'inputData' => '1',
 				'valuemap' => $valuemap_patterns['exactMatch'],
-				'outputData' => 'Value 1 (1)' 
-			 ],
-			 [
+				'outputData' => 'Value 1 (1)'
+			],
+			[
 				'inputData' => '0',
 				'valuemap' => $valuemap_patterns['exactMatch'],
-				'outputData' => 'Value 0 (0)' 
-			 ],
-			 [
+				'outputData' => 'Value 0 (0)'
+			],
+			[
 				'inputData' => '2',
 				'valuemap' => $valuemap_patterns['exactMatch'],
-				'outputData' => '2' 
-			 ],
-			 [
+				'outputData' => '2'
+			],
+			[
 				'inputData' => '0',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Value 0 (0)' 
-			 ],
-			 [
+				'outputData' => 'Value 0 (0)'
+			],
+			[
 				'inputData' => '1',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Regexp 1 (1)' 
-			 ],
-			 [
+				'outputData' => 'Regexp 1 (1)'
+			],
+			[
 				'inputData' => '3',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Value <= 3 (3)' 
-			 ],
-			 [
+				'outputData' => 'Value <= 3 (3)'
+			],
+			[
 				'inputData' => '5',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Range 5-7,8 (5)' 
-			 ],
-			 [
+				'outputData' => 'Range 5-7,8 (5)'
+			],
+			[
 				'inputData' => '8',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Range 5-7,8 (8)' 
-			 ],
-			 [
+				'outputData' => 'Range 5-7,8 (8)'
+			],
+			[
 				'inputData' => '9',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => '9' 
-			 ],
-			 [
+				'outputData' => '9'
+			],
+			[
 				'inputData' => '10',
 				'valuemap' => $valuemap_patterns['rangeWithoutDefault'],
-				'outputData' => 'Value >= 10 (10)' 
-			 ],
-			 [
+				'outputData' => 'Value >= 10 (10)'
+			],
+			[
 				'inputData' => '-123',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Default (-123)' 
-			 ],
-			 [
+				'outputData' => 'Default (-123)'
+			],
+			[
 				'inputData' => '-122.88',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Range (-122.88)' 
-			 ],
-			 [
+				'outputData' => 'Range (-122.88)'
+			],
+			[
 				'inputData' => '-30',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Range (-30)' 
-			 ],
-			 [
+				'outputData' => 'Range (-30)'
+			],
+			[
 				'inputData' => '0',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Range (0)' 
-			 ],
-			 [
+				'outputData' => 'Range (0)'
+			],
+			[
 				'inputData' => '7987.2',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Range (7987.2)' 
-			 ],
-			 [
+				'outputData' => 'Range (7987.2)'
+			],
+			[
 				'inputData' => '7988',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Default (7988)' 
-			 ],
-			 [
+				'outputData' => 'Default (7988)'
+			],
+			[
 				'inputData' => '4',
 				'valuemap' => $valuemap_patterns['rangeWithDefault'],
-				'outputData' => 'Default (4)' 
-			 ]
-		 ];
-	 }
-	
+				'outputData' => 'Default (4)'
+			]
+		];
+	}
+
 	/**
 	 * Test valuemaps cases.
 	 *
@@ -247,7 +247,7 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertArrayHasKey('valuemapids', $response['result']);
 		$this->assertEquals(1, count($response['result']['valuemapids']));
 		$valuemapid = $response['result']['valuemapids'];
-		
+
 		$response = $this->call('item.update', [
 				'itemid' => self::$itemid[0],
 				'valuemapid' => $valuemapid[0]
@@ -263,19 +263,19 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		$triggerid =  $response['result']['triggerids'];
-		
+
 		$this->reloadConfigurationCache();
-		
+
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
-		
+
 		['result' => $result] = $this->call('problem.get', [
 			'output' => ['name'],
 			'objectids' => $triggerid
 		]);
-		
+
 		$result = array_column($result, 'name');
 		$this->assertEquals(' '.$outputData, $result[0]);
-		
+
 		$response = $this->call('trigger.delete', $triggerid);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals($triggerid, $response['result']['triggerids']);
