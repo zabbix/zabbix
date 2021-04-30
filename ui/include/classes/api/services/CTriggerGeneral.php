@@ -934,16 +934,24 @@ abstract class CTriggerGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
-		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
+		$_db_triggers = $this->get($options);
+
+		if (!$_db_triggers) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$db_trigger_tags = API::getApiService()->select('trigger_tag', [
+		$db_trigger_tags = DB::select('trigger_tag', [
 			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
 			'filter' => ['triggerid' => array_keys($_db_triggers)],
 			'preservekeys' => true
 		]);
-		$_db_triggers = $this->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
+
+		$_db_triggers = $this
+			->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $db_trigger_tags, 'tags');
 
 		$read_only_fields = ['description', 'expression', 'recovery_mode', 'recovery_expression', 'correlation_mode',
