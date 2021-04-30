@@ -5154,7 +5154,6 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 
 	dbpatch_convert_params(&parameter, function->parameter, params,
 			ZBX_DBPATCH_ARG_HIST, secnum, 2,
-			ZBX_DBPATCH_ARG_NUM, 1,
 			ZBX_DBPATCH_ARG_NONE);
 
 	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
