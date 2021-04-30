@@ -63,7 +63,7 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
-		//create trapper
+		// create trapper
 		$response = $this->call('item.create', [
 			'hostid' => self::$hostid,
 			'name' => self::ITEM_NAME,
@@ -279,7 +279,7 @@ class testValuemaps extends CIntegrationTest {
 		$response = $this->call('trigger.delete', $triggerid);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals($triggerid, $response['result']['triggerids']);
-		
+
 		$response = $this->call('valuemap.delete', $valuemapid);
 		$this->assertArrayHasKey('valuemapids', $response['result']);
 		$this->assertEquals($valuemapid, $response['result']['valuemapids']);
