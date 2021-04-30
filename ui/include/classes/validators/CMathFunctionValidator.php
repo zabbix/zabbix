@@ -25,7 +25,7 @@
 class CMathFunctionValidator extends CValidator {
 
 	/**
-	 * Common functions along with number of required parameters (or -1 for number of required parameters >= 1).
+	 * Math functions along with number of required parameters (or -1 for number of required parameters >= 1).
 	 *
 	 * @var array
 	 */

@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class for validating history functions.
+ */
 class CHistFunctionValidator extends CValidator {
 
 	/**
@@ -142,7 +145,7 @@ class CHistFunctionValidator extends CValidator {
 	}
 
 	private static function validateQuery(string $host, string $item): bool {
-		return ($host !== '*' || $item !== '*');
+		return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
 	}
 
 	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {

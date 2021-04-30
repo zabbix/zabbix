@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class for validating trigger expressions and calculated item formulas.
+ */
 class CExpressionValidator extends CValidator {
 
 	/**
