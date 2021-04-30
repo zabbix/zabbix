@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-04-30T05:42:03Z</date>
+    <date>2021-04-30T12:03:38Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -100,7 +100,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: alerter processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of alerter processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -135,7 +135,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: alert manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of alert manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -170,7 +170,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: alert syncer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of alert syncer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -205,7 +205,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: availability manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of availability manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -240,7 +240,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: configuration syncer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of configuration syncer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -275,7 +275,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: discoverer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of discoverer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -310,7 +310,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: escalator processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of escalator processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -345,7 +345,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: history poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of history poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -380,7 +380,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: history syncer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of history syncer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -415,7 +415,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: housekeeper processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of housekeeper processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -450,7 +450,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: http poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of http poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -485,7 +485,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: icmp pinger processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of icmp pinger processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -520,7 +520,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: ipmi manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of ipmi manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -555,7 +555,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: ipmi poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of ipmi poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -590,7 +590,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: java poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of java poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -625,7 +625,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: lld manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of lld manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -660,7 +660,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: lld worker processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of lld worker processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -695,7 +695,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -730,7 +730,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: preprocessing manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of preprocessing manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -765,7 +765,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: preprocessing worker processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of preprocessing worker processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -800,7 +800,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: proxy poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of proxy poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -835,7 +835,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: report manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of report manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -870,7 +870,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: report writer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of report writer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -905,7 +905,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: self-monitoring processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of self-monitoring processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -940,7 +940,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: snmp trapper processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of snmp trapper processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -975,7 +975,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: task manager processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of task manager processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -1010,7 +1010,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: timer processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of timer processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -1045,7 +1045,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: trapper processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of trapper processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -1080,7 +1080,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: unreachable poller processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of unreachable poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -1115,7 +1115,7 @@
                             <expression>{avg(10m)}&gt;75</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: vmware collector processes more than 75% busy</name>
+                            <name>Remote Zabbix server: Utilization of vmware collector processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
