@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-30T23:23:28Z</date>
+   <date>2021-05-02T20:38:10Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,9 +11,11 @@
       <template>
          <template>Template App Nginx Plus by HTTP</template>
          <name>Template App Nginx Plus by HTTP</name>
-         <description>Get metrics from NOTHING using HTTP agent.&#13;
+         <description>Get Nginx Plus metrics by HTTP agent.&#13;
+Metrics are collected by requests to Nginx Plus API.&#13;
+Don't forget to change macros {$NGINX.API.ENDPOINT}.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -249,6 +251,43 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
+               <name>Nginx: Get info error</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.error</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>Nginx error description.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.error.text</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{strlen()}&gt;0</expression>
+                     <name>Nginx: Server response error (text: {ITEM.VALUE})</name>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>Nginx: Generation</name>
                <type>DEPENDENT</type>
                <key>nginx.info.generation</key>
@@ -293,6 +332,7 @@ Template tooling version used: 0.38</description>
                   <step>
                      <type>JSONPATH</type>
                      <params>$.load_timestamp</params>
+                     <error_handler>DISCARD_VALUE</error_handler>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -950,7 +990,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1352,7 +1392,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1429,40 +1469,13 @@ return JSON.stringify(output);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate</name>
-                     <type>DEPENDENT</type>
-                     <key>nginx.http.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <status>ENABLED</status>
-                     <description>The total number of unsuccessful attempts to communicate with the server per second.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].fails.first()</params>
-                        </step>
-                        <step>
-                           <type>CHANGE_PER_SECOND</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>nginx.http.upstreams</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
                      <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Header time</name>
                      <type>DEPENDENT</type>
                      <key>nginx.http.upstream.peer.header_time.rate[{#UPSTREAM},{#PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <units>ms</units>
+                     <units>!ms</units>
                      <description>The average time to get the response header from the server.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1610,7 +1623,7 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <units>ms</units>
+                     <units>!ms</units>
                      <description>The average time to get the full response from the server.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1847,8 +1860,9 @@ return JSON.stringify(output);
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{str(up)}=0 or {str(down)}=0</expression>
+                           <expression>{str(up)}=0 and {str(down)}=0</expression>
                            <name>Nginx: HTTP upstream server is not in UP or DOWN state.</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1880,12 +1894,12 @@ return JSON.stringify(output);
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}].sum(5m)}/({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}+0.001)*100&gt;5</expression>
+                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}].sum(5m)} &gt; ({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))</expression>
                      <name>Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)</name>
                      <priority>WARNING</priority>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}].sum(5m)}/({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}+0.001)*100&gt;5</expression>
+                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}].sum(5m)} &gt; ({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))</expression>
                      <name>Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)</name>
                      <priority>HIGH</priority>
                   </trigger_prototype>
@@ -1993,7 +2007,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2113,7 +2127,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2210,33 +2224,6 @@ return JSON.stringify(output);
                         <step>
                            <type>JSONPATH</type>
                            <params>$['{#NAME}'].requests.srv</params>
-                        </step>
-                        <step>
-                           <type>CHANGE_PER_SECOND</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>nginx.resolvers</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Nginx: Resolver [{#NAME}]: Responses formerr, rate</name>
-                     <type>DEPENDENT</type>
-                     <key>nginx.resolvers.responses.formerr.rate[{#NAME}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <status>ENABLED</status>
-                     <description>The total number of FORMERR (Format error) responses per second.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Nginx: Resolver [{#NAME}]</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$['{#NAME}'].responses.formerr</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2591,7 +2578,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2908,7 +2895,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2964,7 +2951,7 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <units>ms</units>
+                     <units>!ms</units>
                      <description>The average time to connect to the upstream server.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3039,7 +3026,7 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <units>ms</units>
+                     <units>!ms</units>
                      <description>The average time to receive the first byte of data.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3160,7 +3147,7 @@ return JSON.stringify(output);
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <units>ms</units>
+                     <units>!ms</units>
                      <description>The average time to receive the last byte of data.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3235,8 +3222,9 @@ return JSON.stringify(output);
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{str(up)}=0 or {str(down)}=0</expression>
+                           <expression>{str(up)}=0 and {str(down)}=0</expression>
                            <name>Nginx: Stream upstream server is not in UP or DOWN state.</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -3320,7 +3308,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -3415,7 +3403,7 @@ return JSON.stringify(output);
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>15m</params>
+                     <params>30m</params>
                   </step>
                </preprocessing>
             </discovery_rule>
