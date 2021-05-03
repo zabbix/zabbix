@@ -92,7 +92,7 @@ final class CHistFunctionData {
 		],
 		'logseverity' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
+			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false]
 		],
 		'logsource' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -101,7 +101,7 @@ final class CHistFunctionData {
 		],
 		'max' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
+			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
 		],
 		'max_foreach' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -109,7 +109,7 @@ final class CHistFunctionData {
 		],
 		'min' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
+			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
 		],
 		'min_foreach' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -127,7 +127,7 @@ final class CHistFunctionData {
 			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
 			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
 				['type' => 'regexp', 'pattern' => '/^(\d+(\.\d{0,4})?)|(\.\d{1,4})$/'],
-				['type' => 'range', 'min' => 0, 'max' => 100],
+				['type' => 'range', 'min' => 0, 'max' => 100]
 			]]
 		],
 		'sum' => [
