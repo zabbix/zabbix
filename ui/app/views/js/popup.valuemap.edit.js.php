@@ -24,7 +24,14 @@
  */
 ?>
 $(() => {
-	let VALUEMAP_MAPPING_TYPE_DEFAULT = 5;
+	let VALUEMAP_MAPPING_TYPE_DEFAULT = <?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>;
+	let type_placeholder = <?= json_encode([
+		VALUEMAP_MAPPING_TYPE_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_IN_RANGE => _('value'),
+		VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp')
+	]) ?>;
 	let table = document.querySelector('#mappings_table');
 	let observer = new MutationObserver(mutationHandler);
 
@@ -39,30 +46,31 @@ $(() => {
 
 	function updateOnTypeChange() {
 		let default_select = table.querySelector(`z-select[value="${VALUEMAP_MAPPING_TYPE_DEFAULT}"]`);
-		let have_default_type = !!default_select;
-		let table_row = have_default_type ? default_select.closest('tr') : null;
-		let value_input = have_default_type ? table_row.querySelector('input[name$="[value]"]') : null;
 
-		table.querySelectorAll('z-select[name$="[type]"]').forEach((zselect) => {
-			if (zselect.closest('tr') !== table_row) {
-				zselect.getOptionByValue(VALUEMAP_MAPPING_TYPE_DEFAULT).disabled = have_default_type;
+		table.querySelectorAll('tr').forEach((row) => {
+			let zselect = row.querySelector('z-select[name$="[type]"]');
+			let input = row.querySelector('input[name$="[value]"]');
+
+			if (zselect) {
+				zselect.getOptionByValue(VALUEMAP_MAPPING_TYPE_DEFAULT).disabled = (default_select
+					&& zselect !== default_select
+				);
+				input.classList.toggle('visibility-hidden', (zselect === default_select));
+				input.disabled = (zselect === default_select);
+				input.setAttribute('placeholder', type_placeholder[zselect.value]||'');
 			}
-		});
-		table.querySelectorAll('input[name$="[value]"]').forEach((input) => {
-			input.classList.toggle('visibility-hidden', have_default_type && input.closest('tr') === table_row);
-			input.disabled = (have_default_type && input.closest('tr') === table_row);
 		});
 	}
 
 	function mutationHandler(mutation_records, observer) {
-		mutation_records.forEach((mutation) => {
-			if (mutation.target.tagName === 'INPUT' && mutation.target.getAttribute('name').substr(-6) === '[type]') {
-				updateOnTypeChange();
-			}
-			else if (mutation.target.tagName === 'TBODY' && mutation.removedNodes.length > 0) {
-				updateOnTypeChange();
-			}
+		let update = mutation_records.filter((mutation) => {
+			return (mutation.target.tagName === 'INPUT' && mutation.target.getAttribute('name').substr(-6) === '[type]')
+				|| (mutation.target.tagName === 'TBODY' && mutation.removedNodes.length > 0);
 		});
+
+		if (update.length) {
+			updateOnTypeChange();
+		}
 	}
 });
 
