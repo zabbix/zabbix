@@ -101,7 +101,7 @@ class CHistFunctionValidator extends CValidator {
 				continue;
 			}
 
-			$is_valid =	in_array($param['type'],
+			$is_valid = in_array($param['type'],
 				array_key_exists('type_any', $param_spec) ? $param_spec['type_any'] : [$param_spec['type']]
 			);
 
