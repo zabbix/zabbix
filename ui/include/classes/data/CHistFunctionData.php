@@ -126,7 +126,7 @@ final class CHistFunctionData {
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
 			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
 			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(\d+(\.\d{0,4})?)|(\.\d{1,4})$/'],
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
 				['type' => 'range', 'min' => 0, 'max' => 100]
 			]]
 		],
