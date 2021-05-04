@@ -23,8 +23,7 @@ final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
 	public const PERIOD_MODE_SEC_POSITIVE = 1;
-	public const PERIOD_MODE_SEC_POSITIVE_OR_ZERO = 2;
-	public const PERIOD_MODE_TREND = 3;
+	public const PERIOD_MODE_TREND = 2;
 
 	private const PARAMETERS = [
 		'avg' => [
@@ -73,7 +72,7 @@ final class CHistFunctionData {
 		],
 		'fuzzytime' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE_OR_ZERO]
+			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
 		],
 		'last' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],

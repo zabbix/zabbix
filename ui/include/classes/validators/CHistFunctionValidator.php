@@ -166,7 +166,6 @@ class CHistFunctionValidator extends CValidator {
 				return false;
 
 			case CHistFunctionData::PERIOD_MODE_SEC_POSITIVE:
-			case CHistFunctionData::PERIOD_MODE_SEC_POSITIVE_OR_ZERO:
 				if ($time_shift !== '') {
 					return false;
 				}
@@ -175,9 +174,7 @@ class CHistFunctionValidator extends CValidator {
 					return true;
 				}
 
-				$min = ($mode == CHistFunctionData::PERIOD_MODE_SEC_POSITIVE_OR_ZERO) ? 0 : 1;
-
-				if (self::validateSimpleInterval($sec_num) && self::validateRange($sec_num, ['min' => $min])) {
+				if (self::validateSimpleInterval($sec_num) && self::validateRange($sec_num, ['min' => 1])) {
 					return true;
 				}
 
