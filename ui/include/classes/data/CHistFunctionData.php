@@ -199,7 +199,7 @@ final class CHistFunctionData {
 		'sum_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
-		'trendcount' => self::ITEM_VALUE_TYPES_ALL,
+		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
 		'trendsum' => self::ITEM_VALUE_TYPES_NUM
