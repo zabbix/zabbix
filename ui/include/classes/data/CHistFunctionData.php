@@ -40,7 +40,9 @@ final class CHistFunctionData {
 			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
 				['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']
 			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
+				'required' => false
+			]
 		],
 		'count_foreach' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -55,7 +57,9 @@ final class CHistFunctionData {
 			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
 				['type' => 'regexp', 'pattern' => '/^(iregexp|regexp|like)$/']
 			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
+				'required' => false
+			]
 		],
 		'forecast' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -87,7 +91,9 @@ final class CHistFunctionData {
 		'logeventid' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
 			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
+				'required' => false
+			]
 		],
 		'logseverity' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
@@ -96,7 +102,9 @@ final class CHistFunctionData {
 		'logsource' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
 			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
+				'required' => false
+			]
 		],
 		'max' => [
 			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
