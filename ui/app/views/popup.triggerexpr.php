@@ -32,6 +32,7 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
+	->addVar('function_type', $data['function_type'])
 	->addItem((new CInput('submit', 'submit'))
 		->addStyle('display: none;')
 		->removeId()
@@ -101,16 +102,52 @@ if ($data['item_required']) {
 $function_select = (new CSelect('function'))
 	->setFocusableElementId('label-function')
 	->setId('function')
-	->setValue($data['function']);
+	->setValue($data['function_type'].'_'.$data['function']);
 
-foreach ($data['functions'] as $id => $f) {
-	$function_select->addOption(new CSelectOption($id, $f['description']));
+$function_types = [
+	ZBX_FUNCTION_TYPE_AGGREGATE => _('Aggregate functions'),
+	ZBX_FUNCTION_TYPE_BITWISE => _('Bitwise functions'),
+	ZBX_FUNCTION_TYPE_DATE_TIME => _('Date and time functions'),
+	ZBX_FUNCTION_TYPE_HISTORY => _('History functions'),
+	ZBX_FUNCTION_TYPE_MATH => _('Mathematical functions'),
+	ZBX_FUNCTION_TYPE_OPERATOR => _('Operator functions'),
+	ZBX_FUNCTION_TYPE_PREDICTION => _('Prediction functions'),
+	ZBX_FUNCTION_TYPE_STRING => _('String functions')
+];
+
+$functions_by_group = [];
+foreach ($data['functions'] as $id => $function) {
+	foreach ($function['types'] as $type) {
+		$functions_by_group[$function_types[$type]][$id] = [
+			'type' => $type,
+			'description' => $function['description']
+		];
+	}
+}
+ksort($functions_by_group);
+
+foreach ($functions_by_group as $group_name => $functions) {
+	$opt_group = new CSelectOptionGroup($group_name);
+
+	foreach ($functions as $id => $function) {
+		$opt_group->addOption(new CSelectOption($function['type'].'_'.$id, $function['description']));
+	}
+
+	$function_select->addOptionGroup($opt_group);
 }
 
 $expression_form_list->addRow(new CLabel(_('Function'), $function_select->getFocusableElementId()), $function_select);
 
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	$paramid = 0;
+
+	// Functions with optional #num and time shift parameters.
+	$count_functions = [
+		'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift', 'bitnot', 'bitor',
+		'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos', 'cosh', 'cot', 'degrees', 'exp',
+		'expm1', 'floor', 'in', 'insert', 'last', 'left', 'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians',
+		'repeat', 'replace', 'right', 'round', 'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate'
+	];
 
 	foreach ($data['functions'][$data['selectedFunction']]['params'] as $param_name => $param_function) {
 		if (array_key_exists($param_name, $data['params'])) {
@@ -127,7 +164,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
-					if (in_array($data['selectedFunction'], ['last', 'bitand', 'strlen'])) {
+					if (in_array($data['selectedFunction'], $count_functions)) {
 						$param_type_element = $param_function['M'][PARAM_TYPE_COUNTS];
 						$label = $param_function['C'];
 						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());
@@ -181,20 +218,22 @@ else {
 	$expression_form->addVar('paramtype', PARAM_TYPE_TIME);
 }
 
-$expression_form_list->addRow(
-	(new CLabel(_('Result'), 'value'))->setAsteriskMark(), [
-		(new CSelect('operator'))
-			->setValue($data['operator'])
-			->setFocusableElementId('value')
-			->addOptions(CSelect::createOptionsFromArray(array_combine($data['functions'][$data['function']]['operators'],
-				$data['functions'][$data['function']]['operators']
-			))),
-		' ',
-		(new CTextBox('value', $data['value']))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	]
-);
+if (array_key_exists('operators', $data['functions'][$data['selectedFunction']])) {
+	$expression_form_list->addRow(
+		(new CLabel(_('Result'), 'value'))->setAsteriskMark(), [
+			(new CSelect('operator'))
+				->setValue($data['operator'])
+				->setFocusableElementId('value')
+				->addOptions(CSelect::createOptionsFromArray(array_combine($data['functions'][$data['function']]['operators'],
+					$data['functions'][$data['function']]['operators']
+				))),
+			' ',
+			(new CTextBox('value', $data['value']))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		]
+	);
+}
 
 $expression_form->addItem($expression_form_list);
 

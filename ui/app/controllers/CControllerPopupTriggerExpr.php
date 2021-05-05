@@ -20,6 +20,7 @@
 
 
 class CControllerPopupTriggerExpr extends CController {
+
 	private $metrics = [];
 	private $param1SecCount = [];
 	private $param1Period = [];
@@ -30,7 +31,6 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param3SecVal = [];
 	private $param_find = [];
 	private $param3SecPercent = [];
-	private $paramSecIntCount = [];
 	private $paramForecast = [];
 	private $paramTimeleft = [];
 	private $allowedTypesAny = [];
@@ -39,7 +39,11 @@ class CControllerPopupTriggerExpr extends CController {
 	private $allowedTypesLog = [];
 	private $allowedTypesInt = [];
 	private $functions = [];
-	private $operators = [];
+	private $function_types = [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_BITWISE, ZBX_FUNCTION_TYPE_DATE_TIME,
+		ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_MATH, ZBX_FUNCTION_TYPE_OPERATOR, ZBX_FUNCTION_TYPE_PREDICTION,
+		ZBX_FUNCTION_TYPE_STRING
+	];
+	private $operators = ['=', '<>', '>', '<', '>=', '<='];
 	private $period_optional = [];
 
 	protected function init() {
@@ -196,25 +200,6 @@ class CControllerPopupTriggerExpr extends CController {
 			]
 		];
 
-		$this->paramSecIntCount = [
-			'last' => [
-				'C' => _('Last of').' (T)',
-				'T' => T_ZBX_INT,
-				'M' => $this->metrics,
-				'A' => true
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
-				'A' => false
-			],
-			'mask' => [
-				'C' => _('Mask'),
-				'T' => T_ZBX_STR,
-				'A' => true
-			]
-		];
-
 		$this->paramForecast = [
 			'last' => [
 				'C' => _('Last of').' (T)',
@@ -297,180 +282,758 @@ class CControllerPopupTriggerExpr extends CController {
 
 		$this->functions = [
 			'abs' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
 				'description' => _('abs() - Absolute value'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'acos' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('acos() - The arccosine of a value as an angle, expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'ascii' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('ascii() - Returns the ASCII code of the leftmost character of the value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'asin' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('asin() - The arcsine of a value as an angle, expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'atan' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('atan() - The arctangent of a value as an angle, expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'atan2' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians'),
+				'params' => $this->param1SecCount + [
+					'abscissa' => [
+						'C' => _('Abscissa'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
 			],
 			'avg' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_MATH],
 				'description' => _('avg() - Average value of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'between' => [
+				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
+				'description' => _('between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>']
+			],
+			'bitand' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitand() - Bitwise AND'),
+				'params' => $this->param1SecCount + [
+					'mask' => [
+						'C' => _('Mask'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bitlength' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('bitlength() - Returns the length in bits'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'bitlshift' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitlshift() - Bitwise shift left'),
+				'params' => $this->param1SecCount + [
+					'bits' => [
+						'C' => _('Bits to shift'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bitnot' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitnot() - Bitwise NOT'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bitor' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitor() - Bitwise OR'),
+				'params' => $this->param1SecCount + [
+					'mask' => [
+						'C' => _('Mask'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bitrshift' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitrshift() - Bitwise shift right'),
+				'params' => $this->param1SecCount + [
+					'bits' => [
+						'C' => _('Bits to shift'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bitxor' => [
+				'types' => [ZBX_FUNCTION_TYPE_BITWISE],
+				'description' => _('bitxor() - Bitwise exclusive OR'),
+				'params' => $this->param1SecCount + [
+					'mask' => [
+						'C' => _('Mask'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesInt,
+				'operators' => $this->operators
+			],
+			'bytelength' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('bytelength() - Returns the length in bytes'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'cbrt' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('cbrt() - Cube root'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'ceil' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('ceil() - Rounds up to the nearest greater integer'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
 			],
 			'change' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('change() - Difference between last and previous value'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'char' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('char() - Returns the character which represents the given ASCII code'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'concat' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('concat() - Returns a string that is the result of concatenating value to string'),
+				'params' => $this->param1SecCount + [
+					'string' => [
+						'C' => _('String'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'cos' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('cos() - The cosine of a value, where the value is an angle expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'cosh' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('cosh() - The hyperbolic cosine of a value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'cot' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('cot() - The cotangent of a value, where the value is an angle expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
 			],
 			'count' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('count() - Number of successfully retrieved values V (which fulfill operator O) for period T'),
 				'params' => $this->param3SecVal,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'countunique' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('countunique() - The number of unique values'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'date' => [
+				'types' => [ZBX_FUNCTION_TYPE_DATE_TIME],
+				'description' => _('date() - Current date'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'dayofmonth' => [
+				'types' => [ZBX_FUNCTION_TYPE_DATE_TIME],
+				'description' => _('dayofmonth() - Day of month'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'dayofweek' => [
+				'types' => [ZBX_FUNCTION_TYPE_DATE_TIME],
+				'description' => _('dayofweek() - Day of week'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'degrees' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('degrees() - Converts a value from radians to degrees'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'e' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _("e() - Returns Euler's number")
+			],
+			'exp' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _("exp() - Euler's number at a power of a value"),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'expm1' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _("expm1() - Euler's number at a power of a value minus 1"),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
 			],
 			'find' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param_find,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
-			'last' => [
-				'description' => _('last() - Last (most recent) T value'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'first' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('first() - The oldest value in the specified time interval'),
+				'params' => $this->param1Sec + $this->period_optional,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
 			],
-			'length' => [
-				'description' => _('length() - Length of last (most recent) T value in characters'),
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'max' => [
-				'description' => _('max() - Maximum value for period T'),
+			'floor' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('floor() - Rounds down to the nearest smaller integer'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
-			'min' => [
-				'description' => _('min() - Minimum value for period T'),
-				'params' => $this->param1SecCount,
+			'forecast' => [
+				'types' => [ZBX_FUNCTION_TYPE_PREDICTION],
+				'description' => _('forecast() - Forecast for next t seconds based on period T'),
+				'params' => $this->paramForecast,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'percentile' => [
-				'description' => _('percentile() - Percentile P of a period T'),
-				'params' => $this->param3SecPercent,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'sum' => [
-				'description' => _('sum() - Sum of values of a period T'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'date' => [
-				'description' => _('date() - Current date'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'dayofweek' => [
-				'description' => _('dayofweek() - Day of week'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'dayofmonth' => [
-				'description' => _('dayofmonth() - Day of month'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'fuzzytime' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)'),
 				'params' => $this->param1Sec,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
+			'in' => [
+				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
+				'description' => _('in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)'),
+				'params' => $this->param1SecCount + [
+					'min' => [
+						'C' => _('Min'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'max' => [
+						'C' => _('Max'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>']
+			],
+			'insert' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string'),
+				'params' => $this->param1SecCount + [
+					'start' => [
+						'C' => _('Start'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'length' => [
+						'C' => _('Length'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'replace' => [
+						'C' => _('Replacement'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'kurtosis' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('kurtosis() - Measures the "tailedness" of the probability distribution'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'last' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('last() - Last (most recent) T value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'left' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('left() - Returns the leftmost count characters'),
+				'params' => $this->param1SecCount + [
+					'count' => [
+						'C' => _('Count'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'length' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('length() - Length of last (most recent) T value in characters'),
+				'allowed_types' => $this->allowedTypesStr,
+				'operators' => $this->operators
+			],
+			'log' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('log() - Natural logarithm'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'log10' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('log10() - Decimal logarithm'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'logeventid' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
 			'logseverity' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('logseverity() - Log severity of the last log entry for period T'),
 				'params' => $this->period_optional,
 				'allowed_types' => $this->allowedTypesLog,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'logsource' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
-			'now' => [
-				'description' => _('now() - Number of seconds since the Epoch'),
+			'ltrim' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('ltrim() - Remove specified characters from the beginning of a string'),
+				'params' => $this->param1SecCount + [
+					'chars' => [
+						'C' => _('Chars'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
-			'time' => [
-				'description' => _('time() - Current time'),
+			'mad' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('mad() - Median absolute deviation'),
+				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'max' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('max() - Maximum value for period T'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'mid' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('mid() - Returns a substring beginning at the character position specified by start for N characters'),
+				'params' => $this->param1SecCount + [
+					'start' => [
+						'C' => _('Start'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'length' => [
+						'C' => _('Length'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'min' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('min() - Minimum value for period T'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'mod' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('mod() - Division remainder'),
+				'params' => $this->param1SecCount + [
+					'denominator' => [
+						'C' => _('Division denominator'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
 			],
 			'nodata' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)'),
 				'params' => $this->param2SecMode,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
-			'bitand' => [
-				'description' => _('bitand() - Bitwise AND of last (most recent) T value and mask'),
-				'params' => $this->paramSecIntCount,
-				'allowed_types' => $this->allowedTypesInt,
-				'operators' => ['=', '<>']
+			'now' => [
+				'types' => [ZBX_FUNCTION_TYPE_DATE_TIME],
+				'description' => _('now() - Number of seconds since the Epoch'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
 			],
-			'forecast' => [
-				'description' => _('forecast() - Forecast for next t seconds based on period T'),
-				'params' => $this->paramForecast,
+			'percentile' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('percentile() - Percentile P of a period T'),
+				'params' => $this->param3SecPercent,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'pi' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('pi() - Returns the Pi constant')
+			],
+			'power' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('power() - The power of a base value to a power value'),
+				'params' => $this->param1SecCount + [
+					'power' => [
+						'C' => _('Power value'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'radians' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('radians() - Converts a value from degrees to radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'rand' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('rand() - A random integer value')
+			],
+			'repeat' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('repeat() - Returns a string composed of value repeated count times'),
+				'params' => $this->param1SecCount + [
+					'count' => [
+						'C' => _('Count'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'replace' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('replace() - Search value for occurrences of pattern, and replace with replacement'),
+				'params' => $this->param1SecCount + [
+					'pattern' => [
+						'C' => _('Pattern'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'replace' => [
+						'C' => _('Replacement'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'right' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('right() - Returns the rightmost count characters'),
+				'params' => $this->param1SecCount + [
+					'count' => [
+						'C' => _('Count'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'round' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('round() - Rounds a value to decimal places'),
+				'params' => $this->param1SecCount + [
+					'decimals' => [
+						'C' => _('Decimal places'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'rtrim' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('rtrim() - Removes specified characters from the end of a string'),
+				'params' => $this->param1SecCount + [
+					'chars' => [
+						'C' => _('Chars'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'signum' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'sin' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('sin() - The sine of a value, where the value is an angle expressed in radians'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'sinh' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('sinh() - The hyperbolic sine of a value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'skewness' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('skewness() - Measures the asymmetry of the probability distribution'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'sqrt' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('sqrt() - Square root of a value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'stddevpop' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('stddevpop() - Population standard deviation'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'stddevsamp' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('stddevsamp() - Sample standard deviation'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'sum' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('sum() - Sum of values of a period T'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'sumofsquares' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('sumofsquares() - The sum of squares'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'tan' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('tan() - The tangent of a value'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'time' => [
+				'types' => [ZBX_FUNCTION_TYPE_DATE_TIME],
+				'description' => _('time() - Current time'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
 			],
 			'timeleft' => [
+				'types' => [ZBX_FUNCTION_TYPE_PREDICTION],
 				'description' => _('timeleft() - Time to reach threshold estimated based on period T'),
 				'params' => $this->paramTimeleft,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'trendavg' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendavg() - Average value of a period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'trendcount' => [
-				'description' => _('trendcount() - Number of successfully retrieved values V (which fulfill operator O) for period T with exact period shift'),
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('trendcount() - Number of successfully retrieved values for period T'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'trendmax' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendmax() - Maximum value for period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'trendmin' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendmin() - Minimum value for period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
 			],
 			'trendsum' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendsum() - Sum of values of a period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'operators' => $this->operators
+			],
+			'trim' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('trim() - Remove specified characters from the beginning and the end of a string'),
+				'params' => $this->param1SecCount + [
+					'chars' => [
+						'C' => _('Chars'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'truncate' => [
+				'types' => [ZBX_FUNCTION_TYPE_MATH],
+				'description' => _('truncate() - Truncates a value to decimal places'),
+				'params' => $this->param1SecCount + [
+					'decimals' => [
+						'C' => _('Decimal places'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'varpop' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('varpop() - Population variance'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
+			'varsamp' => [
+				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
+				'description' => _('varsamp() - Sample variance'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
 			]
 		];
 
 		CArrayHelper::sort($this->functions, ['description']);
-
-		foreach ($this->functions as $function) {
-			foreach ($function['operators'] as $operator) {
-				$this->operators[$operator] = true;
-			}
-		}
 	}
 
 	protected function checkInput() {
@@ -481,7 +1044,8 @@ class CControllerPopupTriggerExpr extends CController {
 			'itemid' =>				'db items.itemid',
 			'parent_discoveryid' =>	'db items.itemid',
 			'function' =>			'in '.implode(',', array_keys($this->functions)),
-			'operator' =>			'in '.implode(',', array_keys($this->operators)),
+			'function_type' =>		'in '.implode(',', $this->function_types),
+			'operator' =>			'in '.implode(',', $this->operators),
 			'params' =>				'',
 			'paramtype' =>			'in '.implode(',', [PARAM_TYPE_TIME, PARAM_TYPE_COUNTS]),
 			'value' =>				'string|not_empty',
@@ -572,7 +1136,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 					if (array_key_exists($index, $tokens)
 							&& $tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
-							&& in_array($tokens[$index]['match'], ['=', '<>', '>', '<', '>=', '<='])) {
+							&& in_array($tokens[$index]['match'], $this->operators)) {
 						$operator = $tokens[$index]['match'];
 						$index++;
 
@@ -725,9 +1289,10 @@ class CControllerPopupTriggerExpr extends CController {
 			'params' => $params,
 			'paramtype' => $param_type,
 			'item_description' => $description,
-			'item_required' => !in_array($function, getStandaloneFunctions()),
+			'item_required' => !in_array($function, array_merge(getStandaloneFunctions(), getFunctionsConstants())),
 			'functions' => $this->functions,
 			'function' => $function,
+			'function_type' => $this->getInput('function_type', ZBX_FUNCTION_TYPE_HISTORY),
 			'operator' => $operator,
 			'item_key' => $item_key,
 			'itemValueType' => $item_value_type,
@@ -738,8 +1303,8 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Check if submitted function is usable with selected item.
 		foreach ($data['functions'] as $id => $f) {
-			if (($data['itemValueType'] === null || array_key_exists($item_value_type, $f['allowed_types']))
-					&& $id === $function) {
+			if (($data['itemValueType'] === null || (array_key_exists('allowed_types', $f)
+					&& array_key_exists($item_value_type, $f['allowed_types']))) && $id === $function) {
 				$data['selectedFunction'] = $id;
 				break;
 			}
@@ -748,16 +1313,19 @@ class CControllerPopupTriggerExpr extends CController {
 		if ($data['selectedFunction'] === null) {
 			$data['selectedFunction'] = 'last';
 			$data['function'] = 'last';
+			$data['function_type'] = ZBX_FUNCTION_TYPE_HISTORY;
 		}
 
 		// Remove functions that not correspond to chosen item.
 		foreach ($data['functions'] as $id => $f) {
-			if ($data['itemValueType'] !== null && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
+			if ($data['itemValueType'] !== null && (!array_key_exists('allowed_types', $f)
+					|| !array_key_exists($data['itemValueType'], $f['allowed_types']))) {
 				unset($data['functions'][$id]);
 
-				// Take first available function from list and change to first available operator for that function.
+				// Take first available function from list.
 				if ($id === $data['function']) {
 					$data['function'] = key($data['functions']);
+					$data['function_type'] = reset($data['functions'][$data['function']]['types']);
 					$data['operator'] = reset($data['functions'][$data['function']]['operators']);
 				}
 			}
@@ -766,7 +1334,10 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if (in_array($function, getStandaloneFunctions())) {
+				if (in_array($function, getFunctionsConstants())) {
+					$data['expression'] = sprintf('%s()', $function);
+				}
+				elseif (in_array($function, getStandaloneFunctions())) {
 					$data['expression'] = sprintf('%s()%s%s', $function, $operator,
 						CExpressionParser::quoteString($data['value'])
 					);
@@ -802,42 +1373,33 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 					unset($data['params']['shift'], $data['params']['period_shift']);
 
-					$mask = '';
-					if ($function === 'bitand' && array_key_exists('mask', $data['params'])) {
-						$mask = $data['params']['mask'];
-						unset($data['params']['mask']);
-					}
+					// Functions where item is wrapped in last() like func(last(/host/item)).
+					$last_functions = [
+						'abs', 'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift',
+						'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos',
+						'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'left', 'log', 'log10',
+						'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round', 'signum',
+						'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate'
+					];
 
-					$fn_params = rtrim(implode(',', $data['params']), ',');
+					if (in_array($function, $last_functions)) {
+						$last_params = $data['params']['last'];
+						unset($data['params']['last']);
+						$fn_params = rtrim(implode(',', $data['params']), ',');
 
-					if ($function === 'abs') {
-						$data['expression'] = sprintf('abs(last(/%s/%s)%s)%s%s',
+						$data['expression'] = sprintf('%s(last(/%s/%s%s)%s)%s%s',
+							$function,
 							$item_host_data['host'],
 							$data['item_key'],
+							($last_params === '') ? '' : ','.$last_params,
 							($fn_params === '') ? '' : ','.$fn_params,
-							$operator,
-							CExpressionParser::quoteString($data['value'])
-						);
-					}
-					elseif ($function === 'bitand') {
-						$data['expression'] = sprintf('bitand(last(/%s/%s%s)%s)%s%s',
-							$item_host_data['host'],
-							$data['item_key'],
-							($fn_params === '') ? '' : ','.$fn_params,
-							($mask === '') ? '' : ','.$mask,
-							$operator,
-							CExpressionParser::quoteString($data['value'])
-						);
-					}
-					elseif ($function === 'length') {
-						$data['expression'] = sprintf('length(last(/%s/%s))%s%s',
-							$item_host_data['host'],
-							$data['item_key'],
 							$operator,
 							CExpressionParser::quoteString($data['value'])
 						);
 					}
 					else {
+						$fn_params = rtrim(implode(',', $data['params']), ',');
+
 						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
 							$function,
 							$item_host_data['host'],

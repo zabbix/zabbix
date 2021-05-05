@@ -717,6 +717,14 @@ function validate_trigger_expression(overlay) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 
+	// Remove function type from function name.
+	var function_name = $form[0].elements.function,
+		function_name_parts = function_name.value.split('_');
+
+	if (function_name_parts.length == 2) {
+		function_name.value = function_name_parts[1];
+	}
+
 	url.setArgument('add', 1);
 
 	overlay.setLoading();
