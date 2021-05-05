@@ -1260,7 +1260,7 @@ class CConfigurationExport {
 	protected function getGroupsReferences(array $groupIds) {
 		$groups = API::HostGroup()->get([
 			'groupids' => $groupIds,
-			'output' => ['name'],
+			'output' => ['uuid', 'name'],
 			'preservekeys' => true
 		]);
 
@@ -1270,7 +1270,10 @@ class CConfigurationExport {
 		}
 
 		foreach ($groups as &$group) {
-			$group = ['name' => $group['name']];
+			$group = [
+				'uuid' => $group['uuid'],
+				'name' => $group['name']
+			];
 		}
 		unset($group);
 
