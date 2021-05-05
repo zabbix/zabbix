@@ -1569,13 +1569,6 @@ static void	zbx_report_dst_free(zbx_report_dst_t *dst)
 	zbx_free(dst);
 }
 
-typedef struct
-{
-	const char	*name;
-	int		min_width;
-}
-zbx_rm_widget_t;
-
 #define	ZBX_REPORT_DEFAULT_WIDTH	1920
 #define	ZBX_REPORT_DEFAULT_HEIGHT	1080
 #define ZBX_REPORT_ROW_HEIGHT		70
