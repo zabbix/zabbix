@@ -833,8 +833,7 @@ abstract class CHostGeneral extends CHostBase {
 				$params = [
 					'output' => ['valuemapid', 'type', 'value', 'newvalue'],
 					'filter' => ['valuemapid' => array_keys($valuemaps)],
-					'sortfield' => ['sortorder'],
-					'sortorder' => ZBX_SORT_UP
+					'sortfield' => ['sortorder']
 				];
 				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
 
