@@ -31,7 +31,7 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	public function convert($data): array {
+	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '5.4';
 		$templates_names = [];
 
