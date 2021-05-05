@@ -75,6 +75,10 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				'bitand(last(/t/trap[{#IF}],{#PERIOD}:now-{#TIMESHIFT}),123)'
 			],
 			[
+				'{t:trap[{#IF}].band("{{#PERIOD}.regsub(\"^[0-9]+\", \1)}",123,{#TIMESHIFT})}',
+				'bitand(last(/t/trap[{#IF}],{{#PERIOD}.regsub("^[0-9]+", \1)}:now-{#TIMESHIFT}),123)'
+			],
+			[
 				'{t:log.logeventid()} or {t:log.logeventid( )} or {t:log.logeventid( "" )} or {t:log.logeventid( " " )} or {t:log.logeventid( "pattern" )} or {t:log.logeventid(pattern)} or {t:log.logeventid( pattern)}',
 				'logeventid(/t/log) or logeventid(/t/log) or logeventid(/t/log,,"") or logeventid(/t/log,," ") or logeventid(/t/log,,"pattern") or logeventid(/t/log,,"pattern") or logeventid(/t/log,,"pattern")'
 			],

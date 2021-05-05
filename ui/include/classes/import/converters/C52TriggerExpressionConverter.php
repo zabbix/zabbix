@@ -326,7 +326,7 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'strlen':
 			case 'last':
 				$parameters += ['', ''];
-				if (!self::isUserMacro($parameters[0])
+				if (!self::isMacro($parameters[0])
 						&& (substr($parameters[0], 0, 1) !== '#'
 							|| !ctype_digit(substr($parameters[0], 1))
 							|| (int) substr($parameters[0], 1) === 0)) {
@@ -366,7 +366,7 @@ class C52TriggerExpressionConverter extends CConverter {
 			// (<sec|#num>,mask,<time_shift>)
 			case 'band':
 				$parameters += ['', '', ''];
-				if (!self::isUserMacro($parameters[0])
+				if (!self::isMacro($parameters[0])
 						&& (substr($parameters[0], 0, 1) !== '#'
 							|| !ctype_digit(substr($parameters[0], 1))
 							|| (int) substr($parameters[0], 1) === 0)) {
@@ -752,15 +752,19 @@ class C52TriggerExpressionConverter extends CConverter {
 	}
 
 	/**
-	 * Check if given string is valid user macro.
+	 * Check if given string is valid user or lld macro.
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
-	private static function isUserMacro(string $param): bool {
-		$user_macro_parser = new CUserMacroParser();
+	private static function isMacro(string $param): bool {
+		foreach ([new CUserMacroParser(), new CLLDMacroParser(), new CLLDMacroFunctionParser()] as $parser) {
+			if ($parser->parse($param) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
 
-		return ($user_macro_parser->parse($param) == CParser::PARSE_SUCCESS);
+		return false;
 	}
 }
