@@ -455,8 +455,8 @@ class CHistFunctionValidatorTest extends TestCase {
 			['last_foreach(/host/key, 1h)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, 1d)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, 1d:now/d)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "last_foreach". Invalid second parameter.']],
-			['last_foreach(/host/key, {$PERIOD}:{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
-			['last_foreach(/host/key, {$PERIOD}:now-{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
+			['last_foreach(/host/key, {$PERIOD}:{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "last_foreach". Invalid second parameter.']],
+			['last_foreach(/host/key, {$PERIOD}:now-{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "last_foreach". Invalid second parameter.']],
 			['last_foreach(/host/key, {$MACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, {#LLDMACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, 1d,)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "last_foreach". Invalid number of parameters.']]
