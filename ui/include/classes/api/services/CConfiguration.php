@@ -283,6 +283,7 @@ class CConfiguration extends CApiService {
 
 		$data = $validator
 			->setStrict(true)
+			->setPreview(true)
 			->validate($data, '/');
 
 		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2'] as $version) {
@@ -297,6 +298,7 @@ class CConfiguration extends CApiService {
 			$data = $validator
 				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
 				->setStrict(false)
+				->setPreview(true)
 				->validate($data, '/');
 		}
 
@@ -304,13 +306,6 @@ class CConfiguration extends CApiService {
 		$schema = $import_validator_factory
 			->getObject(ZABBIX_EXPORT_VERSION)
 			->getSchema();
-
-		// TODO VM: remove commented blocks
-		// Convert human readable import constants to values Zabbix API can work with.
-//		$data = (new CConstantImportConverter($schema))->convert($data);
-
-		// Add default values in place of missed tags.
-//		$data = (new CDefaultImportConverter($schema))->convert($data);
 
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
