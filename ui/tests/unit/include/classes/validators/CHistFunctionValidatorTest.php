@@ -471,7 +471,8 @@ class CHistFunctionValidatorTest extends TestCase {
 			'lldmacros' => true
 		] + $options);
 		$hist_function_validator = new CHistFunctionValidator([
-			'parameters' => (new CHistFunctionData($options))->getParameters()
+			'parameters' => (new CHistFunctionData($options))->getParameters(),
+			'lldmacros' => true
 		]);
 		$expression_parser->parse($source);
 		$tokens = $expression_parser->getResult()->getTokens();
