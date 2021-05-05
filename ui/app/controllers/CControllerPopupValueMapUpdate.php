@@ -83,24 +83,51 @@ class CControllerPopupValueMapUpdate extends CController {
 		}
 
 		$type_values = [];
+		$number_parser = new CNumberParser();
+		$range_parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
 
 		foreach ($mappings as $mapping) {
 			$mapping += ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
 			$type = $mapping['type'];
+			$value = $mapping['value'];
 
 			if ($mapping['newvalue'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Mapped to'), _('cannot be empty')));
+
 				return false;
 			}
 
-			if (array_key_exists($mapping['value'], $type_values[$type])) {
+			if (array_key_exists($value, $type_values[$type])) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
-					_s('value %1$s already exists', '('.$mapping['value'].')'))
+					_s('value %1$s already exists', '('.$value.')'))
 				);
+
 				return false;
 			}
 
-			$type_values[$type][$mapping['value']] = true;
+			$type_values[$type][$value] = true;
+
+			if ($type == VALUEMAP_MAPPING_TYPE_REGEXP
+					&& @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
+
+				return false;
+			}
+			elseif ($type == VALUEMAP_MAPPING_TYPE_IN_RANGE && $range_parser->parse($value) != CParser::PARSE_SUCCESS) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
+					_('invalid range expression')
+				));
+
+				return false;
+			}
+			elseif (($type == VALUEMAP_MAPPING_TYPE_LESS_EQUAL || $type == VALUEMAP_MAPPING_TYPE_GREATER_EQUAL)
+					&& $number_parser->parse($value) != CParser::PARSE_SUCCESS) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
+					_('a floating point value is expected')
+				));
+
+				return false;
+			}
 		}
 
 		return true;
@@ -112,9 +139,18 @@ class CControllerPopupValueMapUpdate extends CController {
 
 	protected function doAction() {
 		$data = [];
+		$mappings = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
-		$data['mappings'] = array_values($data['mappings']);
 
+		foreach ($data['mappings'] as $mapping) {
+			if ($mapping['value'] === '' && $mapping['newvalue'] === '') {
+				continue;
+			}
+
+			$mappings[] = $mapping;
+		}
+
+		$data['mappings'] = $mappings;
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($data)])));
 	}
 }

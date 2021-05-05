@@ -2195,6 +2195,12 @@ class CApiInputValidator {
 
 		$parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
 
-		return $parser->parse($data) == CParser::PARSE_SUCCESS;
+		if ($parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid range expression'));
+
+			return false;
+		}
+
+		return true;
 	}
 }
