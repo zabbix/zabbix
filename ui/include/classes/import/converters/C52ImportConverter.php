@@ -64,7 +64,7 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['graphs'] = self::convertGraphs($data['zabbix_export']['graphs'], $templates_names);
 		}
 
-		if (array_key_exists('groups', $data['zabbix_export']) && $templates_names) {
+		if (array_key_exists('groups', $data['zabbix_export'])) {
 			foreach ($data['zabbix_export']['groups'] as &$group) {
 				$group['uuid'] = generateUuidV4($group['name']);
 			}
