@@ -321,7 +321,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'find' => [
 				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param_find,
-				'allowed_types' => $this->allowedTypesStr,
+				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
 			'last' => [
@@ -641,21 +641,28 @@ class CControllerPopupTriggerExpr extends CController {
 					$params = [];
 
 					if ($parameters !== null && array_key_exists(1, $parameters)) {
-						if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
-							$sec_num = $parameters[1]['data']['sec_num'];
-							if ($sec_num !== '' && $sec_num[0] === '#') {
-								$params[] = substr($sec_num, 1);
-								$param_type = PARAM_TYPE_COUNTS;
-							}
-							else {
-								$params[] = $sec_num;
-								$param_type = PARAM_TYPE_TIME;
-							}
-							$params[] = $parameters[1]['data']['time_shift'];
+						if ($function === "nodata" || $function === "fuzzytime") {
+							$params[] = ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
+								? CHistFunctionParser::unquoteParam($parameters[1]['match'])
+								: $parameters[1]['match'];
 						}
 						else {
-							$params[] = '';
-							$params[] = '';
+							if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
+								$sec_num = $parameters[1]['data']['sec_num'];
+								if ($sec_num !== '' && $sec_num[0] === '#') {
+									$params[] = substr($sec_num, 1);
+									$param_type = PARAM_TYPE_COUNTS;
+								}
+								else {
+									$params[] = $sec_num;
+									$param_type = PARAM_TYPE_TIME;
+								}
+								$params[] = $parameters[1]['data']['time_shift'];
+							}
+							else {
+								$params[] = '';
+								$params[] = '';
+							}
 						}
 
 						for ($i = 2; $i < count($parameters); $i++) {

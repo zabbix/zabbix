@@ -1821,7 +1821,7 @@ function get_item_function_info(string $expr) {
 		'avg' => $rules['numeric_as_float'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
-		'find' => $rules['string_as_0or1'],
+		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'last' => $rules['numeric'] + $rules['string'],
