@@ -1951,14 +1951,13 @@ footer {
   border-bottom: 1px solid #888888;
   background: #333333; }
 .toc .toc-arrow {
-  width: 14px;
   min-height: 14px;
   padding: 0;
-  margin-right: 4px;
   background-color: transparent;
   border: 0; }
   .toc .toc-arrow .arrow-down,
   .toc .toc-arrow .arrow-up {
+    margin-right: 4px;
     transform: translateY(-1px); }
   .toc .toc-arrow .arrow-down {
     border-top-color: #ffffff; }
@@ -1966,7 +1965,8 @@ footer {
     border-bottom-color: #ffffff; }
 .toc .toc-sublist .toc-row {
   padding-left: 20px;
-  background: #ffffff;
+  background: #ffffff; }
+.toc .toc-sublist .toc-arrow {
   color: #000000; }
 .toc .toc-sublist .toc-sublist .toc-row {
   padding-left: 50px; }

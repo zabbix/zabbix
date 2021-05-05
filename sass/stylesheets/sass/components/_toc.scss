@@ -11,15 +11,14 @@
 	}
 
 	.toc-arrow {
-		width: 14px;
 		min-height: 14px;
 		padding: 0;
-		margin-right: 4px;
 		background-color: transparent;
 		border: 0;
 
 		.arrow-down,
 		.arrow-up {
+			margin-right: 4px;
 			transform: translateY(-1px);
 		}
 
@@ -36,6 +35,9 @@
 		.toc-row {
 			padding-left: 20px;
 			background: $form-bg-color;
+		}
+
+		.toc-arrow {
 			color: $font-color;
 		}
 
