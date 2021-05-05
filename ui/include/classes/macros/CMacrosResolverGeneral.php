@@ -756,8 +756,7 @@ class CMacrosResolverGeneral {
 		$options = [
 			'output' => ['valuemapid', 'type', 'value', 'newvalue'],
 			'filter' => ['valuemapid' => array_keys($valuemapids)],
-			'sortfield' => ['sortorder'],
-			'sortorder' => ZBX_SORT_UP
+			'sortfield' => ['sortorder']
 		];
 		$db_mappings = DBselect(DB::makeSql('valuemap_mapping', $options));
 
