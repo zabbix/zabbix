@@ -96,7 +96,7 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('interfaces', $host)) {
-				$host['interfaces'] = self::convertIntefaces($host['interfaces']);
+				$host['interfaces'] = self::convertInterfaces($host['interfaces']);
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
@@ -124,18 +124,19 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertTemplates(array $templates): array {
-		$result = [];
 		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
 
 		foreach ($templates as &$template) {
-			$tmpl_name = $template['name'];
+			$template_name = $template['name'];
 
-			if (preg_match($old_name_match, $tmpl_name, $match)) {
-				$tmpl_name = $match['mapped_name'];
+			if (preg_match($old_name_match, $template_name, $match)) {
+				$template_name = $match['mapped_name'];
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
-				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'], $tmpl_name);
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'],
+					$template_name
+				);
 			}
 
 			if (array_key_exists('httptests', $template)) {
@@ -145,14 +146,14 @@ class C52ImportConverter extends CConverter {
 			unset($template['applications']);
 
 			if (array_key_exists('dashboards', $template)) {
-				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards'], $tmpl_name);
+				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards'], $template_name);
 			}
 
 			if (array_key_exists('items', $template)) {
 				$template['items'] = self::convertItems($template['items']);
 
 				foreach ($template['items'] as &$item) {
-					$item['uuid'] = generateUuidV4($tmpl_name.'/'.$item['key']);
+					$item['uuid'] = generateUuidV4($template_name.'/'.$item['key']);
 
 					if (!array_key_exists('triggers', $item)) {
 						continue;
@@ -174,19 +175,19 @@ class C52ImportConverter extends CConverter {
 
 			if (array_key_exists('httptests', $template)) {
 				foreach ($template['httptests'] as &$httptest) {
-					$httptest['uuid'] = generateUuidV4($tmpl_name.'/'.$httptest['name']);
+					$httptest['uuid'] = generateUuidV4($template_name.'/'.$httptest['name']);
 				}
 				unset($httptest);
 			}
 
 			if (array_key_exists('valuemaps', $template)) {
 				foreach ($template['valuemaps'] as &$valuemap) {
-					$valuemap['uuid'] = generateUuidV4($tmpl_name.'/'.$valuemap['name']);
+					$valuemap['uuid'] = generateUuidV4($template_name.'/'.$valuemap['name']);
 				}
 				unset($valuemap);
 			}
 
-			$template['uuid'] = generateUuidV4($tmpl_name);
+			$template['uuid'] = generateUuidV4($template_name);
 		}
 		unset($template);
 
@@ -234,7 +235,7 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private static function convertIntefaces(array $interfaces): array {
+	private static function convertInterfaces(array $interfaces): array {
 		$result = [];
 
 		foreach ($interfaces as $interface) {
@@ -276,7 +277,7 @@ class C52ImportConverter extends CConverter {
 
 		foreach ($host_prototypes as $host_prototype) {
 			if (array_key_exists('interfaces', $host_prototype)) {
-				$host_prototype['interfaces'] = self::convertIntefaces($host_prototype['interfaces']);
+				$host_prototype['interfaces'] = self::convertInterfaces($host_prototype['interfaces']);
 			}
 
 			$result[] = $host_prototype;
@@ -300,7 +301,7 @@ class C52ImportConverter extends CConverter {
 		return $import;
 	}
 
-	private static function moveValueMaps(array $hosts, array $valuemaps) {
+	private static function moveValueMaps(array $hosts, array $valuemaps): array {
 		foreach ($hosts as &$host) {
 			$used_valuemaps = [];
 
@@ -316,12 +317,12 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				foreach ($host['discovery_rules'] as $drule) {
-					if (!array_key_exists('item_prototypes', $drule)) {
+				foreach ($host['discovery_rules'] as $discovery_rule) {
+					if (!array_key_exists('item_prototypes', $discovery_rule)) {
 						continue;
 					}
 
-					foreach ($drule['item_prototypes'] as $item_prototype) {
+					foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
 						if (array_key_exists('valuemap', $item_prototype)
 								&& !in_array($item_prototype['valuemap']['name'], $used_valuemaps)) {
 							if (array_key_exists($item_prototype['valuemap']['name'], $valuemaps)) {
@@ -344,10 +345,11 @@ class C52ImportConverter extends CConverter {
 	 * @static
 	 *
 	 * @param array $discovery_rules
+	 * @param string $template_name
 	 *
 	 * @return array
 	 */
-	private static function convertDiscoveryRules(array $discovery_rules): array {
+	private static function convertDiscoveryRules(array $discovery_rules, string $template_name = ''): array {
 		$result = [];
 
 		foreach ($discovery_rules as $discovery_rule) {
