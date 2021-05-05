@@ -760,6 +760,33 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '#25', 'abc' , '"def"', '1', '1.125', '-1e12', '{$M}', '{$M: context}', '{#M}', '{{#M}.regsub()}', '', '', '']
 			],
 			[
+				'nodata(/host/key, "1h")', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'nodata(/host/key, "1h")',
+					'function' => 'nodata',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 18,
+							'match' => '"1h"',
+							'length' => 4
+						]
+					]
+				],
+				['/host/key', '1h']
+			],
+			[
 				'last(/{HOST.HOST}/key)', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -841,16 +868,6 @@ class CHistFunctionParserTest extends TestCase {
 			],
 			[
 				'last("/host/key")', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'function' => '',
-					'parameters' => []
-				],
-				[]
-			],
-			[
-				'last(/host/key, "1h")', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
