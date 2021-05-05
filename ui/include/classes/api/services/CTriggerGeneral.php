@@ -199,7 +199,10 @@ abstract class CTriggerGeneral extends CApiService {
 						$descriptions[$new_trigger['description']][] = [
 							'expression' => $new_trigger['expression'],
 							'recovery_expression' => $new_trigger['recovery_expression'],
-							'hostid' => $host['hostid']
+							'host' => [
+								'hostid' => $host['hostid'],
+								'status' => $host['status']
+							]
 						];
 					}
 				}
@@ -276,7 +279,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	private static function getLinkedHosts(array $tpl_hostids, array $hostids = null) {
 		// Fetch all child hosts and templates
-		$sql = 'SELECT ht.hostid,ht.templateid,h.host'.
+		$sql = 'SELECT ht.hostid,ht.templateid,h.host,h.status'.
 			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
 				' AND '.dbConditionInt('ht.templateid', $tpl_hostids).
