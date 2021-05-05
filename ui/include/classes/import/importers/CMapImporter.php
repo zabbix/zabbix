@@ -41,7 +41,7 @@ class CMapImporter extends CImporter {
 		 * between maps and links that are imported.
 		 */
 		foreach ($this->getMapsWithoutElements($maps) as $map_name => $map_without_elements) {
-			$mapid = $this->referencer->findMapidByName($map_name);
+			$mapid = $this->referencer->findMapidByName($map_without_elements['name']);
 
 			if ($mapid !== null) {
 				// Update sysmapid in source map too.
