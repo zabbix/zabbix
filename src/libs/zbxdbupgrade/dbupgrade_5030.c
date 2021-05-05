@@ -25,6 +25,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "sysinfo.h"
 
 /*
  * 5.4 development database patches
