@@ -125,7 +125,7 @@ function submitImportPopup(overlay) {
 				postMessageDetails('success', response.messages);
 			}
 			overlayDialogueDestroy(overlay.dialogueid);
-			location.href = location.href;
+			location.href = location.href.split('#')[0];
 		}
 	});
 }
