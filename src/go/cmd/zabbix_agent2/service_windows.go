@@ -505,6 +505,6 @@ func getCmdName(cmd svc.Cmd) string {
 	case svc.SessionChange:
 		return "SessionChange"
 	default:
-		return "unkonwn"
+		return "unknown"
 	}
 }
