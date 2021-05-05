@@ -70,7 +70,7 @@ You can add any data to ServiceDesk or user-defined fields.<br>
 Please see the [On-demand](https://www.manageengine.com/products/service-desk/sdpod-v3-api/SDPOD-V3-API.html#add-request) and [On-premise](
 https://ui.servicedeskplus.com/APIDocs3/index.html#add-request) API specification for details about fields.<br>
 Most of fields should be filled as single-line string, other should be an object with *name* property. Zabbix can fill both, but not *"date"* fields.<br>
-Supported fied types: Single-line, Multi-line, Numeric, Pick List, Email, Phone, Currency, Decimal, Percent, Web URL, Radio Button, Decision Box. All of them should be passed as string.<br>
+Supported field types: Single-line, Multi-line, Numeric, Pick List, Email, Phone, Currency, Decimal, Percent, Web URL, Radio Button, Decision Box. All of them should be passed as string.<br>
 
 Fields should be in format **field_string:fieldname**, where:<br>
 **field** - can be *field* for system fields or *udf_field* for user-defined fields. The prefix for payload generator.<br>
