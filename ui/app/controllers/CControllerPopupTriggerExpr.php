@@ -517,6 +517,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 	protected function doAction() {
 		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_validator = new CExpressionValidator(['lldmacros' => true]);
 
 		$itemid = $this->getInput('itemid', 0);
 		$function = $this->getInput('function', 'last');
@@ -854,8 +855,6 @@ class CControllerPopupTriggerExpr extends CController {
 				if (array_key_exists('expression', $data)) {
 					// Parse and validate trigger expression.
 					if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-						$expression_validator = new CExpressionValidator();
-
 						if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
 							error($expression_validator->getError());
 						}

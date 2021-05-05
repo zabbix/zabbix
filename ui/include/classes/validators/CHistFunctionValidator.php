@@ -28,17 +28,20 @@ class CHistFunctionValidator extends CValidator {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'parameters' => []  Definition of parameters of known history functions.
+	 *   'parameters' => []     Definition of parameters of known history functions.
+	 *   'lldmacros'  => false  Enable low-level discovery macro usage in history function.
+	 *   'calculated' => false  Validate history function as part of calculated item formula.
 	 *
 	 * @var array
 	 */
 	private $options = [
-		'parameters' => []
+		'parameters' => [],
+		'lldmacros' => false,
+		'calculated' => false
 	];
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['calculated']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -97,7 +100,7 @@ class CHistFunctionValidator extends CValidator {
 				? CHistFunctionParser::unquoteParam($param['match'])
 				: $param['match'];
 
-			if (self::isMacro($param_match_unquoted)) {
+			if ($this->isMacro($param_match_unquoted)) {
 				continue;
 			}
 
@@ -108,7 +111,7 @@ class CHistFunctionValidator extends CValidator {
 			if ($is_valid) {
 				switch ($param['type']) {
 					case CHistFunctionParser::PARAM_TYPE_QUERY:
-						$is_valid = self::validateQuery($param['data']['host'], $param['data']['item']);
+						$is_valid = $this->validateQuery($param['data']['host'], $param['data']['item']);
 						break;
 
 					case CHistFunctionParser::PARAM_TYPE_PERIOD:
@@ -117,7 +120,7 @@ class CHistFunctionValidator extends CValidator {
 							: CHistFunctionData::PERIOD_MODE_DEFAULT;
 
 						$is_valid = (!$required || $param['data']['sec_num'] !== '')
-							&& self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $mode);
+							&& $this->validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $mode);
 
 						break;
 
@@ -142,18 +145,42 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
-	private static function isMacro(string $value): bool {
-		return (substr($value, 0, 1) === '{');
+	private function isMacro(string $value): bool {
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			return true;
+		}
+
+		if ($this->options['lldmacros']) {
+			$lld_macro_parser = new CLLDMacroParser();
+
+			if ($lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+
+			if ($lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
-	private static function validateQuery(string $host, string $item): bool {
+	private function validateQuery(string $host, string $item): bool {
+		if (!$this->options['calculated']) {
+			return true;
+		}
+
 		return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
 	}
 
-	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
+	private function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
 		switch ($mode) {
 			case CHistFunctionData::PERIOD_MODE_DEFAULT:
-				if ($sec_num === '' || self::isMacro($sec_num)) {
+				if ($sec_num === '' || $this->isMacro($sec_num)) {
 					return true;
 				}
 
@@ -187,7 +214,7 @@ class CHistFunctionValidator extends CValidator {
 					return false;
 				}
 
-				if (!self::isMacro($sec_num)) {
+				if (!$this->isMacro($sec_num)) {
 					if (!self::validateSimpleInterval($sec_num, ['with_year' => true])) {
 						return false;
 					}
