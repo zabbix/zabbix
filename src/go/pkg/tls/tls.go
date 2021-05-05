@@ -922,8 +922,11 @@ static const char	*tls_version_static(void)
 import "C"
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"runtime"
 	"time"
@@ -966,6 +969,15 @@ type tlsConn struct {
 	buf           []byte
 	timeout       time.Duration
 	shiftDeadline bool
+}
+
+type TlsDetails struct {
+	SessionName string
+	TlsConnect  string
+	TlsCaFile   string
+	TlsCertFile string
+	TlsKeyFile  string
+	RawUri      string
 }
 
 func (c *tlsConn) Error() (err error) {
@@ -1370,4 +1382,35 @@ func Init(config *Config) (err error) {
 	log.Debugf("psk context ciphersuites:%s", describeCiphersuites(pskContext))
 
 	return
+}
+
+func CreateTlsConfig(details TlsDetails, skipVerify bool) (*tls.Config, error) {
+	rootCertPool := x509.NewCertPool()
+	pem, err := ioutil.ReadFile(details.TlsCaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		return nil, errors.New("Failed to append PEM")
+	}
+
+	clientCerts := make([]tls.Certificate, 0, 1)
+	certs, err := tls.LoadX509KeyPair(details.TlsCertFile, details.TlsKeyFile)
+	if err != nil {
+		return nil, err
+	}
+
+	clientCerts = append(clientCerts, certs)
+
+	if skipVerify {
+		return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify}, nil
+	}
+
+	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: details.RawUri}, nil
+}
+
+func NewTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) TlsDetails {
+	//TODO add validation here
+	return TlsDetails{session, dbConnect, caFile, certFile, keyFile, uri}
 }

@@ -22,10 +22,7 @@ package mysql
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"database/sql"
-	"errors"
-	"io/ioutil"
 	"sync"
 	"time"
 
@@ -34,6 +31,7 @@ import (
 	"zabbix.com/pkg/uri"
 
 	"zabbix.com/pkg/log"
+	zbxTls "zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -45,15 +43,6 @@ type MyClient interface {
 type MyConn struct {
 	client         *sql.DB
 	lastTimeAccess time.Time
-}
-
-type tlsDetails struct {
-	sessionName string
-	tlsConnect  string
-	tlsCaFile   string
-	tlsCertFile string
-	tlsKeyFile  string
-	rawUri      string
 }
 
 func (conn *MyConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
@@ -153,7 +142,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI, details tlsDetails) (*MyConn, error) {
+func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*MyConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -193,56 +182,30 @@ func (c *ConnManager) create(uri uri.URI, details tlsDetails) (*MyConn, error) {
 	return c.connections[uri], nil
 }
 
-func registerTLSConfig(config *mysql.Config, details tlsDetails) error {
-	switch details.tlsConnect {
+func registerTLSConfig(config *mysql.Config, details zbxTls.TlsDetails) error {
+	switch details.TlsConnect {
 	case "required":
-		mysql.RegisterTLSConfig(details.sessionName, &tls.Config{InsecureSkipVerify: true})
+		mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
 	case "verify_ca":
-		conf, err := createTlsConfig(details, true)
+		conf, err := zbxTls.CreateTlsConfig(details, true)
 		if err != nil {
 			return err
 		}
 
-		mysql.RegisterTLSConfig(details.sessionName, conf)
+		mysql.RegisterTLSConfig(details.SessionName, conf)
 	case "verify_full":
-		conf, err := createTlsConfig(details, false)
+		conf, err := zbxTls.CreateTlsConfig(details, false)
 		if err != nil {
 			return err
 		}
 
-		mysql.RegisterTLSConfig(details.sessionName, conf)
+		mysql.RegisterTLSConfig(details.SessionName, conf)
 	default:
 		return nil
 	}
 
-	config.TLSConfig = details.sessionName
+	config.TLSConfig = details.SessionName
 	return nil
-}
-
-func createTlsConfig(details tlsDetails, skipVerify bool) (*tls.Config, error) {
-	rootCertPool := x509.NewCertPool()
-	pem, err := ioutil.ReadFile(details.tlsCaFile)
-	if err != nil {
-		return nil, err
-	}
-
-	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		return nil, errors.New("Failed to append PEM")
-	}
-
-	clientCerts := make([]tls.Certificate, 0, 1)
-	certs, err := tls.LoadX509KeyPair(details.tlsCertFile, details.tlsKeyFile)
-	if err != nil {
-		return nil, err
-	}
-
-	clientCerts = append(clientCerts, certs)
-
-	if skipVerify {
-		return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify}, nil
-	}
-
-	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: details.rawUri}, nil
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
@@ -259,7 +222,7 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, details tlsDetails) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details zbxTls.TlsDetails) (conn *MyConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -274,9 +237,4 @@ func (c *ConnManager) GetConnection(uri uri.URI, details tlsDetails) (conn *MyCo
 	}
 
 	return
-}
-
-func newTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) tlsDetails {
-	//TODO add validation here
-	return tlsDetails{session, dbConnect, caFile, certFile, keyFile, uri}
 }

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/plugin"
+	zbxTls "zabbix.com/pkg/tls"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -60,7 +61,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri, newTlsDetails(params["sessionName"], params["DBTLSConnect"],
+	conn, err := p.connMgr.GetConnection(*uri, zbxTls.NewTlsDetails(params["sessionName"], params["DBTLSConnect"],
 		params["TLSCaFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"]))
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
