@@ -1264,7 +1264,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	if (NULL == table_items)
 	{
-		table_items = DBget_table("items");
+		table_items = DBget_table("item_rtdata");
 
 		/* do not update existing lastlogsize and mtime fields */
 		zbx_vector_ptr_create(&skip_fields);
