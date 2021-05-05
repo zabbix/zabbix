@@ -39,6 +39,34 @@ class C52TriggerExpressionConverterTest extends TestCase {
 	public function simpleProviderData() {
 		return [
 			[
+				'{host:key.last(0)} or {host:key.last(10)}',
+				'last(/host/key) or last(/host/key)'
+			],
+			[
+				'{host:key.band(,9)}',
+				'bitand(last(/host/key),9)'
+			],
+			[
+				'{host:key.logeventid()} or {host:key.logeventid("")}',
+				'logeventid(/host/key) or logeventid(/host/key,,"")'
+			],
+			[
+				'{host:key.logsource()} or {host:key.logsource("")}',
+				'logsource(/host/key) or logsource(/host/key,,"")'
+			],
+			[
+				'{host:key.strlen()} or {host:key.strlen(123)} or {host:key.strlen("123")} or {host:key.strlen({$M})} or {host:key.strlen("{$M}")}',
+				'length(last(/host/key)) or length(last(/host/key)) or length(last(/host/key)) or length(last(/host/key,{$M})) or length(last(/host/key,{$M}))'
+			],
+			[
+				'{host:key.regexp("","")}',
+				'find(/host/key,,"regexp","")'
+			],
+			[
+				'{host:key.iregexp("","")}',
+				'find(/host/key,,"iregexp","")'
+			],
+			[
 				'{t:trap[{#IF}].last({#PERIOD},{#TIMESHIFT})}',
 				'last(/t/trap[{#IF}],{#PERIOD}:now-{#TIMESHIFT})'
 			],
