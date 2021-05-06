@@ -81,7 +81,7 @@ class CHistFunctionValidator extends CValidator {
 		foreach ($params_spec as $index => $param_spec) {
 			$required = !array_key_exists('required', $param_spec) || $param_spec['required'];
 
-			if ($index >= count($params) || $params[$index]['match'] === '') {
+			if ($index >= count($params)) {
 				if ($required) {
 					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
 						_('Mandatory parameter is missing.')
@@ -94,6 +94,18 @@ class CHistFunctionValidator extends CValidator {
 			}
 
 			$param = $params[$index];
+
+			if ($param['match'] === '') {
+				if ($required) {
+					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
+						$invalid_param_labels[$index]
+					);
+
+					return false;
+				}
+
+				continue;
+			}
 
 			switch ($param['type']) {
 				case CHistFunctionParser::PARAM_TYPE_PERIOD:
@@ -116,7 +128,9 @@ class CHistFunctionValidator extends CValidator {
 			}
 
 			if (array_key_exists('rules', $param_spec)) {
-				if (!self::validateRules($param, $param_spec['rules'], $required, $this->options)) {
+				$is_valid = self::validateRules($param, $param_spec['rules'], $this->options);
+
+				if (!$is_valid) {
 					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
 						$invalid_param_labels[$index]
 					);
@@ -133,7 +147,7 @@ class CHistFunctionValidator extends CValidator {
 		return (strpos($value, '{') !== false);
 	}
 
-	private static function validateRules(array $param, array $rules, bool $required, array $options): bool {
+	private static function validateRules(array $param, array $rules, array $options): bool {
 		$param_match_unquoted = ($param['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
 			? CHistFunctionParser::unquoteParam($param['match'])
 			: $param['match'];
@@ -153,10 +167,6 @@ class CHistFunctionValidator extends CValidator {
 
 				case 'period':
 					if ($param['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-						return false;
-					}
-
-					if ($required && $param['data']['sec_num'] === '') {
 						return false;
 					}
 
@@ -217,7 +227,7 @@ class CHistFunctionValidator extends CValidator {
 			return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
 		}
 
-		return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
+		return true;
 	}
 
 	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
@@ -234,7 +244,7 @@ class CHistFunctionValidator extends CValidator {
 				}
 
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
-					return ($matches['num'] >= 1 && $matches['num'] <= ZBX_MAX_INT32);
+					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
 				return false;
@@ -242,10 +252,6 @@ class CHistFunctionValidator extends CValidator {
 			case CHistFunctionData::PERIOD_MODE_SEC:
 				if ($time_shift !== '') {
 					return false;
-				}
-
-				if ($sec_num === '') {
-					return true;
 				}
 
 				$sec = timeUnitToSeconds($sec_num);
@@ -257,22 +263,14 @@ class CHistFunctionValidator extends CValidator {
 				return false;
 
 			case CHistFunctionData::PERIOD_MODE_NUM:
-				if ($time_shift !== '') {
-					return false;
-				}
-
-				if ($sec_num === '') {
-					return true;
-				}
-
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
-					return ($matches['num'] >= 1 && $matches['num'] <= ZBX_MAX_INT32);
+					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
 				return false;
 
 			case CHistFunctionData::PERIOD_MODE_TREND:
-				if ($sec_num === '' || $time_shift === '') {
+				if ($time_shift === '') {
 					return false;
 				}
 
