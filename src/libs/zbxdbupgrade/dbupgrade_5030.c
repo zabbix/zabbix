@@ -4664,10 +4664,12 @@ static int	DBpatch_5030165(void)
 {
 	return DBdrop_foreign_key("valuemap_mapping", 1);
 }
+
 static int	DBpatch_5030166(void)
 {
 	return DBdrop_index("valuemap_mapping", "valuemap_mapping_1");
 }
+
 static int	DBpatch_5030167(void)
 {
 	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value,type", 1);
@@ -4679,6 +4681,7 @@ static int	DBpatch_5030168(void)
 
 	return DBadd_foreign_key("valuemap_mapping", 1, &field);
 }
+
 static int	DBpatch_5030169(void)
 {
 	const ZBX_FIELD	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -4689,41 +4692,38 @@ static int	DBpatch_5030169(void)
 static int	DBpatch_5030170(void)
 {
 	int		ret = SUCCEED;
-	zbx_uint64_t	valuemap_num, i;
 	DB_ROW		row;
 	DB_RESULT	result;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = DBselect("select max(valuemapid) from valuemap_mapping");
+	result = DBselect("select valuemapid from valuemap order by valuemapid asc");
 
-	if (NULL != (row = DBfetch(result)))
-		ZBX_DBROW2UINT64(valuemap_num, row[0]);
-	else
-		valuemap_num = 0;
-
-	DBfree_result(result);
-
-	for (i = 0; i <= valuemap_num; i++)
+	while (NULL != (row = DBfetch(result)))
 	{
-		int		j = 0;
+		int		i = 0;
 		char		*sql = NULL;
+		zbx_uint64_t	valuemapid;
 		size_t		sql_alloc = 0, sql_offset = 0;
+		DB_ROW		in_row;
+		DB_RESULT	in_result;
+
+		ZBX_DBROW2UINT64(valuemapid, row[0]);
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		result = DBselect("select valuemap_mappingid"
+		in_result = DBselect("select valuemap_mappingid"
 				" from valuemap_mapping"
 				" where valuemapid=" ZBX_FS_UI64
-				" order by valuemap_mappingid asc", i);
+				" order by valuemap_mappingid asc", valuemapid);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (in_row = DBfetch(in_result)))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update valuemap_mapping set sortorder=%d where valuemap_mappingid=%s;\n",
-					j, row[0]);
-			j++;
+					i, in_row[0]);
+			i++;
 
 			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				goto out;
@@ -4734,12 +4734,14 @@ static int	DBpatch_5030170(void)
 		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
 out:
-		DBfree_result(result);
+		DBfree_result(in_result);
 		zbx_free(sql);
 
 		if (FAIL == ret)
 			break;
 	}
+
+	DBfree_result(result);
 
 	return ret;
 }

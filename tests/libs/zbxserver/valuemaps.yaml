@@ -245,6 +245,18 @@ out:
   return: SUCCEED
   value: "Value <= 3 (1)"
 ---
+test case: scientific ranges
+in:
+  value: -0.22
+  type: 0 # ITEM_VALUE_TYPE_FLOAT
+  valuemaps:
+  - type: 3
+    value: "-3.05E-1--1.1e-2, 1e+4 - 1.002e+5"
+    newvalue: "Scientific Range"
+out:
+  return: SUCCEED
+  value: "Scientific Range (-0.22)"
+---
 test case: complex range
 in:
   value: 4
@@ -257,7 +269,7 @@ out:
   return: SUCCEED
   value: "Range (4)"
 ---
-test case: complex range2
+test case: complex range 2
 in:
   value: 4
   type: 3 # ITEM_VALUE_TYPE_UINT64

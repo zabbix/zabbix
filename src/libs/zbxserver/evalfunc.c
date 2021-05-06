@@ -3315,7 +3315,7 @@ static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
  *                                                                            *
  * Parameters: value - value for replacing                                    *
  *             max_len - maximal length of output value                       *
- *             valuemaps - vector of vales mapped                             *
+ *             valuemaps - vector of values mapped                            *
  *             value_type - type of input value                               *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
@@ -3390,7 +3390,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
 			{
 				int	num, j;
-				char	*input_ptr, *range_str;
+				char	*input_ptr;
 
 				input_ptr = valuemap->value;
 
@@ -3398,63 +3398,43 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 				zbx_trim_str_list(input_ptr, '-');
 				num = num_param(input_ptr);
 
+				zabbix_log(LOG_LEVEL_DEBUG, "%s: input_ptr: '%s'", __func__, input_ptr);
+
 				for (j = 0; j < num; j++)
 				{
 					int	found = 0;
-					char	*ptr, *threshold_min, *threshold_max, *delimiter_ptr;
-					size_t	min_size, max_size;
+					char	*ptr, *range_str;
 
-					range_str = get_param_dyn(input_ptr, j + 1, NULL);
-					ptr = range_str;
-					if (1 < strlen(ptr) && '-' == ptr[0])
+					range_str = ptr = get_param_dyn(input_ptr, j + 1, NULL);
+
+					if (1 < strlen(ptr) && '-' == *ptr)
 						ptr++;
 
-					do
+					while (NULL != (ptr = strchr(ptr, '-')))
 					{
-						delimiter_ptr = strchr(ptr, '-');
-						if (NULL != delimiter_ptr &&
-								(delimiter_ptr > ptr && 'e' != delimiter_ptr[-1]))
-						{
+						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
 							break;
-						}
-						ptr = delimiter_ptr + 1;
-					} while (NULL != delimiter_ptr);
+						ptr++;
+					}
 
-					if (NULL == delimiter_ptr)
+					if (NULL == ptr)
 					{
-						threshold_min = zbx_strdup(NULL, range_str);
-						threshold_max = NULL;
+						min = evaluate_string_to_double(range_str);
+						found = ZBX_INFINITY != min && SUCCEED == zbx_double_compare(input_value, min);
 					}
 					else
 					{
-						min_size = (size_t)(delimiter_ptr - range_str) + 1;
-						max_size = strlen(range_str) - (size_t)(delimiter_ptr - range_str);
-						threshold_min = zbx_malloc(NULL, min_size);
-						threshold_max = zbx_malloc(NULL, max_size);
-						memcpy(threshold_min, range_str, min_size - 1);
-						threshold_min[min_size - 1] = '\0';
-						memcpy(threshold_max, delimiter_ptr + 1, max_size);
+						*ptr = '\0';
+						min = evaluate_string_to_double(range_str);
+						max = evaluate_string_to_double(ptr + 1);
+						if (ZBX_INFINITY != min && ZBX_INFINITY != max &&
+								input_value >= min && input_value <= max)
+						{
+							found = 1;
+						}
 					}
 
 					zbx_free(range_str);
-
-					if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
-							(NULL == threshold_max || ZBX_INFINITY !=
-							(max = evaluate_string_to_double(threshold_max))))
-					{
-						if (NULL != threshold_max && input_value >= min && input_value <= max)
-						{
-							found = 1;
-						}
-						else if (NULL == threshold_max &&
-								SUCCEED == zbx_double_compare(input_value, min))
-						{
-							found = 1;
-						}
-					}
-
-					zbx_free(threshold_min);
-					zbx_free(threshold_max);
 
 					if (0 != found)
 						goto map_value;
@@ -3471,7 +3451,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 			goto map_value;
 	}
 map_value:
-	if (0 <= i && i < valuemaps->values_num)
+	if (i < valuemaps->values_num)
 	{
 		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
 		zbx_strlcpy_utf8(value, value_tmp, max_len);
@@ -3482,6 +3462,7 @@ map_value:
 
 	return ret;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: replace_value_by_map                                             *
