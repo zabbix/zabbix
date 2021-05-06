@@ -22,156 +22,139 @@
 final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
-	public const PERIOD_MODE_SEC_POSITIVE = 1;
-	public const PERIOD_MODE_TREND = 2;
+	public const PERIOD_MODE_SEC = 1;
+	public const PERIOD_MODE_NUM = 2;
+	public const PERIOD_MODE_TREND = 3;
 
 	private const PARAMETERS = [
 		'avg' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'avg_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'count' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']
-			]],
-			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
 				'required' => false
-			]
+			],
+			['required' => false]
 		],
 		'count_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'change' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY]
+			['rules' => [['type' => 'query']]]
 		],
 		'find' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(iregexp|regexp|like)$/']
-			]],
-			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
-				'required' => false
-			]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]], 'required' => false],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(iregexp|regexp|like)$/']], 'required' => false],
+			['required' => false]
 		],
 		'forecast' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
-				['type' => 'simple_interval', 'options' => ['negative' => true]]
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'time']]],
+			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(linear|polynomial[1-6]|exponential|logarithmic|power)$/']
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(value|max|min|delta|avg)$/']
-			]]
+			], 'required' => false],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(value|max|min|delta|avg)$/']], 'required' => false]
 		],
 		'fuzzytime' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'time', 'min' => 1]]]
 		],
 		'last' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'last_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false,
-				'mode' => self::PERIOD_MODE_SEC_POSITIVE
-			]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]], 'required' => false]
 		],
 		'logeventid' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
-				'required' => false
-			]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
+			['required' => false]
 		],
 		'logseverity' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'logsource' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type_any' => [CHistFunctionParser::PARAM_TYPE_QUOTED, CHistFunctionParser::PARAM_TYPE_UNQUOTED],
-				'required' => false
-			]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
+			['required' => false]
 		],
 		'max' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'max_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'min' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'min_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'nodata' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(strict)$/']
-			]]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'time', 'min' => 1]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
 		],
 		'percentile' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
-				['type' => 'range', 'min' => 0, 'max' => 100]
+				['type' => 'number', 'min' => 0, 'max' => 100]
 			]]
 		],
 		'sum' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'sum_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'timeleft' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'number', 'with_suffix' => true]]],
+			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(linear|polynomial[1-6]|exponential|logarithmic|power)$/']
-			]]
+			], 'required' => false]
 		],
 		'trendavg' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendcount' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendmax' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendmin' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendsum' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		]
 	];
 
