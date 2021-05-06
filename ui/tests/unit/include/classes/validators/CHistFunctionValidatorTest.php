@@ -461,6 +461,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['last_foreach(/host/key, 1d)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, 1d:now/d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$PERIOD}:{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
+			['last_foreach(/host/key, {$PERIOD}:now-1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$PERIOD}:now-{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$MACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, {#LLDMACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
