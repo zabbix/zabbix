@@ -428,23 +428,27 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertItems(array $items): array {
 		foreach ($items as &$item) {
-			$item['tags'] = [];
+			$tags = [];
 			$i = 0;
 
 			if (array_key_exists('applications', $item)) {
 				foreach (self::convertApplicationsToTags($item['applications']) as $tag) {
-					$item['tags']['tag'.($i > 0 ? $i : '')] = $tag;
+					$tags['tag'.($i > 0 ? $i : '')] = $tag;
 					$i++;
 				}
 			}
 
 			if (array_key_exists('application_prototypes', $item)) {
 				foreach (self::convertApplicationsToTags($item['application_prototypes']) as $tag) {
-					$item['tags']['tag'.($i > 0 ? $i : '')] = $tag;
+					$tags['tag'.($i > 0 ? $i : '')] = $tag;
 					$i++;
 				}
 			}
 			unset($item['applications'], $item['application_prototypes']);
+
+			if ($tags) {
+				$item['tags'] = $tags;
+			}
 		}
 		unset($item);
 
@@ -519,10 +523,11 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertHttpTests(array $httptests, string $template_name = ''): array {
 		foreach ($httptests as &$httptest) {
+			if ($template_name !== '') {
+				$httptest['uuid'] = generateUuidV4($template_name.'/'.$httptest['name']);
+			}
+
 			if (array_key_exists('application', $httptest)) {
-				if ($template_name !== '') {
-					$httptest['uuid'] = generateUuidV4($template_name.'/'.$httptest['name']);
-				}
 				$httptest['tags'] = self::convertApplicationsToTags([$httptest['application']]);
 				unset($httptest['application']);
 			}

@@ -50,13 +50,16 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getGroups(), [
 			[
-				'name' => 'Linux servers'
+				'name' => 'Linux servers',
+				'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8'
 			],
 			[
-				'name' => 'Zabbix servers'
+				'name' => 'Zabbix servers',
+				'uuid' => '6f6799aa69e844b4b3918f779f2abf08'
 			],
 			[
-				'name' => 'Templates'
+				'name' => 'Templates',
+				'uuid' => '7df96b18c230490a9a0a9e2307226338'
 			]
 		]);
 	}
@@ -273,6 +276,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTemplates(), [
 			[
+				'uuid' => 'c2fe64e562a040bd96333fb6b2de815a',
 				'groups' => [
 					[
 						'name' => 'Templates'
@@ -287,6 +291,7 @@ class CImportDataAdapterTest extends TestCase {
 				'valuemaps' => []
 			],
 			[
+				'uuid' => '00fda66f07e4479498058bf352711a06',
 				'groups' =>	[
 					[
 						'name' => 'Templates'
@@ -483,6 +488,7 @@ class CImportDataAdapterTest extends TestCase {
 			],
 			'export-template' => [
 				'item' => [
+					'uuid' => 'cfe34a246c054d0483796f5bb71631b6',
 					'name' => 'item',
 					'type' => '0',
 					'snmp_oid' => '',
@@ -531,6 +537,7 @@ class CImportDataAdapterTest extends TestCase {
 					'preprocessing' => []
 				],
 				'item-jmx' => [
+					'uuid' => '4164d2d034dc41ccb151a46b546110bc',
 					'name' => 'item-jmx',
 					'type' => '16',
 					'snmp_oid' => '',
@@ -579,6 +586,7 @@ class CImportDataAdapterTest extends TestCase {
 					'preprocessing' => []
 				],
 				'item2' => [
+					'uuid' => '3dc664d55caf4f008fb8d6db770d22e8',
 					'name' => 'item2',
 					'type' => '0',
 					'snmp_oid' => '',
@@ -640,6 +648,8 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTriggers(), [
 			[
+				'uuid' => 'fe9cb3ea1d4d485c9ff7f8a749dc9380',
+
 				'expression' => '{export-host:item.last(0)}<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -664,6 +674,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
+				'uuid' => 'ba2b1992cfcc4c3c84d7908a9afd3f3d',
 				'expression' => '{export-host:item.last(0)}<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -682,6 +693,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger2'
 			],
 			[
+				'uuid' => 'cd79d05182bc4974b745f0076a4edef4',
 				'expression' => '{export-template:item.last(0)}<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -706,6 +718,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
+				'uuid' => 'b43057d7c32e4698a462143b889cfe87',
 				'expression' => '{export-template:item.last(0)}<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -731,6 +744,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getGraphs(), [
 			[
+				'uuid' => '8dbdda48fb8748d6b46f1965824e966a',
 				'name' => 'simple',
 				'width' => '900',
 				'height' => '200',
@@ -763,6 +777,7 @@ class CImportDataAdapterTest extends TestCase {
 				]
 			],
 			[
+				'uuid' => '8dbdda48fb8748d6b46f1965824e966a',
 				'name' => 'simple',
 				'width' => '900',
 				'height' => '200',
@@ -1203,6 +1218,7 @@ class CImportDataAdapterTest extends TestCase {
 			],
 			'export-template' => [
 				'empty-lld-rule' => [
+					'uuid' => '6ff04b5a5e8443c7aa9d5ce5f60ea4f9',
 					'name' => 'empty-lld-rule',
 					'type' => '0',
 					'snmp_oid' => '',
@@ -1253,6 +1269,7 @@ class CImportDataAdapterTest extends TestCase {
 					'master_item' => []
 				],
 				'lld-rule-jmx' => [
+					'uuid' => '96c257b7f1104833ad3bb18f6a2e8d96',
 					'name' => 'lld-rule-jmx',
 					'type' => '16',
 					'snmp_oid' => '',
@@ -1303,6 +1320,7 @@ class CImportDataAdapterTest extends TestCase {
 					'master_item' => []
 				],
 				'lld-rule' => [
+					'uuid' => 'cdcd6fb3277e481baa22573c8c349b3b',
 					'name' => 'lld-rule',
 					'type' => '0',
 					'snmp_oid' => '',
@@ -1337,6 +1355,7 @@ class CImportDataAdapterTest extends TestCase {
 					'description' => '',
 					'item_prototypes' => [
 						[
+							'uuid' => '2d2820fb2c2244df8dc75c92b2fc0f52',
 							'name' => 'lld-item',
 							'type' => '0',
 							'snmp_oid' => '',
@@ -1385,6 +1404,7 @@ class CImportDataAdapterTest extends TestCase {
 							'trapper_hosts' => ''
 						],
 						[
+							'uuid' => 'd51ab907cd2840d99a1deda0bc6ba887',
 							'name' => 'lld-item-jmx',
 							'type' => '16',
 							'snmp_oid' => '',
@@ -1433,6 +1453,7 @@ class CImportDataAdapterTest extends TestCase {
 							'trapper_hosts' => ''
 						],
 						[
+							'uuid' => '350f8c141fd94a8385a83a3dca077126',
 							'name' => 'lld-item2',
 							'type' => '0',
 							'snmp_oid' => '',
@@ -1488,6 +1509,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'trigger_prototypes' => [
 						[
+							'uuid' => 'e0ead3b167ea4af3a4a1766db2ffc6dc',
 							'expression' => '{export-template:lld-item.last()}=0',
 							'description' => 'lld-trigger',
 							'url' => '',
@@ -1509,6 +1531,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'graph_prototypes' => [
 						[
+							'uuid' => '0d284e97f2724d1ca5b6ddf1f8cadf1a',
 							'name' => 'lld-graph',
 							'width' => '900',
 							'height' => '200',
@@ -1544,6 +1567,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'host_prototypes' => [
 						[
+							'uuid' => '63c71dad71754b1c8746ba88679ecd89',
 							'host' => '{#VMID}',
 							'name' => '{#VMID}',
 							'status' => '0',
@@ -1928,9 +1952,11 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getGroups(), [
 				[
+					'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8',
 					'name' => 'Linux servers'
 				],
 				[
+					'uuid' => '7df96b18c230490a9a0a9e2307226338',
 					'name' => 'Templates'
 				]
 			]
@@ -2459,6 +2485,7 @@ class CImportDataAdapterTest extends TestCase {
 							'name' => 'template'
 						]
 					],
+					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
@@ -2795,6 +2822,7 @@ class CImportDataAdapterTest extends TestCase {
 				],
 				'macros' => [],
 				'templates' => [],
+				'uuid' => '206a9b642b3e46c89a61696ab28f3d5c',
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
