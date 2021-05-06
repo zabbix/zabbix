@@ -53,7 +53,9 @@ final class CHistFunctionData {
 		'find' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]], 'required' => false],
-			['rules' => [['type' => 'regexp', 'pattern' => '/^(iregexp|regexp|like)$/']], 'required' => false],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
+				'required' => false
+			],
 			['required' => false]
 		],
 		'forecast' => [
