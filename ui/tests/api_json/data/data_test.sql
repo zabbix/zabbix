@@ -1463,7 +1463,7 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 -- trigger permissions: END
 
 -- test discovered host groups after import parent host
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50025, 'Master group', 0);
+INSERT INTO hstgrp (groupid, name, internal, uuid) VALUES (50025, 'Master group', 0, '45d1ca90cd844dd98762e118ea3208fc');
 INSERT INTO hstgrp (groupid, name, internal, flags) VALUES (50026, 'host group discovered', 0, 4);
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
