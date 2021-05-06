@@ -436,28 +436,31 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertMaps(array $maps): array {
-		foreach ($maps as $i => $map) {
-			if (array_key_exists('selements', $map)) {
-				foreach ($map['selements'] as $s => $selement) {
-					$maps[$i]['selements'][$s]['evaltype'] = (string) CONDITION_EVAL_TYPE_AND_OR;
+		foreach ($maps as &$map) {
+			foreach ($map['selements'] as &$selement) {
+				$selement['evaltype'] = (string) CONDITION_EVAL_TYPE_AND_OR;
 
-					if (array_key_exists('application', $selement) && $selement['application'] !== '') {
-						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToTags([[
-							'name' => $selement['application']
-						]]);
+				if ($selement['application'] !== '') {
+					$selement['tags'] = array_map(function ($tag) {
+						return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
+					}, self::convertApplicationsToTags([['name' => $selement['application']]]));
+				}
+				unset($selement['application']);
 
-						$maps[$i]['selements'][$s]['tags'] = array_map(function ($tag) {
-							return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
-						}, $maps[$i]['selements'][$s]['tags']);
-					}
-					unset($maps[$i]['selements'][$s]['application']);
-
-					if (array_key_exists('elements', $selement)) {
-						$maps[$i]['selements'][$s]['elements'] = self::convertTriggers($selement['elements']);
-					}
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					$selement['elements'] = self::convertTriggers($selement['elements']);
 				}
 			}
+			unset($selement);
+
+			foreach ($map['links'] as &$link) {
+				foreach ($link['linktriggers'] as &$linktrigger) {
+					$linktrigger['trigger'] = self::convertTriggers([$linktrigger['trigger']])[0];
+				}
+			}
+			unset($link);
 		}
+		unset($map);
 
 		return $maps;
 	}
@@ -498,19 +501,17 @@ class C52ImportConverter extends CConverter {
 		$event_name_converter = new C52EventNameConverter();
 
 		foreach ($triggers as &$trigger) {
-			if (array_key_exists('expression', $trigger)) {
-				$trigger['expression'] = $expression_converter->convert([
-					'expression' => $trigger['expression'],
-					'host' => $host,
-					'item' => $item
-				]);
-			}
+			$trigger['expression'] = $expression_converter->convert([
+				'expression' => $trigger['expression'],
+				'host' => $host,
+				'item' => $item
+			]);
 
 			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== '') {
 				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
 			}
 
-			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
+			if ($trigger['recovery_expression'] !== '') {
 				$trigger['recovery_expression'] = $expression_converter->convert([
 					'expression' => $trigger['recovery_expression'],
 					'host' => $host,

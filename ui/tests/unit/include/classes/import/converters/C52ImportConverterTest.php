@@ -83,7 +83,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
-											'expression' => '{min(5m)}=1'
+											'expression' => '{min(5m)}=1',
+											'recovery_expression' => ''
 										]
 									]
 								]
@@ -100,7 +101,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
-											'expression' => 'min(/hostname/key,5m)=1'
+											'expression' => 'min(/hostname/key,5m)=1',
+											'recovery_expression' => ''
 										]
 									]
 								]
@@ -113,14 +115,16 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'expression' => '{hostname:key.min(5m)}=1'
+							'expression' => '{hostname:key.min(5m)}=1',
+							'recovery_expression' => '{hostname:key.min(5m)}<>1'
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'expression' => 'min(/hostname/key,5m)=1'
+							'expression' => 'min(/hostname/key,5m)=1',
+							'recovery_expression' => 'min(/hostname/key,5m)<>1'
 						]
 					]
 				]
@@ -140,7 +144,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '{k:grpmin["host group","item",last,5m].last()}=5'
+							'expression' => '{hostname:grpmin["host group","item",last,5m].last()}=5',
+							'recovery_expression' => ''
 						]
 					]
 				],
@@ -159,7 +164,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => 'last(/k/grpmin["host group","item",last,5m])=5'
+							'expression' => 'last(/hostname/grpmin["host group","item",last,5m])=5',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -179,7 +185,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '{k:grpmin["host group","item",last,5m].date()}=5'
+							'expression' => '{hostname:grpmin["host group","item",last,5m].date()}=5',
+							'recovery_expression' => ''
 						]
 					]
 				],
@@ -198,7 +205,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '(date()=5) or (last(/k/grpmin["host group","item",last,5m])<>last(/k/grpmin["host group","item",last,5m]))'
+							'expression' => '(date()=5) or (last(/hostname/grpmin["host group","item",last,5m])<>last(/hostname/grpmin["host group","item",last,5m]))',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -207,14 +215,18 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}'
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}',
+							'expression' => '{k:system.cpu.load.last(5s, 1d)} > 5',
+							'recovery_expression' => ''
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}'
+							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}',
+							'expression' => 'last(/k/system.cpu.load,#1:now-1d) > 5',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -223,14 +235,111 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}'
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}',
+							'expression' => '{k:system.cpu.load.last(5s)} > 5',
+							'recovery_expression' => ''
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?date()}'
+							'event_name' => '{?date()}',
+							'expression' => 'last(/k/system.cpu.load) > 5',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'application' => 'MySQL'
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => '{Zabbix server:proc.num.last()} = 0',
+											'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+										]
+									],
+									'application' => ''
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => '{Zabbix server:proc.num.last()} = 0',
+												'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'evaltype' => '0',
+									'tags' => [
+										'tag' => [
+											'tag' => 'Application',
+											'value' => 'MySQL',
+											'operator' => '0'
+										]
+									]
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => 'last(/Zabbix server/proc.num) = 0',
+											'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+										]
+									],
+									'evaltype' => '0'
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => 'last(/Zabbix server/proc.num) = 0',
+												'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+											]
+										]
+									]
+								]
+							]
 						]
 					]
 				]
