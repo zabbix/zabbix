@@ -100,7 +100,7 @@ class CControllerPopupValueMapUpdate extends CController {
 				return false;
 			}
 
-			if (array_key_exists($value, $type_uniq[$type])) {
+			if ($type != VALUEMAP_MAPPING_TYPE_DEFAULT && array_key_exists($value, $type_uniq[$type])) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
 					_s('value %1$s already exists', '('.$value.')'))
 				);
@@ -108,7 +108,7 @@ class CControllerPopupValueMapUpdate extends CController {
 				return false;
 			}
 
-			$type_values[$type][$value] = true;
+			$type_uniq[$type][$value] = true;
 
 			if ($type == VALUEMAP_MAPPING_TYPE_REGEXP
 					&& @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
@@ -146,7 +146,8 @@ class CControllerPopupValueMapUpdate extends CController {
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
 
 		foreach ($data['mappings'] as $mapping) {
-			if ($mapping['value'] === '' && $mapping['newvalue'] === '') {
+			if ($mapping['type'] != VALUEMAP_MAPPING_TYPE_DEFAULT &&
+					$mapping['value'] === '' && $mapping['newvalue'] === '') {
 				continue;
 			}
 

@@ -534,7 +534,7 @@ class CValueMap extends CApiService {
 						_('should be empty')
 					));
 				}
-				elseif (array_key_exists($value, $type_uniq[$type])) {
+				elseif ($type != VALUEMAP_MAPPING_TYPE_DEFAULT && array_key_exists($value, $type_uniq[$type])) {
 					$error = _s('value %1$s already exists', '(value)=('.$value.')');
 				}
 
