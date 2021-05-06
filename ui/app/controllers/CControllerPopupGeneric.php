@@ -379,6 +379,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name'),
 					_('Mapping')
 				]
+			],
+			'dashboard' => [
+				'title' => _('Dashboards'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'dashboardid,name',
+				'form' => [
+					'name' => 'dashboardform',
+					'id' => 'dashboards'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -1287,7 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
 				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
-				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
 				 *          this parameter is not set;
 				 */
 				$records = [];
@@ -1358,6 +1370,17 @@ class CControllerPopupGeneric extends CController {
 
 				$records = array_column($records, null, 'id');
 				CArrayHelper::sort($records, ['name', 'hostname']);
+				break;
+
+			case 'dashboard':
+				$options += [
+					'output' => ['dashboardid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Dashboard()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
 				break;
 		}
 

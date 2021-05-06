@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-18T09:22:26Z'
+  date: '2021-04-22T11:27:41Z'
   groups:
     -
       name: Templates/Applications
@@ -18,13 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Sharepoint
-        -
-          name: 'Sharepoint front page'
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Sharepoint: Get directory structure'
@@ -133,9 +126,6 @@ zabbix_export:
             result.time = new Date().getTime() - js_start;
             return JSON.stringify(result);
           description: 'Used to get directory structure information'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -156,6 +146,10 @@ zabbix_export:
             -
               name: user
               value: '{$SHAREPOINT.USER}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Sharepoint: Get directory structure: Status'
           type: DEPENDENT
@@ -163,9 +157,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.'
-          applications:
-            -
-              name: Sharepoint
           valuemap:
             name: 'HTTP response status code'
           preprocessing:
@@ -181,6 +172,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
               expression: '{last()}<>200'
@@ -195,9 +190,6 @@ zabbix_export:
           history: 7d
           units: '!ms'
           description: 'The time taken to execute the script for obtaining the data structure (in ms). Less is better.'
-          applications:
-            -
-              name: Sharepoint
           preprocessing:
             -
               type: JSONPATH
@@ -211,6 +203,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
               expression: '{last()}>2000'
@@ -225,9 +221,6 @@ zabbix_export:
           username: '{$SHAREPOINT.USER}'
           password: '{$SHAREPOINT.PASSWORD}'
           description: 'This item specifies a value between 0 and 10, where 0 represents a low load and a high ability to process requests and 10 represents a high load and that the server is throttling requests to maintain adequate throughput.'
-          applications:
-            -
-              name: Sharepoint
           preprocessing:
             -
               type: REGEX
@@ -247,6 +240,10 @@ zabbix_export:
           url: '{$SHAREPOINT.URL}'
           retrieve_mode: HEADERS
           request_method: HEAD
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
               expression: '{last()}>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
@@ -370,9 +367,6 @@ zabbix_export:
               description: |
                 Date of creation:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -385,6 +379,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
             -
               name: 'Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
@@ -395,9 +393,6 @@ zabbix_export:
               description: |
                 Date of change:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -410,6 +405,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1'
@@ -428,9 +427,6 @@ zabbix_export:
               description: |
                 Size of:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -443,6 +439,10 @@ zabbix_export:
                     - 24h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
           parameters:
             -
               name: password
@@ -461,20 +461,6 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-      httptests:
-        -
-          name: 'Sharepoint: Front page'
-          application:
-            name: 'Sharepoint front page'
-          delay: 10m
-          authentication: NTLM
-          http_user: '{$SHAREPOINT.USER}'
-          http_password: '{$SHAREPOINT.PASSWORD}'
-          steps:
-            -
-              name: Login
-              url: '{$SHAREPOINT.URL}'
-              status_codes: '200'
       macros:
         -
           macro: '{$SHAREPOINT.GET_INTERVAL}'

@@ -38,7 +38,12 @@ if AGENT2
 if !AGENT 
 AGENT_SUBDIRS = zabbix_agent
 endif
-AGENT2_SUBDIRS = \
+GO_SUBDIRS = \
+	go
+endif
+
+if WEBSERVICE
+GO_SUBDIRS = \
 	go
 endif
 
@@ -84,7 +89,7 @@ endif
 SUBDIRS = \
 	$(COMMON_SUBDIRS) \
 	$(AGENT_SUBDIRS) \
-	$(AGENT2_SUBDIRS) \
+	$(GO_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(JAVA_SUBDIRS)

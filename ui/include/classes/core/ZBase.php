@@ -651,7 +651,7 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
+	 * Set layout mode using URL parameters.
 	 */
 	private function setLayoutModeByUrl() {
 		if (hasRequest('kiosk')) {

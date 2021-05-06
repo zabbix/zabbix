@@ -63,7 +63,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  ******************************************************************************/
 static void	lld_process_task(zbx_ipc_message_t *message)
 {
-	zbx_uint64_t		itemid, lastlogsize;
+	zbx_uint64_t		itemid, hostid, lastlogsize;
 	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
@@ -73,7 +73,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_lld_deserialize_item_value(message->data, &itemid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
+	zbx_lld_deserialize_item_value(message->data, &itemid, &hostid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 	if (SUCCEED != errcode)

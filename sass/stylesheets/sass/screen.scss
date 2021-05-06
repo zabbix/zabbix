@@ -1513,6 +1513,7 @@ form {
 }
 
 .radio-list-control {
+	display: inline-block;
 	white-space: nowrap;
 
 	li {
@@ -1605,6 +1606,10 @@ form {
 			transition: none;
 			@extend %form-disabled;
 		}
+	}
+
+	+ .icon-info {
+		margin-left: 5px;
 	}
 }
 
@@ -3049,8 +3054,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
-			padding: 0 10px;
+			margin: 0 -10px 8px;
+			padding: 2px 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3190,7 +3195,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 6px;
+		margin: -10px -10px 4px;
 	}
 
 	.maps-container {
@@ -5497,7 +5502,9 @@ svg {
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
 .icon-actions-number-red,
-.icon-description {
+.icon-description,
+.icon-user,
+.icon-user-group {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -5629,6 +5636,30 @@ svg {
 
 	&::before {
 		background-position: -474px -245px;
+	}
+}
+
+.icon-user,
+.icon-user-group {
+	height: 16px;
+	width: 16px;
+	vertical-align: top;
+
+	&::before {
+		height: inherit;
+		width: inherit;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -339px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -339px -8px;
 	}
 }
 
@@ -6462,6 +6493,13 @@ z-select,
 		td {
 			vertical-align: top;
 		}
+	}
+}
+
+.subscriptions-table {
+
+	th {
+		color: $font-alt-color;
 	}
 }
 

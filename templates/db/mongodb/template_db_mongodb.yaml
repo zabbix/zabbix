@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-01T10:04:17Z'
+  date: '2021-04-22T11:28:34Z'
   groups:
     -
       name: Templates/Databases
@@ -20,11 +20,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: MongoDB
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'MongoDB: Document: deleted, rate'
@@ -34,9 +29,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of documents deleted per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -48,6 +40,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Document: inserted, rate'
           type: DEPENDENT
@@ -56,9 +52,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of documents inserted per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -70,6 +63,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Document: returned, rate'
           type: DEPENDENT
@@ -78,9 +75,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of documents returned by queries per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -92,6 +86,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Document: updated, rate'
           type: DEPENDENT
@@ -100,9 +98,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of documents updated per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -114,6 +109,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Active clients: readers'
           type: DEPENDENT
@@ -121,9 +120,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of the active client connections performing read operations.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -131,6 +127,10 @@ zabbix_export:
                 - $.globalLock.activeClients.readers
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Active clients: total'
           type: DEPENDENT
@@ -138,9 +138,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of internal client connections to the database including system threads as well as queued readers and writers.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -148,6 +145,10 @@ zabbix_export:
                 - $.globalLock.activeClients.total
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Active clients: writers'
           type: DEPENDENT
@@ -155,9 +156,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of active client connections performing write operations.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -165,6 +163,10 @@ zabbix_export:
                 - $.globalLock.activeClients.writers
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Asserts: message, rate'
           type: DEPENDENT
@@ -175,9 +177,6 @@ zabbix_export:
           description: |
             The number of message assertions raised per second.
             Check the log file for more information about these messages.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -189,6 +188,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Asserts: regular, rate'
           type: DEPENDENT
@@ -199,9 +202,6 @@ zabbix_export:
           description: |
             The number of regular assertions raised per second.
             Check the log file for more information about these messages.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -213,6 +213,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Asserts: rollovers, rate'
           type: DEPENDENT
@@ -223,9 +227,6 @@ zabbix_export:
           description: |
             Number of times that the rollover counters roll over per second.
             The counters rollover to zero every 2^30 assertions.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -237,6 +238,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Asserts: user, rate'
           type: DEPENDENT
@@ -247,9 +252,6 @@ zabbix_export:
           description: |
             The number of “user asserts” that have occurred per second.
             These are errors that user may generate, such as out of disk space or duplicate key.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -261,6 +263,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Asserts: warning, rate'
           type: DEPENDENT
@@ -269,9 +275,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of warnings raised per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -283,6 +286,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Get collections usage stats'
           key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -290,9 +297,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Returns usage statistics for each collection.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB: Connections, active'
           type: DEPENDENT
@@ -303,9 +311,6 @@ zabbix_export:
             The number of active client connections to the server.
             Active client connections refers to client connections that currently have operations in progress.
             Available starting in  4.0.7, 0 for older versions.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -314,6 +319,10 @@ zabbix_export:
               error_handler: DISCARD_VALUE
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Connections, available'
           type: DEPENDENT
@@ -321,9 +330,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of unused incoming connections available.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -331,6 +337,10 @@ zabbix_export:
                 - $.connections.available
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Connections, current'
           type: DEPENDENT
@@ -340,9 +350,6 @@ zabbix_export:
           description: |
             The number of incoming connections from clients to the database server.
             This number includes the current shell session
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -350,6 +357,10 @@ zabbix_export:
                 - $.connections.current
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: New connections, rate'
           type: DEPENDENT
@@ -359,9 +370,6 @@ zabbix_export:
           value_type: FLOAT
           units: Rps
           description: 'Rate of all incoming connections created to the server.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -373,6 +381,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Current queue: readers'
           type: DEPENDENT
@@ -382,9 +394,6 @@ zabbix_export:
           description: |
             The number of operations that are currently queued and waiting for the read lock.
             A consistently small read-queue, particularly of shorter operations, should cause no concern.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -392,6 +401,10 @@ zabbix_export:
                 - $.globalLock.currentQueue.readers
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Current queue: total'
           type: DEPENDENT
@@ -399,9 +412,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of operations queued waiting for the lock.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -409,6 +419,10 @@ zabbix_export:
                 - $.globalLock.currentQueue.total
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Current queue: writers'
           type: DEPENDENT
@@ -418,9 +432,6 @@ zabbix_export:
           description: |
             The number of operations that are currently queued and waiting for the write lock. 
              A consistently small write-queue, particularly of shorter operations, is no cause for concern.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -428,6 +439,10 @@ zabbix_export:
                 - $.globalLock.currentQueue.writers
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Cursor: open pinned'
           type: DEPENDENT
@@ -435,9 +450,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of pinned open cursors.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -445,6 +457,10 @@ zabbix_export:
                 - $.metrics.cursor.open.pinned
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Cursor: open total'
           type: DEPENDENT
@@ -452,9 +468,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of cursors that MongoDB is maintaining for clients.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -462,6 +475,10 @@ zabbix_export:
                 - $.metrics.cursor.open.total
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
           triggers:
             -
               expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
@@ -475,9 +492,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of cursors that time out, per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -489,6 +503,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
           triggers:
             -
               expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
@@ -502,9 +520,6 @@ zabbix_export:
           history: 7d
           units: bit
           description: 'A number, either 64 or 32, that indicates whether the MongoDB instance is compiled for 64-bit or 32-bit architecture.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -516,6 +531,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Memory: mapped'
           type: DEPENDENT
@@ -524,9 +543,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Amount of mapped memory by the database.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -539,6 +555,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Memory: mapped with journal'
           type: DEPENDENT
@@ -547,9 +567,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'The amount of mapped memory, including the memory used for journaling.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -562,6 +579,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Memory: resident'
           type: DEPENDENT
@@ -570,9 +591,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Amount of memory currently used by the database process.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -584,6 +602,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Memory: virtual'
           type: DEPENDENT
@@ -592,9 +614,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Amount of virtual memory used by the mongod process.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -606,6 +625,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Cursor: open no timeout'
           type: DEPENDENT
@@ -613,9 +636,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -623,6 +643,10 @@ zabbix_export:
                 - $.metrics.cursor.open.noTimeout
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Bytes in, rate'
           type: DEPENDENT
@@ -632,9 +656,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -646,6 +667,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Bytes out, rate'
           type: DEPENDENT
@@ -655,9 +680,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -669,6 +691,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Requests, rate'
           type: DEPENDENT
@@ -678,9 +704,6 @@ zabbix_export:
           value_type: FLOAT
           units: '!Rps'
           description: 'Number of distinct requests that the server has received per second'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -692,6 +715,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: command, rate'
           type: DEPENDENT
@@ -702,9 +729,6 @@ zabbix_export:
           description: |
             The number of commands issued to the database the mongod instance per second.
             Counts all commands except the write commands: insert, update, and delete.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -716,6 +740,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: delete, rate'
           type: DEPENDENT
@@ -724,9 +752,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of delete operations the mongod instance per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -738,6 +763,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: getmore, rate'
           type: DEPENDENT
@@ -748,9 +777,6 @@ zabbix_export:
           description: |
             The number of “getmore” operations since the mongod instance per second. This counter can be high even if the query count is low. 
             Secondary nodes send getMore operations as part of the replication process.
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -762,6 +788,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: insert, rate'
           type: DEPENDENT
@@ -770,9 +800,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of insert operations received since the mongod instance per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -784,6 +811,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: query, rate'
           type: DEPENDENT
@@ -792,9 +823,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of queries received the mongod instance per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -806,6 +834,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Operations: update, rate'
           type: DEPENDENT
@@ -814,9 +846,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of update operations the mongod instance per second.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -828,6 +857,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
         -
           name: 'MongoDB: Get oplog stats'
           key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -835,18 +868,16 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Returns status of the replica set, using data polled from the oplog.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB: Ping'
           key: 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           delay: 30s
           history: 7d
           description: 'Test if a connection is alive or not.'
-          applications:
-            -
-              name: MongoDB
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -854,6 +885,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
+          tags:
+            -
+              tag: Application
+              value: MongoDB
           triggers:
             -
               expression: '{last()}=0'
@@ -867,9 +902,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Returns the replica set status from the point of view of the member where the method is run.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB: Get server status'
           key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -877,9 +913,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Returns a database’s state.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB: Uptime'
           type: DEPENDENT
@@ -889,9 +926,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Number of seconds that the mongod process has been active.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -899,6 +933,10 @@ zabbix_export:
                 - $.uptime
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
           triggers:
             -
               expression: '{nodata(10m)}=1'
@@ -925,9 +963,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of the MongoDB server.'
-          applications:
-            -
-              name: MongoDB
           preprocessing:
             -
               type: JSONPATH
@@ -939,6 +974,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: MongoDB
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -972,9 +1011,7 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: |
-            Collect collections metrics.
-            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
+          description: 'Collect collections metrics.'
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
@@ -985,9 +1022,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The size of the average object in the collection in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -996,6 +1030,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
               type: DEPENDENT
@@ -1003,9 +1041,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Whether or not the collection is capped.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               valuemap:
                 name: 'MongoDB flag'
               preprocessing:
@@ -1023,6 +1058,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
               type: DEPENDENT
@@ -1030,9 +1069,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of objects in the collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1040,6 +1076,10 @@ zabbix_export:
                     - $.count
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max number'
               type: DEPENDENT
@@ -1048,9 +1088,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Maximum number of documents that may be present in a capped collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1059,6 +1096,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max size'
               type: DEPENDENT
@@ -1067,9 +1108,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Maximum size of a capped collection in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1078,6 +1116,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
               type: DEPENDENT
@@ -1085,9 +1127,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of indices on the collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1095,6 +1134,10 @@ zabbix_export:
                     - $.nindexes
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, ms/s'
               type: DEPENDENT
@@ -1104,9 +1147,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1118,6 +1158,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, rate'
               type: DEPENDENT
@@ -1126,9 +1170,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1140,6 +1181,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, ms/s'
               type: DEPENDENT
@@ -1149,9 +1194,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1163,6 +1205,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, rate'
               type: DEPENDENT
@@ -1171,9 +1217,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1185,6 +1228,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, ms/s'
               type: DEPENDENT
@@ -1194,9 +1241,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1208,6 +1252,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, rate'
               type: DEPENDENT
@@ -1216,9 +1264,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1230,6 +1275,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, ms/s'
               type: DEPENDENT
@@ -1239,9 +1288,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1253,6 +1299,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, rate'
               type: DEPENDENT
@@ -1261,9 +1311,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1275,6 +1322,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, ms/s'
               type: DEPENDENT
@@ -1284,9 +1335,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1298,6 +1346,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, rate'
               type: DEPENDENT
@@ -1306,9 +1358,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1320,6 +1369,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, ms/s'
               type: DEPENDENT
@@ -1329,9 +1382,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1343,6 +1393,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, rate'
               type: DEPENDENT
@@ -1351,9 +1405,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1365,6 +1416,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, ms/s'
               type: DEPENDENT
@@ -1374,9 +1429,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1388,6 +1440,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, rate'
               type: DEPENDENT
@@ -1396,9 +1452,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1410,6 +1463,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, ms/s'
               type: DEPENDENT
@@ -1419,9 +1476,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1433,6 +1487,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, rate'
               type: DEPENDENT
@@ -1441,9 +1499,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1455,6 +1510,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
               type: DEPENDENT
@@ -1463,9 +1522,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total size in bytes of the data in the collection plus the size of every indexes on the mongodb.collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1473,6 +1529,10 @@ zabbix_export:
                     - $.size
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
               key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
@@ -1480,9 +1540,10 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Returns a variety of storage statistics for a given collection.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
               type: DEPENDENT
@@ -1491,9 +1552,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total storage space allocated to this collection for document storage.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1501,6 +1559,10 @@ zabbix_export:
                     - $.storageSize
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, ms/s'
               type: DEPENDENT
@@ -1510,9 +1572,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent to operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1524,6 +1583,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, rate'
               type: DEPENDENT
@@ -1532,9 +1595,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1546,6 +1606,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}.{#COLLECTION}'
           graph_prototypes:
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Locks'
@@ -1681,9 +1745,7 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: |
-            Collect database metrics.
-            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
+          description: 'Collect database metrics.'
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Collections'
@@ -1692,9 +1754,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Contains a count of the number of collections in that database.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1702,6 +1761,10 @@ zabbix_export:
                     - $.collections
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Size, data'
               type: DEPENDENT
@@ -1710,9 +1773,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of the data held in this database including the padding factor.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1720,6 +1780,10 @@ zabbix_export:
                     - $.dataSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Extents'
               type: DEPENDENT
@@ -1727,9 +1791,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Contains a count of the number of extents in the database across all collections.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1738,6 +1799,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Size, file'
               type: DEPENDENT
@@ -1746,9 +1811,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of the data held in this database including the padding factor (only available with the mmapv1 storage engine).'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1757,6 +1819,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Size, index'
               type: DEPENDENT
@@ -1765,9 +1831,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of all indexes created on this database.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1775,6 +1838,10 @@ zabbix_export:
                     - $.indexSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Objects, count'
               type: DEPENDENT
@@ -1782,9 +1849,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of objects (documents) in the database across all collections.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1792,6 +1856,10 @@ zabbix_export:
                     - $.objects
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Objects, avg size'
               type: DEPENDENT
@@ -1801,9 +1869,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The average size of each document in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1811,6 +1876,10 @@ zabbix_export:
                     - $.avgObjSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
               key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
@@ -1818,9 +1887,10 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Returns statistics reflecting the database system’s state.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MongoDB {#DBNAME}: Size, storage'
               type: DEPENDENT
@@ -1829,9 +1899,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total amount of space allocated to collections in this database for document storage.'
-              application_prototypes:
-                -
-                  name: 'MongoDB: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1839,6 +1906,10 @@ zabbix_export:
                     - $.storageSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB: {#DBNAME}'
           graph_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Collections stats'
@@ -1896,9 +1967,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) the mongod has spent applying operations from the oplog.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1910,6 +1978,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Apply batches, rate'
               type: DEPENDENT
@@ -1918,9 +1990,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of batches applied across all databases per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1932,6 +2001,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Apply ops, rate'
               type: DEPENDENT
@@ -1940,9 +2013,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of oplog operations applied per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1954,6 +2024,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Buffer'
               type: DEPENDENT
@@ -1961,9 +2035,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of operations in the oplog buffer.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1971,6 +2042,10 @@ zabbix_export:
                     - $.metrics.repl.buffer.count
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Buffer, max size'
               type: DEPENDENT
@@ -1979,9 +2054,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Maximum size of the buffer.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1989,6 +2061,10 @@ zabbix_export:
                     - $.metrics.repl.buffer.maxSizeBytes
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Buffer, size'
               type: DEPENDENT
@@ -1997,9 +2073,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Current size of the contents of the oplog buffer.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2007,6 +2080,10 @@ zabbix_export:
                     - $.metrics.repl.buffer.sizeBytes
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Replication lag'
               type: DEPENDENT
@@ -2016,9 +2093,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Delay between a write operation on the primary and its copy to a secondary.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2026,6 +2100,10 @@ zabbix_export:
                     - '$.members[?(@.self == "true")].lag.first()'
               master_item:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MONGODB.REPL.LAG.MAX.WARN}'
@@ -2040,9 +2118,6 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: 'Amount of data read from the replication sync source per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2054,6 +2129,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Network getmores, ms/s'
               type: DEPENDENT
@@ -2063,9 +2142,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) required to collect data from getmore operations.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2077,6 +2153,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Network getmores, rate'
               type: DEPENDENT
@@ -2085,9 +2165,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of getmore operations per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2099,6 +2176,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Network ops, rate'
               type: DEPENDENT
@@ -2107,9 +2188,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of operations read from the replication source per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2121,6 +2199,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Network readers created, rate'
               type: DEPENDENT
@@ -2129,9 +2211,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of oplog query processes created per second.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2143,6 +2222,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB {#RS_NAME}: Oplog time diff'
               type: DEPENDENT
@@ -2151,9 +2234,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Oplog window: difference between the first and last operation in the oplog. Only present if there are entries in the oplog.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2161,6 +2241,10 @@ zabbix_export:
                     - $.timediff
               master_item:
                 key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Preload docs, ms/s'
               type: DEPENDENT
@@ -2170,9 +2254,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) spent loading documents as part of the pre-fetch stage of replication.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2184,6 +2265,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Preload docs, rate'
               type: DEPENDENT
@@ -2192,9 +2277,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of documents loaded per second during the pre-fetch stage of replication.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2206,6 +2288,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Preload indexes, ms/s'
               type: DEPENDENT
@@ -2215,9 +2301,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms/s
               description: 'Fraction of time (ms/s) spent loading documents as part of the pre-fetch stage of replication.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2229,6 +2312,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Preload indexes, rate'
               type: DEPENDENT
@@ -2237,9 +2324,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2251,6 +2335,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Node state'
               type: DEPENDENT
@@ -2258,9 +2346,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'An integer between 0 and 10 that represents the replica state of the current member.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               valuemap:
                 name: 'ReplicaSet node state'
               preprocessing:
@@ -2274,6 +2359,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
               trigger_prototypes:
                 -
                   expression: '{change()}=1'
@@ -2290,9 +2379,6 @@ zabbix_export:
               history: 7d
               discover: NO_DISCOVER
               description: 'The number of replucated nodes in current ReplicaSet.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2304,6 +2390,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Unhealthy replicas'
               type: DEPENDENT
@@ -2314,9 +2404,6 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: CHAR
               description: 'The replicated nodes in current ReplicaSet with member health value  = 0.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2328,13 +2415,16 @@ zabbix_export:
                     - |
                       var value = JSON.parse(value);
                       return value.length ? JSON.stringify(value) : '';
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
             -
               name: 'MongoDB: Number of unhealthy replicas'
               type: DEPENDENT
@@ -2343,9 +2433,6 @@ zabbix_export:
               history: 7d
               discover: NO_DISCOVER
               description: 'The number of replicated nodes with member health value  = 0.'
-              application_prototypes:
-                -
-                  name: 'MongoDB Replica Set: {#RS_NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2357,6 +2444,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB Replica Set: {#RS_NAME}'
           trigger_prototypes:
             -
               expression: '{MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy_count[{#RS_NAME}].last()}>0  and {MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy[{#RS_NAME}].strlen()}>0'
@@ -2388,22 +2479,6 @@ zabbix_export:
               parameters:
                 - 1h
           overrides:
-            -
-              name: 'Arbiter metrics'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#NODE_STATE}'
-                    value: '7'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: 'Replication lag'
-                  status: ENABLED
-                  discover: NO_DISCOVER
             -
               name: 'Primary metrics'
               step: '1'
@@ -2453,9 +2528,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Size of the data currently in cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2463,6 +2535,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''bytes currently in the cache'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: bytes, max'
               type: DEPENDENT
@@ -2471,9 +2547,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Maximum cache size.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2481,6 +2554,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''maximum bytes configured'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: max page size at eviction'
               type: DEPENDENT
@@ -2489,9 +2566,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Maximum page size at eviction.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2499,6 +2573,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''maximum page size at eviction'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: modified pages evicted'
               type: DEPENDENT
@@ -2506,9 +2584,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pages, that have been modified, evicted from the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2516,6 +2591,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''modified pages evicted'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: pages evicted by application threads, rate'
               type: DEPENDENT
@@ -2524,9 +2603,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of page evicted by application threads per second.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2534,6 +2610,10 @@ zabbix_export:
                     - '$.wiredTiger.cache.[''pages evicted by application threads'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: pages held in cache'
               type: DEPENDENT
@@ -2541,9 +2621,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pages currently held in the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2551,6 +2628,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''pages currently held in the cache'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: pages read into cache'
               type: DEPENDENT
@@ -2558,9 +2639,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pages read into the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2568,6 +2646,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''pages read into cache'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: pages written from cache'
               type: DEPENDENT
@@ -2575,9 +2657,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pages writtent from the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2585,6 +2664,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''pages written from cache'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: in-memory page splits'
               type: DEPENDENT
@@ -2592,9 +2675,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'In-memory page splits.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2602,6 +2682,10 @@ zabbix_export:
                     - '$.wiredTiger.cache[''in-memory page splits'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: tracked dirty bytes in the cache'
               type: DEPENDENT
@@ -2610,9 +2694,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Size of the dirty data in the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2620,6 +2701,10 @@ zabbix_export:
                     - '$.wiredTiger.cache.[''tracked dirty bytes in the cache'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger cache: unmodified pages evicted'
               type: DEPENDENT
@@ -2627,9 +2712,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pages, that were not modified, evicted from the cache.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2637,6 +2719,10 @@ zabbix_export:
                     - '$.wiredTiger.cache.[''unmodified pages evicted'']'
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger concurrent transactions: read, available'
               type: DEPENDENT
@@ -2644,9 +2730,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of available read tickets (concurrent transactions) remaining.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2654,6 +2737,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.read.available
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
               trigger_prototypes:
                 -
                   expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
@@ -2669,9 +2756,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of read tickets (concurrent transactions) in use.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2679,6 +2763,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.read.out
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger concurrent transactions: read, total tickets'
               type: DEPENDENT
@@ -2686,9 +2774,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of read tickets (concurrent transactions) available.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2696,6 +2781,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.read.totalTickets
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger concurrent transactions: write, available'
               type: DEPENDENT
@@ -2703,9 +2792,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of available write tickets (concurrent transactions) remaining.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2713,6 +2799,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.write.available
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
               trigger_prototypes:
                 -
                   expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
@@ -2728,9 +2818,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of write tickets (concurrent transactions) in use.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2738,6 +2825,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.write.out
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
             -
               name: 'MongoDB: WiredTiger concurrent transactions: write, total tickets'
               type: DEPENDENT
@@ -2745,9 +2836,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of write tickets (concurrent transactions) available.'
-              applications:
-                -
-                  name: MongoDB
               preprocessing:
                 -
                   type: JSONPATH
@@ -2755,6 +2843,10 @@ zabbix_export:
                     - $.wiredTiger.concurrentTransactions.write.totalTickets
               master_item:
                 key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MongoDB
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           preprocessing:

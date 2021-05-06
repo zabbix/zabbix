@@ -193,6 +193,9 @@ class CApiInputValidator {
 			case API_JSONRPC_ID:
 				return self::validateJsonRpcId($rule, $data, $path, $error);
 
+			case API_DATE:
+				return self::validateDate($rule, $data, $path, $error);
+
 			case API_UUID:
 				return self::validateUuid($rule, $data, $path, $error);
 		}
@@ -250,6 +253,7 @@ class CApiInputValidator {
 			case API_EVENT_NAME:
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
+			case API_DATE:
 			case API_UUID:
 				return true;
 
@@ -2120,6 +2124,45 @@ class CApiInputValidator {
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
 
 		return false;
+	}
+
+	/**
+	 * Date validator in YYYY-MM-DD format.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateDate(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		[$year, $month, $day] = sscanf($data, '%d-%d-%d');
+
+		if (!checkdate($month, $day, $year)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a date in YYYY-MM-DD format is expected'));
+			return false;
+		}
+
+		if (!validateDateInterval($year, $month, $day)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
+			);
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
