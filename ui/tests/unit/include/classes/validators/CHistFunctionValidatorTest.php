@@ -37,7 +37,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['sum_foreach(/host/key)', [], ['rc' => false, 'error' => 'Unknown function "sum_foreach".']],
 
 			['avg(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Mandatory parameter is missing.']],
-			['avg(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Mandatory parameter is missing.']],	// invalid second parameter
+			['avg(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Invalid second parameter.']],
 			['avg(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Invalid second parameter.']],
 			['avg(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Invalid second parameter.']],
 			['avg(/host/key,1)', [], ['rc' => true, 'error' => null]],
@@ -53,7 +53,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['avg(/host/key, #256,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "avg". Invalid number of parameters.']],
 
 			['min(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Mandatory parameter is missing.']],
-			['min(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Mandatory parameter is missing.']],	// invalid second parameter
+			['min(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Invalid second parameter.']],
 			['min(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Invalid second parameter.']],
 			['min(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Invalid second parameter.']],
 			['min(/host/key,1)', [], ['rc' => true, 'error' => null]],
@@ -69,7 +69,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['min(/host/key, #256,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "min". Invalid number of parameters.']],
 
 			['max(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Mandatory parameter is missing.']],
-			['max(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Mandatory parameter is missing.']],	// invalid second parameter
+			['max(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Invalid second parameter.']],
 			['max(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Invalid second parameter.']],
 			['max(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Invalid second parameter.']],
 			['max(/host/key,1)', [], ['rc' => true, 'error' => null]],
@@ -85,7 +85,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['max(/host/key, #256,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "max". Invalid number of parameters.']],
 
 			['sum(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "sum". Mandatory parameter is missing.']],
-			['sum(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "sum". Mandatory parameter is missing.']],	// invalid second parameter
+			['sum(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "sum". Invalid second parameter.']],
 			['sum(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "sum". Invalid second parameter.']],
 			['sum(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "sum". Invalid second parameter.']],
 			['sum(/host/key,1)', [], ['rc' => true, 'error' => null]],
@@ -107,48 +107,51 @@ class CHistFunctionValidatorTest extends TestCase {
 			['last(/host/key,)', [], ['rc' => true, 'error' => null]],
 			['last(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
 			['last(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
-			['last(/host/key,1)', [], ['rc' => true, 'error' => null]],
+			['last(/host/key,1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
 			['last(/host/key,#1)', [], ['rc' => true, 'error' => null]],
-			['last(/host/key,1s)', [], ['rc' => true, 'error' => null]],
-			['last(/host/key, 1m)', [], ['rc' => true, 'error' => null]],
+			['last(/host/key,1s)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
+			['last(/host/key, 1m)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
 			['last(/host/key, 1M)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
-			['last(/host/key, 1m:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['last(/host/key, 1m:now/h-1h)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
 			['last(/host/key, #3:now/h-1h)', [], ['rc' => true, 'error' => null]],
 			['last(/host/key, #5:now/M)', [], ['rc' => true, 'error' => null]],
 			['last(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
-			['last(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
+			['last(/host/key, #2147483648)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
+			['last(/host/key, 2147483647)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid second parameter.']],
 			['last(/host/key, #256,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "last". Invalid number of parameters.']],
 
 			['logseverity(/host/key)', [], ['rc' => true, 'error' => null]],
 			['logseverity(/host/key,)', [], ['rc' => true, 'error' => null]],
 			['logseverity(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
 			['logseverity(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
-			['logseverity(/host/key,1)', [], ['rc' => true, 'error' => null]],
+			['logseverity(/host/key,1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
 			['logseverity(/host/key,#1)', [], ['rc' => true, 'error' => null]],
-			['logseverity(/host/key,1s)', [], ['rc' => true, 'error' => null]],
-			['logseverity(/host/key, 1m)', [], ['rc' => true, 'error' => null]],
+			['logseverity(/host/key,1s)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
+			['logseverity(/host/key, 1m)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
 			['logseverity(/host/key, 1M)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
-			['logseverity(/host/key, 1m:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['logseverity(/host/key, 1m:now/h-1h)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
 			['logseverity(/host/key, #3:now/h-1h)', [], ['rc' => true, 'error' => null]],
 			['logseverity(/host/key, #5:now/M)', [], ['rc' => true, 'error' => null]],
 			['logseverity(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
-			['logseverity(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
+			['logseverity(/host/key, #2147483648)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
+			['logseverity(/host/key, 2147483647)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid second parameter.']],
 			['logseverity(/host/key, #256,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logseverity". Invalid number of parameters.']],
 
 			['logeventid(/host/key)', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key,)', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
 			['logeventid(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
-			['logeventid(/host/key,1)', [], ['rc' => true, 'error' => null]],
+			['logeventid(/host/key,1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
 			['logeventid(/host/key,#1)', [], ['rc' => true, 'error' => null]],
-			['logeventid(/host/key,1s)', [], ['rc' => true, 'error' => null]],
-			['logeventid(/host/key, 1m)', [], ['rc' => true, 'error' => null]],
+			['logeventid(/host/key,1s)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
+			['logeventid(/host/key, 1m)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
 			['logeventid(/host/key, 1M)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
-			['logeventid(/host/key, 1m:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['logeventid(/host/key, 1m:now/h-1h)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
 			['logeventid(/host/key, #3:now/h-1h)', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key, #5:now/M)', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
-			['logeventid(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
+			['logeventid(/host/key, #2147483648)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
+			['logeventid(/host/key, 2147483647)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logeventid". Invalid second parameter.']],
 			['logeventid(/host/key, #256,)', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key, #256, "str")', [], ['rc' => true, 'error' => null]],
 			['logeventid(/host/key, #256, 10)', [], ['rc' => true, 'error' => null]],
@@ -161,16 +164,17 @@ class CHistFunctionValidatorTest extends TestCase {
 			['logsource(/host/key,)', [], ['rc' => true, 'error' => null]],
 			['logsource(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
 			['logsource(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
-			['logsource(/host/key,1)', [], ['rc' => true, 'error' => null]],
+			['logsource(/host/key,1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
 			['logsource(/host/key,#1)', [], ['rc' => true, 'error' => null]],
-			['logsource(/host/key,1s)', [], ['rc' => true, 'error' => null]],
-			['logsource(/host/key, 1m)', [], ['rc' => true, 'error' => null]],
+			['logsource(/host/key,1s)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
+			['logsource(/host/key, 1m)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
 			['logsource(/host/key, 1M)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
-			['logsource(/host/key, 1m:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['logsource(/host/key, 1m:now/h-1h)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
 			['logsource(/host/key, #3:now/h-1h)', [], ['rc' => true, 'error' => null]],
 			['logsource(/host/key, #5:now/M)', [], ['rc' => true, 'error' => null]],
 			['logsource(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
-			['logsource(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
+			['logsource(/host/key, #2147483648)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
+			['logsource(/host/key, 2147483647)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid second parameter.']],
 			['logsource(/host/key, #256,)', [], ['rc' => true, 'error' => null]],
 			['logsource(/host/key, #256, "str")', [], ['rc' => true, 'error' => null]],
 			['logsource(/host/key, #256, 10)', [], ['rc' => true, 'error' => null]],
@@ -180,7 +184,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['logsource(/host/key, #256, "str",)', [], ['rc' => false, 'error' => 'Incorrect usage of function "logsource". Invalid number of parameters.']],
 
 			['count(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "count". Mandatory parameter is missing.']],
-			['count(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "count". Mandatory parameter is missing.']],	// invalid second parameter
+			['count(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "count". Invalid second parameter.']],
 			['count(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "count". Invalid second parameter.']],
 			['count(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "count". Invalid second parameter.']],
 			['count(/host/key,1)', [], ['rc' => true, 'error' => null]],
@@ -229,10 +233,10 @@ class CHistFunctionValidatorTest extends TestCase {
 			['find(/host/key, #256, "str")', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
 			['find(/host/key, #256, 10)', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
 			['find(/host/key, #256, 10K)', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
-			['find(/host/key, #256, "eq")', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
-			['find(/host/key, #256, "ne")', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
+			['find(/host/key, #256, "eq")', [], ['rc' => true, 'error' => null]],
+			['find(/host/key, #256, "ne")', [], ['rc' => true, 'error' => null]],
 			['find(/host/key, #256, "like")', [], ['rc' => true, 'error' => null]],
-			['find(/host/key, #256, "bitand")', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid third parameter.']],
+			['find(/host/key, #256, "bitand")', [], ['rc' => true, 'error' => null]],
 			['find(/host/key, #256, "{$MACRO}{$LLDMACRO}")', [], ['rc' => true, 'error' => null]],
 			['find(/host/key, #256, {$MACRO})', [], ['rc' => true, 'error' => null]],
 			['find(/host/key, #256, {$LLDMACRO})', [], ['rc' => true, 'error' => null]],
@@ -244,7 +248,8 @@ class CHistFunctionValidatorTest extends TestCase {
 			['find(/host/key, #256, "regexp",,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "find". Invalid number of parameters.']],
 
 			['forecast(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Mandatory parameter is missing.']],
-			['forecast(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Mandatory parameter is missing.']],
+			['forecast(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid second parameter.']],
+			['forecast(/host/key,,10h)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid second parameter.']],
 			['forecast(/host/key,#1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Mandatory parameter is missing.']],
 			['forecast(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid second parameter.']],
 			['forecast(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid second parameter.']],
@@ -254,7 +259,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['forecast(/host/key,1s, {$MACRO})', [], ['rc' => true, 'error' => null]],
 			['forecast(/host/key,1s, {$LLDMACRO})', [], ['rc' => true, 'error' => null]],
 			['forecast(/host/key,1s, "{$MACRO}{$LLDMACRO}")', [], ['rc' => true, 'error' => null]],
-			['forecast(/host/key, 1m,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Mandatory parameter is missing.']],	// invalid third parameter
+			['forecast(/host/key, 1m,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid third parameter.']],
 			['forecast(/host/key, 1M,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid second parameter.']],
 			['forecast(/host/key, 1m:now/h-1h, 1d)', [], ['rc' => true, 'error' => null]],
 			['forecast(/host/key, #3:now/h-1h, 1m)', [], ['rc' => true, 'error' => null]],
@@ -273,9 +278,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['forecast(/host/key, #256, 30d, "exponential", "min",)', [], ['rc' => false, 'error' => 'Incorrect usage of function "forecast". Invalid number of parameters.']],
 
 			['timeleft(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Mandatory parameter is missing.']],
-			['timeleft(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Mandatory parameter is missing.']],	// invalid second parameter
+			['timeleft(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Invalid second parameter.']],
 			['timeleft(/host/key,#1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Mandatory parameter is missing.']],
-			['timeleft(/host/key,#1,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Mandatory parameter is missing.']],	// invalid third parameter
+			['timeleft(/host/key,#1,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Invalid third parameter.']],
 			['timeleft(/host/key,0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Invalid second parameter.']],
 			['timeleft(/host/key,#0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Invalid second parameter.']],
 			['timeleft(/host/key,1,5s)', [], ['rc' => true, 'error' => null]],
@@ -297,9 +302,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['timeleft(/host/key, #256, 30d, "exponential",)', [], ['rc' => false, 'error' => 'Incorrect usage of function "timeleft". Invalid number of parameters.']],
 
 			['percentile(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Mandatory parameter is missing.']],
-			['percentile(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Mandatory parameter is missing.']],	// invalid second parameter
+			['percentile(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid second parameter.']],
 			['percentile(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Mandatory parameter is missing.']],
-			['percentile(/host/key, #1,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Mandatory parameter is missing.']],	// invalid third parameter
+			['percentile(/host/key, #1,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid third parameter.']],
 			['percentile(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid second parameter.']],
 			['percentile(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid second parameter.']],
 			['percentile(/host/key, 1h:now/h-1h, "abc")', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid third parameter.']],
@@ -319,7 +324,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['percentile(/host/key, #256, 5,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "percentile". Invalid number of parameters.']],
 
 			['fuzzytime(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Mandatory parameter is missing.']],
-			['fuzzytime(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Mandatory parameter is missing.']],	// invalid second parameter
+			['fuzzytime(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Invalid second parameter.']],
 			['fuzzytime(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Invalid second parameter.']],
 			['fuzzytime(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Invalid second parameter.']],
 			['fuzzytime(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Invalid second parameter.']],
@@ -332,7 +337,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['fuzzytime(/host/key, 1h,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "fuzzytime". Invalid number of parameters.']],
 
 			['nodata(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Mandatory parameter is missing.']],
-			['nodata(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Mandatory parameter is missing.']],	// invalid second parameter
+			['nodata(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Invalid second parameter.']],
 			['nodata(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Invalid second parameter.']],
 			['nodata(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Invalid second parameter.']],
 			['nodata(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Invalid second parameter.']],
@@ -352,7 +357,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['nodata(/host/key, 1h, "strict",)', [], ['rc' => false, 'error' => 'Incorrect usage of function "nodata". Invalid number of parameters.']],
 
 			['trendavg(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Mandatory parameter is missing.']],
-			['trendavg(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Mandatory parameter is missing.']],	// invalid second parameter
+			['trendavg(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Invalid second parameter.']],
 			['trendavg(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Invalid second parameter.']],
 			['trendavg(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Invalid second parameter.']],
 			['trendavg(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Invalid second parameter.']],
@@ -368,7 +373,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendavg(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendavg". Invalid number of parameters.']],
 
 			['trendcount(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Mandatory parameter is missing.']],
-			['trendcount(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Mandatory parameter is missing.']],	// invalid second parameter
+			['trendcount(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Invalid second parameter.']],
 			['trendcount(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Invalid second parameter.']],
 			['trendcount(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Invalid second parameter.']],
 			['trendcount(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Invalid second parameter.']],
@@ -384,7 +389,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendcount(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendcount". Invalid number of parameters.']],
 
 			['trendmax(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Mandatory parameter is missing.']],
-			['trendmax(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Mandatory parameter is missing.']],	// invalid second parameter
+			['trendmax(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Invalid second parameter.']],
 			['trendmax(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Invalid second parameter.']],
 			['trendmax(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Invalid second parameter.']],
 			['trendmax(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Invalid second parameter.']],
@@ -400,7 +405,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendmax(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmax". Invalid number of parameters.']],
 
 			['trendmin(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Mandatory parameter is missing.']],
-			['trendmin(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Mandatory parameter is missing.']],	// invalid second parameter
+			['trendmin(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Invalid second parameter.']],
 			['trendmin(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Invalid second parameter.']],
 			['trendmin(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Invalid second parameter.']],
 			['trendmin(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Invalid second parameter.']],
@@ -416,7 +421,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendmin(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendmin". Invalid number of parameters.']],
 
 			['trendsum(/host/key)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Mandatory parameter is missing.']],
-			['trendsum(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Mandatory parameter is missing.']],	// invalid second parameter
+			['trendsum(/host/key,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Invalid second parameter.']],
 			['trendsum(/host/key, 0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Invalid second parameter.']],
 			['trendsum(/host/key, #0)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Invalid second parameter.']],
 			['trendsum(/host/key, #1)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Invalid second parameter.']],
@@ -432,7 +437,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendsum(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'Incorrect usage of function "trendsum". Invalid number of parameters.']],
 
 			['avg_foreach(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Mandatory parameter is missing.']],
-			['avg_foreach(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Mandatory parameter is missing.']],	// invalid second parameter
+			['avg_foreach(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
 			['avg_foreach(/host/key, 0)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
 			['avg_foreach(/host/key, #0)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
 			['avg_foreach(/host/key, #1)', ['calculated' => true], ['rc' => false, 'error' => 'Incorrect usage of function "avg_foreach". Invalid second parameter.']],
