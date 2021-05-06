@@ -21,7 +21,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class C44ImportConverterTest extends CImportConverterTest {
+class C52ImportConverterTest extends CImportConverterTest {
 
 	protected function getTemplateNameUuidData(): array {
 		/**
