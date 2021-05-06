@@ -1410,7 +1410,32 @@ func CreateTlsConfig(details TlsDetails, skipVerify bool) (*tls.Config, error) {
 	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: details.RawUri}, nil
 }
 
-func NewTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) TlsDetails {
-	//TODO add validation here
-	return TlsDetails{session, dbConnect, caFile, certFile, keyFile, uri}
+func NewTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (TlsDetails, error) {
+
+	if dbConnect != "" {
+		if caFile == "" {
+			return TlsDetails{}, fmt.Errorf("missing TLS CA file for database uri %s, with session %s", uri, session)
+		}
+		if certFile == "" {
+			return TlsDetails{}, fmt.Errorf("missing TLS certificate file for database uri %s, with session %s", uri, session)
+		}
+		if keyFile == "" {
+			return TlsDetails{}, fmt.Errorf("missing TLS key file for database uri %s, with session %s", uri, session)
+		}
+	} else {
+		if caFile != "" {
+			return TlsDetails{}, fmt.Errorf("TLS CA file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
+
+		}
+		if certFile != "" {
+			return TlsDetails{}, fmt.Errorf("TLS certificate file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
+
+		}
+		if keyFile != "" {
+			return TlsDetails{}, fmt.Errorf(" TLS key file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
+
+		}
+	}
+
+	return TlsDetails{session, dbConnect, caFile, certFile, keyFile, uri}, nil
 }
