@@ -294,7 +294,8 @@ abstract class CTriggerGeneral extends CApiService {
 		while ($row = DBfetch($result)) {
 			$hosts_by_tpl_hostid[$row['templateid']][] = [
 				'hostid' => $row['hostid'],
-				'host' => $row['host']
+				'host' => $row['host'],
+				'status' => $row['status']
 			];
 		}
 
