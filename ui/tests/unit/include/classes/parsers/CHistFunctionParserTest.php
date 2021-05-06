@@ -341,6 +341,37 @@ class CHistFunctionParserTest extends TestCase {
 				['/*/*']
 			],
 			[
+				'sum(/host/key?[tag="a" and not tag="b"], 1m)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'sum(/host/key?[tag="a" and not tag="b"], 1m)',
+					'function' => 'sum',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 4,
+							'match' => '/host/key?[tag="a" and not tag="b"]',
+							'length' => 35,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
+						],
+						1 => [
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 41,
+							'match' => '1m',
+							'length' => 2,
+							'data' => [
+								'sec_num' => '1m',
+								'time_shift' => ''
+							]
+						]
+					]
+				],
+				['/host/key?[tag="a" and not tag="b"]', '1m']
+			],
+			[
 				'last(/{HOST.HOST}/key)', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,

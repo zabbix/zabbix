@@ -216,7 +216,7 @@ class CFilterParser extends CParser {
 								break 3;
 							}
 
-							if (self::parsePair($source, $p, $_tokens)) {
+							if (self::parsePair($source, $p)) {
 								$state = self::STATE_AFTER_PAIR;
 
 								if ($level == 0) {
