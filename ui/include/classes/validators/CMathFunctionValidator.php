@@ -53,7 +53,7 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	public function validate($token) {
 		if (!array_key_exists($token['data']['function'], self::MATH_FUNCTIONS)) {
-			$this->setError(_s('Unknown function "%1$s".', $token['data']['function']));
+			$this->setError(_s('unknown function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
@@ -63,9 +63,7 @@ class CMathFunctionValidator extends CValidator {
 
 		if (($num_required_parameters == -1 && $num_parameters == 0)
 				|| ($num_required_parameters != -1 && $num_parameters != $num_required_parameters)) {
-			$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-				_('Invalid number of parameters.')
-			);
+			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
 
 			return false;
 		}

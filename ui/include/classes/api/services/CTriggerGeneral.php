@@ -1369,14 +1369,12 @@ abstract class CTriggerGeneral extends CApiService {
 		switch ($class) {
 			case 'CTrigger':
 				$expression_parser = new CExpressionParser();
-				$expression_validator = new CExpressionValidator();
 				$error_wrong_host = _('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.');
 				break;
 
 			case 'CTriggerPrototype':
 				$expression_parser = new CExpressionParser(['lldmacros' => true]);
-				$expression_validator = new CExpressionValidator(['lldmacros' => true]);
 				$error_wrong_host = _('Incorrect trigger prototype expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously.');
 				break;
@@ -1556,10 +1554,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$expression_parser->parse($trigger['expression']);
 
-			if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $expression_validator->getError());
-			}
-
 			$hist_functions1 = $expression_parser->getResult()->getTokensOfTypes(
 				[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 			);
@@ -1568,10 +1562,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expression_parser->parse($trigger['recovery_expression']);
-
-				if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expression_validator->getError());
-				}
 
 				$hist_functions2 = $expression_parser->getResult()->getTokensOfTypes(
 					[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]

@@ -53,16 +53,16 @@ class CHistFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($token) {
-		$invalid_param_labels = [
-			_('Invalid first parameter.'),
-			_('Invalid second parameter.'),
-			_('Invalid third parameter.'),
-			_('Invalid fourth parameter.'),
-			_('Invalid fifth parameter.')
+		$invalid_param_messages = [
+			_('invalid first parameter in function "%1$s"'),
+			_('invalid second parameter in function "%1$s"'),
+			_('invalid third parameter in function "%1$s"'),
+			_('invalid fourth parameter in function "%1$s"'),
+			_('invalid fifth parameter in function "%1$s"')
 		];
 
 		if (!array_key_exists($token['data']['function'], $this->options['parameters'])) {
-			$this->setError(_s('Unknown function "%1$s".', $token['data']['function']));
+			$this->setError(_s('unknown function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
@@ -71,9 +71,7 @@ class CHistFunctionValidator extends CValidator {
 		$params_spec = $this->options['parameters'][$token['data']['function']];
 
 		if (count($params) > count($params_spec)) {
-			$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-				_('Invalid number of parameters.')
-			);
+			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
@@ -83,8 +81,8 @@ class CHistFunctionValidator extends CValidator {
 
 			if ($index >= count($params)) {
 				if ($required) {
-					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-						_('Mandatory parameter is missing.')
+					$this->setError(
+						_s('mandatory parameter is missing in function "%1$s"', $token['data']['function'])
 					);
 
 					return false;
@@ -97,9 +95,7 @@ class CHistFunctionValidator extends CValidator {
 
 			if ($param['match'] === '') {
 				if ($required) {
-					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-						$invalid_param_labels[$index]
-					);
+					$this->setError(_params($invalid_param_messages[$index], [$token['data']['function']]));
 
 					return false;
 				}
@@ -131,9 +127,7 @@ class CHistFunctionValidator extends CValidator {
 				$is_valid = self::validateRules($param, $param_spec['rules'], $this->options);
 
 				if (!$is_valid) {
-					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-						$invalid_param_labels[$index]
-					);
+					$this->setError(_params($invalid_param_messages[$index], [$token['data']['function']]));
 
 					return false;
 				}
