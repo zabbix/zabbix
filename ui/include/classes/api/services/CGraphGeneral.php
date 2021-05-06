@@ -494,14 +494,14 @@ abstract class CGraphGeneral extends CApiService {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID, 'flags' => API_NOT_EMPTY]
+					'uuid' =>		['type' => API_UUID]
 				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+					'uuid' =>		['type' => API_UUID],
 					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
@@ -583,7 +583,6 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($graphs_to_create as $index => &$graph) {
 			if (!array_key_exists($index, $templated_graph_indexes) && array_key_exists('uuid', $graph)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
 						_s('unexpected parameter "%1$s"', 'uuid')
 					)
@@ -604,7 +603,6 @@ abstract class CGraphGeneral extends CApiService {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}
@@ -708,7 +706,6 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (array_key_exists('uuid', $graph)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}

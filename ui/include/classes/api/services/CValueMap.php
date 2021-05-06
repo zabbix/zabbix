@@ -315,7 +315,7 @@ class CValueMap extends CApiService {
 	private function validateCreate(array &$valuemaps) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'uuid' =>		['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' =>		['type' => API_UUID],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
 				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
@@ -369,7 +369,6 @@ class CValueMap extends CApiService {
 			if ($db_hosts[$valuemap['hostid']]['status'] != HOST_STATUS_TEMPLATE
 					&& array_key_exists('uuid', $valuemap)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
@@ -389,7 +388,6 @@ class CValueMap extends CApiService {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}

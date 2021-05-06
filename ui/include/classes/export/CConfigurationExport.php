@@ -261,7 +261,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectDashboards' => API_OUTPUT_EXTEND, // TODO VM: (?) why it is requested, if we have gatherTemplateDashboards() ? (Can this row be deleted?)
+			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings', 'uuid'],
 			'templateids' => $templateids,

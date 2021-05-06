@@ -606,7 +606,6 @@ abstract class CItemGeneral extends CApiService {
 			foreach ($items_to_create as $index => &$item) {
 				if (array_key_exists('uuid', $item)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						// TODO VM: check, if this message is correct
 						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
 							_s('unexpected parameter "%1$s"', 'uuid')
 						)
@@ -620,7 +619,6 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items_to_create as $index => &$item) {
 			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
@@ -639,7 +637,6 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}

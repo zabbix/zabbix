@@ -73,31 +73,10 @@ class CConfigurationImportcompare {
 	 */
 	public function importcompare(array $export, array $import): array {
 		// Leave only template related keys.
-		$export = $this->intersectKeys($export, $this->uuid_structure);
-		$import = $this->intersectKeys($import, $this->uuid_structure);
+		$export = array_intersect_key($export, $this->uuid_structure);
+		$import = array_intersect_key($import, $this->uuid_structure);
 
 		return $this->compareByStructure($this->uuid_structure, $export, $import, $this->options);
-	}
-
-	/**
-	 * Similar to array_intersect(), but will not throw notice when working on multidimensional array.
-	 *
-	 * @param array $array
-	 * @param array $keys
-	 *
-	 * @return array
-	 */
-	protected function intersectKeys(array $array, array $keys): array {
-		// TODO VM: (?) do I really need it?
-		$result = [];
-
-		foreach($array as $key => $value) {
-			if (array_key_exists($key, $keys)) {
-				$result[$key] = $value;
-			}
-		}
-
-		return $result;
 	}
 
 	/**
@@ -357,11 +336,10 @@ class CConfigurationImportcompare {
 			// Reset keys.
 			$diff['updated'] = array_values($diff['updated']);
 
-			// TODO VM: (?) it may be a good idea to keep original order of keys, but it will increase complexity.
 			// Make sure, key order is same in 'before' and 'after' arrays.
 			foreach ($diff['updated'] as &$entity) {
 				$order = array_flip(array_keys($entity['before']));
-				$order = $this->intersectKeys($order, array_keys($entity['after']));
+				$order = array_intersect_key($order, $entity['after']);
 				$entity['after'] = array_merge($order, $entity['after']);
 			}
 			unset($entity);

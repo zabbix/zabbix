@@ -3843,12 +3843,6 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_UUID],
 				'',
 				'/uuid',
-				''
-			],
-			[
-				['type' => API_UUID, 'flags' => API_NOT_EMPTY],
-				'',
-				'/uuid',
 				'Invalid parameter "/uuid": cannot be empty.'
 			],
 			[

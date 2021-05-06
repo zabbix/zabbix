@@ -896,7 +896,6 @@ class CConfigurationImport {
 
 			if (!$this->importedObjectContainer->isHostProcessed($hostid)
 					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
-				// TODO VM: (?) I don't see use-case, when this will be called.
 				unset($discovery_rules_by_hosts[$host]);
 			}
 		}

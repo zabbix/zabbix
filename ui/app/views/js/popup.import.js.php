@@ -90,7 +90,7 @@ function openImportComparePopup(overlay) {
 				content: response.body,
 				buttons: response.buttons,
 				script_inline: response.script_inline,
-				debug: response.debug // TODO VM: check with no debug mode
+				debug: response.debug
 			}, overlay.$btn_submit);
 		}
 

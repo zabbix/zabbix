@@ -197,7 +197,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateCreate(array &$host_prototypes) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
-			'uuid' =>				['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' =>				['type' => API_UUID],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
@@ -319,7 +319,6 @@ class CHostPrototype extends CHostBase {
 			if (!array_key_exists($host_prototype['ruleid'], $db_templated_rules)
 					&& array_key_exists('uuid', $host_prototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					// TODO VM: check, if this message is correct
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
@@ -339,7 +338,6 @@ class CHostPrototype extends CHostBase {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}

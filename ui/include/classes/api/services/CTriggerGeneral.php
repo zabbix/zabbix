@@ -519,7 +519,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host,h.status'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.host', array_keys($hosts)). // TODO VM: (?) h.host is hostNAME and is not an integer. It should use dbConditionString.
+			' WHERE '.dbConditionInt('h.host', array_keys($hosts)).
 				' AND '.dbConditionInt('h.status',
 					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 				)
@@ -617,7 +617,6 @@ abstract class CTriggerGeneral extends CApiService {
 			foreach ($triggers as $trigger) {
 				if ($trigger['host']['status'] != HOST_STATUS_TEMPLATE && $trigger['uuid'] !== null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						// TODO VM: check, if this message is correct
 						_s('Invalid parameter "%1$s": %2$s.', '/'.($trigger['index'] + 1),
 							_s('unexpected parameter "%1$s"', 'uuid')
 						)
@@ -638,7 +637,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}
@@ -821,7 +819,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateCreate(array &$triggers) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['description', 'expression']], 'fields' => [
-			'uuid' =>					['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' =>					['type' => API_UUID],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
 			'event_name' =>				['type' => API_EVENT_NAME, 'length' => DB::getFieldLength('triggers', 'event_name')],

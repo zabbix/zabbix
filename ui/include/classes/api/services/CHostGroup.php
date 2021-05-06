@@ -356,8 +356,6 @@ class CHostGroup extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// TODO VM: (?) should we return uuid by API_OUTPUT_EXTEND? If not, how it can be removed from output?
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -722,7 +720,7 @@ class CHostGroup extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
-			'uuid' =>	['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
@@ -756,7 +754,6 @@ class CHostGroup extends CApiService {
 
 		if ($db_uuid) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				// TODO VM: check, if this message is correct
 				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
 			);
 		}

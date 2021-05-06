@@ -262,20 +262,6 @@ class CConfiguration extends CApiService {
 	public function importcompare(array $params): array {
 		$this->validateImport($params);
 
-		if ($params['format'] === CImportReaderFactory::XML) {
-			$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
-
-			if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
-				self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
-			}
-
-			$xml_reader = (new CFrontendSetup())->checkPhpXmlReader();
-
-			if ($xml_reader['result'] == CFrontendSetup::CHECK_FATAL) {
-				self::exception(ZBX_API_ERROR_INTERNAL, $xml_reader['error']);
-			}
-		}
-
 		$import_reader = CImportReaderFactory::getReader($params['format']);
 		$data = $import_reader->read($params['source']);
 
@@ -299,7 +285,7 @@ class CConfiguration extends CApiService {
 				->convert($data);
 
 			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
 				->setStrict(false)
 				->setPreview(true)
 				->validate($data, '/');
@@ -318,8 +304,6 @@ class CConfiguration extends CApiService {
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
-
-		// TODO VM: (?) Everything till now is almost same as in import(). Need to find nice way to move it to function.
 
 		$import = $adapter->getData();
 		$imported_uuids = [];
@@ -353,8 +337,6 @@ class CConfiguration extends CApiService {
 					$imported_ids['templates'] = array_keys($imported_ids['templates']);
 
 					break;
-
-				// TODO VM: (?) In import file, if we have a trigger or graph unrelated to templates in this file, export is not managing it. Do we need an alternative?
 
 				default:
 					break;

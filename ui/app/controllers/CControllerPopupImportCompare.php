@@ -27,7 +27,6 @@ class CControllerPopupImportCompare extends CController {
 	public const CHANGE_UPDATED = 3;
 
 	private $toc = [];
-	private $toc_id = 0;
 
 	protected function checkInput() {
 		$fields = [
@@ -66,8 +65,6 @@ class CControllerPopupImportCompare extends CController {
 	}
 
 	protected function doAction() {
-		// TODO VM: (?) Do I merge this somehow with CControllerPopupImport? I would prefer not to, as they are similar, but stil different.
-
 		$rules = [
 			'groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
@@ -219,7 +216,6 @@ class CControllerPopupImportCompare extends CController {
 		$is_hash = CArrayHelper::isHash($before) || CArrayHelper::isHash($after);
 
 		// Make sure, order changes are also taken into account.
-		// TODO VM: (?) It may look nicer, if longest chains of unchanged entries will be searched, but it will make it even more complex.
 		$unchanged_map = [];
 		$before_keys = array_keys($before);
 		$after_keys = array_keys($after);
@@ -374,8 +370,7 @@ class CControllerPopupImportCompare extends CController {
 			}
 		}
 
-		// TODO VM: don't show UUID (after testing)
-//		unset($all_keys['uuid']);
+		unset($all_keys['uuid']);
 
 		foreach ($all_keys as $key => $change_type) {
 			switch ($change_type) {
@@ -452,19 +447,16 @@ class CControllerPopupImportCompare extends CController {
 					$object = $before ? $before : $after;
 					unset($entity['before'], $entity['after']);
 
-					// TODO VM: (?) while we are sure to setup each such, as it has UUID, this precaution is not needed.
-					$id = array_key_exists('uuid', $object) ? $object['uuid'] : $this->toc_id++;
-					// TODO VM: (?) it might be bad idea to relay on every entity having 'name', even if currently it is true.
+					$id = $object['uuid'];
 					$this->toc[$change_type][$entity_type][] = [
-						'name' => array_key_exists('name', $object) ? $object['name'] : 'Unknown',
+						'name' => $object['name'],
 						'id' => $id
 					];
 
 					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth+1, $id));
 
-					// Process any subentities.
+					// Process any sub-entities.
 					if ($entity) {
-						// TODO VM: I don't really like change type here, but otherwise triggers for added item will not be marked as green.
 						$rows = array_merge($rows, $this->blocksToDiff($entity, $depth+2, $change_type));
 					}
 				}

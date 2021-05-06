@@ -2177,34 +2177,28 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUuid(array $rule, &$data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
-		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
-			return true;
-		}
-
 		if (mb_strlen($data) != 32) {
-			// TODO VM: check trasnlation string
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', 32));
 			return false;
 		}
 
 		if (!ctype_xdigit($data)) {
-			// TODO VM: check trasnlation string
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
 			return false;
 		}
 
 		$binary = hex2bin($data);
 		if ((ord($binary[6]) & 0xf0) != 0x40 || (ord($binary[8]) & 0xc0) != 0x80) {
-			// TODO VM: check trasnlation string
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
 			return false;
 		}
+
+		// TODO VM: check that everywhere comparison is done in lowercase.
+		$data = strtolower($data);
 
 		return true;
 	}
