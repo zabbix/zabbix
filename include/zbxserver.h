@@ -60,7 +60,8 @@
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
+int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **start,
+		const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 
 int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,

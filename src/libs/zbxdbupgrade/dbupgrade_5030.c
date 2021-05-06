@@ -21,6 +21,8 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxserver.h"
+#include "zbxregexp.h"
 #include "dbupgrade_macros.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
@@ -4653,6 +4655,822 @@ static int	DBpatch_5030163(void)
 	return DBadd_field("config", &field);
 }
 
+#undef HOST_STATUS_TEMPLATE
+#define HOST_STATUS_TEMPLATE		3
+#undef ZBX_FLAG_DISCOVERY_NORMAL
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00
+#undef ZBX_FLAG_DISCOVERY_RULE
+#define ZBX_FLAG_DISCOVERY_RULE		0x01
+#undef ZBX_FLAG_DISCOVERY_PROTOTYPE
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
+
+#define ZBX_FIELD_UUID			{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0}
+
+static int	DBpatch_5030164(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_5030165(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_5030166(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_5030167(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("dashboard", &field);
+}
+
+static int	DBpatch_5030168(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("graphs", &field);
+}
+
+static int	DBpatch_5030169(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("hstgrp", &field);
+}
+
+static int	DBpatch_5030170(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_5030171(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("valuemap", &field);
+}
+
+static char	*update_template_name(char *old)
+{
+	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp, buffer[7];
+	int	version;
+
+#define MIN_TEMPLATE_NAME_LEN	3
+#define STRING_SNMP_LABEL		"SNMP"
+
+	ptr = old;
+
+	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
+			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "[^\n]s", new) &&
+			MIN_TEMPLATE_NAME_LEN <= strlen(new))
+	{
+		ptr = zbx_strdup(ptr, new);
+	}
+
+	for (version = 1; version <= 2; version++)
+	{
+		zbx_snprintf(buffer, sizeof(buffer), "%sv%d", STRING_SNMP_LABEL, version);
+		ptr_snmp = string_replace(ptr, buffer, STRING_SNMP_LABEL);
+		zbx_free(ptr);
+		ptr = ptr_snmp;
+	}
+
+	return ptr;
+}
+
+static int	DBpatch_5030172(void)
+{
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select h.hostid,h.host"
+			" from hosts h"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name = zbx_strdup(NULL, row[1]);
+		name = update_template_name(name);
+		uuid = zbx_gen_uuid4(name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030173(void)
+{
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select i.itemid,i.key_,h.host"
+			" from items i"
+			" join hosts h on h.hostid=i.hostid"
+			" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name = zbx_strdup(NULL, row[2]);
+		name = update_template_name(name);
+		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030174(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is null and t.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*pexpr, *pexpr_f, *pexpr_s;
+		char		*trigger_expr, *expression = NULL;
+		int		i;
+		size_t		expression_alloc = 0, expression_offset = 0;
+		zbx_uint64_t	functionid;
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		for (i = 0; i < 2; i++)
+		{
+			int	expr_start = 1;
+
+			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			pexpr = pexpr_f = (const char *)trigger_expr;
+
+			while (SUCCEED == get_N_functionid(pexpr, 1, &functionid, (const char **)&pexpr_s, &pexpr_f))
+			{
+				trigger_expr[pexpr_s - trigger_expr] = '\0';
+
+				result2 = DBselect(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				while (NULL != (row2 = DBfetch(result2)))
+				{
+					char	*template_name;
+
+					if (1 == expr_start)
+					{
+						zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
+								"/");
+						expr_start = 0;
+					}
+					template_name = zbx_strdup(NULL, row2[0]);
+					template_name = update_template_name(template_name);
+					zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
+							"%s{%s:%s.%s(%s)}",pexpr, template_name,
+							row2[1], row2[2], row2[3]);
+					pexpr = pexpr_f;
+					zbx_free(template_name);
+				}
+
+				DBfree_result(result2);
+			}
+
+			if (pexpr != trigger_expr)
+				zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset, "%s", pexpr);
+
+			zbx_free(trigger_expr);
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", expression);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
+				" where triggerid=%s;\n", uuid, row[0]);
+		zbx_free(expression);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030175(void)
+{
+	int		ret = SUCCEED;
+	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = DBselect(
+			"select distinct g.graphid,g.name"
+			" from graphs g"
+			" join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where g.templateid is null and g.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+
+		result2 = DBselect(
+				"select h.host"
+				" from graphs_items gi"
+				" join items i on i.itemid=gi.itemid"
+				" join hosts h on h.hostid=i.hostid"
+				" where gi.graphid=%s"
+				" order by h.host",
+				row[0]);
+
+		while (NULL != (row2 = DBfetch(result2)))
+		{
+			host_name = zbx_strdup(NULL, row2[0]);
+			host_name = update_template_name(host_name);
+
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
+			zbx_free(host_name);
+		}
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
+				" where graphid=%s;\n", uuid, row[0]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		DBfree_result(result2);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030176(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select d.dashboardid,d.name,h.host"
+			" from dashboard d"
+			" join hosts h on h.hostid=d.templateid"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update dashboard set uuid='%s' where dashboardid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030177(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select ht.httptestid,ht.name,h.host"
+			" from httptest ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" where ht.templateid is null",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update httptest set uuid='%s' where httptestid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030178(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select v.valuemapid,v.name,h.host"
+			" from valuemap v"
+			" join hosts h on h.hostid=v.hostid"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update valuemap set uuid='%s' where valuemapid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030179(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select groupid,name from hstgrp");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		uuid = zbx_gen_uuid4(row[1]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hstgrp set uuid='%s' where groupid=%s;\n", uuid, row[0]);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030180(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select i.itemid,i.key_,h.host,i2.key_"
+			" from items i"
+			" join hosts h on h.hostid=i.hostid"
+			" join item_discovery id on id.itemid=i.itemid"
+			" join items i2 on id.parent_itemid=i2.itemid"
+			" where h.status=%d and i.flags=%d and i.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", template_name, row[3], row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
+				uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030181(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is null and t.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*pexpr, *pexpr_f, *pexpr_s;
+		char		*trigger_expr, *total_expr = NULL;
+		int		i;
+		size_t		total_expr_alloc = 0, total_expr_offset = 0;
+		zbx_uint64_t	functionid;
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		result2 = DBselect(
+				"select distinct i2.key_"
+				" from items i"
+				" join item_discovery id on id.itemid=i.itemid"
+				" join items i2 on id.parent_itemid=i2.itemid"
+				" join functions f on i.itemid=f.itemid and f.triggerid=%s"
+				" where i.flags=%d",
+				row[0], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		if (NULL == (row2 = DBfetch(result2)))
+		{
+			DBfree_result(result2);
+			continue;
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row2[0]);
+
+		DBfree_result(result2);
+
+		for (i = 0; i < 2; i++)
+		{
+			int	expr_start = 1;
+
+			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			pexpr = pexpr_f = (const char *)trigger_expr;
+
+			while (SUCCEED == get_N_functionid(pexpr, 1, &functionid, (const char **)&pexpr_s, &pexpr_f))
+			{
+				trigger_expr[pexpr_s - trigger_expr] = '\0';
+
+				result2 = DBselect(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				while (NULL != (row2 = DBfetch(result2)))
+				{
+					char	*template_name;
+
+					if (1 == expr_start)
+					{
+						zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
+								"/");
+						expr_start = 0;
+					}
+
+					template_name = zbx_strdup(NULL, row2[0]);
+					template_name = update_template_name(template_name);
+
+					zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
+							"%s{%s:%s.%s(%s)}",pexpr, template_name,
+							row2[1], row2[2], row2[3]);
+					pexpr = pexpr_f;
+					zbx_free(template_name);
+				}
+
+				DBfree_result(result2);
+			}
+
+			if (pexpr != trigger_expr)
+				zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset, "%s", pexpr);
+
+			zbx_free(trigger_expr);
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", total_expr);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
+				" where triggerid=%s;\n", uuid, row[0]);
+		zbx_free(total_expr);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030182(void)
+{
+	int		ret = SUCCEED;
+	char		*templ_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = DBselect(
+			"select distinct g.graphid,g.name,h.host,i2.key_"
+			" from graphs g"
+			" join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid and i.flags=%d"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" join item_discovery id on id.itemid=i.itemid"
+			" join items i2 on id.parent_itemid=i2.itemid"
+			" where g.templateid is null and g.flags=%d",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		templ_name = zbx_strdup(NULL, row[2]);
+		templ_name = update_template_name(templ_name);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/%s/%s", templ_name, row[3], row[1]);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
+				" where graphid=%s;\n", uuid, row[0]);
+		zbx_free(templ_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030183(void)
+{
+	int		ret = SUCCEED;
+	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select h.hostid,h.host,h2.host,i.key_"
+			" from hosts h"
+			" join host_discovery hd on hd.hostid=h.hostid"
+			" join items i on i.itemid=hd.parent_itemid"
+			" join hosts h2 on h2.hostid=i.hostid and h2.status=%d"
+			" where h.flags=%d and h.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name_tmpl = zbx_strdup(NULL, row[2]);
+		name_tmpl = update_template_name(name_tmpl);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", name_tmpl, row[3], row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name_tmpl);
+		zbx_free(seed);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+#undef HOST_STATUS_TEMPLATE
+#undef ZBX_FLAG_DISCOVERY_NORMAL
+#undef ZBX_FLAG_DISCOVERY_RULE
+#undef ZBX_FLAG_DISCOVERY_PROTOTYPE
+
 #endif
 
 DBPATCH_START(5030)
@@ -4823,5 +5641,25 @@ DBPATCH_ADD(5030160, 0, 1)
 DBPATCH_ADD(5030161, 0, 1)
 DBPATCH_ADD(5030162, 0, 1)
 DBPATCH_ADD(5030163, 0, 1)
+DBPATCH_ADD(5030164, 0, 1)
+DBPATCH_ADD(5030165, 0, 1)
+DBPATCH_ADD(5030166, 0, 1)
+DBPATCH_ADD(5030167, 0, 1)
+DBPATCH_ADD(5030168, 0, 1)
+DBPATCH_ADD(5030169, 0, 1)
+DBPATCH_ADD(5030170, 0, 1)
+DBPATCH_ADD(5030171, 0, 1)
+DBPATCH_ADD(5030172, 0, 1)
+DBPATCH_ADD(5030173, 0, 1)
+DBPATCH_ADD(5030174, 0, 1)
+DBPATCH_ADD(5030175, 0, 1)
+DBPATCH_ADD(5030176, 0, 1)
+DBPATCH_ADD(5030177, 0, 1)
+DBPATCH_ADD(5030178, 0, 1)
+DBPATCH_ADD(5030179, 0, 1)
+DBPATCH_ADD(5030180, 0, 1)
+DBPATCH_ADD(5030181, 0, 1)
+DBPATCH_ADD(5030182, 0, 1)
+DBPATCH_ADD(5030183, 0, 1)
 
 DBPATCH_END()

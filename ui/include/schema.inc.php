@@ -343,6 +343,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -371,6 +377,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -707,6 +719,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -882,6 +900,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
+				'default' => ''
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
 				'default' => ''
 			]
 		]
@@ -1194,6 +1218,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -2848,6 +2878,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -3031,6 +3067,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],
@@ -7191,6 +7233,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			],
 			'display_period' => [
 				'null' => false,
