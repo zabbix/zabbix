@@ -511,7 +511,7 @@ class C52ImportConverter extends CConverter {
 				$trigger['event_name'] = $event_name_converter->convert($trigger['event_name']);
 			}
 
-			if ($trigger['recovery_expression'] !== '') {
+			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
 				$trigger['recovery_expression'] = $expression_converter->convert([
 					'expression' => $trigger['recovery_expression'],
 					'host' => $host,
