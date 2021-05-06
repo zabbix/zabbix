@@ -2004,6 +2004,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTemplates(), [
 				[
+					'uuid' => '0f5ffb0773844d77b8a8622f7819ccdf',
 					'macros' => [
 						[
 							'value' => '21',
@@ -2031,6 +2032,7 @@ class CImportDataAdapterTest extends TestCase {
 					'valuemaps' => []
 				],
 				[
+					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
 					'macros' => [],
 					'host' => 'Template_Simple',
 					'groups' =>	[
@@ -2498,6 +2500,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getItems(), [
 				'Template_Simple' => [
 					'net.tcp.service[ftp,,21]' => [
+						'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
 						'type' => '3',
 						'value_type' => '3',
 						'description' => 'FTP check',
@@ -2553,6 +2556,7 @@ class CImportDataAdapterTest extends TestCase {
 						'trapper_hosts' => ''
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
+						'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
 						'type' => '3',
 						'value_type' => '3',
 						'description' => 'FTP check with macro',
@@ -2834,6 +2838,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getItems(), [
 			'Test 1' => [
 				'test' => [
+					'uuid' => '86491ebd3d2549eaab7bbba6537c5e9b',
 					'name' => 'Item SNMPv1 without port',
 					'type' => '20',
 					'snmp_oid' => 'test',
@@ -2882,6 +2887,7 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'test2' => [
+					'uuid' => 'c036b6c02dc14b61b981842081a3887d',
 					'name' => 'Item SNMPv1 with port',
 					'type' => '20',
 					'snmp_oid' => 'test',
@@ -2930,6 +2936,7 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'test3' => [
+					'uuid' => 'a7ffc1b7cf88455c89ef04284fcc9f4e',
 					'name' => 'Item SNMPv2 without port',
 					'type' => '20',
 					'snmp_oid' => 'test',
@@ -2978,6 +2985,7 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'test4' => [
+					'uuid' => 'e678a548f5194961b8b3cd20214bd7fa',
 					'name' => 'Item SNMPv2 with port',
 					'type' => '20',
 					'snmp_oid' => 'test',
@@ -3026,6 +3034,7 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'test5' => [
+					'uuid' => '72be963b76ed41fea8577b83fcc279bf',
 					'name' => 'Item SNMPv3 without port',
 					'type' => '20',
 					'snmp_oid' => 'test',
@@ -3074,6 +3083,7 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'test6' => [
+					'uuid' => 'a0891fa71e2b45dba8587c29cd137a09',
 					'name' => 'Item SNMPv3 with port',
 					'type' => '20',
 					'snmp_oid' => 'test',
