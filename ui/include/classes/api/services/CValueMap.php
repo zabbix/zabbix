@@ -512,7 +512,10 @@ class CValueMap extends CApiService {
 				continue;
 			}
 
-			$type_uniq = [];
+			$type_uniq = array_fill_keys([VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+					VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
+				], []
+			);;
 			$has_default = false;
 
 			foreach (array_values($valuemap['mappings']) as $j => $mapping) {

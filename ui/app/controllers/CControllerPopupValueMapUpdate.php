@@ -74,7 +74,7 @@ class CControllerPopupValueMapUpdate extends CController {
 		}
 
 		$mappings = array_filter($this->getInput('mappings', []), function ($mapping) {
-			return ($mapping['value'] !== '' || $mapping['newvalue'] !== '');
+			return array_key_exists('value', $mapping) && ($mapping['value'] !== '' || $mapping['newvalue'] !== '');
 		});
 
 		if (!$mappings) {
@@ -82,7 +82,10 @@ class CControllerPopupValueMapUpdate extends CController {
 			return false;
 		}
 
-		$type_values = [];
+		$type_uniq = array_fill_keys([VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+				VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
+			], []
+		);
 		$number_parser = new CNumberParser();
 		$range_parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
 
@@ -97,7 +100,7 @@ class CControllerPopupValueMapUpdate extends CController {
 				return false;
 			}
 
-			if (array_key_exists($value, $type_values[$type])) {
+			if (array_key_exists($value, $type_uniq[$type])) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
 					_s('value %1$s already exists', '('.$value.')'))
 				);
