@@ -93,9 +93,9 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_CALC_FORMULA],
-				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
 				'/1/formula',
-				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
 			],
 			[
 				['type' => API_CALC_FORMULA],
