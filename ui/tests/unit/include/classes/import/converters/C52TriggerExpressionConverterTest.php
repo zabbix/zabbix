@@ -389,20 +389,24 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[3].count(#1, 0, eq)} > 0'.
+				' and {Trapper:trap[3].count(#1,0,eq)} > 0'.
 				' and {Trapper:trap[3].count(5m, "xyz", regexp, 2h)} > 0'.
+				' and {Trapper:trap[3].count(5m,"xyz",regexp,2h)} > 0'.
 				' and {Trapper:trap[2].count(5m, 10, iregexp, 1h)} > 0'.
 				' and {Trapper:trap[1].count(5m, 100, gt, 2d)} > 0'.
 				' and {Trapper:trap[1].count(1m, 32, band)} > 0'.
 				' and {Trapper:trap[1].count(1m, 32/8, band)} > 0'.
-				' and {Trapper:trap[1].count(1m)} > 0',
+				' and {Trapper:trap[1].count(10m)} > 0',
 
 				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
+				' and count(/Trapper/trap[3],#1,"eq","0") > 0'.
+				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
 				' and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0'.
 				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32/8") > 0'.
-				' and count(/Trapper/trap[1],1m) > 0'
+				' and count(/Trapper/trap[1],10m) > 0'
 			],
 			[
 				'{Trapper:trap[3].iregexp("^error", #10)} > 0'.
@@ -436,13 +440,6 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				'find(/Trapper/trap[3],#10,"regexp","^error") > 0'.
 				' and find(/Trapper/trap[3],60s,"regexp","^critical") > 0'.
 				' and find(/Trapper/trap[3],5m,"regexp","^warning") > 0'
-			],
-			[
-				'{Trapper:trap[3].count(#1,0,eq)} > 0'.
-				' and {Trapper:trap[3].count(5m,"xyz",regexp,2h)} > 0',
-
-				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
-				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'
 			],
 			[
 				'{Trapper:trap[3].str("^error", #10)} > 0'.
