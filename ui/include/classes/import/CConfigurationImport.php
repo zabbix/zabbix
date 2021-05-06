@@ -82,7 +82,11 @@ class CConfigurationImport {
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
-		$options = array_merge($default_options, $options);
+		foreach ($default_options as $entity => $rules) {
+			$options[$entity] = array_key_exists($entity, $options)
+				? array_merge($rules, $options[$entity])
+				: $rules;
+		}
 
 		$object_options = (
 			$options['templateLinkage']['createMissing']
