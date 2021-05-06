@@ -174,7 +174,7 @@ final class CHistFunctionData {
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
-		'find' => self::ITEM_VALUE_TYPES_STR,
+		'find' => self::ITEM_VALUE_TYPES_ALL,
 		'forecast' => self::ITEM_VALUE_TYPES_NUM,
 		'fuzzytime' => self::ITEM_VALUE_TYPES_NUM,
 		'last' => self::ITEM_VALUE_TYPES_ALL,
