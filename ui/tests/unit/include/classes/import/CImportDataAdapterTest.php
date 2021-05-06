@@ -2052,6 +2052,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getItems(), [
 				'Template_Linux' => [
 					'vfs.fs.size[/,pfree]' => [
+						'uuid' => '1af0599983904849aed77e1bc145a8c2',
 						'type' => '0',
 						'value_type' => '0',
 						'ipmi_sensor' => '',
@@ -2113,6 +2114,7 @@ class CImportDataAdapterTest extends TestCase {
 				],
 				'Template_Simple' => [
 					'net.tcp.service[ftp,,21]' => [
+						'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
 						'type' => '3',
 						'value_type' => '3',
 						'ipmi_sensor' => '',
@@ -2168,6 +2170,7 @@ class CImportDataAdapterTest extends TestCase {
 						]
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
+						'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
 						'type' => '3',
 						'value_type' => '3',
 						'ipmi_sensor' => '',
@@ -3137,11 +3140,13 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getDiscoveryRules(), [
 			'Test 1' => [
 				'drule' => [
+					'uuid' => '3b7d292c10354838805205cfcbc444cc',
 					'name' => 'Discovery Rule 1',
 					'type' => '20',
 					'snmp_oid' => 'test',
 					'item_prototypes' => [
 						[
+							'uuid' => '779884b6c977492e87fbda06daa13756',
 							'name' => 'Drule Item SNMP v1',
 							'type' => '20',
 							'snmp_oid' => 'test',
@@ -3236,11 +3241,13 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'drule2' => [
+					'uuid' => '72eebc5b22a340f084a53ae0aa0be7c9',
 					'name' => 'Discovery Rule 2',
 					'type' => '20',
 					'snmp_oid' => 'test',
 					'item_prototypes' => [
 						[
+							'uuid' => '1ce99b4e607f4b1381207b9952f59b2b',
 							'name' => 'Drule Item SNMP v2',
 							'type' => '20',
 							'snmp_oid' => 'test',
@@ -3335,11 +3342,13 @@ class CImportDataAdapterTest extends TestCase {
 					'trapper_hosts' => ''
 				],
 				'drule3' => [
+					'uuid' => '857400f45ff845de8ee70e132299bd4e',
 					'name' => 'Discovery Rule 3',
 					'type' => '20',
 					'snmp_oid' => 'test',
 					'item_prototypes' => [
 						[
+							'uuid' => 'b178dc2e1e234031bdbd46007542ffcc',
 							'name' => 'Drule Item SNMP v3',
 							'type' => '20',
 							'snmp_oid' => 'test',
