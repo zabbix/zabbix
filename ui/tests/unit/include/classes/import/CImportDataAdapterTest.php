@@ -2231,6 +2231,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTriggers(), [
 				[
+					'uuid' => '8aece41340ce47ecab3e0ac69313fb6d',
 					'type' => '0',
 					'expression' => '{Template_Linux:vfs.fs.size[/,pfree].last(0)}<10',
 					'url' => 'http://www.zabbix.com/',
@@ -2249,6 +2250,7 @@ class CImportDataAdapterTest extends TestCase {
 					'dependencies' => []
 				],
 				[
+					'uuid' => '0117c941adb04a728bb79e156179f97f',
 					'type' => '1',
 					'expression' => '{Template_Simple:net.tcp.service[ftp,,21].last(0)}<>0 or {Template_Simple:net.tcp.service[ftp,,{$PORT.FTP}].last(0)}<>0',
 					'url' => 'triggers.php',
