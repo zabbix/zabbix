@@ -2066,13 +2066,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (!$expression_parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION])) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('trigger expression must contain at least one /host/key reference')
-			);
-			return false;
-		}
-
 		return true;
 	}
 

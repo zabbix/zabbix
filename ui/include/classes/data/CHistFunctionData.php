@@ -218,7 +218,7 @@ final class CHistFunctionData {
 		$this->options = $options + $this->options;
 	}
 
-	public static function isCalculated(string $function): bool {
+	public static function isAggregated(string $function): bool {
 		switch ($function) {
 			case 'avg_foreach':
 			case 'count_foreach':
@@ -241,7 +241,7 @@ final class CHistFunctionData {
 		$result = [];
 
 		foreach (self::PARAMETERS as $function => $parameters) {
-			if (self::isCalculated($function)) {
+			if (self::isAggregated($function)) {
 				continue;
 			}
 
@@ -259,7 +259,7 @@ final class CHistFunctionData {
 		$result = [];
 
 		foreach (self::VALUE_TYPES as $function => $value_types) {
-			if (self::isCalculated($function)) {
+			if (self::isAggregated($function)) {
 				continue;
 			}
 

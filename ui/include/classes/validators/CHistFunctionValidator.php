@@ -30,12 +30,14 @@ class CHistFunctionValidator extends CValidator {
 	 * Supported options:
 	 *   'parameters' => []     Definition of parameters of known history functions.
 	 *   'calculated' => false  Validate history function as part of calculated item formula.
+	 *   'aggregated' => false  Validate as aggregated history function.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'parameters' => [],
-		'calculated' => false
+		'calculated' => false,
+		'aggregated' => false
 	];
 
 	/**
@@ -218,7 +220,10 @@ class CHistFunctionValidator extends CValidator {
 
 	private static function validateQuery(string $host, string $item, array $options): bool {
 		if ($options['calculated']) {
-			return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
+			return ($options['aggregated']
+				? ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
+				: ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
+			);
 		}
 
 		return true;
