@@ -68,7 +68,6 @@ class C52TriggerExpressionConverter extends CConverter {
 
 	public function __construct() {
 		$this->parser = new C10TriggerExpression(['allow_func_only' => true]);
-		$this->function_parser = new C10FunctionParser();
 		$this->standalone_functions = getStandaloneFunctions();
 	}
 
@@ -186,12 +185,11 @@ class C52TriggerExpressionConverter extends CConverter {
 
 		$extra_expr = '';
 
-		$this->function_parser->parse($fn['function']);
 		$parameters = [
-			'unquotable' => array_filter($this->function_parser->getParamsRaw()['parameters'], function ($param) {
+			'unquotable' => array_filter($fn['functionParamsRaw']['parameters'], function ($param) {
 				return ($param['type'] == C10FunctionParser::PARAM_UNQUOTED && $param['raw'] === '');
 			}),
-			'indicated' => array_filter($this->function_parser->getParamsRaw()['parameters'], function ($param) {
+			'indicated' => array_filter($fn['functionParamsRaw']['parameters'], function ($param) {
 				return ($param['type'] == C10FunctionParser::PARAM_QUOTED || $param['raw'] !== '');
 			})
 		];
