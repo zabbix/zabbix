@@ -169,7 +169,8 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$item_config_url = (new CUrl('items.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid);
+			->setArgument('itemid', $itemid)
+			->setArgument('context', 'host');
 
 		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
