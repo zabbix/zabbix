@@ -143,6 +143,7 @@ class CControllerPopupValueMapUpdate extends CController {
 	protected function doAction() {
 		$data = [];
 		$mappings = [];
+		$default = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
 
 		foreach ($data['mappings'] as $mapping) {
@@ -150,8 +151,17 @@ class CControllerPopupValueMapUpdate extends CController {
 					$mapping['value'] === '' && $mapping['newvalue'] === '') {
 				continue;
 			}
+			elseif ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {
+				$default = $mapping;
+
+				continue;
+			}
 
 			$mappings[] = $mapping;
+		}
+
+		if ($default) {
+			$mappings[] = $default;
 		}
 
 		$data['mappings'] = $mappings;
