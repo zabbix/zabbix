@@ -594,18 +594,39 @@ switch ($data['popup_type']) {
 					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick));
 			}
 
-			$span = [];
+			$mappings_table = [];
 
 			foreach (array_slice($valuemap['mappings'], 0, 3) as $mapping) {
-				$span[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
-				$span[] = BR();
+				switch ($mapping['type']) {
+					case VALUEMAP_MAPPING_TYPE_EQUAL:
+						$value = '='.$mapping['value'];
+						break;
+
+					case VALUEMAP_MAPPING_TYPE_GREATER_EQUAL:
+						$value = '>='.$mapping['value'];
+						break;
+
+					case VALUEMAP_MAPPING_TYPE_LESS_EQUAL:
+						$value = '<='.$mapping['value'];
+
+					case VALUEMAP_MAPPING_TYPE_DEFAULT:
+						$value = new CTag('em', true, _('default'));
+						break;
+
+					default:
+						$value = $mapping['value'];
+						break;
+				}
+
+				$mappings_table[] = new CDiv($value);
+				$mappings_table[] = new CDiv('⇒');
+				$mappings_table[] = new CDiv($mapping['newvalue']);
 			}
 
-			if (count($valuemap['mappings']) > 3) {
-				$span[] = '&hellip;';
-			}
-
-			$table->addRow([$check_box, $name, $span]);
+			$hellip = (count($valuemap['mappings']) > 3) ? '&hellip;' : null;
+			$table->addRow([$check_box, $name, [
+				(new CDiv($mappings_table))->addClass(ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE), $hellip
+			]]);
 		}
 		break;
 }

@@ -6319,6 +6319,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #383838; }
 
+.mappings-table {
+  display: grid;
+  grid-template-columns: auto auto minmax(auto, 100%); }
+  .mappings-table > div {
+    text-align: left; }
+  .mappings-table > div:nth-child(3n + 2) {
+    text-align: center;
+    padding: 0 10px; }
+
 .valuemap-checkbox {
   margin-top: 10px; }
 
