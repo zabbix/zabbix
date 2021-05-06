@@ -2273,6 +2273,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getGraphs(), [
 				[
+					'uuid' => '5b0b876fffc141f7b875f3bf8a0a17c8',
 					'name' => 'simple graph fixed',
 					'width' => '755',
 					'height' => '332',
@@ -2317,6 +2318,7 @@ class CImportDataAdapterTest extends TestCase {
 					'show_legend' => '0'
 				],
 				[
+					'uuid' => '6c58ad6f8e844daea37447c98d6b9b52',
 					'name' => 'simple graph',
 					'width' => '900',
 					'height' => '200',
@@ -2361,6 +2363,7 @@ class CImportDataAdapterTest extends TestCase {
 					'show_legend' => '0'
 				],
 				[
+					'uuid' => 'a427129237d44299bb8fec32ce7c0bae',
 					'name' => 'simple graph min/max',
 					'width' => '1024',
 					'height' => '768',
