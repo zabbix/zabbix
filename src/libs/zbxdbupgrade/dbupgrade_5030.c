@@ -4441,6 +4441,7 @@ static int	DBpatch_5030142(void)
 {
 	return DBdrop_table("applications");
 }
+
 static int	DBpatch_5030143(void)
 {
 	DB_RESULT	result;
