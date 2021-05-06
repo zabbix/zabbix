@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-03-02T19:42:24Z'
+  date: '2021-04-22T11:28:35Z'
   groups:
     -
       name: Templates/Databases
@@ -2078,87 +2078,89 @@ zabbix_export:
       dashboards:
         -
           name: 'PostgreSQL databases'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: pg_stat_database metrics'
-                    host: 'PostgreSQL Agent 2'
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Locks'
-                    host: 'PostgreSQL Agent 2'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: pg_stat_database metrics'
+                        host: 'PostgreSQL Agent 2'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Size'
-                    host: 'PostgreSQL Agent 2'
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  x: '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Locks'
+                        host: 'PostgreSQL Agent 2'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Number of bloating tables'
-                    host: 'PostgreSQL Agent 2'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Size'
+                        host: 'PostgreSQL Agent 2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Number of bloating tables'
+                        host: 'PostgreSQL Agent 2'
       valuemaps:
         -
           name: 'PostgreSQL recovery role'

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package serverlistener
+package zbxnet
 
 import (
 	"fmt"
@@ -128,7 +128,7 @@ func (tc *testCase) checkResult() error {
 	options.Server = tc.allowed
 	peerip := net.ParseIP(tc.peer)
 
-	if ap, err := GetAllowedPeers(&options); err == nil {
+	if ap, err := GetAllowedPeers(options.Server); err == nil {
 		allow := ap.CheckPeer(peerip)
 
 		if allow != true && tc.fail == false {

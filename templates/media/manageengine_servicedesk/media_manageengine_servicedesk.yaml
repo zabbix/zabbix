@@ -1,0 +1,466 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-04-26T13:40:40Z'
+  media_types:
+    -
+      name: 'ManageEngine ServiceDesk'
+      type: WEBHOOK
+      parameters:
+        22:
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        0:
+          name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        1:
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        2:
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        3:
+          name: event_value
+          value: '{EVENT.VALUE}'
+        14:
+          name: 'field_ref:requester'
+          value: '<PLACE API USER NAME>'
+        11:
+          name: 'field_string:description'
+          value: '{ALERT.MESSAGE}'
+        13:
+          name: 'field_string:subject'
+          value: '{ALERT.SUBJECT}'
+        15:
+          name: priority_average
+          value: Normal
+        16:
+          name: priority_default
+          value: Normal
+        17:
+          name: priority_disaster
+          value: High
+        18:
+          name: priority_high
+          value: High
+        19:
+          name: priority_information
+          value: Low
+        20:
+          name: priority_not_classified
+          value: Low
+        21:
+          name: priority_warning
+          value: Medium
+        8:
+          name: sd_on_demand_client_id
+          value: '<PLACE ON DEMAND CLIENT ID>'
+        9:
+          name: sd_on_demand_client_secret
+          value: '<PLACE ON DEMAND CLIENT SECRET>'
+        10:
+          name: sd_on_demand_refresh_token
+          value: '<PLACE ON DEMAND REFRESH TOKEN>'
+        23:
+          name: sd_on_demand_url_auth
+          value: '<PLACE AUTHENTICATION URL FOR ON DEMAND>'
+        7:
+          name: sd_on_premise
+          value: 'true'
+        4:
+          name: sd_on_premise_auth_token
+          value: '<PLACE ON PREMISE TECHNICIAN_KEY>'
+        12:
+          name: sd_request_id
+          value: '{EVENT.TAGS.__zbx_sd_request_id}'
+        5:
+          name: sd_url
+          value: '<PLACE INSTANCE URL>'
+        6:
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+      script: |
+        var MEngine = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                MEngine.params = params;
+                if (typeof MEngine.params.url === 'string') {
+                    if (!MEngine.params.url.endsWith('/')) {
+                        MEngine.params.url += '/';
+                    }
+        
+                    MEngine.params.url += 'api/v3/';
+                }
+        
+                if (MEngine.params.on_premise.toLowerCase() !== 'true'
+                        && typeof MEngine.params.on_demand_url_auth === 'string') {
+                    if (!MEngine.params.on_demand_url_auth.endsWith('/')) {
+                        MEngine.params.on_demand_url_auth += '/';
+                    }
+        
+                    MEngine.params.on_demand_url_auth += 'oauth/v2/token?';
+                }
+            },
+        
+            setProxy: function (HTTPProxy) {
+                MEngine.HTTPProxy = HTTPProxy;
+            },
+        
+            createLink: function (id, url) {
+                return url + (url.endsWith('/') ? '' : '/') +
+                    ((MEngine.params.on_premise.toLowerCase() === 'true')
+                        ? ('WorkOrder.do?woMode=viewWO&woID=' + id)
+                        : ('app/itdesk/ui/requests/' + id + '/details')
+                    );
+            },
+        
+            refreshAccessToken: function () {
+                [
+                    'on_demand_url_auth',
+                    'on_demand_refresh_token',
+                    'on_demand_client_id',
+                    'on_demand_client_secret'
+                ].forEach(function (field) {
+                    if (typeof MEngine.params !== 'object' || typeof MEngine.params[field] === 'undefined'
+                            || MEngine.params[field].trim() === '' ) {
+                        throw 'Required MEngine param is not set: "sd_' + field + '".';
+                    }
+                });
+        
+                var response,
+                    request = new HttpRequest(),
+                    url = MEngine.params.on_demand_url_auth +
+                        'refresh_token=' + encodeURIComponent(MEngine.params.on_demand_refresh_token) +
+                        '&grant_type=refresh_token&client_id=' + encodeURIComponent(MEngine.params.on_demand_client_id) +
+                        '&client_secret=' + encodeURIComponent(MEngine.params.on_demand_client_secret) +
+                        '&redirect_uri=https://www.zoho.com&scope=SDPOnDemand.requests.ALL';
+        
+                if (MEngine.HTTPProxy) {
+                    request.setProxy(MEngine.HTTPProxy);
+                }
+        
+                Zabbix.log(4, '[ ManageEngine Webhook ] Refreshing access token. Request: ' + url);
+        
+                response = request.post(url);
+        
+                Zabbix.log(4, '[ ManageEngine Webhook ] Received response with status code ' +
+                request.getStatus() + '\n' + response);
+        
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ ManageEngine Webhook ] Failed to parse response received from Zoho Accounts');
+                }
+        
+                if ((request.getStatus() < 200 || request.getStatus() >= 300) && !response.access_token) {
+                    throw 'Access token refresh failed with HTTP status code ' + request.getStatus() +
+                        '. Check debug log for more information.';
+                }
+                else {
+                    MEngine.params.on_demand_auth_token = response.access_token;
+                }
+            },
+        
+            request: function (method, query, data) {
+                var response,
+                    url = MEngine.params.url + query,
+                    input,
+                    request = new HttpRequest(),
+                    message;
+        
+                if (MEngine.params.on_premise.toLowerCase() === 'true') {
+                    request.addHeader('TECHNICIAN_KEY: ' + MEngine.params.on_premise_auth_token);
+                }
+                else {
+                    request.addHeader('Authorization: Zoho-oauthtoken ' + MEngine.params.on_demand_auth_token);
+                    request.addHeader('Accept: application/v3+json');
+                }
+        
+                if (MEngine.HTTPProxy) {
+                    request.setProxy(MEngine.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                input = 'input_data=' + encodeURIComponent(data);
+                Zabbix.log(4, '[ ManageEngine Webhook ] Sending request: ' + url + '?' + input);
+        
+                switch (method) {
+                    case 'post':
+                        response = request.post(url, input);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, input);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ ManageEngine Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+        
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ ManageEngine Webhook ] Failed to parse response received from ManageEngine');
+                }
+        
+                if ((request.getStatus() < 200 || request.getStatus() >= 300)
+                        && typeof response.response_status !== 'object') {
+                    throw 'Request failed with HTTP status code ' + request.getStatus() +
+                        '. Check debug log for more information.';
+                }
+                else if (typeof response.response_status === 'object' && response.response_status.status === 'failed') {
+                    message = 'Request failed with status_code ';
+        
+                    if (typeof response.response_status.messages === 'object'
+                            && response.response_status.messages[0]
+                            && response.response_status.messages[0].message) {
+                        message += response.response_status.messages[0].status_code +
+                            '. Message: ' + response.response_status.messages[0].message;
+                    }
+                    else {
+                        message += response.response_status.status_code;
+                    }
+        
+                    message += '. Check debug log for more information.';
+                    throw message;
+                }
+                else if (response.request) {
+                    return response.request.id;
+                }
+            },
+        
+            createPaylaod: function (fields, isNote) {
+                var data = {},
+                    result;
+        
+                if (isNote) {
+                    data.description = fields['field_string:description'].replace(/(?:\r\n|\r|\n)/g, '<br>');
+                    result = {request_note: data};
+                }
+                else {
+                    Object.keys(fields)
+                        .forEach(function(field) {
+                            if (fields[field].trim() === '') {
+                                Zabbix.log(4, '[ ManageEngine Webhook ] Field "' + field +
+                                    '" can\'t be empty. The field ignored.');
+                            }
+                            else {
+                                try {
+                                    var prefix = field.split(':')[0],
+                                        root;
+        
+                                    if  (prefix.startsWith('udf_') && !data.udf_fields) {
+                                        data.udf_fields = {};
+                                        root = data.udf_fields;
+                                    }
+                                    else if (prefix.startsWith('udf_')) {
+                                        root = data.udf_fields;
+                                    }
+                                    else {
+                                        root = data;
+                                    }
+        
+                                    if (prefix.endsWith('string')) {
+                                        root[field.substring(field.indexOf(':') + 1)
+                                            .toLowerCase()] = fields[field];
+                                    }
+                                    else {
+                                        root[field.substring(field.indexOf(':') + 1)
+                                            .toLowerCase()] = {
+                                            name: fields[field]
+                                        };
+                                    }
+                                }
+                                catch (error) {
+                                    Zabbix.log(4, '[ ManageEngine Webhook ] Can\'t parse field "' + field +
+                                        '". The field ignored.');
+                                }
+                            }
+                        });
+                    if (data.description) {
+                        data.description = data.description.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                    }
+        
+                    result = {request: data};
+                }
+        
+                return result;
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                fields = {},
+                sd = {},
+                result = {tags: {}},
+                required_params = [
+                    'sd_on_premise', 'field_string:subject', 'field_string:description',
+                    'event_recovery_value', 'event_source', 'event_value', 'event_update_status'
+                ],
+                severities = [
+                    {name: 'not_classified', color: '#97AAB3'},
+                    {name: 'information', color: '#7499FF'},
+                    {name: 'warning', color: '#FFC859'},
+                    {name: 'average', color: '#FFA059'},
+                    {name: 'high', color: '#E97659'},
+                    {name: 'disaster', color: '#E45959'},
+                    {name: 'default', color: '#000000'}
+                ];
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('sd_')) {
+                        sd[key.substring(3)] = params[key];
+                    }
+                    else if (key.startsWith('field_') || key.startsWith('udf_field_')) {
+                        fields[key] = params[key];
+                    }
+        
+                    if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '6';
+            }
+        
+            if (params.event_update_status === '1' && (typeof params.sd_request_id === 'undefined'
+                    || params.sd_request_id.trim() === ''
+                    || params.sd_request_id === '{EVENT.TAGS.__zbx_sd_request_id}')) {
+                throw 'Parameter "sd_request_id" can\'t be empty for update operation.';
+            }
+        
+            MEngine.setParams(sd);
+            MEngine.setProxy(params.HTTPProxy);
+        
+            if (MEngine.params.on_premise.toLowerCase() !== 'true') {
+                MEngine.refreshAccessToken();
+            }
+        
+            // Create issue for non trigger-based events.
+            if (params.event_source !== '0' && params.event_recovery_value !== '0') {
+                fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
+                || 'Normal';
+        
+                MEngine.request('post', 'requests', MEngine.createPaylaod(fields));
+            }
+            // Create issue for trigger-based events.
+            else if (params.event_value === '1' && params.event_update_status === '0') {
+                fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
+                || 'Normal';
+        
+                var id = MEngine.request('post', 'requests', MEngine.createPaylaod(fields));
+        
+                result.tags.__zbx_sd_request_id = id;
+                result.tags.__zbx_sd_request_link = MEngine.createLink(id, params.sd_url);
+            }
+            // Update created issue for trigger-based event.
+            else {
+                if (params.event_update_status === '1') {
+                    MEngine.request('post', 'requests/' + params.sd_request_id + '/notes',
+                        MEngine.createPaylaod(fields, true)
+                    );
+                }
+                delete fields['field_string:description'];
+                MEngine.request('put', 'requests/' + params.sd_request_id, MEngine.createPaylaod(fields));
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ ManageEngine Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_sd_request_link}'
+      event_menu_name: 'ManageEngine: {EVENT.TAGS.__zbx_sd_request_id}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

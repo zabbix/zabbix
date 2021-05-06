@@ -3706,6 +3706,126 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/id',
 				null
+			],
+			[
+				['type' => API_DATE],
+				null,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'',
+				'/1/date',
+				''
+			],
+			[
+				['type' => API_DATE, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/date',
+				'Invalid parameter "/1/date": cannot be empty.'
+			],
+			[
+				['type' => API_DATE],
+				[],
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				true,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				false,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'aaa',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'123',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				456,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'01-01-2000',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'01-2000-01',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-99-01',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-01-99',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-01-31',
+				'/1/date',
+				'2000-01-31'
+			],
+			[
+				['type' => API_DATE],
+				'2000-02-29',
+				'/1/date',
+				'2000-02-29'
+			],
+			[
+				['type' => API_DATE],
+				'2001-02-29',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'1900-01-01',
+				'/1/date',
+				'Invalid parameter "/1/date": value must be between "1970-01-01" and "2038-01-18".'
+			],
+			[
+				['type' => API_DATE],
+				'1970-01-01',
+				'/1/date',
+				'1970-01-01'
+			],
+			[
+				['type' => API_DATE],
+				'2100-01-01',
+				'/1/date',
+				'Invalid parameter "/1/date": value must be between "1970-01-01" and "2038-01-18".'
+			],
+			[
+				['type' => API_DATE],
+				'2038-01-18',
+				'/1/date',
+				'2038-01-18'
 			]
 		];
 	}

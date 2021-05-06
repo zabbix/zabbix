@@ -1357,6 +1357,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "history poller";
 		case ZBX_PROCESS_TYPE_AVAILMAN:
 			return "availability manager";
+		case ZBX_PROCESS_TYPE_REPORTMANAGER:
+			return "report manager";
+		case ZBX_PROCESS_TYPE_REPORTWRITER:
+			return "report writer";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

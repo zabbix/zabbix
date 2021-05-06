@@ -164,6 +164,7 @@ class CDateSelector extends CTag {
 				(new CTextBox($this->name, $this->value))
 					->setId($this->name)
 					->setAttribute('placeholder', $this->placeholder)
+					->setAttribute('maxlength', strlen(date($this->date_format)))
 					->setAriaRequired($this->is_required)
 					->setEnabled($this->enabled)
 					->setReadonly($this->readonly)
