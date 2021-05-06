@@ -213,11 +213,11 @@ class CHistFunctionValidator extends CValidator {
 	}
 
 	private static function validateQuery(string $host, string $item, array $options): bool {
-		if (!$options['calculated']) {
-			return true;
+		if ($options['calculated']) {
+			return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
 		}
 
-		return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
+		return ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD);
 	}
 
 	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
