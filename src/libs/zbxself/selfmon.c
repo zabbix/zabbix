@@ -19,6 +19,7 @@
 
 #include "zbxself.h"
 #include "common.h"
+#include "selfmon.h"
 
 #ifndef _WINDOWS
 #	include "mutexs.h"
@@ -209,8 +210,7 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_AVAILMAN_FORKS;
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	return get_component_process_type_forks(proc_type);
 }
 
 #ifndef _WINDOWS

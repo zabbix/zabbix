@@ -90,74 +90,17 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
-	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', SHOW_DATA)))
-		->addVar('type', SHOW_DATA)
-		->setProfile($data['profileIdx'])
-		->setActiveTab($data['active_tab'])
-		->addFilterTab(_('Filter'), [
-			(new CFormList())
-				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
-					(new CMultiSelect([
-						'multiple' => true,
-						'name' => 'filter_groupids[]',
-						'object_name' => 'hostGroup',
-						'data' => $data['filter']['groups'],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'host_groups',
-								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_groupids_',
-								'with_monitored_items' => true
-							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
-					(new CMultiSelect([
-						'multiple' => true,
-						'name' => 'filter_hostids[]',
-						'object_name' => 'hosts',
-						'data' => $data['filter']['hosts'],
-						'popup' => [
-							'filter_preselect_fields' => [
-								'hostgroups' => 'filter_groupids_'
-							],
-							'parameters' => [
-								'srctbl' => 'hosts',
-								'srcfld1' => 'hostid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_hostids_',
-								'monitored_hosts' => true,
-								'with_monitored_items' => true
-							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow(_('Application'), [
-					(new CTextBox('application', $data['filter']['application']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CButton('application_name', _('Select')))
-						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic", jQuery.extend('.
-							json_encode([
-								'srctbl' => 'applications',
-								'srcfld1' => 'name',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'application',
-								'real_hosts' => '1',
-								'with_applications' => '1'
-							]).', getFirstMultiselectValue("filter_hostids_", "filter_groupids_")), null, this);'
-						)
-				])
-				->addRow(_('Show suppressed problems'),
-					(new CCheckBox('show_suppressed'))->setChecked(
-						$data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE
-					)
-				)
-		])
-	);
+	$widget->addItem(new CPartial('common.filter.item', [
+		'filter' => [
+			'groups' => $data['filter']['groups'],
+			'hosts' => $data['filter']['hosts'],
+			'show_suppressed' => $data['filter']['show_suppressed'],
+			'tags' => $data['filter']['tags'],
+			'evaltype' => $data['filter']['evaltype']
+		],
+		'profileIdx' => $data['profileIdx'],
+		'active_tab' => $data['active_tab']
+	]));
 }
 
 $partial = ($data['view_style'] == STYLE_TOP) ? 'dataoverview.table.top' : 'dataoverview.table.left';

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T08:10:37Z'
+  date: '2021-02-23T11:04:43Z'
   groups:
     -
       name: Templates/Applications
@@ -19,11 +19,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Jenkins
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Jenkins: Get computer info'
@@ -35,16 +30,16 @@ zabbix_export:
           authtype: BASIC
           username: '{$JENKINS.USER}'
           password: '{$JENKINS.API.TOKEN}'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
-              error_handler: DISCARD_VALUE
           url: '{$JENKINS.URL}/computer/api/json'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Jenkins: File descriptor ratio'
           type: DEPENDENT
@@ -54,9 +49,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The ratio of used to total file descriptors'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -68,6 +60,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
           triggers:
             -
               expression: '{min(5m)}>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
@@ -80,9 +76,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Returns FAIL if any of the Jenkins disk space monitors are reporting the disk space as less than the configured threshold.'
-          applications:
-            -
-              name: Jenkins
           valuemap:
             name: 'Jenkins healthcheck'
           preprocessing:
@@ -100,6 +93,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Disk space check message'
           type: DEPENDENT
@@ -109,9 +106,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The message will reference the first node which fails this check.  There may be other nodes that fail the check, but this health check is designed to fail fast.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -124,6 +118,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Executors count'
           type: DEPENDENT
@@ -131,9 +129,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of executors available to Jenkins. This is corresponds to the sum of all the executors of all the on-line nodes.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -145,6 +140,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Executors free'
           type: DEPENDENT
@@ -152,9 +151,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of executors available to Jenkins that are not currently in use.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -162,6 +158,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.executor.free.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Executors in use'
           type: DEPENDENT
@@ -169,9 +169,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of executors available to Jenkins that are currently in use.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -179,6 +176,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.executor.in-use.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Get service metrics'
           type: HTTP_AGENT
@@ -186,17 +187,17 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
-              error_handler: DISCARD_VALUE
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/metrics'
           status_codes: ''
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Jenkins: Get healthcheck'
           type: HTTP_AGENT
@@ -204,17 +205,17 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
-              error_handler: DISCARD_VALUE
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/healthcheck'
           status_codes: ''
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Jenkins: HTTP active requests, rate'
           type: DEPENDENT
@@ -224,9 +225,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The number of currently active requests against the Jenkins master Web UI.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -238,6 +236,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 400, rate'
           type: DEPENDENT
@@ -247,9 +249,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/400 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -261,6 +260,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 201, rate'
           type: DEPENDENT
@@ -270,9 +273,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/201 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -284,6 +284,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 403, rate'
           type: DEPENDENT
@@ -293,9 +297,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/403 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -307,6 +308,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 404, rate'
           type: DEPENDENT
@@ -316,9 +321,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/404 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -330,6 +332,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 304, rate'
           type: DEPENDENT
@@ -339,9 +345,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/304 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -353,6 +356,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 204, rate'
           type: DEPENDENT
@@ -362,9 +369,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/204 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -376,6 +380,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 200, rate'
           type: DEPENDENT
@@ -385,9 +393,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/200 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -399,6 +404,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response other, rate'
           type: DEPENDENT
@@ -408,9 +417,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a non-informational status code that is not in the list: HTTP/200, HTTP/201, HTTP/204, HTTP/304, HTTP/400, HTTP/403, HTTP/404, HTTP/500, or HTTP/503.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -422,6 +428,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP requests, rate'
           type: DEPENDENT
@@ -431,9 +441,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is receiving requests.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -445,6 +452,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP requests, median'
           type: DEPENDENT
@@ -454,9 +465,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The time spent generating the corresponding responses.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -464,6 +472,10 @@ zabbix_export:
                 - '$.timers.[''http.requests''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP requests, p95'
           type: DEPENDENT
@@ -473,9 +485,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The time spent generating the corresponding responses.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -483,6 +492,10 @@ zabbix_export:
                 - '$.timers.[''http.requests''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 500, rate'
           type: DEPENDENT
@@ -492,9 +505,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/500 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -506,6 +516,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: HTTP response 503, rate'
           type: DEPENDENT
@@ -515,9 +529,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/503 status code.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -529,6 +540,10 @@ zabbix_export:
                 - ''
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job blocked duration, median'
           type: DEPENDENT
@@ -538,9 +553,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The amount of time which jobs spend in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -548,6 +560,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.blocked.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job blocked duration, p95'
           type: DEPENDENT
@@ -557,9 +573,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The amount of time which jobs spend in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -567,6 +580,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.blocked.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job blocked, m1 rate'
           type: DEPENDENT
@@ -575,9 +592,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs in the build queue enter the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -585,6 +599,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.blocked.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job blocked, m5 rate'
           type: DEPENDENT
@@ -593,9 +611,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs in the build queue enter the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -603,6 +618,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.blocked.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job buildable duration, median'
           type: DEPENDENT
@@ -611,10 +630,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The amount of time which jobs spend inthe buildable state.'
-          applications:
-            -
-              name: Jenkins
+          description: 'The amount of time which jobs spend in the buildable state.'
           preprocessing:
             -
               type: JSONPATH
@@ -622,6 +638,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.buildable.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job buildable duration, p95'
           type: DEPENDENT
@@ -630,10 +650,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The amount of time which jobs spend inthe buildable state.'
-          applications:
-            -
-              name: Jenkins
+          description: 'The amount of time which jobs spend in the buildable state.'
           preprocessing:
             -
               type: JSONPATH
@@ -641,6 +658,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.buildable.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job buildable, m1 rate'
           type: DEPENDENT
@@ -649,9 +670,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs in the build queue enter the buildable state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -659,6 +677,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.buildable.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job buildable, m5 rate'
           type: DEPENDENT
@@ -667,9 +689,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs in the build queue enter the buildable state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -677,6 +696,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.buildable.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job building duration, median'
           type: DEPENDENT
@@ -686,9 +709,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The amount of time which jobs spend building.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -696,6 +716,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.building.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job building duration, p95'
           type: DEPENDENT
@@ -705,9 +729,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The amount of time which jobs spend building.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -715,6 +736,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.building.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job building, m1 rate'
           type: DEPENDENT
@@ -723,9 +748,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are built.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -733,6 +755,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.building.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job building, m5 rate'
           type: DEPENDENT
@@ -741,9 +767,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are built.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -751,6 +774,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.building.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Jobs count'
           type: DEPENDENT
@@ -758,9 +785,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs in Jenkins.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -772,6 +796,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job queuing duration, median'
           type: DEPENDENT
@@ -781,9 +809,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total time which jobs spend in the build queue.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -791,6 +816,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.queuing.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job queuing duration, p95'
           type: DEPENDENT
@@ -800,9 +829,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total time which jobs spend in the build queue.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -810,6 +836,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.queuing.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job queuing, m1 rate'
           type: DEPENDENT
@@ -818,9 +848,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are queued.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -828,6 +855,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.queuing.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job queuing, m5 rate'
           type: DEPENDENT
@@ -836,9 +867,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are queued.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -846,6 +874,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.queuing.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job scheduled, m1 rate'
           type: DEPENDENT
@@ -854,9 +886,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are scheduled. If a job is already in the queue and an identical request for scheduling the job is received then Jenkins will coalesce the two requests. This metric gives a reasonably pure measure of the load requirements of the Jenkins master as it is unaffected by the number of executors available to the system.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -864,6 +893,10 @@ zabbix_export:
                 - '$.meters.[''jenkins.job.scheduled''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Jobs scheduled, m5 rate'
           type: DEPENDENT
@@ -872,9 +905,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are scheduled. If a job is already in the queue and an identical request for scheduling the job is received then Jenkins will coalesce the two requests. This metric gives a reasonably pure measure of the load requirements of the Jenkins master as it is unaffected by the number of executors available to the system.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -882,6 +912,10 @@ zabbix_export:
                 - '$.meters.[''jenkins.job.scheduled''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job total duration, median'
           type: DEPENDENT
@@ -891,9 +925,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total time which jobs spend from entering the build queue to completing building.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -901,6 +932,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.total.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job total duration, p95'
           type: DEPENDENT
@@ -910,9 +945,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total time which jobs spend from entering the build queue to completing building.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -920,6 +952,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.total.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job total, m1 rate'
           type: DEPENDENT
@@ -928,9 +964,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are queued.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -938,6 +971,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.total.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job total, m5 rate'
           type: DEPENDENT
@@ -946,9 +983,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs are queued.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -956,6 +990,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.total.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job waiting duration, median'
           type: DEPENDENT
@@ -965,9 +1003,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total amount of time that jobs spend in their quiet period.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -975,6 +1010,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.waiting.duration''].p50'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job waiting duration, p95'
           type: DEPENDENT
@@ -984,9 +1023,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total amount of time that jobs spend in their quiet period.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -994,6 +1030,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.waiting.duration''].p95'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job waiting, m1 rate'
           type: DEPENDENT
@@ -1002,9 +1042,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs enter the quiet period.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1012,6 +1049,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.waiting.duration''].m1_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Job waiting, m5 rate'
           type: DEPENDENT
@@ -1020,9 +1061,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which jobs enter the quiet period.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1030,6 +1068,10 @@ zabbix_export:
                 - '$.timers.[''jenkins.job.waiting.duration''].m5_rate'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Get jobs info'
           type: HTTP_AGENT
@@ -1041,20 +1083,20 @@ zabbix_export:
           authtype: BASIC
           username: '{$JENKINS.USER}'
           password: '{$JENKINS.API.TOKEN}'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
-              error_handler: DISCARD_VALUE
           url: '{$JENKINS.URL}/api/json'
           query_fields:
             -
               name: tree
               value: 'jobs[name,description,url,healthReport[score],lastBuild[number,result,duration,timestamp],lastSuccessfulBuild[number,result,duration,timestamp],lastFailedBuild[number,result,duration,timestamp]]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Jenkins: Nodes count'
           type: DEPENDENT
@@ -1062,9 +1104,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of build nodes available to Jenkins, both on-line and off-line.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1076,6 +1115,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Nodes offline'
           type: DEPENDENT
@@ -1083,9 +1126,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of build nodes available to Jenkins but currently off-line.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1097,6 +1137,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Nodes online'
           type: DEPENDENT
@@ -1104,9 +1148,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of build nodes available to Jenkins and currently on-line.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1118,6 +1159,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
           triggers:
             -
               expression: '{last()}=0'
@@ -1128,9 +1173,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: jenkins.ping
           history: 7d
-          applications:
-            -
-              name: Jenkins
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1153,6 +1195,10 @@ zabbix_export:
                 - 30m
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/ping'
           status_codes: ''
+          tags:
+            -
+              tag: Application
+              value: Jenkins
           triggers:
             -
               expression: '{last()}=0'
@@ -1166,9 +1212,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Returns FAIL if any of the Jenkins plugins failed to start.'
-          applications:
-            -
-              name: Jenkins
           valuemap:
             name: 'Jenkins healthcheck'
           preprocessing:
@@ -1186,6 +1229,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Plugins active'
           type: DEPENDENT
@@ -1193,9 +1240,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of plugins in the Jenkins instance that started successfully.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1207,6 +1251,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Plugins failed'
           type: DEPENDENT
@@ -1214,9 +1262,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of plugins in the Jenkins instance that failed to start. A value other than 0 is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the plugin(s) or by resolving the plugin dependency issues.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1228,6 +1273,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Plugins inactive'
           type: DEPENDENT
@@ -1235,9 +1284,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of plugins in the Jenkins instance that are not currently enabled.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1249,6 +1295,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Plugins check message'
           type: DEPENDENT
@@ -1258,9 +1308,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The message of plugins health check.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1273,6 +1320,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Plugins with update'
           type: DEPENDENT
@@ -1280,9 +1331,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of plugins in the Jenkins instance that have an newer version reported as available in the current Jenkins update center metadata held by Jenkins. This value is not indicative of an issue with Jenkins but high values can be used as a trigger to review the plugins with updates with a view to seeing whether those updates potentially contain fixes for issues that could be affecting your Jenkins instance.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1294,6 +1342,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Projects count'
           type: DEPENDENT
@@ -1301,9 +1353,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of projects.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1315,6 +1364,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Build queue, blocked'
           type: DEPENDENT
@@ -1322,9 +1375,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1332,6 +1382,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.queue.blocked.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Build queue, buildable'
           type: DEPENDENT
@@ -1339,9 +1393,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1349,6 +1400,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.queue.buildable.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Build queue, pending'
           type: DEPENDENT
@@ -1356,9 +1411,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1366,6 +1418,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.queue.pending.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Build queue, size'
           type: DEPENDENT
@@ -1373,9 +1429,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs that are in the Jenkins build queue.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1383,6 +1436,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.queue.size.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Build queue, stuck'
           type: DEPENDENT
@@ -1390,9 +1447,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1400,6 +1454,10 @@ zabbix_export:
                 - '$.gauges.[''jenkins.queue.stuck.value''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: CPU Load'
           type: DEPENDENT
@@ -1408,9 +1466,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The system load on the Jenkins master as reported by the JVM’s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1418,6 +1473,10 @@ zabbix_export:
                 - '$.gauges.[''system.cpu.load''].value'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Uptime'
           type: DEPENDENT
@@ -1426,9 +1485,6 @@ zabbix_export:
           history: 7d
           units: s
           description: 'The number of seconds since the Jenkins master JVM started.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1440,6 +1496,10 @@ zabbix_export:
                 - '0.001'
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
           triggers:
             -
               expression: '{last()}<10m'
@@ -1454,9 +1514,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Returns FAIL if any of the Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold.'
-          applications:
-            -
-              name: Jenkins
           valuemap:
             name: 'Jenkins healthcheck'
           preprocessing:
@@ -1474,6 +1531,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Temporary space check message'
           type: DEPENDENT
@@ -1483,9 +1544,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The message will reference the first node which fails this check. There may be other nodes that fail the check, but this health check is designed to fail fast.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1498,6 +1556,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Thread deadlock check'
           type: DEPENDENT
@@ -1505,9 +1567,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Returns FAIL if there are any deadlocked threads in the Jenkins master JVM.'
-          applications:
-            -
-              name: Jenkins
           valuemap:
             name: 'Jenkins healthcheck'
           preprocessing:
@@ -1525,6 +1584,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Thread deadlock check message'
           type: DEPENDENT
@@ -1534,9 +1597,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The message of thread deadlock health check.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1549,6 +1609,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.healthcheck
+          tags:
+            -
+              tag: Application
+              value: Jenkins
         -
           name: 'Jenkins: Version'
           type: DEPENDENT
@@ -1558,9 +1622,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of Jenkins server.'
-          applications:
-            -
-              name: Jenkins
           preprocessing:
             -
               type: JSONPATH
@@ -1572,6 +1633,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: jenkins.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Jenkins
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -1597,9 +1662,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total physical memory of the system, available bytes.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1608,6 +1670,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available swap space'
               type: DEPENDENT
@@ -1616,9 +1682,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Available swap space in bytes.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1627,6 +1690,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Clock difference'
               type: DEPENDENT
@@ -1636,9 +1703,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'The clock difference between the master and nodes.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1651,6 +1715,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available disk space'
               type: DEPENDENT
@@ -1659,9 +1727,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The available disk space of $JENKINS_HOME on agent.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1670,6 +1735,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Idle'
               type: DEPENDENT
@@ -1677,9 +1746,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Returns true if all the executors of this computer are idle.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               valuemap:
                 name: 'Computer state'
               preprocessing:
@@ -1697,6 +1763,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Executors'
               type: DEPENDENT
@@ -1704,9 +1774,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The maximum number of concurrent builds that Jenkins may perform on this node.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1715,6 +1782,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Offline cause reason'
               type: DEPENDENT
@@ -1724,9 +1795,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'If the computer was offline (either temporarily or not), will return the cause as a string (without user info). Empty string if the system was put offline without given a cause.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1738,6 +1806,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Response time average'
               type: DEPENDENT
@@ -1746,9 +1818,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'The round trip network response time from the master to the agent'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1761,6 +1830,10 @@ zabbix_export:
                     - '0.001'
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: State'
               type: DEPENDENT
@@ -1770,9 +1843,6 @@ zabbix_export:
               description: |
                 Represents the actual online/offline state.
                 Node description: {#DESCRIPTION}
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               valuemap:
                 name: 'Computer online'
               preprocessing:
@@ -1790,6 +1860,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Temporarily offline'
               type: DEPENDENT
@@ -1797,9 +1871,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Returns true if this node is marked temporarily offline.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               valuemap:
                 name: 'Computer state'
               preprocessing:
@@ -1817,6 +1888,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available temp space'
               type: DEPENDENT
@@ -1825,9 +1900,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The available disk space of the temporary directory. Java tools and tests/builds often create files in the temporary directory, and may not function properly if there''s no available space.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1836,6 +1908,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total physical memory'
               type: DEPENDENT
@@ -1844,9 +1920,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total physical memory of the system, in bytes.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1855,6 +1928,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
             -
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total swap space'
               type: DEPENDENT
@@ -1863,9 +1940,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total number of swap space in bytes.'
-              application_prototypes:
-                -
-                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1874,6 +1948,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: jenkins.computer_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
           trigger_prototypes:
             -
               expression: '{Jenkins by HTTP:jenkins.computer.state[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
@@ -1958,9 +2036,6 @@ zabbix_export:
                 Represents health of project. A number between 0-100.
                 Job Description: {#DESCRIPTION}
                 Job Url: {#URL}
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1973,6 +2048,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
               trigger_prototypes:
                 -
                   expression: '{last()}<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
@@ -1987,9 +2066,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Build duration (in seconds).'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2006,6 +2082,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Build number'
               type: DEPENDENT
@@ -2013,9 +2093,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Details: {#URL}/lastBuild/'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2028,6 +2105,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Build result'
               type: DEPENDENT
@@ -2036,9 +2117,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2051,6 +2129,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Build timestamp'
               type: DEPENDENT
@@ -2058,9 +2140,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2077,6 +2156,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Failed Build duration'
               type: DEPENDENT
@@ -2085,9 +2168,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Build duration (in seconds).'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2104,6 +2184,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Failed Build number'
               type: DEPENDENT
@@ -2111,9 +2195,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Details: {#URL}/lastFailedBuild/'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2126,6 +2207,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Failed Build timestamp'
               type: DEPENDENT
@@ -2133,9 +2218,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2152,6 +2234,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Successful Build duration'
               type: DEPENDENT
@@ -2160,9 +2246,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Build duration (in seconds).'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2179,6 +2262,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Successful Build number'
               type: DEPENDENT
@@ -2186,9 +2273,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Details: {#URL}/lastSuccessfulBuild/'
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2201,6 +2285,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
             -
               name: 'Jenkins job [{#NAME}]: Last Successful Build timestamp'
               type: DEPENDENT
@@ -2208,9 +2296,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Jenkins job [{#NAME}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2227,6 +2312,10 @@ zabbix_export:
                     - 30m
               master_item:
                 key: jenkins.job_info
+              tags:
+                -
+                  tag: Application
+                  value: 'Jenkins job [{#NAME}]'
           url: '{$JENKINS.URL}/api/json'
           query_fields:
             -

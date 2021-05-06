@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-17T14:10:15Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:37Z'
   groups:
     -
       name: Templates/Applications
@@ -19,11 +19,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: 'Zabbix raw items'
-        -
-          name: Zookeeper
       items:
         -
           name: 'Zookeeper: Approximate data size'
@@ -33,9 +28,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Data tree size in bytes.The size includes the znode path and its value.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -43,6 +35,10 @@ zabbix_export:
                 - $.approximate_data_size
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Election time, avg'
           type: DEPENDENT
@@ -52,9 +48,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Time between entering and leaving election.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -68,6 +61,10 @@ zabbix_export:
                   return res;
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Fsync time, avg'
           type: DEPENDENT
@@ -77,9 +74,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Time to fsync transaction log.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -93,6 +87,10 @@ zabbix_export:
                   return res;
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Latency, avg'
           type: DEPENDENT
@@ -102,9 +100,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'The average amount of time it takes for the server to respond to a client request.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -112,6 +107,10 @@ zabbix_export:
                 - $.avg_latency
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Snapshot write time, avg'
           type: DEPENDENT
@@ -121,9 +120,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Average time to write a snapshot.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -137,6 +133,10 @@ zabbix_export:
                   return res;
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Bytes received per sec'
           type: DEPENDENT
@@ -146,9 +146,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of bytes received per second.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -160,6 +157,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Elections'
           type: DEPENDENT
@@ -167,9 +168,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of elections happened.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -184,6 +182,10 @@ zabbix_export:
                   }
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Fsync'
           type: DEPENDENT
@@ -191,9 +193,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of performed fsyncs.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -203,6 +202,10 @@ zabbix_export:
                   return metrics.cnt_fsynctime || metrics.fsynctime_count
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Snapshot writes'
           type: DEPENDENT
@@ -210,9 +213,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of performed snapshot writes.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JAVASCRIPT
@@ -222,6 +222,10 @@ zabbix_export:
                   return metrics.snapshottime_count || metrics.cnt_snapshottime
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Commit per sec'
           type: DEPENDENT
@@ -230,9 +234,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of commits performed per second'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -244,6 +245,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Drop connections per sec'
           type: DEPENDENT
@@ -252,9 +257,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of connection drops.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -266,6 +268,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Rejected connections per sec'
           type: DEPENDENT
@@ -274,9 +280,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of connection rejected.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -288,6 +291,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Revalidate connections per sec'
           type: DEPENDENT
@@ -296,9 +303,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate ofconnection revalidations.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -310,6 +314,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Diff syncs per sec'
           type: DEPENDENT
@@ -318,9 +326,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of diff syncs performed per second'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -332,6 +337,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Ephemeral nodes count'
           type: DEPENDENT
@@ -339,9 +348,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of ephemeral nodes that a zookeeper server has in its data tree.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -349,6 +355,10 @@ zabbix_export:
                 - $.ephemerals_count
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Get connections stats'
           type: HTTP_AGENT
@@ -357,10 +367,11 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/connections'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Zookeeper: Get server metrics'
           type: HTTP_AGENT
@@ -368,10 +379,11 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/monitor'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Zookeeper: Global sessions'
           type: DEPENDENT
@@ -379,9 +391,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of global sessions.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -389,6 +398,10 @@ zabbix_export:
                 - $.global_sessions
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Local sessions'
           type: DEPENDENT
@@ -396,9 +409,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of local sessions.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -406,6 +416,10 @@ zabbix_export:
                 - $.local_sessions
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Looking per sec'
           type: DEPENDENT
@@ -414,9 +428,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of transitions into looking state.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -428,6 +439,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: File descriptors, max'
           type: DEPENDENT
@@ -435,9 +450,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Maximum number of file descriptors that a zookeeper server can open.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -449,6 +461,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Latency, max'
           type: DEPENDENT
@@ -458,9 +474,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'The maximum amount of time it takes for the server to respond to a client request.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -468,6 +481,10 @@ zabbix_export:
                 - $.max_latency
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Latency, min'
           type: DEPENDENT
@@ -477,9 +494,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'The minimum amount of time it takes for the server to respond to a client request.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -487,6 +501,10 @@ zabbix_export:
                 - $.min_latency
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Alive connections'
           type: DEPENDENT
@@ -494,9 +512,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of active clients connected to a zookeeper server.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -504,6 +519,10 @@ zabbix_export:
                 - $.num_alive_connections
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: File descriptors, open'
           type: DEPENDENT
@@ -511,9 +530,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of file descriptors that a zookeeper server has open.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -521,6 +537,10 @@ zabbix_export:
                 - $.open_file_descriptor_count
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Outstanding requests'
           type: DEPENDENT
@@ -528,9 +548,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of queued requests when the server is under load and is receiving more sustained requests than it can process.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -538,6 +555,10 @@ zabbix_export:
                 - $.outstanding_requests
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
           triggers:
             -
               expression: '{min(5m)}>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
@@ -553,9 +574,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of zookeeper packets received by a server per second.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -567,6 +585,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Packets sent per sec'
           type: DEPENDENT
@@ -575,9 +597,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of zookeeper packets sent from a server per second.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -589,6 +608,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Revalidate per sec'
           type: DEPENDENT
@@ -597,9 +620,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of revalidations.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -611,6 +631,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Server mode'
           type: DEPENDENT
@@ -620,9 +644,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -634,6 +655,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -649,9 +674,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of snap syncs performed per second'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -663,6 +685,10 @@ zabbix_export:
                 - ''
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Uptime'
           type: DEPENDENT
@@ -671,9 +697,6 @@ zabbix_export:
           history: 7d
           units: s
           description: 'Uptime of Zookeeper server.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -685,6 +708,10 @@ zabbix_export:
                 - '0.001'
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
           triggers:
             -
               expression: '{nodata(10m)}=1'
@@ -707,9 +734,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of Zookeeper server.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -726,6 +750,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -740,9 +768,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of watches currently set on the local ZooKeeper process.'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -750,6 +775,10 @@ zabbix_export:
                 - $.watch_count
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
         -
           name: 'Zookeeper: Znode count'
           type: DEPENDENT
@@ -757,9 +786,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of znodes in the ZooKeeper namespace (the data)'
-          applications:
-            -
-              name: Zookeeper
           preprocessing:
             -
               type: JSONPATH
@@ -771,6 +797,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: zookeeper.get_metrics
+          tags:
+            -
+              tag: Application
+              value: Zookeeper
       discovery_rules:
         -
           name: 'Clients discovery'
@@ -790,9 +820,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'The average amount of time it takes for the server to respond to a client request.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -800,6 +827,10 @@ zabbix_export:
                     - '$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].avg_latency.first()'
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency, max'
               type: DEPENDENT
@@ -809,9 +840,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'The maximum amount of time it takes for the server to respond to a client request.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -819,6 +847,10 @@ zabbix_export:
                     - '$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].max_latency.first()'
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency, min'
               type: DEPENDENT
@@ -828,9 +860,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'The minimum amount of time it takes for the server to respond to a client request.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -838,6 +867,10 @@ zabbix_export:
                     - '$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].min_latency.first()'
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Outstanding requests'
               type: DEPENDENT
@@ -845,9 +878,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of queued requests when the server is under load and is receiving more sustained requests than it can process.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -855,6 +885,10 @@ zabbix_export:
                     - '$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].outstanding_requests.first()'
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Packets received per sec'
               type: DEPENDENT
@@ -863,9 +897,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of packets received.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -877,6 +908,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Packets sent per sec'
               type: DEPENDENT
@@ -885,9 +920,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of packets sent.'
-              application_prototypes:
-                -
-                  name: 'Zookeeper {#TYPE} {#CLIENT}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -899,6 +931,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: zookeeper.get_connections_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Zookeeper {#TYPE} {#CLIENT}'
           graph_prototypes:
             -
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency'
@@ -973,9 +1009,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of learners.'
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -983,6 +1016,10 @@ zabbix_export:
                     - $.learners
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
             -
               name: 'Zookeeper: Pending syncs{#SINGLETON}'
               type: DEPENDENT
@@ -990,9 +1027,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of pending syncs to carry out to ZooKeeper ensemble followers.'
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -1000,6 +1034,10 @@ zabbix_export:
                     - $.pending_syncs
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}'
@@ -1012,9 +1050,6 @@ zabbix_export:
               key: 'zookeeper.quorum_size[{#SINGLETON}]'
               delay: '0'
               history: 7d
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -1022,6 +1057,10 @@ zabbix_export:
                     - $.quorum_size
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
             -
               name: 'Zookeeper: Synced followers{#SINGLETON}'
               type: DEPENDENT
@@ -1029,9 +1068,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of synced followers reported when a node server_state is leader.'
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -1039,6 +1075,10 @@ zabbix_export:
                     - $.synced_followers
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
             -
               name: 'Zookeeper: Synced non-voting follower{#SINGLETON}'
               type: DEPENDENT
@@ -1046,9 +1086,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of synced voting followers reported when a node server_state is leader.'
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -1056,6 +1093,10 @@ zabbix_export:
                     - $.synced_non_voting_followers
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
             -
               name: 'Zookeeper: Synced observers{#SINGLETON}'
               type: DEPENDENT
@@ -1063,9 +1104,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of synced observers.'
-              applications:
-                -
-                  name: Zookeeper
               preprocessing:
                 -
                   type: JSONPATH
@@ -1073,6 +1111,10 @@ zabbix_export:
                     - $.synced_observers
               master_item:
                 key: zookeeper.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: Zookeeper
           trigger_prototypes:
             -
               expression: '{Zookeeper by HTTP:zookeeper.synced_followers[{#SINGLETON}].last()} < {Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1'
@@ -1098,7 +1140,7 @@ zabbix_export:
         -
           macro: '{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'
           value: '85'
-          description: 'Maximum percentage of file descriptors usage alert treshold (for trigger expression).'
+          description: 'Maximum percentage of file descriptors usage alert threshold (for trigger expression).'
         -
           macro: '{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
           value: '10'

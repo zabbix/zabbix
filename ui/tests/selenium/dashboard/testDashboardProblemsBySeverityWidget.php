@@ -568,8 +568,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			'pages' => [
 				[
 					'name' => 'Test Dashboard Page',
-				'display_period' => 1800,
-				'widgets' => array_values($widgets)
+					'display_period' => 1800,
+					'widgets' => array_values($widgets)
 				]
 			]
 		]);

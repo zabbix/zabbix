@@ -1218,6 +1218,18 @@ td.inactive-bg {
 	}
 }
 
+.icon-user {
+	&::before {
+		background-position: -419px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -419px -8px;
+	}
+}
+
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

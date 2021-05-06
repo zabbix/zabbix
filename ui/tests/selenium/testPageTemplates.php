@@ -43,8 +43,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName);
 
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',
-				'Dashboards', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
+		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web',
+				'Linked templates', 'Linked to templates', 'Tags'
+		];
 		$this->assertSame($headers, $table->getHeadersText());
 
 		foreach (['Export', 'Mass update', 'Delete', 'Delete and clear'] as $button) {
@@ -58,8 +59,8 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allTemplates
-	*/
+	 * @dataProvider allTemplates
+	 */
 	public function testPageTemplates_SimpleUpdate($template) {
 		$host = $template['host'];
 		$name = $template['name'];
@@ -81,8 +82,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false)->isValid() === false) {
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 2; $i++) {
+			if ($this->query('link', $name)->one(false)->isValid() === true) {
+				break;
+			}
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}

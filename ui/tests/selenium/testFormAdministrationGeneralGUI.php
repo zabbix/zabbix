@@ -30,7 +30,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public $default = [
 		'Default language' => 'English (en_GB)',
-		'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
+		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
 		'Limit for search and filter results' => '1000',
 		'Max number of columns and rows in overview tables' => '50',
@@ -123,7 +123,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Default language' => 'English (en_US)',
-						'Default time zone' => '(UTC+00:00) UTC',
+						'Default time zone' => 'UTC',
 						'Default theme' => 'Dark',
 						'Limit for search and filter results' => '1',
 						'Max number of columns and rows in overview tables' => '5',
@@ -270,7 +270,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
+						'Default time zone' => 'System',
 						'Default theme' => 'High-contrast dark',
 						'Max history display period' => '604800',
 						'Time filter default period' => '315360000',
@@ -352,7 +352,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => '(UTC+14:00) Pacific/Kiritimati',
+						'Default time zone' => 'Pacific/Kiritimati',
 						'Default theme' => 'High-contrast light',
 						'Limit for search and filter results' => '999999',
 						'Max number of columns and rows in overview tables' => '999999',
@@ -1013,7 +1013,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
 				// Days count for the case when current or past year is leap year.
-				$days_count = (new DateTime())->diff((new DateTime())->sub(new DateInterval('P1Y')))->days;
+				$days_count = CDateTimeHelper::countDays();
 				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
 						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
 				break;

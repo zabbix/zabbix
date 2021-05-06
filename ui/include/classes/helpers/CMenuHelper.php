@@ -111,6 +111,11 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SYSTEM_INFO)
 				? (new CMenuItem(_('System information')))->setAction('report.status')
 				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
+				? (new CMenuItem(_('Scheduled reports')))
+					->setAction('scheduledreport.list')
+					->setAliases(['scheduledreport.edit'])
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
 				? (new CMenuItem(_('Availability report')))
 					->setUrl(new CUrl('report2.php'), 'report2.php')
@@ -159,10 +164,10 @@ class CMenuHelper {
 				? (new CMenuItem(_('Hosts')))
 					->setUrl(new CUrl('hosts.php'), 'hosts.php')
 					->setAliases([
-						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
-						'graphs.php?context=host', 'host_discovery.php?context=host',
-						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
-						'host_prototypes.php?context=host', 'httpconf.php?context=host'
+						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
+						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
+						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
+						'httpconf.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)

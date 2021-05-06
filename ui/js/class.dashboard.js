@@ -525,11 +525,38 @@ class CDashboard extends CBaseComponent {
 					widgets[i].fields = response.widgets[i].fields;
 				}
 
+				const used_references = this._getUsedReferences();
+				const reference_substitution = new Map();
+
+				for (const widget of widgets) {
+					const reference_field = this._widget_defaults[widget.type].reference_field;
+
+					if (reference_field !== null) {
+						const old_reference = widget.fields[reference_field];
+						const new_reference = this._createReference({used_references});
+
+						widget.fields[reference_field] = new_reference;
+
+						used_references.add(new_reference);
+						reference_substitution.set(old_reference, new_reference);
+					}
+				}
+
+				for (const widget of widgets) {
+					for (const reference_field of this._widget_defaults[widget.type].foreign_reference_fields) {
+						const old_reference = widget.fields[reference_field];
+
+						if (reference_substitution.has(old_reference)) {
+							widget.fields[reference_field] = reference_substitution.get(old_reference);
+						}
+					}
+				}
+
 				const dashboard_page = this.addDashboardPage({
 					dashboard_pageid: null,
 					name: new_dashboard_page_data.name,
 					display_period: new_dashboard_page_data.display_period,
-					widgets: widgets
+					widgets
 				});
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
@@ -573,6 +600,29 @@ class CDashboard extends CBaseComponent {
 
 		if (widget !== null) {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
+		}
+
+		const reference_field = this._widget_defaults[new_widget_data.type].reference_field;
+
+		if (reference_field !== null) {
+			new_widget_data.fields[reference_field] = this._createReference();
+		}
+
+		let references = [];
+
+		for (const widget of dashboard_page.getWidgets()) {
+			const reference_field = this._widget_defaults[widget.getType()].reference_field;
+
+			if (reference_field !== null) {
+				references.push(widget.getFields()[reference_field]);
+			}
+		}
+
+		for (const reference_field of this._widget_defaults[new_widget_data.type].foreign_reference_fields) {
+			if (reference_field in new_widget_data.fields
+					&& !references.includes(new_widget_data.fields[reference_field])) {
+				new_widget_data.fields[reference_field] = '';
+			}
 		}
 
 		const paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
@@ -1177,6 +1227,10 @@ class CDashboard extends CBaseComponent {
 					return;
 				}
 
+				if (this._widget_defaults[type].reference_field !== null) {
+					fields[this._widget_defaults[type].reference_field] = this._createReference();
+				}
+
 				const widget_data = {
 					type,
 					name,
@@ -1539,6 +1593,46 @@ class CDashboard extends CBaseComponent {
 
 	_createUniqueId() {
 		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
+	}
+
+	_createReference({used_references = null} = {}) {
+		if (used_references === null) {
+			used_references = this._getUsedReferences();
+		}
+
+		let reference;
+
+		do {
+			reference = '';
+
+			for (let i = 0; i < 5; i++) {
+				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+			}
+		}
+		while (used_references.has(reference));
+
+		return reference;
+	}
+
+	_getUsedReferences() {
+		const used_references = new Set();
+
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			for (const widget of dashboard_page.getWidgets()) {
+				const type = widget.getType();
+				const fields = widget.getFields();
+
+				if (this._widget_defaults[type].reference_field !== null) {
+					used_references.add(fields[this._widget_defaults[type].reference_field]);
+				}
+
+				for (const reference_field of this._widget_defaults[type].foreign_reference_fields) {
+					used_references.add(fields[reference_field]);
+				}
+			}
+		}
+
+		return used_references;
 	}
 
 	// Internal events management methods.

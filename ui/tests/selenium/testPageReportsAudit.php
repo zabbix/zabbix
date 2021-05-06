@@ -40,7 +40,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 	private $resourcetypes = [
 		-1 => 'All',
 		AUDIT_RESOURCE_ACTION => 'Action',
-		AUDIT_RESOURCE_APPLICATION => 'Application',
 		AUDIT_RESOURCE_AUTOREGISTRATION => 'Autoregistration',
 		AUDIT_RESOURCE_ZABBIX_CONFIG => 'Configuration of Zabbix',
 		AUDIT_RESOURCE_DASHBOARD => 'Dashboard',
@@ -119,9 +118,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ACTION],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
-			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
-			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],

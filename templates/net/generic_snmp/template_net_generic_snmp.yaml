@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:31Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:34Z'
   groups:
     -
       name: 'Templates/Network devices'

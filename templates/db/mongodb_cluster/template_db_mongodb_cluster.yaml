@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-01T10:04:12Z'
+  date: '2021-04-22T11:28:28Z'
   groups:
     -
       name: Templates/Databases
@@ -22,11 +22,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: 'MongoDB sharded cluster'
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'MongoDB cluster: Configserver heartbeat'
@@ -36,9 +31,6 @@ zabbix_export:
           history: 7d
           units: s
           description: 'Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -46,9 +38,12 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connections, active'
           type: DEPENDENT
@@ -59,9 +54,6 @@ zabbix_export:
             "The number of active client connections to the server. 
             Active client connections refers to client connections that currently have operations in progress.
             Available starting in  4.0.7, 0 for older versions."
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -71,6 +63,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connections, available'
           type: DEPENDENT
@@ -78,9 +74,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: '"The number of unused incoming connections available."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -88,6 +81,10 @@ zabbix_export:
                 - $.connections.available
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{max(5m)}<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
@@ -105,9 +102,6 @@ zabbix_export:
           description: |
             "The number of incoming connections from clients to the database server. 
             This number includes the current shell session"
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -115,6 +109,10 @@ zabbix_export:
                 - $.connections.current
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: New connections, rate'
           type: DEPENDENT
@@ -123,9 +121,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: '"Rate of all incoming connections created to the server."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -137,6 +132,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: available'
           type: DEPENDENT
@@ -144,9 +143,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of available outgoing connections from the current mongos instance to other members of the sharded cluster.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -154,6 +150,10 @@ zabbix_export:
                 - $.totalAvailable
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: client connections'
           type: DEPENDENT
@@ -161,9 +161,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of active and stored outgoing synchronous connections from the current mongos instance to other members of the sharded cluster.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -171,6 +168,10 @@ zabbix_export:
                 - $.numClientConnections
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: created, rate'
           type: DEPENDENT
@@ -179,9 +180,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of outgoing connections created per second by the current mongos instance to other members of the sharded cluster.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -193,6 +191,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: in use'
           type: DEPENDENT
@@ -200,9 +202,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster set that are currently in use.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -210,6 +209,10 @@ zabbix_export:
                 - $.totalInUse
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: refreshing'
           type: DEPENDENT
@@ -217,9 +220,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster that are currently being refreshed.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -227,6 +227,10 @@ zabbix_export:
                 - $.totalRefreshing
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Connection pool: scoped'
           type: DEPENDENT
@@ -234,9 +238,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of active and stored outgoing scoped synchronous connections from the current mongos instance to other members of the sharded cluster.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -244,6 +245,10 @@ zabbix_export:
                 - $.numAScopedConnections
           master_item:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Get mongodb.connpool.stats'
           key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -251,9 +256,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Returns current info about connpool.stats.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB cluster: Cursor: open pinned'
           type: DEPENDENT
@@ -261,9 +267,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of pinned open cursors.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -271,6 +274,10 @@ zabbix_export:
                 - $.metrics.cursor.open.pinned
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Cursor: open total'
           type: DEPENDENT
@@ -278,9 +285,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of cursors that MongoDB is maintaining for clients.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -288,6 +292,10 @@ zabbix_export:
                 - $.metrics.cursor.open.total
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
@@ -301,9 +309,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of cursors that time out, per second.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -315,6 +320,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
@@ -325,9 +334,10 @@ zabbix_export:
           key: 'mongodb.jumbo_chunks.count["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: 7d
           description: 'Total number of ''jumbo'' chunks in the mongo cluster.'
-          applications:
+          tags:
             -
-              name: 'MongoDB sharded cluster'
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Last seen configserver'
           type: DEPENDENT
@@ -336,9 +346,6 @@ zabbix_export:
           history: 7d
           units: unixtime
           description: 'The latest optime of the CSRS primary that the mongos has seen.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -346,9 +353,12 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Architecture'
           type: DEPENDENT
@@ -357,9 +367,6 @@ zabbix_export:
           history: 7d
           units: bit
           description: 'A number, either 64 or 32, that indicates whether the MongoDB instance is compiled for 64-bit or 32-bit architecture.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -371,6 +378,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Memory: resident'
           type: DEPENDENT
@@ -379,9 +390,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Amount of memory currently used by the database process.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -393,6 +401,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Memory: virtual'
           type: DEPENDENT
@@ -401,9 +413,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Amount of virtual memory used by the mongos process.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -415,6 +424,10 @@ zabbix_export:
                 - '1048576'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Cursor: open no timeout'
           type: DEPENDENT
@@ -422,9 +435,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -432,6 +442,10 @@ zabbix_export:
                 - $.metrics.cursor.open.noTimeout
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Bytes in, rate'
           type: DEPENDENT
@@ -440,9 +454,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -454,6 +465,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Bytes out, rate'
           type: DEPENDENT
@@ -463,9 +478,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -477,6 +489,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Requests, rate'
           type: DEPENDENT
@@ -486,9 +502,6 @@ zabbix_export:
           value_type: FLOAT
           units: '!Rps'
           description: 'Number of distinct requests that the server has received per second'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -500,6 +513,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: command'
           type: DEPENDENT
@@ -510,9 +527,6 @@ zabbix_export:
           description: |
             "The number of commands issued to the database per second.
             Counts all commands except the write commands: insert, update, and delete."
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -524,6 +538,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: delete'
           type: DEPENDENT
@@ -532,9 +550,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: '"The number of delete operations the mongos instance per second."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -546,6 +561,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: getmore, rate'
           type: DEPENDENT
@@ -556,9 +575,6 @@ zabbix_export:
           description: |
             "The number of “getmore” operations the mongos per second. This counter can be high even if the query count is low.
             Secondary nodes send getMore operations as part of the replication process."
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -570,6 +586,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: insert, rate'
           type: DEPENDENT
@@ -578,9 +598,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: '"The number of insert operations received the mongos instance per second."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -592,6 +609,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: query, rate'
           type: DEPENDENT
@@ -600,9 +621,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: '"The number of queries received the mongos instance per second."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -614,6 +632,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Operations: update, rate'
           type: DEPENDENT
@@ -622,9 +644,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: '"The number of update operations the mongos instance per second."'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -636,15 +655,16 @@ zabbix_export:
                 - ''
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
         -
           name: 'MongoDB cluster: Ping'
           key: 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           delay: 30s
           history: 7d
           description: 'Test if a connection is alive or not.'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -652,6 +672,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{last()}=0'
@@ -665,9 +689,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The mongos statistic'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MongoDB cluster: Uptime'
           type: DEPENDENT
@@ -676,9 +701,6 @@ zabbix_export:
           history: 7d
           units: s
           description: 'Number of seconds since Mongos server start'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -686,6 +708,10 @@ zabbix_export:
                 - $.uptime
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{nodata(10m)}=1'
@@ -712,9 +738,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of the Mongos server'
-          applications:
-            -
-              name: 'MongoDB sharded cluster'
           preprocessing:
             -
               type: JSONPATH
@@ -726,6 +749,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'MongoDB sharded cluster'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -783,9 +810,7 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: |
-            Collect collections metrics.
-            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
+          description: 'Collect collections metrics.'
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
@@ -796,9 +821,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The size of the average object in the collection in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -807,6 +829,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
               type: DEPENDENT
@@ -816,9 +842,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Whether or not the collection is capped.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               valuemap:
                 name: 'MongoDB flag'
               preprocessing:
@@ -836,6 +859,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
               type: DEPENDENT
@@ -843,9 +870,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of objects in the collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -853,6 +877,10 @@ zabbix_export:
                     - $.count
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max number'
               type: DEPENDENT
@@ -861,9 +889,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Maximum number of documents in a capped collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -872,6 +897,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max size'
               type: DEPENDENT
@@ -880,9 +909,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Maximum size of a capped collection in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -891,6 +917,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
               type: DEPENDENT
@@ -898,9 +928,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of indices on the collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -908,6 +935,10 @@ zabbix_export:
                     - $.nindexes
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
               type: DEPENDENT
@@ -916,9 +947,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total size in bytes of the data in the collection plus the size of every indexes on the mongodb.collection.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -926,6 +954,10 @@ zabbix_export:
                     - $.size
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
               key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
@@ -933,9 +965,10 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Returns a variety of storage statistics for a given collection.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
               type: DEPENDENT
@@ -944,9 +977,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total storage space allocated to this collection for document storage.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -954,6 +984,10 @@ zabbix_export:
                     - $.storageSize
               master_item:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
         -
           name: 'Database discovery'
           key: 'mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -970,9 +1004,7 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: |
-            Collect database metrics.
-            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
+          description: 'Collect database metrics.'
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Size, data'
@@ -982,9 +1014,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of the data held in this database including the padding factor.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -992,6 +1021,10 @@ zabbix_export:
                     - $.dataSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Extents'
               type: DEPENDENT
@@ -999,9 +1032,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Contains a count of the number of extents in the database across all collections.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1010,6 +1040,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Size, file'
               type: DEPENDENT
@@ -1018,9 +1052,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of the data held in this database including the padding factor (only available with the mmapv1 storage engine).'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1029,6 +1060,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Size, index'
               type: DEPENDENT
@@ -1037,9 +1072,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total size of all indexes created on this database.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1047,6 +1079,10 @@ zabbix_export:
                     - $.indexSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Objects, count'
               type: DEPENDENT
@@ -1054,9 +1090,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of objects (documents) in the database across all collections.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1064,6 +1097,10 @@ zabbix_export:
                     - $.objects
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Objects, avg size'
               type: DEPENDENT
@@ -1073,9 +1110,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The average size of each document in bytes.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1083,6 +1117,10 @@ zabbix_export:
                     - $.avgObjSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
             -
               name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
               key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
@@ -1090,9 +1128,10 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Returns statistics reflecting the database system’s state.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MongoDB {#DBNAME}: Size, storage'
               type: DEPENDENT
@@ -1101,9 +1140,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total amount of space allocated to collections in this database for document storage.'
-              application_prototypes:
-                -
-                  name: 'MongoDB sharded cluster: {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1111,6 +1147,10 @@ zabbix_export:
                     - $.storageSize
               master_item:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MongoDB sharded cluster: {#DBNAME}'
           graph_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Disk usage'

@@ -28,7 +28,6 @@ class CAudit {
 	 */
 	static private $supported_type = [
 		AUDIT_RESOURCE_ACTION => 				['actionid', 'name', 'actions'],
-		AUDIT_RESOURCE_APPLICATION =>			['applicationid', 'name', 'applications'],
 		AUDIT_RESOURCE_AUTHENTICATION =>		['configid', null, 'config'],
 		AUDIT_RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token'],
 		AUDIT_RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config'],
@@ -50,6 +49,7 @@ class CAudit {
 		AUDIT_RESOURCE_MODULE =>				['moduleid', 'id', 'module'],
 		AUDIT_RESOURCE_PROXY =>					['proxyid', 'host', 'hosts'],
 		AUDIT_RESOURCE_SCENARIO =>				['httptestid', 'name', 'httptest'],
+		AUDIT_RESOURCE_SCHEDULED_REPORT =>		['reportid', 'name', 'report'],
 		AUDIT_RESOURCE_SCRIPT =>				['scriptid', 'name', 'scripts'],
 		AUDIT_RESOURCE_SETTINGS =>				['configid', null, 'config'],
 		AUDIT_RESOURCE_TEMPLATE =>				['templateid', 'name', 'hosts'],
