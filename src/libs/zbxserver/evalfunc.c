@@ -3398,8 +3398,6 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 				zbx_trim_str_list(input_ptr, '-');
 				num = num_param(input_ptr);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s: input_ptr: '%s'", __func__, input_ptr);
-
 				for (j = 0; j < num; j++)
 				{
 					int	found = 0;
