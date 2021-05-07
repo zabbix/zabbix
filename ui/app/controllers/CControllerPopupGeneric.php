@@ -1299,7 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
 				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
-				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
 				 *          this parameter is not set;
 				 */
 				$records = [];

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXHISTORY_H
 #define ZABBIX_ZBXHISTORY_H
 
+#include "zbxjson.h"
+
 /* the item history value */
 typedef struct
 {
@@ -55,6 +57,6 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-
+void	zbx_history_check_version(struct zbx_json *json);
 
 #endif
