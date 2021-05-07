@@ -31,19 +31,24 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
+	int			expected_ret, returned_ret;
 
 	ZBX_UNUSED(state);
 
-
-	if (SUCCEED != zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"),
-				ZBX_EVAL_PARSE_QUERY_EXPRESSION, &error))
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	if (SUCCEED != (returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"),
+			ZBX_EVAL_PARSE_QUERY_EXPRESSION, &error)))
 	{
-		fail_msg("failed to parse expression: %s", error);
+		printf("ERROR: %s\n", error);
 	}
 
-	zbx_eval_prepare_filter(&ctx);
+	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 
-	mock_compare_stack(&ctx, "out.stack");
+	if (SUCCEED == expected_ret)
+	{
+		zbx_eval_prepare_filter(&ctx);
+		mock_compare_stack(&ctx, "out.stack");
+	}
 
 	zbx_free(error);
 	zbx_eval_clear(&ctx);

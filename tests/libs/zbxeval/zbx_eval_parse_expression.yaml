@@ -1700,7 +1700,7 @@ in:
 out:
   result: FAIL
 ---
-test case: Succeed 'group="xyz" = tag'
+test case: Fail 'group="xyz" = tag'
 in:
   rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_GROUP]
   expression: 'group="xyz" = tag'
