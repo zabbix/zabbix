@@ -28,16 +28,16 @@ class CHistFunctionValidator extends CValidator {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'parameters' => []     Definition of parameters of known history functions.
-	 *   'calculated' => false  Validate history function as part of calculated item formula.
-	 *   'aggregated' => false  Validate as aggregated history function.
+	 *   'parameters' => []      Definition of parameters of known history functions.
+	 *   'calculated' => false   Validate history function as part of calculated item formula.
+	 *   'aggregating' => false  Validate as aggregating history function.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'parameters' => [],
 		'calculated' => false,
-		'aggregated' => false
+		'aggregating' => false
 	];
 
 	/**
@@ -142,10 +142,30 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
+	/**
+	 * Loose check if string value contains macros.
+	 *
+	 * @param string $value
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function hasMacros(string $value): bool {
 		return (strpos($value, '{') !== false);
 	}
 
+	/**
+	 * Validate function parameter token's compliance to the rules.
+	 *
+	 * @param array $param    Function parameter token.
+	 * @param array $rules
+	 * @param array $options
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function validateRules(array $param, array $rules, array $options): bool {
 		$param_match_unquoted = ($param['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
 			? CHistFunctionParser::unquoteParam($param['match'])
@@ -158,7 +178,8 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
-					if (!self::validateQuery($param['data']['host'], $param['data']['item'], $options)) {
+					if (!self::validateQuery($param['data']['host'], $param['data']['item'], $param['data']['filter'],
+							$options)) {
 						return false;
 					}
 
@@ -221,17 +242,50 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
-	private static function validateQuery(string $host, string $item, array $options): bool {
+	/**
+	 * Validate function's query parameter.
+	 *
+	 * @param string $host
+	 * @param string $item
+	 * @param array  $filter   Filter token.
+	 * @param array  $options
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	private static function validateQuery(string $host, string $item, array $filter, array $options): bool {
 		if ($options['calculated']) {
-			return ($options['aggregated']
-				? ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
-				: ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
-			);
+			if ($options['aggregating']) {
+				if ($host === CQueryParser::HOST_ITEMKEY_WILDCARD && $item === CQueryParser::HOST_ITEMKEY_WILDCARD) {
+					return false;
+				}
+			}
+			else {
+				if ($filter['match'] !== '') {
+					return false;
+				}
+
+				if ($host === CQueryParser::HOST_ITEMKEY_WILDCARD || $item === CQueryParser::HOST_ITEMKEY_WILDCARD) {
+					return false;
+				}
+			}
 		}
 
 		return true;
 	}
 
+	/**
+	 * Validate function's period parameter.
+	 *
+	 * @param string $sec_num
+	 * @param string $time_shift
+	 * @param int    $mode
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
 		switch ($mode) {
 			case CHistFunctionData::PERIOD_MODE_DEFAULT:

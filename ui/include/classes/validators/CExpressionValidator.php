@@ -25,13 +25,6 @@
 class CExpressionValidator extends CValidator {
 
 	/**
-	 * Math functions accepting calculated history functions for aggregation in calculated item formulas.
-	 *
-	 * @var array
-	 */
-	private const AGGREGATE_MATH_FUNCTIONS = ['avg', 'max', 'min', 'sum'];
-
-	/**
 	 * An options array.
 	 *
 	 * Supported options:
@@ -43,14 +36,45 @@ class CExpressionValidator extends CValidator {
 		'calculated' => false
 	];
 
+	/**
+	 * Provider of information on math functions.
+	 *
+	 * @var CMathFunctionData
+	 */
+	private $math_function_data;
+
+	/**
+	 * Known math functions along with number of required parameters.
+	 *
+	 * @var array
+	 */
+	private $math_function_parameters = [];
+
+	/**
+	 * Provider of information on history functions.
+	 *
+	 * @var CHistFunctionData
+	 */
+	private $hist_function_data;
+
+	/**
+	 * Known history functions along with definition of parameters.
+	 *
+	 * @var array
+	 */
 	private $hist_function_parameters = [];
 
+	/**
+	 * @param array $options
+	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		$hist_function_data = new CHistFunctionData(['calculated' => $this->options['calculated']]);
+		$this->math_function_data = new CMathFunctionData();
+		$this->math_function_parameters = $this->math_function_data->getParameters();
 
-		$this->hist_function_parameters = $hist_function_data->getParameters();
+		$this->hist_function_data = new CHistFunctionData(['calculated' => $this->options['calculated']]);
+		$this->hist_function_parameters = $this->hist_function_data->getParameters();
 	}
 
 	/**
@@ -76,11 +100,28 @@ class CExpressionValidator extends CValidator {
 		return true;
 	}
 
-	private function validateRecursively(array $tokens, ?array $parent_token) {
+	/**
+	 * Validate expression (recursive helper).
+	 *
+	 * @param array $tokens             A hierarchy of tokens.
+	 * @param array|null $parent_token  Parent token containing the hierarchy of tokens.
+	 *
+	 * @return bool
+	 */
+	private function validateRecursively(array $tokens, ?array $parent_token): bool {
 		foreach ($tokens as $token) {
 			switch ($token['type']) {
 				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
-					$math_function_validator = new CMathFunctionValidator();
+					if (!$this->math_function_data->isKnownFunction($token['data']['function'])
+							&& $this->hist_function_data->isKnownFunction($token['data']['function'])) {
+						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+
+						return false;
+					}
+
+					$math_function_validator = new CMathFunctionValidator([
+						'parameters' => $this->math_function_parameters
+					]);
 
 					if (!$math_function_validator->validate($token)) {
 						$this->setError($math_function_validator->getError());
@@ -97,13 +138,20 @@ class CExpressionValidator extends CValidator {
 					break;
 
 				case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+					if (!$this->hist_function_data->isKnownFunction($token['data']['function'])
+							&& $this->math_function_data->isKnownFunction($token['data']['function'])) {
+						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+
+						return false;
+					}
+
 					$options = [
 						'parameters' => $this->hist_function_parameters,
 						'calculated' => $this->options['calculated']
 					];
 
 					if ($this->options['calculated']) {
-						$options['aggregated'] = CHistFunctionData::isAggregated($token['data']['function']);
+						$options['aggregating'] = CHistFunctionData::isAggregating($token['data']['function']);
 					}
 
 					$hist_function_validator = new CHistFunctionValidator($options);
@@ -114,10 +162,10 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
-					if ($options['calculated'] && $options['aggregated']) {
+					if ($options['calculated'] && $options['aggregating']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
-								|| !in_array($parent_token['data']['function'], self::AGGREGATE_MATH_FUNCTIONS)
+								|| !$this->math_function_data->isAggregating($parent_token['data']['function'])
 								|| count($parent_token['data']['parameters']) != 1) {
 							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
@@ -139,7 +187,16 @@ class CExpressionValidator extends CValidator {
 		return true;
 	}
 
-	private static function hasHistoryFunctions(array $tokens) {
+	/**
+	 * Check if history function tokens are contained within the hierarchy of given tokens.
+	 *
+	 * @param array $tokens
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
+	private static function hasHistoryFunctions(array $tokens): bool {
 		foreach ($tokens as $token) {
 			switch ($token['type']) {
 				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:

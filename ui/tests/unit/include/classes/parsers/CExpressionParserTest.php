@@ -2173,6 +2173,9 @@ class CExpressionParserTest extends TestCase {
 			['last(/'.'/*) = 1', null, CParser::PARSE_FAIL, ['empty_host' => true]],
 			['last(/'.'/*) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'empty_host' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = "tag1" or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = {$MACRO} or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/host2/*?[group = "Zabbix servers" and (tag = {#MACRO} or tag = "tag2")]) = 1', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['last(/host2/*?[group = "Zabbix servers" and (tag = {#MACRO} or tag = {{#MACRO}.func()})]) = 1', null, CParser::PARSE_SUCCESS, ['lldmacros' => true, 'calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'host_macro' => true]],
 			['last(/*/agent.ping) = {TRIGGER.VALUE}', ['error' => 'incorrect expression starting from "{TRIGGER.VALUE}"', 'match' => 'last(/*/agent.ping)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
@@ -2343,7 +2346,11 @@ class CExpressionParserTest extends TestCase {
 										'length' => 9,
 										'data' => [
 											'host' => 'host',
-											'item' => 'key'
+											'item' => 'key',
+											'filter' => [
+												'match' => '',
+												'tokens' => []
+											]
 										]
 									],
 									[
@@ -2423,7 +2430,11 @@ class CExpressionParserTest extends TestCase {
 																'length' => 9,
 																'data' => [
 																	'host' => 'host',
-																	'item' => 'key'
+																	'item' => 'key',
+																	'filter' => [
+																		'match' => '',
+																		'tokens' => []
+																	]
 																]
 															]
 														]
@@ -2520,7 +2531,11 @@ class CExpressionParserTest extends TestCase {
 																						'length' => 9,
 																						'data' => [
 																							'host' => 'host',
-																							'item' => 'key'
+																							'item' => 'key',
+																							'filter' => [
+																								'match' => '',
+																								'tokens' => []
+																							]
 																						]
 																					],
 																					[

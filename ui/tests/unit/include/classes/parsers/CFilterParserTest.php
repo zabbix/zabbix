@@ -26,59 +26,338 @@ class CFilterParserTest extends TestCase {
 	public function dataProvider() {
 		return [
 			[
-				'?[tag="name"]', 0,
+				'?[tag="name"]', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '?[tag="name"]'
+					'match' => '?[tag="name"]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 2,
+							'match' => 'tag',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 5,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 6,
+							'match' => '"name"',
+							'length' => 6
+						]
+					]
 				]
 			],
 			[
-				'?[ group = "\\"string1\\"" and tag = "\\"string2\\"" ]', 0,
+				'?[ group = "\\"string1\\"" and tag = "\\"string2\\"" ]', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '?[ group = "\"string1\"" and tag = "\"string2\"" ]'
+					'match' => '?[ group = "\"string1\"" and tag = "\"string2\"" ]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 3,
+							'match' => 'group',
+							'length' => 5
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 9,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 11,
+							'match' => '"\"string1\""',
+							'length' => 13
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 25,
+							'match' => 'and',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 29,
+							'match' => 'tag',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 33,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 35,
+							'match' => '"\"string2\""',
+							'length' => 13
+						]
+					]
 				]
 			],
 			[
-				'?[((tag="tag1" or group="name") and tag="tag2")]', 0,
+				'?[((tag="tag1" or group="name") and tag="tag2")]', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '?[((tag="tag1" or group="name") and tag="tag2")]'
+					'match' => '?[((tag="tag1" or group="name") and tag="tag2")]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPEN_BRACE,
+							'pos' => 2,
+							'match' => '(',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPEN_BRACE,
+							'pos' => 3,
+							'match' => '(',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 4,
+							'match' => 'tag',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 7,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 8,
+							'match' => '"tag1"',
+							'length' => 6
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 15,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 18,
+							'match' => 'group',
+							'length' => 5
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 23,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 24,
+							'match' => '"name"',
+							'length' => 6
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_CLOSE_BRACE,
+							'pos' => 30,
+							'match' => ')',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 32,
+							'match' => 'and',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 36,
+							'match' => 'tag',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 39,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 40,
+							'match' => '"tag2"',
+							'length' => 6
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_CLOSE_BRACE,
+							'pos' => 46,
+							'match' => ')',
+							'length' => 1
+						]
+					]
 				]
 			],
 			[
-				'?[tag="name"] text', 0,
+				'?[tag="name"] text', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '?[tag="name"]'
+					'match' => '?[tag="name"]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+							'pos' => 2,
+							'match' => 'tag',
+							'length' => 3
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 5,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 6,
+							'match' => '"name"',
+							'length' => 6
+						]
+
+					]
 				]
 			],
 			[
-				'?[tag=tag]', 0,
+				'?["string1" = "string2"]', 0, [],
 				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '?["string1" = "string2"]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 2,
+							'match' => '"string1"',
+							'length' => 9
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 12,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 14,
+							'match' => '"string2"',
+							'length' => 9
+						]
+
+					]
 				]
 			],
 			[
-				'?["string1" = "string2"]', 0,
+				'?["{$MACRO}" = "{#MACRO}"]', 0, [],
 				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '?["{$MACRO}" = "{#MACRO}"]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 2,
+							'match' => '"{$MACRO}"',
+							'length' => 10
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 13,
+							'match' => '=',
+							'length' => 1
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_STRING,
+							'pos' => 15,
+							'match' => '"{#MACRO}"',
+							'length' => 10
+						]
+					]
 				]
 			],
 			[
-				'?[()]', 0,
+				'?[{$MACRO} <> {#MACRO}]', 0, ['usermacros' => true, 'lldmacros' => true],
 				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '?[{$MACRO} <> {#MACRO}]',
+					'tokens' => [
+						[
+							'type' => CFilterParser::TOKEN_TYPE_USER_MACRO,
+							'pos' => 2,
+							'match' => '{$MACRO}',
+							'length' => 8
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+							'pos' => 11,
+							'match' => '<>',
+							'length' => 2
+						],
+						[
+							'type' => CFilterParser::TOKEN_TYPE_LLD_MACRO,
+							'pos' => 14,
+							'match' => '{#MACRO}',
+							'length' => 8
+						]
+					]
 				]
 			],
 			[
-				'?[(tag = "tag"]', 0,
+				'?[{$MACRO} = {#MACRO}]', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
+					'match' => '',
+					'tokens' => []
+				]
+			],
+			[
+				'?[{$MACRO} = {#MACRO}]', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'tokens' => []
+				]
+			],
+			[
+				'?[{$MACRO} = {#MACRO}]', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'tokens' => []
+				]
+			],
+			[
+				'?[tag=tag]', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'tokens' => []
+				]
+			],
+			[
+				'?[()]', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'tokens' => []
+				]
+			],
+			[
+				'?[(tag = "tag"]', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'tokens' => []
 				]
 			]
 		];
@@ -87,12 +366,13 @@ class CFilterParserTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testFilterParser($source, $pos, $expected) {
-		$filter_parser = new CFilterParser();
+	public function testFilterParser($source, $pos, $options, $expected) {
+		$filter_parser = new CFilterParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $filter_parser->parse($source, $pos),
-			'match' => $filter_parser->getMatch()
+			'match' => $filter_parser->getMatch(),
+			'tokens' => $filter_parser->getTokens()
 		]);
 		$this->assertSame(strlen($expected['match']), $filter_parser->getLength());
 	}

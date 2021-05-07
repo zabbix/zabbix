@@ -1124,6 +1124,67 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_append_operand                                              *
+ *                                                                            *
+ * Purpose: add operand token to evaluation stack                             *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             token - [IN] the token to add                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_append_operand(zbx_eval_context_t *ctx, zbx_eval_token_t *token, char **error)
+{
+	if (0 == (ctx->last_token_type & ZBX_EVAL_BEFORE_OPERAND))
+	{
+		*error = zbx_dsprintf(*error, "operand following another operand at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROPERTY))
+	{
+		int			i;
+		zbx_eval_token_t	*prop = NULL;
+
+		for (i = ctx->stack.values_num - 1; i >= 0; i--)
+		{
+			if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_PROPERTY))
+			{
+				prop = &ctx->stack.values[i];
+				continue;
+			}
+
+			if (0 == (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERAND))
+				break;
+		}
+
+		if (0 != (token->type & ZBX_EVAL_CLASS_PROPERTY))
+		{
+			if (NULL != prop)
+			{
+				*error = zbx_dsprintf(*error, "property must be compared with a constant value at"
+						" \"%s\"", ctx->expression + prop->loc.l);
+				return FAIL;
+			}
+			prop = token;
+		}
+
+		if (NULL != prop && 2 < ctx->stack.values_num - i)
+		{
+			*error = zbx_dsprintf(*error, "property must be compared with a constant value at"
+					" \"%s\"", ctx->expression + prop->loc.l);
+			return FAIL;
+		}
+	}
+
+	zbx_vector_eval_token_append_ptr(&ctx->stack, token);
+
+	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_append_arg_null                                             *
  *                                                                            *
  * Purpose: add null argument token to evaluation stack                       *
@@ -1320,13 +1381,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 		}
 		else if (0 != (token.type & (ZBX_EVAL_CLASS_OPERAND | ZBX_EVAL_CLASS_PROPERTY)))
 		{
-			if (0 == (ctx->last_token_type & ZBX_EVAL_BEFORE_OPERAND))
-			{
-				*error = zbx_dsprintf(*error, "operand following another operand at \"%s\"",
-						ctx->expression + pos);
+			if (FAIL == eval_append_operand(ctx, &token, error))
 				goto out;
-			}
-			zbx_vector_eval_token_append_ptr(&ctx->stack, &token);
 		}
 		else if (0 != (token.type & ZBX_EVAL_CLASS_OPERATOR))
 		{

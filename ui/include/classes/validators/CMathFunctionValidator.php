@@ -25,24 +25,23 @@
 class CMathFunctionValidator extends CValidator {
 
 	/**
-	 * Math functions along with number of required parameters (or -1 for number of required parameters >= 1).
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'parameters' => []  Number of required parameters of known math functions.
 	 *
 	 * @var array
 	 */
-	private const MATH_FUNCTIONS = [
-		'abs' => 1,
-		'avg' => -1,
-		'bitand' => 2,
-		'date' => 0,
-		'dayofmonth' => 0,
-		'dayofweek' => 0,
-		'length' => 1,
-		'max' => -1,
-		'min' => -1,
-		'now' => 0,
-		'sum' => -1,
-		'time' => 0
+	private $options = [
+		'parameters' => []
 	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+	}
 
 	/**
 	 * Validate math function.
@@ -55,13 +54,13 @@ class CMathFunctionValidator extends CValidator {
 		// TODO: remove the temporary stub
 		return true;
 
-		if (!array_key_exists($token['data']['function'], self::MATH_FUNCTIONS)) {
+		if (!array_key_exists($token['data']['function'], $this->options['parameters'])) {
 			$this->setError(_s('unknown function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
 
-		$num_required_parameters = self::MATH_FUNCTIONS[$token['data']['function']];
+		$num_required_parameters = $this->options['parameters'][$token['data']['function']];
 		$num_parameters = count($token['data']['parameters']);
 
 		if (($num_required_parameters == -1 && $num_parameters == 0)

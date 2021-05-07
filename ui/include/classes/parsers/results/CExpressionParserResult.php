@@ -96,7 +96,6 @@ class CExpressionParserResult extends CParserResult {
 	/**
 	 * Returns all tokens include nested of the given types.
 	 *
-	 * @param array  $tokens
 	 * @param array  $types
 	 *
 	 * @return array

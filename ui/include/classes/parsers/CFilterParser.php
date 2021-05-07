@@ -28,14 +28,47 @@ class CFilterParser extends CParser {
 	private const STATE_AFTER_CLOSE_BRACE = 4;
 	private const STATE_AFTER_PAIR = 5;
 
-	// For parsing of keyword/string pairs.
-	private const TOKEN_STRING = 1;
-	private const TOKEN_KEYWORD = 2;
+	// Token types.
+	public const TOKEN_TYPE_OPEN_BRACE = 0;
+	public const TOKEN_TYPE_CLOSE_BRACE = 1;
+	public const TOKEN_TYPE_OPERATOR = 2;
+	public const TOKEN_TYPE_KEYWORD = 3;
+	public const TOKEN_TYPE_USER_MACRO = 4;
+	public const TOKEN_TYPE_LLD_MACRO = 5;
+	public const TOKEN_TYPE_STRING = 6;
 
 	/**
 	 * Chars that should be treated as spaces.
 	 */
 	public const WHITESPACES = " \r\n\t";
+
+	/**
+	 * Array of tokens.
+	 *
+	 * @var array
+	 */
+	protected $tokens = [];
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'usermacros' => false  Enable user macros usage in filter expression.
+	 *   'lldmacros' => false   Enable low-level discovery macros usage in filter expression.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+	}
 
 	/**
 	 * Parse a filter expression.
@@ -54,13 +87,14 @@ class CFilterParser extends CParser {
 		$this->length = 0;
 
 		$p = $pos;
+		$tokens = [];
 
 		if (substr($source, $p, 2) !== '?[') {
 			return self::PARSE_FAIL;
 		}
 		$p += 2;
 
-		if (!self::parseExpression($source, $p)) {
+		if (!self::parseExpression($source, $p, $tokens, $this->options)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -73,19 +107,30 @@ class CFilterParser extends CParser {
 
 		$this->length = $len;
 		$this->match = substr($source, $pos, $len);
+		$this->tokens = $tokens;
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
-	private static function parseExpression(string $source, int &$pos): bool {
+	/**
+	 * Parses an expression.
+	 *
+	 * @param string  $source
+	 * @param int     $pos
+	 * @param array   $tokens
+	 * @param array   $options
+	 *
+	 * @return bool  Returns true if parsed successfully, false otherwise.
+	 */
+	private static function parseExpression(string $source, int &$pos, array &$tokens, array $options): bool {
 		$logical_operator_parser = new CSetParser(['and', 'or']);
 		$not_operator_parser = new CSetParser(['not']);
 
 		$state = self::STATE_AFTER_OPEN_BRACE;
 		$after_space = false;
 		$level = 0;
-		$is_valid = false;
 		$p = $pos;
+		$_tokens = [];
 
 		while (isset($source[$p])) {
 			$char = $source[$p];
@@ -101,19 +146,25 @@ class CFilterParser extends CParser {
 					switch ($char) {
 						case '(':
 							$level++;
+							$_tokens[] = [
+								'type' => self::TOKEN_TYPE_OPEN_BRACE,
+								'pos' => $p,
+								'match' => $char,
+								'length' => 1
+							];
 							break;
 
 						default:
-							if ($not_operator_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $not_operator_parser->getLength() - 1;
+							if (self::parseUsing($not_operator_parser, $source, $p, $_tokens,
+									self::TOKEN_TYPE_OPERATOR)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
-							elseif (self::parsePair($source, $p)) {
+							elseif (self::parsePair($source, $p, $_tokens, $options)) {
 								$state = self::STATE_AFTER_PAIR;
 
 								if ($level == 0) {
 									$pos = $p + 1;
-									$is_valid = true;
+									$tokens = $_tokens;
 								}
 							}
 							else {
@@ -127,6 +178,12 @@ class CFilterParser extends CParser {
 						case '(':
 							$level++;
 							$state = self::STATE_AFTER_OPEN_BRACE;
+							$_tokens[] = [
+								'type' => self::TOKEN_TYPE_OPEN_BRACE,
+								'pos' => $p,
+								'match' => $char,
+								'length' => 1
+							];
 							break;
 
 						default:
@@ -134,16 +191,16 @@ class CFilterParser extends CParser {
 								break 3;
 							}
 
-							if ($not_operator_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $not_operator_parser->getLength() - 1;
+							if (self::parseUsing($not_operator_parser, $source, $p, $_tokens,
+									self::TOKEN_TYPE_OPERATOR)) {
 								$state = self::STATE_AFTER_NOT_OPERATOR;
 							}
-							elseif (self::parsePair($source, $p)) {
+							elseif (self::parsePair($source, $p, $_tokens, $options)) {
 								$state = self::STATE_AFTER_PAIR;
 
 								if ($level == 0) {
 									$pos = $p + 1;
-									$is_valid = true;
+									$tokens = $_tokens;
 								}
 							}
 							else {
@@ -159,16 +216,22 @@ class CFilterParser extends CParser {
 								break 3;
 							}
 							$level--;
+							$_tokens[] = [
+								'type' => self::TOKEN_TYPE_CLOSE_BRACE,
+								'pos' => $p,
+								'match' => $char,
+								'length' => 1
+							];
 
 							if ($level == 0) {
 								$pos = $p + 1;
-								$is_valid = true;
+								$tokens = $_tokens;
 							}
 							break;
 
 						default:
-							if ($logical_operator_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $logical_operator_parser->getLength() - 1;
+							if (self::parseUsing($logical_operator_parser, $source, $p, $_tokens,
+									self::TOKEN_TYPE_OPERATOR)) {
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 								break;
 							}
@@ -186,16 +249,22 @@ class CFilterParser extends CParser {
 							}
 							$level--;
 							$state = self::STATE_AFTER_CLOSE_BRACE;
+							$_tokens[] = [
+								'type' => self::TOKEN_TYPE_CLOSE_BRACE,
+								'pos' => $p,
+								'match' => $char,
+								'length' => 1
+							];
 
 							if ($level == 0) {
 								$pos = $p + 1;
-								$is_valid = true;
+								$tokens = $_tokens;
 							}
 							break;
 
 						default:
-							if ($after_space && $logical_operator_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $logical_operator_parser->getLength() - 1;
+							if ($after_space && self::parseUsing($logical_operator_parser, $source, $p, $_tokens,
+									self::TOKEN_TYPE_OPERATOR)) {
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 							}
 							else {
@@ -209,6 +278,12 @@ class CFilterParser extends CParser {
 						case '(':
 							$level++;
 							$state = self::STATE_AFTER_OPEN_BRACE;
+							$_tokens[] = [
+								'type' => self::TOKEN_TYPE_OPEN_BRACE,
+								'pos' => $p,
+								'match' => $char,
+								'length' => 1
+							];
 							break;
 
 						default:
@@ -216,12 +291,12 @@ class CFilterParser extends CParser {
 								break 3;
 							}
 
-							if (self::parsePair($source, $p)) {
+							if (self::parsePair($source, $p, $_tokens, $options)) {
 								$state = self::STATE_AFTER_PAIR;
 
 								if ($level == 0) {
 									$pos = $p + 1;
-									$is_valid = true;
+									$tokens = $_tokens;
 								}
 							}
 							else {
@@ -235,14 +310,14 @@ class CFilterParser extends CParser {
 			$p++;
 		}
 
-		if ($is_valid) {
+		if ($tokens) {
 			// Including trailing whitespaces as part of the expression.
 			while (isset($source[$pos]) && strpos(self::WHITESPACES, $source[$pos]) !== false) {
 				$pos++;
 			}
 		}
 
-		return $is_valid;
+		return (bool) $tokens;
 	}
 
 	/**
@@ -257,67 +332,199 @@ class CFilterParser extends CParser {
 	 *
 	 * @param string  $source
 	 * @param int     $pos
+	 * @param array   $tokens
+	 * @param array   $options
 	 *
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
-	private static function parsePair(string $source, int &$pos): bool {
+	private static function parsePair(string $source, int &$pos, array &$tokens, array $options): bool {
 		$keyword_parser = new CSetParser(['tag', 'group']);
 		$binary_operator_parser = new CSetParser(['=', '<>']);
 
 		$p = $pos;
+		$_tokens = [];
+		$keywords = 0;
 
-		if ($keyword_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-			$p += $keyword_parser->getLength();
-			$pending_token = self::TOKEN_STRING;
+		if (self::parseUsing($keyword_parser, $source, $p, $_tokens, self::TOKEN_TYPE_KEYWORD)) {
+			$keywords++;
 		}
-		elseif (self::parseString($source, $p)) {
-			$pending_token = self::TOKEN_KEYWORD;
-		}
-		else {
+		elseif (!self::parseConstant($source, $p, $_tokens, $options)) {
 			return false;
 		}
+		$p++;
 
 		while (isset($source[$p]) && strpos(self::WHITESPACES, $source[$p]) !== false) {
 			$p++;
 		}
 
-		if ($binary_operator_parser->parse($source, $p) == CParser::PARSE_FAIL) {
+		if (!self::parseUsing($binary_operator_parser, $source, $p, $_tokens, self::TOKEN_TYPE_OPERATOR)) {
 			return false;
 		}
-		$p += $binary_operator_parser->getLength();
+		$p++;
 
 		while (isset($source[$p]) && strpos(self::WHITESPACES, $source[$p]) !== false) {
 			$p++;
 		}
 
-		if ($pending_token == self::TOKEN_KEYWORD && $keyword_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-			$p += $keyword_parser->getLength();
+		if (self::parseUsing($keyword_parser, $source, $p, $_tokens, self::TOKEN_TYPE_KEYWORD)) {
+			$keywords++;
 		}
-		else if ($pending_token != self::TOKEN_STRING || !self::parseString($source, $p)) {
+		else if (!self::parseConstant($source, $p, $_tokens, $options)) {
+			return false;
+		}
+		$p++;
+
+		if ($keywords > 1) {
 			return false;
 		}
 
-		$pos = $p;
+		$pos = $p - 1;
+		$tokens = array_merge($tokens, $_tokens);
 
 		return true;
 	}
 
+
+	/**
+	 * Parses a constant in the expression.
+	 *
+	 * The constant can be:
+	 *  - string
+	 *  - user macro like {$MACRO}
+	 *  - LLD macro like {#LLD}
+	 *  - LLD macro with function like {{#LLD}.func())}
+	 *
+	 * @param string  $source
+	 * @param int     $pos
+	 * @param array   $tokens
+	 * @param array   $options
+	 *
+	 * @return bool  Returns true if parsed successfully, false otherwise.
+	 */
+	private static function parseConstant(string $source, int &$pos, array &$tokens, array $options): bool {
+		if (self::parseString($source, $pos, $tokens)) {
+			return true;
+		}
+
+		if ($options['usermacros'] && self::parseUsing(new CUserMacroParser(), $source, $pos, $tokens,
+				self::TOKEN_TYPE_USER_MACRO)) {
+			return true;
+		}
+
+		if ($options['lldmacros'] && self::parseUsing(new CLLDMacroParser(), $source, $pos, $tokens,
+				self::TOKEN_TYPE_LLD_MACRO)) {
+			return true;
+		}
+
+		if ($options['lldmacros'] && self::parseUsing(new CLLDMacroFunctionParser(), $source, $pos, $tokens,
+				self::TOKEN_TYPE_LLD_MACRO)) {
+			return true;
+		}
+
+		return false;
+	}
 	/**
 	 * Parses a quoted string constant in the expression.
 	 *
 	 * @param string  $source
 	 * @param int     $pos
+	 * @param array   $tokens
 	 *
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
-	private static function parseString(string $source, int &$pos): bool {
+	private static function parseString(string $source, int &$pos, array &$tokens): bool {
 		if (!preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
 		$len = strlen($matches[0]);
+		$tokens[] = [
+			'type' => self::TOKEN_TYPE_STRING,
+			'pos' => $pos,
+			'match' => $matches[0],
+			'length' => $len
+		];
 		$pos += $len - 1;
 
 		return true;
+	}
+
+	/**
+	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
+	 * matched string.
+	 *
+	 * @param CParser $parser
+	 * @param string  $source
+	 * @param int     $pos
+	 * @param array   $tokens
+	 * @param int     $token_type
+	 *
+	 * @return bool
+	 */
+	private static function parseUsing(CParser $parser, string $source, int &$pos, array &$tokens,
+			int $token_type): bool {
+		if ($parser->parse($source, $pos) == CParser::PARSE_FAIL) {
+			return false;
+		}
+
+		$tokens[] = [
+			'type' => $token_type,
+			'pos' => $pos,
+			'match' => $parser->getMatch(),
+			'length' => $parser->getLength()
+		];
+		$pos += $parser->getLength() - 1;
+
+		return true;
+	}
+
+	/**
+	 * Return the expression tokens.
+	 *
+	 * @return array
+	 */
+	public function getTokens(): array {
+		return $this->tokens;
+	}
+
+	/**
+	 * Returns tokens of the given types.
+	 *
+	 * @param array  $types
+	 *
+	 * @return array
+	 */
+	public function getTokensOfTypes(array $types): array {
+		$result = [];
+
+		foreach ($this->tokens as $token) {
+			if (in_array($token['type'], $types)) {
+				$result[] = $token;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Unquoting quoted string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function unquoteString(string $value): string {
+		return strtr(substr($value, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+	}
+
+	/**
+	 * Quoting string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function quoteString(string $value): string {
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
 	}
 }

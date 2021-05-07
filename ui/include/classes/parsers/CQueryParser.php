@@ -36,6 +36,8 @@ class CQueryParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
+	 *   'usermacros' => false    Enable user macros usage in filter expression.
+	 *   'lldmacros' => false     Enable low-level discovery macros usage in filter expression.
 	 *   'calculated' => false    Allow wildcards to be used in place of hostname and item key. Allow filter expression
 	 *                            for item.
 	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
@@ -45,6 +47,8 @@ class CQueryParser extends CParser {
 	 * @var array
 	 */
 	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false,
 		'calculated' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
@@ -60,6 +64,14 @@ class CQueryParser extends CParser {
 	 * @var string
 	 */
 	private $item = '';
+
+	/**
+	 * @var array
+	 */
+	private $filter = [
+		'match' => '',
+		'tokens' => []
+	];
 
 	/**
 	 * @param array $options
@@ -78,7 +90,10 @@ class CQueryParser extends CParser {
 		}
 		$this->item_key_parser = new CItemKey();
 		if ($this->options['calculated']) {
-			$this->filter_parser = new CFilterParser();
+			$this->filter_parser = new CFilterParser([
+				'usermacros' => $this->options['usermacros'],
+				'lldmacros' => $this->options['lldmacros']
+			]);
 		}
 	}
 
@@ -95,6 +110,10 @@ class CQueryParser extends CParser {
 		$this->length = 0;
 		$this->host = '';
 		$this->item = '';
+		$this->filter = [
+			'match' => '',
+			'tokens' => []
+		];
 
 		$p = $pos;
 
@@ -145,6 +164,10 @@ class CQueryParser extends CParser {
 		}
 
 		if ($this->options['calculated'] && $this->filter_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$this->filter = [
+				'match' => $this->filter_parser->getMatch(),
+				'tokens' => $this->filter_parser->getTokens()
+			];
 			$p += $this->filter_parser->getLength();
 		}
 
@@ -173,6 +196,13 @@ class CQueryParser extends CParser {
 	public function getItem(): string {
 		return $this->item;
 	}
+
+	/**
+	 * Returns the filter.
+	 *
+	 * @return array
+	 */
+	public function getFilter(): array {
+		return $this->filter;
+	}
 }
-
-
