@@ -3087,6 +3087,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num)
 					*more = ZBX_SYNC_MORE;
 			}
+
 			UNLOCK_CACHE;
 
 			*values_num += history_num;
