@@ -145,8 +145,7 @@ class testConfiguration extends CAPITest {
 			['hosts'],
 			['images'],
 			['maps'],
-			['templates'],
-			['valueMaps']
+			['templates']
 		];
 	}
 
