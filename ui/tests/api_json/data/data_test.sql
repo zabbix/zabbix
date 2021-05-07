@@ -3,7 +3,7 @@
 -- Activate "Zabbix Server" host
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
--- applications
+-- host groups
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
@@ -12,50 +12,7 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for template
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
-INSERT INTO applications (applicationid,hostid,name) VALUES (366,50009,'API application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (367,50009,'API host application for update');
-INSERT INTO applications (applicationid,hostid,name) VALUES (368,10093,'API template application for update');
-INSERT INTO applications (applicationid,hostid,name) VALUES (369,50010,'API templated application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (370,50009,'API templated application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (371,50009,'API application delete');
-INSERT INTO applications (applicationid,hostid,name) VALUES (372,50009,'API application delete2');
-INSERT INTO applications (applicationid,hostid,name) VALUES (373,50009,'API application delete3');
-INSERT INTO applications (applicationid,hostid,name) VALUES (374,50009,'API application delete4');
-INSERT INTO applications (applicationid,hostid,name) VALUES (376,10084,'API application for Zabbix server');
-INSERT INTO application_template (application_templateid,applicationid,templateid) VALUES (52,370,369);
--- discovered application
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40066, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40067, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[{#FSNAME},free]',30,90,0,'','',2,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40068, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[/,free]',30,90,0,'','',4,'','');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
-INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
-INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,900,'API discovery application');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
-
--- valuemap
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
-
--- host groups
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'API host group for update',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
@@ -90,9 +47,12 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (19, 'API user group delete3');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'API user group in actions');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'API user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration');
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
@@ -102,7 +62,7 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (31, 16, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (31, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (5, 'API script', 0, 'test', 2, 21, NULL, 'api script description');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (5, 'API script', 'test', 2, 21, NULL, 'api script description', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
 UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
 
 -- users
@@ -112,26 +72,35 @@ INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refres
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (12, 'api-user-delete2', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (13, 'api-user-action', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-screen', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (16, 'api-user-slideshow', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (12, 14, 9);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (13, 14, 10);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (14, 14, 11);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (15, 14, 12);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (16, 9, 13);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (17, 14, 14);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (18, 14, 15);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (19, 14, 16);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (20, 14, 5);
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (17, 'API action with user', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (32, 17, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (32, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 13);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (6, 'API map', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 14, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200021, 'API screen', 1, 1, 15, 0);
-INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200004, 'API slide show', 10, 16, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, 1, 0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200022, 0, 0);
+
+-- valuemap
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
 
 -- scripts
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
@@ -148,19 +117,77 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (5
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50017,'API group with deny permissions',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (4, 14, 0, 50017);
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (6, 'API script for update one', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (7, 'API script for update two', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (8, 'API script for delete', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (9, 'API script for delete1', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (10, 'API script for delete2', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (11, 'API script in action', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (12, 'API script with user group', 0, '/sbin/shutdown -r', 2, 7, NULL, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (13, 'API script with host group', 0, '/sbin/shutdown -r', 2, NULL, 4, '');
-INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (14, 'API script with write permissions for the host group', 0, '/sbin/shutdown -r', 3, NULL, NULL, '');
-INSERT INTO actions (actionid, name,eventsource, evaltype, status, esc_period) VALUES (18, 'API action with script', 0, 0, 0, 60);
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (6, 'API script for update one',                             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (7, 'API script for update two',                             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (8, 'API script for delete',                                 '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (9, 'API script for delete1',                                '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (10, 'API script for delete2',                               '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (11, 'API script in action',                                 '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 1, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (12, 'API script with user group',                           '/sbin/shutdown -r', 2, 7,    NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (13, 'API script with host group',                           '/sbin/shutdown -r', 2, NULL, 4,    '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (14, 'API script with write permissions for the host group', '/sbin/shutdown -r', 3, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (15, 'API script custom execute on agent (action scope)',    '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 1, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (16, 'API script custom execute on agent (host scope)',      '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (17, 'API script custom execute on agent (event scope)',     '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 4, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (18, 'API script custom execute on server',                  '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 1, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (19, 'API script custom execute on proxy',                   '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (20, 'API script IPMI',                                      '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (21, 'API script SSH password',                              '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 0, 'John', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (22, 'API script SSH public key',                            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 1, 'John', '', 'pub-k', 'priv-k', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (23, 'API script Telnet',                                    '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (24, 'API script Webhook no params',                         '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '10s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (25, 'API script Webhook with params',                       '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (26, 'API script Webhook with params to change',             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (27, 'API script custom for change to other one',            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (28, 'API script custom for change to other two',            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (29, 'API script custom for change to other three',          '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (30, 'API script custom for change to other four',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (31, 'API script custom for change to other five',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 0, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (32, 'API script IPMI for change to other one',              '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (33, 'API script IPMI for change to other two',              '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (34, 'API script IPMI for change to other three',            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (35, 'API script IPMI for change to other four',             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (36, 'API script IPMI for change to other five',             '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (37, 'API script SSH password for change to other one',      '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 0, 'John', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (38, 'API script SSH password for change to other two',      '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 0, 'John', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (39, 'API script SSH password for change to other three',    '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 0, 'John', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (40, 'API script SSH password for change to other four',     '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 0, 'John', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (41, 'API script SSH public key for change to other one',    '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 1, 'John', '', 'pub-k', 'priv-k', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (42, 'API script SSH public key for change to other two',    '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 1, 'John', '', 'pub-k', 'priv-k', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (43, 'API script SSH public key for change to other three',  '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 1, 'John', '', 'pub-k', 'priv-k', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (44, 'API script SSH public key for change to other four',   '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     2, 2, '30s', 2, '123', 1, 'John', '', 'pub-k', 'priv-k', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (45, 'API script Telnet for change to other one',            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (46, 'API script Telnet for change to other two',            '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (47, 'API script Telnet for change to other three',          '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (48, 'API script Telnet for change to other four',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (49, 'API script Telnet for change to other five',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     3, 2, '30s', 2, '123', 0, 'Jill', '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (50, 'API script Webhook for change to other one',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (51, 'API script Webhook for change to other two',           '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (52, 'API script Webhook for change to other three',         '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (53, 'API script Webhook for change to other four',          '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (54, 'API script Webhook for change to other five',          '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     5, 2, '25',  2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (55, 'API scope update (action scope)',                      '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 1, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (56, 'API scope update (host scope)',                        '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (57, 'API scope update (event scope)',                       '/sbin/shutdown -r', 2, NULL, NULL, '',                 '',     0, 4, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (58, 'API scope reset to action',                            '/sbin/shutdown -r', 3, 7,    NULL, '',                 'text', 0, 2, '30s', 2, '',    0, '',     '', '',      '',       '/home');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (59, 'Script for Get1',                                      'test',              2, NULL, NULL, 'Get1 description', '',     5, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (60, 'Script for Get2',                                      'test',              2, NULL, NULL, 'Get2 description', '',     1, 2, '30s', 2, '',    0, '',     '', '',      '',       '');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (1,  25, 'param 1',  '');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (2,  25, 'param 2',  'value 2');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (3,  25, 'param 3',  'value 3');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (4,  26, 'username', 'John');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (5,  26, 'password', 'Ada');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (6,  50, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (7,  51, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (8,  52, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (9,  53, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (10, 54, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (11, 59, 'param 1',  'value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (12, 59, 'param 2',  'value 2');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (18, 'API action with script', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (33, 18, 1, 0, 1, 1, 0);
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
-INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
+INSERT INTO opcommand (operationid, scriptid) VALUES (33, 11);
 
 -- scripts / inherited hostgroups
 INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
@@ -182,9 +209,9 @@ INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90020,90020,90020)
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90021,90021,90021);
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90022,90022,90022);
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90023,90023,90023);
-INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90020, 90020, 2, '90020-acc-read', 0,'date', NULL, '');
-INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90021, 90021, 3, '90021-acc-write', 0, 'date', NULL, '');
-INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90023, 90023, 2, '90023-acc-read', 0, 'date', NULL, '');
+INSERT INTO scripts (groupid, scriptid, host_access, name, command, usrgrpid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (90020, 90020, 2, '90020-acc-read', 'date', NULL, '', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
+INSERT INTO scripts (groupid, scriptid, host_access, name, command, usrgrpid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (90021, 90021, 3, '90021-acc-write', 'date', NULL, '', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
+INSERT INTO scripts (groupid, scriptid, host_access, name, command, usrgrpid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (90023, 90023, 2, '90023-acc-read', 'date', NULL, '', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
 
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update','desc');
@@ -246,9 +273,7 @@ INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (1501
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15014, 15013, 'Api step 2', 2, 'http://api.com', '');
 
 -- web scenario for webitem update testing
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15015,50009,'Webtest key_name application',0);
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15016,50009,'Webtest key_name application2',0);
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, applicationid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009, 15015);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15015, 15015, 'Webstep name 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15016, 15015, 'Webstep name 2', 2, 'http://api.com', '');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
@@ -269,15 +294,6 @@ INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (1501
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150157, 15016, 150157, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150158, 15016, 150158, 1);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150159, 15016, 150159, 0);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150151,15015,150151);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150152,15015,150152);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150153,15015,150153);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150154,15015,150154);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150155,15015,150155);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150156,15015,150156);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150157,15015,150157);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150158,15015,150158);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150159,15015,150159);
 
 -- proxy
 INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'Api active proxy for delete0', 5, '');
@@ -302,7 +318,7 @@ INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, la
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (1, 10001, 5, 3);
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (2, 10003, 5, 3);
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (3, 10004, 5, 3);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance, elementsubtype, areatype, width, height, viewtype, use_iconmap, application) VALUES (7, 10001, 0, 4, 151, NULL, 'New element', -1, 189, 77, NULL, NULL, 0, 0, 200, 200, 0, 1, '');
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance, elementsubtype, areatype, width, height, viewtype, use_iconmap) VALUES (7, 10001, 0, 4, 151, NULL, 'New element', -1, 189, 77, NULL, NULL, 0, 0, 200, 200, 0, 1);
 
 -- disabled item and LLD rule
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (90000, 10084, 1, 0, 3,'Api disabled item','disabled.item','30d','90d',1,'','',0,'','');
@@ -1598,12 +1614,6 @@ INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (1016, 5003, 'OS'
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, r_eventid, r_clock, r_ns, correlationid, userid, name, acknowledged, severity) VALUES (5003, 0, 0, 50175, 1610000000, 0, NULL, 0, 0, NULL, NULL, 'trigger4', 0, 0);
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1015, 5003, 'OS', 'Windows');
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1016, 5003, 'OS', 'Win7');
-
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (200, 5, 'Script for Get','test',2,NULL,NULL,'get description');
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (100, 200, 'parameter 1','value 1');
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 200, 'parameter 2','value 2');
-
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 1, 'Script for Get2','test',2,NULL,NULL,'Get2 description');
 
 -- test trigger validation
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '');

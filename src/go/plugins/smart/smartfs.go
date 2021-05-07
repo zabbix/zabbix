@@ -53,6 +53,10 @@ type device struct {
 	Model        string `json:"{#MODEL}"`
 	SerialNumber string `json:"{#SN}"`
 }
+type jsonDevice struct {
+	serialNumber string
+	jsonData     string
+}
 
 type attribute struct {
 	Name       string `json:"{#NAME}"`
@@ -119,10 +123,8 @@ type runner struct {
 	done        chan struct{}
 	raidDone    chan struct{}
 	raids       chan raidParameters
-	devices     []deviceParser
-	jsonDevices map[string]string
-	found       map[string]bool
-	foundRaid   map[string]bool
+	devices     map[string]deviceParser
+	jsonDevices map[string]jsonDevice
 }
 
 // execute returns the smartctl runner with all devices data returned by smartctl.
@@ -137,17 +139,17 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	}
 
 	r := &runner{
-		names:     make(chan string, len(basicDev)),
-		err:       make(chan error, cpuCount),
-		done:      make(chan struct{}),
-		raidDone:  make(chan struct{}),
-		plugin:    p,
-		found:     make(map[string]bool),
-		foundRaid: make(map[string]bool),
+		names:    make(chan string, len(basicDev)),
+		err:      make(chan error, cpuCount),
+		done:     make(chan struct{}),
+		raidDone: make(chan struct{}),
+		plugin:   p,
 	}
 
 	if jsonRunner {
-		r.jsonDevices = make(map[string]string)
+		r.jsonDevices = make(map[string]jsonDevice)
+	} else {
+		r.devices = make(map[string]deviceParser)
 	}
 
 	r.startBasicRunners(jsonRunner)
@@ -178,6 +180,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	close(r.raids)
 
 	r.waitForRaidExecution()
+	r.parseOutput(jsonRunner)
 
 	return r, err
 }
@@ -326,15 +329,13 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 
 		if dp.SmartStatus != nil {
 			r.mux.Lock()
-			if !r.found[dp.SerialNumber] {
-				r.found[dp.SerialNumber] = true
 
-				if jsonRunner {
-					r.jsonDevices[name] = string(devices)
-				} else {
-					r.devices = append(r.devices, dp)
-				}
+			if jsonRunner {
+				r.jsonDevices[name] = jsonDevice{dp.SerialNumber, string(devices)}
+			} else {
+				r.devices[name] = dp
 			}
+
 			r.mux.Unlock()
 		}
 	}
@@ -428,23 +429,60 @@ func (r *runner) setRaidDevices(dp deviceParser, device []byte, raidType string,
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	if !r.foundRaid[dp.SerialNumber] {
-		r.foundRaid[dp.SerialNumber] = true
-
-		if json {
-			r.jsonDevices[dp.Info.Name] = string(device)
-		} else {
-			r.devices = append(r.devices, dp)
-		}
-
-		if raidType == satType {
-			return true
-		}
+	if json {
+		r.jsonDevices[dp.Info.Name] = jsonDevice{dp.SerialNumber, string(device)}
 	} else {
+		r.devices[dp.Info.Name] = dp
+	}
+
+	if raidType == satType {
 		return true
 	}
 
 	return false
+}
+
+func (r *runner) parseOutput(jsonRunner bool) {
+	found := make(map[string]bool)
+	var keys []string
+
+	if jsonRunner {
+		tmp := make(map[string]jsonDevice)
+
+		for k := range r.jsonDevices {
+			keys = append(keys, k)
+		}
+
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			dev := r.jsonDevices[k]
+			if !found[dev.serialNumber] {
+				found[dev.serialNumber] = true
+				tmp[k] = dev
+			}
+		}
+
+		r.jsonDevices = tmp
+	} else {
+		tmp := make(map[string]deviceParser)
+
+		for k := range r.devices {
+			keys = append(keys, k)
+		}
+
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			dev := r.devices[k]
+			if !found[dev.SerialNumber] {
+				found[dev.SerialNumber] = true
+				tmp[k] = dev
+			}
+		}
+
+		r.devices = tmp
+	}
 }
 
 func (dp *deviceParser) checkErr() (err error) {

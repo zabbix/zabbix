@@ -50,7 +50,7 @@ func TestUserParameterPlugin(t *testing.T) {
 		t.Run(results[i].data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			if err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters); err != nil {
+			if err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters, ""); err != nil {
 				if !results[i].failed {
 					t.Errorf("Expected success while got error %s", err)
 				}
@@ -209,7 +209,7 @@ func TestCmd(t *testing.T) {
 		t.Run(resultsCmd[i].data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			if err := InitUserParameterPlugin(resultsCmd[i].data, resultsCmd[i].unsafeUserParameters); err != nil {
+			if err := InitUserParameterPlugin(resultsCmd[i].data, resultsCmd[i].unsafeUserParameters, ""); err != nil {
 				t.Errorf("Plugin init failed: %s", err)
 			}
 
@@ -238,7 +238,7 @@ func TestUnsafeCmd(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		plugin.Metrics = make(map[string]*plugin.Metric)
 
-		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 0); err != nil {
+		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 0, ""); err != nil {
 			t.Errorf("Plugin init failed: %s", err)
 		}
 
@@ -251,7 +251,7 @@ func TestUnsafeCmd(t *testing.T) {
 
 		plugin.Metrics = make(map[string]*plugin.Metric)
 
-		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 1); err != nil {
+		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 1, ""); err != nil {
 			t.Errorf("Plugin init failed: %s", err)
 		}
 

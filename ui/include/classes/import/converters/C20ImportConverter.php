@@ -32,6 +32,12 @@ class C20ImportConverter extends CConverter {
 	protected $itemKeyConverter;
 
 	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
+	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
+
+	/**
 	 * Converter used for converting trigger expressions from 2.2 to 2.4 format.
 	 *
 	 * @var CConverter
@@ -57,9 +63,6 @@ class C20ImportConverter extends CConverter {
 		}
 		if (array_key_exists('triggers', $data['zabbix_export'])) {
 			$data['zabbix_export']['triggers'] = $this->convertTriggers($data['zabbix_export']['triggers']);
-		}
-		if (array_key_exists('screens', $data['zabbix_export'])) {
-			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
 		}
 		if (array_key_exists('maps', $data['zabbix_export'])) {
 			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
@@ -233,8 +236,8 @@ class C20ImportConverter extends CConverter {
 
 			if (zbx_is_int($screen_item['resourcetype'])) {
 				switch ($screen_item['resourcetype']) {
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-					case SCREEN_RESOURCE_PLAIN_TEXT:
+					case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
+					case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
 						$screen_item['resource']['key'] =
 							$this->itemKeyConverter->convert($screen_item['resource']['key']);
 						break;

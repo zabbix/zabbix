@@ -62,7 +62,7 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'applications', 'graphs', 'graph_prototypes',
+	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'graphs', 'graph_prototypes',
 		'item_prototypes'
 	];
 
@@ -179,30 +179,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'applications' => [
-				'title' => _('Applications'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'applicationid,name',
-				'form' => [
-					'name' => 'applicationform',
-					'id' => 'applications'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
-			'application_prototypes' => [
-				'title' => _('Application prototypes'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'application_prototypeid,name',
-				'form' => [
-					'name' => 'application_prototype_form',
-					'id' => 'application_prototypes'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
 			'triggers' => [
 				'title' => _('Triggers'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -282,18 +258,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'screens' => [
-				'title' => _('Screens'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'screenid',
-				'form' => [
-					'name' => 'screenform',
-					'id' => 'screens'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
 			'graphs' => [
 				'title' => _('Graphs'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -367,19 +331,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'scripts' => [
-				'title' => _('Global scripts'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'scriptid,name',
-				'form' => [
-					'name' => 'scriptform',
-					'id' => 'scripts'
-				],
-				'table_columns' => [
-					_('Name'),
-					_('Execute on')
-				]
-			],
 			'roles' => [
 				'title' => _('User roles'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -428,6 +379,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name'),
 					_('Mapping')
 				]
+			],
+			'dashboard' => [
+				'title' => _('Dashboards'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'dashboardid,name',
+				'form' => [
+					'name' => 'dashboardform',
+					'id' => 'dashboards'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -452,7 +415,6 @@ class CControllerPopupGeneric extends CController {
 			'hostid' =>								'db hosts.hostid',
 			'host' =>								'string',
 			'parent_discoveryid' =>					'db items.itemid',
-			'screenid' =>							'db screens.screenid',
 			'templates' =>							'string|not_empty',
 			'host_templates' =>						'string|not_empty',
 			'multiselect' =>						'in 1',
@@ -465,7 +427,6 @@ class CControllerPopupGeneric extends CController {
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
-			'with_applications' =>					'in 1',
 			'with_graphs' =>						'in 1',
 			'with_graph_prototypes' =>				'in 1',
 			'with_items' =>							'in 1',
@@ -668,7 +629,7 @@ class CControllerPopupGeneric extends CController {
 			$group_options['enrich_parent_groups'] = 1;
 		}
 
-		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
+		foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
 				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
 			if ($this->hasInput($name)) {
 				$group_options[$name] = 1;
@@ -765,7 +726,7 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected function getPageOptions(): array {
 		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
-		$option_fields_value = ['host_templates', 'screenid'];
+		$option_fields_value = ['host_templates'];
 
 		$page_options = [
 			'srcfld1' => $this->getInput('srcfld1', ''),
@@ -955,9 +916,7 @@ class CControllerPopupGeneric extends CController {
 			'preservekeys' => true
 		];
 
-		$popups_support_templated_entries = ['applications', 'triggers', 'trigger_prototypes', 'graphs',
-			'graph_prototypes'
-		];
+		$popups_support_templated_entries = ['triggers', 'trigger_prototypes', 'graphs', 'graph_prototypes'];
 
 		if (in_array($this->source_table, $popups_support_templated_entries)) {
 			if (!$this->hasInput('monitored_hosts') && $this->hasInput('real_hosts')) {
@@ -1208,51 +1167,6 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name_expanded']);
 				break;
 
-			case 'applications':
-				$options += [
-					'output' => ['applicationid', 'name'],
-					'hostids' => $this->hostids ? $this->hostids : null
-				];
-
-				if (!$this->host_preselect_required || $this->hostids) {
-					$records = API::Application()->get($options);
-				}
-				else {
-					$records = [];
-				}
-
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['applicationid' => 'id']);
-				break;
-
-			case 'application_prototypes':
-				$records = [];
-				$parent_discoveryid = $this->getInput('parent_discoveryid');
-
-				$discovery_rules = API::DiscoveryRule()->get([
-					'output' => [],
-					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
-					'itemids' => [$parent_discoveryid]
-				]);
-
-				if ($discovery_rules) {
-					$discovery_rule = $discovery_rules[0];
-
-					if ($discovery_rule['applicationPrototypes']) {
-						CArrayHelper::sort($discovery_rule['applicationPrototypes'], [
-							['field' => 'name', 'order' => ZBX_SORT_UP]
-						]);
-
-						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
-							$records[$application_prototype['application_prototypeid']] = [
-								'id' => $application_prototype['application_prototypeid'],
-								'name' => $application_prototype['name']
-							];
-						}
-					}
-				}
-				break;
-
 			case 'graphs':
 			case 'graph_prototypes':
 				$options += [
@@ -1282,15 +1196,6 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::Map()->get($options);
 
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'screens':
-				$options += [
-					'output' => ['screenid', 'name']
-				];
-
-				$records = API::Screen()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
 
@@ -1324,23 +1229,6 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
 				break;
 
-			case 'scripts':
-				$options += [
-					'output' => ['scriptid', 'name', 'type', 'execute_on'],
-					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
-				];
-
-				if ((!$this->host_preselect_required && $this->hostids)
-						|| (!$this->group_preselect_required || $this->groupids)) {
-					$records = API::Script()->get($options);
-				}
-				else {
-					$records = [];
-				}
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
 			case 'roles':
 				$options += [
 					'output' => ['roleid', 'name'],
@@ -1351,6 +1239,7 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
+
 			case 'api_methods':
 				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
 				$api_methods = CRoleHelper::getApiMethods($user_type);
@@ -1410,7 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
 				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
-				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
 				 *          this parameter is not set;
 				 */
 				$records = [];
@@ -1481,6 +1370,17 @@ class CControllerPopupGeneric extends CController {
 
 				$records = array_column($records, null, 'id');
 				CArrayHelper::sort($records, ['name', 'hostname']);
+				break;
+
+			case 'dashboard':
+				$options += [
+					'output' => ['dashboardid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Dashboard()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
 				break;
 		}
 

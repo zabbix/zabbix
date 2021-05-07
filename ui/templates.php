@@ -28,7 +28,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js',
-	'class.tab-indicators.js'
+	'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -208,12 +208,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($templateId == 0) {
 			$messageSuccess = _('Template added');
 			$messageFailed = _('Cannot add template');
-			$auditAction = AUDIT_ACTION_ADD;
 		}
 		else {
 			$messageSuccess = _('Template updated');
 			$messageFailed = _('Cannot update template');
-			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 
 		// Add new group.
@@ -275,7 +273,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = API::Template()->update($template);
 
-			if (!$result) {
+			if ($result) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
+			}
+			else {
 				throw new Exception();
 			}
 		}
@@ -323,9 +324,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
-			if (!copyApplications($cloneTemplateId, $templateId)) {
-				throw new Exception();
-			}
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -388,7 +386,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$db_template_dashboards = API::TemplateDashboard()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
-				'selectWidgets' => API_OUTPUT_EXTEND,
+				'selectPages' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			]);
 
@@ -399,10 +397,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					throw new Exception();
 				}
 			}
-		}
-
-		if ($result) {
-			add_audit_ext($auditAction, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
@@ -786,7 +780,6 @@ else {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,

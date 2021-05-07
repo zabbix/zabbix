@@ -24,14 +24,26 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for dashboard popup menu.
 	 *
-	 * @param string $dashboardid
+	 * @param string|null $dashboardid
+	 * @param bool        $editable
+	 * @param bool        $has_related_reports
+	 * @param bool        $can_edit_dashboards
+	 * @param bool        $can_view_reports
+	 * @param bool        $can_create_reports
+	 *
+	 * @return array
 	 */
-	public static function getDashboard($dashboardid, $editable) {
+	public static function getDashboard(?string $dashboardid, bool $editable, bool $has_related_reports,
+			bool $can_edit_dashboards, bool $can_view_reports, bool $can_create_reports): array {
 		return [
 			'type' => 'dashboard',
 			'data' => [
 				'dashboardid' => $dashboardid,
-				'editable' => $editable
+				'editable' => $editable,
+				'has_related_reports' => $has_related_reports,
+				'can_edit_dashboards' => $can_edit_dashboards,
+				'can_view_reports' => $can_view_reports,
+				'can_create_reports' => $can_create_reports
 			]
 		];
 	}
@@ -99,38 +111,15 @@ class CMenuPopupHelper {
 			]
 		];
 
+		if (array_key_exists('unique_id', $selement)) {
+			$data['data']['unique_id'] = $selement['unique_id'];
+		}
+
 		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 			$data['data']['severity_min'] = $severity_min;
 		}
 		if ($hostid != 0) {
 			$data['data']['hostid'] = $hostid;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Prepare data for refresh time menu popup.
-	 *
-	 * @param string $widgetName
-	 * @param string $currentRate
-	 * @param bool   $multiplier   Multiplier or time mode.
-	 * @param array  $params       (optional) URL parameters.
-	 *
-	 * @return array
-	 */
-	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
-		$data = [
-			'type' => 'refresh',
-			'data' => [
-				'widgetName' => $widgetName,
-				'currentRate' => $currentRate,
-				'multiplier' => $multiplier ? '1' : '0'
-			]
-		];
-
-		if ($params) {
-			$data['data']['params'] = $params;
 		}
 
 		return $data;

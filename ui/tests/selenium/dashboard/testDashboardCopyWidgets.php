@@ -21,13 +21,14 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  */
 class testDashboardCopyWidgets extends CWebTest {
 
 	const DASHBOARD_ID = 130;
 	const PASTE_DASHBOARD_ID = 131;
+	const NEW_PAGE_ID = 143;
+	const NEW_PAGE_NAME = 'Test_page';
 
 	private static $replaced_widget_name = "Test widget for replace";
 	private static $replaced_widget_size = [ 'width' => '13', 'height' => '8'];
@@ -36,7 +37,14 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * Data provider for copying widgets.
 	 */
 	public static function getCopyWidgetsData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget WHERE dashboardid ='.self::DASHBOARD_ID);
+		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM dashboard_page dp'.
+				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+					' AND dp.dashboardid='.self::DASHBOARD_ID.
+			') ORDER BY w.widgetid DESC'
+		);
 	}
 
 	/**
@@ -60,7 +68,14 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->copyWidgets($data, true, true);
 	}
 
-	private function copyWidgets($data, $new_dashboard = false, $replace = false) {
+	/**
+	 * @dataProvider getCopyWidgetsData
+	 */
+	public function testDashboardCopyWidgets_NewPage($data) {
+		$this->copyWidgets($data, false, false, true);
+	}
+
+	private function copyWidgets($data, $new_dashboard = false, $replace = false, $new_page = false) {
 		$name = $data['name'];
 
 		// Exclude Map navigation tree widget from replacing tests.
@@ -86,27 +101,44 @@ class testDashboardCopyWidgets extends CWebTest {
 		];
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
 		$dashboard = CDashboardElement::find()->one();
+
 		// Get fields from widget form to compare them with new widget after copying.
 		$fields = $dashboard->getWidget($name)->edit()->getFields();
+
 		// Add tag fields mapping to form for problem widgets.
 		if (stristr($name, 'Problem')) {
 			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
 		}
+
 		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
-			: CDBHelper::getRow('SELECT width, height FROM widget WHERE dashboardid='.zbx_dbstr(self::DASHBOARD_ID).
-					' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC');
+			: CDBHelper::getRow('SELECT w.width, w.height'.
+					' FROM widget w WHERE EXISTS ('.
+						'SELECT NULL FROM dashboard_page dp'.
+						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+							' AND dp.dashboardid='.self::DASHBOARD_ID.
+					')'.
+					' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
+			);
 
 		// Close widget configuration overlay.
 		COverlayDialogElement::find()->one()->close();
-
 		$dashboard->copyWidget($name);
+
 		// Open other dashboard for paste widgets.
 		if ($new_dashboard) {
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::PASTE_DASHBOARD_ID);
 			$dashboard = CDashboardElement::find()->one();
 		}
+
+		if ($new_page) {
+			$this->query('xpath://div[@class="dashboard-navigation-tabs"]//span[text()="'.self::NEW_PAGE_NAME.'"]')
+					->waitUntilClickable()->one()->click();
+			$this->query('xpath://div[@class="selected-tab"]//span[text()="'.self::NEW_PAGE_NAME.'"]')
+					->waitUntilVisible()->one();
+		}
+
 		$dashboard->edit();
 
 		if ($replace) {
@@ -115,33 +147,44 @@ class testDashboardCopyWidgets extends CWebTest {
 		else {
 			$dashboard->pasteWidget();
 		}
-		sleep(1);
+
 		// Wait until widget is pasted and loading spinner disappeared.
+		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$copied_widget = $dashboard->getWidgets()->last();
+
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
-		if ($new_dashboard && stristr($name, 'Map from tree')) {
+		if (($new_dashboard || $new_page) && stristr($name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
 		}
+
 		$this->assertEquals($name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields();
+
 		// Add tag fields mapping to form for newly copied problem widgets.
 		if (stristr($name, 'Problem')) {
 			$copied_fields->set('', $copied_fields->get('')->asMultifieldTable(['mapping' => $mapping]));
 		}
+
 		$copied_form = $copied_fields->asValues();
 		$this->assertEquals($original_form, $copied_form);
+
 		// Close overlay and save dashboard to get new widget size from DB.
 		$copied_overlay = COverlayDialogElement::find()->one();
 		$copied_overlay->close();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
-		$copied_widget_size = CDBHelper::getRow('SELECT width, height FROM widget'.
-				' WHERE dashboardid='.zbx_dbstr($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
-				' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC'
+		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height'.
+				' FROM widget w WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid='.($new_page ? self::NEW_PAGE_ID : 'dp.dashboard_pageid').
+						' AND dp.dashboardid='.($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
+				')'.
+				' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
 		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
 	}

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-24T07:24:01Z'
+  date: '2021-04-22T12:04:30Z'
   groups:
     -
       name: Templates/Applications
@@ -18,9 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: VMware
       items:
         -
           name: 'VMware: Event log'
@@ -32,9 +29,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/5.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Full name'
           type: SIMPLE
@@ -46,14 +44,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'VMware service full name.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Version'
           type: SIMPLE
@@ -65,14 +64,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'VMware service version.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
       discovery_rules:
         -
           name: 'Discover VMware clusters'
@@ -91,11 +91,12 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware cluster status.'
-              applications:
-                -
-                  name: VMware
               valuemap:
                 name: 'VMware status'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
         -
           name: 'Discover VMware datastores'
           type: SIMPLE
@@ -112,9 +113,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Amount of time for a read operation from the datastore (milliseconds).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
@@ -126,9 +128,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware datastore space in percentage from total.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Total size of datastore {#DATASTORE}'
               type: SIMPLE
@@ -139,9 +142,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware datastore space in bytes.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
@@ -150,9 +154,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Amount of time for a write operation to the datastore (milliseconds).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
         -
           name: 'Discover VMware hypervisors'
           type: SIMPLE
@@ -247,9 +252,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: VMware
       items:
         -
           name: 'VMware: Cluster name'
@@ -262,14 +264,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Cluster name of the guest VM.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU latency in percents'
           type: SIMPLE
@@ -279,9 +282,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Number of virtual CPUs'
           type: SIMPLE
@@ -291,14 +295,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Number of virtual CPUs assigned to the guest.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU readiness latency in percents'
           type: SIMPLE
@@ -308,9 +313,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU ready'
           type: SIMPLE
@@ -320,9 +326,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU swap-in latence in percents'
           type: SIMPLE
@@ -332,9 +339,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Percentage of CPU time spent waiting for swap-in.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU usage in percents'
           type: SIMPLE
@@ -344,9 +352,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'CPU usage as a percentage during the interval.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU usage'
           type: SIMPLE
@@ -356,9 +365,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Current upper-bound on CPU usage. The upper-bound is based on the host the virtual machine is current running on, as well as limits configured on the virtual machine itself or any parent resource pool. Valid while the virtual machine is running.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Datacenter name'
           type: SIMPLE
@@ -370,14 +380,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Datacenter name of the guest VM.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Guest memory swapped'
           type: SIMPLE
@@ -387,9 +398,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Amount of guest physical memory that is swapped out to the swap space.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Uptime of guest OS'
           type: SIMPLE
@@ -399,9 +411,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Total time elapsed since the last operating system boot-up (in seconds).'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
           triggers:
             -
               expression: '{last()}<10m'
@@ -420,14 +433,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Hypervisor name of the guest VM.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Ballooned memory'
           type: SIMPLE
@@ -437,9 +451,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Compressed memory'
           type: SIMPLE
@@ -449,9 +464,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of memory currently in the compression cache for this VM.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Host memory consumed'
           type: SIMPLE
@@ -461,9 +477,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Amount of host physical memory consumed for backing up guest physical memory pages.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Private memory'
           type: SIMPLE
@@ -473,9 +490,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Amount of memory backed by host memory and not being shared.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Shared memory'
           type: SIMPLE
@@ -485,9 +503,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of guest physical memory shared through transparent page sharing.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Swapped memory'
           type: SIMPLE
@@ -497,9 +516,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of guest physical memory swapped out to the VM''s swap device by ESX.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Guest memory usage'
           type: SIMPLE
@@ -509,9 +529,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of guest physical memory that is being used by the VM.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Host memory usage'
           type: SIMPLE
@@ -521,9 +542,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of host physical memory allocated to the VM, accounting for saving from memory sharing with other VMs.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Memory size'
           type: SIMPLE
@@ -534,14 +556,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Total size of configured memory.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Host memory usage in percents'
           type: SIMPLE
@@ -551,9 +574,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Percentage of host physical memory that has been consumed.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Power state'
           type: SIMPLE
@@ -562,9 +586,6 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The current power state of the virtual machine.'
-          applications:
-            -
-              name: VMware
           valuemap:
             name: 'VMware VirtualMachinePowerState'
           preprocessing:
@@ -572,6 +593,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Committed storage space'
           type: SIMPLE
@@ -581,9 +606,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Total storage space, in bytes, committed to this virtual machine across all datastores.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Uncommitted storage space'
           type: SIMPLE
@@ -593,9 +619,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Additional storage space, in bytes, potentially used by this virtual machine on all datastores.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Unshared storage space'
           type: SIMPLE
@@ -605,9 +632,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Uptime'
           type: SIMPLE
@@ -617,9 +645,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'System uptime.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
       discovery_rules:
         -
           name: 'Network device discovery'
@@ -639,9 +668,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine network interface input statistics (bytes per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Number of packets received on interface {#IFDESC}'
               type: SIMPLE
@@ -650,9 +680,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine network interface input statistics (packets per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
               type: SIMPLE
@@ -662,9 +693,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine network interface output statistics (bytes per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
               type: SIMPLE
@@ -673,9 +705,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine network interface output statistics (packets per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Network utilization on interface {#IFDESC}'
               type: SIMPLE
@@ -685,14 +718,15 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.'
-              applications:
-                -
-                  name: VMware
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
         -
           name: 'Disk device discovery'
           type: SIMPLE
@@ -710,9 +744,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Average number of outstanding read requests to the virtual disk during the collection interval.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average read latency to the disk {#DISKDESC}'
               type: SIMPLE
@@ -722,9 +757,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'The average time a read from the virtual disk takes.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average write latency to the disk {#DISKDESC}'
               type: SIMPLE
@@ -734,9 +770,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'The average time a write to the virtual disk takes.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average number of outstanding write requests to the disk {#DISKDESC}'
               type: SIMPLE
@@ -745,9 +782,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Average number of outstanding write requests to the virtual disk during the collection interval.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
               type: SIMPLE
@@ -757,9 +795,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine disk device read statistics (bytes per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average number of reads from the disk {#DISKDESC}'
               type: SIMPLE
@@ -768,9 +807,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine disk device read statistics (operations per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
               type: SIMPLE
@@ -780,9 +820,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine disk device write statistics (bytes per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average number of writes to the disk {#DISKDESC}'
               type: SIMPLE
@@ -791,9 +832,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine disk device write statistics (operations per second).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
         -
           name: 'Mounted filesystem discovery'
           type: SIMPLE
@@ -812,9 +854,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine file system statistics (bytes).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Free disk space on {#FSNAME} (percentage)'
               type: SIMPLE
@@ -825,9 +868,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine file system statistics (percentages).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Total disk space on {#FSNAME}'
               type: SIMPLE
@@ -838,14 +882,15 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine total disk space (bytes).'
-              applications:
-                -
-                  name: VMware
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Used disk space on {#FSNAME}'
               type: SIMPLE
@@ -855,9 +900,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware virtual machine used disk space (bytes).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
       valuemaps:
         -
           name: 'VMware VirtualMachinePowerState'
@@ -881,9 +927,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: VMware
       items:
         -
           name: 'VMware: Hypervisor ping'
@@ -891,9 +934,6 @@ zabbix_export:
           key: 'icmpping[]'
           history: 7d
           description: 'Checks if the hypervisor is running and accepting ICMP pings.'
-          applications:
-            -
-              name: VMware
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -901,6 +941,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: VMware
           triggers:
             -
               expression: '{last()}=0'
@@ -919,14 +963,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Cluster name of the guest VM.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU usage in percents'
           type: SIMPLE
@@ -936,9 +981,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'CPU usage as a percentage during the interval.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU usage'
           type: SIMPLE
@@ -948,9 +994,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU utilization'
           type: SIMPLE
@@ -960,9 +1007,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'CPU usage as a percentage during the interval depends on power management or HT.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Datacenter name'
           type: SIMPLE
@@ -974,14 +1022,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Datacenter name of the hypervisor.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Full name'
           type: SIMPLE
@@ -993,14 +1042,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The complete product name, including the version information.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU frequency'
           type: SIMPLE
@@ -1011,9 +1061,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU model'
           type: SIMPLE
@@ -1025,9 +1076,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The CPU model.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU cores'
           type: SIMPLE
@@ -1037,14 +1089,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Number of physical CPU cores on the host. Physical CPU cores are the processors contained by a CPU package.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: CPU threads'
           type: SIMPLE
@@ -1054,9 +1107,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Number of physical CPU threads on the host.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Total memory'
           type: SIMPLE
@@ -1067,9 +1121,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The physical memory size.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Model'
           type: SIMPLE
@@ -1081,9 +1136,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The system model identification.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Bios UUID'
           type: SIMPLE
@@ -1095,9 +1151,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The hardware BIOS identification.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Vendor'
           type: SIMPLE
@@ -1109,9 +1166,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The hardware vendor identification.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Ballooned memory'
           type: SIMPLE
@@ -1121,9 +1179,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver. Sum of all guest VMs.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Used memory'
           type: SIMPLE
@@ -1133,9 +1192,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Physical memory usage on the host.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Number of bytes received'
           type: SIMPLE
@@ -1145,9 +1205,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'VMware hypervisor network input statistics (bytes per second).'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Number of bytes transmitted'
           type: SIMPLE
@@ -1157,9 +1218,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'VMware hypervisor network output statistics (bytes per second).'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Power usage maximum allowed'
           type: SIMPLE
@@ -1169,14 +1231,15 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Maximum allowed power usage.'
-          applications:
-            -
-              name: VMware
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Power usage'
           type: SIMPLE
@@ -1186,9 +1249,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Current power usage.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Health state rollup'
           type: SIMPLE
@@ -1197,11 +1261,12 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
-          applications:
-            -
-              name: VMware
           valuemap:
             name: 'VMware status'
+          tags:
+            -
+              tag: Application
+              value: VMware
           triggers:
             -
               expression: '{last()}=3'
@@ -1235,11 +1300,12 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The overall alarm status of the host: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
-          applications:
-            -
-              name: VMware
           valuemap:
             name: 'VMware status'
+          tags:
+            -
+              tag: Application
+              value: VMware
           triggers:
             -
               expression: '{last()}=3'
@@ -1264,9 +1330,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'System uptime.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
           triggers:
             -
               expression: '{last()}<10m'
@@ -1285,9 +1352,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Dot-separated version string.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
         -
           name: 'VMware: Number of guest VMs'
           type: SIMPLE
@@ -1297,9 +1365,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Number of guest virtual machines.'
-          applications:
+          tags:
             -
-              name: VMware
+              tag: Application
+              value: VMware
       discovery_rules:
         -
           name: 'Datastore discovery'
@@ -1317,9 +1386,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Number of available datastore paths.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {last()}<{#MULTIPATH.COUNT}'
@@ -1336,9 +1406,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Average amount of time for a read operation from the datastore (milliseconds).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
@@ -1350,9 +1421,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware datastore space in percentage from total.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Total size of datastore {#DATASTORE}'
               type: SIMPLE
@@ -1363,9 +1435,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'VMware datastore space in bytes.'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
             -
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
@@ -1374,9 +1447,10 @@ zabbix_export:
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
               description: 'Average amount of time for a write operation to the datastore (milliseconds).'
-              applications:
+              tags:
                 -
-                  name: VMware
+                  tag: Application
+                  value: VMware
       valuemaps:
         -
           name: 'Service state'

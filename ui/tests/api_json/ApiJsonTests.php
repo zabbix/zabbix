@@ -19,9 +19,9 @@
 **/
 
 
+require_once dirname(__FILE__).'/testJSONRPC.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
-require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testAuditLog.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
@@ -44,7 +44,6 @@ require_once dirname(__FILE__).'/testTriggerPermissions.php';
 require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testTagFiltering.php';
-require_once dirname(__FILE__).'/testTemplateImport.php';
 require_once dirname(__FILE__).'/testToken.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
@@ -59,9 +58,9 @@ class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
+		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
-		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testAuditLog');
 		$suite->addTestSuite('testConfiguration');
 //		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
@@ -85,7 +84,6 @@ class ApiJsonTests {
 		$suite->addTestSuite('testTriggerValidation');
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testTagFiltering');
-		$suite->addTestSuite('testTemplateImport');
 		$suite->addTestSuite('testToken');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');

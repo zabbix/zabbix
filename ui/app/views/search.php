@@ -35,7 +35,7 @@ $table = (new CTableInfo())
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
 		->addItem((new CColHeader(_('Configuration')))
-			->setColSpan($data['hosts'] ? 6 : 1)
+			->setColSpan($data['hosts'] ? 5 : 1)
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
 	)
@@ -112,17 +112,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 		)
 		: _('Web');
 
-	$app_count = CViewHelper::showNum($host['applications']);
-	$applications_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'application.list')
-			->setArgument('filter_set', '1')
-			->setArgument('filter_hostids', [$hostid])
-		), $app_count]
-		: _('Applications');
-
-	$applications_link = (new CCol($applications_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
-
 	$item_count = CViewHelper::showNum($host['items']);
 	$items_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Items'), (new CUrl('items.php'))
@@ -131,6 +120,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('context', 'host')
 		), $item_count]
 		: _('Items');
+
+	$items_link = (new CCol($items_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -177,7 +168,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 		$charts_link,
 		$dashboards_link,
 		$web_link,
-		$applications_link,
 		$items_link,
 		$triggers_link,
 		$graphs_link,
@@ -187,7 +177,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
-	->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
+	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
 	->setHeader(_('Hosts'), [], 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state')
 	->setFooter(new CList([
@@ -271,7 +261,7 @@ foreach ($data['groups'] as $groupid => $group) {
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
-	->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
+	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
 	->setHeader(_('Host groups'), [], 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state')
 	->setFooter(new CList([
@@ -283,14 +273,13 @@ if ($data['admin']) {
 		->setHeader((new CRowHeader())
 			->addItem(new CColHeader(_('Template')))
 			->addItem((new CColHeader(_('Configuration')))
-				->setColSpan($data['templates'] ? 7 : 1)
+				->setColSpan($data['templates'] ? 6 : 1)
 				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 			)
 		);
 
 	foreach ($data['templates'] as $templateid => $template) {
 		$visible_name = make_decoration($template['name'], $data['search']);
-		$app_count = CViewHelper::showNum($template['applications']);
 		$item_count = CViewHelper::showNum($template['items']);
 		$trigger_count = CViewHelper::showNum($template['triggers']);
 		$graph_count = CViewHelper::showNum($template['graphs']);
@@ -305,16 +294,6 @@ if ($data['admin']) {
 			)]
 			: [new CSpan($visible_name)];
 
-		$applications_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'application.list')
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$templateid])
-			), $app_count]
-			: _('Applications');
-
-		$applications_link = (new CCol($applications_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
-
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
@@ -322,6 +301,8 @@ if ($data['admin']) {
 				->setArgument('context', 'template')
 			), $item_count]
 			: _('Items');
+
+		$items_link = (new CCol($items_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
@@ -373,13 +354,13 @@ if ($data['admin']) {
 			$template_cell[] = ')';
 		}
 
-		$table->addRow([$template_cell, $applications_link, $items_link, $triggers_link, $graphs_link, $dashboards_link,
+		$table->addRow([$template_cell, $items_link, $triggers_link, $graphs_link, $dashboards_link,
 			$discovery_link, $httptests_link
 		]);
 	}
 
 	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
-		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
+		->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
 		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
 		->setHeader(_('Templates'), [], 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state')
 		->setFooter(new CList([

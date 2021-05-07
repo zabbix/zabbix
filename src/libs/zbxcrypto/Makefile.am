@@ -7,6 +7,8 @@ libzbxcrypto_a_SOURCES = \
 	md5.c \
 	sha256crypt.c \
 	sha512crypt.c \
+	aes.c \
+	aes.h \
 	tls.c \
 	tls.h \
 	tls_tcp.h \

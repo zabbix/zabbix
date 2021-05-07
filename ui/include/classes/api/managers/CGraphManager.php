@@ -51,11 +51,6 @@ class CGraphManager {
 
 		$del_graphids = array_keys($del_graphids);
 
-		DB::delete('screens_items', [
-			'resourceid' => $del_graphids,
-			'resourcetype' => SCREEN_RESOURCE_GRAPH
-		]);
-
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.graphids',
 			'source' => 'graphid',

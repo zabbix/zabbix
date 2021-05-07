@@ -29,7 +29,9 @@ class CControllerDashboardPropertiesEdit extends CController {
 		$fields = [
 			'template' => 'in 1',
 			'userid' => 'db users.userid',
-			'name' => 'required|db dashboard.name'
+			'name' => 'required|db dashboard.name',
+			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' => 'required|db dashboard.auto_start|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,7 +59,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 		}
 		else {
 			return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 	}
 
@@ -65,7 +67,9 @@ class CControllerDashboardPropertiesEdit extends CController {
 		$data = [
 			'dashboard' => [
 				'template' => $this->hasInput('template'),
-				'name' => $this->getInput('name')
+				'name' => $this->getInput('name'),
+				'display_period' => (int) $this->getInput('display_period'),
+				'auto_start' => (int) $this->getInput('auto_start')
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

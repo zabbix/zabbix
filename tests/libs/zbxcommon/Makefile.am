@@ -25,7 +25,8 @@ SERVER_tests = \
 	zbx_tm_add \
 	zbx_tm_sub \
 	zbx_tm_round_up \
-	zbx_tm_round_down
+	zbx_tm_round_down \
+	zbx_get_report_nextcheck
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -466,4 +467,18 @@ zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_tm_round_down_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+# zbx_get_report_nextcheck
+
+zbx_get_report_nextcheck_SOURCES = \
+	zbx_get_report_nextcheck.c \
+	$(COMMON_SRC_FILES)
+
+zbx_get_report_nextcheck_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
+
+zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif

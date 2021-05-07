@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-28T10:38:45Z'
+  date: '2021-02-23T11:04:39Z'
   groups:
     -
       name: Templates/Applications
@@ -12,11 +12,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Aranet
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Aranet: Get data'
@@ -288,9 +283,6 @@ zabbix_export:
                 Zabbix.log(3, '[ Aranet scraper ] ERROR: ' + error);
                 throw 'Scraping failed: ' + error;
             }
-          applications:
-            -
-              name: 'Zabbix raw items'
           timeout: 10s
           parameters:
             -
@@ -305,6 +297,10 @@ zabbix_export:
             -
               name: username
               value: '{$ARANET.API.USERNAME}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Aranet: Sensors discovery'
           type: DEPENDENT
@@ -314,9 +310,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Discovery for Aranet Cloud sensors'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -347,6 +340,10 @@ zabbix_export:
                 - 15m
           master_item:
             key: aranet.get_data
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
       discovery_rules:
         -
           name: 'Battery voltage discovery'
@@ -396,9 +393,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -406,6 +400,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
                   expression: '{max(5m)} < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
@@ -469,9 +467,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -479,6 +474,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)} > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
@@ -542,9 +541,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -552,6 +548,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -602,9 +602,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -612,6 +609,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -662,9 +663,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -672,6 +670,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -722,9 +724,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -732,6 +731,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)} > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
@@ -795,9 +798,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -805,6 +805,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -854,9 +858,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -868,6 +869,10 @@ zabbix_export:
                     - 'return Math.floor(Date.now()/1000 - Number(value));'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
                   expression: '{last()} > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}'
@@ -922,9 +927,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -932,6 +934,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -982,9 +988,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -992,6 +995,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1042,9 +1049,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1052,6 +1056,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1102,9 +1110,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1112,6 +1117,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1162,9 +1171,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1172,6 +1178,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1222,9 +1232,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1232,6 +1239,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1282,9 +1293,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1292,6 +1300,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1342,9 +1354,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1352,6 +1361,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1402,9 +1415,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1412,6 +1422,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1462,9 +1476,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1472,6 +1483,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1522,9 +1537,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1532,6 +1544,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1582,9 +1598,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1592,6 +1605,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
@@ -1642,9 +1659,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1652,6 +1666,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
       macros:

@@ -1057,30 +1057,12 @@ class testFormUser extends CWebTest {
 					'error_details' => 'User "user-zabbix" is map "Local network" owner.'
 				]
 			],
-			// Attempt to delete a user that owns a screen.
+			// Attempt to delete a user that owns a dashboard.
 			[
 				[
 					'expected' => TEST_BAD,
-					'username' => 'test-user',
-					'parameters' => [
-						'DB_table' => 'screens',
-						'column' => 'name',
-						'value' => 'Zabbix server'
-					],
-					'error_details' => 'User "test-user" is screen "Zabbix server" owner.'
-				]
-			],
-			// Attempt to delete a user that owns a slide show.
-			[
-				[
-					'expected' => TEST_BAD,
-					'username' => 'admin-zabbix',
-					'parameters' => [
-						'DB_table' => 'slideshows',
-						'column' => 'name',
-						'value' => 'Test slide show 1'
-					],
-					'error_details' => 'User "admin-zabbix" is slide show "Test slide show 1" owner.'
+					'username' => 'test-timezone',
+					'error_details' => 'User "test-timezone" is dashboard "Testing share dashboard" owner.'
 				]
 			],
 			// Attempt to delete a user that is mentioned in an action.
@@ -1115,7 +1097,7 @@ class testFormUser extends CWebTest {
 		$this->query('link', $username)->one()->click();
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username =' . zbx_dbstr($username));
 
-		// Link user with map, screen, slideshow, action to validate user deletion.
+		// Link user with map, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
 					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid).

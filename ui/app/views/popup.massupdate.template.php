@@ -29,7 +29,6 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.template')
@@ -159,7 +158,7 @@ $tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
 	]
 ]));
 
-// Value mappping.
+// Value mapping.
 $tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 	'visible' => [],
 	'hostids' => $data['ids'],

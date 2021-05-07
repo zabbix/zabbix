@@ -277,26 +277,6 @@ class DB {
 		return $schema['fields'][$field_name]['length'];
 	}
 
-	private static function addMissingFields($tableSchema, $values) {
-		global $DB;
-
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			foreach ($tableSchema['fields'] as $name => $field) {
-				if (($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB)
-						&& !$field['null']) {
-					foreach ($values as &$value) {
-						if (!isset($value[$name])) {
-							$value[$name] = '';
-						}
-					}
-					unset($value);
-				}
-			}
-		}
-
-		return $values;
-	}
-
 	public static function getDefaults($table) {
 		$table = self::getSchema($table);
 
@@ -324,9 +304,55 @@ class DB {
 		return isset($field['default']) ? $field['default'] : null;
 	}
 
-	public static function checkValueTypes($table, &$values) {
+	/**
+	 * Get the updated values of a record by correctly comparing the new and old ones, taking field types into account.
+	 *
+	 * @param string $table_name
+	 * @param array  $new_values
+	 * @param array  $old_values
+	 *
+	 * @return array
+	 */
+	public static function getUpdatedValues(string $table_name, array $new_values, array $old_values): array {
+		$updated_values = [];
+
+		// Discard field names not existing in the target table.
+		$fields = array_intersect_key(DB::getSchema($table_name)['fields'], $new_values);
+
+		foreach ($fields as $name => $spec) {
+			if (!array_key_exists($name, $old_values)) {
+				$updated_values[$name] = $new_values[$name];
+				continue;
+			}
+
+			switch ($spec['type']) {
+				case DB::FIELD_TYPE_ID:
+					if (bccomp($new_values[$name], $old_values[$name]) != 0) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+
+				case DB::FIELD_TYPE_INT:
+				case DB::FIELD_TYPE_UINT:
+				case DB::FIELD_TYPE_FLOAT:
+					if ($new_values[$name] != $old_values[$name]) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+
+				default:
+					if ($new_values[$name] !== $old_values[$name]) {
+						$updated_values[$name] = $new_values[$name];
+					}
+					break;
+			}
+		}
+
+		return $updated_values;
+	}
+
+	private static function checkValueTypes($tableSchema, &$values) {
 		global $DB;
-		$tableSchema = self::getSchema($table);
 
 		foreach ($values as $field => $value) {
 			if (!isset($tableSchema['fields'][$field])) {
@@ -471,38 +497,60 @@ class DB {
 	 * @return array    an array of ids with the keys preserved
 	 */
 	public static function insert($table, $values, $getids = true) {
-		if (empty($values)) {
-			return true;
-		}
-
-		$resultIds = [];
-
-		if ($getids) {
-			$id = self::reserveIds($table, count($values));
-		}
-
-		$tableSchema = self::getSchema($table);
-
-		$values = self::addMissingFields($tableSchema, $values);
+		$table_schema = self::getSchema($table);
+		$fields = [];
 
 		foreach ($values as $key => $row) {
-			if ($getids) {
-				$resultIds[$key] = $id;
-				$row[$tableSchema['key']] = $id;
-				$id = bcadd($id, 1, 0);
+			$fields += array_diff_key($row, $fields);
+		}
+
+		$fields = array_intersect_key($fields, $table_schema['fields']);
+
+		foreach ($fields as $field => &$value) {
+			$value = array_key_exists('default', $table_schema['fields'][$field])
+				? $table_schema['fields'][$field]['default']
+				: null;
+		}
+		unset($value);
+
+		foreach ($values as $key => &$row) {
+			$row += $fields;
+
+			$ordered_row = [];
+			foreach ($fields as $field => $foo) {
+				$ordered_row[$field] = $row[$field];
 			}
 
-			self::checkValueTypes($table, $row);
+			$row = $ordered_row;
+		}
+		unset($row);
 
-			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
-					' VALUES ('.implode(',', array_values($row)).')';
+		return self::insertBatch($table, $values, $getids);
+	}
 
-			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
+	/**
+	 * Returns the list of mandatory fields with default values for INSERT statements.
+	 *
+	 * @static
+	 *
+	 * @param array $table_schema
+	 *
+	 * @return array
+	 */
+	private static function getMandatoryFields(array $table_schema): array {
+		global $DB;
+
+		$mandatory_fields = [];
+
+		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+			foreach ($table_schema['fields'] as $name => $field) {
+				if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
+					$mandatory_fields += [$name => $field['default']];
+				}
 			}
 		}
 
-		return $resultIds;
+		return $mandatory_fields;
 	}
 
 	/**
@@ -521,28 +569,28 @@ class DB {
 
 		$resultIds = [];
 
-		$tableSchema = self::getSchema($table);
-		$values = self::addMissingFields($tableSchema, $values);
+		$table_schema = self::getSchema($table);
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
 		}
 
-		$newValues = [];
-		foreach ($values as $key => $row) {
+		$mandatory_fields = self::getMandatoryFields($table_schema);
+
+		foreach ($values as $key => &$row) {
 			if ($getids) {
 				$resultIds[$key] = $id;
-				$row[$tableSchema['key']] = $id;
-				$values[$key][$tableSchema['key']] = $id;
+				$row[$table_schema['key']] = $id;
 				$id = bcadd($id, 1, 0);
 			}
-			self::checkValueTypes($table, $row);
-			$newValues[] = $row;
+
+			$row += $mandatory_fields;
+
+			self::checkValueTypes($table_schema, $row);
 		}
+		unset($row);
 
-		$fields = array_keys(reset($newValues));
-
-		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
+		$sql = self::getDbBackend()->createInsertQuery($table, array_keys(reset($values)), $values);
 
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
@@ -571,7 +619,7 @@ class DB {
 		$data = zbx_toArray($data);
 		foreach ($data as $row) {
 			// check
-			self::checkValueTypes($table, $row['values']);
+			self::checkValueTypes($tableSchema, $row['values']);
 			if (empty($row['values'])) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
 			}
@@ -846,11 +894,11 @@ class DB {
 	 * Delete data from DB.
 	 *
 	 * Example:
-	 * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
-	 * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
+	 * DB::delete('items', ['itemid' => [1, 8, 6]]);
+	 * DELETE FROM items WHERE itemid IN (1, 8, 6)
 	 *
-	 * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
-	 * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
+	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10]]);
+	 * DELETE FROM items WHERE itemid IN (1) AND templateid IN (10)
 	 *
 	 * @param string $table
 	 * @param array  $wheres pair of fieldname => fieldvalues

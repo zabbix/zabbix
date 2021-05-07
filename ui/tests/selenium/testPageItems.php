@@ -51,7 +51,6 @@ class testPageItems extends CLegacyWebTest {
 					'History',
 					'Trends',
 					'Type',
-					'Applications',
 					'Status',
 					'Info'
 				]
@@ -69,7 +68,6 @@ class testPageItems extends CLegacyWebTest {
 					'History',
 					'Trends',
 					'Type',
-					'Applications',
 					'Status',
 					'Info'
 				]

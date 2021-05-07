@@ -351,8 +351,10 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
+		$this->query('button:Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
+		$result_form->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
 	}
 
@@ -905,8 +907,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Reboot',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -925,7 +928,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -944,7 +949,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -963,8 +970,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Reboot',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]

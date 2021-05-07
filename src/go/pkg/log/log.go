@@ -47,8 +47,10 @@ const Console = 3
 
 const MB = 1048576
 
+//DefaultLogger is the default Zabbix agent 2 and Zabbix web service logger.
+var DefaultLogger *log.Logger
+
 var logLevel int
-var logger *log.Logger
 
 type LogStat struct {
 	logType  int
@@ -118,13 +120,13 @@ func Open(logType int, level int, filename string, filesize int) error {
 			return err
 		}
 	case Console:
-		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
+		DefaultLogger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
 	case File:
 		logStat.f, err = os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
-		logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+		DefaultLogger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
 	default:
 		return errors.New("invalid argument")
 	}
@@ -178,7 +180,7 @@ func procLog(format string, args []interface{}, level int) {
 	logAccess.Lock()
 	defer logAccess.Unlock()
 	rotateLog()
-	logger.Printf(format, args...)
+	DefaultLogger.Printf(format, args...)
 }
 
 func rotateLog() {
@@ -210,11 +212,11 @@ func rotateLog() {
 				panic(errmsg)
 			}
 
-			logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+			DefaultLogger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
 			if printError != "" {
-				logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
+				DefaultLogger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
 					logStat.filename, filenameOld, printError)
-				logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
+				DefaultLogger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
 					" moving it to \"%s\" failed. The logfile was truncated.",
 					logStat.filename, filenameOld)
 			}

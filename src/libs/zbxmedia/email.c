@@ -34,6 +34,9 @@
 /* multiple 'encoded-word's should be separated by <CR><LF><SPACE> */
 #define ZBX_EMAIL_ENCODED_WORD_SEPARATOR	"\r\n "
 
+/* separator for multipart mixed messages */
+#define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
+
 /******************************************************************************
  *                                                                            *
  * Function: str_base64_encode_rfc2047                                        *
@@ -272,16 +275,27 @@ out:
 	return ret;
 }
 
+static char	*email_encode_part(const char *data, size_t data_size)
+{
+	char	*base64 = NULL, *part;
+
+	str_base64_encode_dyn(data, &base64, data_size);
+	part = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
+	zbx_free(base64);
+
+	return part;
+}
+
 static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char content_type)
 {
-	char		*tmp = NULL, *base64 = NULL, *base64_lf;
+	char		*tmp = NULL, *base64 = NULL;
 	char		*localsubject = NULL, *localbody = NULL, *from = NULL, *to = NULL;
 	char		str_time[MAX_STRING_LEN];
 	struct tm	*local_time;
 	time_t		email_time;
 	int		i;
-	size_t		from_alloc = 0, from_offset = 0, to_alloc = 0, to_offset = 0;
+	size_t		from_alloc = 0, from_offset = 0, to_alloc = 0, to_offset = 0, tmp_alloc = 0, tmp_offset = 0;
 
 	/* prepare subject */
 
@@ -301,20 +315,18 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 
 	/* prepare body */
 
-	tmp = string_replace(mailbody, "\r\n", "\n");
-	localbody = string_replace(tmp, "\n", "\r\n");
-	zbx_free(tmp);
+	if (ZBX_MEDIA_CONTENT_TYPE_MULTI != content_type)
+	{
+		char	*tmp_body;
 
-	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
-
-	/* wrap base64 encoded data with linefeeds */
-	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
-	zbx_free(base64);
-	base64 = base64_lf;
-
-	zbx_free(localbody);
-	localbody = base64;
-	base64 = NULL;
+		tmp = string_replace(mailbody, "\r\n", "\n");
+		tmp_body = string_replace(tmp, "\n", "\r\n");
+		localbody = email_encode_part(tmp_body, strlen(tmp_body));
+		zbx_free(tmp_body);
+		zbx_free(tmp);
+	}
+	else
+		localbody = (char *)mailbody;
 
 	/* prepare date */
 
@@ -345,24 +357,36 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	/* e-mails are sent in 'SMTP/MIME e-mail' format because UTF-8 is used both in mailsubject and mailbody */
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 
-	tmp = zbx_dsprintf(tmp,
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 			"From: %s\r\n"
 			"To: %s\r\n"
 			"In-Reply-To: %s\r\n"
 			"Date: %s\r\n"
 			"Subject: %s\r\n"
-			"MIME-Version: 1.0\r\n"
-			"Content-Type: %s; charset=\"UTF-8\"\r\n"
-			"Content-Transfer-Encoding: base64\r\n"
+			"MIME-Version: 1.0\r\n",
+			from, to, inreplyto, str_time, localsubject);
+
+	if (ZBX_MEDIA_CONTENT_TYPE_MULTI == content_type)
+	{
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset,
+				"Content-Type: multipart/mixed; boundary=" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n");
+	}
+	else
+	{
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+				"Content-Type: %s\r\n"
+				"Content-Transfer-Encoding: base64\r\n",
+				ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain");
+	}
+
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 			"\r\n"
 			"%s",
-			from, to, inreplyto,
-			str_time, localsubject,
-			ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain",
 			localbody);
 
 	zbx_free(localsubject);
-	zbx_free(localbody);
+	if (localbody != mailbody)
+		zbx_free(localbody);
 	zbx_free(from);
 	zbx_free(to);
 
@@ -833,4 +857,46 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
+		const char *attachment_type, const char *attachment, size_t attachment_size)
+{
+	size_t	body_alloc = 0, body_offset = 0;
+	char	*body = NULL, *localbody, *tmp, *tmp_body, *localattachment;
+
+	tmp = string_replace(message, "\r\n", "\n");
+	tmp_body = string_replace(tmp, "\n", "\r\n");
+	localbody = email_encode_part(tmp_body, strlen(tmp_body));
+	zbx_free(tmp_body);
+	zbx_free(tmp);
+
+	zbx_snprintf_alloc(&body, &body_alloc, &body_offset,
+			"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
+			"Content-Type: %s\r\n"
+			"Content-Transfer-Encoding: base64\r\n"
+			"\r\n"
+			"%s\r\n"
+			"\r\n",
+			ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain",
+			localbody);
+
+	zbx_free(localbody);
+
+	localattachment = email_encode_part(attachment, attachment_size);
+
+	zbx_snprintf_alloc(&body, &body_alloc, &body_offset,
+			"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
+			"Content-Type: %s\r\n"
+			"Content-Transfer-Encoding: base64\r\n"
+			"Content-Disposition: attachment; filename=\"%s\"\r\n"
+			"\r\n"
+			"%s\r\n"
+			"\r\n"
+			"--" ZBX_MULTIPART_MIXED_BOUNDARY "--\r\n",
+			attachment_type, attachment_name, localattachment);
+
+	zbx_free(localattachment);
+
+	return body;
 }

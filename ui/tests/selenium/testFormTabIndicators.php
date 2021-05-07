@@ -334,7 +334,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&context=host&form=create',
+					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
@@ -763,6 +763,8 @@ class testFormTabIndicators extends CWebTest {
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
 		$this->page->login()->open('zabbix.php?action=usergroup.edit')->waitUntilReady();
+		$permissions_table = $this->query('id:group-right-table')->one();
+		$tag_table = $this->query('id:tag-filter-table')->one();
 
 		// Check status indicator in Permissions tab.
 		$form = $this->query('id:user-group-form')->asForm()->one();
@@ -777,6 +779,7 @@ class testFormTabIndicators extends CWebTest {
 		$permission_level->fill('Read');
 		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
 		$add_button->click();
+		$permissions_table->waitUntilReloaded();
 		$tab_selector->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, true);
 
@@ -784,6 +787,7 @@ class testFormTabIndicators extends CWebTest {
 		$group_selector->fill('Discovered hosts');
 		$permission_level->fill('None');
 		$add_button->click();
+		$permissions_table->waitUntilReloaded();
 		$tab_selector->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, false);
 
@@ -795,7 +799,7 @@ class testFormTabIndicators extends CWebTest {
 		// Add tag filter for Discovered hosts group and check indicator.
 		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
 		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
-		$tab_selector->waitUntilReady();
+		$tag_table->waitUntilReloaded();
 		$this->assertTabIndicator($tab_selector, true);
 
 		// Remove the tag filter for Discovered hosts group and check indicator.

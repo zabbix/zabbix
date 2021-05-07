@@ -134,11 +134,12 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			'statusChange' => $data['filter']['statusChange'],
 			'statusChangeDays' => $data['filter']['statusChangeDays'],
 			'txtSelect' => $data['filter']['txtSelect'],
-			'application' => $data['filter']['application'],
 			'inventory' => $data['filter']['inventory'],
 			'show_suppressed' => $data['filter']['show_suppressed'],
 			'groups' => $data['filter']['groups'],
-			'hosts' => $data['filter']['hosts']
+			'hosts' => $data['filter']['hosts'],
+			'tags' => $data['filter']['tags'],
+			'evaltype' => $data['filter']['evaltype']
 		],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']

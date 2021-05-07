@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:26Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -29,19 +29,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'CPU utilization'
@@ -54,9 +41,10 @@ zabbix_export:
           description: |
             MIB: SW-MIB
             System's CPU usage.
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -74,14 +62,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: SW-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -101,14 +90,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: SW-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -131,11 +121,12 @@ zabbix_export:
             offline(2) means the switch is not accessible
             testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port
             faulty(4) means the switch is not operational.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'SW-MIB::swOperStatus'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
@@ -164,9 +155,10 @@ zabbix_export:
           description: |
             MIB: SW-MIB
             Memory utilization in %
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -198,9 +190,10 @@ zabbix_export:
                 The current value (reading) of the sensor.
                 The value, -2147483648, represents an unknown quantity.
                 The fan value will be in RPM(revolution per minute)
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
             -
               name: '{#SENSOR_INFO}: Fan status'
               type: SNMP_AGENT
@@ -210,11 +203,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: SW-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'SW-MIB::swSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -254,11 +248,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: SW-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'SW-MIB::swSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -300,11 +295,12 @@ zabbix_export:
               description: |
                 MIB: SW-MIB
                 Temperature status of testpoint: {#SENSOR_INFO}
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'SW-MIB::swSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
@@ -316,9 +312,10 @@ zabbix_export:
               description: |
                 MIB: SW-MIB
                 Temperature readings of testpoint: {#SENSOR_INFO}
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
