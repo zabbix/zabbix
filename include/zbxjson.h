@@ -86,6 +86,7 @@
 #define ZBX_PROTO_TAG_JMX_ENDPOINT		"jmx_endpoint"
 #define ZBX_PROTO_TAG_EVENTID			"eventid"
 #define ZBX_PROTO_TAG_NAME			"name"
+#define ZBX_PROTO_TAG_SEVERITY			"severity"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
 #define ZBX_PROTO_TAG_GROUPS			"groups"
 #define ZBX_PROTO_TAG_APPLICATIONS		"applications"
