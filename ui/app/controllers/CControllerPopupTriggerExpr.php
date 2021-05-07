@@ -325,7 +325,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'avg' => [
@@ -339,7 +339,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
 				'description' => _('between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
 			'bitand' => [
@@ -557,7 +557,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('first() - The oldest value in the specified time interval'),
 				'params' => $this->param1Sec + $this->period_optional,
-				'allowed_types' => $this->allowedTypesNumeric,
+				'allowed_types' => $this->allowedTypesAny,
 				'operators' => $this->operators
 			],
 			'floor' => [
@@ -752,7 +752,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'nodata' => [
@@ -789,7 +789,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'radians' => [
@@ -857,7 +857,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'rtrim' => [
@@ -1014,7 +1014,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'varpop' => [
