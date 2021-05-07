@@ -24,7 +24,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in host,template,mediatype,valuemap,map',
+			'rules_preset' => 'in host,template,mediatype,map',
 			'rules' => 'array'
 		];
 

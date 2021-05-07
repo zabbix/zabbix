@@ -280,8 +280,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 // Value maps.
 (() => {
 	const valuemap = document.querySelector('#valuemap-div');
-	const form = document.querySelector('#massupdate-form');
-	const action = form.querySelector('#action').value;
 
 	if (!valuemap) {
 		return false;
@@ -449,7 +447,7 @@ function submitPopup(overlay) {
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-	url = new Curl('zabbix.php', false),
+	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', action);
 	url.setArgument('output', 'ajax');
 
