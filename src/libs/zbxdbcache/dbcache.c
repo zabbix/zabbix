@@ -58,6 +58,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;
+extern char		*CONFIG_EXPORT_DIR;
 
 #define ZBX_IDS_SIZE	9
 
@@ -2879,8 +2880,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
-	unsigned char			item_retrieve_mode;
-	extern char			*CONFIG_EXPORT_DIR;
+	int				item_retrieve_mode;
 
 	item_retrieve_mode = NULL == CONFIG_EXPORT_DIR ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 

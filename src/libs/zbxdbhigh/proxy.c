@@ -3483,11 +3483,11 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	{
 		if (validator_func == proxy_item_validator)
 		{
-			DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num,
+			DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, (size_t)values_num,
 					ZBX_ITEM_GET_PROCESS);
 		}
 		else
-			DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
+			DCconfig_get_items_by_itemids(items, itemids, errcodes, (size_t)values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
