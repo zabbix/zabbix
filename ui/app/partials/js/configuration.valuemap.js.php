@@ -147,6 +147,9 @@ var AddValueMap = class {
 					value_cell = document.createElement('em');
 					value_cell.textContent = <?= json_encode(_('default')) ?>;
 					break;
+
+				default:
+					value_cell.textContent = mapping.value;
 			}
 
 			mappings_table.append(value_cell);
