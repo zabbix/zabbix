@@ -139,10 +139,30 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
+	/**
+	 * Loose check if string value contains macros.
+	 *
+	 * @param string $value
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function hasMacros(string $value): bool {
 		return (strpos($value, '{') !== false);
 	}
 
+	/**
+	 * Validate function parameter token's compliance to the rules.
+	 *
+	 * @param array $param    Function parameter token.
+	 * @param array $rules
+	 * @param array $options
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function validateRules(array $param, array $rules, array $options): bool {
 		$param_match_unquoted = ($param['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
 			? CHistFunctionParser::unquoteParam($param['match'])
@@ -218,6 +238,17 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
+	/**
+	 * Validate function's query parameter.
+	 *
+	 * @param string $host
+	 * @param string $item
+	 * @param array  $options
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function validateQuery(string $host, string $item, array $options): bool {
 		if ($options['calculated']) {
 			return ($options['aggregated']
@@ -229,6 +260,17 @@ class CHistFunctionValidator extends CValidator {
 		return true;
 	}
 
+	/**
+	 * Validate function's period parameter.
+	 *
+	 * @param string $sec_num
+	 * @param string $time_shift
+	 * @param int    $mode
+	 *
+	 * @static
+	 *
+	 * @return bool
+	 */
 	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
 		switch ($mode) {
 			case CHistFunctionData::PERIOD_MODE_DEFAULT:

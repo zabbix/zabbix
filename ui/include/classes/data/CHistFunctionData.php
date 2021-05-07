@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class containing information on history functions.
+ */
 final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
@@ -26,6 +29,11 @@ final class CHistFunctionData {
 	public const PERIOD_MODE_NUM = 2;
 	public const PERIOD_MODE_TREND = 3;
 
+	/**
+	 * Known history functions along with definition of parameters.
+	 *
+	 * @var array
+	 */
 	private const PARAMETERS = [
 		'avg' => [
 			['rules' => [['type' => 'query']]],
@@ -168,6 +176,11 @@ final class CHistFunctionData {
 		ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG
 	];
 
+	/**
+	 * Known history functions along with supported item value types.
+	 *
+	 * @var array
+	 */
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
@@ -212,13 +225,82 @@ final class CHistFunctionData {
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['calculated']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 	}
 
-	public static function isAggregated(string $function): bool {
+	/**
+	 * Check if function is known history function.
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public function isKnownFunction(string $function): bool {
+		if (!array_key_exists($function, self::PARAMETERS)) {
+			return false;
+		}
+
+		return ($this->options['calculated'] || !self::isAggregating($function));
+	}
+
+	/**
+	 * Get known history functions along with definition of parameters.
+	 *
+	 * @return array
+	 */
+	public function getParameters(): array {
+		if ($this->options['calculated']) {
+			return self::PARAMETERS;
+		}
+
+		$result = [];
+
+		foreach (self::PARAMETERS as $function => $parameters) {
+			if (self::isAggregating($function)) {
+				continue;
+			}
+
+			$result[$function] = $parameters;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get known history functions along with supported item value types.
+	 *
+	 * @return array
+	 */
+	public function getValueTypes(): array {
+		if ($this->options['calculated']) {
+			return self::VALUE_TYPES;
+		}
+
+		$result = [];
+
+		foreach (self::VALUE_TYPES as $function => $value_types) {
+			if (self::isAggregating($function)) {
+				continue;
+			}
+
+			$result[$function] = $value_types;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregating(string $function): bool {
 		switch ($function) {
 			case 'avg_foreach':
 			case 'count_foreach':
@@ -231,41 +313,5 @@ final class CHistFunctionData {
 			default:
 				return false;
 		}
-	}
-
-	public function getParameters(): array {
-		if ($this->options['calculated']) {
-			return self::PARAMETERS;
-		}
-
-		$result = [];
-
-		foreach (self::PARAMETERS as $function => $parameters) {
-			if (self::isAggregated($function)) {
-				continue;
-			}
-
-			$result[$function] = $parameters;
-		}
-
-		return $result;
-	}
-
-	public function getValueTypes(): array {
-		if ($this->options['calculated']) {
-			return self::VALUE_TYPES;
-		}
-
-		$result = [];
-
-		foreach (self::VALUE_TYPES as $function => $value_types) {
-			if (self::isAggregated($function)) {
-				continue;
-			}
-
-			$result[$function] = $value_types;
-		}
-
-		return $result;
 	}
 }
