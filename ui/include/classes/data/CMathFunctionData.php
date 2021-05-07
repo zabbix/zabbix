@@ -25,23 +25,72 @@
 final class CMathFunctionData {
 
 	/**
-	 * Known math functions along with number of required parameters (-1 for number of required parameters >= 1).
+	 * Known math functions along with number or range of required parameters.
 	 *
 	 * @var array
 	 */
 	private const PARAMETERS = [
 		'abs' => 1,
-		'avg' => -1,
+		'acos' => 1,
+		'ascii' => 1,
+		'asin' => 1,
+		'atan' => 1,
+		'atan2' => 2,
+		'avg' => [1, null],
+		'between' => 3,
 		'bitand' => 2,
+		'bitlength' => 1,
+		'bitlshift' => 2,
+		'bitnot' => 1,
+		'bitor' => 2,
+		'bitrshift' => 2,
+		'bitxor' => 2,
+		'bytelength' => 1,
+		'cbrt' => 1,
+		'ceil' => 1,
+		'char' => 1,
+		'concat' => 2,
+		'cos' => 1,
+		'cosh' => 1,
+		'cot' => 1,
 		'date' => 0,
 		'dayofmonth' => 0,
 		'dayofweek' => 0,
+		'degrees' => 1,
+		'e' => 0,
+		'exp' => 1,
+		'expm1' => 1,
+		'floor' => 1,
+		'in' => [2, null],
+		'insert' => 4,
+		'left' => 2,
 		'length' => 1,
-		'max' => -1,
-		'min' => -1,
+		'log' => 1,
+		'log10' => 1,
+		'ltrim' => [1, 2],
+		'max' => [1, null],
+		'mid' => 3,
+		'min' => [1, null],
+		'mod' => 2,
 		'now' => 0,
-		'sum' => -1,
-		'time' => 0
+		'pi' => 0,
+		'power' => 2,
+		'radians' => 1,
+		'rand' => 0,
+		'repeat' => 2,
+		'replace' => 3,
+		'right' => 2,
+		'rtrim' => [1, 2],
+		'round' => 2,
+		'sin' => 1,
+		'sinh' => 1,
+		'signum' => 1,
+		'sqrt' => 1,
+		'sum' => [1, null],
+		'tan' => 1,
+		'time' => 0,
+		'trim' => [1, 2],
+		'truncate' => 2
 	];
 
 	/**
@@ -56,7 +105,7 @@ final class CMathFunctionData {
 	}
 
 	/**
-	 * Get known math functions along with number of required parameters (-1 for number of required parameters >= 1).
+	 * Get known math functions along with number or range of required parameters.
 	 *
 	 * @return array
 	 */

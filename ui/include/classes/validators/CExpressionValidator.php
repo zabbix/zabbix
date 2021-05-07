@@ -44,7 +44,7 @@ class CExpressionValidator extends CValidator {
 	private $math_function_data;
 
 	/**
-	 * Known math functions along with number of required parameters.
+	 * Known math functions along with number or range of required parameters.
 	 *
 	 * @var array
 	 */
