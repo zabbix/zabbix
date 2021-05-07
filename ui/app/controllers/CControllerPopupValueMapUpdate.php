@@ -73,44 +73,29 @@ class CControllerPopupValueMapUpdate extends CController {
 			return false;
 		}
 
-		$mappings = array_filter($this->getInput('mappings', []), function ($mapping) {
-			return array_key_exists('value', $mapping) && ($mapping['value'] !== '' || $mapping['newvalue'] !== '');
-		});
-
-		if (!$mappings) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Mappings'), _('cannot be empty')));
-			return false;
-		}
-
 		$type_uniq = array_fill_keys([VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
 				VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
 			], []
 		);
 		$number_parser = new CNumberParser();
 		$range_parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
+		$mappings = [];
 
-		foreach ($mappings as $mapping) {
+		foreach ($this->getInput('mappings', []) as $mapping) {
 			$mapping += ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '', 'newvalue' => ''];
 			$type = $mapping['type'];
 			$value = $mapping['value'];
+
+			if ($type != VALUEMAP_MAPPING_TYPE_DEFAULT && $value === '' && $mapping['newvalue'] === '') {
+				continue;
+			}
 
 			if ($mapping['newvalue'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Mapped to'), _('cannot be empty')));
 
 				return false;
 			}
-
-			if ($type != VALUEMAP_MAPPING_TYPE_DEFAULT && array_key_exists($value, $type_uniq[$type])) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
-					_s('value %1$s already exists', '('.$value.')'))
-				);
-
-				return false;
-			}
-
-			$type_uniq[$type][$value] = true;
-
-			if ($type == VALUEMAP_MAPPING_TYPE_REGEXP
+			elseif ($type == VALUEMAP_MAPPING_TYPE_REGEXP
 					&& @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
 
@@ -123,14 +108,34 @@ class CControllerPopupValueMapUpdate extends CController {
 
 				return false;
 			}
-			elseif (($type == VALUEMAP_MAPPING_TYPE_LESS_EQUAL || $type == VALUEMAP_MAPPING_TYPE_GREATER_EQUAL)
-					&& $number_parser->parse($value) != CParser::PARSE_SUCCESS) {
+			elseif ($type == VALUEMAP_MAPPING_TYPE_LESS_EQUAL || $type == VALUEMAP_MAPPING_TYPE_GREATER_EQUAL) {
+				if ($number_parser->parse($value) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
+						_('a floating point value is expected')
+					));
+
+					return false;
+				}
+
+				$value = (float) $number_parser->getMatch();
+				$value = strval($value);
+			}
+
+			if ($type != VALUEMAP_MAPPING_TYPE_DEFAULT && array_key_exists($value, $type_uniq[$type])) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
-					_('a floating point value is expected')
-				));
+					_s('value %1$s already exists', '('.$value.')'))
+				);
 
 				return false;
 			}
+
+			$type_uniq[$type][$value] = true;
+			$mappings[] = $mapping;
+		}
+
+		if (!$mappings) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Mappings'), _('cannot be empty')));
+			return false;
 		}
 
 		return true;
