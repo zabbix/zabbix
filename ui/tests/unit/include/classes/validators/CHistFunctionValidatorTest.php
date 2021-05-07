@@ -486,7 +486,29 @@ class CHistFunctionValidatorTest extends TestCase {
 			['last_foreach(/host/key, {$PERIOD}:now-{$TIMESHIFT})', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$MACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, {#LLDMACRO})', ['calculated' => true], ['rc' => true, 'error' => null]],
-			['last_foreach(/host/key, 1d,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "last_foreach"']]
+			['last_foreach(/host/key, 1d,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "last_foreach"']],
+
+			// Wildcards in non-aggregating functions.
+			['sum(/*/key[p1,p2], 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
+			['sum(/host/*, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
+			['sum(/host/key[*,p2], 1d)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sum(/host/key[p1,*], 1d)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sum(/host/key[*,*], 1d)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sum(/*/*, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
+			['sum(/*/key[*,p2], 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
+
+			// Wildcards in aggregating functions.
+			['sum_foreach(/*/key[p1,p2], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+			['sum_foreach(/host/*, 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+			['sum_foreach(/host/key[*,p2], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+			['sum_foreach(/host/key[p1,*], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+			['sum_foreach(/host/key[*,*], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+			['sum_foreach(/*/*, 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum_foreach"']],
+			['sum_foreach(/*/key[*,p2], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+
+			// Filters.
+			['sum(/host/key?[tag="foo"], 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
+			['sum_foreach(/host/key?[tag="foo"], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]]
 		];
 	}
 
@@ -499,7 +521,7 @@ class CHistFunctionValidatorTest extends TestCase {
 		] + $options);
 		$hist_function_validator = new CHistFunctionValidator([
 			'parameters' => (new CHistFunctionData($options))->getParameters()
-		]);
+		] + $options);
 		$expression_parser->parse($source);
 		$tokens = $expression_parser->getResult()->getTokens();
 
