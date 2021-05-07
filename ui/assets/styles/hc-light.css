@@ -1954,22 +1954,29 @@ footer {
   background: #333333; }
 .toc .toc-arrow {
   min-height: 14px;
+  margin-left: 12px;
   padding: 0;
   background-color: transparent;
   border: 0; }
   .toc .toc-arrow .arrow-down,
   .toc .toc-arrow .arrow-up {
     margin-right: 4px;
+    margin-left: -12px;
     transform: translateY(-1px); }
   .toc .toc-arrow .arrow-down {
     border-top-color: #ffffff; }
   .toc .toc-arrow .arrow-up {
     border-bottom-color: #ffffff; }
+  .toc .toc-arrow:focus {
+    margin-bottom: -2px;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: none; }
 .toc .toc-sublist .toc-row {
   padding-left: 20px;
   background: #ffffff; }
 .toc .toc-sublist .toc-arrow {
-  color: #000000; }
+  color: #000000;
+  border-color: #000000; }
 .toc .toc-sublist .toc-sublist .toc-row {
   padding-left: 50px; }
 .toc .toc-sublist .arrow-down {

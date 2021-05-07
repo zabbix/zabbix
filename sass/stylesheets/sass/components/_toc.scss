@@ -12,6 +12,7 @@
 
 	.toc-arrow {
 		min-height: 14px;
+		margin-left: 12px;
 		padding: 0;
 		background-color: transparent;
 		border: 0;
@@ -19,6 +20,7 @@
 		.arrow-down,
 		.arrow-up {
 			margin-right: 4px;
+			margin-left: -12px;
 			transform: translateY(-1px);
 		}
 
@@ -28,6 +30,12 @@
 
 		.arrow-up {
 			border-bottom-color: $toc-title-color;
+		}
+
+		&:focus {
+			margin-bottom: -2px;
+			border-bottom: 2px solid $toc-title-color;
+			box-shadow: none;
 		}
 	}
 
@@ -39,6 +47,7 @@
 
 		.toc-arrow {
 			color: $font-color;
+			border-color: $font-color;
 		}
 
 		.toc-sublist .toc-row {

@@ -153,6 +153,7 @@ else {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'focused' => true,
 			'action' => 'submitImportComparePopup(overlay);'
 		];
 	}
