@@ -7269,8 +7269,11 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 		if (NULL == items[i].error)
 			items[i].error = zbx_strdup(NULL, "");
 
-		if (NULL == items[i].units)
-			items[i].units = zbx_strdup(NULL, "");
+		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+		{
+			if (NULL == items[i].units)
+				items[i].units = zbx_strdup(NULL, "");
+		}
 	}
 }
 
