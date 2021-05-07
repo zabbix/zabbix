@@ -130,6 +130,13 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 			return FAIL;
 	}
 
+	if (FP_ZERO != fpclassify(value) && FP_NORMAL != fpclassify(value))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 	zbx_variant_clear(right);
 	zbx_variant_set_dbl(right, value);
 
@@ -373,6 +380,14 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 			value = left->data.dbl / right->data.dbl;
 			break;
 	}
+
+	if (FP_ZERO != fpclassify(value) && FP_NORMAL != fpclassify(value))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 finish:
 	zbx_variant_clear(left);
 	zbx_variant_clear(right);
@@ -559,13 +574,14 @@ int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, c
  *           return value.                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	eval_function_return(int args_num, zbx_variant_t *value, zbx_vector_var_t *output)
+static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zbx_vector_var_t *output)
 {
 	int	i;
 
-	for (i = output->values_num - args_num; i < output->values_num; i++)
+	for (i = output->values_num - (int)args_num; i < output->values_num; i++)
 		zbx_variant_clear(&output->values[i]);
-	output->values_num -= args_num;
+
+	output->values_num -= (int)args_num;
 
 	zbx_vector_var_append_ptr(output, value);
 }
@@ -2200,11 +2216,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
  *                                                                            *
- * Parameters: ctx        - [IN] the evaluation context                       *
- *             token      - [IN] the function token                           *
- *             functio_cb - [IN] the callback function                        *
- *             output     - [IN/OUT] the output value stack                   *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             token       - [IN] the function token                          *
+ *             function_cb - [IN] the callback function                       *
+ *             output      - [IN/OUT] the output value stack                  *
+ *             error       - [OUT] the error message in the case of failure   *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -2232,6 +2248,239 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	}
 
 	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+#define ZBX_MATH_CONST_PI	3.141592653589793238463
+#define ZBX_MATH_CONST_E	2.7182818284590452354
+#define ZBX_MATH_RANDOM		0
+
+static double	eval_math_func_degrees(double radians)
+{
+	return radians * (180.0 / ZBX_MATH_CONST_PI);
+}
+
+static double	eval_math_func_radians(double degrees)
+{
+	return degrees * (ZBX_MATH_CONST_PI / 180);
+}
+
+static double	eval_math_func_cot(double x)
+{
+	return cos(x) / sin(x);
+}
+
+static double	eval_math_func_signum(double x)
+{
+	if (0 > x)
+		return -1;
+
+	if (0 == x)
+		return 0;
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_math_function_single_param                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 1 double argument                                            *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             func       - [IN] the pointer to math function                 *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double (*func)(double))
+{
+	int		ret;
+	double		result;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl) ||
+			(eval_math_func_cot == func && 0 == arg->data.dbl))
+	{
+		*error = zbx_dsprintf(*error, "invalid argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+
+		return FAIL;
+	}
+
+	result = func(arg->data.dbl);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, result);
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+static double	eval_math_func_round(double n, double decimal_points)
+{
+	double	multiplier;
+
+	multiplier = pow(10.0, decimal_points);
+
+	return round(n * multiplier ) / multiplier;
+}
+
+static double	eval_math_func_truncate(double n, double decimal_points)
+{
+	double	multiplier = 1;
+
+	if (0 < decimal_points)
+		multiplier = pow(10, decimal_points);
+
+	if (0 > n)
+		multiplier = -multiplier;
+
+	return floor(multiplier * n) / multiplier;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_math_function_double_param                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 2 double arguments                                           *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             func       - [IN] the pointer to math function                 *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double (*func)(double, double))
+{
+	int		ret;
+	double		result;
+	zbx_variant_t	*arg1, *arg2, value;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg1 = &output->values[output->values_num - 2];
+	arg2 = &output->values[output->values_num - 1];
+
+	if (((eval_math_func_round == func || eval_math_func_truncate == func) && (0 > arg2->data.dbl ||
+			0.0 != fmod(arg2->data.dbl, 1))) || (fmod == func && 0.0 == arg2->data.dbl))
+	{
+		*error = zbx_dsprintf(*error, "invalid second argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+
+		return FAIL;
+	}
+
+	if (atan2 == func && 0.0 == arg1->data.dbl && 0.0 == arg2->data.dbl)
+	{
+		*error = zbx_dsprintf(*error, "undefined result for arguments (0,0) for function 'atan2' at \"%s\"",
+				ctx->expression + token->loc.l);
+
+		return FAIL;
+	}
+
+	result = func(arg1->data.dbl, arg2->data.dbl);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, result);
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_math_function_return_value                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function that returns constant value        *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             value      - [IN] the value to be returned                     *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double value)
+{
+	zbx_variant_t	ret_value;
+
+	if (0 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (ZBX_MATH_RANDOM == value)
+	{
+		struct timespec ts;
+
+		if (SUCCEED != clock_gettime(CLOCK_MONOTONIC, &ts))
+		{
+			*error = zbx_strdup(*error, "failed to generate seed for random number generator");
+			return FAIL;
+		}
+		else
+		{
+			srandom((unsigned int)(ts.tv_nsec ^ ts.tv_sec));
+			zbx_variant_set_dbl(&ret_value, random());
+		}
+	}
+	else
+		zbx_variant_set_dbl(&ret_value, value);
+
+	eval_function_return(0, &ret_value, output);
 
 	return SUCCEED;
 }
@@ -2327,6 +2576,62 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_function_trim(ctx, token, FUNCTION_OPTYPE_TRIM_RIGHT, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "trim", ZBX_CONST_STRLEN("trim")))
 		return eval_execute_function_trim(ctx, token, FUNCTION_OPTYPE_TRIM_ALL, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cbrt", ZBX_CONST_STRLEN("cbrt")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, cbrt);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "ceil", ZBX_CONST_STRLEN("ceil")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, ceil);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "exp", ZBX_CONST_STRLEN("exp")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, exp);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "expm1", ZBX_CONST_STRLEN("expm1")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, expm1);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "floor", ZBX_CONST_STRLEN("floor")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, floor);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "signum", ZBX_CONST_STRLEN("signum")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_signum);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "degrees", ZBX_CONST_STRLEN("degrees")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_degrees);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "radians", ZBX_CONST_STRLEN("radians")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_radians);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "acos", ZBX_CONST_STRLEN("acos")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, acos);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "asin", ZBX_CONST_STRLEN("asin")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, asin);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan", ZBX_CONST_STRLEN("atan")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, atan);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cos", ZBX_CONST_STRLEN("cos")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, cos);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cosh", ZBX_CONST_STRLEN("cosh")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, cosh);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cot", ZBX_CONST_STRLEN("cot")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_cot);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sin", ZBX_CONST_STRLEN("sin")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, sin);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sinh", ZBX_CONST_STRLEN("sinh")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, sinh);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "tan", ZBX_CONST_STRLEN("tan")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, tan);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "log", ZBX_CONST_STRLEN("log")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, log);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "log10", ZBX_CONST_STRLEN("log10")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, log10);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sqrt", ZBX_CONST_STRLEN("sqrt")))
+		return eval_execute_math_function_single_param(ctx, token, output, error, sqrt);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "power", ZBX_CONST_STRLEN("power")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, pow);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "round", ZBX_CONST_STRLEN("round")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, eval_math_func_round);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mod", ZBX_CONST_STRLEN("mod")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, fmod);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "truncate", ZBX_CONST_STRLEN("truncate")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, eval_math_func_truncate);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan2", ZBX_CONST_STRLEN("atan2")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, atan2);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "pi", ZBX_CONST_STRLEN("pi")))
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_PI);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "e", ZBX_CONST_STRLEN("e")))
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_E);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "rand", ZBX_CONST_STRLEN("rand")))
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_RANDOM);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

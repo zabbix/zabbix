@@ -2391,8 +2391,11 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 int	zbx_is_trigger_function(const char *name, size_t len)
 {
 	char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change", "find",
-			"fuzzytime", "logeventid", "logseverity", "logsource", "bitand", "forecast", "timeleft",
-			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
+			"fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
+			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum", "abs", "cbrt", "ceil", "exp",
+			"floor", "log", "log10", "power", "round", "rand", "signum", "sqrt", "truncate", "acos",
+			"asin", "atan", "cos", "cosh", "cot", "sin", "sinh", "tan", "degrees", "radians", "mod", "pi",
+			"e", "expm1", "atan2",
 		NULL};
 	char	**ptr;
 
