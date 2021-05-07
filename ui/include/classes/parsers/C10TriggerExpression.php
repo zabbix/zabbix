@@ -666,6 +666,7 @@ class C10TriggerExpression {
 				'item' => '',
 				'function' => $this->function_parser->getMatch(),
 				'functionName' => $this->function_parser->getFunction(),
+				'functionParamsRaw' => $this->function_parser->getParamsRaw(),
 				'functionParams' => $function_param_list
 			]
 		);
@@ -733,6 +734,7 @@ class C10TriggerExpression {
 				'item' => $this->function_macro_parser->getItem(),
 				'function' => $this->function_macro_parser->getFunction(),
 				'functionName' => $this->function_parser->getFunction(),
+				'functionParamsRaw' => $this->function_parser->getParamsRaw(),
 				'functionParams' => $function_param_list
 			]
 		);
@@ -776,6 +778,7 @@ class C10TriggerExpression {
 			$this->function_parser->getMatch(), $startPos, $this->function_parser->getLength(),
 			[
 				'functionName' => $this->function_parser->getFunction(),
+				'functionParamsRaw' => $this->function_parser->getParamsRaw(),
 				'functionParams' => $function_param_list
 			]
 		);

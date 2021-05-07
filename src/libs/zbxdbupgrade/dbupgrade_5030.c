@@ -25,6 +25,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "sysinfo.h"
 
 /*
  * 5.4 development database patches
@@ -5129,6 +5130,7 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 		char **replace)
 {
 	char	*parameter = NULL, *mask = NULL;
+	int	secnum = 0;
 
 	if (2 <= params->values_num && '\0' != function->parameter[params->values[1].l])
 	{
@@ -5139,8 +5141,20 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 	else
 		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "})", function->functionid);
 
+	if (0 < params->values_num)
+	{
+		char	*param;
+
+		param = zbx_substr_unquote(function->parameter, params->values[0].l, params->values[0].r);
+
+		if ('#' != *param && '{' != *param)
+			secnum = -1;
+
+		zbx_free(param);
+	}
+
 	dbpatch_convert_params(&parameter, function->parameter, params,
-			ZBX_DBPATCH_ARG_HIST, 0, 2,
+			ZBX_DBPATCH_ARG_HIST, secnum, 2,
 			ZBX_DBPATCH_ARG_NONE);
 
 	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
@@ -5309,9 +5323,17 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	{
 		int	secnum = 0;
 
-		if (0 < params.values_num && '#' != function->parameter[params.values[0].l] &&
-				'{' != function->parameter[params.values[0].l])
-			secnum = -1;
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
 
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, secnum, 1,
@@ -5324,9 +5346,24 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	}
 	else if (0 == strcmp(function->name, "strlen"))
 	{
+		int	secnum = 0;
+
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
+
 		dbpatch_convert_params(&parameter, function->parameter, &params,
-				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_HIST, secnum, 1,
 				ZBX_DBPATCH_ARG_NONE);
+
 		dbpatch_update_func_strlen(function, parameter, replace);
 	}
 	else if (0 == strcmp(function->name, "logeventid") || 0 == strcmp(function->name, "logsource"))

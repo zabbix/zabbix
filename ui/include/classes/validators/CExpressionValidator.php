@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class for validating trigger expressions and calculated item formulas.
+ */
 class CExpressionValidator extends CValidator {
 
 	/**
@@ -40,22 +43,14 @@ class CExpressionValidator extends CValidator {
 		'calculated' => false
 	];
 
-	private $math_function_validator;
-
-	private $hist_function_validator;
-
-	private $hist_function_data;
+	private $hist_function_parameters = [];
 
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		$this->hist_function_data = new CHistFunctionData([
-			'calculated' => $this->options['calculated']
-		]);
-		$this->math_function_validator = new CMathFunctionValidator();
-		$this->hist_function_validator = new CHistFunctionValidator([
-			'parameters' => $this->hist_function_data->getParameters()
-		]);
+		$hist_function_data = new CHistFunctionData(['calculated' => $this->options['calculated']]);
+
+		$this->hist_function_parameters = $hist_function_data->getParameters();
 	}
 
 	/**
@@ -66,15 +61,29 @@ class CExpressionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($tokens) {
-		return $this->validateRecursively($tokens, null);
+		if (!$this->validateRecursively($tokens, null)) {
+			return false;
+		}
+
+		if (!$this->options['calculated']) {
+			if (!self::hasHistoryFunctions($tokens)) {
+				$this->setError(_('trigger expression must contain at least one /host/key reference'));
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private function validateRecursively(array $tokens, ?array $parent_token) {
 		foreach ($tokens as $token) {
 			switch ($token['type']) {
 				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
-					if (!$this->math_function_validator->validate($token)) {
-						$this->setError($this->math_function_validator->getError());
+					$math_function_validator = new CMathFunctionValidator();
+
+					if (!$math_function_validator->validate($token)) {
+						$this->setError($math_function_validator->getError());
 
 						return false;
 					}
@@ -88,20 +97,29 @@ class CExpressionValidator extends CValidator {
 					break;
 
 				case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
-					if (!$this->hist_function_validator->validate($token)) {
-						$this->setError($this->hist_function_validator->getError());
+					$options = [
+						'parameters' => $this->hist_function_parameters,
+						'calculated' => $this->options['calculated']
+					];
+
+					if ($this->options['calculated']) {
+						$options['aggregated'] = CHistFunctionData::isAggregated($token['data']['function']);
+					}
+
+					$hist_function_validator = new CHistFunctionValidator($options);
+
+					if (!$hist_function_validator->validate($token)) {
+						$this->setError($hist_function_validator->getError());
 
 						return false;
 					}
 
-					if (CHistFunctionData::isCalculated($token['data']['function'])) {
+					if ($options['calculated'] && $options['aggregated']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
 								|| !in_array($parent_token['data']['function'], self::AGGREGATE_MATH_FUNCTIONS)
 								|| count($parent_token['data']['parameters']) != 1) {
-							$this->setError(_s('Incorrect usage of function "%1$s".',
-								$parent_token['data']['function']).' '._('Invalid first parameter.')
-							);
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
 						}
@@ -119,5 +137,28 @@ class CExpressionValidator extends CValidator {
 		}
 
 		return true;
+	}
+
+	private static function hasHistoryFunctions(array $tokens) {
+		foreach ($tokens as $token) {
+			switch ($token['type']) {
+				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+					foreach ($token['data']['parameters'] as $parameter) {
+						if (self::hasHistoryFunctions($parameter['data']['tokens'])) {
+							return true;
+						}
+					}
+
+					break;
+
+				case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+					return true;
+
+				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
+					return self::hasHistoryFunctions($parameter['data']['tokens']);
+			}
+		}
+
+		return false;
 	}
 }

@@ -19,23 +19,29 @@
 **/
 
 
+/**
+ * Class for validating history functions.
+ */
 class CHistFunctionValidator extends CValidator {
 
 	/**
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'parameters' => []  Definition of parameters of known history functions.
+	 *   'parameters' => []     Definition of parameters of known history functions.
+	 *   'calculated' => false  Validate history function as part of calculated item formula.
+	 *   'aggregated' => false  Validate as aggregated history function.
 	 *
 	 * @var array
 	 */
 	private $options = [
-		'parameters' => []
+		'parameters' => [],
+		'calculated' => false,
+		'aggregated' => false
 	];
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['calculated']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -49,16 +55,16 @@ class CHistFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($token) {
-		$invalid_param_labels = [
-			_('Invalid first parameter.'),
-			_('Invalid second parameter.'),
-			_('Invalid third parameter.'),
-			_('Invalid fourth parameter.'),
-			_('Invalid fifth parameter.')
+		$invalid_param_messages = [
+			_('invalid first parameter in function "%1$s"'),
+			_('invalid second parameter in function "%1$s"'),
+			_('invalid third parameter in function "%1$s"'),
+			_('invalid fourth parameter in function "%1$s"'),
+			_('invalid fifth parameter in function "%1$s"')
 		];
 
 		if (!array_key_exists($token['data']['function'], $this->options['parameters'])) {
-			$this->setError(_s('Unknown function "%1$s".', $token['data']['function']));
+			$this->setError(_s('unknown function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
@@ -67,9 +73,7 @@ class CHistFunctionValidator extends CValidator {
 		$params_spec = $this->options['parameters'][$token['data']['function']];
 
 		if (count($params) > count($params_spec)) {
-			$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-				_('Invalid number of parameters.')
-			);
+			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
 
 			return false;
 		}
@@ -77,10 +81,10 @@ class CHistFunctionValidator extends CValidator {
 		foreach ($params_spec as $index => $param_spec) {
 			$required = !array_key_exists('required', $param_spec) || $param_spec['required'];
 
-			if ($index >= count($params) || $params[$index]['match'] === '') {
+			if ($index >= count($params)) {
 				if ($required) {
-					$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-						_('Mandatory parameter is missing.')
+					$this->setError(
+						_s('mandatory parameter is missing in function "%1$s"', $token['data']['function'])
 					);
 
 					return false;
@@ -90,170 +94,201 @@ class CHistFunctionValidator extends CValidator {
 			}
 
 			$param = $params[$index];
-			$param_match_unquoted = ($param['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
-				? CHistFunctionParser::unquoteParam($param['match'])
-				: $param['match'];
 
-			if (self::isMacro($param_match_unquoted)) {
+			if ($param['match'] === '') {
+				if ($required) {
+					$this->setError(_params($invalid_param_messages[$index], [$token['data']['function']]));
+
+					return false;
+				}
+
 				continue;
 			}
 
-			$is_valid = $param['type'] == $param_spec['type'];
+			switch ($param['type']) {
+				case CHistFunctionParser::PARAM_TYPE_PERIOD:
+					if (self::hasMacros($param['data']['sec_num']) && $param['data']['time_shift'] === '') {
+						continue 2;
+					}
+					break;
 
-			if ($is_valid) {
-				switch ($param['type']) {
-					case CHistFunctionParser::PARAM_TYPE_QUERY:
-						$is_valid = self::validateQuery($param['data']['host'], $param['data']['item']);
-						break;
+				case CHistFunctionParser::PARAM_TYPE_QUOTED:
+					if (self::hasMacros(CHistFunctionParser::unquoteParam($param['match']))) {
+						continue 2;
+					}
+					break;
 
-					case CHistFunctionParser::PARAM_TYPE_PERIOD:
-						$mode = array_key_exists('mode', $param_spec)
-							? $param_spec['mode']
-							: CHistFunctionData::PERIOD_MODE_DEFAULT;
-
-						$is_valid = (!$required || $param['data']['sec_num'] !== '')
-							&& self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $mode);
-
-						break;
-
-					case CHistFunctionParser::PARAM_TYPE_QUOTED:
-					case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
-						if (array_key_exists('rules', $param_spec)) {
-							$is_valid = self::validateRules($param_match_unquoted, $param_spec['rules']);
-						}
-						break;
-				}
+				case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+					if (self::hasMacros($param['match'])) {
+						continue 2;
+					}
+					break;
 			}
 
-			if (!$is_valid) {
-				$this->setError(_s('Incorrect usage of function "%1$s".', $token['data']['function']).' '.
-					$invalid_param_labels[$index]
-				);
+			if (array_key_exists('rules', $param_spec)) {
+				$is_valid = self::validateRules($param, $param_spec['rules'], $this->options);
 
-				return false;
+				if (!$is_valid) {
+					$this->setError(_params($invalid_param_messages[$index], [$token['data']['function']]));
+
+					return false;
+				}
 			}
 		}
 
 		return true;
 	}
 
-	private static function isMacro(string $value): bool {
-		return (substr($value, 0, 1) === '{');
+	private static function hasMacros(string $value): bool {
+		return (strpos($value, '{') !== false);
 	}
 
-	private static function validateQuery(string $host, string $item): bool {
-		return ($host !== '*' || $item !== '*');
-	}
+	private static function validateRules(array $param, array $rules, array $options): bool {
+		$param_match_unquoted = ($param['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
+			? CHistFunctionParser::unquoteParam($param['match'])
+			: $param['match'];
 
-	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
-		switch ($mode) {
-			case CHistFunctionData::PERIOD_MODE_DEFAULT:
-				if ($sec_num === '' || self::isMacro($sec_num)) {
-					return true;
-				}
-
-				if (self::validateSimpleInterval($sec_num) && self::validateRange($sec_num, ['min' => 1])) {
-					return true;
-				}
-
-				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1 && $matches['num'] > 0) {
-					return true;
-				}
-
-				return false;
-
-			case CHistFunctionData::PERIOD_MODE_SEC_POSITIVE:
-			case CHistFunctionData::PERIOD_MODE_SEC_POSITIVE_OR_ZERO:
-				if ($time_shift !== '') {
-					return false;
-				}
-
-				if ($sec_num === '') {
-					return true;
-				}
-
-				$min = ($mode == CHistFunctionData::PERIOD_MODE_SEC_POSITIVE_OR_ZERO) ? 0 : 1;
-
-				if (self::validateSimpleInterval($sec_num) && self::validateRange($sec_num, ['min' => $min])) {
-					return true;
-				}
-
-				return false;
-
-			case CHistFunctionData::PERIOD_MODE_TREND:
-				if ($sec_num === '' || $time_shift === '') {
-					return false;
-				}
-
-				if (!self::isMacro($sec_num)) {
-					if (!self::validateSimpleInterval($sec_num, ['with_year' => true])) {
-						return false;
-					}
-
-					$sec = timeUnitToSeconds($sec_num, true);
-
-					if ($sec == 0 || $sec % SEC_PER_HOUR != 0) {
-						return false;
-					}
-				}
-
-				return true;
-		}
-
-		return false;
-	}
-
-	private static function validateRules(string $match_unquoted, array $rules): bool {
 		foreach ($rules as $rule) {
 			switch ($rule['type']) {
-				case 'range':
-					$options = array_intersect_key($rule, array_flip(['min', 'max']));
+				case 'query':
+					if ($param['type'] != CHistFunctionParser::PARAM_TYPE_QUERY) {
+						return false;
+					}
 
-					if (!self::validateRange($match_unquoted, $options)) {
+					if (!self::validateQuery($param['data']['host'], $param['data']['item'], $options)) {
+						return false;
+					}
+
+					break;
+
+				case 'period':
+					if ($param['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+						return false;
+					}
+
+					if (!self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $rule['mode'])) {
+						return false;
+					}
+
+					break;
+
+				case 'number':
+					$with_suffix = array_key_exists('with_suffix', $rule) && $rule['with_suffix'];
+
+					$parser = new CNumberParser(['with_minus' => true, 'with_suffix' => $with_suffix]);
+
+					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
+						return false;
+					}
+
+					$value = $parser->calcValue();
+
+					if ((array_key_exists('min', $rule) && $value < $rule['min'])
+							|| array_key_exists('max', $rule) && $value > $rule['max']) {
 						return false;
 					}
 
 					break;
 
 				case 'regexp':
-					if (preg_match($rule['pattern'], $match_unquoted) != 1) {
+					if (preg_match($rule['pattern'], $param_match_unquoted) != 1) {
 						return false;
 					}
 
 					break;
 
-				case 'simple_interval':
-					$options = array_key_exists('options', $rule) ? $rule['options'] : [];
+				case 'time':
+					$with_year = array_key_exists('with_year', $rule) && $rule['with_year'];
+					$min = array_key_exists('min', $rule) ? $rule['min'] : ZBX_MIN_INT32;
+					$max = array_key_exists('max', $rule) ? $rule['max'] : ZBX_MAX_INT32;
 
-					if (!self::validateSimpleInterval($match_unquoted, $options)) {
+					$sec = timeUnitToSeconds($param_match_unquoted, $with_year);
+
+					if ($sec === null || $sec < $min || $sec > $max) {
 						return false;
 					}
 
 					break;
+
+				default:
+					return false;
 			}
 		}
 
 		return true;
 	}
 
-	private static function validateRange(string $match_unquoted, array $options): bool {
-		$number_parser = new CNumberParser(['with_minus' => true, 'with_suffix' => true]);
-
-		if ($number_parser->parse($match_unquoted) != CParser::PARSE_SUCCESS) {
-			return false;
+	private static function validateQuery(string $host, string $item, array $options): bool {
+		if ($options['calculated']) {
+			return ($options['aggregated']
+				? ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
+				: ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
+			);
 		}
 
-		$value = $number_parser->calcValue();
-
-		$is_valid = (!array_key_exists('min', $options) || $value >= $options['min'])
-			&& (!array_key_exists('max', $options) || $value <= $options['max']);
-
-		return $is_valid;
+		return true;
 	}
 
-	private static function validateSimpleInterval(string $match_unquoted, array $options = []): bool {
-		$simple_interval_parser = new CSimpleIntervalParser($options);
+	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
+		switch ($mode) {
+			case CHistFunctionData::PERIOD_MODE_DEFAULT:
+				if ($sec_num === '' || self::hasMacros($sec_num)) {
+					return true;
+				}
 
-		return ($simple_interval_parser->parse($match_unquoted) == CParser::PARSE_SUCCESS);
+				$sec = timeUnitToSeconds($sec_num);
+
+				if ($sec !== null) {
+					return ($sec > 0 && $sec <= ZBX_MAX_INT32);
+				}
+
+				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
+					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
+				}
+
+				return false;
+
+			case CHistFunctionData::PERIOD_MODE_SEC:
+				if ($time_shift !== '') {
+					return false;
+				}
+
+				$sec = timeUnitToSeconds($sec_num);
+
+				if ($sec !== null) {
+					return ($sec > 0 && $sec <= ZBX_MAX_INT32);
+				}
+
+				return false;
+
+			case CHistFunctionData::PERIOD_MODE_NUM:
+				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
+					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
+				}
+
+				return false;
+
+			case CHistFunctionData::PERIOD_MODE_TREND:
+				if ($time_shift === '') {
+					return false;
+				}
+
+				if (self::hasMacros($sec_num)) {
+					return true;
+				}
+
+				$sec = timeUnitToSeconds($sec_num, true);
+
+				if ($sec !== null) {
+					return ($sec > 0 && $sec <= ZBX_MAX_INT32 && $sec % SEC_PER_HOUR == 0);
+				}
+
+				return false;
+
+			default:
+				return false;
+		}
+
+		return false;
 	}
 }

@@ -22,148 +22,180 @@
 final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
-	public const PERIOD_MODE_SEC_POSITIVE = 1;
-	public const PERIOD_MODE_SEC_POSITIVE_OR_ZERO = 2;
+	public const PERIOD_MODE_SEC = 1;
+	public const PERIOD_MODE_NUM = 2;
 	public const PERIOD_MODE_TREND = 3;
 
 	private const PARAMETERS = [
 		'avg' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'avg_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'count' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
+				'required' => false
+			],
+			['required' => false]
 		],
 		'count_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'change' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY]
+			['rules' => [['type' => 'query']]]
 		],
 		'find' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(iregexp|regexp|like)$/']
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]], 'required' => false],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
+				'required' => false
+			],
+			['required' => false]
 		],
 		'forecast' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
-				['type' => 'simple_interval', 'options' => ['negative' => true]]
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'time']]],
+			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(linear|polynomial[1-6]|exponential|logarithmic|power)$/']
-			]],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(value|max|min|delta|avg)$/']
-			]]
+			], 'required' => false],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(value|max|min|delta|avg)$/']], 'required' => false]
 		],
 		'fuzzytime' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE_OR_ZERO]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'time', 'min' => 1]]]
 		],
 		'last' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'last_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]], 'required' => false]
 		],
 		'logeventid' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
+			['required' => false]
 		],
 		'logseverity' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'logsource' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'required' => false],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
+			['required' => false]
 		],
 		'max' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'max_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'min' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'min_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'nodata' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(strict)$/']
-			]]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'time', 'min' => 1]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
 		],
 		'percentile' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED, 'rules' => [
-				['type' => 'regexp', 'pattern' => '/^(\d+(\.\d{0,4})?)|(\.\d{1,4})$/'],
-				['type' => 'range', 'min' => 0, 'max' => 100],
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 0, 'max' => 100]
 			]]
 		],
 		'sum' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'sum_foreach' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_SEC_POSITIVE]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'timeleft' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD],
-			['type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED],
-			['type' => CHistFunctionParser::PARAM_TYPE_QUOTED, 'required' => false, 'rules' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'number', 'with_suffix' => true]]],
+			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(linear|polynomial[1-6]|exponential|logarithmic|power)$/']
-			]]
+			], 'required' => false]
 		],
 		'trendavg' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendcount' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendmax' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendmin' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
 		'trendsum' => [
-			['type' => CHistFunctionParser::PARAM_TYPE_QUERY],
-			['type' => CHistFunctionParser::PARAM_TYPE_PERIOD, 'mode' => self::PERIOD_MODE_TREND]
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		]
+	];
+
+	private const ITEM_VALUE_TYPES_INT = [ITEM_VALUE_TYPE_UINT64];
+	private const ITEM_VALUE_TYPES_NUM = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+	private const ITEM_VALUE_TYPES_STR = [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG];
+	private const ITEM_VALUE_TYPES_LOG = [ITEM_VALUE_TYPE_LOG];
+	private const ITEM_VALUE_TYPES_ALL = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG
+	];
+
+	private const VALUE_TYPES = [
+		'avg' => self::ITEM_VALUE_TYPES_NUM,
+		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'count' => self::ITEM_VALUE_TYPES_ALL,
+		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
+		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'find' => self::ITEM_VALUE_TYPES_ALL,
+		'forecast' => self::ITEM_VALUE_TYPES_NUM,
+		'fuzzytime' => self::ITEM_VALUE_TYPES_NUM,
+		'last' => self::ITEM_VALUE_TYPES_ALL,
+		'last_foreach' => self::ITEM_VALUE_TYPES_ALL,
+		'logeventid' => self::ITEM_VALUE_TYPES_LOG,
+		'logseverity' => self::ITEM_VALUE_TYPES_LOG,
+		'logsource' => self::ITEM_VALUE_TYPES_LOG,
+		'max' => self::ITEM_VALUE_TYPES_NUM,
+		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'min' => self::ITEM_VALUE_TYPES_NUM,
+		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'nodata' => self::ITEM_VALUE_TYPES_ALL,
+		'percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'sum' => self::ITEM_VALUE_TYPES_NUM,
+		'sum_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
+		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
+		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
+		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendsum' => self::ITEM_VALUE_TYPES_NUM
 	];
 
 	/**
@@ -186,7 +218,7 @@ final class CHistFunctionData {
 		$this->options = $options + $this->options;
 	}
 
-	public static function isCalculated(string $function): bool {
+	public static function isAggregated(string $function): bool {
 		switch ($function) {
 			case 'avg_foreach':
 			case 'count_foreach':
@@ -209,11 +241,29 @@ final class CHistFunctionData {
 		$result = [];
 
 		foreach (self::PARAMETERS as $function => $parameters) {
-			if (self::isCalculated($function)) {
+			if (self::isAggregated($function)) {
 				continue;
 			}
 
 			$result[$function] = $parameters;
+		}
+
+		return $result;
+	}
+
+	public function getValueTypes(): array {
+		if ($this->options['calculated']) {
+			return self::VALUE_TYPES;
+		}
+
+		$result = [];
+
+		foreach (self::VALUE_TYPES as $function => $value_types) {
+			if (self::isAggregated($function)) {
+				continue;
+			}
+
+			$result[$function] = $value_types;
 		}
 
 		return $result;

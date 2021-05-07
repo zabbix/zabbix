@@ -321,7 +321,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'find' => [
 				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
 				'params' => $this->period_optional + $this->param_find,
-				'allowed_types' => $this->allowedTypesStr,
+				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
 			'last' => [
@@ -517,6 +517,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 	protected function doAction() {
 		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_validator = new CExpressionValidator();
 
 		$itemid = $this->getInput('itemid', 0);
 		$function = $this->getInput('function', 'last');
@@ -641,21 +642,28 @@ class CControllerPopupTriggerExpr extends CController {
 					$params = [];
 
 					if ($parameters !== null && array_key_exists(1, $parameters)) {
-						if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
-							$sec_num = $parameters[1]['data']['sec_num'];
-							if ($sec_num !== '' && $sec_num[0] === '#') {
-								$params[] = substr($sec_num, 1);
-								$param_type = PARAM_TYPE_COUNTS;
-							}
-							else {
-								$params[] = $sec_num;
-								$param_type = PARAM_TYPE_TIME;
-							}
-							$params[] = $parameters[1]['data']['time_shift'];
+						if ($function === "nodata" || $function === "fuzzytime") {
+							$params[] = ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
+								? CHistFunctionParser::unquoteParam($parameters[1]['match'])
+								: $parameters[1]['match'];
 						}
 						else {
-							$params[] = '';
-							$params[] = '';
+							if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
+								$sec_num = $parameters[1]['data']['sec_num'];
+								if ($sec_num !== '' && $sec_num[0] === '#') {
+									$params[] = substr($sec_num, 1);
+									$param_type = PARAM_TYPE_COUNTS;
+								}
+								else {
+									$params[] = $sec_num;
+									$param_type = PARAM_TYPE_TIME;
+								}
+								$params[] = $parameters[1]['data']['time_shift'];
+							}
+							else {
+								$params[] = '';
+								$params[] = '';
+							}
 						}
 
 						for ($i = 2; $i < count($parameters); $i++) {
@@ -845,30 +853,11 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 
 				if (array_key_exists('expression', $data)) {
-					// Validate trigger expression.
+					// Parse and validate trigger expression.
 					if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-						// Validate trigger function.
-//						$math_function_validator = new CMathFunctionValidator();
-//						$trigger_function_validator = new CFunctionValidator();
-//						$fn = $result->getTokens()[0];
-//						$errors = [];
-
-//						if (!$math_function_validator->validate($fn)) {
-//							$errors[$math_function_validator->error_pos] = $math_function_validator->getError();
-
-//							if (!$trigger_function_validator->validate($fn)
-//									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
-//								$errors[$trigger_function_validator->error_pos]
-//									= $trigger_function_validator->getError();
-//							}
-//							else {
-//								$errors = [];
-//							}
-//						}
-
-//						if ($errors) {
-//							error($errors[max(array_keys($errors))]);
-//						}
+						if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+							error($expression_validator->getError());
+						}
 					}
 					else {
 						error($expression_parser->getError());

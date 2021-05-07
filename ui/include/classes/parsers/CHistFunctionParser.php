@@ -209,6 +209,16 @@ class CHistFunctionParser extends CParser {
 									$state = self::STATE_END_OF_PARAMS;
 									break;
 
+								case '"':
+									$_parameters[$num] = [
+										'type' => self::PARAM_TYPE_QUOTED,
+										'pos' => $p,
+										'match' => $source[$p],
+										'length' => 1
+									];
+									$state = self::STATE_QUOTED;
+									break;
+
 								default:
 									if ($this->period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 										$_parameters[$num] = [

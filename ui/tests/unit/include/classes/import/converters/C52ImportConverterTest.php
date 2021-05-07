@@ -67,7 +67,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 								$calculated + ['params' => 'last(/'.'/vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(/'.'/vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'],
 								$calculated + ['params' => 'last(/'.'/system.swap.size[,total]) - last(/'.'/system.swap.size[,total]) / 100 * last(/'.'/perf_counter_en["\\Paging file(_Total)\% Usage"])'],
 								$calculated + ['params' => 'avg(/zbxnext_6451/agent_numeric[wcache,values],600s)'],
-								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,"","12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
+								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,"12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
 							]
 						]
 					]
@@ -83,7 +83,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
-											'expression' => '{min(5m)}=1'
+											'expression' => '{min(5m)}=1',
+											'recovery_expression' => ''
 										]
 									]
 								]
@@ -100,7 +101,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
-											'expression' => 'min(/hostname/key,5m)=1'
+											'expression' => 'min(/hostname/key,5m)=1',
+											'recovery_expression' => ''
 										]
 									]
 								]
@@ -113,14 +115,16 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'expression' => '{hostname:key.min(5m)}=1'
+							'expression' => '{hostname:key.min(5m)}=1',
+							'recovery_expression' => '{hostname:key.min(5m)}<>1'
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'expression' => 'min(/hostname/key,5m)=1'
+							'expression' => 'min(/hostname/key,5m)=1',
+							'recovery_expression' => 'min(/hostname/key,5m)<>1'
 						]
 					]
 				]
@@ -140,7 +144,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '{k:grpmin["host group","item",last,5m].last()}=5'
+							'expression' => '{hostname:grpmin["host group","item",last,5m].last()}=5',
+							'recovery_expression' => ''
 						]
 					]
 				],
@@ -159,7 +164,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => 'last(/k/grpmin["host group","item",last,5m])=5'
+							'expression' => 'last(/hostname/grpmin["host group","item",last,5m])=5',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -179,7 +185,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '{k:grpmin["host group","item",last,5m].date()}=5'
+							'expression' => '{hostname:grpmin["host group","item",last,5m].date()}=5',
+							'recovery_expression' => ''
 						]
 					]
 				],
@@ -198,7 +205,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
-							'expression' => '(date()=5) or (last(/k/grpmin["host group","item",last,5m])<>last(/k/grpmin["host group","item",last,5m]))'
+							'expression' => '(date()=5) or (last(/hostname/grpmin["host group","item",last,5m])<>last(/hostname/grpmin["host group","item",last,5m]))',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -207,14 +215,18 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}'
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}',
+							'expression' => '{k:system.cpu.load.last(5s, 1d)} > 5',
+							'recovery_expression' => ''
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}'
+							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}',
+							'expression' => 'last(/k/system.cpu.load,#1:now-1d) > 5',
+							'recovery_expression' => ''
 						]
 					]
 				]
@@ -223,14 +235,111 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}'
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}',
+							'expression' => '{k:system.cpu.load.last(5s)} > 5',
+							'recovery_expression' => ''
 						]
 					]
 				],
 				[
 					'triggers' => [
 						[
-							'event_name' => '{?date()}'
+							'event_name' => '{?date()}',
+							'expression' => 'last(/k/system.cpu.load) > 5',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'application' => 'MySQL'
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => '{Zabbix server:proc.num.last()} = 0',
+											'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+										]
+									],
+									'application' => ''
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => '{Zabbix server:proc.num.last()} = 0',
+												'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'evaltype' => '0',
+									'tags' => [
+										'tag' => [
+											'tag' => 'Application',
+											'value' => 'MySQL',
+											'operator' => '0'
+										]
+									]
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => 'last(/Zabbix server/proc.num) = 0',
+											'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+										]
+									],
+									'evaltype' => '0'
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => 'last(/Zabbix server/proc.num) = 0',
+												'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+											]
+										]
+									]
+								]
+							]
 						]
 					]
 				]

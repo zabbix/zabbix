@@ -706,7 +706,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                            (3) value to compare with (optional)            *
  *                                Becomes mandatory for numeric items if 3rd  *
  *                                parameter is specified and is not "regexp"  *
- *                                or "iregexp". With "band" can take one of   *
+ *                                or "iregexp". With "bitand" can take one of *
  *                                2 forms:                                    *
  *                                  - value_to_compare_with/mask              *
  *                                  - mask                                    *
@@ -739,7 +739,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
-	if (4 < (nparams = num_param(parameters)))
+	if (3 < (nparams = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -790,7 +790,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 		op = OP_REGEXP;
 	else if (0 == strcmp(operator, "iregexp"))
 		op = OP_IREGEXP;
-	else if (0 == strcmp(operator, "band"))
+	else if (0 == strcmp(operator, "bitand"))
 		op = OP_BITAND;
 
 	if (OP_UNKNOWN == op)
@@ -1810,7 +1810,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_BAND                                                    *
+ * Function: evaluate_BITAND                                                  *
  *                                                                            *
  * Purpose: evaluate logical bitwise function 'and' for the item              *
  *                                                                            *
@@ -1829,7 +1829,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_BAND(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_BITAND(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	char		*last_parameters = NULL;
@@ -2347,9 +2347,9 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_LOGSOURCE(value, item, parameter, ts, error);
 	}
-	else if (0 == strcmp(function, "band"))
+	else if (0 == strcmp(function, "bitand"))
 	{
-		ret = evaluate_BAND(value, item, parameter, ts, error);
+		ret = evaluate_BITAND(value, item, parameter, ts, error);
 	}
 	else if (0 == strcmp(function, "forecast"))
 	{
@@ -2391,7 +2391,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 int	zbx_is_trigger_function(const char *name, size_t len)
 {
 	char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change", "find",
-			"fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
+			"fuzzytime", "logeventid", "logseverity", "logsource", "bitand", "forecast", "timeleft",
 			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
 		NULL};
 	char	**ptr;

@@ -464,7 +464,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => '{Simple form test host}',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Invalid parameter "/1/expression": incorrect trigger expression starting from "{Simple form test host}".'
+						'Invalid parameter "/1/expression": incorrect expression starting from "{Simple form test host}".'
 					]
 				]
 			],
@@ -646,7 +646,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'somefunc(/Simple form test host/test-item-reuse,#1)<0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Incorrect trigger function "somefunc(/Simple form test host/test-item-reuse,#1)" provided in expression. Unknown function.'
+						'Unknown function "somefunc".'
 					]
 				]
 			],
@@ -657,7 +657,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/test-item-reuse,#1) or {#MACRO}',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#MACRO}".'
+						'Invalid parameter "/1/expression": incorrect expression starting from "{#MACRO}".'
 					]
 				]
 			],
@@ -727,9 +727,10 @@ class testFormTrigger extends CLegacyWebTest {
 					'description' => 'MyTrigger',
 					'expression' => 'last(/Simple form test host@/test-item-reuse,#1)<0',
 					'constructor' => [
-						'elementError' => true,
 						'errors' => [
-							'last(/Simple form test host@/test-item-reuse,#1):Unknown host, no such host present in system'
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from "last(/Simple'.
+									' form test host@/test-item-reuse,#1)<0".'
 						]
 					]
 				]
@@ -740,9 +741,10 @@ class testFormTrigger extends CLegacyWebTest {
 					'description' => 'MyTrigger',
 					'expression' => 'last(/Simple form test host/system .uptime,#1)<0',
 					'constructor' => [
-						'elementError' => true,
 						'errors' => [
-							'last(/Simple form test host/system .uptime,#1):Unknown host item, no such item in selected host'
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from '.
+									'"last(/Simple form test host/system .uptime,#1)<0".'
 						]
 					]
 				]
@@ -755,7 +757,8 @@ class testFormTrigger extends CLegacyWebTest {
 					'constructor' => [
 						'errors' => [
 							'header' => 'Expression syntax error.',
-							'details' => 'Incorrect trigger expression. Check expression part starting from "lastA(/Simple form test host/test-item-reuse,#1)<0".'
+							'details' => 'Cannot build expression tree: incorrect expression starting from '.
+									'"lastA(/Simple form test host/test-item-reuse,#1)<0".'
 						]
 					]
 				]

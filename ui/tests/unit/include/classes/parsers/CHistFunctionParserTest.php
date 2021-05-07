@@ -341,6 +341,37 @@ class CHistFunctionParserTest extends TestCase {
 				['/*/*']
 			],
 			[
+				'sum(/host/key?[tag="a" and not tag="b"], 1m)', 0, ['calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'sum(/host/key?[tag="a" and not tag="b"], 1m)',
+					'function' => 'sum',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 4,
+							'match' => '/host/key?[tag="a" and not tag="b"]',
+							'length' => 35,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
+						],
+						1 => [
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 41,
+							'match' => '1m',
+							'length' => 2,
+							'data' => [
+								'sec_num' => '1m',
+								'time_shift' => ''
+							]
+						]
+					]
+				],
+				['/host/key?[tag="a" and not tag="b"]', '1m']
+			],
+			[
 				'last(/{HOST.HOST}/key)', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -760,6 +791,33 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '#25', 'abc' , '"def"', '1', '1.125', '-1e12', '{$M}', '{$M: context}', '{#M}', '{{#M}.regsub()}', '', '', '']
 			],
 			[
+				'nodata(/host/key, "1h")', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'nodata(/host/key, "1h")',
+					'function' => 'nodata',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 18,
+							'match' => '"1h"',
+							'length' => 4
+						]
+					]
+				],
+				['/host/key', '1h']
+			],
+			[
 				'last(/{HOST.HOST}/key)', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -841,16 +899,6 @@ class CHistFunctionParserTest extends TestCase {
 			],
 			[
 				'last("/host/key")', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'function' => '',
-					'parameters' => []
-				],
-				[]
-			],
-			[
-				'last(/host/key, "1h")', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
