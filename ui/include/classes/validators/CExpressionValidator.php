@@ -165,7 +165,7 @@ class CExpressionValidator extends CValidator {
 					if ($options['calculated'] && $options['aggregated']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
-								|| !in_array($parent_token['data']['function'], self::AGGREGATE_MATH_FUNCTIONS)
+								|| !$this->math_function_data->isAggregating($parent_token['data']['function'])
 								|| count($parent_token['data']['parameters']) != 1) {
 							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
