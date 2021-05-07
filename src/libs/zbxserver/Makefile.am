@@ -6,7 +6,7 @@ libzbxserver_a_SOURCES = \
 	evalfunc.c \
 	evalfunc.h \
 	expression.c \
-	expression.h ]\
+	expression.h \
 	macrofunc.c \
 	macrofunc.h \
 	zabbix_stats.c \
