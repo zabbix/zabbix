@@ -33,7 +33,7 @@ class CControllerPopupImportCompare extends CController {
 			'import' => 'in 1',
 			'rules_preset' => 'in template',
 			'rules' => 'array',
-			'parent_overlayid' => 'required|string'
+			'import_overlayid' => 'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -134,7 +134,7 @@ class CControllerPopupImportCompare extends CController {
 		$data = [
 			'title' => _('Templates'),
 			'errors' => null,
-			'parent_overlayid' => $this->getInput('parent_overlayid'),
+			'import_overlayid' => $this->getInput('import_overlayid'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

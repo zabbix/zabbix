@@ -24,43 +24,49 @@
  */
 ?>
 
-function confirmSubmit(overlay) {
-	if (document.querySelectorAll('.deleteMissing:checked').length === 0) {
-		return submitPopup(overlay);
-	}
-	else {
-		overlayDialogue({
-			content: jQuery('<span>')
-						.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
-			buttons: [
-				{
-					title: <?= json_encode(_('OK')) ?>,
-					focused: true,
-					action: function() {
-						return submitPopup(overlay);
-					}
-				},
-				{
-					title: <?= json_encode(_('Cancel')) ?>,
-					cancel: true,
-					class: '<?= ZBX_STYLE_BTN_ALT ?>',
-					action: function() {
-						overlay.unsetLoading();
-						return true;
-					}
-				}
-			]
-		}, overlay);
-	}
-}
-
 function submitPopup(overlay) {
 	if (document.getElementById('rules_preset').value === "template") {
 		return openImportComparePopup(overlay);
 	}
 	else {
+		if (isDeleteMissingChecked(overlay)) {
+			return confirmSubmit(overlay);
+		}
+
 		return submitImportPopup(overlay);
 	}
+}
+
+function isDeleteMissingChecked(import_overlay) {
+	return import_overlay.$dialogue.get(0).querySelectorAll('.deleteMissing:checked').length > 0;
+}
+
+function confirmSubmit(import_overlay, compare_overlay) {
+	overlayDialogue({
+		content: jQuery('<span>')
+					.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
+		buttons: [
+			{
+				title: <?= json_encode(_('OK')) ?>,
+				focused: true,
+				action: function() {
+					if (compare_overlay !== undefined) {
+						overlayDialogueDestroy(compare_overlay.dialogueid);
+					}
+					return submitImportPopup(import_overlay);
+				}
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				cancel: true,
+				class: '<?= ZBX_STYLE_BTN_ALT ?>',
+				action: function() {
+					(compare_overlay || import_overlay).unsetLoading();
+					return true;
+				}
+			}
+		]
+	}, (compare_overlay || import_overlay).$btn_submit);
 }
 
 function openImportComparePopup(overlay) {
@@ -71,7 +77,9 @@ function openImportComparePopup(overlay) {
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import.compare');
-	url.setArgument('parent_overlayid', overlay.dialogueid);
+	url.setArgument('import_overlayid', overlay.dialogueid);
+
+	overlay.setLoading();
 
 	fetch(url.getUrl(), {
 		method: 'post',
@@ -107,6 +115,8 @@ function submitImportPopup(overlay) {
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import');
 	url.setArgument('output', 'ajax');
+
+	overlay.setLoading();
 
 	fetch(url.getUrl(), {
 		method: 'post',

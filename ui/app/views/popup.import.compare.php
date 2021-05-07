@@ -151,8 +151,9 @@ else {
 		$buttons[] = [
 			'title' => _('Import'),
 			'class' => '',
+			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitImportComparePopup();'
+			'action' => 'submitImportComparePopup(overlay);'
 		];
 	}
 
@@ -172,7 +173,7 @@ else {
 					->toString()
 			: (new CForm())
 				->addClass('import-compare')
-				->addVar('parent_overlayid', $data['parent_overlayid'])
+				->addVar('import_overlayid', $data['import_overlayid'])
 				->addItem(drawToc($data['diff_toc']))
 				->addItem(drawDiff($data['diff']))
 				->toString(),

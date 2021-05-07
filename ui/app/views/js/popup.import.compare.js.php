@@ -33,11 +33,15 @@ jQuery(function($) {
 	});
 });
 
-function submitImportComparePopup() {
+function submitImportComparePopup(compare_overlay) {
 	const form = document.querySelector('.import-compare');
-	const parent_overlayid = form.querySelector('#parent_overlayid').value;
-	const parent_overlay = overlays_stack.getById(parent_overlayid);
+	const import_overlayid = form.querySelector('#import_overlayid').value;
+	const import_overlay = overlays_stack.getById(import_overlayid);
 
-	parent_overlay.setLoading();
-	submitImportPopup(parent_overlay);
+	if (isDeleteMissingChecked(import_overlay)) {
+		return confirmSubmit(import_overlay, compare_overlay);
+	}
+
+	overlayDialogueDestroy(compare_overlay.dialogueid);
+	return submitImportPopup(import_overlay);
 }

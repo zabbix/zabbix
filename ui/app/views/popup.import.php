@@ -138,7 +138,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return confirmSubmit(overlay);'
+			'action' => 'return submitPopup(overlay);'
 		]
 	]
 ];
