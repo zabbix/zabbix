@@ -1,0 +1,3569 @@
+---
+test case: Base
+in:
+  stack:
+  - type: 1539029947 #* 0x5bbbbbb -> 10101010101...
+    opt: 0
+    left: 0
+    right: 0
+  - type: 0
+    opt: 1
+    left: 2
+    right: 3
+  - type: 1000
+    opt: 10
+    left: 20
+    right: 30
+  - type: 217726
+    opt: 1
+    value: 'xyz'
+  - type: 1
+    opt: 0
+    value: ''
+  - type: 1
+    opt: 0
+    value: '1.234e10'
+  - type: 1
+    opt: 0
+    value: '12345678901234567890'
+  - type: 1
+    opt: 0
+    value: '1.234e10'
+---
+test case: Stack size
+in:
+  stack:
+  - type: 1539029947 #* 0x5bbbbbb -> 10101010101...
+    opt: 0
+    left: 0
+    right: 0
+  - type: 0
+    opt: 1
+    left: 2
+    right: 3
+  - type: 1000
+    opt: 10
+    left: 20
+    right: 30
+  repeat: 1000
+---
+test case: Auto-generated case 1 for random limit 7
+in:
+  stack:
+  - type: 6
+    opt: 2
+    left: 1
+    right: 0
+  - type: 6
+    opt: 4
+    left: 3
+    right: 5
+  - type: 4
+    opt: 1
+    left: 4
+    right: 6
+  - type: 4
+    opt: 3
+    left: 1
+    right: 4
+  - type: 0
+    opt: 6
+    left: 0
+    right: 5
+  - type: 3
+    opt: 2
+    left: 3
+    right: 6
+  - type: 1
+    opt: 3
+    left: 1
+    right: 6
+  - type: 4
+    opt: 2
+    left: 0
+    right: 3
+  - type: 6
+    opt: 4
+    left: 3
+    right: 6
+  - type: 0
+    opt: 0
+    left: 5
+    right: 4
+---
+test case: Auto-generated case 2 for random limit 7
+in:
+  stack:
+  - type: 6
+    opt: 3
+    left: 6
+    right: 0
+  - type: 6
+    opt: 1
+    left: 1
+    right: 4
+  - type: 6
+    opt: 4
+    left: 6
+    right: 0
+  - type: 5
+    opt: 0
+    left: 1
+    right: 4
+  - type: 2
+    opt: 3
+    left: 5
+    right: 6
+  - type: 5
+    opt: 0
+    left: 1
+    right: 3
+  - type: 5
+    opt: 4
+    left: 0
+    right: 1
+  - type: 5
+    opt: 2
+    left: 1
+    right: 0
+  - type: 1
+    opt: 2
+    left: 3
+    right: 4
+  - type: 0
+    opt: 0
+    left: 6
+    right: 5
+---
+test case: Auto-generated case 3 for random limit 7
+in:
+  stack:
+  - type: 0
+    opt: 1
+    left: 0
+    right: 3
+  - type: 5
+    opt: 3
+    left: 4
+    right: 6
+  - type: 1
+    opt: 5
+    left: 6
+    right: 3
+  - type: 6
+    opt: 5
+    left: 3
+    right: 4
+  - type: 6
+    opt: 6
+    left: 6
+    right: 2
+  - type: 6
+    opt: 3
+    left: 5
+    right: 3
+  - type: 5
+    opt: 3
+    left: 0
+    right: 1
+  - type: 0
+    opt: 5
+    left: 4
+    right: 0
+  - type: 6
+    opt: 1
+    left: 5
+    right: 5
+  - type: 6
+    opt: 2
+    left: 0
+    right: 3
+---
+test case: Auto-generated case 4 for random limit 7
+in:
+  stack:
+  - type: 2
+    opt: 6
+    left: 4
+    right: 6
+  - type: 5
+    opt: 6
+    left: 6
+    right: 4
+  - type: 0
+    opt: 4
+    left: 3
+    right: 4
+  - type: 6
+    opt: 5
+    left: 5
+    right: 6
+  - type: 1
+    opt: 5
+    left: 3
+    right: 4
+  - type: 3
+    opt: 0
+    left: 3
+    right: 6
+  - type: 0
+    opt: 4
+    left: 2
+    right: 0
+  - type: 4
+    opt: 3
+    left: 4
+    right: 5
+  - type: 5
+    opt: 5
+    left: 2
+    right: 3
+  - type: 3
+    opt: 0
+    left: 2
+    right: 0
+---
+test case: Auto-generated case 5 for random limit 7
+in:
+  stack:
+  - type: 3
+    opt: 0
+    left: 1
+    right: 0
+  - type: 1
+    opt: 6
+    left: 0
+    right: 1
+  - type: 0
+    opt: 3
+    left: 1
+    right: 3
+  - type: 5
+    opt: 0
+    left: 5
+    right: 2
+  - type: 1
+    opt: 1
+    left: 1
+    right: 5
+  - type: 5
+    opt: 4
+    left: 6
+    right: 0
+  - type: 4
+    opt: 0
+    left: 2
+    right: 4
+  - type: 4
+    opt: 0
+    left: 1
+    right: 2
+  - type: 3
+    opt: 2
+    left: 2
+    right: 3
+  - type: 4
+    opt: 5
+    left: 6
+    right: 2
+---
+test case: Auto-generated case 6 for random limit 7
+in:
+  stack:
+  - type: 4
+    opt: 0
+    left: 4
+    right: 5
+  - type: 0
+    opt: 2
+    left: 2
+    right: 0
+  - type: 5
+    opt: 5
+    left: 2
+    right: 3
+  - type: 3
+    opt: 4
+    left: 4
+    right: 5
+  - type: 5
+    opt: 2
+    left: 0
+    right: 6
+  - type: 0
+    opt: 5
+    left: 0
+    right: 5
+  - type: 3
+    opt: 5
+    left: 4
+    right: 2
+  - type: 6
+    opt: 4
+    left: 3
+    right: 4
+  - type: 4
+    opt: 3
+    left: 4
+    right: 1
+  - type: 2
+    opt: 5
+    left: 3
+    right: 6
+---
+test case: Auto-generated case 7 for random limit 7
+in:
+  stack:
+  - type: 0
+    opt: 1
+    left: 5
+    right: 2
+  - type: 2
+    opt: 2
+    left: 3
+    right: 2
+  - type: 3
+    opt: 3
+    left: 5
+    right: 1
+  - type: 4
+    opt: 2
+    left: 2
+    right: 5
+  - type: 2
+    opt: 3
+    left: 3
+    right: 0
+  - type: 1
+    opt: 0
+    left: 2
+    right: 2
+  - type: 4
+    opt: 4
+    left: 0
+    right: 5
+  - type: 3
+    opt: 1
+    left: 3
+    right: 3
+  - type: 3
+    opt: 6
+    left: 4
+    right: 0
+  - type: 2
+    opt: 2
+    left: 2
+    right: 2
+---
+test case: Auto-generated case 8 for random limit 7
+in:
+  stack:
+  - type: 3
+    opt: 3
+    left: 2
+    right: 5
+  - type: 5
+    opt: 5
+    left: 3
+    right: 1
+  - type: 4
+    opt: 1
+    left: 1
+    right: 6
+  - type: 0
+    opt: 6
+    left: 0
+    right: 6
+  - type: 1
+    opt: 4
+    left: 0
+    right: 3
+  - type: 4
+    opt: 0
+    left: 4
+    right: 6
+  - type: 4
+    opt: 3
+    left: 5
+    right: 0
+  - type: 5
+    opt: 4
+    left: 5
+    right: 2
+  - type: 1
+    opt: 3
+    left: 1
+    right: 2
+  - type: 2
+    opt: 6
+    left: 0
+    right: 0
+---
+test case: Auto-generated case 9 for random limit 7
+in:
+  stack:
+  - type: 3
+    opt: 2
+    left: 0
+    right: 1
+  - type: 4
+    opt: 2
+    left: 1
+    right: 3
+  - type: 4
+    opt: 4
+    left: 0
+    right: 6
+  - type: 4
+    opt: 4
+    left: 3
+    right: 0
+  - type: 6
+    opt: 3
+    left: 5
+    right: 0
+  - type: 3
+    opt: 0
+    left: 2
+    right: 3
+  - type: 4
+    opt: 1
+    left: 1
+    right: 1
+  - type: 5
+    opt: 3
+    left: 1
+    right: 2
+  - type: 6
+    opt: 4
+    left: 5
+    right: 1
+  - type: 4
+    opt: 5
+    left: 5
+    right: 5
+---
+test case: Auto-generated case 10 for random limit 7
+in:
+  stack:
+  - type: 0
+    opt: 5
+    left: 5
+    right: 5
+  - type: 1
+    opt: 5
+    left: 6
+    right: 5
+  - type: 2
+    opt: 6
+    left: 2
+    right: 1
+  - type: 6
+    opt: 6
+    left: 1
+    right: 6
+  - type: 0
+    opt: 1
+    left: 6
+    right: 1
+  - type: 3
+    opt: 2
+    left: 5
+    right: 0
+  - type: 6
+    opt: 3
+    left: 2
+    right: 2
+  - type: 1
+    opt: 1
+    left: 6
+    right: 3
+  - type: 3
+    opt: 3
+    left: 2
+    right: 0
+  - type: 6
+    opt: 2
+    left: 0
+    right: 5
+---
+test case: Auto-generated case 1 for random limit 7f
+in:
+  stack:
+  - type: 116
+    opt: 53
+    left: 27
+    right: 19
+  - type: 126
+    opt: 66
+    left: 40
+    right: 108
+  - type: 126
+    opt: 71
+    left: 91
+    right: 32
+  - type: 66
+    opt: 82
+    left: 106
+    right: 74
+  - type: 120
+    opt: 97
+    left: 0
+    right: 91
+  - type: 38
+    opt: 67
+    left: 3
+    right: 54
+  - type: 76
+    opt: 105
+    left: 110
+    right: 13
+  - type: 48
+    opt: 14
+    left: 44
+    right: 40
+  - type: 49
+    opt: 86
+    left: 18
+    right: 8
+  - type: 6
+    opt: 63
+    left: 32
+    right: 49
+---
+test case: Auto-generated case 2 for random limit 7f
+in:
+  stack:
+  - type: 12
+    opt: 61
+    left: 55
+    right: 97
+  - type: 6
+    opt: 92
+    left: 109
+    right: 35
+  - type: 50
+    opt: 91
+    left: 104
+    right: 70
+  - type: 50
+    opt: 78
+    left: 82
+    right: 100
+  - type: 5
+    opt: 34
+    left: 71
+    right: 70
+  - type: 1
+    opt: 45
+    left: 73
+    right: 102
+  - type: 47
+    opt: 53
+    left: 31
+    right: 88
+  - type: 56
+    opt: 9
+    left: 95
+    right: 58
+  - type: 20
+    opt: 61
+    left: 22
+    right: 109
+  - type: 79
+    opt: 102
+    left: 120
+    right: 58
+---
+test case: Auto-generated case 3 for random limit 7f
+in:
+  stack:
+  - type: 16
+    opt: 28
+    left: 125
+    right: 0
+  - type: 76
+    opt: 118
+    left: 50
+    right: 27
+  - type: 22
+    opt: 39
+    left: 11
+    right: 10
+  - type: 114
+    opt: 114
+    left: 27
+    right: 12
+  - type: 117
+    opt: 81
+    left: 37
+    right: 61
+  - type: 110
+    opt: 120
+    left: 82
+    right: 34
+  - type: 82
+    opt: 0
+    left: 121
+    right: 21
+  - type: 6
+    opt: 70
+    left: 121
+    right: 111
+  - type: 4
+    opt: 99
+    left: 29
+    right: 123
+  - type: 11
+    opt: 53
+    left: 62
+    right: 63
+---
+test case: Auto-generated case 4 for random limit 7f
+in:
+  stack:
+  - type: 70
+    opt: 62
+    left: 84
+    right: 104
+  - type: 104
+    opt: 101
+    left: 73
+    right: 38
+  - type: 72
+    opt: 61
+    left: 51
+    right: 110
+  - type: 44
+    opt: 90
+    left: 118
+    right: 72
+  - type: 35
+    opt: 44
+    left: 14
+    right: 57
+  - type: 60
+    opt: 117
+    left: 92
+    right: 41
+  - type: 13
+    opt: 83
+    left: 114
+    right: 6
+  - type: 2
+    opt: 89
+    left: 31
+    right: 14
+  - type: 97
+    opt: 58
+    left: 83
+    right: 122
+  - type: 77
+    opt: 49
+    left: 13
+    right: 107
+---
+test case: Auto-generated case 5 for random limit 7f
+in:
+  stack:
+  - type: 68
+    opt: 115
+    left: 6
+    right: 97
+  - type: 78
+    opt: 40
+    left: 78
+    right: 90
+  - type: 30
+    opt: 114
+    left: 37
+    right: 97
+  - type: 16
+    opt: 100
+    left: 101
+    right: 45
+  - type: 118
+    opt: 78
+    left: 9
+    right: 15
+  - type: 14
+    opt: 73
+    left: 98
+    right: 14
+  - type: 64
+    opt: 102
+    left: 103
+    right: 101
+  - type: 28
+    opt: 34
+    left: 35
+    right: 119
+  - type: 97
+    opt: 100
+    left: 48
+    right: 79
+  - type: 68
+    opt: 48
+    left: 93
+    right: 120
+---
+test case: Auto-generated case 6 for random limit 7f
+in:
+  stack:
+  - type: 80
+    opt: 84
+    left: 18
+    right: 77
+  - type: 16
+    opt: 99
+    left: 106
+    right: 58
+  - type: 102
+    opt: 38
+    left: 118
+    right: 106
+  - type: 55
+    opt: 39
+    left: 35
+    right: 1
+  - type: 106
+    opt: 41
+    left: 18
+    right: 124
+  - type: 50
+    opt: 68
+    left: 115
+    right: 86
+  - type: 92
+    opt: 97
+    left: 24
+    right: 6
+  - type: 102
+    opt: 11
+    left: 119
+    right: 44
+  - type: 59
+    opt: 35
+    left: 82
+    right: 96
+  - type: 70
+    opt: 48
+    left: 70
+    right: 104
+---
+test case: Auto-generated case 7 for random limit 7f
+in:
+  stack:
+  - type: 16
+    opt: 53
+    left: 7
+    right: 109
+  - type: 28
+    opt: 9
+    left: 94
+    right: 10
+  - type: 110
+    opt: 4
+    left: 12
+    right: 77
+  - type: 72
+    opt: 16
+    left: 90
+    right: 6
+  - type: 16
+    opt: 28
+    left: 58
+    right: 104
+  - type: 102
+    opt: 20
+    left: 81
+    right: 8
+  - type: 107
+    opt: 121
+    left: 3
+    right: 66
+  - type: 23
+    opt: 106
+    left: 109
+    right: 37
+  - type: 18
+    opt: 121
+    left: 94
+    right: 120
+  - type: 43
+    opt: 70
+    left: 42
+    right: 103
+---
+test case: Auto-generated case 8 for random limit 7f
+in:
+  stack:
+  - type: 112
+    opt: 119
+    left: 52
+    right: 2
+  - type: 105
+    opt: 79
+    left: 59
+    right: 47
+  - type: 66
+    opt: 64
+    left: 111
+    right: 50
+  - type: 84
+    opt: 86
+    left: 1
+    right: 84
+  - type: 48
+    opt: 123
+    left: 56
+    right: 5
+  - type: 108
+    opt: 80
+    left: 126
+    right: 37
+  - type: 22
+    opt: 47
+    left: 124
+    right: 46
+  - type: 115
+    opt: 44
+    left: 85
+    right: 69
+  - type: 23
+    opt: 47
+    left: 125
+    right: 106
+  - type: 124
+    opt: 3
+    left: 37
+    right: 6
+---
+test case: Auto-generated case 9 for random limit 7f
+in:
+  stack:
+  - type: 106
+    opt: 36
+    left: 48
+    right: 99
+  - type: 65
+    opt: 44
+    left: 50
+    right: 23
+  - type: 110
+    opt: 112
+    left: 74
+    right: 104
+  - type: 60
+    opt: 10
+    left: 78
+    right: 38
+  - type: 109
+    opt: 54
+    left: 10
+    right: 64
+  - type: 45
+    opt: 24
+    left: 116
+    right: 100
+  - type: 103
+    opt: 83
+    left: 61
+    right: 70
+  - type: 18
+    opt: 48
+    left: 126
+    right: 86
+  - type: 46
+    opt: 48
+    left: 106
+    right: 104
+  - type: 101
+    opt: 79
+    left: 76
+    right: 25
+---
+test case: Auto-generated case 10 for random limit 7f
+in:
+  stack:
+  - type: 61
+    opt: 69
+    left: 116
+    right: 1
+  - type: 12
+    opt: 46
+    left: 89
+    right: 9
+  - type: 71
+    opt: 106
+    left: 49
+    right: 12
+  - type: 21
+    opt: 51
+    left: 36
+    right: 22
+  - type: 32
+    opt: 119
+    left: 61
+    right: 97
+  - type: 4
+    opt: 30
+    left: 50
+    right: 33
+  - type: 125
+    opt: 21
+    left: 63
+    right: 80
+  - type: 5
+    opt: 66
+    left: 57
+    right: 96
+  - type: 100
+    opt: 41
+    left: 61
+    right: 71
+  - type: 64
+    opt: 54
+    left: 88
+    right: 10
+---
+test case: Auto-generated case 1 for random limit 7ff
+in:
+  stack:
+  - type: 1463
+    opt: 1823
+    left: 154
+    right: 1437
+  - type: 1271
+    opt: 2002
+    left: 860
+    right: 1149
+  - type: 1029
+    opt: 1169
+    left: 868
+    right: 1032
+  - type: 932
+    opt: 1697
+    left: 102
+    right: 162
+  - type: 981
+    opt: 331
+    left: 926
+    right: 45
+  - type: 936
+    opt: 1199
+    left: 1533
+    right: 457
+  - type: 654
+    opt: 1651
+    left: 141
+    right: 655
+  - type: 1236
+    opt: 1901
+    left: 143
+    right: 1786
+  - type: 16
+    opt: 2008
+    left: 2032
+    right: 1784
+  - type: 1080
+    opt: 50
+    left: 2042
+    right: 226
+---
+test case: Auto-generated case 2 for random limit 7ff
+in:
+  stack:
+  - type: 1038
+    opt: 13
+    left: 52
+    right: 1268
+  - type: 1901
+    opt: 337
+    left: 1378
+    right: 529
+  - type: 594
+    opt: 1165
+    left: 1522
+    right: 889
+  - type: 520
+    opt: 1524
+    left: 425
+    right: 183
+  - type: 311
+    opt: 494
+    left: 1060
+    right: 815
+  - type: 1629
+    opt: 1776
+    left: 1794
+    right: 1712
+  - type: 1163
+    opt: 291
+    left: 358
+    right: 1797
+  - type: 1701
+    opt: 298
+    left: 382
+    right: 657
+  - type: 564
+    opt: 875
+    left: 1139
+    right: 284
+  - type: 1638
+    opt: 1360
+    left: 600
+    right: 1440
+---
+test case: Auto-generated case 3 for random limit 7ff
+in:
+  stack:
+  - type: 1240
+    opt: 413
+    left: 1320
+    right: 307
+  - type: 386
+    opt: 627
+    left: 1586
+    right: 1064
+  - type: 1051
+    opt: 1395
+    left: 131
+    right: 1876
+  - type: 604
+    opt: 975
+    left: 741
+    right: 1680
+  - type: 1423
+    opt: 1631
+    left: 785
+    right: 1157
+  - type: 506
+    opt: 1608
+    left: 32
+    right: 454
+  - type: 1223
+    opt: 1146
+    left: 850
+    right: 312
+  - type: 328
+    opt: 1958
+    left: 45
+    right: 1217
+  - type: 1697
+    opt: 1948
+    left: 545
+    right: 1901
+  - type: 206
+    opt: 996
+    left: 1778
+    right: 716
+---
+test case: Auto-generated case 4 for random limit 7ff
+in:
+  stack:
+  - type: 1756
+    opt: 1199
+    left: 597
+    right: 1471
+  - type: 877
+    opt: 683
+    left: 272
+    right: 1751
+  - type: 622
+    opt: 101
+    left: 1574
+    right: 597
+  - type: 448
+    opt: 899
+    left: 611
+    right: 357
+  - type: 407
+    opt: 1736
+    left: 727
+    right: 1433
+  - type: 1623
+    opt: 1449
+    left: 1894
+    right: 1049
+  - type: 2025
+    opt: 553
+    left: 1789
+    right: 1150
+  - type: 910
+    opt: 1126
+    left: 1150
+    right: 1641
+  - type: 896
+    opt: 1079
+    left: 1760
+    right: 1492
+  - type: 691
+    opt: 665
+    left: 1516
+    right: 1154
+---
+test case: Auto-generated case 5 for random limit 7ff
+in:
+  stack:
+  - type: 632
+    opt: 216
+    left: 1551
+    right: 60
+  - type: 394
+    opt: 1811
+    left: 691
+    right: 1276
+  - type: 1848
+    opt: 162
+    left: 939
+    right: 703
+  - type: 611
+    opt: 807
+    left: 1387
+    right: 1794
+  - type: 1316
+    opt: 1375
+    left: 199
+    right: 1134
+  - type: 689
+    opt: 1778
+    left: 208
+    right: 919
+  - type: 2009
+    opt: 1091
+    left: 1684
+    right: 1029
+  - type: 2007
+    opt: 1383
+    left: 294
+    right: 1938
+  - type: 217
+    opt: 1195
+    left: 1586
+    right: 259
+  - type: 1075
+    opt: 1353
+    left: 2013
+    right: 697
+---
+test case: Auto-generated case 6 for random limit 7ff
+in:
+  stack:
+  - type: 706
+    opt: 1474
+    left: 30
+    right: 2007
+  - type: 943
+    opt: 563
+    left: 670
+    right: 289
+  - type: 391
+    opt: 1013
+    left: 5
+    right: 621
+  - type: 1271
+    opt: 101
+    left: 1113
+    right: 1965
+  - type: 546
+    opt: 1811
+    left: 1805
+    right: 1266
+  - type: 1910
+    opt: 1492
+    left: 1917
+    right: 672
+  - type: 1574
+    opt: 1133
+    left: 1118
+    right: 1607
+  - type: 1834
+    opt: 2029
+    left: 1544
+    right: 215
+  - type: 1033
+    opt: 1771
+    left: 1226
+    right: 599
+  - type: 1470
+    opt: 1070
+    left: 1954
+    right: 1530
+---
+test case: Auto-generated case 7 for random limit 7ff
+in:
+  stack:
+  - type: 1604
+    opt: 1567
+    left: 542
+    right: 1524
+  - type: 195
+    opt: 1509
+    left: 1253
+    right: 514
+  - type: 78
+    opt: 1946
+    left: 1331
+    right: 857
+  - type: 1319
+    opt: 830
+    left: 1655
+    right: 1377
+  - type: 1748
+    opt: 709
+    left: 1825
+    right: 154
+  - type: 1518
+    opt: 1496
+    left: 741
+    right: 1317
+  - type: 126
+    opt: 487
+    left: 1587
+    right: 213
+  - type: 1200
+    opt: 739
+    left: 784
+    right: 1635
+  - type: 2036
+    opt: 1124
+    left: 1344
+    right: 8
+  - type: 261
+    opt: 1323
+    left: 1488
+    right: 1819
+---
+test case: Auto-generated case 8 for random limit 7ff
+in:
+  stack:
+  - type: 1258
+    opt: 1965
+    left: 1488
+    right: 898
+  - type: 1314
+    opt: 1979
+    left: 479
+    right: 244
+  - type: 1768
+    opt: 1948
+    left: 586
+    right: 332
+  - type: 251
+    opt: 1981
+    left: 760
+    right: 880
+  - type: 899
+    opt: 1778
+    left: 1876
+    right: 313
+  - type: 1999
+    opt: 997
+    left: 483
+    right: 739
+  - type: 375
+    opt: 1704
+    left: 517
+    right: 125
+  - type: 563
+    opt: 649
+    left: 1153
+    right: 422
+  - type: 394
+    opt: 173
+    left: 1139
+    right: 541
+  - type: 249
+    opt: 1916
+    left: 1489
+    right: 710
+---
+test case: Auto-generated case 9 for random limit 7ff
+in:
+  stack:
+  - type: 1570
+    opt: 828
+    left: 837
+    right: 62
+  - type: 991
+    opt: 419
+    left: 1790
+    right: 1714
+  - type: 271
+    opt: 536
+    left: 1929
+    right: 477
+  - type: 131
+    opt: 1276
+    left: 70
+    right: 265
+  - type: 271
+    opt: 1048
+    left: 1089
+    right: 2033
+  - type: 1021
+    opt: 422
+    left: 1803
+    right: 1896
+  - type: 1561
+    opt: 47
+    left: 117
+    right: 1238
+  - type: 1525
+    opt: 1618
+    left: 1385
+    right: 1141
+  - type: 413
+    opt: 347
+    left: 1974
+    right: 533
+  - type: 900
+    opt: 800
+    left: 1625
+    right: 1030
+---
+test case: Auto-generated case 10 for random limit 7ff
+in:
+  stack:
+  - type: 1081
+    opt: 1848
+    left: 1191
+    right: 315
+  - type: 1419
+    opt: 1480
+    left: 1002
+    right: 269
+  - type: 139
+    opt: 390
+    left: 400
+    right: 773
+  - type: 1663
+    opt: 1036
+    left: 448
+    right: 619
+  - type: 106
+    opt: 669
+    left: 1154
+    right: 539
+  - type: 1529
+    opt: 1314
+    left: 46
+    right: 1403
+  - type: 6
+    opt: 62
+    left: 2042
+    right: 1299
+  - type: 1213
+    opt: 1476
+    left: 452
+    right: 1624
+  - type: 1623
+    opt: 647
+    left: 558
+    right: 503
+  - type: 936
+    opt: 921
+    left: 1834
+    right: 1213
+---
+test case: Auto-generated case 1 for random limit 7fff
+in:
+  stack:
+  - type: 25568
+    opt: 29171
+    left: 26772
+    right: 5451
+  - type: 10967
+    opt: 11279
+    left: 20552
+    right: 2319
+  - type: 476
+    opt: 31117
+    left: 3106
+    right: 21831
+  - type: 5035
+    opt: 28239
+    left: 2047
+    right: 6719
+  - type: 26138
+    opt: 16787
+    left: 32705
+    right: 1942
+  - type: 1020
+    opt: 31636
+    left: 24915
+    right: 31478
+  - type: 8632
+    opt: 29884
+    left: 11377
+    right: 20009
+  - type: 16700
+    opt: 16003
+    left: 5172
+    right: 10723
+  - type: 26073
+    opt: 20810
+    left: 26452
+    right: 5906
+  - type: 31739
+    opt: 4172
+    left: 17603
+    right: 3944
+---
+test case: Auto-generated case 2 for random limit 7fff
+in:
+  stack:
+  - type: 24878
+    opt: 17324
+    left: 9552
+    right: 31616
+  - type: 22938
+    opt: 15439
+    left: 4622
+    right: 5771
+  - type: 16562
+    opt: 30307
+    left: 26722
+    right: 12386
+  - type: 3270
+    opt: 25792
+    left: 8636
+    right: 6159
+  - type: 24457
+    opt: 1560
+    left: 30690
+    right: 26539
+  - type: 27877
+    opt: 32660
+    left: 30568
+    right: 24121
+  - type: 29423
+    opt: 12244
+    left: 18970
+    right: 12520
+  - type: 17328
+    opt: 22449
+    left: 19863
+    right: 7131
+  - type: 17633
+    opt: 12219
+    left: 20691
+    right: 13644
+  - type: 1153
+    opt: 26514
+    left: 2136
+    right: 19651
+---
+test case: Auto-generated case 3 for random limit 7fff
+in:
+  stack:
+  - type: 18086
+    opt: 26101
+    left: 32079
+    right: 32282
+  - type: 8927
+    opt: 7030
+    left: 1602
+    right: 385
+  - type: 22183
+    opt: 14383
+    left: 20771
+    right: 3807
+  - type: 9889
+    opt: 8396
+    left: 21241
+    right: 31694
+  - type: 24242
+    opt: 27989
+    left: 8772
+    right: 24241
+  - type: 29007
+    opt: 24889
+    left: 23757
+    right: 9698
+  - type: 393
+    opt: 24624
+    left: 16812
+    right: 3215
+  - type: 30591
+    opt: 18242
+    left: 29549
+    right: 7536
+  - type: 4359
+    opt: 23195
+    left: 4895
+    right: 7111
+  - type: 10407
+    opt: 20981
+    left: 12509
+    right: 30317
+---
+test case: Auto-generated case 4 for random limit 7fff
+in:
+  stack:
+  - type: 16738
+    opt: 28765
+    left: 3940
+    right: 24551
+  - type: 8862
+    opt: 26918
+    left: 17125
+    right: 30720
+  - type: 20420
+    opt: 16180
+    left: 29294
+    right: 22431
+  - type: 26831
+    opt: 18017
+    left: 15868
+    right: 31378
+  - type: 27021
+    opt: 3829
+    left: 12239
+    right: 30585
+  - type: 4214
+    opt: 9292
+    left: 30621
+    right: 3738
+  - type: 20670
+    opt: 20792
+    left: 5488
+    right: 26651
+  - type: 21494
+    opt: 30496
+    left: 12526
+    right: 10063
+  - type: 5493
+    opt: 31506
+    left: 15075
+    right: 20495
+  - type: 10380
+    opt: 8559
+    left: 31008
+    right: 21601
+---
+test case: Auto-generated case 5 for random limit 7fff
+in:
+  stack:
+  - type: 8977
+    opt: 26044
+    left: 4310
+    right: 29308
+  - type: 862
+    opt: 20360
+    left: 13483
+    right: 11253
+  - type: 301
+    opt: 1812
+    left: 30043
+    right: 28659
+  - type: 28595
+    opt: 8455
+    left: 5864
+    right: 9022
+  - type: 12001
+    opt: 10205
+    left: 28740
+    right: 5580
+  - type: 14137
+    opt: 8207
+    left: 17325
+    right: 27363
+  - type: 32217
+    opt: 2344
+    left: 12385
+    right: 12965
+  - type: 26526
+    opt: 20295
+    left: 25209
+    right: 7679
+  - type: 19771
+    opt: 25837
+    left: 1712
+    right: 1826
+  - type: 20427
+    opt: 25848
+    left: 25683
+    right: 31315
+---
+test case: Auto-generated case 6 for random limit 7fff
+in:
+  stack:
+  - type: 19835
+    opt: 16067
+    left: 21002
+    right: 3422
+  - type: 20348
+    opt: 27824
+    left: 2653
+    right: 21837
+  - type: 7266
+    opt: 6468
+    left: 5885
+    right: 14447
+  - type: 27659
+    opt: 28544
+    left: 8044
+    right: 17191
+  - type: 11333
+    opt: 29352
+    left: 17163
+    right: 28425
+  - type: 7424
+    opt: 18028
+    left: 10247
+    right: 20668
+  - type: 16083
+    opt: 13243
+    left: 1361
+    right: 7114
+  - type: 6833
+    opt: 4423
+    left: 28635
+    right: 16671
+  - type: 22223
+    opt: 28444
+    left: 28717
+    right: 11607
+  - type: 12405
+    opt: 16530
+    left: 6203
+    right: 27960
+---
+test case: Auto-generated case 7 for random limit 7fff
+in:
+  stack:
+  - type: 30443
+    opt: 15678
+    left: 5655
+    right: 32366
+  - type: 24709
+    opt: 8965
+    left: 25948
+    right: 26264
+  - type: 32067
+    opt: 27091
+    left: 8135
+    right: 28748
+  - type: 13589
+    opt: 7111
+    left: 28344
+    right: 6121
+  - type: 18054
+    opt: 271
+    left: 15507
+    right: 12402
+  - type: 9925
+    opt: 13267
+    left: 2020
+    right: 27020
+  - type: 31578
+    opt: 31092
+    left: 26435
+    right: 5397
+  - type: 30953
+    opt: 16050
+    left: 26482
+    right: 26473
+  - type: 2930
+    opt: 28671
+    left: 23121
+    right: 4869
+  - type: 9121
+    opt: 5436
+    left: 19426
+    right: 10470
+---
+test case: Auto-generated case 8 for random limit 7fff
+in:
+  stack:
+  - type: 30851
+    opt: 10299
+    left: 27890
+    right: 21202
+  - type: 26810
+    opt: 5335
+    left: 13880
+    right: 2166
+  - type: 23207
+    opt: 29998
+    left: 11947
+    right: 3405
+  - type: 26559
+    opt: 3483
+    left: 25161
+    right: 18763
+  - type: 5240
+    opt: 14817
+    left: 32229
+    right: 312
+  - type: 15164
+    opt: 29101
+    left: 20193
+    right: 20707
+  - type: 8532
+    opt: 4277
+    left: 15269
+    right: 26437
+  - type: 2191
+    opt: 19668
+    left: 23252
+    right: 25068
+  - type: 1648
+    opt: 8310
+    left: 23198
+    right: 3909
+  - type: 1195
+    opt: 9687
+    left: 11594
+    right: 23397
+---
+test case: Auto-generated case 9 for random limit 7fff
+in:
+  stack:
+  - type: 18785
+    opt: 22570
+    left: 565
+    right: 30674
+  - type: 6967
+    opt: 19613
+    left: 629
+    right: 11032
+  - type: 21154
+    opt: 528
+    left: 29562
+    right: 15795
+  - type: 518
+    opt: 12779
+    left: 9163
+    right: 14311
+  - type: 7331
+    opt: 4541
+    left: 3308
+    right: 12305
+  - type: 11979
+    opt: 14538
+    left: 18166
+    right: 20209
+  - type: 6134
+    opt: 22026
+    left: 11270
+    right: 28902
+  - type: 21380
+    opt: 31523
+    left: 21132
+    right: 23715
+  - type: 1147
+    opt: 27719
+    left: 8837
+    right: 20192
+  - type: 15993
+    opt: 18682
+    left: 7107
+    right: 22245
+---
+test case: Auto-generated case 10 for random limit 7fff
+in:
+  stack:
+  - type: 12230
+    opt: 27732
+    left: 12905
+    right: 19273
+  - type: 21911
+    opt: 44
+    left: 23208
+    right: 7366
+  - type: 24915
+    opt: 26159
+    left: 5450
+    right: 4493
+  - type: 22574
+    opt: 2248
+    left: 299
+    right: 11313
+  - type: 17115
+    opt: 8006
+    left: 28023
+    right: 29568
+  - type: 12431
+    opt: 5160
+    left: 18504
+    right: 10430
+  - type: 20009
+    opt: 6012
+    left: 15913
+    right: 30621
+  - type: 4803
+    opt: 29179
+    left: 23751
+    right: 29117
+  - type: 10321
+    opt: 25788
+    left: 23802
+    right: 30637
+  - type: 20019
+    opt: 12910
+    left: 27693
+    right: 16332
+---
+test case: Auto-generated case 1 for random limit 7ffff
+in:
+  stack:
+  - type: 100837
+    opt: 449281
+    left: 229745
+    right: 136947
+  - type: 251558
+    opt: 269144
+    left: 397649
+    right: 158037
+  - type: 417083
+    opt: 207194
+    left: 390431
+    right: 217656
+  - type: 147282
+    opt: 252599
+    left: 380607
+    right: 216357
+  - type: 342077
+    opt: 62696
+    left: 116968
+    right: 359960
+  - type: 356281
+    opt: 197215
+    left: 440261
+    right: 154965
+  - type: 105476
+    opt: 271036
+    left: 406671
+    right: 99912
+  - type: 128426
+    opt: 349230
+    left: 73434
+    right: 54906
+  - type: 127694
+    opt: 248197
+    left: 95323
+    right: 385904
+  - type: 153765
+    opt: 401473
+    left: 218755
+    right: 358968
+---
+test case: Auto-generated case 2 for random limit 7ffff
+in:
+  stack:
+  - type: 265015
+    opt: 183051
+    left: 76805
+    right: 341726
+  - type: 37146
+    opt: 80016
+    left: 328445
+    right: 402194
+  - type: 388815
+    opt: 7857
+    left: 277038
+    right: 350237
+  - type: 172650
+    opt: 410944
+    left: 382131
+    right: 426169
+  - type: 453969
+    opt: 38259
+    left: 21785
+    right: 300557
+  - type: 154119
+    opt: 40923
+    left: 134318
+    right: 217875
+  - type: 318497
+    opt: 172385
+    left: 480426
+    right: 502138
+  - type: 149564
+    opt: 506577
+    left: 481677
+    right: 365015
+  - type: 482595
+    opt: 146467
+    left: 285822
+    right: 185948
+  - type: 399687
+    opt: 183500
+    left: 296536
+    right: 205569
+---
+test case: Auto-generated case 3 for random limit 7ffff
+in:
+  stack:
+  - type: 68197
+    opt: 477535
+    left: 153341
+    right: 444758
+  - type: 253619
+    opt: 27436
+    left: 461573
+    right: 331572
+  - type: 449419
+    opt: 54189
+    left: 35895
+    right: 15954
+  - type: 336946
+    opt: 322266
+    left: 356565
+    right: 105820
+  - type: 12709
+    opt: 59590
+    left: 386299
+    right: 305244
+  - type: 477477
+    opt: 451641
+    left: 373111
+    right: 163181
+  - type: 377382
+    opt: 316053
+    left: 436054
+    right: 481381
+  - type: 329574
+    opt: 461016
+    left: 287541
+    right: 303000
+  - type: 43045
+    opt: 14845
+    left: 71488
+    right: 300940
+  - type: 440010
+    opt: 133920
+    left: 87498
+    right: 293403
+---
+test case: Auto-generated case 4 for random limit 7ffff
+in:
+  stack:
+  - type: 379057
+    opt: 394276
+    left: 398145
+    right: 324348
+  - type: 93483
+    opt: 28822
+    left: 460959
+    right: 370663
+  - type: 280144
+    opt: 247447
+    left: 377701
+    right: 489536
+  - type: 452563
+    opt: 432713
+    left: 199336
+    right: 336415
+  - type: 328132
+    opt: 468586
+    left: 326567
+    right: 150373
+  - type: 83418
+    opt: 285779
+    left: 486389
+    right: 101030
+  - type: 31397
+    opt: 125616
+    left: 284869
+    right: 8659
+  - type: 309651
+    opt: 31322
+    left: 219134
+    right: 226155
+  - type: 115309
+    opt: 295663
+    left: 338582
+    right: 85811
+  - type: 385080
+    opt: 471498
+    left: 46452
+    right: 196432
+---
+test case: Auto-generated case 5 for random limit 7ffff
+in:
+  stack:
+  - type: 30919
+    opt: 291616
+    left: 217947
+    right: 138552
+  - type: 140613
+    opt: 59843
+    left: 472512
+    right: 319836
+  - type: 438803
+    opt: 415911
+    left: 509474
+    right: 195414
+  - type: 65392
+    opt: 255360
+    left: 345133
+    right: 145069
+  - type: 225659
+    opt: 372110
+    left: 494158
+    right: 214269
+  - type: 180525
+    opt: 523716
+    left: 432483
+    right: 297223
+  - type: 463745
+    opt: 450585
+    left: 39748
+    right: 111985
+  - type: 217389
+    opt: 486877
+    left: 104376
+    right: 28893
+  - type: 406354
+    opt: 89026
+    left: 365387
+    right: 152153
+  - type: 395057
+    opt: 57736
+    left: 296968
+    right: 162456
+---
+test case: Auto-generated case 6 for random limit 7ffff
+in:
+  stack:
+  - type: 173102
+    opt: 413192
+    left: 497529
+    right: 200196
+  - type: 413128
+    opt: 365050
+    left: 318772
+    right: 428015
+  - type: 94689
+    opt: 346037
+    left: 475547
+    right: 68401
+  - type: 399696
+    opt: 97890
+    left: 81919
+    right: 86086
+  - type: 47462
+    opt: 143358
+    left: 404677
+    right: 334434
+  - type: 265893
+    opt: 318458
+    left: 34100
+    right: 256442
+  - type: 100839
+    opt: 115658
+    left: 308912
+    right: 15458
+  - type: 174902
+    opt: 134093
+    left: 218067
+    right: 194919
+  - type: 391769
+    opt: 166314
+    left: 21409
+    right: 335410
+  - type: 482193
+    opt: 451282
+    left: 490655
+    right: 167696
+---
+test case: Auto-generated case 7 for random limit 7ffff
+in:
+  stack:
+  - type: 13100
+    opt: 480
+    left: 170123
+    right: 13017
+  - type: 230857
+    opt: 43258
+    left: 179807
+    right: 356680
+  - type: 345213
+    opt: 113695
+    left: 151678
+    right: 142550
+  - type: 198888
+    opt: 451971
+    left: 523600
+    right: 16789
+  - type: 323983
+    opt: 205374
+    left: 37643
+    right: 312629
+  - type: 72103
+    opt: 250443
+    left: 309023
+    right: 352014
+  - type: 186855
+    opt: 442839
+    left: 18164
+    right: 462543
+  - type: 314107
+    opt: 134916
+    left: 35605
+    right: 35649
+  - type: 219041
+    opt: 290128
+    left: 442871
+    right: 219968
+  - type: 473002
+    opt: 166198
+    left: 218188
+    right: 372546
+---
+test case: Auto-generated case 8 for random limit 7ffff
+in:
+  stack:
+  - type: 402339
+    opt: 348525
+    left: 73683
+    right: 214736
+  - type: 456948
+    opt: 107553
+    left: 112029
+    right: 134075
+  - type: 444204
+    opt: 308000
+    left: 437392
+    right: 25899
+  - type: 509406
+    opt: 101236
+    left: 334291
+    right: 240679
+  - type: 209568
+    opt: 371755
+    left: 25590
+    right: 361900
+  - type: 513039
+    opt: 220773
+    left: 14089
+    right: 207751
+  - type: 464556
+    opt: 141649
+    left: 13565
+    right: 146318
+  - type: 239870
+    opt: 162357
+    left: 301177
+    right: 391682
+  - type: 389224
+    opt: 489896
+    left: 348998
+    right: 434983
+  - type: 421790
+    opt: 324917
+    left: 284348
+    right: 80321
+---
+test case: Auto-generated case 9 for random limit 7ffff
+in:
+  stack:
+  - type: 380808
+    opt: 295805
+    left: 367327
+    right: 203911
+  - type: 502404
+    opt: 96001
+    left: 272138
+    right: 434979
+  - type: 150971
+    opt: 52832
+    left: 132027
+    right: 487765
+  - type: 102409
+    opt: 72365
+    left: 230461
+    right: 46882
+  - type: 490806
+    opt: 514482
+    left: 444014
+    right: 223581
+  - type: 397240
+    opt: 214316
+    left: 125326
+    right: 386613
+  - type: 374491
+    opt: 180167
+    left: 116011
+    right: 248515
+  - type: 388842
+    opt: 249298
+    left: 435715
+    right: 20549
+  - type: 154183
+    opt: 228385
+    left: 115045
+    right: 1416
+  - type: 92678
+    opt: 322124
+    left: 387946
+    right: 331925
+---
+test case: Auto-generated case 10 for random limit 7ffff
+in:
+  stack:
+  - type: 335837
+    opt: 442090
+    left: 267272
+    right: 365432
+  - type: 428704
+    opt: 387926
+    left: 182715
+    right: 301582
+  - type: 466538
+    opt: 451239
+    left: 410133
+    right: 497700
+  - type: 465070
+    opt: 289723
+    left: 454150
+    right: 375624
+  - type: 486784
+    opt: 350314
+    left: 37305
+    right: 337074
+  - type: 231478
+    opt: 345186
+    left: 419962
+    right: 490016
+  - type: 186500
+    opt: 110633
+    left: 389995
+    right: 366795
+  - type: 412276
+    opt: 399548
+    left: 347610
+    right: 492091
+  - type: 473996
+    opt: 343659
+    left: 169442
+    right: 42650
+  - type: 144772
+    opt: 169781
+    left: 360563
+    right: 140273
+---
+test case: Auto-generated case 1 for random limit 7fffff
+in:
+  stack:
+  - type: 4676444
+    opt: 991015
+    left: 6033838
+    right: 4473340
+  - type: 4217822
+    opt: 2838363
+    left: 442757
+    right: 3525825
+  - type: 1135432
+    opt: 1477005
+    left: 551265
+    right: 8165424
+  - type: 6990650
+    opt: 4468989
+    left: 2489850
+    right: 2450526
+  - type: 1723618
+    opt: 1673635
+    left: 6018360
+    right: 3828834
+  - type: 3870026
+    opt: 581269
+    left: 3445234
+    right: 4421404
+  - type: 7643734
+    opt: 562155
+    left: 2016158
+    right: 6252299
+  - type: 7759453
+    opt: 5731060
+    left: 6385876
+    right: 7365907
+  - type: 7209911
+    opt: 1523714
+    left: 5292197
+    right: 5694595
+  - type: 429374
+    opt: 8021095
+    left: 230905
+    right: 191380
+---
+test case: Auto-generated case 2 for random limit 7fffff
+in:
+  stack:
+  - type: 4243623
+    opt: 1690705
+    left: 4492379
+    right: 6882269
+  - type: 5499895
+    opt: 5212302
+    left: 7076873
+    right: 3175124
+  - type: 2317225
+    opt: 424518
+    left: 8308051
+    right: 7228279
+  - type: 7594721
+    opt: 8370908
+    left: 5351720
+    right: 2694250
+  - type: 6269914
+    opt: 6213513
+    left: 5797779
+    right: 3682321
+  - type: 176141
+    opt: 5606967
+    left: 7246718
+    right: 1974825
+  - type: 6948999
+    opt: 7307999
+    left: 2757143
+    right: 2405934
+  - type: 2608485
+    opt: 2929098
+    left: 5120494
+    right: 5854200
+  - type: 4723147
+    opt: 6320822
+    left: 4146399
+    right: 220085
+  - type: 4672804
+    opt: 3492730
+    left: 6263864
+    right: 7798149
+---
+test case: Auto-generated case 3 for random limit 7fffff
+in:
+  stack:
+  - type: 2002644
+    opt: 6453488
+    left: 6562536
+    right: 4048306
+  - type: 5180960
+    opt: 6120076
+    left: 6860445
+    right: 5367054
+  - type: 2599426
+    opt: 6766868
+    left: 5127555
+    right: 679343
+  - type: 4286322
+    opt: 3968380
+    left: 4363842
+    right: 7758631
+  - type: 6829566
+    opt: 2382603
+    left: 7978215
+    right: 1840426
+  - type: 6822372
+    opt: 6552998
+    left: 3975772
+    right: 1268927
+  - type: 1904396
+    opt: 4420693
+    left: 2005747
+    right: 4178923
+  - type: 8053723
+    opt: 2378228
+    left: 1124891
+    right: 6235848
+  - type: 1182171
+    opt: 6373594
+    left: 4349882
+    right: 5439407
+  - type: 3236403
+    opt: 4922741
+    left: 6016851
+    right: 6348572
+---
+test case: Auto-generated case 4 for random limit 7fffff
+in:
+  stack:
+  - type: 8002498
+    opt: 4242565
+    left: 8212890
+    right: 3535155
+  - type: 2788979
+    opt: 6800480
+    left: 4582185
+    right: 5872822
+  - type: 3008068
+    opt: 6579656
+    left: 347954
+    right: 7819066
+  - type: 3810187
+    opt: 3921890
+    left: 897194
+    right: 444212
+  - type: 7527898
+    opt: 1260888
+    left: 2952794
+    right: 6923714
+  - type: 8097471
+    opt: 5963122
+    left: 3204281
+    right: 7222629
+  - type: 3372270
+    opt: 5347404
+    left: 6638577
+    right: 3681974
+  - type: 3225131
+    opt: 6653643
+    left: 2237655
+    right: 7132781
+  - type: 3630510
+    opt: 3034241
+    left: 1392237
+    right: 5934556
+  - type: 5635144
+    opt: 6197336
+    left: 2685625
+    right: 7198122
+---
+test case: Auto-generated case 5 for random limit 7fffff
+in:
+  stack:
+  - type: 4253896
+    opt: 6697206
+    left: 2027352
+    right: 3325331
+  - type: 904855
+    opt: 7064184
+    left: 5560044
+    right: 1522774
+  - type: 1324988
+    opt: 2483635
+    left: 1126001
+    right: 4461882
+  - type: 3396361
+    opt: 4693748
+    left: 6781672
+    right: 7660486
+  - type: 6247468
+    opt: 8134080
+    left: 6296160
+    right: 2378570
+  - type: 8236368
+    opt: 5205439
+    left: 1892658
+    right: 6361497
+  - type: 4131437
+    opt: 536975
+    left: 4720809
+    right: 518109
+  - type: 3961174
+    opt: 6216894
+    left: 711976
+    right: 7603838
+  - type: 1366547
+    opt: 1815736
+    left: 7068329
+    right: 7043998
+  - type: 7385348
+    opt: 3847390
+    left: 5602914
+    right: 3521832
+---
+test case: Auto-generated case 6 for random limit 7fffff
+in:
+  stack:
+  - type: 2801002
+    opt: 6427203
+    left: 4324586
+    right: 2812900
+  - type: 4344037
+    opt: 7894950
+    left: 5529210
+    right: 1897979
+  - type: 3639740
+    opt: 2814520
+    left: 7986932
+    right: 1741822
+  - type: 5208669
+    opt: 4459767
+    left: 6658772
+    right: 3162164
+  - type: 66491
+    opt: 1284904
+    left: 5112657
+    right: 6549262
+  - type: 499720
+    opt: 3912127
+    left: 5705286
+    right: 1823456
+  - type: 7946155
+    opt: 790652
+    left: 3728861
+    right: 6758224
+  - type: 3338592
+    opt: 527074
+    left: 6239640
+    right: 8354067
+  - type: 1122028
+    opt: 214922
+    left: 7356219
+    right: 5109871
+  - type: 710943
+    opt: 7839922
+    left: 5158400
+    right: 830887
+---
+test case: Auto-generated case 7 for random limit 7fffff
+in:
+  stack:
+  - type: 4741345
+    opt: 2129531
+    left: 7649814
+    right: 3181554
+  - type: 7710764
+    opt: 6447413
+    left: 2740739
+    right: 2812938
+  - type: 6322263
+    opt: 4232473
+    left: 165923
+    right: 72667
+  - type: 414766
+    opt: 4751955
+    left: 743885
+    right: 5520549
+  - type: 3112813
+    opt: 2032034
+    left: 6226738
+    right: 3706283
+  - type: 5490142
+    opt: 791798
+    left: 1873691
+    right: 270242
+  - type: 2100886
+    opt: 7829663
+    left: 4312395
+    right: 2942102
+  - type: 7421432
+    opt: 278565
+    left: 7723293
+    right: 4341568
+  - type: 7122389
+    opt: 4107200
+    left: 1493079
+    right: 4084888
+  - type: 4455346
+    opt: 3647910
+    left: 2151174
+    right: 6167203
+---
+test case: Auto-generated case 8 for random limit 7fffff
+in:
+  stack:
+  - type: 423
+    opt: 4040063
+    left: 1137196
+    right: 6192667
+  - type: 1005320
+    opt: 6762149
+    left: 476992
+    right: 7273329
+  - type: 7120226
+    opt: 8164982
+    left: 5785837
+    right: 502421
+  - type: 4901949
+    opt: 7475580
+    left: 6677329
+    right: 7563686
+  - type: 4472052
+    opt: 2436400
+    left: 6868744
+    right: 1303705
+  - type: 8144381
+    opt: 3396550
+    left: 6882544
+    right: 2727527
+  - type: 82238
+    opt: 5497381
+    left: 1826648
+    right: 7865472
+  - type: 5620209
+    opt: 6042580
+    left: 8183917
+    right: 2181149
+  - type: 6796611
+    opt: 6774590
+    left: 5317344
+    right: 5344695
+  - type: 2622452
+    opt: 5786132
+    left: 5513966
+    right: 8165611
+---
+test case: Auto-generated case 9 for random limit 7fffff
+in:
+  stack:
+  - type: 5809739
+    opt: 6582905
+    left: 7539989
+    right: 5598979
+  - type: 7358748
+    opt: 4533542
+    left: 6042547
+    right: 5202964
+  - type: 1514300
+    opt: 8240846
+    left: 7062133
+    right: 6411753
+  - type: 563937
+    opt: 7976503
+    left: 5452173
+    right: 7523562
+  - type: 122995
+    opt: 507970
+    left: 5698047
+    right: 4782012
+  - type: 7029657
+    opt: 2805391
+    left: 5362331
+    right: 5448267
+  - type: 5272158
+    opt: 6618780
+    left: 5418676
+    right: 4752604
+  - type: 3650582
+    opt: 5680691
+    left: 2542875
+    right: 4719685
+  - type: 5822851
+    opt: 188550
+    left: 6459192
+    right: 1104086
+  - type: 8272830
+    opt: 6447183
+    left: 6869708
+    right: 2781083
+---
+test case: Auto-generated case 10 for random limit 7fffff
+in:
+  stack:
+  - type: 3039362
+    opt: 4509624
+    left: 5802981
+    right: 8130365
+  - type: 7966107
+    opt: 2756672
+    left: 1017860
+    right: 5441100
+  - type: 185027
+    opt: 1276845
+    left: 6713712
+    right: 4971802
+  - type: 3995436
+    opt: 6769683
+    left: 3201294
+    right: 2837649
+  - type: 1159771
+    opt: 2410704
+    left: 419352
+    right: 4166682
+  - type: 4430278
+    opt: 3677423
+    left: 4617684
+    right: 1870787
+  - type: 1364444
+    opt: 5345167
+    left: 295128
+    right: 5577646
+  - type: 7533553
+    opt: 5764715
+    left: 2072022
+    right: 4905245
+  - type: 2600765
+    opt: 4894709
+    left: 6972265
+    right: 4234513
+  - type: 1398272
+    opt: 794331
+    left: 4731401
+    right: 5508956
+---
+test case: Auto-generated case 1 for random limit 7ffffff
+in:
+  stack:
+  - type: 122874804
+    opt: 118188782
+    left: 114208215
+    right: 79906807
+  - type: 84420440
+    opt: 126790013
+    left: 114706322
+    right: 104875477
+  - type: 131926798
+    opt: 126512924
+    left: 18759675
+    right: 117656452
+  - type: 24064763
+    opt: 69754731
+    left: 49904844
+    right: 42619476
+  - type: 87783436
+    opt: 72003417
+    left: 106600345
+    right: 72046560
+  - type: 31040568
+    opt: 66219254
+    left: 95342253
+    right: 66245670
+  - type: 14089890
+    opt: 87394674
+    left: 43213902
+    right: 97599050
+  - type: 6250779
+    opt: 91652028
+    left: 54160370
+    right: 105020090
+  - type: 42961846
+    opt: 86348399
+    left: 50226534
+    right: 71931840
+  - type: 98355192
+    opt: 31005256
+    left: 134133271
+    right: 108184252
+---
+test case: Auto-generated case 2 for random limit 7ffffff
+in:
+  stack:
+  - type: 39958424
+    opt: 11828041
+    left: 100332902
+    right: 45647447
+  - type: 24835935
+    opt: 120800092
+    left: 90841603
+    right: 5220891
+  - type: 95739892
+    opt: 64609637
+    left: 1851828
+    right: 43748739
+  - type: 100461531
+    opt: 36199500
+    left: 1890070
+    right: 8526390
+  - type: 86163845
+    opt: 44125461
+    left: 30036927
+    right: 122357240
+  - type: 120506061
+    opt: 78930498
+    left: 20385816
+    right: 14142250
+  - type: 54994743
+    opt: 17129665
+    left: 111704423
+    right: 80013039
+  - type: 999022
+    opt: 32332199
+    left: 91753773
+    right: 110120392
+  - type: 88895445
+    opt: 118686564
+    left: 115416181
+    right: 132039879
+  - type: 26013144
+    opt: 104518325
+    left: 78707965
+    right: 60798027
+---
+test case: Auto-generated case 3 for random limit 7ffffff
+in:
+  stack:
+  - type: 31023427
+    opt: 13517062
+    left: 53889412
+    right: 59838186
+  - type: 43847169
+    opt: 76203381
+    left: 3781714
+    right: 26457091
+  - type: 131435083
+    opt: 101323694
+    left: 76470851
+    right: 91027786
+  - type: 46502477
+    opt: 6378516
+    left: 94743997
+    right: 56480186
+  - type: 16808267
+    opt: 52943967
+    left: 126120050
+    right: 104898657
+  - type: 84975869
+    opt: 98043149
+    left: 47952038
+    right: 2253638
+  - type: 117773768
+    opt: 30507285
+    left: 63488682
+    right: 125830998
+  - type: 69293463
+    opt: 133366207
+    left: 86687077
+    right: 122538913
+  - type: 126798581
+    opt: 34635099
+    left: 24294449
+    right: 97017439
+  - type: 58392456
+    opt: 35272870
+    left: 18896151
+    right: 76005076
+---
+test case: Auto-generated case 4 for random limit 7ffffff
+in:
+  stack:
+  - type: 25320128
+    opt: 22398325
+    left: 128921030
+    right: 53537924
+  - type: 101059413
+    opt: 122333473
+    left: 132230401
+    right: 103883580
+  - type: 29407889
+    opt: 6624693
+    left: 71965876
+    right: 132032731
+  - type: 129499
+    opt: 96462701
+    left: 12759351
+    right: 2548275
+  - type: 26011232
+    opt: 115476624
+    left: 116842272
+    right: 97212119
+  - type: 131461542
+    opt: 832696
+    left: 127202151
+    right: 50681376
+  - type: 70390470
+    opt: 53702249
+    left: 43125724
+    right: 115658857
+  - type: 89231569
+    opt: 28696163
+    left: 133530847
+    right: 17728863
+  - type: 35182901
+    opt: 3258166
+    left: 98659429
+    right: 13582704
+  - type: 117064197
+    opt: 97907669
+    left: 126319294
+    right: 86086400
+---
+test case: Auto-generated case 5 for random limit 7ffffff
+in:
+  stack:
+  - type: 4352061
+    opt: 112615353
+    left: 64261027
+    right: 28418880
+  - type: 119310677
+    opt: 36743574
+    left: 115806772
+    right: 91947300
+  - type: 60434462
+    opt: 73419422
+    left: 14332905
+    right: 11489238
+  - type: 78760156
+    opt: 83821259
+    left: 36202997
+    right: 23599624
+  - type: 71859823
+    opt: 8353092
+    left: 62617403
+    right: 94564295
+  - type: 121923855
+    opt: 9217456
+    left: 122809723
+    right: 88361680
+  - type: 58104355
+    opt: 34620288
+    left: 96762521
+    right: 27568576
+  - type: 970159
+    opt: 100031968
+    left: 82293743
+    right: 20903920
+  - type: 119424984
+    opt: 25072716
+    left: 50986612
+    right: 72438516
+  - type: 29590797
+    opt: 123569750
+    left: 96249562
+    right: 3891147
+---
+test case: Auto-generated case 6 for random limit 7ffffff
+in:
+  stack:
+  - type: 42770925
+    opt: 51488922
+    left: 51273515
+    right: 130414231
+  - type: 100428667
+    opt: 119933778
+    left: 89377976
+    right: 60459808
+  - type: 100788953
+    opt: 6156472
+    left: 4980950
+    right: 118967685
+  - type: 91506084
+    opt: 41026678
+    left: 48274146
+    right: 23274768
+  - type: 132754091
+    opt: 106486436
+    left: 98670049
+    right: 12409117
+  - type: 832715
+    opt: 31306073
+    left: 50073831
+    right: 79763656
+  - type: 14781537
+    opt: 112504346
+    left: 104680263
+    right: 110992292
+  - type: 77182608
+    opt: 3329021
+    left: 103143174
+    right: 22901825
+  - type: 95617644
+    opt: 97329972
+    left: 77870600
+    right: 47116561
+  - type: 114524590
+    opt: 56294763
+    left: 119174366
+    right: 58558962
+---
+test case: Auto-generated case 7 for random limit 7ffffff
+in:
+  stack:
+  - type: 107627978
+    opt: 131306270
+    left: 48914189
+    right: 49085760
+  - type: 113656031
+    opt: 96500959
+    left: 23737856
+    right: 32610649
+  - type: 12916706
+    opt: 89538026
+    left: 34458599
+    right: 22696115
+  - type: 17767336
+    opt: 120558696
+    left: 73961268
+    right: 99209496
+  - type: 77792512
+    opt: 118724192
+    left: 130013749
+    right: 33055446
+  - type: 81057065
+    opt: 96771268
+    left: 16847286
+    right: 41896049
+  - type: 44672856
+    opt: 67118673
+    left: 8576956
+    right: 7148045
+  - type: 43395637
+    opt: 109307959
+    left: 103432351
+    right: 103954988
+  - type: 37982415
+    opt: 33357091
+    left: 61874241
+    right: 125205097
+  - type: 24115612
+    opt: 5654669
+    left: 65535283
+    right: 102652136
+---
+test case: Auto-generated case 8 for random limit 7ffffff
+in:
+  stack:
+  - type: 35698716
+    opt: 119295938
+    left: 101567174
+    right: 90541290
+  - type: 54040100
+    opt: 114214668
+    left: 18832601
+    right: 127404846
+  - type: 7129778
+    opt: 2071176
+    left: 117994623
+    right: 103392519
+  - type: 120109612
+    opt: 113398356
+    left: 113529269
+    right: 22444126
+  - type: 106566861
+    opt: 94714864
+    left: 12576375
+    right: 22334299
+  - type: 34458424
+    opt: 128054924
+    left: 65856217
+    right: 128098551
+  - type: 124179786
+    opt: 84494399
+    left: 12691151
+    right: 6717115
+  - type: 70096051
+    opt: 93942178
+    left: 132937362
+    right: 77317178
+  - type: 20330179
+    opt: 67129796
+    left: 32783997
+    right: 116775113
+  - type: 39636917
+    opt: 34349299
+    left: 26372612
+    right: 24914707
+---
+test case: Auto-generated case 9 for random limit 7ffffff
+in:
+  stack:
+  - type: 87091722
+    opt: 100089700
+    left: 120380566
+    right: 105751410
+  - type: 40282768
+    opt: 98089731
+    left: 34159389
+    right: 68612592
+  - type: 130209317
+    opt: 2102013
+    left: 30883357
+    right: 24437090
+  - type: 62048835
+    opt: 16036160
+    left: 9305768
+    right: 115668440
+  - type: 112996538
+    opt: 55342471
+    left: 50114537
+    right: 14851207
+  - type: 8437331
+    opt: 127725291
+    left: 83107919
+    right: 99281565
+  - type: 94604022
+    opt: 91848028
+    left: 58501377
+    right: 98347590
+  - type: 112837151
+    opt: 104714738
+    left: 44631842
+    right: 48525671
+  - type: 99699769
+    opt: 104770755
+    left: 101085031
+    right: 31948587
+  - type: 16160066
+    opt: 37696066
+    left: 125279183
+    right: 32577895
+---
+test case: Auto-generated case 10 for random limit 7ffffff
+in:
+  stack:
+  - type: 4325465
+    opt: 107661258
+    left: 40149303
+    right: 23385550
+  - type: 38504784
+    opt: 32410874
+    left: 72296647
+    right: 98997772
+  - type: 96731610
+    opt: 77555672
+    left: 106600926
+    right: 93470297
+  - type: 95185431
+    opt: 65369926
+    left: 133120245
+    right: 7333795
+  - type: 71846069
+    opt: 18236305
+    left: 127243800
+    right: 108827883
+  - type: 105358865
+    opt: 84463728
+    left: 132637831
+    right: 118100352
+  - type: 13232465
+    opt: 116317452
+    left: 37013488
+    right: 124805268
+  - type: 26725295
+    opt: 9953442
+    left: 58411385
+    right: 132079404
+  - type: 68153355
+    opt: 130704117
+    left: 115191021
+    right: 132881979
+  - type: 34588741
+    opt: 110159845
+    left: 129937266
+    right: 7767754
+---
+test case: Auto-generated case 1 for random limit 7fffffff
+in:
+  stack:
+  - type: 835508170
+    opt: 917279953
+    left: 667979992
+    right: 1304087876
+  - type: 463035674
+    opt: 441940023
+    left: 477471788
+    right: 1559064056
+  - type: 126415795
+    opt: 835642135
+    left: 252507011
+    right: 305735438
+  - type: 499371538
+    opt: 1722437595
+    left: 1974053411
+    right: 2001501328
+  - type: 1966098307
+    opt: 715911580
+    left: 953024959
+    right: 987858301
+  - type: 1370021142
+    opt: 1823943518
+    left: 971382312
+    right: 485918666
+  - type: 1747066990
+    opt: 795270022
+    left: 1855301088
+    right: 1818823689
+  - type: 2123035233
+    opt: 55660401
+    left: 1592903141
+    right: 511752704
+  - type: 741188429
+    opt: 1031491022
+    left: 1847426785
+    right: 193428618
+  - type: 1555672488
+    opt: 142327485
+    left: 615522737
+    right: 746074325
+---
+test case: Auto-generated case 2 for random limit 7fffffff
+in:
+  stack:
+  - type: 1803438020
+    opt: 1183475442
+    left: 1462649583
+    right: 619023371
+  - type: 1940320238
+    opt: 1233157639
+    left: 1544269674
+    right: 1299235346
+  - type: 2114492463
+    opt: 851261361
+    left: 1991245867
+    right: 1169235805
+  - type: 486887435
+    opt: 149830340
+    left: 557289683
+    right: 515007712
+  - type: 1258610586
+    opt: 2021204422
+    left: 93413084
+    right: 189451813
+  - type: 91040629
+    opt: 1553606279
+    left: 684366280
+    right: 756495026
+  - type: 979237243
+    opt: 1786596014
+    left: 1463230826
+    right: 1222493128
+  - type: 1532847932
+    opt: 1440750585
+    left: 971089194
+    right: 1264366790
+  - type: 615700439
+    opt: 1338928829
+    left: 1941867629
+    right: 595565704
+  - type: 1498035857
+    opt: 804406402
+    left: 552094123
+    right: 893417985
+---
+test case: Auto-generated case 3 for random limit 7fffffff
+in:
+  stack:
+  - type: 89732768
+    opt: 387494460
+    left: 1042040126
+    right: 135265250
+  - type: 357496411
+    opt: 2115311650
+    left: 89136825
+    right: 39885812
+  - type: 304138816
+    opt: 2038105107
+    left: 1521965095
+    right: 888204397
+  - type: 1134855952
+    opt: 722729925
+    left: 21802113
+    right: 57193966
+  - type: 1925033617
+    opt: 1866061049
+    left: 1924946029
+    right: 327685888
+  - type: 2131733762
+    opt: 1753192684
+    left: 1898329463
+    right: 1357517759
+  - type: 1082302676
+    opt: 1838928052
+    left: 744556386
+    right: 1637907200
+  - type: 1929561125
+    opt: 1446807160
+    left: 1040489310
+    right: 1192998406
+  - type: 424766384
+    opt: 814097479
+    left: 1481348923
+    right: 2000691253
+  - type: 1456025815
+    opt: 1673732393
+    left: 778159336
+    right: 173140696
+---
+test case: Auto-generated case 4 for random limit 7fffffff
+in:
+  stack:
+  - type: 744028061
+    opt: 848706143
+    left: 908577540
+    right: 1228263185
+  - type: 296917506
+    opt: 392380011
+    left: 1873554654
+    right: 960574622
+  - type: 1414415183
+    opt: 1788219723
+    left: 501810425
+    right: 1194336919
+  - type: 918392693
+    opt: 531695617
+    left: 1016332470
+    right: 1696083017
+  - type: 1308428005
+    opt: 1796565320
+    left: 1583479807
+    right: 1519090228
+  - type: 1114032170
+    opt: 2020170470
+    left: 1308013775
+    right: 229384285
+  - type: 674888069
+    opt: 1738179181
+    left: 1464202232
+    right: 1838900021
+  - type: 144787596
+    opt: 289524714
+    left: 396978692
+    right: 1421373107
+  - type: 193156880
+    opt: 15951451
+    left: 2019873799
+    right: 239435392
+  - type: 1992047163
+    opt: 64971477
+    left: 1050069609
+    right: 1660433998
+---
+test case: Auto-generated case 5 for random limit 7fffffff
+in:
+  stack:
+  - type: 2023418578
+    opt: 1347377573
+    left: 842035871
+    right: 512143210
+  - type: 1997276472
+    opt: 2098302071
+    left: 2012004696
+    right: 561164636
+  - type: 1721452409
+    opt: 775069675
+    left: 1973504771
+    right: 1413051184
+  - type: 1937693532
+    opt: 387797597
+    left: 2029321341
+    right: 275756359
+  - type: 3546065
+    opt: 47007187
+    left: 1658135726
+    right: 503225794
+  - type: 1682819560
+    opt: 1314811317
+    left: 1413791081
+    right: 670967861
+  - type: 306220120
+    opt: 1706859477
+    left: 314566082
+    right: 137877393
+  - type: 1848505728
+    opt: 1302545742
+    left: 824749083
+    right: 2032614279
+  - type: 1682815634
+    opt: 875915954
+    left: 583817824
+    right: 1394593897
+  - type: 681941250
+    opt: 604391279
+    left: 413373255
+    right: 699460123
+---
+test case: Auto-generated case 6 for random limit 7fffffff
+in:
+  stack:
+  - type: 333554057
+    opt: 1789737236
+    left: 333492094
+    right: 376214351
+  - type: 385941476
+    opt: 1266351097
+    left: 323534832
+    right: 132180557
+  - type: 1441816765
+    opt: 1837817462
+    left: 1880079730
+    right: 1745147702
+  - type: 410076659
+    opt: 2002191832
+    left: 1440560312
+    right: 215034701
+  - type: 225794474
+    opt: 1589758678
+    left: 1954334932
+    right: 619437033
+  - type: 1241844121
+    opt: 296959707
+    left: 281551925
+    right: 400850717
+  - type: 254746800
+    opt: 1816912839
+    left: 579470496
+    right: 937431946
+  - type: 1440345112
+    opt: 1990550498
+    left: 506594918
+    right: 1884199525
+  - type: 925278932
+    opt: 584410276
+    left: 1279002109
+    right: 1791230534
+  - type: 115037563
+    opt: 1434842424
+    left: 271648675
+    right: 383693932
+---
+test case: Auto-generated case 7 for random limit 7fffffff
+in:
+  stack:
+  - type: 856434806
+    opt: 549611310
+    left: 417922951
+    right: 1278697934
+  - type: 661346461
+    opt: 631971868
+    left: 1784166903
+    right: 978385031
+  - type: 556032728
+    opt: 1917009422
+    left: 734972372
+    right: 1896910187
+  - type: 1571805245
+    opt: 733071361
+    left: 1163426436
+    right: 228377708
+  - type: 1256451806
+    opt: 1894132471
+    left: 2039114354
+    right: 1211216836
+  - type: 832093388
+    opt: 968139438
+    left: 555350724
+    right: 1620970228
+  - type: 1786817589
+    opt: 1843020733
+    left: 387279068
+    right: 1041003429
+  - type: 882901097
+    opt: 2068240463
+    left: 258519807
+    right: 319149720
+  - type: 1903945597
+    opt: 1215648048
+    left: 1399946174
+    right: 1474285376
+  - type: 2007508711
+    opt: 420571705
+    left: 1894237686
+    right: 1103238141
+---
+test case: Auto-generated case 8 for random limit 7fffffff
+in:
+  stack:
+  - type: 872444242
+    opt: 107614233
+    left: 1638770649
+    right: 1754915153
+  - type: 276036020
+    opt: 2054474500
+    left: 306840610
+    right: 1199770460
+  - type: 270187923
+    opt: 2019987719
+    left: 1983709309
+    right: 2070613945
+  - type: 1466714864
+    opt: 836931933
+    left: 1581965139
+    right: 700164199
+  - type: 2063637358
+    opt: 749796010
+    left: 1020515535
+    right: 559626280
+  - type: 617242646
+    opt: 1546690580
+    left: 112140588
+    right: 535969576
+  - type: 1235785306
+    opt: 1806832569
+    left: 1002171936
+    right: 1261314003
+  - type: 1902084492
+    opt: 1200971330
+    left: 1084105212
+    right: 330643309
+  - type: 1581887973
+    opt: 658967144
+    left: 1443524167
+    right: 1800378500
+  - type: 215518655
+    opt: 819047757
+    left: 818825628
+    right: 865761877
+---
+test case: Auto-generated case 9 for random limit 7fffffff
+in:
+  stack:
+  - type: 662781794
+    opt: 1333480534
+    left: 948278800
+    right: 573243310
+  - type: 130766844
+    opt: 1042654494
+    left: 1165359505
+    right: 1656351627
+  - type: 1074276946
+    opt: 1119096146
+    left: 195694153
+    right: 1805085221
+  - type: 1653962556
+    opt: 1162795119
+    left: 2060143040
+    right: 713774169
+  - type: 494684249
+    opt: 1319638573
+    left: 979104640
+    right: 1866013507
+  - type: 916302633
+    opt: 1679825010
+    left: 2114387495
+    right: 1399753607
+  - type: 1648278869
+    opt: 1000978166
+    left: 1033487752
+    right: 999587339
+  - type: 1401704763
+    opt: 148842996
+    left: 989305506
+    right: 1025137775
+  - type: 544467038
+    opt: 1743471217
+    left: 1174241953
+    right: 191747590
+  - type: 163961414
+    opt: 1296333620
+    left: 1596169590
+    right: 929626088
+---
+test case: Auto-generated case 10 for random limit 7fffffff
+in:
+  stack:
+  - type: 1116885794
+    opt: 1342322335
+    left: 306857345
+    right: 1907464746
+  - type: 851894323
+    opt: 858522050
+    left: 1077251779
+    right: 428807356
+  - type: 1646204317
+    opt: 1183988266
+    left: 283867190
+    right: 1775821236
+  - type: 1035518098
+    opt: 100056886
+    left: 1710922242
+    right: 79715731
+  - type: 491413076
+    opt: 1767724217
+    left: 374022278
+    right: 286445618
+  - type: 1050639809
+    opt: 1697328652
+    left: 799318133
+    right: 172825028
+  - type: 1067133755
+    opt: 1561125604
+    left: 1445532682
+    right: 1066401855
+  - type: 667731423
+    opt: 2115706446
+    left: 151481334
+    right: 1775787781
+  - type: 1415720527
+    opt: 1780314672
+    left: 1815798809
+    right: 506894502
+  - type: 388771049
+    opt: 1855606246
+    left: 1218590293
+    right: 785020079
+...

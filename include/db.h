@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
+#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -208,6 +209,7 @@ struct	_DC_TRIGGER;
 
 #define EVENT_NAME_LEN			2048
 
+#define FUNCTION_NAME_LEN		12
 #define FUNCTION_PARAM_LEN		255
 
 #define REPORT_ERROR_LEN		2048
@@ -310,6 +312,11 @@ typedef struct
 }
 DB_DSERVICE;
 
+#define ZBX_DB_TRIGGER_EVAL_NONE			0x0000
+#define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001
+#define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002
+#define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -326,6 +333,9 @@ typedef struct
 	unsigned char	type;
 	unsigned char	recovery_mode;
 	unsigned char	correlation_mode;
+
+	/* temporary trigger cache for related data */
+	void		*cache;
 }
 DB_TRIGGER;
 
@@ -789,7 +799,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-
+void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 typedef struct
@@ -892,4 +903,12 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		zbx_vector_ptr_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
+
+void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
 #endif

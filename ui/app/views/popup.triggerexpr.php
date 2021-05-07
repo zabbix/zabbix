@@ -32,7 +32,6 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('itemid', $data['itemid'])
 	->addItem((new CInput('submit', 'submit'))
 		->addStyle('display: none;')
 		->removeId()
@@ -65,35 +64,39 @@ if ($data['parent_discoveryid'] !== '') {
 	$popup_options['normal_only'] = '1';
 }
 
-$item = [
-	(new CTextBox('item_description', $data['item_description'], true))
-		->setAriaRequired()
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('select', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
-];
+if ($data['item_required']) {
+	$expression_form->addVar('itemid', $data['itemid']);
 
-if ($data['parent_discoveryid'] !== '') {
-	$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$item[] = (new CButton('select', _('Select prototype')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			json_encode([
-				'srctbl' => 'item_prototypes',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $expression_form->getName(),
-				'dstfld1' => 'itemid',
-				'dstfld2' => 'item_description',
-				'parent_discoveryid' => $data['parent_discoveryid']
-			]).', null, this);'
-		)
-		->removeId();
+	$item = [
+		(new CTextBox('item_description', $data['item_description'], true))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
+	];
+
+	if ($data['parent_discoveryid'] !== '') {
+		$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$item[] = (new CButton('select', _('Select prototype')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.generic",'.
+				json_encode([
+					'srctbl' => 'item_prototypes',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $expression_form->getName(),
+					'dstfld1' => 'itemid',
+					'dstfld2' => 'item_description',
+					'parent_discoveryid' => $data['parent_discoveryid']
+				]).', null, this);'
+			)
+			->removeId();
+	}
+
+	$expression_form_list->addRow((new CLabel(_('Item'), 'item_description'))->setAsteriskMark(), $item);
 }
-
-$expression_form_list->addRow((new CLabel(_('Item'), 'item_description'))->setAsteriskMark(), $item);
 
 $function_select = (new CSelect('function'))
 	->setFocusableElementId('label-function')
@@ -124,7 +127,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
-					if (in_array($data['selectedFunction'], ['last', 'band', 'strlen'])) {
+					if (in_array($data['selectedFunction'], ['last', 'bitand', 'strlen'])) {
 						$param_type_element = $param_function['M'][PARAM_TYPE_COUNTS];
 						$label = $param_function['C'];
 						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());
@@ -151,6 +154,9 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if ($param_name === 'period_shift') {
 				$param_field->setAttribute('placeholder', 'now/h');
+			}
+			elseif ($param_name === 'shift') {
+				$param_field->setAttribute('placeholder', 'now-h');
 			}
 
 			$expression_form_list->addRow($label, [

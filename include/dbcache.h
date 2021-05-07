@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "memalloc.h"
+#include "zbxeval.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -193,6 +194,7 @@ typedef struct
 	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*script_params;
 	char			*error;
+	unsigned char		*formula_bin;
 }
 DC_ITEM;
 
@@ -229,9 +231,6 @@ typedef struct _DC_TRIGGER
 {
 	zbx_uint64_t		triggerid;
 	char			*description;
-	char			*expression_orig;
-	char			*recovery_expression_orig;
-	/* temporary values, allocated during processing and freed right after */
 	char			*expression;
 	char			*recovery_expression;
 
@@ -240,6 +239,8 @@ typedef struct _DC_TRIGGER
 	char			*correlation_tag;
 	char			*opdata;
 	char			*event_name;
+	unsigned char		*expression_bin;
+	unsigned char		*recovery_expression_bin;
 	zbx_timespec_t		timespec;
 	int			lastchange;
 	unsigned char		topoindex;
@@ -255,6 +256,9 @@ typedef struct _DC_TRIGGER
 	unsigned char		flags;
 
 	zbx_vector_ptr_t	tags;
+
+	zbx_eval_context_t	*eval_ctx;
+	zbx_eval_context_t	*eval_ctx_r;
 }
 DC_TRIGGER;
 
@@ -743,7 +747,6 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 #define ZBX_MACRO_SECRET_MASK	"******"
 
 void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to);
-char	*DCexpression_expand_user_macros(const char *expression);
 char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params);
 
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
@@ -812,7 +815,7 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
-void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vector_uint64_t *nested_groupids);
+void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
@@ -967,6 +970,7 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags);
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
 		zbx_vector_ptr_t *item_tags);
+void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags);
 
 unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
@@ -974,6 +978,9 @@ const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error);
+
 
 /* diagnostic data */
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
@@ -984,10 +991,10 @@ typedef struct
 {
 	zbx_uint64_t		objectid;
 	zbx_uint64_t		triggerid;
-	zbx_function_type_t	type;
+	zbx_uint32_t		type;
 	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
-	int			revision;	/* function revision */
+	int			revision;	/* revision */
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
 	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
 	const char		*parameter;	/* function parameters (for trend functions) */
@@ -1007,5 +1014,7 @@ void	zbx_db_trigger_queue_unlock(void);
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
+void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
 
 #endif

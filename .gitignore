@@ -156,8 +156,6 @@ tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbcache/dc_check_maintenance_period
-tests/libs/zbxdbcache/dc_expand_user_macros_in_calcitem
-tests/libs/zbxdbcache/dc_expand_user_macros_in_expression
 tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
@@ -168,6 +166,15 @@ tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbcache/dc_function_calculate_nextcheck
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
+tests/libs/zbxeval/zbx_eval_compose_expression
+tests/libs/zbxeval/zbx_eval_execute
+tests/libs/zbxeval/zbx_eval_execute_ext
+tests/libs/zbxeval/zbx_eval_get_constant
+tests/libs/zbxeval/zbx_eval_get_group_filter
+tests/libs/zbxeval/zbx_eval_parse_expression
+tests/libs/zbxeval/zbx_eval_parse_query
+tests/libs/zbxeval/zbx_eval_prepare_filter
+tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn

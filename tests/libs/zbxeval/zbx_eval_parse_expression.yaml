@@ -1,0 +1,1778 @@
+---
+test case: Fail ''
+in:
+  rules: []
+  expression: ''
+out:
+  result: FAIL
+--- # numeric variables
+test case: Succeed '0'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '0'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '0'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail (no rules) '0'
+in:
+  rules: []
+  expression: '0'
+out:
+  result: FAIL
+---
+test case: Succeed '0.1'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '0.1'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '0.1'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1s'
+in:
+   rules: [ZBX_EVAL_PARSE_VAR_NUM]
+   expression: '1s'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1s'
+    opt: 0
+  result: SUCCEED
+---
+test case: FAIL 's'
+in:
+  rules: []
+  expression: 's'
+out:
+  result: FAIL
+---
+test case: Succeed '.1'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '.1'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '.1'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1.'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1.'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1.'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '1.1.'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1.1.'
+out:
+  result: FAIL
+---
+test case: Succeed '1e10'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1e10'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1e10'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '1e1000'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1e1000'
+out:
+  result: FAIL
+--- # string variables
+test case: Succeed '"xyz"'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '"xyz"'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_STR
+    token: '"xyz"'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail (no rules) '"xyz"'
+in:
+  rules: []
+  expression: '"xyz"'
+out:
+  result: FAIL
+---
+test case: Succeed '"x\\\"y\"z/"'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '"x\\\"y\"z/"'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_STR
+    token: '"x\\\"y\"z/"'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '"x\yz"'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '"x\yz"'
+out:
+  result: FAIL
+---
+test case: Succeed '""'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '""'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_STR
+    token: '""'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '"xyz'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '"xyz'
+out:
+  result: FAIL
+---
+test case: Fail '"xyz\"'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR_STR]
+  expression: '"xyz\"'
+out:
+  result: FAIL
+--- # functionid
+test case: Succeed '{1}'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID]
+  expression: '{1}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_FUNCTIONID
+    token: '{1}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{1}'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{1}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_MACRO
+    token: '{1}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '{1}'
+in:
+  rules: []
+  expression: '{1}'
+out:
+  result: FAIL
+--- # macros
+test case: Succeed '{MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_MACRO
+    token: '{MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{MACRO}.func()}'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{{MACRO}.func()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_MACRO
+    token: '{{MACRO}.func()}'
+    opt: 0
+  result: SUCCEED
+--- # user macros
+test case: Succeed '{$MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
+    token: '{$MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$MACRO:context}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO:context}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
+    token: '{$MACRO:context}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '{$MACRO:context'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO:context'
+out:
+  result: FAIL
+---
+test case: Succeed '{$MACRO:"context:\"context\""}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO:"context:\"context\""}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
+    token: '{$MACRO:"context:\"context\""}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '{$MACRO:"context:\"context\"}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO:"context:\"context\"}'
+out:
+  result: FAIL
+---
+test case: Fail '{$MACRO}1'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{$MACRO}1'
+out:
+  result: FAIL
+---
+test case: Succeed '{$MACRO}1'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{$MACRO}1'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$MACRO}1'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1{$MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1{$MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1{$MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$USER}{$MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{$USER}{$MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$USER}{$MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$MACRO}s'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{$MACRO}s'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$MACRO}s'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$MACRO}x'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{$MACRO}x'
+out:
+  result: FAIL
+--- # LLD macros
+test case: Succeed '{#LLD}'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{#LLD}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
+    token: '{#LLD}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '{#LLD}'
+in:
+  rules: []
+  expression: '{#LLD}'
+out:
+  result: FAIL
+---
+test case: Fail '{#LLD'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{#LLD'
+out:
+  result: FAIL
+---
+test case: Succeed '{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
+    token: '{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '.{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '.{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '.{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}.{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{{#LLD}.function()}.{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}.{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{{#LLD}.function()}e{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}e{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed 'e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: 'e{{#LLD}.function()}'
+out:
+  result: FAIL  
+--- # parenthesis
+test case: Fail '()'
+in:
+  rules: [ZBX_EVAL_PARSE_GROUP]
+  expression: '()'
+out:
+  result: FAIL
+---
+test case: Succeed '(0)'
+in:
+  rules: [ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: '(0)'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '0'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '(0'
+in:
+  rules: [ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: '(0'
+out:
+  result: FAIL
+---
+test case: Fail '0)'
+in:
+  rules: [ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: '0)'
+out:
+  result: FAIL
+---
+test case: Succeed '((0))'
+in:
+  rules: [ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: '((0))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  result: SUCCEED
+--- # unary minus operations
+test case: Fail '-'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '-'
+out:
+  result: FAIL
+---
+test case: Succeed '-1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '-1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '-(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '-(1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '-{MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO,ZBX_EVAL_PARSE_MATH]
+  expression: '-{MACRO}'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_MACRO, token: '{MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '--1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '--1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '- - 1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '- - 1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '-(-1)'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '-(-1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
+  result: SUCCEED
+--- # arithmetic operations
+test case: Fail '+'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH]
+  expression: '+'
+out:
+  result: FAIL
+---
+test case: Fail '-'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH]
+  expression: '-'
+out:
+  result: FAIL
+---
+test case: Fail '/'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH]
+  expression: '/'
+out:
+  result: FAIL
+---
+test case: Fail '*'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH]
+  expression: '*'
+out:
+  result: FAIL
+---
+test case: Fail '1+'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1+'
+out:
+  result: FAIL
+---
+test case: Fail '1-'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1-'
+out:
+  result: FAIL
+---
+test case: Fail '1/'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1/'
+out:
+  result: FAIL
+---
+test case: Fail '1*'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1*'
+out:
+  result: FAIL
+---
+test case: Fail '+1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '+1'
+out:
+  result: FAIL
+---
+test case: Fail '/1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '/1'
+out:
+  result: FAIL
+---
+test case: Fail '*1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '*1'
+out:
+  result: FAIL
+---
+test case: Succeed '1+2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1+2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1+2-3'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1+2-3'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1-2+3'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1-2+3'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '2**1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '2**1'
+out:
+  result: FAIL
+---
+test case: Fail '2++1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '2++1'
+out:
+  result: FAIL
+---
+test case: Fail '2//1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '2//1'
+out:
+  result: FAIL
+---
+test case: Succeed '2--1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '2--1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1+2*3'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1+2*3'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1*2+3'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1*2+3'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1+2*3-4'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1+2*3-4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1/2+3*4'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: '1/2+3*4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_DIV, token: '/', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1/(2+3)*4'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '1/(2+3)*4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_DIV, token: '/', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1+(2-(3+4))'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '1+(2-(3+4))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '((1+2)-3)+4'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: '((1+2)-3)+4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+--- # comparison operators
+test case: Succeed '1=2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1<>2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<>2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1<2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_LT, token: '<', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1<=2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<=2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_LE, token: '<=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1>2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1>2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_GT, token: '>', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1>=2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1>=2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_GE, token: '>=', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '1='
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1='
+out:
+  result: FAIL
+---
+test case: Fail '1<>'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<>'
+out:
+  result: FAIL
+---
+test case: Fail '1<'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<'
+out:
+  result: FAIL
+---
+test case: Fail '1<='
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1<='
+out:
+  result: FAIL
+---
+test case: Fail '1>'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1>'
+out:
+  result: FAIL
+---
+test case: Fail '1>='
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1>='
+out:
+  result: FAIL
+---
+test case: Fail '=1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '=1'
+out:
+  result: FAIL
+---
+test case: Fail '<>1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '<>1'
+out:
+  result: FAIL
+---
+test case: Fail '<1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '<1'
+out:
+  result: FAIL
+---
+test case: Fail '<=1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '<=1'
+out:
+  result: FAIL
+---
+test case: Fail '>1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '>1'
+out:
+  result: FAIL
+---
+test case: Fail '>=1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '>=1'
+out:
+  result: FAIL
+---
+test case: Fail '1==1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1==1'
+out:
+  result: FAIL
+---
+test case: Fail '1=<1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=<1'
+out:
+  result: FAIL
+---
+test case: Fail '1=>1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=>1'
+out:
+  result: FAIL
+---
+test case: Succeed '3 > 2 <> 1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '3 > 2 <> 1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_GT, token: '>', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
+  result: SUCCEED
+--- # mixed arithmetic and comparison operators
+test case: Succeed '3 = 2 + 1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '3 = 2 + 1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '(3 = 2) + 1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '(3 = 2) + 1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '1=+2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=+2'
+out:
+  result: FAIL
+---
+test case: Fail '1+=2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1+=2'
+out:
+  result: FAIL
+---
+test case: Succeed '1=-2'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=-2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+--- # logical not
+test case: Fail 'not 1'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: 'not 1'
+out:
+  result: FAIL
+---  
+test case: Succeed 'not 1'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'not 1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  result: SUCCEED
+---
+test case: Fail 'not1'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: 'not1'
+out:
+  result: FAIL
+---
+test case: Succeed 'not(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP]
+  expression: 'not(1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'not 1 + 2'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: 'not 1 + 2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'not (1 + 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: 'not (1 + 2)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '(not 1)'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '(not 1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1 = not 2'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1 = not 2'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '1 + not'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 + not'
+out:
+  result: FAIL
+---
+test case: Fail '1 +not 2'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 +not 2'
+out:
+  stack:
+  result: FAIL
+--- # constant variable index
+test case: Succeed '1+2*3-{MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_MACRO,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1+2*3-{MACRO}'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_MACRO, token: '{MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  result: SUCCEED
+--- # logical and/or
+test case: Succeed '1=2 or 3<4'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_LOGIC]
+  expression: '1=2 or 3<4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_LT, token: '<', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1=2 and 3<4'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1=2 and 3<4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_LT, token: '<', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1 or 2 and 3 or 4'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 or 2 and 3 or 4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed '1 or 2 and 3 or 4'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 and 2 or 3 and 4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '1 and'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 and'
+out:
+  result: FAIL
+---
+test case: Fail '1 or'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 or'
+out:
+  result: FAIL
+---
+test case: Fail 'and 1'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: 'and 1'
+out:
+  result: FAIL
+---
+test case: Fail 'or 1'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: 'or 1'
+out:
+  result: FAIL
+---
+test case: Fail '1 and1'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1 and1'
+out:
+  result: FAIL
+---
+test case: Fail '1and 1'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '1and 1'
+out:
+  result: FAIL
+---
+test case: Succeed '(1)and(2)'
+in:
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: '(1)and(2)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  result: SUCCEED
+--- # built-in functions
+test case: Succeed 'min()'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'min()'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 0}
+  result: SUCCEED
+---
+test case: Fail 'min('
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'min('
+out:
+  result: FAIL
+---
+test case: Succeed 'min(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 1}
+  result: SUCCEED
+---
+test case: Succeed 'min(1,2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,2)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(1,)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(,)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(,)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(1,"xyz")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1,"xyz")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(1,{$MACRO:context,})'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_USERMACRO]
+  expression: 'min(1,{$MACRO:context,})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_USERMACRO, token: '{$MACRO:context,}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed '1 + min(2, 3) - 4'
+in:
+  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1 + min(2, 3) - 4'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'avg(min(1, 2), 3, max(4, 5, 6))'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'avg(min(1, 2), 3, max(4, 5, 6))'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '6', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'max', opt: 3}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'avg', opt: 3}
+  result: SUCCEED
+---
+test case: Succeed 'min(1, , 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(1, , 2)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 3}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Fail 'min(/host/key,1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,1)'
+out:
+  result: FAIL
+---
+test case: Fail 'min(,1m:now-1d)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(,1m:now-1d)'
+out:
+  result: FAIL
+---
+test case: Succeed 'min(/host/key,5m)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,5m)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,5m:now-1h)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/host/key,5m:now-1h)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#10)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'min(/host/key,#10)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#10', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,{$MACRO})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'min(/host/key,{$MACRO})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '{$MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#{$MACRO})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: 'min(/host/key,#{$MACRO})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{$MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#{{#LLD}.func})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: 'min(/host/key,#{{#LLD}.func})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{{#LLD}.func}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+--- # suffixed numbers
+test case: Succeed '1w + 2G + 3h + 4K + 5s'
+in:
+  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1w + 2G + 3h + 4K + 5s '
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1w', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2G', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3h', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4K', opt: 3}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5s', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'min(1w, 2d, 3h, 4m, 5s)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(1w, 2d, 3h, 4m, 5s)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1w', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5s', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 5}
+  result: SUCCEED
+---
+test case: Fail '10y'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '10y'
+out:
+  result: FAIL
+---
+test case: Succeed '1G'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1G'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1G'
+    opt: 0
+  result: SUCCEED
+---
+test case: Fail '1N'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1N'
+out:
+  result: FAIL
+---
+test case: Succeed '1m=60s'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_COMPARE]
+  expression: '1m=60s'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '60s', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Fail '1e+309s'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1e+309s'
+out:
+  result: FAIL
+---
+test case: Fail '1e+308K'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1e+308K'
+out:
+  result: FAIL
+---
+test case: Fail 'min(2s, 1m),'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'min(2s, 1m),'
+out:
+  result: FAIL
+---
+test case: Fail '1 + ((/host/key))'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: '1 + ((/host/key,1d))'
+out:
+  result: FAIL
+---
+test case: Succeed 'last(/host/key)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 1}
+  result: SUCCEED
+---
+test case: Succeed 'last(/host/key,#1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key,#1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h ","1 ")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/Trapper/trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1h"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'min(1 + 2, 0.5 + 1.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: 'min(1 + 2, 0.5 + 1.5)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0.5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1.5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Fail '(1, 2, 3)'
+in:
+  rules: []
+  expression: '(1, 2, 3)'
+out:
+  result: FAIL
+---
+test case: Succeed 'min(3 * (1 + 2), 0.5 + 1.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: 'min(3 * (1 + 2), 0.5 + 1.5)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0.5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1.5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed '1=-1'
+in:
+  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1=-1'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'last(/host/key,#1:now-1h)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key,#1:now-1h)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#1:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'tag="xyz" and group<>"abc"'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'tag="xyz" and group<>"abc"'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_PROP_GROUP, token: 'group', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"abc"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'tag'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'tag'
+out:
+  result: FAIL
+---
+test case: Succeed 'tag=group'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC]
+  expression: 'tag=group'
+out:
+  result: FAIL
+---
+test case: Succeed '"xyz"=tag'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC]
+  expression: '"xyz"=tag'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'tag=("xyz")'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_GROUP]
+  expression: 'tag=("xyz")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+---
+test case: Succeed 'group=1'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_GROUP]
+  expression: 'group=1'
+out:
+  result: FAIL
+---
+test case: Fail 'group="xyz" = tag'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_GROUP]
+  expression: 'group="xyz" = tag'
+out:
+  result: FAIL
+---
+test case: Succeed '(tag="xyz") = (group<>"abc")'
+in:
+  rules: [ZBX_EVAL_PARSE_PROPERTY,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_COMPARE_EQ,ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_GROUP]
+  expression: '(tag="xyz") = (group<>"abc")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_PROP_GROUP, token: 'group', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"abc"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
+--- # query filters
+test case: Succeed 'min(/*/key?[group="a"],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a"],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="a"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/*/key?[group="a:\"1\""],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a:\"1\""],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="a:\"1\""]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/*/key?[group="[]"],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="[]"],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="[]"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Fail 'min(/*/key?[group="a",1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a",1)'
+out:
+  result: FAIL
+---
+test case: Fail 'min(/*/key?[group="a],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a],1)'
+out:
+  result: FAIL
+---
+test case: Fail '1 < 2'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1 < 2'
+out:
+  result: FAIL
+...

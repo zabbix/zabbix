@@ -1,0 +1,99 @@
+---
+test case: Expression 'group="x"'
+in:
+  expression: 'group="x"'
+out:
+  groups: ['x']
+  filter: '{0}'
+---
+test case: Expression '"x"=group'
+in:
+  expression: '"x"=group'
+out:
+  groups: ['x']
+  filter: '{0}'
+---
+test case: Expression 'group="x" or "y"=group'
+in:
+  expression: 'group="x" or "y"=group'
+out:
+  groups: ['x','y']
+  filter: '({0} or {1})'
+---
+test case: Expression 'tag="a"'
+in:
+  expression: 'tag="a"'
+out:
+  groups: []
+  filter: ''
+---
+test case: Expression 'tag="abc" and group<>"xyz"'
+in:
+  expression: 'tag="abc" and group<>"xyz"'
+out:
+  groups: [xyz]
+  filter: 'not {0}'
+---
+test case: Expression 'tag="abc" or group="xyz"'
+in:
+  expression: 'tag="abc" or group="xyz"'
+out:
+  groups: []
+  filter: ''
+---
+test case: Expression 'group="x" and tag="a" or group="y" and tag="b"'
+in:
+  expression: 'group="x" and tag="a" or group="y" and tag="b"'
+out:
+  groups: ['x', 'y']
+  filter: '({0} or {1})'
+---
+test case: Expression '(group="x" or tag="a") and (group="y" or tag="b")'
+in:
+  expression: '(group="x" or tag="a") and (group="y" or tag="b")'
+out:
+  groups: []
+  filter: ''
+---
+test case: Expression '"a" <> "b" and group="xyz"'
+in:
+  expression: '"a" <> "b" and group="xyz"'
+out:
+  groups: [xyz]
+  filter: '(("a"<>"b") and {0})'
+---
+test case: Expression '"a" <> "b" and tag="abc" and group="xyz"'
+in:
+  expression: '"a" <> "b" and tag="abc" and group="xyz"'
+out:
+  groups: [xyz]
+  filter: '(("a"<>"b") and {0})'
+---
+test case: Expression '"a" <> "b" or tag="abc" and group="xyz"'
+in:
+  expression: '"a" <> "b" or tag="abc" and group="xyz"'
+out:
+  groups: [xyz]
+  filter: '(("a"<>"b") or {0})'
+---
+test case: Expression '(group="x") = (group="y")'
+in:
+  expression: '(group="x") = (group="y")'
+out:
+  groups: ['x', 'y']
+  filter: '({0}={1})'
+---
+test case: Expression 'group<>"abc" and group<>"xyz"'
+in:
+  expression: 'group<>"abc" and group<>"xyz"'
+out:
+  groups: [abc,xyz]
+  filter: '(not {0} and not {1})'
+---
+test case: Expression '(group="Zabbix servers") or ("Zabbix servers"=group)'
+in:
+  expression: '(group="Zabbix servers") or ("Zabbix servers"=group)'
+out:
+  groups: [Zabbix servers,Zabbix servers]
+  filter: '({0} or {1})'
+...

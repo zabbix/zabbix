@@ -3510,7 +3510,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 		return FAIL;
 
 	/* don't process aggregate/calculated items coming from proxy */
-	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
+	if (ITEM_TYPE_CALCULATED == item->type)
 		return FAIL;
 
 	return SUCCEED;
