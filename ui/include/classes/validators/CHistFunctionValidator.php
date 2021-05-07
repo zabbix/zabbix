@@ -28,16 +28,16 @@ class CHistFunctionValidator extends CValidator {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'parameters' => []     Definition of parameters of known history functions.
-	 *   'calculated' => false  Validate history function as part of calculated item formula.
-	 *   'aggregated' => false  Validate as aggregated history function.
+	 *   'parameters' => []      Definition of parameters of known history functions.
+	 *   'calculated' => false   Validate history function as part of calculated item formula.
+	 *   'aggregating' => false  Validate as aggregating history function.
 	 *
 	 * @var array
 	 */
 	private $options = [
 		'parameters' => [],
 		'calculated' => false,
-		'aggregated' => false
+		'aggregating' => false
 	];
 
 	/**
@@ -175,7 +175,8 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
-					if (!self::validateQuery($param['data']['host'], $param['data']['item'], $options)) {
+					if (!self::validateQuery($param['data']['host'], $param['data']['item'], $param['data']['filter'],
+							$options)) {
 						return false;
 					}
 
@@ -243,18 +244,29 @@ class CHistFunctionValidator extends CValidator {
 	 *
 	 * @param string $host
 	 * @param string $item
+	 * @param array  $filter   Filter token.
 	 * @param array  $options
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function validateQuery(string $host, string $item, array $options): bool {
+	private static function validateQuery(string $host, string $item, array $filter, array $options): bool {
 		if ($options['calculated']) {
-			return ($options['aggregated']
-				? ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD || $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
-				: ($host !== CQueryParser::HOST_ITEMKEY_WILDCARD && $item !== CQueryParser::HOST_ITEMKEY_WILDCARD)
-			);
+			if ($options['aggregating']) {
+				if ($host === CQueryParser::HOST_ITEMKEY_WILDCARD && $item === CQueryParser::HOST_ITEMKEY_WILDCARD) {
+					return false;
+				}
+			}
+			else {
+				if ($filter['match'] !== '') {
+					return false;
+				}
+
+				if ($host === CQueryParser::HOST_ITEMKEY_WILDCARD || $item === CQueryParser::HOST_ITEMKEY_WILDCARD) {
+					return false;
+				}
+			}
 		}
 
 		return true;

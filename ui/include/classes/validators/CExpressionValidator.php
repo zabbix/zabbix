@@ -151,7 +151,7 @@ class CExpressionValidator extends CValidator {
 					];
 
 					if ($this->options['calculated']) {
-						$options['aggregated'] = CHistFunctionData::isAggregating($token['data']['function']);
+						$options['aggregating'] = CHistFunctionData::isAggregating($token['data']['function']);
 					}
 
 					$hist_function_validator = new CHistFunctionValidator($options);
@@ -162,7 +162,7 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
-					if ($options['calculated'] && $options['aggregated']) {
+					if ($options['calculated'] && $options['aggregating']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
 								|| !$this->math_function_data->isAggregating($parent_token['data']['function'])
