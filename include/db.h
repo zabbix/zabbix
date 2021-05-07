@@ -516,7 +516,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBcheck_capabilities(void);
+zbx_uint32_t	DBextract_version(struct zbx_json *json);
+void		DBflush_version_requirements(const char *version);
+int		DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);
@@ -890,6 +892,4 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		zbx_vector_ptr_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
-
-
 #endif

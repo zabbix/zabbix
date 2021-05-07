@@ -875,11 +875,11 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 
 	while ('\0' != *p)
 	{
+		unsigned int	nbytes, i;
+		unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
+
 		switch (*p)
 		{
-			unsigned int	nbytes, i;
-			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
-
 			case '\\':
 				++p;
 				if (0 == (nbytes = zbx_json_decode_character(&p, uc)))
