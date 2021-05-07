@@ -349,6 +349,8 @@ class CConfiguration extends CApiService {
 			'prettyprint' => false,
 			'options' => $imported_ids
 		]);
+		// Normalize array keys and strings.
+		$export = (new CImportDataNormalizer($schema))->normalize($export);
 		$export = $export['zabbix_export'];
 
 		$importcompare = new CConfigurationImportcompare($params['rules']);

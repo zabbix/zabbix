@@ -691,8 +691,8 @@ class CConfigurationImport {
 				continue;
 			}
 
-			foreach ($order_tree[$host] as $index => $level) {
-				$item = $items[$index];
+			foreach ($order_tree[$host] as $item_key => $level) {
+				$item = $items[$item_key];
 				$item['hostid'] = $hostid;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
@@ -1120,7 +1120,7 @@ class CConfigurationImport {
 							$item_prototype[$master_item_key]['key']
 						);
 
-						if ($master_item_prototypeid !== false) {
+						if ($master_item_prototypeid !== null) {
 							$item_prototype['master_itemid'] = $master_item_prototypeid;
 							unset($item_prototype[$master_item_key]);
 						}
