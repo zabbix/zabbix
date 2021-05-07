@@ -42,7 +42,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -63,7 +67,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 16,
 							'data' => [
 								'host' => '{HOST.HOST}',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -84,7 +92,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 16,
 							'data' => [
 								'host' => '{HOST.HOST}',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -105,7 +117,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 17,
 							'data' => [
 								'host' => '{HOST.HOST3}',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -126,7 +142,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -147,7 +167,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -168,7 +192,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 50,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key[ "param1", param2, "param3" ,"param4\""]'
+								'item' => 'key[ "param1", param2, "param3" ,"param4\""]',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -199,7 +227,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 7,
 							'data' => [
 								'host' => 'host',
-								'item' => '*'
+								'item' => '*',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -230,7 +262,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 6,
 							'data' => [
 								'host' => '*',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -271,7 +307,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 5,
 							'data' => [
 								'host' => '',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -302,7 +342,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 3,
 							'data' => [
 								'host' => '',
-								'item' => '*'
+								'item' => '*',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -333,7 +377,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 4,
 							'data' => [
 								'host' => '*',
-								'item' => '*'
+								'item' => '*',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -354,7 +402,60 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 35,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '?[tag="a" and not tag="b"]',
+									'tokens' => [
+										[
+											'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+											'pos' => 15,
+											'match' => 'tag',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 18,
+											'match' => '=',
+											'length' => 1
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_STRING,
+											'pos' => 19,
+											'match' => '"a"',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 23,
+											'match' => 'and',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 27,
+											'match' => 'not',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+											'pos' => 31,
+											'match' => 'tag',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 34,
+											'match' => '=',
+											'length' => 1
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_STRING,
+											'pos' => 35,
+											'match' => '"b"',
+											'length' => 3
+										]
+									]
+								]
 							]
 						],
 						1 => [
@@ -370,6 +471,110 @@ class CHistFunctionParserTest extends TestCase {
 					]
 				],
 				['/host/key?[tag="a" and not tag="b"]', '1m']
+			],
+			[
+				'sum(/host/key?[tag={$MACRO} and not tag={#MACRO}], 1m)', 0, ['usermacros' => true, 'lldmacros' => true, 'calculated' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'sum(/host/key?[tag={$MACRO} and not tag={#MACRO}], 1m)',
+					'function' => 'sum',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 4,
+							'match' => '/host/key?[tag={$MACRO} and not tag={#MACRO}]',
+							'length' => 45,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '?[tag={$MACRO} and not tag={#MACRO}]',
+									'tokens' => [
+										[
+											'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+											'pos' => 15,
+											'match' => 'tag',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 18,
+											'match' => '=',
+											'length' => 1
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_USER_MACRO,
+											'pos' => 19,
+											'match' => '{$MACRO}',
+											'length' => 8
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 28,
+											'match' => 'and',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 32,
+											'match' => 'not',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_KEYWORD,
+											'pos' => 36,
+											'match' => 'tag',
+											'length' => 3
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_OPERATOR,
+											'pos' => 39,
+											'match' => '=',
+											'length' => 1
+										],
+										[
+											'type' => CFilterParser::TOKEN_TYPE_LLD_MACRO,
+											'pos' => 40,
+											'match' => '{#MACRO}',
+											'length' => 8
+										]
+									]
+								]
+							]
+						],
+						1 => [
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 51,
+							'match' => '1m',
+							'length' => 2,
+							'data' => [
+								'sec_num' => '1m',
+								'time_shift' => ''
+							]
+						]
+					]
+				],
+				['/host/key?[tag={$MACRO} and not tag={#MACRO}]', '1m']
+			],
+			[
+				'sum(/host/key?[tag={$MACRO} and not tag="b"], 1m)', 0, ['lldmacros' => true, 'calculated' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'sum(/host/key?[tag={#MACRO} and not tag="b"], 1m)', 0, ['usermacros' => true, 'calculated' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
 			],
 			[
 				'last(/{HOST.HOST}/key)', 0, [],
@@ -405,7 +610,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 16,
 							'data' => [
 								'host' => '{HOST.HOST}',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						]
 					]
@@ -426,7 +635,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -457,7 +670,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -488,7 +705,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -519,7 +740,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -550,7 +775,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -577,7 +806,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -608,7 +841,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -639,7 +876,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -670,7 +911,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -701,7 +946,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[
@@ -804,7 +1053,11 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 9,
 							'data' => [
 								'host' => 'host',
-								'item' => 'key'
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
 							]
 						],
 						[

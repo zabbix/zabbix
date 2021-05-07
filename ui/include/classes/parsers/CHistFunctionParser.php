@@ -83,6 +83,8 @@ class CHistFunctionParser extends CParser {
 		$this->options = $options + $this->options;
 
 		$this->query_parser = new CQueryParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros'],
 			'calculated' => $this->options['calculated'],
 			'host_macro' => $this->options['host_macro'],
 			'host_macro_n' => $this->options['host_macro_n'],
@@ -178,7 +180,8 @@ class CHistFunctionParser extends CParser {
 									'length' => $this->query_parser->getLength(),
 									'data' => [
 										'host' => $this->query_parser->getHost(),
-										'item' => $this->query_parser->getItem()
+										'item' => $this->query_parser->getItem(),
+										'filter' => $this->query_parser->getFilter()
 									]
 								];
 								$p += $this->query_parser->getLength() - 1;
