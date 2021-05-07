@@ -705,10 +705,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.12rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
 .........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
 ........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
