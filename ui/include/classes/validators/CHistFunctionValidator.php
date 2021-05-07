@@ -55,6 +55,9 @@ class CHistFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($token) {
+		// TODO: remove the temporary stub
+		return true;
+
 		$invalid_param_messages = [
 			_('invalid first parameter in function "%1$s"'),
 			_('invalid second parameter in function "%1$s"'),
@@ -303,8 +306,7 @@ class CHistFunctionValidator extends CValidator {
 				return false;
 
 			case CHistFunctionData::PERIOD_MODE_SEC:
-			case CHistFunctionData::PERIOD_MODE_SEC_ONLY:
-				if ($mode == CHistFunctionData::PERIOD_MODE_SEC_ONLY && $time_shift !== '') {
+				if ($time_shift !== '') {
 					return false;
 				}
 
@@ -316,7 +318,7 @@ class CHistFunctionValidator extends CValidator {
 
 				return false;
 
-			case CHistFunctionData::PERIOD_MODE_NUM_ONLY:
+			case CHistFunctionData::PERIOD_MODE_NUM:
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}

@@ -26,8 +26,7 @@ final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
 	public const PERIOD_MODE_SEC = 1;
-	public const PERIOD_MODE_SEC_ONLY = 1;
-	public const PERIOD_MODE_NUM_ONLY = 2;
+	public const PERIOD_MODE_NUM = 2;
 	public const PERIOD_MODE_TREND = 3;
 
 	/**
@@ -42,7 +41,7 @@ final class CHistFunctionData {
 		],
 		'avg_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'count' => [
 			['rules' => [['type' => 'query']]],
@@ -52,17 +51,9 @@ final class CHistFunctionData {
 			],
 			['required' => false]
 		],
-		'countunique' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
-			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
-				'required' => false
-			],
-			['required' => false]
-		],
 		'count_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'change' => [
 			['rules' => [['type' => 'query']]]
@@ -74,10 +65,6 @@ final class CHistFunctionData {
 				'required' => false
 			],
 			['required' => false]
-		],
-		'first' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'forecast' => [
 			['rules' => [['type' => 'query']]],
@@ -92,35 +79,27 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'time', 'min' => 1]]]
 		],
-		'kurtosis' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
 		'last' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM_ONLY]], 'required' => false]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'last_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]], 'required' => false]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]], 'required' => false]
 		],
 		'logeventid' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM_ONLY]], 'required' => false],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
 			['required' => false]
 		],
 		'logseverity' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM_ONLY]], 'required' => false]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false]
 		],
 		'logsource' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM_ONLY]], 'required' => false],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_NUM]], 'required' => false],
 			['required' => false]
-		],
-		'mad' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'max' => [
 			['rules' => [['type' => 'query']]],
@@ -128,7 +107,7 @@ final class CHistFunctionData {
 		],
 		'max_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'min' => [
 			['rules' => [['type' => 'query']]],
@@ -136,7 +115,7 @@ final class CHistFunctionData {
 		],
 		'min_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'nodata' => [
 			['rules' => [['type' => 'query']]],
@@ -151,38 +130,13 @@ final class CHistFunctionData {
 				['type' => 'number', 'min' => 0, 'max' => 100]
 			]]
 		],
-		'skewness' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-
-		'stddevpop' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'stddevsamp' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'sumofsquares' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'varpop' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'varsamp' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
 		'sum' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'sum_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
 		],
 		'timeleft' => [
 			['rules' => [['type' => 'query']]],
@@ -231,32 +185,22 @@ final class CHistFunctionData {
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
-		'countunique' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
 		'find' => self::ITEM_VALUE_TYPES_ALL,
-		'first' => self::ITEM_VALUE_TYPES_ALL,
 		'forecast' => self::ITEM_VALUE_TYPES_NUM,
 		'fuzzytime' => self::ITEM_VALUE_TYPES_NUM,
-		'kurtosis' => self::ITEM_VALUE_TYPES_NUM,
 		'last' => self::ITEM_VALUE_TYPES_ALL,
 		'last_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'logeventid' => self::ITEM_VALUE_TYPES_LOG,
 		'logseverity' => self::ITEM_VALUE_TYPES_LOG,
 		'logsource' => self::ITEM_VALUE_TYPES_LOG,
-		'mad' => self::ITEM_VALUE_TYPES_NUM,
 		'max' => self::ITEM_VALUE_TYPES_NUM,
 		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'min' => self::ITEM_VALUE_TYPES_NUM,
 		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'nodata' => self::ITEM_VALUE_TYPES_ALL,
 		'percentile' => self::ITEM_VALUE_TYPES_NUM,
-		'skewness' => self::ITEM_VALUE_TYPES_NUM,
-		'stddevpop' => self::ITEM_VALUE_TYPES_NUM,
-		'stddevsamp' => self::ITEM_VALUE_TYPES_NUM,
-		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
-		'varpop' => self::ITEM_VALUE_TYPES_NUM,
-		'varsamp' => self::ITEM_VALUE_TYPES_NUM,
 		'sum' => self::ITEM_VALUE_TYPES_NUM,
 		'sum_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
