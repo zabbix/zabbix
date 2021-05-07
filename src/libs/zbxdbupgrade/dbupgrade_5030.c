@@ -4654,6 +4654,13 @@ static int	DBpatch_5030163(void)
 	return DBadd_field("config", &field);
 }
 
+static int	DBpatch_5030164(void)
+{
+	const ZBX_FIELD	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 /* trigger function conversion to new syntax */
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
@@ -5632,7 +5639,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
-static int	DBpatch_5030164(void)
+static int	DBpatch_5030165(void)
 {
 	int			i, ret = SUCCEED;
 	DB_ROW			row;
@@ -5776,7 +5783,7 @@ static int	DBpatch_5030164(void)
 	return ret;
 }
 
-static int	DBpatch_5030165(void)
+static int	DBpatch_5030166(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -5966,7 +5973,7 @@ static int	dbpatch_convert_expression_macro(const char *expression, const zbx_st
 	return SUCCEED;
 }
 
-static int	DBpatch_5030166(void)
+static int	DBpatch_5030167(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -6160,7 +6167,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 	return exp;
 }
 
-static int	DBpatch_5030167(void)
+static int	DBpatch_5030168(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -6370,7 +6377,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	return SUCCEED;
 }
 
-static int	DBpatch_5030168(void)
+static int	DBpatch_5030169(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -6429,7 +6436,7 @@ static int	DBpatch_5030168(void)
 	return ret;
 }
 
-static int	DBpatch_5030169(void)
+static int	DBpatch_5030170(void)
 {
 #ifdef HAVE_MYSQL
 	return DBcreate_index("items", "items_8", "key_(1024)", 0);
@@ -6614,5 +6621,6 @@ DBPATCH_ADD(5030166, 0, 1)
 DBPATCH_ADD(5030167, 0, 1)
 DBPATCH_ADD(5030168, 0, 1)
 DBPATCH_ADD(5030169, 0, 1)
+DBPATCH_ADD(5030170, 0, 1)
 
 DBPATCH_END()

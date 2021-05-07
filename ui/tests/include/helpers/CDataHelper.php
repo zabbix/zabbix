@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../../../include/hosts.inc.php';
 
 class CDataHelper extends CAPIHelper {
 
+	protected static $data = null;
 	protected static $request = [];
 	protected static $response = [];
 
@@ -215,5 +216,87 @@ class CDataHelper extends CAPIHelper {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Load the data source data from the file cache.
+	 */
+	protected static function preload() {
+		if (static::$data === null) {
+			static::$data = [];
+
+			if (!defined('PHPUNIT_DATA_DIR')) {
+				return;
+			}
+
+			foreach (new DirectoryIterator(PHPUNIT_DATA_DIR) as $file) {
+				if ($file->isDot() || $file->isDir() || strtolower($file->getExtension()) !== 'json') {
+					continue;
+				}
+
+				$name = $file->getBasename('.'.$file->getExtension());
+				static::$data[$name] = json_decode(file_get_contents($file->getPathname()), true);
+			}
+		}
+	}
+
+	/**
+	 * Get data from the data sources.
+	 *
+	 * @param mixed $path       data path to look for
+	 * @param mixed $default    default value to be returned if data doesn't exist
+	 *
+	 * @return mixed
+	 */
+	public static function get($path, $default = null) {
+		return CTestArrayHelper::get(static::$data, $path, $default);
+	}
+
+	/**
+	 * Load specific data source data.
+	 *
+	 * @param mixed $source    name of the data source(s)
+	 *
+	 * @return boolean
+	 *
+	 * @throws \Exception
+	 */
+	public static function load($source) {
+		if (is_array($source)) {
+			$result = true;
+			foreach ($source as $name) {
+				$result &= static::load($name);
+			}
+
+			return $result;
+		}
+
+		static::preload();
+
+		if (array_key_exists($source, static::$data)) {
+			return true;
+		}
+
+		try {
+			$path = PHPUNIT_DATA_SOURCES_DIR.$source.'.php';
+			if (!file_exists($path)) {
+				throw new \Exception('File "'.$path.'" doesn\'t exist.');
+			}
+
+			require_once $path;
+			static::$data[$source] = forward_static_call([$source, 'load']);
+
+			if (defined('PHPUNIT_DATA_DIR')) {
+				$data = json_encode(static::get($source));
+				file_put_contents(PHPUNIT_DATA_DIR.$source.'.json', $data);
+			}
+		}
+		catch (\Exception $e) {
+			echo 'Failed to load data from data source "'.$source.'".'."\n\n".$e->getMessage()."\n".$e->getTraceAsString();
+
+			return false;
+		}
+
+		return true;
 	}
 }
