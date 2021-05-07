@@ -2760,7 +2760,7 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"e", "expm1", "atan2", "first", "kurtosis", "mad", "skewness", "stddevpop", "stddevsamp",
 			"sumofsquares", "varpop", "varsamp",
 		NULL};
-	const char	**ptr;
+	char	**ptr;
 
 	for (ptr = functions; NULL != *ptr; ptr++)
 	{
