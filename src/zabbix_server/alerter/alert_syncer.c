@@ -487,10 +487,10 @@ ZBX_PTR_VECTOR_IMPL(events_tags, zbx_event_tags_t*)
 
 static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 {
-	const zbx_event_tags_t	*event_tags_1 = *(const zbx_event_tags_t **)d1;
-	const zbx_event_tags_t	*event_tags_2 = *(const zbx_event_tags_t **)d2;
+	const zbx_event_tags_t	*event_tags_1 = (const zbx_event_tags_t *)d1;
+	const zbx_event_tags_t	*event_tags_2 = (const zbx_event_tags_t *)d2;
 
-	return event_tags_1->eventid < event_tags_2->eventid;
+	return event_tags_1->eventid > event_tags_2->eventid;
 }
 
 static void	event_tags_free(zbx_event_tags_t *event_tags)
@@ -667,15 +667,6 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
-static int	zbx_result_compare_func(const void *d1, const void *d2)
-{
-	const zbx_am_result_t	*result1 = *(const zbx_am_result_t **)d1;
-	const zbx_am_result_t	*result2 = *(const zbx_am_result_t **)d2;
-
-	return result1->eventid > result2->eventid;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: am_db_flush_results                                              *
@@ -706,11 +697,10 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	if (0 != results_num)
 	{
-		int 			i;
-		char			*sql;
-		size_t			sql_alloc = results_num * 128, sql_offset;
-		zbx_db_insert_t		db_event, db_problem;
-		zbx_vector_ptr_t	result_vector;
+		int 		i;
+		char		*sql;
+		size_t		sql_alloc = results_num * 128, sql_offset;
+		zbx_db_insert_t	db_event, db_problem;
 
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
@@ -724,8 +714,6 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 					NULL);
 
 			zbx_vector_events_tags_create(&update_events_tags);
-
-			zbx_vector_ptr_create(&result_vector);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -753,18 +741,12 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 				{
 					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);
 					if (NULL != mediatype && 0 != mediatype->process_tags)
-						zbx_vector_ptr_append(&result_vector, result);
+					{
+						am_db_update_event_tags(result->eventid, result->value,
+								&update_events_tags);
+					}
 				}
 				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-			}
-
-			zbx_vector_ptr_sort(&result_vector, zbx_result_compare_func);
-
-			for (i = 0; i < result_vector.values_num; i++)
-			{
-				zbx_am_result_t		*result = (zbx_am_result_t*)result_vector.values[i];
-				am_db_update_event_tags(result->eventid, result->value,
-						&update_events_tags);
 			}
 
 			am_db_validate_tags_for_update(&update_events_tags, &db_event, &db_problem);
