@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 class CHistFunctionValidatorTest extends TestCase {
 
 	/**
-	 * An array of e-mails, results and error messages.
+	 * An array of history functions, options and the expected results.
 	 */
 	public function dataProvider() {
 		return [
