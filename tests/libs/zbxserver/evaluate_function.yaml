@@ -223,7 +223,7 @@ out:
   return: SUCCEED
   value: 3.5
 ---
-test case: Evaluate band(#1,1) 
+test case: Evaluate bitand(#1,1) 
 in:
   history:
   - itemid: 1
@@ -240,13 +240,13 @@ in:
     - value: 5
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: band
+  function: bitand
   params: '#1,1'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate band(#2,1) 
+test case: Evaluate bitand(#2,1) 
 in:
   history:
   - itemid: 1
@@ -263,13 +263,13 @@ in:
     - value: 5
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: band
+  function: bitand
   params: '#2,1'
 out:
   return: SUCCEED
   value: 0
 ---
-test case: Evaluate band(#2:now-1m,2) 
+test case: Evaluate bitand(#2:now-1m,2) 
 in:
   history:
   - itemid: 1
@@ -286,7 +286,7 @@ in:
     - value: 5
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: band
+  function: bitand
   params: '#2:now-1m,2'
 out:
   return: SUCCEED
@@ -453,7 +453,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate count(5m,band,1/3) 
+test case: Evaluate count(5m,bitand,1/3) 
 in:
   history:
   - itemid: 1
@@ -471,12 +471,12 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: count
-  params: '5m,band,1/3'
+  params: '5m,bitand,1/3'
 out:
   return: SUCCEED
   value: 2
 ---
-test case: Evaluate count(5m,band,"2/3") 
+test case: Evaluate count(5m,bitand,"2/3") 
 in:
   history:
   - itemid: 1
@@ -494,7 +494,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: count
-  params: '5m,band,2/3'
+  params: '5m,bitand,2/3'
 out:
   return: SUCCEED
   value: 1
