@@ -623,7 +623,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'somefunc(/Simple form test host/item-prototype-reuse,#1)<5',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Unknown function "somefunc".'
+						'Invalid parameter "/1/expression": unknown function "somefunc".'
 					]
 				]
 			],
