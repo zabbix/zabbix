@@ -41,7 +41,7 @@ $(() => {
 	};
 
 	$('#function').on('change', (e) => {
-		var form = $(e.target).closest('form')[0],
+		var form = e.target.closest('form'),
 			function_name_parts = form.elements.function.value.split('_');
 
 		form.elements.function_type.value = function_name_parts[0];
