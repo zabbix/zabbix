@@ -167,7 +167,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				]);
 
 				if ($expression_parser->parse($inputs[$field]) == CParser::PARSE_SUCCESS) {
-					foreach ($expression_parser->getResult()->getTokens() as $token) {
+					$tokens = $expression_parser->getResult()->getTokensOfTypes([
+						CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+						CExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
+						CExpressionParserResult::TOKEN_TYPE_STRING,
+						CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+					]);
+					foreach ($tokens as $token) {
 						switch ($token['type']) {
 							case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
 								$texts_support_user_macros[] = $token['match'];
@@ -178,8 +184,29 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 								break;
 
 							case CExpressionParserResult::TOKEN_TYPE_STRING:
-								$texts_support_user_macros[] = CExpressionParser::unquoteString($token['match']);
-								$texts_support_lld_macros[] = CExpressionParser::unquoteString($token['match']);
+								$text = CExpressionParser::unquoteString($token['match']);
+								$texts_support_user_macros[] = $text;
+								$texts_support_lld_macros[] = $text;
+								break;
+
+							case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+								foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
+									switch ($filter_token['type']) {
+										case CFilterParser::TOKEN_TYPE_USER_MACRO:
+											$texts_support_user_macros[] = $filter_token['match'];
+											break;
+
+										case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+											$texts_support_lld_macros[] = $filter_token['match'];
+											break;
+
+										case CFilterParser::TOKEN_TYPE_STRING:
+											$text = CFilterParser::unquoteString($filter_token['match']);
+											$texts_support_user_macros[] = $text;
+											$texts_support_lld_macros[] = $text;
+											break;
+									}
+								}
 								break;
 						}
 					}

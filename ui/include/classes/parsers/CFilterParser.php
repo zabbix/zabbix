@@ -505,4 +505,26 @@ class CFilterParser extends CParser {
 
 		return $result;
 	}
+
+	/**
+	 * Unquoting quoted string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function unquoteString(string $value): string {
+		return strtr(substr($value, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+	}
+
+	/**
+	 * Quoting string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function quoteString(string $value): string {
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
+	}
 }

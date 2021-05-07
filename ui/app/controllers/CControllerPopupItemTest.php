@@ -1081,29 +1081,61 @@ abstract class CControllerPopupItemTest extends CController {
 		$expression = [];
 		$pos_left = 0;
 
-		foreach ($expression_parser->getResult()->getTokens() as $token) {
+		$tokens = $expression_parser->getResult()->getTokensOfTypes([
+			CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+			CExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
+			CExpressionParserResult::TOKEN_TYPE_STRING,
+			CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+		]);
+		foreach ($tokens as $token) {
 			switch ($token['type']) {
 				case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
 				case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
-				case CExpressionParserResult::TOKEN_TYPE_STRING:
 					if ($pos_left != $token['pos']) {
 						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
 					}
 					$pos_left = $token['pos'] + $token['length'];
-					break;
-			}
 
-			switch ($token['type']) {
-				case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
-				case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
 					$expression[] = array_key_exists($token['match'], $macros_posted)
 						? CExpressionParser::quoteString($macros_posted[$token['match']], false)
 						: $token['match'];
 					break;
 
 				case CExpressionParserResult::TOKEN_TYPE_STRING:
+					if ($pos_left != $token['pos']) {
+						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
+					}
+					$pos_left = $token['pos'] + $token['length'];
+
 					$string = strtr(CExpressionParser::unquoteString($token['match']), $macros_posted);
 					$expression[] = CExpressionParser::quoteString($string, false, true);
+					break;
+
+				case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+					foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
+						switch ($filter_token['type']) {
+							case CFilterParser::TOKEN_TYPE_USER_MACRO:
+							case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+								if ($pos_left != $filter_token['pos']) {
+									$expression[] = substr($formula, $pos_left, $filter_token['pos'] - $pos_left);
+								}
+								$pos_left = $filter_token['pos'] + $filter_token['length'];
+
+								$string = strtr($filter_token['match'], $macros_posted);
+								$expression[] = CFilterParser::quoteString($string);
+								break;
+
+							case CFilterParser::TOKEN_TYPE_STRING:
+								if ($pos_left != $filter_token['pos']) {
+									$expression[] = substr($formula, $pos_left, $filter_token['pos'] - $pos_left);
+								}
+								$pos_left = $filter_token['pos'] + $filter_token['length'];
+
+								$string = strtr(CFilterParser::unquoteString($filter_token['match']), $macros_posted);
+								$expression[] = CFilterParser::quoteString($string);
+								break;
+						}
+					}
 					break;
 			}
 		}
