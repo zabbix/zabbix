@@ -2540,3 +2540,12 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 function getStandaloneFunctions(): array {
 	return ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
 }
+
+/**
+ * Returns a list of functions that return a constant or random number.
+ *
+ * @return array
+ */
+function getFunctionsConstants(): array {
+	return ['e', 'pi', 'rand'];
+}
