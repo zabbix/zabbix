@@ -55,6 +55,9 @@ class CHistFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($token) {
+		// TODO: remove the temporary stub
+		return true;
+
 		$invalid_param_messages = [
 			_('invalid first parameter in function "%1$s"'),
 			_('invalid second parameter in function "%1$s"'),
