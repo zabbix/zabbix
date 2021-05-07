@@ -522,6 +522,269 @@ out:
   return: FAIL
   value: 2
 ---
+test case: Evaluate countunique(5m) FLOAT 5 3 3 1 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 5
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countunique(5m) FLOAT 1 1 1 1 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countunique(5m) UINT64 5 3 3 1 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 5
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countunique(5m) UINT64 1 1 1 1 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countunique(5m) STR One One One One One
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countunique(5m) STR One Two Three Four One
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countunique
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countunique(11m) LOG 'abc', 'abc' no sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countunique
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countunique(11m) LOG 'qwerty' 'abc' no sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: qwerty
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countunique
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' different sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source: serv1
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source: serv2
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countunique
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' only source 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source: serv1
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countunique
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' only source 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source: serv2
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countunique
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
 test case: Evaluate forecast(#5,1h) 
 in:
   history:
@@ -1302,4 +1565,965 @@ in:
 out:
   return: SUCCEED
   value: -5
+---
+test case: Evaluate first() <- 0.1, 0.2. It should FAIL because no argument is specified.
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: first
+  params: ''
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate first(#2) <- 0.1, 0.2. It should FAIL because number of value is specified.
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: first
+  params: '#2'
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate first(600) <- 'xyz'. It should FAIL because not enough data.
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: xyz
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: first
+  params: '600'
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate first(601) <- 'xyz'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: xyz
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: first
+  params: '601'
+out:
+  return: SUCCEED
+  value: 'xyz'
+---
+test case: Evaluate first(:now-10m) <- 0.1, 0.2. It should FAIL because no time interval is specified.
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: first
+  params: :now-10m
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate first(60:now-10m) <- 0.1, 0.2, 0.3
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+    - value: 0.3
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:11:00.000000000 +00:00
+  function: first
+  params: 60:now-10m
+out:
+  return: SUCCEED
+  value: 0.2
+---
+test case: Evaluate first(61:now-10m) <- 0.1, 0.2, 0.3
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+    - value: 0.3
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:11:00.000000000 +00:00
+  function: first
+  params: 61:now-10m
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate kurtosis(3m) FLOAT 0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: kurtosis
+  params: 3m
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate kurtosis(3m) UINT64 0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: kurtosis
+  params: 3m
+out:
+  return: FAIL
+  value:
+---
+test case: Evaluate kurtosis(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: kurtosis
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: Evaluate kurtosis(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: kurtosis
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: Evaluate kurtosis(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: kurtosis
+  params: 6m
+out:
+  return: SUCCEED
+  value: 3.050521
+---
+test case: Evaluate kurtosis(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: kurtosis
+  params: 6m
+out:
+  return: SUCCEED
+  value: 3.050521
+---
+test case: Evaluate mad(7m) FLOAT 1, 1, 2, 2, 4, 6, 9 - odd number of values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 100
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+    - value: 9
+      ts: 2021-03-27 10:08:00.000000000 +00:00
+  time: 2021-03-27 10:08:00.000000000 +00:00
+  function: mad
+  params: 7m
+out:
+  return: SUCCEED
+  value: 1.0
+---
+test case: Evaluate mad(7m) UINT64 1, 1, 2, 2, 4, 6, 9 - odd number of values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 100
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+    - value: 9
+      ts: 2021-03-27 10:08:00.000000000 +00:00
+  time: 2021-03-27 10:08:00.000000000 +00:00
+  function: mad
+  params: 7m
+out:
+  return: SUCCEED
+  value: 1.0
+---
+test case: Evaluate mad(6m) FLOAT 26, 12, 16, 56, 112, 24 - even number of values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: mad
+  params: 6m
+out:
+  return: SUCCEED
+  value: 11.0
+---
+test case: Evaluate mad(6m) UINT64 26, 12, 16, 56, 112, 24 - even number of values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: mad
+  params: 6m
+out:
+  return: SUCCEED
+  value: 11.0
+---
+test case: Evaluate skewness(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: skewness
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate skewness(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: skewness
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate skewness(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: skewness
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1.24294
+---
+test case: Evaluate skewness(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: skewness
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1.24294
+---
+test case: Evaluate stddevpop(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: stddevpop
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0.816497
+---
+test case: Evaluate stddevpop(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: stddevpop
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0.816497
+---
+test case: Evaluate stddevpop(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 34.751499
+---
+test case: Evaluate stddevpop(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 34.751499
+---
+test case: Evaluate stddevsamp(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: stddevsamp
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate stddevsamp(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: stddevsamp
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate stddevsamp(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevsamp
+  params: 6m
+out:
+  return: SUCCEED
+  value: 38.068360
+---
+test case: Evaluate stddevsamp(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevsamp
+  params: 6m
+out:
+  return: SUCCEED
+  value: 38.068360
+---
+test case: Evaluate sumofsquares(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: sumofsquares
+  params: 3m
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate sumofsquares(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: sumofsquares
+  params: 3m
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate sumofsquares(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: sumofsquares
+  params: 6m
+out:
+  return: SUCCEED
+  value: 17332
+---
+test case: Evaluate sumofsquares(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: sumofsquares
+  params: 6m
+out:
+  return: SUCCEED
+  value: 17332
+---
+test case: Evaluate varpop(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: varpop
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0.666667
+---
+test case: Evaluate varpop(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: varpop
+  params: 3m
+out:
+  return: SUCCEED
+  value: 0.666667
+---
+test case: Evaluate varpop(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1207.666667
+---
+test case: Evaluate varpop(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1207.666667
+---
+test case: Evaluate varsamp(3m) FLOAT 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: varsamp
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate varsamp(3m) UINT64 0, 1, 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+  time: 2021-03-27 10:05:00.000000000 +00:00
+  function: varsamp
+  params: 3m
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate varsamp(6m) FLOAT 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varsamp
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1449.2
+---
+test case: Evaluate varsamp(6m) UINT64 26, 12, 16, 56, 112, 24
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: varsamp
+  params: 6m
+out:
+  return: SUCCEED
+  value: 1449.2
 ...

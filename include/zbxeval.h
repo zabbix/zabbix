@@ -266,4 +266,15 @@ void	zbx_eval_clear_query(zbx_item_query_t *query);
 void	zbx_eval_prepare_filter(zbx_eval_context_t *ctx);
 int	zbx_eval_get_group_filter(zbx_eval_context_t *ctx, zbx_vector_str_t *groups, char **filter, char **error);
 
+typedef int	(*zbx_statistical_func_t)(zbx_vector_dbl_t *values, double *result, char **error);
+
+int	zbx_eval_calc_kurtosis(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_mad(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_skewness(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_stddevpop(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_stddevsamp(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_varpop(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_varsamp(zbx_vector_dbl_t *values, double *result, char **error);
+
 #endif
