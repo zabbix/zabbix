@@ -384,7 +384,70 @@ class testValuemap extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/2": value (type)=(5) already exists.'
 			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API float value with zero suffix check for geq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '7',
+								'newvalue' => '1 fail'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '7.00',
+								'newvalue' => '2 fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(7) already exists.'
+			],
 			// Successfully create.
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API equal value uniqueness check as string for eq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '5',
+								'newvalue' => '5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '5.00',
+								'newvalue' => '5.00'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API float value uniqueness validation for geq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '5',
+								'newvalue' => '5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '5.001',
+								'newvalue' => '5.001'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
 			[
 				'valuemap' => [
 					[
