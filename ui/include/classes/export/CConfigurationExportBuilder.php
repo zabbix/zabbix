@@ -442,6 +442,16 @@ class CConfigurationExportBuilder {
 	protected function formatValueMaps(array $valuemaps) {
 		CArrayHelper::sort($valuemaps, ['name']);
 
+		foreach ($valuemaps as &$valuemap) {
+			foreach ($valuemap['mappings'] as &$mapping) {
+				if ($mapping['type'] == VALUEMAP_MAPPING_TYPE_EQUAL) {
+					unset($mapping['type']);
+				}
+			}
+			unset($mapping);
+		}
+		unset($valuemap);
+
 		return $valuemaps;
 	}
 

@@ -33,7 +33,7 @@ class CValueMapHelper {
 	 *
 	 * @return string
 	 */
-	static public function applyValueMap($value_type, string $value, array $valuemap): string {
+	public static function applyValueMap($value_type, string $value, array $valuemap): string {
 		$newvalue = static::getMappedValue($value_type, $value, $valuemap);
 
 		return ($newvalue !== false) ? $newvalue.' ('.$value.')' : $value;
@@ -49,7 +49,7 @@ class CValueMapHelper {
 	 *
 	 * @return string|bool     If there is no mapping return false, return mapped value otherwise.
 	 */
-	static public function getMappedValue($value_type, string $value, array $valuemap) {
+	public static function getMappedValue($value_type, string $value, array $valuemap) {
 		$newvalue = false;
 
 		if (array_key_exists('mappings', $valuemap)) {
@@ -77,7 +77,7 @@ class CValueMapHelper {
 	 * @param string $mapping['type']  Type of mapping.
 	 * @param string $mapping['value]  Value of mapping.
 	 */
-	static public function matchMapping($value_type, string $value, array $mapping): bool {
+	public static function matchMapping($value_type, string $value, array $mapping): bool {
 		$match_numeric = ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64);
 		$result = false;
 
