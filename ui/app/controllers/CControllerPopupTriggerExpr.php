@@ -338,7 +338,18 @@ class CControllerPopupTriggerExpr extends CController {
 			'between' => [
 				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
 				'description' => _('between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)'),
-				'params' => $this->param1SecCount,
+				'params' => $this->param1SecCount + [
+					'min' => [
+						'C' => _('Min'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'max' => [
+						'C' => _('Max'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
@@ -584,18 +595,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'in' => [
 				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
 				'description' => _('in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)'),
-				'params' => $this->param1SecCount + [
-					'min' => [
-						'C' => _('Min'),
-						'T' => T_ZBX_STR,
-						'A' => true
-					],
-					'max' => [
-						'C' => _('Max'),
-						'T' => T_ZBX_STR,
-						'A' => true
-					]
-				],
+				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
@@ -1345,7 +1345,7 @@ class CControllerPopupTriggerExpr extends CController {
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
 					foreach ($data['params'] as $param_key => $param) {
-						if (!in_array($param_key, ['v', 'o', 'fit', 'mode', 'pattern'])
+						if (!in_array($param_key, ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string'])
 								|| !array_key_exists($param_key, $data['params'])
 								|| $data['params'][$param_key] === '') {
 							continue;
