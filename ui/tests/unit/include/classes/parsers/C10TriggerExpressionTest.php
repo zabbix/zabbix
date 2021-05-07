@@ -3329,7 +3329,19 @@ class C10TriggerExpressionTest extends TestCase {
 							'item' => 'item',
 							'function' => 'str(ГУГЛ)',
 							'functionName' => 'str',
-							'functionParams' => ['ГУГЛ']
+							'functionParams' => ['ГУГЛ'],
+							'functionParamsRaw' => [
+								'type' => C10FunctionParser::PARAM_ARRAY,
+								'raw' => '(ГУГЛ)',
+								'pos' => 3,
+								'parameters' => [
+									[
+										'type' => C10FunctionParser::PARAM_UNQUOTED,
+										'raw' => 'ГУГЛ',
+										'pos' => 1
+									]
+								]
+							]
 						]
 					],
 					[
@@ -3428,7 +3440,7 @@ class C10TriggerExpressionTest extends TestCase {
 				]
 			],
 			[
-				'(-1.15w + str(host:item, ГУГЛ) or {$USERMACRO}) or {#LLD}',
+				'(-1.15w + str(host:item, "param2") or {$USERMACRO}) or {#LLD}',
 				[
 					[
 						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -3462,12 +3474,29 @@ class C10TriggerExpressionTest extends TestCase {
 					],
 					[
 						'type' => C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION,
-						'value' => 'str(host:item, ГУГЛ)',
+						'value' => 'str(host:item, "param2")',
 						'pos' => 10,
 						'length' => 24,
 						'data' => [
 							'functionName' => 'str',
-							'functionParams' => ['host:item', 'ГУГЛ']
+							'functionParams' => ['host:item', 'param2'],
+							'functionParamsRaw' => [
+								'type' => C10FunctionParser::PARAM_ARRAY,
+								'raw' => '(host:item, "param2")',
+								'pos' => 3,
+								'parameters' => [
+									[
+										'type' => C10FunctionParser::PARAM_UNQUOTED,
+										'raw' => 'host:item',
+										'pos' => 1
+									],
+									[
+										'type' => C10FunctionParser::PARAM_QUOTED,
+										'raw' => '"param2"',
+										'pos' => 12
+									]
+								]
+							]
 						]
 					],
 					[

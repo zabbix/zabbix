@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-26 18:36+0300\n"
-"PO-Revision-Date: 2021-04-22 02:49+0300\n"
+"PO-Revision-Date: 2021-04-29 09:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1619052547.000000\n"
+"X-POOTLE-MTIME: 1619682561.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -46,7 +46,7 @@ msgstr "\"%1$s\" で指定してください"
 #: include/classes/api/services/CReport.php:651
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\"は空文字列か\"%2$s\"よりも大きい値を設定してください。"
 
 #: include/classes/api/services/CMaintenance.php:359
 #: include/classes/api/services/CMaintenance.php:366
@@ -855,7 +855,7 @@ msgstr "プロトタイプを追加"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "定期レポートを追加"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -875,11 +875,11 @@ msgstr "ホストグループに追加"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "ユーザーを追加"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "ユーザーグループを追加"
 
 #: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
@@ -1266,7 +1266,7 @@ msgstr "少なくとも1つ以上のユーザーまたはユーザーグルー�
 
 #: include/classes/api/services/CReport.php:351
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "少なくとも1人以上のユーザーまたはユーザーグループを指定する必要があります。"
 
 #: app/views/administration.mediatype.edit.php:341
 msgid "Attempt interval"
@@ -1826,7 +1826,7 @@ msgstr "正規表現を追加できません"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "定期レポートを追加できません"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -1979,7 +1979,7 @@ msgstr "アイコンのマッピングを作成できません"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "定期レポートを作成できません"
 
 #: include/classes/setup/CSetupWizard.php:666
 msgid "Cannot create the configuration file."
@@ -2140,7 +2140,7 @@ msgstr[0] "正規表現を削除できません"
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
+msgstr[0] "定期レポートを削除できません"
 
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
@@ -2283,7 +2283,7 @@ msgstr[0] "モジュールを無効にできません: %1$s。"
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
-msgstr[0] ""
+msgstr[0] "定期レポートを無効にできません"
 
 #: triggers.php:461
 msgid "Cannot disable trigger"
@@ -2350,7 +2350,7 @@ msgstr[0] "モジュールを有効にできません: %1$s。"
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
 msgid_plural "Cannot enable scheduled reports"
-msgstr[0] ""
+msgstr[0] "定期レポートを有効にできません"
 
 #: triggers.php:460
 msgid "Cannot enable trigger"
@@ -2921,7 +2921,7 @@ msgstr "正規表現を更新できません"
 #: app/controllers/CControllerScheduledReportUpdate.php:63
 #: app/controllers/CControllerScheduledReportUpdate.php:156
 msgid "Cannot update scheduled report"
-msgstr ""
+msgstr "定期レポートを更新できません"
 
 #: app/controllers/CControllerScriptUpdate.php:61
 #: app/controllers/CControllerScriptUpdate.php:170
@@ -4100,7 +4100,7 @@ msgstr "プロキシの作成"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
-msgstr ""
+msgstr "レポートの作成"
 
 #: app/views/administration.script.list.php:34
 msgid "Create script"
@@ -4187,7 +4187,7 @@ msgstr "現在のホスト"
 
 #: app/views/popup.scheduledreport.subscription.php:105
 msgid "Current user"
-msgstr ""
+msgstr "現在のユーザー"
 
 #: include/classes/setup/CSetupWizard.php:237
 msgid "Current value"
@@ -4255,7 +4255,7 @@ msgstr "カスタムサイズ"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 msgid "Cycle"
-msgstr ""
+msgstr "周期"
 
 #: include/locales.inc.php:52
 msgid "Czech (cs_CZ)"
@@ -4308,7 +4308,7 @@ msgstr "ダッシュボード\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CDashboardGeneral.php:89
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%1$s\"はレポート\"%2$s\"で使用しています。"
 
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
@@ -4342,7 +4342,7 @@ msgstr "ダッシュボードを更新しました"
 #: include/classes/api/services/CReport.php:285
 #, c-format
 msgid "Dashboard with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のダッシュボードは使用できません。"
 
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
@@ -4880,11 +4880,11 @@ msgstr "選択した役割を削除しますか？"
 
 #: app/partials/scheduledreport.formgrid.html.php:240
 msgid "Delete selected scheduled report?"
-msgstr ""
+msgstr "選択した定期レポートを削除しますか？"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
-msgstr ""
+msgstr "選択した定期レポートを削除しますか？"
 
 #: app/views/administration.script.list.php:197
 msgid "Delete selected scripts?"
@@ -5159,7 +5159,7 @@ msgstr "選択したモジュールを無効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
-msgstr ""
+msgstr "選択した定期レポートを無効にしますか？"
 
 #: include/views/configuration.triggers.list.php:341
 msgid "Disable selected triggers?"
@@ -5918,7 +5918,7 @@ msgstr "選択したモジュールを有効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
-msgstr ""
+msgstr "選択した定期レポートを有効にしますか？"
 
 #: include/views/configuration.triggers.list.php:340
 msgid "Enable selected triggers?"
@@ -6010,7 +6010,7 @@ msgstr "暗号化レベル"
 
 #: app/partials/scheduledreport.formgrid.html.php:165
 msgid "End date"
-msgstr ""
+msgstr "終了日付"
 
 #: app/views/popup.itemtestedit.view.php:295
 msgid "End of line sequence"
@@ -6143,7 +6143,7 @@ msgstr "繰返し間隔(週)"
 
 #: app/views/administration.miscconfig.edit.php:37
 msgid "Example: https://localhost/zabbix/ui/"
-msgstr ""
+msgstr "例： https://localhost/zabbix/ui/"
 
 #: app/partials/massupdate.macros.tab.php:103
 #: app/partials/massupdate.valuemaps.tab.php:77
@@ -6247,7 +6247,7 @@ msgstr "障害が1件のときにトリガー名を表示"
 #: app/partials/scheduledreport.table.html.php:92
 #: app/views/reports.scheduledreport.list.php:64
 msgid "Expired"
-msgstr ""
+msgstr "期限切れ"
 
 #: include/views/configuration.maintenance.list.php:67
 #: include/views/configuration.maintenance.list.php:97
@@ -6258,7 +6258,7 @@ msgstr "メンテナンス期間の終了"
 #: app/partials/scheduledreport.table.html.php:95
 #, c-format
 msgid "Expired on %1$s."
-msgstr ""
+msgstr "%1$sに期限切れ"
 
 #: app/views/administration.token.edit.php:82
 #: app/views/administration.token.list.php:133
@@ -6727,7 +6727,7 @@ msgstr "開始"
 
 #: app/views/administration.miscconfig.edit.php:34
 msgid "Frontend URL"
-msgstr ""
+msgstr "WebインターフェースURL"
 
 #: app/views/administration.usergroup.edit.php:79
 #: app/views/administration.usergroup.edit.php:87
@@ -6784,7 +6784,7 @@ msgstr "一般設定"
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:102
 msgid "Generate report by"
-msgstr ""
+msgstr "レポート生成ユーザー"
 
 #: chart4.php:172 chart5.php:203
 #, c-format
@@ -7963,7 +7963,7 @@ msgstr "フィルターが一致した場合"
 
 #: include/classes/api/services/CReport.php:356
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
-msgstr ""
+msgstr "ユーザーグループを指定しない場合は、少なくともメーリングリストに1人のユーザーを含める必要があります。"
 
 #: include/func.inc.php:1516 include/func.inc.php:1536
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8072,7 +8072,7 @@ msgstr "値の範囲"
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
-msgstr ""
+msgstr "アクセスできないダッシュボード"
 
 #: include/views/configuration.host.edit.php:70
 #: include/views/configuration.host.list.php:200
@@ -8144,7 +8144,7 @@ msgstr "アクセスできないユーザー"
 
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
-msgstr ""
+msgstr "アクセスできないユーザーグループ"
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -10353,7 +10353,7 @@ msgstr "最新データ受信時刻 (経過時間)"
 
 #: app/partials/scheduledreport.table.html.php:43
 msgid "Last sent"
-msgstr ""
+msgstr "最終送信日時"
 
 #: app/partials/monitoring.latest.view.html.php:56
 #: app/partials/monitoring.latest.view.html.php:69
@@ -10859,7 +10859,7 @@ msgstr "APIトークンの管理"
 
 #: include/classes/helpers/CRoleHelper.php:504
 msgid "Manage scheduled reports"
-msgstr ""
+msgstr "定期レポートの管理"
 
 #: include/classes/validators/CFunctionValidator.php:373
 msgid "Mandatory parameter is missing."
@@ -11762,7 +11762,7 @@ msgstr "メディアテストのためのネットワークタイムアウト"
 
 #: app/views/administration.miscconfig.edit.php:171
 msgid "Network timeout for scheduled report test"
-msgstr ""
+msgstr "定期レポートテストのためのネットワークタイムアウト"
 
 #: app/views/administration.miscconfig.edit.php:157
 msgid "Network timeout for script execution"
@@ -12844,7 +12844,7 @@ msgstr "特権管理者のみがダッシュボードのオーナーを設定で
 
 #: include/classes/api/services/CReport.php:342
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "特権管理者のみがレポートのオーナーを設定できます。"
 
 #: include/classes/api/services/CCorrelation.php:696
 msgid "Only super admins can update correlations."
@@ -13720,7 +13720,7 @@ msgstr "プレビュー"
 #: app/partials/scheduledreport.formgrid.html.php:90
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
-msgstr ""
+msgstr "前日"
 
 #: app/partials/scheduledreport.formgrid.html.php:92
 #: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
@@ -14173,7 +14173,7 @@ msgstr "送信先"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
-msgstr ""
+msgstr "送信先がすでに存在しています。"
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
@@ -14279,7 +14279,7 @@ msgstr "正規表現"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:52
 msgid "Related reports"
-msgstr ""
+msgstr "関連するレポート"
 
 #: jsLoader.php:166
 msgid "Release to create a widget."
@@ -14475,11 +14475,11 @@ msgstr "名前変更"
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/partials/scheduledreport.formgrid.html.php:139
 msgid "Repeat on"
-msgstr ""
+msgstr "繰り返す曜日"
 
 #: app/partials/scheduledreport.table.html.php:41
 msgid "Repeats"
-msgstr ""
+msgstr "繰り返し"
 
 #: app/views/popup.massupdate.host.php:51
 #: app/views/popup.massupdate.host.php:113
@@ -14503,39 +14503,39 @@ msgstr "依存関係を置換"
 #: include/classes/api/services/CReport.php:264
 #, c-format
 msgid "Report \"%1$s\" already exists."
-msgstr ""
+msgstr "レポート\"%1$s\"はすでに存在します。"
 
 #: app/views/js/reports.scheduledreport.edit.js.php:74
 msgid "Report generated by other users will be changed to the current user."
-msgstr ""
+msgstr "他のユーザーが生成したレポートは現在のユーザーに変更されます。"
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:97
 msgid "Report generating test failed."
-msgstr ""
+msgstr "レポート生成テストが失敗しました。"
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:94
 msgid "Report generating test successful."
-msgstr ""
+msgstr "レポート生成テストが成功しました。"
 
 #: app/views/popup.scheduledreport.subscription.php:109
 #, c-format
 msgid "Report is currently generated by \"%1$s\"."
-msgstr ""
+msgstr "レポートは現在\"%1$s\"によって生成されています。"
 
 #: app/views/popup.scheduledreport.test.php:52
 #, c-format
 msgid "Report sending failed for: %1$s."
-msgstr ""
+msgstr "次のユーザーへのレポート送信に失敗しました：%1$s。"
 
 #: app/views/popup.scheduledreport.test.php:44
 #, c-format
 msgid "Report was successfully sent to: %1$s."
-msgstr ""
+msgstr "次のユーザーへのレポート送信に成功しました：%1$s。"
 
 #: include/classes/api/services/CReport.php:579
 #, c-format
 msgid "Report with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のレポートは存在しません。"
 
 #: include/classes/helpers/CMenuHelper.php:141
 #: include/classes/helpers/CRoleHelper.php:351
@@ -15133,34 +15133,34 @@ msgstr "スケジュールされたチェック時刻"
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/reports.scheduledreport.edit.php:58
 msgid "Scheduled report"
-msgstr ""
+msgstr "定期レポート"
 
 #: app/controllers/CControllerScheduledReportCreate.php:145
 msgid "Scheduled report added"
-msgstr ""
+msgstr "定期レポートを追加しました"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:129
 msgid "Scheduled report created"
-msgstr ""
+msgstr "定期レポートを作成しました"
 
 #: app/controllers/CControllerScheduledReportDelete.php:67
 msgid "Scheduled report deleted"
 msgid_plural "Scheduled reports deleted"
-msgstr[0] ""
+msgstr[0] "定期レポートを削除しました"
 
 #: app/controllers/CControllerScheduledReportDisable.php:74
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
-msgstr[0] ""
+msgstr[0] "定期レポートを無効にしました"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
-msgstr[0] ""
+msgstr[0] "定期レポートを有効にしました"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
-msgstr ""
+msgstr "定期レポートを更新しました"
 
 #: app/controllers/CControllerScheduledReportEdit.php:309
 #: app/controllers/CControllerScheduledReportList.php:148
@@ -15169,7 +15169,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:115
 #: include/classes/helpers/CRoleHelper.php:421
 msgid "Scheduled reports"
-msgstr ""
+msgstr "定期レポート"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
 #: app/views/popup.lldoperation.php:125
@@ -16043,7 +16043,7 @@ msgstr "標準のアイテム"
 
 #: app/partials/scheduledreport.formgrid.html.php:156
 msgid "Start date"
-msgstr ""
+msgstr "開始日付"
 
 #: include/views/configuration.action.edit.php:174
 msgid "Start in"
@@ -16062,7 +16062,7 @@ msgstr "スライドショーの自動開始"
 
 #: app/partials/scheduledreport.formgrid.html.php:111
 msgid "Start time"
-msgstr ""
+msgstr "開始時刻"
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16290,11 +16290,11 @@ msgstr "サブマップ"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:168
 msgid "Subscription"
-msgstr ""
+msgstr "配信先"
 
 #: app/partials/scheduledreport.formgrid.html.php:192
 msgid "Subscriptions"
-msgstr ""
+msgstr "配信先"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
@@ -16759,7 +16759,7 @@ msgstr "\"%1$s\"アイテムのテストはサポートしていません。"
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:79
 msgid "Test report generating"
-msgstr ""
+msgstr "レポート生成テスト"
 
 #: app/views/administration.regex.edit.php:119
 msgid "Test string"
@@ -18013,12 +18013,12 @@ msgstr "ユーザー\"%1$s\"はマップ\"%2$s\"の所有者です。"
 #: include/classes/api/services/CUser.php:1288
 #, c-format
 msgid "User \"%1$s\" is report \"%2$s\" owner."
-msgstr ""
+msgstr "ユーザー\"%1$s\"はレポート\"%2$s\"の所有者です。"
 
 #: include/classes/api/services/CUser.php:1296
 #, c-format
 msgid "User \"%1$s\" is report \"%2$s\" recipient."
-msgstr ""
+msgstr "ユーザー\"%1$s\"はレポート\"%2$s\"の受信者です。"
 
 #: include/classes/api/services/CUser.php:1236
 #, c-format
@@ -18028,7 +18028,7 @@ msgstr "ユーザー\"%1$s\"は\"%2$s\"アクション内で使用されてい�
 #: include/classes/api/services/CUser.php:1309
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
-msgstr ""
+msgstr "ユーザー\"%1$s\"は代わりにレポート\"%2$s\"を作成したユーザーです。"
 
 #: include/actions.inc.php:1894
 msgid "User action"
@@ -18080,7 +18080,7 @@ msgstr "ユーザーグループ\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CUserGroup.php:940
 #, c-format
 msgid "User group \"%1$s\" is report \"%2$s\" recipient."
-msgstr ""
+msgstr "ユーザーグループ\"%1$s\"はレポート\"%2$s\"の受信者です。"
 
 #: include/classes/api/services/CUserGroup.php:905
 #, c-format
@@ -19169,7 +19169,7 @@ msgstr "YAML"
 #: app/partials/scheduledreport.formgrid.html.php:160
 #: app/partials/scheduledreport.formgrid.html.php:169
 msgid "YYYY-MM-DD"
-msgstr ""
+msgstr "YYYY-MM-DD"
 
 #: app/views/popup.maintenance.period.php:150
 #: include/views/configuration.maintenance.edit.php:113
@@ -19451,7 +19451,7 @@ msgstr "文字列で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2150
 msgid "a date in YYYY-MM-DD format is expected"
-msgstr ""
+msgstr "日付はYYYY-MM-DDフォーマットで指定してください。"
 
 #: include/classes/validators/CApiInputValidator.php:652
 msgid "a floating point value is expected"
@@ -19662,7 +19662,7 @@ msgstr "昇順"
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
-msgstr ""
+msgstr "少なくとも1つの曜日を選択する必要があります"
 
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:131
 msgid "at least one override option must be specified"
@@ -21021,12 +21021,12 @@ msgstr "値が長すぎます"
 #: include/classes/api/services/CReport.php:618
 #, c-format
 msgid "value must be %1$s"
-msgstr ""
+msgstr "値は%1$sにしてください"
 
 #: include/classes/validators/CApiInputValidator.php:2156
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
 
 #: include/classes/validators/CNewValidator.php:230
 #, c-format

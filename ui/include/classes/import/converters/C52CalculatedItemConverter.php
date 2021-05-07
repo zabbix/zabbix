@@ -110,6 +110,7 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 
 			if ($this->item_key_parser->parse($key_param) === CParser::PARSE_SUCCESS) {
 				array_shift($fn['functionParams']);
+				array_shift($fn['functionParamsRaw']['parameters']);
 				[$new_expression] = $this->convertFunction($fn, $host_name, $key_param);
 
 				$expression_element['expression'] = substr_replace($expression_element['expression'], $new_expression,

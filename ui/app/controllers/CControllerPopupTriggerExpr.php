@@ -1081,7 +1081,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 	protected function doAction() {
 		$expression_parser = new CExpressionParser(['lldmacros' => true]);
-		$expression_validator = new CExpressionValidator(['lldmacros' => true]);
+		$expression_validator = new CExpressionValidator();
 
 		$itemid = $this->getInput('itemid', 0);
 		$function = $this->getInput('function', 'last');

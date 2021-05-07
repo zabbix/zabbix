@@ -1855,7 +1855,7 @@ class CExpressionParserTest extends TestCase {
 			['find(/host/key,,"like","")=0', null, CParser::PARSE_SUCCESS],
 
 			['last(/host/key,0)=0', null, CParser::PARSE_SUCCESS],
-			['(find(/hostA/keyA,"abc")=0) or (last(/hostB/keyB,123)=0)', null, CParser::PARSE_FAIL],
+			['(nodata(/hostA/keyA, "1h")=0) or (last(/hostB/keyB,123)=0)', null, CParser::PARSE_SUCCESS],
 			['find(/host/key[asd[],aaa()=0', null, CParser::PARSE_FAIL],
 			['find(/host/key[asd[,asd[,[]],aaa()=0', null, CParser::PARSE_FAIL],
 			['find(/host/key[[],[],[]])', null, CParser::PARSE_SUCCESS],
@@ -1865,7 +1865,7 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,0)=', null, CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,0)<>0', null, CParser::PARSE_SUCCESS],
 
-			['(find(/hostA/keyA,"abc")=0) oror (last(/hostB/keyB,123)=0)', null, CParser::PARSE_FAIL],
+			['(nodata(/hostA/keyA, "300s")=0) oror (last(/hostB/keyB,123)=0)', null, CParser::PARSE_SUCCESS_CONT],
 			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1.23)', null, CParser::PARSE_FAIL],
 			['last(/host/key,1.23s)', null, CParser::PARSE_FAIL],

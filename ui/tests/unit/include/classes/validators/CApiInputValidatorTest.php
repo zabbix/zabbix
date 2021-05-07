@@ -59,13 +59,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_CALC_FORMULA],
 				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)',
 				'/1/formula',
-				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)'
+				'Invalid parameter "/1/formula": invalid first parameter in function "sum".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
 				'10+sum(/host/*?[tag="test:1" and group="test-hosts"],1m)',
 				'/1/formula',
-				'10+sum(/host/*?[tag="test:1" and group="test-hosts"],1m)'
+				'Invalid parameter "/1/formula": invalid first parameter in function "sum".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
@@ -89,19 +89,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_CALC_FORMULA],
 				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])) + last_foreach(/host/key)',
 				'/1/formula',
-				'Incorrect trigger function "last_foreach(/host/key)" provided in expression. Unknown function.'
+				'Invalid parameter "/1/formula": incorrect usage of function "last_foreach".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
-				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
 				'/1/formula',
-				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
 			],
 			[
 				['type' => API_CALC_FORMULA],
 				'last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])',
 				'/1/formula',
-				'Incorrect trigger function "last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])" provided in expression. Unknown function.'
+				'Invalid parameter "/1/formula": incorrect usage of function "last_foreach".'
 			],
 			[
 				['type' => API_CALC_FORMULA],

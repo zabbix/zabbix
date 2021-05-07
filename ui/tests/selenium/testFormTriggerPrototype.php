@@ -499,7 +499,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => '{Simple form test host}',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Invalid parameter "/1/expression": incorrect trigger expression starting from "{Simple form test host}".'
+						'Invalid parameter "/1/expression": incorrect expression starting from "{Simple form test host}".'
 					]
 				]
 			],
@@ -623,7 +623,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'somefunc(/Simple form test host/item-prototype-reuse,#1)<5',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Incorrect trigger function "somefunc(/Simple form test host/item-prototype-reuse,#1)" provided in expression. Unknown function.'
+						'Unknown function "somefunc".'
 					]
 				]
 			],
@@ -691,37 +691,40 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'last(/Simple form test host@/item-prototype-reuse,#1)',
-					'constructor' => [
-						'elementError' => true,
-						'errors' => [
-							'last(/Simple form test host@/item-prototype-reuse,#1):Unknown host, no such host present in system'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'description' => 'MyTrigger',
-					'expression' => 'last(/Simple form test host/system .uptime,#1)',
-					'constructor' => [
-						'elementError' => true,
-						'errors' => [
-							'last(/Simple form test host/system .uptime,#1):Unknown host item, no such item in selected host'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'description' => 'MyTrigger',
-					'expression' => 'lastA(/Simple form test host/item-prototype-reuse,#1)',
+					'expression' => 'last(/Simple form test host@/item-prototype-reuse,#1)<0',
 					'constructor' => [
 						'errors' => [
 							'header' => 'Expression syntax error.',
-							'details' => 'Incorrect trigger expression. Check expression part starting from "lastA(/Simple form test host/item-prototype-reuse,#1)".'
+							'details' => 'Cannot build expression tree: incorrect expression starting from'.
+									' "last(/Simple form test host@/item-prototype-reuse,#1)<0".'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger',
+					'expression' => 'last(/Simple form test host/system .uptime,#1)<0',
+					'constructor' => [
+						'errors' => [
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from'.
+									' "last(/Simple form test host/system .uptime,#1)<0".'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger',
+					'expression' => 'lastA(/Simple form test host/item-prototype-reuse,#1)<0',
+					'constructor' => [
+						'errors' => [
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from'.
+									' "lastA(/Simple form test host/item-prototype-reuse,#1)<0".'
 						]
 					]
 				]

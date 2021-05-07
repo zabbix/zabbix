@@ -1696,7 +1696,7 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #define ZBX_REPORT_CYCLE_YEARLY		3
 
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *timezone);
+		const char *tz);
 
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);

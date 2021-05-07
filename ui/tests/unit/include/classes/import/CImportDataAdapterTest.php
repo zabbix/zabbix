@@ -1838,7 +1838,7 @@ class CImportDataAdapterTest extends TestCase {
 								'color' => 'DD0000',
 								'trigger' => [
 									'description' => 'trigger',
-									'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+									'expression' => 'last(/export-host/item)<>0 or last(/export-host/item)<>0 and last(/export-host/item)<>0',
 									'recovery_expression' => ''
 								]
 							]
