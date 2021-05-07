@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,11 +24,10 @@ class CControllerPopupImportCompare extends CController {
 	public const CHANGE_NONE = 0;
 	public const CHANGE_ADDED = 1;
 	public const CHANGE_REMOVED = 2;
-	public const CHANGE_UPDATED = 3;
 
 	private $toc = [];
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',
 			'rules_preset' => 'in template',
@@ -44,15 +43,13 @@ class CControllerPopupImportCompare extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		$user_type = $this->getUserType();
 
 		switch ($this->getInput('rules_preset', '')) {
@@ -64,7 +61,7 @@ class CControllerPopupImportCompare extends CController {
 		}
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$rules = [
 			'groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
@@ -152,7 +149,7 @@ class CControllerPopupImportCompare extends CController {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	protected function normalizeToc($toc) {
+	private function normalizeToc(array $toc): array {
 		// Order TOC.
 		$toc = array_replace(array_flip(['removed', 'updated', 'added']), $toc);
 		$new_toc = [];
@@ -188,6 +185,7 @@ class CControllerPopupImportCompare extends CController {
 				$new_key = $names[$key];
 				$new_changes[$new_key] = $values;
 			}
+
 			$new_toc_key = $toc_keys[$toc_key];
 			$new_toc[$new_toc_key] = $new_changes;
 		}
@@ -205,13 +203,12 @@ class CControllerPopupImportCompare extends CController {
 	 *
 	 * @return array
 	 */
-	protected function arrayToRows($key, $before, $after, $depth): array {
-		$rows = [];
-		$rows[] = [
+	private function arrayToRows(string $key, array $before, array $after, int $depth): array {
+		$rows = [[
 			'value' => $key . ':',
 			'depth' => $depth,
-			'change_type' => CControllerPopupImportCompare::CHANGE_NONE
-		];
+			'change_type' => self::CHANGE_NONE
+		]];
 
 		$is_hash = CArrayHelper::isHash($before) || CArrayHelper::isHash($after);
 
@@ -221,10 +218,9 @@ class CControllerPopupImportCompare extends CController {
 		$after_keys = array_keys($after);
 		$last_after_index = -1;
 
-		for ($i = 0; $i < count($before_keys); $i++) {
-			$before_key = $before_keys[$i];
-
-			for ($j = $last_after_index + 1; $j < count($after_keys); $j++) {
+		foreach ($before_keys as $before_key) {
+			$after_keys_count = count($after_keys);
+			for ($j = $last_after_index + 1; $j < $after_keys_count; $j++) {
 				$after_key = $after_keys[$j];
 
 				if ($is_hash) {
@@ -241,7 +237,7 @@ class CControllerPopupImportCompare extends CController {
 				}
 			}
 		}
-		unset($before_key, $after_key, $last_after_index);
+		unset($after_key, $last_after_index);
 
 		$unchanged_before_keys = array_keys($unchanged_map);
 		$next_unchanged_before_index = 0;
@@ -250,7 +246,7 @@ class CControllerPopupImportCompare extends CController {
 		foreach ($before_keys as $before_key) {
 			if (array_key_exists($next_unchanged_before_index, $unchanged_before_keys)
 					&& $before_key === $unchanged_before_keys[$next_unchanged_before_index]) {
-				// Show all added after entries
+				// Show all added after entries.
 				while (array_key_exists($next_after_index, $after_keys)
 						&& $after_keys[$next_after_index] !== $unchanged_map[$before_key]) {
 					$after_key = $after_keys[$next_after_index];
@@ -258,40 +254,41 @@ class CControllerPopupImportCompare extends CController {
 					$rows[] = [
 						'value' => $this->convertToYaml([$yaml_key => $after[$after_key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_ADDED
+						'change_type' => self::CHANGE_ADDED
 					];
 					$next_after_index++;
 				}
 
-				// Show unchanged entry
+				// Show unchanged entry.
 				$yaml_key = $this->prepareYamlKey($before_key, $is_hash);
 				$rows[] = [
 					'value' => $this->convertToYaml([$yaml_key => $before[$before_key]]),
 					'depth' => $depth + 1,
-					'change_type' => CControllerPopupImportCompare::CHANGE_NONE
+					'change_type' => self::CHANGE_NONE
 				];
 				$next_unchanged_before_index++;
 				$next_after_index++;
 			}
 			else {
-				// Show all removed before entries
+				// Show all removed before entries.
 				$yaml_key = $this->prepareYamlKey($before_key, $is_hash);
 				$rows[] = [
 					'value' => $this->convertToYaml([$yaml_key => $before[$before_key]]),
 					'depth' => $depth + 1,
-					'change_type' => CControllerPopupImportCompare::CHANGE_REMOVED
+					'change_type' => self::CHANGE_REMOVED
 				];
 			}
 		}
 
-		// Show remaining after entries
-		for ($after_index = $next_after_index; $after_index < count($after_keys); $after_index++) {
+		// Show remaining after entries.
+		$after_keys_count = count($after_keys);
+		for ($after_index = $next_after_index; $after_index < $after_keys_count; $after_index++) {
 			$after_key = $after_keys[$after_index];
 			$yaml_key = $this->prepareYamlKey($after_key, $is_hash);
 			$rows[] = [
 				'value' => $this->convertToYaml([$yaml_key => $after[$after_key]]),
 				'depth' => $depth + 1,
-				'change_type' => CControllerPopupImportCompare::CHANGE_ADDED
+				'change_type' => self::CHANGE_ADDED
 			];
 		}
 
@@ -307,11 +304,10 @@ class CControllerPopupImportCompare extends CController {
 	 *
 	 * @return mixed
 	 */
-	protected function prepareYamlKey ($key, $is_hash) {
+	private function prepareYamlKey($key, bool $is_hash) {
 		if ($is_hash) {
 			// Make sure, array with "zero" key element is not considered as indexed array in YAML converter.
 			// \xE2\x80\x8B is UTF-8 code for zero width space.
-			// TOOD VM: (?) really borderline case, as I don;t expect key "0" in non hash array, but it could be possible. May be a problem, if someone will copy this from popup.
 			$yaml_key = ($key === 0) ? "\xE2\x80\x8B".'0' : $key;
 		}
 		else {
@@ -323,27 +319,26 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	protected function objectToRows($before, $after, $depth, $id) {
+	private function objectToRows(array $before, array $after, int $depth, string $id): array {
 		if ($before && $after) {
-			$outer_change_type = CControllerPopupImportCompare::CHANGE_NONE;
+			$outer_change_type = self::CHANGE_NONE;
 		}
 		else if ($before) {
-			$outer_change_type = CControllerPopupImportCompare::CHANGE_REMOVED;
+			$outer_change_type = self::CHANGE_REMOVED;
 		}
 		else if ($after) {
-			$outer_change_type = CControllerPopupImportCompare::CHANGE_ADDED;
+			$outer_change_type = self::CHANGE_ADDED;
 		}
 		else {
-			$outer_change_type = CControllerPopupImportCompare::CHANGE_NONE;
+			$outer_change_type = self::CHANGE_NONE;
 		}
 
-		$rows = [];
-		$rows[] = [
+		$rows = [[
 			'value' => '-',
 			'depth' => $depth,
 			'change_type' => $outer_change_type,
 			'id' => $id
-		];
+		]];
 
 		$all_keys = [];
 
@@ -378,7 +373,7 @@ class CControllerPopupImportCompare extends CController {
 					$rows[] = [
 						'value' => $this->convertToYaml([$key => $before[$key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_NONE
+						'change_type' => self::CHANGE_NONE
 					];
 
 					break;
@@ -387,12 +382,12 @@ class CControllerPopupImportCompare extends CController {
 					$rows[] = [
 						'value' => $this->convertToYaml([$key => $before[$key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_REMOVED
+						'change_type' => self::CHANGE_REMOVED
 					];
 					$rows[] = [
 						'value' => $this->convertToYaml([$key => $after[$key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_ADDED
+						'change_type' => self::CHANGE_ADDED
 					];
 
 					break;
@@ -401,7 +396,7 @@ class CControllerPopupImportCompare extends CController {
 					$rows[] = [
 						'value' => $this->convertToYaml([$key => $before[$key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_REMOVED
+						'change_type' => self::CHANGE_REMOVED
 					];
 
 					break;
@@ -410,7 +405,7 @@ class CControllerPopupImportCompare extends CController {
 					$rows[] = [
 						'value' => $this->convertToYaml([$key => $after[$key]]),
 						'depth' => $depth + 1,
-						'change_type' => CControllerPopupImportCompare::CHANGE_ADDED
+						'change_type' => self::CHANGE_ADDED
 					];
 
 					break;
@@ -425,11 +420,11 @@ class CControllerPopupImportCompare extends CController {
 		return $rows;
 	}
 
-	protected function blocksToDiff($blocks, $depth, $outer_change_type = 'updated') {
+	private function blocksToDiff(array $blocks, int $depth, string $outer_change_type = 'updated'): array {
 		$change_types = [
-			'added' => CControllerPopupImportCompare::CHANGE_ADDED,
-			'removed' => CControllerPopupImportCompare::CHANGE_REMOVED,
-			'updated' => CControllerPopupImportCompare::CHANGE_NONE,
+			'added' => self::CHANGE_ADDED,
+			'removed' => self::CHANGE_REMOVED,
+			'updated' => self::CHANGE_NONE,
 		];
 
 		$rows = [];
@@ -453,11 +448,11 @@ class CControllerPopupImportCompare extends CController {
 						'id' => $id
 					];
 
-					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth+1, $id));
+					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1, $id));
 
 					// Process any sub-entities.
 					if ($entity) {
-						$rows = array_merge($rows, $this->blocksToDiff($entity, $depth+2, $change_type));
+						$rows = array_merge($rows, $this->blocksToDiff($entity, $depth + 2, $change_type));
 					}
 				}
 			}
@@ -465,11 +460,9 @@ class CControllerPopupImportCompare extends CController {
 		return $rows;
 	}
 
-	protected function convertToYaml($object) {
+	private function convertToYaml($object): string {
 		$writer = new CYamlExportWriter();
 
-		$yaml = $writer->write($object);
-
-		return $yaml;
+		return $writer->write($object);
 	}
 }

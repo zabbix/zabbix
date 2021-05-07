@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -22,9 +22,9 @@
 class CTemplateImporter extends CImporter {
 
 	/**
-	 * @var array		a list of template IDs which were created or updated
+	 * @var array  A list of template IDs which were created or updated.
 	 */
-	protected $processedTemplateIds = [];
+	protected $processed_templateids = [];
 
 	/**
 	 * Import templates.
@@ -125,7 +125,7 @@ class CTemplateImporter extends CImporter {
 
 				foreach ($templates_to_update as $template) {
 					$this->referencer->setDbTemplate($template['templateid'], $template);
-					$this->processedTemplateIds[$template['templateid']] = $template['templateid'];
+					$this->processed_templateids[$template['templateid']] = $template['templateid'];
 
 					// Drop existing template linkages if 'delete missing' is selected.
 					if (array_key_exists($template['templateid'], $templates_to_clear)
@@ -189,6 +189,7 @@ class CTemplateImporter extends CImporter {
 
 						if (array_key_exists($template['host'], $valuemaps)) {
 							$valuemap_uuids = array_column($valuemaps[$template['host']], 'uuid');
+
 							foreach ($db_valuemaps as $db_valuemap) {
 								if (!in_array($db_valuemap['uuid'], $valuemap_uuids)) {
 									$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
@@ -213,7 +214,7 @@ class CTemplateImporter extends CImporter {
 					$templateid = $created_templates['templateids'][$index];
 
 					$this->referencer->setDbTemplate($templateid, $template);
-					$this->processedTemplateIds[$templateid] = $templateid;
+					$this->processed_templateids[$templateid] = $templateid;
 
 					if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($template['host'], $template_linkage)) {
@@ -242,15 +243,16 @@ class CTemplateImporter extends CImporter {
 
 		// if there are templates left in $templates, then they have unresolved references
 		foreach ($templates as $template) {
-			$unresolvedReferences = [];
-			foreach ($template['templates'] as $linkedTemplate) {
-				if (!$this->referencer->findTemplateidByHost($linkedTemplate['name'])) {
-					$unresolvedReferences[] = $linkedTemplate['name'];
+			$unresolved_references = [];
+
+			foreach ($template['templates'] as $linked_template) {
+				if (!$this->referencer->findTemplateidByHost($linked_template['name'])) {
+					$unresolved_references[] = $linked_template['name'];
 				}
 			}
 			throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
 				'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
-				$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
+				$template['host'], implode(', ', $unresolved_references), count($unresolved_references)));
 		}
 	}
 
@@ -259,28 +261,32 @@ class CTemplateImporter extends CImporter {
 	 *
 	 * @return array
 	 */
-	public function getProcessedTemplateIds() {
-		return $this->processedTemplateIds;
+	public function getProcessedTemplateids(): array {
+		return $this->processed_templateids;
 	}
 
 	/**
 	 * Check if templates have circular references.
 	 *
-	 * @throws Exception
 	 * @see checkCircularRecursive
 	 *
 	 * @param array $templates
+	 *
+	 * @throws Exception
 	 */
-	protected function checkCircularTemplateReferences(array $templates) {
+	protected function checkCircularTemplateReferences(array $templates): void {
 		foreach ($templates as $name => $template) {
 			if (empty($template['templates'])) {
 				continue;
 			}
 
-			foreach ($template['templates'] as $linkedTemplate) {
+			foreach ($template['templates'] as $linked_template) {
 				$checked = [$name];
-				if ($circTemplates = $this->checkCircularRecursive($linkedTemplate, $templates, $checked)) {
-					throw new Exception(_s('Circular reference in templates: %1$s.', implode(' - ', $circTemplates)));
+
+				if ($circular_templates = $this->checkCircularRecursive($linked_template, $templates, $checked)) {
+					throw new Exception(
+						_s('Circular reference in templates: %1$s.', implode(' - ', $circular_templates))
+					);
 				}
 			}
 		}
@@ -290,50 +296,51 @@ class CTemplateImporter extends CImporter {
 	 * Recursive function for searching for circular template references.
 	 * If circular reference exist it return array with template names with circular reference.
 	 *
-	 * @param array $linkedTemplate template element to inspect on current recursive loop
-	 * @param array $templates      all templates where circular references should be searched
-	 * @param array $checked        template names that already were processed,
-	 *                              should contain unique values if no circular references exist
+	 * @param array $linked_template  Template element to inspect on current recursive loop.
+	 * @param array $templates        All templates where circular references should be searched.
+	 * @param array $checked          Template names that already were processed,
+	 *                                should contain unique values if no circular references exist.
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	protected function checkCircularRecursive(array $linkedTemplate, array $templates, array $checked) {
-		$linkedTemplateName = $linkedTemplate['name'];
+	protected function checkCircularRecursive(array $linked_template, array $templates, array $checked): array {
+		$linked_template_name = $linked_template['name'];
 
-		// if current element map name is already in list of checked map names,
-		// circular reference exists
-		if (in_array($linkedTemplateName, $checked)) {
-			// to have nice result containing only maps that have circular reference,
-			// remove everything that was added before repeated map name
-			$checked = array_slice($checked, array_search($linkedTemplateName, $checked));
-			// add repeated name to have nice loop like m1->m2->m3->m1
-			$checked[] = $linkedTemplateName;
-			return $checked;
+		// If current template name is already in list of checked template names, circular reference exists.
+		if (!in_array($linked_template_name, $checked)) {
+			$checked[] = $linked_template_name;
 		}
 		else {
-			$checked[] = $linkedTemplateName;
+			// To have nice result containing only templates that have circular reference,
+			// remove everything that was added before repeated template name.
+			$checked = array_slice($checked, array_search($linked_template_name, $checked));
+			// Add repeated name to have nice loop like m1->m2->m3->m1.
+			$checked[] = $linked_template_name;
+			return $checked;
 		}
 
-		// we need to find map that current element reference to
-		// and if it has selements check all them recursively
-		if (!empty($templates[$linkedTemplateName]['templates'])) {
-			foreach ($templates[$linkedTemplateName]['templates'] as $tpl) {
-				return $this->checkCircularRecursive($tpl, $templates, $checked);
+		// We need to find template that current element reference to and if it has linked templates
+		// check all them recursively.
+		foreach ($templates[$linked_template_name]['templates'] as $tpl) {
+			$circular_templates = $this->checkCircularRecursive($tpl, $templates, $checked);
+
+			if ($circular_templates) {
+				return $circular_templates;
 			}
 		}
 
-		return false;
+		return [];
 	}
 
 	/**
-	 * Get templates that don't have not existing linked templates i.e. all templates that must be linked to these templates exist.
-	 * Returns array with template names (host).
+	 * Get templates that don't have not existing linked templates i.e. all templates that must be linked to these
+	 * templates exist. Returns array with template names (host).
 	 *
 	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function getIndependentTemplates(array $templates) {
+	protected function getIndependentTemplates(array $templates): array {
 		foreach ($templates as $index => $template) {
 			if (!array_key_exists('templates', $template)) {
 				continue;
@@ -351,17 +358,16 @@ class CTemplateImporter extends CImporter {
 	}
 
 	/**
-	 * Change all references in template to database ids.
-	 *
-	 * @throws Exception
+	 * Change all references in template to database IDs.
 	 *
 	 * @param array $template
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
-	protected function resolveTemplateReferences(array $template) {
+	protected function resolveTemplateReferences(array $template): array {
 		$templateid = $this->referencer->findTemplateidByUuid($template['uuid']);
-//		$templateid = $this->referencer->findTemplateidByHost($template['host']);
 
 		if ($templateid !== null) {
 			$template['templateid'] = $templateid;
@@ -393,12 +399,9 @@ class CTemplateImporter extends CImporter {
 			foreach ($template['templates'] as $index => $parent_template) {
 				$parent_templateid = $this->referencer->findTemplateidByHost($parent_template['name']);
 
-				// TODO VM: what will happen, if template with such name is not found? How null will be processed? Does this require error message here?
 				if ($parent_templateid === null) {
-//					throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
-//						'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
-//						$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
-					throw new Exception(_n('TODO VM: It is real error'));
+					throw new Exception(_s('Cannot import template "%1$s", linked template "%2$s" does not exist.',
+						$template['host'], $parent_template['name']));
 				}
 
 				$template['templates'][$index] = [

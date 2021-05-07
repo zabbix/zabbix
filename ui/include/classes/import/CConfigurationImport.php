@@ -640,7 +640,7 @@ class CConfigurationImport {
 				$template_importer->import($templates);
 
 				// Get list of imported template IDs and add them processed template ID list.
-				$templateids = $template_importer->getProcessedTemplateIds();
+				$templateids = $template_importer->getProcessedTemplateids();
 				$this->importedObjectContainer->addTemplateIds($templateids);
 			}
 		}
