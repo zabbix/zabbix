@@ -124,6 +124,7 @@ class CTemplateImporter extends CImporter {
 				}
 
 				foreach ($templates_to_update as $template) {
+					$this->referencer->setDbTemplate($template['templateid'], $template);
 					$this->processedTemplateIds[$template['templateid']] = $template['templateid'];
 
 					// Drop existing template linkages if 'delete missing' is selected.
@@ -339,7 +340,7 @@ class CTemplateImporter extends CImporter {
 			}
 
 			foreach ($template['templates'] as $linked_template) {
-				if (!$this->referencer->findTemplateidByHost($linked_template['name'])) {
+				if ($this->referencer->findTemplateidByHost($linked_template['name']) === null) {
 					unset($templates[$index]);
 					continue 2;
 				}
