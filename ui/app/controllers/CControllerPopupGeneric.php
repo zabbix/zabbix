@@ -47,7 +47,7 @@ class CControllerPopupGeneric extends CController {
 	 * @var array
 	 */
 	const ALLOWED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_AGGREGATE, ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
+		ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
 	];
 
 	/**
@@ -1115,7 +1115,7 @@ class CControllerPopupGeneric extends CController {
 			case 'item_prototypes':
 				$options += [
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['name', 'host'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 
@@ -1299,7 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
 				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
-				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
 				 *          this parameter is not set;
 				 */
 				$records = [];

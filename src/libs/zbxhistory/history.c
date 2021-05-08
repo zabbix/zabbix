@@ -426,3 +426,46 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_history_value2variant                                        *
+ *                                                                            *
+ * Purpose: converts history value to variant value                           *
+ *                                                                            *
+ * Parameters: value      - [IN] the value to convert                         *
+ *             value_type - [IN] the history value type                       *
+ *             var        - [IN] the output value                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_history_value2variant(const history_value_t *value, unsigned char value_type, zbx_variant_t *var)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_variant_set_dbl(var, value->dbl);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_variant_set_ui64(var, value->ui64);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_variant_set_str(var, zbx_strdup(NULL, value->str));
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_variant_set_str(var, zbx_strdup(NULL, value->log->value));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_history_check_version                                        *
+ *                                                                            *
+ * Purpose: relays the version retrieval logic to the history implementation  *
+ *          functions                                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_history_check_version(struct zbx_json *json)
+{
+	if (NULL != CONFIG_HISTORY_STORAGE_URL)
+		zbx_elastic_version_extract(json);
+}

@@ -1,264 +1,49 @@
 ---
-test case: Expand '{1} < {#A}' with {#A}=1
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < {#A}'
-out:
-  expression: '{1} < 1'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}"' with {#A}=1
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < "{#A}"'
-out:
-  expression: '{1} < "1"'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}'
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1}'
-  macros: []
-  expression: '{1} < {#A}'
-out:
-  expression: '{1} < {#A}'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}' with {#A}=x
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"x"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < {#A}'
-out:
-  expression: '{1} < "x"'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}' with {#A}="x"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < {#A}'
-out:
-  expression: '{1} < "\"x\""'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}"' with {#A}="x"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < "{#A}"'
-out:
-  expression: '{1} < "\"x\""'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}"'
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\""}'
-  macros: []
-  expression: '{1} < "{#A}"'
-out:
-  expression: '{1} < "{#A}"'
-  return: SUCCEED
----
-test case: Expand '{1} = "x" and {2} < {#A}' with {#A}="x"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} = "x" and {2} < {#A}'
-out:
-  expression: '{1} = "x" and {2} < "\"x\""'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}{#B}"' with {#A}=1,'{#B}'="x"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1, "b":"\"x\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < "{#A}{#B}"'
-out:
-  expression: '{1} < "1\"x\""'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}{#B}"' with {#A}=1,'{#B}'=2
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1, "b":2}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < "{#A}{#B}"'
-out:
-  expression: '{1} < "12"'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}{#B}"' with {#A}="x",'{#B}'="y"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\"", "b":"\"y\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < "{#A}{#B}"'
-out:
-  expression: '{1} < "\"x\"\"y\""'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}{#B}' with {#A}="x",'{#B}'="y"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"x\"", "b":"\"y\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < {#A}{#B}'
-out:
-  expression: '{1} < "\"x\"""\"y\""'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}{#B}' with {#A}=1,'{#B}'=0
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":1, "b":0}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < {#A}{#B}'
-out:
-  expression: '{1} < 10'
-  return: SUCCEED
----
-test case: Expand '{1} < "\"{#A}\"{#B}\""' with {#A}=\",'{#B}'=\
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\\\"", "b":"\\"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < "\"{#A}\"{#B}\""'
-  return: SUCCEED
-out:
-  expression: '{1} < "\"\\\"\"\\\""'
-  return: SUCCEED
----  
-test case: Expand '{1} < " \" {#A}  \"  {#B}  \"  " and {#A}<>"\"{#B}" and " {#A} " = " {#A} "' with {#A}=",'{#B}'=\\
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"", "b":"\\\\"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-    - {macro: '{#B}', path: $.b}
-  expression: '{1} < " \" {#A}  \"  {#B}  \"  " and {#A}<>"\"{#B}" and " {#A} " = " {#A} "'
-out:
-  expression: '{1} < " \" \"  \"  \\\\  \"  " and "\""<>"\"\\\\" and " \" " = " \" "'
-  return: SUCCEED
----
-test case: Expand '{1} < {#A}' with {#A}=""
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"", "b":"\\\\"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < {#A}'
-out:
-  expression: '{1} < ""'
-  return: SUCCEED
----
-test case: Expand '{1} < "{#A}"' with {#A}=""
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"", "b":"\\\\"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < "{#A}"'
-out:
-  expression: '{1} < ""'
-  return: SUCCEED
----
-test case: Expand '{2000} < {#A}' with {#A}=2e+3
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":2e+3}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{2000} < {#A}'
-out:
-  expression: '{2000} < 2e+3'
-  return: SUCCEED
----
-test case: Expand '{1} < "\\\"a\"" and {1} = {#A}' with {#A}="b"
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"\"b\""}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{1} < "\\\"a\"" and {1} = {#A}'
-out:
-  expression: '{1} < "\\\"a\"" and {1} = "\"b\""'
-  return: SUCCEED
----
-test case: Expand '{2} <> {$M:"context:\"\\/\""} and {1} < {#A}' with {#A}=x
-in:
-  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"x"}'
-  macros:
-    - {macro: '{#A}', path: $.a}
-  expression: '{2} <> {$M:"context:\"\\/\""} and {1} < {#A}'
-out:
-  expression: '{2} <> {$M:"context:\"\\/\""} and {1} < "x"'
-  return: SUCCEED
----
-test case: Expand '={?{{HOST.KEY}:key[{#A}].last()}}=' with {#A}=[]
+test case: Expand '={?{last(/{HOST.KEY}/key[{#A}]}}=' with {#A}=[]
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"[]"}'
   macros:
     - {macro: '{#A}', path: $.a}
-  expression: '={?{{HOST.HOST}:key[{#A}].last()}}='
+  expression: '={?{last(/{HOST.KEY}/key[{#A}]}}='
 out:
-  expression: '={?{{HOST.HOST}:key["[]"].last()}}='
+  expression: '={?{last(/{HOST.KEY}/key[[]]}}='
   return: SUCCEED
 ---
-test case: Expand 'Expression:{?{host:key.last()} = "{#A}" }.' with {#A}=value:"xyz"
+test case: Expand 'Expression:{?last(/host/key) = "{#A}" }.' with {#A}=value:"xyz"
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"value:\"xyz\""}'
   macros:
     - {macro: '{#A}', path: $.a}
-  expression: 'Expression:{?{host:key.last()} = "{#A}" }.'
+  expression: 'Expression:{?last(/host/key) = "{#A}" }.'
 out:
-  expression: 'Expression:{?{host:key.last()} = "value:\"xyz\"" }.'
+  expression: 'Expression:{?last(/host/key) = "value:\"xyz\"" }.'
   return: SUCCEED
 ---
-test case: Expand '={?{host:key[{#A}].last({#A})}}=' with {#A}=()
+test case: Expand '={?last(/host/key[{#A}],,{#A})}=' with {#A}=()
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"()"}'
   macros:
     - {macro: '{#A}', path: $.a}
-  expression: '={?{host:key[{#A}].last({#A})}}='
+  expression: '={?last(/host/key[{#A}],,{#A})}='
 out:
-  expression: '={?{host:key[()].last("()")}}='
+  expression: '={?last(/host/key[()],,"()")}='
   return: SUCCEED
 ---
-test case: Expand '{?{$MACRO:"{#A}"} {?{host:key[{#B1},{#B2}].last({#B1},{#B2})}}' with {#A}=x"z, {#B1}=[], {#B2}=()
+test case: Expand '={?func({#A})}=' with {#A}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"()"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?func({#A})}='
+out:
+  expression: '={?func("()")}='
+  return: SUCCEED
+---
+test case: Expand '{?{$MACRO:"{#A}"} {?last(/host/key[{#B1},{#B2}],{#B1},{#B2})}' with {#A}=x"z, {#B1}=[], {#B2}=()
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"x\"z", "b1":"[]", "b2":"()"}'
@@ -266,43 +51,43 @@ in:
     - {macro: '{#A}', path: $.a}
     - {macro: '{#B1}', path: $.b1}
     - {macro: '{#B2}', path: $.b2}
-  expression: '{?{$MACRO:"{#A}"} {?{host:key[{#B1},{#B2}].last({#B1},{#B2})}}'
+  expression: '{?{$MACRO:"{#A}"} {?last(/host/key[{#B1},{#B2}],{#B1},{#B2})}'
 out:
-  expression: '{?{$MACRO:"x\"z"} {?{host:key["[]",()].last([],"()")}}'
+  expression: '{?{$MACRO:"x\"z"} {?last(/host/key["[]",()],[],"()")}'
   return: SUCCEED
 ---
-test case: Expand '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {host:key[{#B1},{#B2}].last({#B1},{#B2})}' with {#B1}=[], {#B2}=()
+test case: Expand '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} last(/host/key[{#B1},{#B2}],{#B1},{#B2})' with {#B1}=[], {#B2}=()
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"b1":"[]", "b2":"()"}'
   macros:
     - {macro: '{#B1}', path: $.b1}
     - {macro: '{#B2}', path: $.b2}
-  expression: '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {host:key[{#B1},{#B2}].last({#B1},{#B2})}'
+  expression: '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} last(/host/key[{#B1},{#B2}],{#B1},{#B2})'
 out:
-  expression: '{?{host:key["[]",()].last([],"()")}} {host:key[[],()].last([],())}'
+  expression: '{?last(/host/key["[]",()],[],"()")} last(/host/key[[],()],[],())'
   return: SUCCEED
 ---
-test case: Expand '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {?{host:key[{#B2},{#B1}].last({#B2},{#B1})}}' with {#B1}=[], {#B2}=()
+test case: Expand '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} {?last(/host/key[{#B2},{#B1}],{#B2},{#B1})}' with {#B1}=[], {#B2}=()
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"b1":"[]", "b2":"()"}'
   macros:
     - {macro: '{#B1}', path: $.b1}
     - {macro: '{#B2}', path: $.b2}
-  expression: '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {?{host:key[{#B2},{#B1}].last({#B2},{#B1})}}'
+  expression: '{?last(/host/key[{#B1},{#B2}],{#B1},{#B2})} {?last(/host/key[{#B2},{#B1}],{#B2},{#B1})}'
 out:
-  expression: '{?{host:key["[]",()].last([],"()")}} {?{host:key[(),"[]"].last("()",[])}}'
+  expression: '{?last(/host/key["[]",()],[],"()")} {?last(/host/key[(),"[]"],(),"[]")}'
   return: SUCCEED
 ---
-test case: Expand 'Expression:{?{host:key.last()} = "{#A}" }.' with {#A}='= "xyz"'
+test case: Expand 'Expression:{?last(/host/key) {#A} }.' with {#A}='= "xyz"'
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"= \"xyz\""}'
   macros:
     - {macro: '{#A}', path: $.a}
-  expression: 'Expression:{?{host:key.last()} {#A} }.'
+  expression: 'Expression:{?last(/host/key) {#A} }.'
 out:
-  expression: 'Expression:{?{host:key.last()} = "xyz" }.'
+  expression: 'Expression:{?last(/host/key) = "xyz" }.'
   return: SUCCEED
 ...

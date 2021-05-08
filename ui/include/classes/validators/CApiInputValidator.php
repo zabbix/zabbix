@@ -316,6 +316,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -329,9 +330,27 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'calculated' => true,
+			'host_macro' => true,
+			'empty_host' => true
+		]);
+
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
+			return false;
+		}
+
+		$expression_validator = new CExpressionValidator(['calculated' => true]);
+
+		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
 			return false;
 		}
 
@@ -2034,20 +2053,19 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression([
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'lowercase_errors' => true
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
 			return false;
 		}
 
-		if (!$expression_data->expressions) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('trigger expression must contain at least one host:key reference')
-			);
+		$expression_validator = new CExpressionValidator();
+
+		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
 			return false;
 		}
 

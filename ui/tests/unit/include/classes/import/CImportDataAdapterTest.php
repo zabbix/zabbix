@@ -640,7 +640,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTriggers(), [
 			[
-				'expression' => '{export-host:item.last(0)}<>0',
+				'expression' => 'last(/export-host/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'url' => '',
@@ -650,7 +650,7 @@ class CImportDataAdapterTest extends TestCase {
 				'dependencies' =>[
 					[
 						'name' => 'trigger2',
-						'expression' => '{export-host:item.last(0)}<>0',
+						'expression' => 'last(/export-host/item)<>0',
 						'recovery_expression' => ''
 					]
 				],
@@ -664,7 +664,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
-				'expression' => '{export-host:item.last(0)}<>0',
+				'expression' => 'last(/export-host/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'url' => '',
@@ -682,7 +682,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger2'
 			],
 			[
-				'expression' => '{export-template:item.last(0)}<>0',
+				'expression' => 'last(/export-template/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'url' => '',
@@ -692,7 +692,7 @@ class CImportDataAdapterTest extends TestCase {
 				'dependencies' =>[
 					[
 						'name' => 'trigger2',
-						'expression' => '{export-template:item.last(0)}<>0',
+						'expression' => 'last(/export-template/item)<>0',
 						'recovery_expression' => ''
 					]
 				],
@@ -706,7 +706,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
-				'expression' => '{export-template:item.last(0)}<>0',
+				'expression' => 'last(/export-template/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'url' => '',
@@ -985,6 +985,7 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => '',
 							'preprocessing' => []
 						],
@@ -1034,6 +1035,7 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item-jmx',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => '',
 							'preprocessing' => []
 						],
@@ -1088,13 +1090,14 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item2',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => '',
 							'preprocessing' => []
 						]
 					],
 					'trigger_prototypes' => [
 						[
-							'expression' => '{export-host:lld-item.last()}=0',
+							'expression' => 'last(/export-host/lld-item)=0',
 							'description' => 'lld-trigger',
 							'url' => '',
 							'discover' => '0',
@@ -1382,6 +1385,7 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						],
 						[
@@ -1430,6 +1434,7 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item-jmx',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						],
 						[
@@ -1483,12 +1488,13 @@ class CImportDataAdapterTest extends TestCase {
 							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item2',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
 					'trigger_prototypes' => [
 						[
-							'expression' => '{export-template:lld-item.last()}=0',
+							'expression' => 'last(/export-template/lld-item)=0',
 							'description' => 'lld-trigger',
 							'url' => '',
 							'discover' => '0',
@@ -1745,7 +1751,7 @@ class CImportDataAdapterTest extends TestCase {
 						'elements' => [
 							[
 								'description' => 'trigger',
-								'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+								'expression' => 'last(/export-host/item)<>0 or last(/export-host/item)<>0 and last(/export-host/item)<>0',
 								'recovery_expression' => ''
 							]
 						]
@@ -1832,7 +1838,7 @@ class CImportDataAdapterTest extends TestCase {
 								'color' => 'DD0000',
 								'trigger' => [
 									'description' => 'trigger',
-									'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
+									'expression' => 'last(/export-host/item)<>0 or last(/export-host/item)<>0 and last(/export-host/item)<>0',
 									'recovery_expression' => ''
 								]
 							]
@@ -2201,7 +2207,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getTriggers(), [
 				[
 					'type' => '0',
-					'expression' => '{Template_Linux:vfs.fs.size[/,pfree].last(0)}<10',
+					'expression' => 'last(/Template_Linux/vfs.fs.size[/,pfree])<10',
 					'url' => 'http://www.zabbix.com/',
 					'status' => '0',
 					'priority' => '4',
@@ -2219,7 +2225,7 @@ class CImportDataAdapterTest extends TestCase {
 				],
 				[
 					'type' => '1',
-					'expression' => '{Template_Simple:net.tcp.service[ftp,,21].last(0)}<>0 or {Template_Simple:net.tcp.service[ftp,,{$PORT.FTP}].last(0)}<>0',
+					'expression' => 'last(/Template_Simple/net.tcp.service[ftp,,21])<>0 or last(/Template_Simple/net.tcp.service[ftp,,{$PORT.FTP}])<>0',
 					'url' => 'triggers.php',
 					'status' => '1',
 					'priority' => '3',
@@ -3149,6 +3155,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test7',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
@@ -3248,6 +3255,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test8',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
@@ -3347,6 +3355,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test9',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
@@ -3940,6 +3949,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test7',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
@@ -4041,6 +4051,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test8',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],
@@ -4142,6 +4153,7 @@ class CImportDataAdapterTest extends TestCase {
 							'verify_peer' => '0',
 							'verify_host' => '0',
 							'key_' => 'test9',
+							'trigger_prototypes' => [],
 							'trapper_hosts' => ''
 						]
 					],

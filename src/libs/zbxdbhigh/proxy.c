@@ -1421,7 +1421,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	if (NULL == table_items)
 	{
-		table_items = DBget_table("items");
+		table_items = DBget_table("item_rtdata");
 
 		/* do not update existing lastlogsize and mtime fields */
 		zbx_vector_ptr_create(&skip_fields);
@@ -2909,14 +2909,15 @@ static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_ti
 {
 	if (0 == item->host.proxy_hostid)
 	{
-		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
+		zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
+				item->state, error);
 		*h_num = 0;
 	}
 	else
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
-			zbx_lld_process_agent_result(item->itemid, result, ts, error);
+			zbx_lld_process_agent_result(item->itemid, item->host.hostid, result, ts, error);
 			*h_num = 0;
 		}
 		else
@@ -3509,7 +3510,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 		return FAIL;
 
 	/* don't process aggregate/calculated items coming from proxy */
-	if (ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_CALCULATED == item->type)
+	if (ITEM_TYPE_CALCULATED == item->type)
 		return FAIL;
 
 	return SUCCEED;

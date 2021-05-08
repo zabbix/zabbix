@@ -334,7 +334,8 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'params' => ['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0]
+					'params' =>		['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+					'value_type' =>	['type' => API_INT32, 'in' => ITEM_VALUE_TYPE_UINT64.','.ITEM_VALUE_TYPE_FLOAT]
 				]];
 
 				$data = array_intersect_key($item, $api_input_rules['fields']);
@@ -446,27 +447,6 @@ abstract class CItemGeneral extends CApiService {
 						$fullItem['key_'], $fullItem['name'], $host['name'], $item_key_parser->getError()
 					])
 				);
-			}
-
-			// parameters
-			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
-				$params_num = $item_key_parser->getParamsNum();
-
-				if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
-						|| $params_num > 4 || $params_num < 3
-						|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
-						|| !str_in_array($item_key_parser->getParam(2), ['last', 'min', 'max', 'avg', 'sum', 'count'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()));
-				}
-			}
-
-			// type of information
-			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE && $fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64
-					&& $fullItem['value_type'] != ITEM_VALUE_TYPE_FLOAT) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
 			if (($fullItem['type'] == ITEM_TYPE_TRAPPER || $fullItem['type'] == ITEM_TYPE_HTTPAGENT)

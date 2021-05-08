@@ -5,8 +5,6 @@ noinst_LIBRARIES = libzbxpoller.a libzbxpoller_server.a libzbxpoller_proxy.a
 libzbxpoller_a_SOURCES = \
 	checks_agent.c \
 	checks_agent.h \
-	checks_aggregate.c \
-	checks_aggregate.h \
 	checks_calculated.c \
 	checks_calculated.h \
 	checks_db.c \

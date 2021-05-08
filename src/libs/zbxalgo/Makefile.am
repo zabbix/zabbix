@@ -21,4 +21,5 @@ libzbxalgo_a_SOURCES = \
 	prediction.c \
 	queue.c \
 	vector.c \
-	vectorimpl.h
+	vectorimpl.h \
+	serialize.c
