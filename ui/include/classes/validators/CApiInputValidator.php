@@ -2215,7 +2215,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		// TODO VM: check that everywhere comparison is done in lowercase.
 		$data = strtolower($data);
 
 		return true;
