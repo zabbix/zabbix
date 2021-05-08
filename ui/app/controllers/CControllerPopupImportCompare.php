@@ -444,7 +444,7 @@ class CControllerPopupImportCompare extends CController {
 
 					$id = $object['uuid'];
 					$this->toc[$change_type][$entity_type][] = [
-						'name' => $object['name'],
+						'name' => $this->nameForToc($entity_type, $object),
 						'id' => $id
 					];
 
@@ -458,6 +458,17 @@ class CControllerPopupImportCompare extends CController {
 			}
 		}
 		return $rows;
+	}
+
+	private function nameForToc(string $entity_type, array $object): string {
+		switch ($entity_type) {
+			case 'templates':
+				return array_key_exists('name', $object) ? $object['name'] : $object['template'];
+			case 'host_prototypes':
+				return array_key_exists('name', $object) ? $object['name'] : $object['host'];
+			default:
+				return $object['name'];
+		}
 	}
 
 	private function convertToYaml($object): string {
