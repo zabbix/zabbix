@@ -1816,14 +1816,11 @@ out:
  *                                                                            *
  * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
- *             parameters - up to 3 comma-separated fields:                   *
+ *             parameters - to 2 comma-separated fields:                      *
  *                            (1) same as the 1st parameter for function      *
  *                                evaluate_LAST() (see documentation of       *
  *                                trigger function last()),                   *
  *                            (2) mask to bitwise AND with (mandatory),       *
- *                            (3) same as the 2nd parameter for function      *
- *                                evaluate_LAST() (see documentation of       *
- *                                trigger function last()).                   *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1844,7 +1841,7 @@ static int	evaluate_BITAND(zbx_variant_t *value, DC_ITEM *item, const char *para
 		goto clean;
 	}
 
-	if (2 < (nparams = num_param(parameters)))
+	if (2 != (nparams = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto clean;
