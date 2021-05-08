@@ -44,8 +44,7 @@ class CConfiguration extends CApiService {
 				'images' =>		['type' => API_IDS],
 				'maps' =>		['type' => API_IDS],
 				'mediaTypes' =>	['type' => API_IDS],
-				'templates' =>	['type' => API_IDS],
-				'valueMaps' =>	['type' => API_IDS]
+				'templates' =>	['type' => API_IDS]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {

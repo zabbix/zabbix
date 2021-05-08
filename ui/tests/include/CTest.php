@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
+require_once dirname(__FILE__).'/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
 require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
 require_once dirname(__FILE__).'/helpers/CDateTimeHelper.php';
@@ -200,6 +201,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 		// Test suite level annotations.
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
+		// Data sources are processed before the backups.
+		$data_source = $this->getAnnotationTokensByName($class_annotations, 'dataSource');
+		if ($data_source) {
+			CDataHelper::load($data_source);
+		}
+
 		// Backup performed before test suite execution.
 		$suite_backup = $this->getAnnotationTokensByName($class_annotations, 'backup');
 
@@ -274,6 +281,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 
 		if ($method_annotations !== null) {
+			// Data sources are processed before the backups.
+			$data_source = $this->getAnnotationTokensByName($method_annotations, 'dataSource');
+			if ($data_source) {
+				CDataHelper::load($data_source);
+			}
+
 			// Backup performed before every test case execution.
 			$case_backup = $this->getAnnotationTokensByName($method_annotations, 'backup');
 

@@ -7,4 +7,5 @@ libzbxeval_a_SOURCES = \
 	execute.c \
 	misc.c \
 	query.c \
-	calc.c
+	calc.c \
+	eval.h
