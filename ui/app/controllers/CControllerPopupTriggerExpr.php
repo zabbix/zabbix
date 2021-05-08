@@ -294,7 +294,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('ascii() - Returns the ASCII code of the leftmost character of the value'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'asin' => [
@@ -459,7 +459,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('char() - Returns the character which represents the given ASCII code'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesInt,
 				'operators' => $this->operators
 			],
 			'concat' => [
@@ -622,14 +622,14 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'kurtosis' => [
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('kurtosis() - Measures the "tailedness" of the probability distribution'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'last' => [
@@ -649,7 +649,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'length' => [
@@ -703,14 +703,14 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => false
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'mad' => [
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('mad() - Median absolute deviation'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'max' => [
@@ -735,7 +735,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'min' => [
@@ -818,7 +818,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'replace' => [
@@ -836,7 +836,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'right' => [
@@ -849,7 +849,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'round' => [
@@ -875,7 +875,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => false
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'signum' => [
@@ -903,7 +903,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('skewness() - Measures the asymmetry of the probability distribution'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'sqrt' => [
@@ -917,14 +917,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('stddevpop() - Population standard deviation'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'stddevsamp' => [
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('stddevsamp() - Sample standard deviation'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'sum' => [
@@ -938,7 +938,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('sumofsquares() - The sum of squares'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'tan' => [
@@ -1006,7 +1006,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => false
 					]
 				],
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
 			'truncate' => [
@@ -1026,14 +1026,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('varpop() - Population variance'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'varsamp' => [
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('varsamp() - Sample variance'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			]
 		];
