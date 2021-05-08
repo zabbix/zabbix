@@ -3726,10 +3726,14 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 			/* force trigger list update for items used in removed trigger */
 
-			zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
-					&functionids);
+			if (NULL != trigger->expression_bin)
+			{
+				zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
+						&functionids);
+			}
 
-			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode &&
+					NULL != trigger->recovery_expression_bin)
 			{
 				zbx_get_serialized_expression_functionids(trigger->recovery_expression,
 						trigger->recovery_expression_bin, &functionids);
