@@ -26,9 +26,9 @@ final class CHistFunctionData {
 
 	public const PERIOD_MODE_DEFAULT = 0;
 	public const PERIOD_MODE_SEC = 1;
-	public const PERIOD_MODE_SEC_ONLY = 1;
-	public const PERIOD_MODE_NUM_ONLY = 2;
-	public const PERIOD_MODE_TREND = 3;
+	public const PERIOD_MODE_SEC_ONLY = 2;
+	public const PERIOD_MODE_NUM_ONLY = 3;
+	public const PERIOD_MODE_TREND = 4;
 
 	/**
 	 * Known history functions along with definition of parameters.
