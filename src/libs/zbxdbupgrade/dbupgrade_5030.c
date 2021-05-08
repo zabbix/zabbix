@@ -3880,7 +3880,7 @@ static int	DBpatch_5030123(void)
 	return ret;
 }
 
-static int	DBpatch_5030124(void)
+static int	DBpatch_5030127(void)
 {
 #define CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -3896,7 +3896,7 @@ static int	DBpatch_5030124(void)
 #undef CONDITION_TYPE_APPLICATION
 }
 
-static int	DBpatch_5030125(void)
+static int	DBpatch_5030128(void)
 {
 #define AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -3909,7 +3909,7 @@ static int	DBpatch_5030125(void)
 #undef AUDIT_RESOURCE_APPLICATION
 }
 
-static int	DBpatch_5030126(void)
+static int	DBpatch_5030129(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4098,7 +4098,7 @@ static int	DBpatch_parse_applications_json(struct zbx_json_parse *jp, struct zbx
 	return SUCCEED;
 }
 
-static int	DBpatch_5030127(void)
+static int	DBpatch_5030130(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -4159,7 +4159,7 @@ static int	DBpatch_5030127(void)
 	return ret;
 }
 
-static int	DBpatch_5030128(void)
+static int	DBpatch_5030131(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -4225,7 +4225,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030129(void)
+static int	DBpatch_5030132(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4237,57 +4237,57 @@ static int	DBpatch_5030129(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030130(void)
+static int	DBpatch_5030133(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_5030131(void)
+static int	DBpatch_5030134(void)
 {
 	return DBdrop_index("httptest", "httptest_1");
 }
 
-static int	DBpatch_5030132(void)
+static int	DBpatch_5030135(void)
 {
 	return DBdrop_field("httptest", "applicationid");
 }
 
-static int	DBpatch_5030133(void)
+static int	DBpatch_5030136(void)
 {
 	return DBdrop_field("sysmaps_elements", "application");
 }
 
-static int	DBpatch_5030134(void)
+static int	DBpatch_5030137(void)
 {
 	return DBdrop_table("application_discovery");
 }
 
-static int	DBpatch_5030135(void)
+static int	DBpatch_5030138(void)
 {
 	return DBdrop_table("item_application_prototype");
 }
 
-static int	DBpatch_5030136(void)
+static int	DBpatch_5030139(void)
 {
 	return DBdrop_table("application_prototype");
 }
 
-static int	DBpatch_5030137(void)
+static int	DBpatch_5030140(void)
 {
 	return DBdrop_table("application_template");
 }
 
-static int	DBpatch_5030138(void)
+static int	DBpatch_5030141(void)
 {
 	return DBdrop_table("items_applications");
 }
 
-static int	DBpatch_5030139(void)
+static int	DBpatch_5030142(void)
 {
 	return DBdrop_table("applications");
 }
 
-static int	DBpatch_5030140(void)
+static int	DBpatch_5030143(void)
 {
 	DB_RESULT	result;
 	int		ret;
@@ -4307,7 +4307,7 @@ static int	DBpatch_5030140(void)
 	return ret;
 }
 
-static int	DBpatch_5030141(void)
+static int	DBpatch_5030144(void)
 {
 	DB_RESULT	result;
 	int		ret;
@@ -4323,7 +4323,7 @@ static int	DBpatch_5030141(void)
 	return ret;
 }
 
-static int	DBpatch_5030142(void)
+static int	DBpatch_5030145(void)
 {
 	const ZBX_TABLE	table =
 			{"report", "reportid", 0,
@@ -4351,26 +4351,26 @@ static int	DBpatch_5030142(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030143(void)
+static int	DBpatch_5030146(void)
 {
 	return DBcreate_index("report", "report_1", "name", 1);
 }
 
-static int	DBpatch_5030144(void)
+static int	DBpatch_5030147(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 1, &field);
 }
 
-static int	DBpatch_5030145(void)
+static int	DBpatch_5030148(void)
 {
 	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 2, &field);
 }
 
-static int	DBpatch_5030146(void)
+static int	DBpatch_5030149(void)
 {
 	const ZBX_TABLE	table =
 			{"report_param", "reportparamid", 0,
@@ -4387,19 +4387,19 @@ static int	DBpatch_5030146(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030147(void)
+static int	DBpatch_5030150(void)
 {
 	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
 }
 
-static int	DBpatch_5030148(void)
+static int	DBpatch_5030151(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_param", 1, &field);
 }
 
-static int	DBpatch_5030149(void)
+static int	DBpatch_5030152(void)
 {
 	const ZBX_TABLE	table =
 			{"report_user", "reportuserid", 0,
@@ -4417,33 +4417,33 @@ static int	DBpatch_5030149(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030150(void)
+static int	DBpatch_5030153(void)
 {
 	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
 }
 
-static int	DBpatch_5030151(void)
+static int	DBpatch_5030154(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 1, &field);
 }
 
-static int	DBpatch_5030152(void)
+static int	DBpatch_5030155(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 2, &field);
 }
 
-static int	DBpatch_5030153(void)
+static int	DBpatch_5030156(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_user", 3, &field);
 }
 
-static int	DBpatch_5030154(void)
+static int	DBpatch_5030157(void)
 {
 	const ZBX_TABLE	table =
 			{"report_usrgrp", "reportusrgrpid", 0,
@@ -4460,47 +4460,47 @@ static int	DBpatch_5030154(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030155(void)
+static int	DBpatch_5030158(void)
 {
 	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
 }
 
-static int	DBpatch_5030156(void)
+static int	DBpatch_5030159(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 1, &field);
 }
 
-static int	DBpatch_5030157(void)
+static int	DBpatch_5030160(void)
 {
 	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 2, &field);
 }
 
-static int	DBpatch_5030158(void)
+static int	DBpatch_5030161(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_usrgrp", 3, &field);
 }
 
-static int	DBpatch_5030159(void)
+static int	DBpatch_5030162(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5030160(void)
+static int	DBpatch_5030163(void)
 {
 	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5030161(void)
+static int	DBpatch_5030164(void)
 {
 	const ZBX_FIELD	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -5485,7 +5485,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
-static int	DBpatch_5030162(void)
+static int	DBpatch_5030165(void)
 {
 	int			i, ret = SUCCEED;
 	DB_ROW			row;
@@ -5629,7 +5629,7 @@ static int	DBpatch_5030162(void)
 	return ret;
 }
 
-static int	DBpatch_5030163(void)
+static int	DBpatch_5030166(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -5819,7 +5819,7 @@ static int	dbpatch_convert_expression_macro(const char *expression, const zbx_st
 	return SUCCEED;
 }
 
-static int	DBpatch_5030164(void)
+static int	DBpatch_5030167(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -6013,7 +6013,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 	return exp;
 }
 
-static int	DBpatch_5030165(void)
+static int	DBpatch_5030168(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -6223,7 +6223,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	return SUCCEED;
 }
 
-static int	DBpatch_5030166(void)
+static int	DBpatch_5030169(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -6287,7 +6287,7 @@ static int	DBpatch_5030166(void)
 	return ret;
 }
 
-static int	DBpatch_5030167(void)
+static int	DBpatch_5030170(void)
 {
 #ifdef HAVE_MYSQL
 	return DBcreate_index("items", "items_8", "key_(1024)", 0);
@@ -6296,12 +6296,12 @@ static int	DBpatch_5030167(void)
 #endif
 }
 
-static int	DBpatch_5030168(void)
+static int	DBpatch_5030171(void)
 {
 	return DBrename_table("trigger_queue", "trigger_queue_tmp");
 }
 
-static int	DBpatch_5030169(void)
+static int	DBpatch_5030172(void)
 {
 	const ZBX_TABLE	table =
 			{"trigger_queue", "trigger_queueid", 0,
@@ -6319,7 +6319,7 @@ static int	DBpatch_5030169(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030170(void)
+static int	DBpatch_5030173(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -6349,48 +6349,48 @@ static int	DBpatch_5030170(void)
 	return ret;
 }
 
-static int	DBpatch_5030171(void)
+static int	DBpatch_5030174(void)
 {
 	return DBdrop_table("trigger_queue_tmp");
 }
 
-static int	DBpatch_5030172(void)
+static int	DBpatch_5030175(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("valuemap_mapping", &field);
 }
 
-static int	DBpatch_5030173(void)
+static int	DBpatch_5030176(void)
 {
 	return DBdrop_foreign_key("valuemap_mapping", 1);
 }
 
-static int	DBpatch_5030174(void)
+static int	DBpatch_5030177(void)
 {
 	return DBdrop_index("valuemap_mapping", "valuemap_mapping_1");
 }
 
-static int	DBpatch_5030175(void)
+static int	DBpatch_5030178(void)
 {
 	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value,type", 1);
 }
 
-static int	DBpatch_5030176(void)
+static int	DBpatch_5030179(void)
 {
 	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("valuemap_mapping", 1, &field);
 }
 
-static int	DBpatch_5030177(void)
+static int	DBpatch_5030180(void)
 {
 	const ZBX_FIELD	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("valuemap_mapping", &field);
 }
 
-static int	DBpatch_5030178(void)
+static int	DBpatch_5030181(void)
 {
 	int		ret = SUCCEED;
 	DB_ROW		row;
@@ -6577,9 +6577,6 @@ DBPATCH_ADD(5030120, 0, 1)
 DBPATCH_ADD(5030121, 0, 1)
 DBPATCH_ADD(5030122, 0, 1)
 DBPATCH_ADD(5030123, 0, 1)
-DBPATCH_ADD(5030124, 0, 1)
-DBPATCH_ADD(5030125, 0, 1)
-DBPATCH_ADD(5030126, 0, 1)
 DBPATCH_ADD(5030127, 0, 1)
 DBPATCH_ADD(5030128, 0, 1)
 DBPATCH_ADD(5030129, 0, 1)
@@ -6632,5 +6629,8 @@ DBPATCH_ADD(5030175, 0, 1)
 DBPATCH_ADD(5030176, 0, 1)
 DBPATCH_ADD(5030177, 0, 1)
 DBPATCH_ADD(5030178, 0, 1)
+DBPATCH_ADD(5030179, 0, 1)
+DBPATCH_ADD(5030180, 0, 1)
+DBPATCH_ADD(5030181, 0, 1)
 
 DBPATCH_END()
