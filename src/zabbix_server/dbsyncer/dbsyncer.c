@@ -52,18 +52,19 @@ static void	zbx_db_flush_timer_queue(void)
 
 	if (0 != persistent_timers.values_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_queue", "objectid", "type", "clock", "ns", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
 
 		for (i = 0; i < persistent_timers.values_num; i++)
 		{
 			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
 
-			zbx_db_insert_add_values(&db_insert, timer->objectid, timer->type, timer->eval_ts.sec,
-					timer->eval_ts.ns);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), timer->objectid, timer->type,
+					timer->eval_ts.sec, timer->eval_ts.ns);
 		}
 
 		zbx_dc_free_timers(&persistent_timers);
 
+		zbx_db_insert_autoincrement(&db_insert, "trigger_queueid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}

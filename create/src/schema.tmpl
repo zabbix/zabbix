@@ -1742,7 +1742,8 @@ TABLE|lld_override_opinventory|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
 FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 
-TABLE|trigger_queue||0
+TABLE|trigger_queue|trigger_queueid|0
+FIELD		|trigger_queueid|t_id		|	|NOT NULL	|0
 FIELD		|objectid	|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
@@ -1847,4 +1848,4 @@ INDEX		|1		|reportid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030167	|5030167
+ROW		|5030171	|5030171
