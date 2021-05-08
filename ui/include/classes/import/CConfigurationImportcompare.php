@@ -47,7 +47,9 @@ class CConfigurationImportcompare {
 					'triggers' => []
 				],
 				'discovery_rules' => [
-					'item_prototypes' => [],
+					'item_prototypes' => [
+						'trigger_prototypes' => []
+					],
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => []
