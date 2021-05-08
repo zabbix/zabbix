@@ -40,11 +40,10 @@ $(() => {
 		}
 	};
 
-	$('#function').on('change', (e) => {
+	$('#function-select').on('change', (e) => {
 		var form = e.target.closest('form'),
-			function_name_parts = form.elements.function.value.split('_');
+			function_name_parts = form.elements.function_select.value.split('_');
 
-		form.elements.function_type.value = function_name_parts[0];
 		form.elements.function.value = function_name_parts[1];
 
 		reloadPopup(form, 'popup.triggerexpr');

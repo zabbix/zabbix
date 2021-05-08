@@ -32,7 +32,7 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('function_type', $data['function_type'])
+	->addVar('function', $data['function'])
 	->addItem((new CInput('submit', 'submit'))
 		->addStyle('display: none;')
 		->removeId()
@@ -99,9 +99,9 @@ if ($data['item_required']) {
 	$expression_form_list->addRow((new CLabel(_('Item'), 'item_description'))->setAsteriskMark(), $item);
 }
 
-$function_select = (new CSelect('function'))
+$function_select = (new CSelect('function_select'))
 	->setFocusableElementId('label-function')
-	->setId('function')
+	->setId('function-select')
 	->setValue($data['function_type'].'_'.$data['function']);
 
 $function_types = [

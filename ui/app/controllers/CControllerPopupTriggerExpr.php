@@ -39,10 +39,6 @@ class CControllerPopupTriggerExpr extends CController {
 	private $allowedTypesLog = [];
 	private $allowedTypesInt = [];
 	private $functions = [];
-	private $function_types = [ZBX_FUNCTION_TYPE_AGGREGATE, ZBX_FUNCTION_TYPE_BITWISE, ZBX_FUNCTION_TYPE_DATE_TIME,
-		ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_MATH, ZBX_FUNCTION_TYPE_OPERATOR, ZBX_FUNCTION_TYPE_PREDICTION,
-		ZBX_FUNCTION_TYPE_STRING
-	];
 	private $operators = ['=', '<>', '>', '<', '>=', '<='];
 	private $period_optional = [];
 
@@ -1044,7 +1040,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'itemid' =>				'db items.itemid',
 			'parent_discoveryid' =>	'db items.itemid',
 			'function' =>			'in '.implode(',', array_keys($this->functions)),
-			'function_type' =>		'in '.implode(',', $this->function_types),
 			'operator' =>			'in '.implode(',', $this->operators),
 			'params' =>				'',
 			'paramtype' =>			'in '.implode(',', [PARAM_TYPE_TIME, PARAM_TYPE_COUNTS]),
@@ -1292,7 +1287,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'item_required' => !in_array($function, array_merge(getStandaloneFunctions(), getFunctionsConstants())),
 			'functions' => $this->functions,
 			'function' => $function,
-			'function_type' => $this->getInput('function_type', ZBX_FUNCTION_TYPE_HISTORY),
+			'function_type' => reset($this->functions[$function]['types']),
 			'operator' => $operator,
 			'item_key' => $item_key,
 			'itemValueType' => $item_value_type,
