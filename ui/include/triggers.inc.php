@@ -1820,19 +1820,28 @@ function get_item_function_info(string $expr) {
 	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'countunique' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
+		'first' => $rules['numeric'] + $rules['string'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
+		'kurtosis' => $rules['numeric_as_float'],
 		'last' => $rules['numeric'] + $rules['string'],
-		'length' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
+		'mad' => $rules['numeric_as_float'],
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'percentile' => $rules['numeric'],
+		'skewness' => $rules['numeric_as_float'],
+		'stddevpop' => $rules['numeric_as_float'],
+		'stddevsamp' => $rules['numeric_as_float'],
+		'sumofsquares' => $rules['numeric_as_float'],
+		'varpop' => $rules['numeric_as_float'],
+		'varsamp' => $rules['numeric_as_float'],
 		'sum' => $rules['numeric'],
 		'timeleft' => $rules['numeric_as_float'],
 		'trendavg' => $rules['numeric'],
@@ -1844,8 +1853,28 @@ function get_item_function_info(string $expr) {
 
 	$math_functions = [
 		'abs' => ['any' => $rule_float],
+		'acos' => ['any' => $rule_float],
+		'ascii' => ['any' => $rule_int],
+		'asin' => ['any' => $rule_float],
+		'atan' => ['any' => $rule_float],
+		'atan2' => ['any' => $rule_float],
 		'avg' => ['any' => $rule_float],
+		'between' => ['any' => $rule_0or1],
 		'bitand' => ['any' => $rule_int],
+		'bitlength' => ['any' => $rule_int],
+		'bitlshift' => ['any' => $rule_int],
+		'bitnot' => ['any' => $rule_int],
+		'bitor' => ['any' => $rule_int],
+		'bitrshift' => ['any' => $rule_int],
+		'bitxor' => ['any' => $rule_int],
+		'bytelength' => ['any' => $rule_int],
+		'cbrt' => ['any' => $rule_float],
+		'ceil' => ['any' => $rule_int],
+		'char' => ['any' => $rule_str],
+		'concat' => ['any' => $rule_str],
+		'cos' => ['any' => $rule_float],
+		'cosh' => ['any' => $rule_float],
+		'cot' => ['any' => $rule_float],
 		'date' => [
 			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
 		],
@@ -1855,14 +1884,43 @@ function get_item_function_info(string $expr) {
 		'dayofweek' => [
 			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
 		],
+		'degrees' => ['any' => $rule_float],
+		'e' => ['any' => $rule_float],
+		'exp' => ['any' => $rule_float],
+		'expm1' => ['any' => $rule_float],
+		'floor' => ['any' => $rule_int],
+		'in' => ['any' => $rule_0or1],
+		'insert' => ['any' => $rule_str],
+		'left' => ['any' => $rule_str],
 		'length' => ['any' => $rule_int],
+		'log' => ['any' => $rule_float],
+		'log10' => ['any' => $rule_float],
+		'ltrim' => ['any' => $rule_str],
 		'max' => ['any' => $rule_float],
+		'mid' => ['any' => $rule_str],
 		'min' => ['any' => $rule_float],
+		'mod' => ['any' => $rule_float],
 		'now' => ['any' => $rule_int],
+		'pi' => ['any' => $rule_float],
+		'power' => ['any' => $rule_float],
+		'radians' => ['any' => $rule_float],
+		'rand' => ['any' => $rule_int],
+		'repeat' => ['any' => $rule_str],
+		'replace' => ['any' => $rule_str],
+		'right' => ['any' => $rule_str],
+		'round' => ['any' => $rule_float],
+		'rtrim' => ['any' => $rule_str],
+		'sin' => ['any' => $rule_float],
+		'sinh' => ['any' => $rule_float],
+		'signum' => ['any' => $rule_int],
+		'sqrt' => ['any' => $rule_float],
 		'sum' => ['any' => $rule_float],
+		'tan' => ['any' => $rule_float],
 		'time' => [
 			'any' => ['value_type' => 'HHMMSS', 'values' => null]
-		]
+		],
+		'trim' => ['any' => $rule_str],
+		'truncate' => ['any' => $rule_float]
 	];
 
 	$expression_parser = new CExpressionParser(['lldmacros' => true]);
@@ -2539,4 +2597,13 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
  */
 function getStandaloneFunctions(): array {
 	return ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
+}
+
+/**
+ * Returns a list of functions that return a constant or random number.
+ *
+ * @return array
+ */
+function getFunctionsConstants(): array {
+	return ['e', 'pi', 'rand'];
 }

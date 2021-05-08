@@ -1173,6 +1173,15 @@ define('EXPRESSION_NOT_A_MACRO_ERROR',		'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',		'#ERROR_FUNCTION#');
 define('EXPRESSION_UNSUPPORTED_VALUE_TYPE',	'#ERROR_VALUE_TYPE#');
 
+define('ZBX_FUNCTION_TYPE_AGGREGATE',	0);
+define('ZBX_FUNCTION_TYPE_BITWISE',		1);
+define('ZBX_FUNCTION_TYPE_DATE_TIME',	2);
+define('ZBX_FUNCTION_TYPE_HISTORY',		3);
+define('ZBX_FUNCTION_TYPE_MATH',		4);
+define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
+define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
+define('ZBX_FUNCTION_TYPE_STRING',		7);
+
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
  */

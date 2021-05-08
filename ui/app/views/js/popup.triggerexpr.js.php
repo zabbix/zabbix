@@ -40,7 +40,12 @@ $(() => {
 		}
 	};
 
-	$('#function').on('change', (e) => {
-		reloadPopup($(e.target).closest('form').get(0), 'popup.triggerexpr');
+	$('#function-select').on('change', (e) => {
+		var form = e.target.closest('form'),
+			function_name_parts = form.elements.function_select.value.split('_');
+
+		form.elements.function.value = function_name_parts[1];
+
+		reloadPopup(form, 'popup.triggerexpr');
 	});
 });

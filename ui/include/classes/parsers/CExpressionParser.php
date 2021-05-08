@@ -648,7 +648,7 @@ class CExpressionParser extends CParser {
 			int $depth): bool {
 		$p = $pos;
 
-		if (!preg_match('/^([a-z]+)\(/', substr($source, $p), $matches)) {
+		if (!preg_match('/^([a-z0-9]+)\(/', substr($source, $p), $matches)) {
 			return false;
 		}
 
