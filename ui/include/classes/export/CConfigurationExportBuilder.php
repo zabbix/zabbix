@@ -447,6 +447,9 @@ class CConfigurationExportBuilder {
 				if ($mapping['type'] == VALUEMAP_MAPPING_TYPE_EQUAL) {
 					unset($mapping['type']);
 				}
+				elseif ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {
+					unset($mapping['value']);
+				}
 			}
 			unset($mapping);
 		}
