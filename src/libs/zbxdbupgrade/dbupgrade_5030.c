@@ -6296,6 +6296,64 @@ static int	DBpatch_5030167(void)
 #endif
 }
 
+static int	DBpatch_5030168(void)
+{
+	return DBrename_table("trigger_queue", "trigger_queue_tmp");
+}
+
+static int	DBpatch_5030169(void)
+{
+	const ZBX_TABLE	table =
+			{"trigger_queue", "trigger_queueid", 0,
+				{
+					{"trigger_queueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030170(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	objectid, type, clock, ns;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+
+	result = DBselect("select objectid,type,clock,ns from trigger_queue_tmp");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_STR2UINT64(type, row[1]);
+		ZBX_STR2UINT64(clock, row[2]);
+		ZBX_STR2UINT64(ns, row[3]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), objectid, type, clock, ns);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "trigger_queueid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030171(void)
+{
+	return DBdrop_table("trigger_queue_tmp");
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -6470,5 +6528,9 @@ DBPATCH_ADD(5030164, 0, 1)
 DBPATCH_ADD(5030165, 0, 1)
 DBPATCH_ADD(5030166, 0, 1)
 DBPATCH_ADD(5030167, 0, 1)
+DBPATCH_ADD(5030168, 0, 1)
+DBPATCH_ADD(5030169, 0, 1)
+DBPATCH_ADD(5030170, 0, 1)
+DBPATCH_ADD(5030171, 0, 1)
 
 DBPATCH_END()
