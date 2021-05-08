@@ -118,22 +118,15 @@ $function_types = [
 $functions_by_group = [];
 foreach ($data['functions'] as $id => $function) {
 	foreach ($function['types'] as $type) {
-		$functions_by_group[$function_types[$type]][$id] = [
-			'type' => $type,
-			'description' => $function['description']
-		];
+		$functions_by_group[$function_types[$type]][$type.'_'.$id] = $function['description'];
 	}
 }
 ksort($functions_by_group);
 
 foreach ($functions_by_group as $group_name => $functions) {
-	$opt_group = new CSelectOptionGroup($group_name);
-
-	foreach ($functions as $id => $function) {
-		$opt_group->addOption(new CSelectOption($function['type'].'_'.$id, $function['description']));
-	}
-
-	$function_select->addOptionGroup($opt_group);
+	$function_select->addOptionGroup(
+		(new CSelectOptionGroup($group_name))->addOptions(CSelect::createOptionsFromArray($functions))
+	);
 }
 
 $expression_form_list->addRow(new CLabel(_('Function'), $function_select->getFocusableElementId()), $function_select);
