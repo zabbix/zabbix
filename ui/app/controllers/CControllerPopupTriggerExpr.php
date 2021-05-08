@@ -537,7 +537,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'e' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
-				'description' => _("e() - Returns Euler's number")
+				'description' => _("e() - Returns Euler's number"),
+				'allowed_types' => $this->allowedTypesAny
 			],
 			'exp' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
@@ -773,7 +774,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'pi' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
-				'description' => _('pi() - Returns the Pi constant')
+				'description' => _('pi() - Returns the Pi constant'),
+				'allowed_types' => $this->allowedTypesAny
 			],
 			'power' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
@@ -797,7 +799,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'rand' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
-				'description' => _('rand() - A random integer value')
+				'description' => _('rand() - A random integer value'),
+				'allowed_types' => $this->allowedTypesAny
 			],
 			'repeat' => [
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
@@ -1298,8 +1301,8 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Check if submitted function is usable with selected item.
 		foreach ($data['functions'] as $id => $f) {
-			if (($data['itemValueType'] === null || (array_key_exists('allowed_types', $f)
-					&& array_key_exists($item_value_type, $f['allowed_types']))) && $id === $function) {
+			if (($data['itemValueType'] === null || array_key_exists($item_value_type, $f['allowed_types']))
+					&& $id === $function) {
 				$data['selectedFunction'] = $id;
 				break;
 			}
@@ -1313,8 +1316,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Remove functions that not correspond to chosen item.
 		foreach ($data['functions'] as $id => $f) {
-			if ($data['itemValueType'] !== null && (!array_key_exists('allowed_types', $f)
-					|| !array_key_exists($data['itemValueType'], $f['allowed_types']))) {
+			if ($data['itemValueType'] !== null && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
 				unset($data['functions'][$id]);
 
 				// Take first available function from list.
