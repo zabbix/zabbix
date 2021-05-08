@@ -616,7 +616,6 @@ switch ($data['popup_type']) {
 
 					default:
 						$value = $mapping['value'];
-						break;
 				}
 
 				$mappings_table[] = new CDiv($value);
