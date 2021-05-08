@@ -608,6 +608,7 @@ switch ($data['popup_type']) {
 
 					case VALUEMAP_MAPPING_TYPE_LESS_EQUAL:
 						$value = '<='.$mapping['value'];
+						break;
 
 					case VALUEMAP_MAPPING_TYPE_DEFAULT:
 						$value = new CTag('em', true, _('default'));
