@@ -275,7 +275,7 @@ class testValuemaps extends CIntegrationTest {
 
 		$response = $this->call('trigger.create', [
 			'description' => ' {ITEM.VALUE}',
-			'expression' => 'last{'.self::HOST_NAME.'/'.self::ITEM_NAME.')='.$inputData
+			'expression' => 'last('.self::HOST_NAME.'/'.self::ITEM_NAME.')='.$inputData
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
