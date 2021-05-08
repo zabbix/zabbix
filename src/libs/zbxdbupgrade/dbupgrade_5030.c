@@ -6402,7 +6402,7 @@ static int	DBpatch_5030169(void)
 
 		if (SUCCEED != parse_item_key(row[1], &request))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[0]);
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
 			continue;
 		}
 
