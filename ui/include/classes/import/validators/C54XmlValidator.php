@@ -383,6 +383,15 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
 	];
 
+	private $VALUEMAP_MAPPING_TYPE = [
+		CXmlConstantValue::MAPPING_EQUAL => CXmlConstantName::MAPPING_EQUAL,
+		CXmlConstantValue::MAPPING_GREATER_EQUAL => CXmlConstantName::MAPPING_GREATER_EQUAL,
+		CXmlConstantValue::MAPPING_LESS_EQUAL => CXmlConstantName::MAPPING_LESS_EQUAL,
+		CXmlConstantValue::MAPPING_IN_RANGE => CXmlConstantName::MAPPING_IN_RANGE,
+		CXmlConstantValue::MAPPING_REGEXP => CXmlConstantName::MAPPING_REGEXP,
+		CXmlConstantValue::MAPPING_DEFAULT => CXmlConstantName::MAPPING_DEFAULT
+	];
+
 	/**
 	 * Get validation rules schema.
 	 *
@@ -1093,7 +1102,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
 								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
+									'value' =>					['type' => XML_STRING, 'default' => ''],
 									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
@@ -1721,7 +1731,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
 								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
+									'value' =>					['type' => XML_STRING, 'default' => ''],
 									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]

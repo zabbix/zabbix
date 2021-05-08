@@ -1105,6 +1105,22 @@ class CConfigurationExport {
 	}
 
 	/**
+	 * Get value maps for export builder from database.
+	 *
+	 * @param array $valuemapids
+	 *
+	 * return array
+	 */
+	protected function gatherValueMaps(array $valuemapids) {
+		$this->data['valueMaps'] = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'selectMappings' => ['type', 'value', 'newvalue'],
+			'valuemapids' => $valuemapids,
+			'preservekeys' => true
+		]);
+	}
+
+	/**
 	 * Change map elements real database selement id and icons ids to unique field references.
 	 *
 	 * @param array $exportMaps

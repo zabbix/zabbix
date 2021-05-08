@@ -517,13 +517,6 @@ if (hasRequest('form')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
 			order_result($data['dbTemplate']['valuemaps'], 'name');
-
-			foreach ($data['dbTemplate']['valuemaps'] as &$valuemap) {
-				order_result($valuemap['mappings'], 'value');
-				$valuemap['mappings'] = array_values($valuemap['mappings']);
-			}
-			unset($valuemap);
-
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}

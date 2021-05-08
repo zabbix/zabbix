@@ -1337,6 +1337,21 @@ form {
 		@extend tfoot;
 	}
 
+	td {
+		position: relative;
+
+		&.td-drag-icon {
+			padding: 0 11px 0 0;
+			vertical-align: middle;
+		}
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			margin-right: 5px;
+		}
+	}
+
 	.table-forms-td-left {
 		display: table-cell;
 		padding: 5px 0;
@@ -1368,14 +1383,7 @@ form {
 			position: relative;
 
 			&.td-drag-icon {
-				padding: 0 11px 0 0;
-				vertical-align: middle;
-			}
-
-			.drag-icon {
-				position: absolute;
-				top: 5px;
-				margin-right: 5px;
+				padding-right: 11px;
 			}
 
 			&.center {
@@ -4999,6 +5007,10 @@ svg {
 	display: none;
 }
 
+.visibility-hidden {
+	visibility: hidden;
+}
+
 .checkbox-list {
 	li {
 		overflow: hidden;
@@ -6474,6 +6486,21 @@ z-select,
 		tr:first-child td {
 			border-top: 1px solid $table-border-color;
 		}
+	}
+}
+
+.mappings-table {
+	display: grid;
+	grid-template-columns: auto auto minmax(auto, 100%);
+
+	& > div {
+		text-align: left;
+	}
+
+	// For every 3th starting from 2nd child.
+	& > div:nth-child(3n + 2) {
+		text-align: center;
+		padding: 0 10px;
 	}
 }
 

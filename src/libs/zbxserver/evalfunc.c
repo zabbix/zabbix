@@ -25,6 +25,7 @@
 #include "evalfunc.h"
 #include "zbxregexp.h"
 #include "zbxtrends.h"
+#include "../zbxalgo/vectorimpl.h"
 
 typedef enum
 {
@@ -39,6 +40,26 @@ typedef enum
 	ZBX_VALUE_NVALUES
 }
 zbx_value_type_t;
+
+#define ZBX_VALUEMAP_STRING_LEN	64
+
+#define ZBX_VALUEMAP_TYPE_MATCH			0
+#define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
+#define ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL		2
+#define ZBX_VALUEMAP_TYPE_RANGE			3
+#define ZBX_VALUEMAP_TYPE_REGEX			4
+#define ZBX_VALUEMAP_TYPE_DEFAULT		5
+
+typedef struct
+{
+	char	value[ZBX_VALUEMAP_STRING_LEN];
+	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
+	int	type;
+}
+zbx_valuemaps_t;
+
+ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
+ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
 static const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -3442,6 +3463,165 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 }
 
+static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
+{
+	zbx_free(valuemap);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_value_by_map                                            *
+ *                                                                            *
+ * Purpose: replace value by mapping value                                    *
+ *                                                                            *
+ * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
+ *             valuemaps - vector of values mapped                            *
+ *             value_type - type of input value                               *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, value contains new value   *
+ *               FAIL - evaluation failed, value contains old value           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
+		unsigned char value_type)
+{
+	char		*value_tmp;
+	int		i, ret = FAIL;
+	double		input_value;
+	zbx_valuemaps_t	*valuemap;
+
+	for (i = 0; i < valuemaps->values_num; i++)
+	{
+		char			*pattern;
+		int			match;
+		zbx_vector_ptr_t	regexps;
+
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+
+		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type)
+		{
+			if (ITEM_VALUE_TYPE_STR != value_type)
+			{
+				double	num1, num2;
+
+				if (ZBX_INFINITY != (num1 = evaluate_string_to_double(value)) &&
+						ZBX_INFINITY != (num2 = evaluate_string_to_double(valuemap->value)) &&
+						SUCCEED == zbx_double_compare(num1, num2))
+				{
+					goto map_value;
+				}
+			}
+			else if (0 == strcmp(valuemap->value, value))
+				goto map_value;
+		}
+
+		if (ITEM_VALUE_TYPE_STR == value_type && ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
+		{
+			zbx_vector_ptr_create(&regexps);
+
+			pattern = valuemap->value;
+
+			match = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+
+			zbx_regexp_clean_expressions(&regexps);
+			zbx_vector_ptr_destroy(&regexps);
+
+			if (ZBX_REGEXP_MATCH == match)
+				goto map_value;
+		}
+
+		if (ITEM_VALUE_TYPE_STR != value_type &&
+				ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
+		{
+			double	min, max;
+
+			if (ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL == valuemap->type &&
+					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
+			{
+				if (input_value <= max)
+					goto map_value;
+			}
+			else if (ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL == valuemap->type &&
+					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
+			{
+				if (input_value >= min)
+					goto map_value;
+			}
+			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
+			{
+				int	num, j;
+				char	*input_ptr;
+
+				input_ptr = valuemap->value;
+
+				zbx_trim_str_list(input_ptr, ',');
+				zbx_trim_str_list(input_ptr, '-');
+				num = num_param(input_ptr);
+
+				for (j = 0; j < num; j++)
+				{
+					int	found = 0;
+					char	*ptr, *range_str;
+
+					range_str = ptr = get_param_dyn(input_ptr, j + 1, NULL);
+
+					if (1 < strlen(ptr) && '-' == *ptr)
+						ptr++;
+
+					while (NULL != (ptr = strchr(ptr, '-')))
+					{
+						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
+							break;
+						ptr++;
+					}
+
+					if (NULL == ptr)
+					{
+						min = evaluate_string_to_double(range_str);
+						found = ZBX_INFINITY != min && SUCCEED == zbx_double_compare(input_value, min);
+					}
+					else
+					{
+						*ptr = '\0';
+						min = evaluate_string_to_double(range_str);
+						max = evaluate_string_to_double(ptr + 1);
+						if (ZBX_INFINITY != min && ZBX_INFINITY != max &&
+								input_value >= min && input_value <= max)
+						{
+							found = 1;
+						}
+					}
+
+					zbx_free(range_str);
+
+					if (0 != found)
+						goto map_value;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < valuemaps->values_num; i++)
+	{
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+
+		if (ZBX_VALUEMAP_TYPE_DEFAULT == valuemap->type)
+			goto map_value;
+	}
+map_value:
+	if (i < valuemaps->values_num)
+	{
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
+
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: replace_value_by_map                                             *
@@ -3449,44 +3629,53 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
  * Purpose: replace value by mapping value                                    *
  *                                                                            *
  * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
  *             valuemapid - index of value map                                *
+ *             value_type - type of input value                               *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  ******************************************************************************/
-static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
+static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid, unsigned char value_type)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*value_esc, *value_tmp;
-	int		ret = FAIL;
+	int				ret = FAIL;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_valuemaps_t			*valuemap;
+	zbx_vector_valuemaps_ptr_t	valuemaps;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
 
 	if (0 == valuemapid)
 		goto clean;
 
-	value_esc = DBdyn_escape_string(value);
+	zbx_vector_valuemaps_ptr_create(&valuemaps);
+
 	result = DBselect(
-			"select newvalue"
+			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
-				" and value" ZBX_SQL_STRCMP,
-			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
-	zbx_free(value_esc);
+			" order by sortorder asc",
+			valuemapid);
 
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	while (NULL != (row = DBfetch(result)))
 	{
-		del_zeros(row[0]);
+		del_zeros(row[1]);
 
-		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
-		zbx_strlcpy_utf8(value, value_tmp, max_len);
-		zbx_free(value_tmp);
-
-		ret = SUCCEED;
+		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
+		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
+		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
+		valuemap->type = atoi(row[2]);
+		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
+
 	DBfree_result(result);
+
+	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
+
+	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
+	zbx_vector_valuemaps_ptr_destroy(&valuemaps);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 
@@ -3513,13 +3702,13 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
-			replace_value_by_map(value, max_len, valuemapid);
+			replace_value_by_map(value, max_len, valuemapid, value_type);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeros(value);
 			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
+			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid, value_type))
 				add_value_suffix(value, max_len, units, value_type);
 			break;
 		default:
@@ -3662,3 +3851,7 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
 
 	return FAIL;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxserver/valuemaps_test.c"
+#endif

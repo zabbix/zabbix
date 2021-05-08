@@ -2853,6 +2853,15 @@ form.is-loading {
     padding-top: 5px; }
   .table-forms tfoot button, .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
+  .table-forms td {
+    position: relative; }
+    .table-forms td.td-drag-icon {
+      padding: 0 11px 0 0;
+      vertical-align: middle; }
+    .table-forms td .drag-icon {
+      position: absolute;
+      top: 5px;
+      margin-right: 5px; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
@@ -2876,12 +2885,7 @@ form.is-loading {
       padding: 5px 5px 5px 0;
       position: relative; }
       .table-forms .table-forms-td-right td.td-drag-icon {
-        padding: 0 11px 0 0;
-        vertical-align: middle; }
-      .table-forms .table-forms-td-right td .drag-icon {
-        position: absolute;
-        top: 5px;
-        margin-right: 5px; }
+        padding-right: 11px; }
       .table-forms .table-forms-td-right td.center {
         text-align: center;
         vertical-align: middle; }
@@ -5304,6 +5308,9 @@ svg {
 .display-none, .table-forms li.display-none {
   display: none; }
 
+.visibility-hidden {
+  visibility: hidden; }
+
 .checkbox-list li {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6311,6 +6318,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     white-space: normal; }
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #383838; }
+
+.mappings-table {
+  display: grid;
+  grid-template-columns: auto auto minmax(auto, 100%); }
+  .mappings-table > div {
+    text-align: left; }
+  .mappings-table > div:nth-child(3n + 2) {
+    text-align: center;
+    padding: 0 10px; }
 
 .valuemap-checkbox {
   margin-top: 10px; }

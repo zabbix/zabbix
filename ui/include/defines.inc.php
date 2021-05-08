@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030174);
+define('ZABBIX_DB_VERSION',		5030181);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -1288,6 +1288,14 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
+// Value map mappings type
+define('VALUEMAP_MAPPING_TYPE_EQUAL',			0);
+define('VALUEMAP_MAPPING_TYPE_GREATER_EQUAL',	1);
+define('VALUEMAP_MAPPING_TYPE_LESS_EQUAL',		2);
+define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
+define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
+define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
+
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1357,6 +1365,7 @@ define('API_EVENT_NAME',			37);
 define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
+define('API_NUMERIC_RANGES',		41);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1856,6 +1865,7 @@ define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_VALUEMAP_LIST_TABLE', 'valuemap-list-table');
 define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
+define('ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE', 'mappings-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
