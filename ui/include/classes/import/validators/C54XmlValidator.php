@@ -1102,8 +1102,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
 								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING, 'in' => $this->VALUEMAP_MAPPING_TYPE, 'default' => CXmlConstantValue::MAPPING_EQUAL],
-									'value' =>					['type' => XML_STRING],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
+									'value' =>					['type' => XML_STRING, 'default' => ''],
 									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
@@ -1731,8 +1731,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
 								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING, 'in' => $this->VALUEMAP_MAPPING_TYPE, 'default' => CXmlConstantValue::MAPPING_EQUAL],
-									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MAPPING_EQUAL, 'in' => $this->VALUEMAP_MAPPING_TYPE],
+									'value' =>					['type' => XML_STRING, 'default' => ''],
 									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
