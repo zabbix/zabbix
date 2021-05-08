@@ -688,7 +688,7 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
  * Purpose: get original trigger expression/recovery expression with expanded *
  *          functions                                                         *
  *                                                                            *
- * Parameters: trigger    - [IN] the trigger                                  *
+ * Parameters: ctx        - [IN] the parsed expression                        *
  *             expression - [OUT] the trigger expression                      *
  *                                                                            *
  ******************************************************************************/
@@ -801,7 +801,7 @@ void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
  *                                                                            *
  * Function: zbx_db_trigger_get_recovery_expression                           *
  *                                                                            *
- * Purpose: get original trigger recovert expression with expanded functions  *
+ * Purpose: get original trigger recovery expression with expanded functions  *
  *                                                                            *
  * Parameters: trigger    - [IN] the trigger                                  *
  *             expression - [OUT] the trigger expression                      *

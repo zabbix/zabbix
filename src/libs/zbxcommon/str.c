@@ -4375,7 +4375,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 
 		if (0 != (token_search & ZBX_TOKEN_SEARCH_REFERENCES))
 		{
-			while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			while (NULL != (dollar = strchr(dollar, '$')) && ptr > dollar)
 			{
 				if (0 == isdigit(dollar[1]))
 				{
@@ -4394,7 +4394,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 		}
 
-		if (NULL == ptr || '\0' == *ptr)
+		if ('\0' == *ptr)
 			return FAIL;
 
 		if ('\0' == ptr[1])

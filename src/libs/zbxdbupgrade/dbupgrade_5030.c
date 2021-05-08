@@ -6245,7 +6245,12 @@ static int	DBpatch_5030166(void)
 		params_offset = 0;
 
 		init_request(&request);
-		parse_item_key(row[1], &request);
+
+		if (SUCCEED != parse_item_key(row[1], &request))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
+			continue;
+		}
 
 		ret_formula = dbpatch_aggregate2formula(row[0], &request, &params, &params_alloc, &params_offset,
 				&error);

@@ -6,4 +6,5 @@ libzbxeval_a_SOURCES = \
 	parse.c \
 	execute.c \
 	misc.c \
-	query.c
+	query.c \
+	eval.h

@@ -437,7 +437,12 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 	{
 		init_request(&pattern);
-		parse_item_key(query->ref.key, &pattern);
+		if (SUCCEED != parse_item_key(query->ref.key, &pattern))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_free(sql);
+			return;
+		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",i.key_");
 	}
