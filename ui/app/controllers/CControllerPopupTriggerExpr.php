@@ -592,7 +592,13 @@ class CControllerPopupTriggerExpr extends CController {
 			'in' => [
 				'types' => [ZBX_FUNCTION_TYPE_OPERATOR],
 				'description' => _('in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)'),
-				'params' => $this->param1SecCount,
+				'params' => $this->param1SecCount + [
+					'values' => [
+						'C' => _('Values'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					]
+				],
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
@@ -694,7 +700,7 @@ class CControllerPopupTriggerExpr extends CController {
 					'chars' => [
 						'C' => _('Chars'),
 						'T' => T_ZBX_STR,
-						'A' => true
+						'A' => false
 					]
 				],
 				'allowed_types' => $this->allowedTypesAny,
@@ -866,7 +872,7 @@ class CControllerPopupTriggerExpr extends CController {
 					'chars' => [
 						'C' => _('Chars'),
 						'T' => T_ZBX_STR,
-						'A' => true
+						'A' => false
 					]
 				],
 				'allowed_types' => $this->allowedTypesAny,
@@ -997,7 +1003,7 @@ class CControllerPopupTriggerExpr extends CController {
 					'chars' => [
 						'C' => _('Chars'),
 						'T' => T_ZBX_STR,
-						'A' => true
+						'A' => false
 					]
 				],
 				'allowed_types' => $this->allowedTypesAny,
