@@ -8020,8 +8020,13 @@ return [
 		]
 	],
 	'trigger_queue' => [
-		'key' => '',
+		'key' => 'trigger_queueid',
 		'fields' => [
+			'trigger_queueid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'objectid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
