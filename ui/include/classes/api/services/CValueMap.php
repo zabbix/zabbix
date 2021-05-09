@@ -204,7 +204,7 @@ class CValueMap extends CApiService {
 		if ($valuemaps_mappings) {
 			$db_mappings = DB::select('valuemap_mapping', [
 				'output' => ['valuemap_mappingid', 'valuemapid', 'type', 'value', 'newvalue', 'sortorder'],
-				'filter' => ['valuemapid' => array_keys($valuemaps_mappings)],
+				'filter' => ['valuemapid' => array_keys($valuemaps_mappings)]
 			]);
 			CArrayHelper::sort($db_mappings, [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
 

@@ -96,7 +96,7 @@ class testValuemaps extends CIntegrationTest {
 					[
 						'value' => '1',
 						'newvalue' => 'Value 1'
-					],
+					]
 				]
 			],
 			'rangeWithoutDefault' => [

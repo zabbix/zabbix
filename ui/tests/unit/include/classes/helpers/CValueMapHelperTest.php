@@ -241,10 +241,10 @@ class CValueMapHelperTest extends TestCase {
 				[
 					['type' => VALUEMAP_MAPPING_TYPE_DEFAULT, 'newvalue' => 'newvalue-1'],
 					['type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, 'value' => '10', 'newvalue' => 'newvalue-2'],
-					['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '10', 'newvalue' => 'newvalue-3'],
+					['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '10', 'newvalue' => 'newvalue-3']
 				],
 				'newvalue-2'
-			],
+			]
 		];
 	}
 

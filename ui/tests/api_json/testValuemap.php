@@ -358,7 +358,7 @@ class testValuemap extends CAPITest {
 								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
 								'value' => '10',
 								'newvalue' => '2 fail'
-							],
+							]
 						]
 					]
 				],
@@ -923,7 +923,7 @@ class testValuemap extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
