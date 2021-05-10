@@ -2069,8 +2069,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 	/* preallocate zbx_item_diff_t structures for item_diff vector */
 	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < history_num; i++)
 	{
 		zbx_item_diff_t	*diff = &diffs[i];
@@ -2088,12 +2086,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		zbx_vector_ptr_append(&item_diff, diff);
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-		if (0 == (ZBX_DC_FLAG_META & history[i].flags))
-			continue;
 	}
 
 	if (0 != item_diff.values_num)
@@ -2101,6 +2093,8 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 		size_t	sql_offset = 0;
 
 		zbx_vector_ptr_sort(&item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diff,
 				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
