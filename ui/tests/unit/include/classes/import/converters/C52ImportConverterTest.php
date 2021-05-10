@@ -614,8 +614,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					[
 						'name' => 'Graph A',
 						'graph_items' => [
-							['host' => 'Template OS', 'key' => 'item3'],
-							['host' => 'Template OS Template G', 'key' => 'item4']
+							['item' => ['host' => 'Template OS', 'key' => 'item3']],
+							['item' => ['host' => 'Template OS Template G', 'key' => 'item4']]
 						]
 					],
 				]
@@ -629,8 +629,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					[
 						'name' => 'Graph A',
 						'graph_items' => [
-							['host' => 'Template OS', 'key' => 'item3'],
-							['host' => 'Template OS Template G', 'key' => 'item4']
+							['item' => ['host' => 'Template OS', 'key' => 'item3']],
+							['item' => ['host' => 'Template OS Template G', 'key' => 'item4']]
 						],
 						'uuid' => generateUuidV4('Graph A/Template OS/Template G')
 					],
