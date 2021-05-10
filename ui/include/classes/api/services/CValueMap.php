@@ -354,17 +354,17 @@ class CValueMap extends CApiService {
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL])],
-						'type' => API_FLOAT,
+						'type' => API_FLOAT | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_IN_RANGE])],
-						'type' => API_NUMERIC_RANGES,
+						'type' => API_NUMERIC_RANGES | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_REGEXP])],
-						'type' => API_REGEX,
+						'type' => API_REGEX | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
@@ -430,17 +430,17 @@ class CValueMap extends CApiService {
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL])],
-						'type' => API_FLOAT,
+						'type' => API_FLOAT | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_IN_RANGE])],
-						'type' => API_NUMERIC_RANGES,
+						'type' => API_NUMERIC_RANGES | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_REGEXP])],
-						'type' => API_REGEX,
+						'type' => API_REGEX | API_NOT_EMPTY,
 						'length' => DB::getFieldLength('valuemap_mapping', 'value')
 					],
 					[
