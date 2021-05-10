@@ -6548,16 +6548,11 @@ static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, co
 
 	zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s", name, template_name, key);
 
-	if ('\0' != *param)
-	{
-		if ('$' == *param)
-		{
-			if (',' == *++param)
-				param++;
-		}
+	if ('$' == *param && ',' == *++param)
+		param++;
 
-		zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s", param);
-	}
+	if ('\0' != *param)
+		zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", param);
 
 	zbx_chrcpy_alloc(&func, &func_alloc, &func_offset, ')');
 
@@ -6699,6 +6694,7 @@ static int	DBpatch_5030192(void)
 			{
 				if (0 == i)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s", __func__, row[0]);
+				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -6707,6 +6703,7 @@ static int	DBpatch_5030192(void)
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
 				zbx_free(error);
+				DBfree_result(result);
 				return FAIL;
 			}
 
@@ -6723,6 +6720,7 @@ static int	DBpatch_5030192(void)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s, is_uint64_n error",
 							__func__, row[0]);
+					DBfree_result(result);
 					return FAIL;
 				}
 
@@ -7138,6 +7136,7 @@ static int	DBpatch_5030199(void)
 			{
 				if (0 == i)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s", __func__, row[0]);
+				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -7146,6 +7145,7 @@ static int	DBpatch_5030199(void)
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
 				zbx_free(error);
+				DBfree_result(result);
 				return FAIL;
 			}
 
@@ -7162,6 +7162,7 @@ static int	DBpatch_5030199(void)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s, is_uint64_n error",
 							__func__, row[0]);
+					DBfree_result(result);
 					return FAIL;
 				}
 
