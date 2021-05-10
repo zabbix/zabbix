@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:43Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -66,7 +66,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              expression: '{min(5m)}>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
+              expression: 'min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
               name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
               priority: WARNING
         -
@@ -1165,7 +1165,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
               name: 'Jenkins: Service has no online nodes'
               priority: AVERAGE
         -
@@ -1201,7 +1201,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Jenkins by HTTP/jenkins.ping)=0'
               name: 'Jenkins: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1502,7 +1502,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Jenkins by HTTP/jenkins.system.uptime)<10m'
               name: 'Jenkins: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -1639,7 +1639,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2))=1 and length(last(/Jenkins by HTTP/jenkins.version))>0'
               name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Jenkins version has changed. Ack to close.'
@@ -1954,19 +1954,19 @@ zabbix_export:
                   value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
           trigger_prototypes:
             -
-              expression: '{Jenkins by HTTP:jenkins.computer.state[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+              expression: 'last(/Jenkins by HTTP/jenkins.computer.state[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is down'
               priority: AVERAGE
               description: 'Node down with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
               dependencies:
                 -
                   name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
-                  expression: '{Jenkins by HTTP:jenkins.computer.temp_offline[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+                  expression: 'last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
                 -
                   name: 'Jenkins: Service has no online nodes'
-                  expression: '{Jenkins by HTTP:jenkins.node.online.last()}=0'
+                  expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
             -
-              expression: '{Jenkins by HTTP:jenkins.computer.temp_offline[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+              expression: 'last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
               priority: INFO
               description: 'Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
@@ -2054,7 +2054,7 @@ zabbix_export:
                   value: 'Jenkins job [{#NAME}]'
               trigger_prototypes:
                 -
-                  expression: '{last()}<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
+                  expression: 'last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
                   name: 'Jenkins job [{#NAME}]: Job is unhealthy'
                   priority: WARNING
                   manual_close: 'YES'
@@ -2401,14 +2401,14 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Jenkins by HTTP:jenkins.disk_space.last()}=0 and {Jenkins by HTTP:jenkins.disk_space.message.strlen()}>0'
+      expression: 'last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0'
       name: 'Jenkins: Disk space is too low'
       priority: WARNING
       description: |
         Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
     -
-      expression: '{Jenkins by HTTP:jenkins.plugins.last()}=0 and {Jenkins by HTTP:jenkins.plugins.message.strlen()}>0'
+      expression: 'last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0'
       name: 'Jenkins: One or more Jenkins plugins failed to start'
       priority: INFO
       description: |
@@ -2416,14 +2416,14 @@ zabbix_export:
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
       manual_close: 'YES'
     -
-      expression: '{Jenkins by HTTP:jenkins.temporary_space.last()}=0 and {Jenkins by HTTP:jenkins.temporary_space.message.strlen()}>0'
+      expression: 'last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0'
       name: 'Jenkins: Temporary space is too low'
       priority: WARNING
       description: |
         Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
     -
-      expression: '{Jenkins by HTTP:jenkins.thread_deadlock.last()}=0 and {Jenkins by HTTP:jenkins.thread_deadlock.message.strlen()}>0'
+      expression: 'last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0'
       name: 'Jenkins: There are deadlocked threads in Jenkins master JVM'
       priority: WARNING
       description: |

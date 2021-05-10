@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T12:58:27Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -118,7 +118,7 @@ zabbix_export:
               value: 'PD instance'
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/TiDB PD by HTTP/pd.status)=0'
               name: 'PD: Instance is not responding'
               priority: AVERAGE
         -
@@ -149,7 +149,7 @@ zabbix_export:
               value: 'PD instance'
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/TiDB PD by HTTP/pd.uptime)<10m'
               name: 'PD: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -180,7 +180,7 @@ zabbix_export:
               value: 'PD instance'
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2))=1 and length(last(/TiDB PD by HTTP/pd.version))>0'
               name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PD version has changed. Ack to close.'
@@ -297,7 +297,7 @@ zabbix_export:
                   value: 'TiDB cluster'
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_disconnected[{#SINGLETON}])>0'
                   name: 'TiDB cluster: There are disconnected TiKV nodes'
                   priority: WARNING
                   description: 'PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.'
@@ -325,7 +325,7 @@ zabbix_export:
                   value: 'TiDB cluster'
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_down[{#SINGLETON}])>0'
                   name: 'TiDB cluster: There are offline TiKV nodes'
                   priority: AVERAGE
                   description: 'PD has not received a TiKV heartbeat for a long time.'
@@ -353,7 +353,7 @@ zabbix_export:
                   value: 'TiDB cluster'
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_low_space[{#SINGLETON}])>0'
                   name: 'TiDB cluster: There are low space TiKV nodes'
                   priority: AVERAGE
                   description: 'Indicates that there is no sufficient space on the TiKV node.'
@@ -446,7 +446,7 @@ zabbix_export:
                   value: 'TiDB cluster'
           trigger_prototypes:
             -
-              expression: '{TiDB PD by HTTP:pd.cluster_status.storage_size[{#SINGLETON}].min(5m)}/{TiDB PD by HTTP:pd.cluster_status.storage_capacity[{#SINGLETON}].last()}*100>{$PD.STORAGE_USAGE.MAX.WARN}'
+              expression: 'min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}'
               name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
               description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
@@ -749,13 +749,13 @@ zabbix_export:
                   value: 'TiDB cluster'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0'
                   name: 'TiDB cluster: There are unresponsive peers'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
                 -
-                  expression: '{min(5m)}>{$PD.MISS_REGION.MAX.WARN}'
+                  expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}'
                   name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING

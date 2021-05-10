@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-25T13:08:40Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -173,9 +173,9 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           params: |
-            (last(mssql.average_latch_wait_time_raw) - prev(mssql.average_latch_wait_time_raw)) /
-            (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base) + 
-            (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base)=0))
+            (last(//mssql.average_latch_wait_time_raw) - last(//mssql.average_latch_wait_time_raw,#2)) /
+            (last(//mssql.average_latch_wait_time_base) - last(//mssql.average_latch_wait_time_base,#2) + 
+            (last(//mssql.average_latch_wait_time_base) - last(//mssql.average_latch_wait_time_base,#2)=0))
           description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
           tags:
             -
@@ -227,9 +227,9 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           params: |
-            (last(mssql.average_wait_time_raw) - prev(mssql.average_wait_time_raw)) /
-            (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base) + 
-            (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base)=0))
+            (last(//mssql.average_wait_time_raw) - last(//mssql.average_wait_time_raw,#2)) /
+            (last(//mssql.average_wait_time_base) - last(//mssql.average_wait_time_base,#2) + 
+            (last(//mssql.average_wait_time_base) - last(//mssql.average_wait_time_base,#2)=0))
           description: 'The average wait time, in milliseconds, for each lock request that had to wait.'
           tags:
             -
@@ -237,7 +237,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.average_wait_time,5m)>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
               name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
               priority: WARNING
               description: 'An average wait time longer than 500ms may indicate excessive blocking. This value should generally correlate to ''Lock Waits/sec'' and move up or down with it accordingly.'
@@ -324,19 +324,19 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
+              expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'Too low buffer cache hit ratio.'
             -
-              expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
+              expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
               name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'Low buffer cache hit ratio.'
               dependencies:
                 -
                   name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
-                  expression: '{MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
+                  expression: 'max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
         -
           name: 'MSSQL: Cache hit ratio'
           type: DEPENDENT
@@ -570,7 +570,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.FREE_LIST_STALLS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.free_list_stalls_sec.rate,5m)>{$MSSQL.FREE_LIST_STALLS.MAX}'
               name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
               priority: WARNING
               description: 'Some requests have to wait for a free page.'
@@ -738,7 +738,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.LAZY_WRITES.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.lazy_writes_sec.rate,5m)>{$MSSQL.LAZY_WRITES.MAX}'
               name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The number of buffers written per second by the buffer manager''s lazy writer exceeds the threshold.'
@@ -768,7 +768,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.lock_requests_sec.rate,5m)>{$MSSQL.LOCK_REQUESTS.MAX}'
               name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
               priority: WARNING
               description: 'Number of new locks and lock conversions per second requested from the lock manager is high.'
@@ -798,7 +798,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.lock_timeouts_sec.rate,5m)>{$MSSQL.LOCK_TIMEOUTS.MAX}'
               name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
               priority: WARNING
               description: 'The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.'
@@ -828,7 +828,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>0'
+              expression: 'min(/MSSQL by ODBC/mssql.lock_waits_sec.rate,5m)>0'
               name: 'MSSQL: Some blocking is occurring for 5m'
               priority: AVERAGE
               description: 'Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.'
@@ -1033,7 +1033,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.DEADLOCKS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.number_deadlocks_sec.rate,5m)>{$MSSQL.DEADLOCKS.MAX}'
               name: 'MSSQL: Number of deadlock is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many deadlocks are occurring currently.'
@@ -1082,7 +1082,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{max(15m)}<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
+              expression: 'max(/MSSQL by ODBC/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
               name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
               priority: HIGH
               description: 'The page stays in the buffer pool without references of less time than the threshold value.'
@@ -1135,7 +1135,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.PAGE_READS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.page_reads_sec.rate,5m)>{$MSSQL.PAGE_READS.MAX}'
               name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page reads are issued too frequently.'
@@ -1187,7 +1187,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.PAGE_WRITES.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.page_writes_sec.rate,5m)>{$MSSQL.PAGE_WRITES.MAX}'
               name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page writes are issued too frequently.'
@@ -1200,8 +1200,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: |
-            last(mssql.sql_compilations_sec.rate) * 100 /
-            (last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))
+            last(//mssql.sql_compilations_sec.rate) * 100 /
+            (last(//mssql.batch_requests_sec.rate) + (last(//mssql.batch_requests_sec.rate)=0))
           description: 'The ratio of SQL compilations per second to Batch requests per second in percentage.'
           tags:
             -
@@ -1209,7 +1209,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(15m)} > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
               name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.'
@@ -1222,8 +1222,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: |
-            last(mssql.sql_recompilations_sec.rate) * 100 /
-            (last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))
+            last(//mssql.sql_recompilations_sec.rate) * 100 /
+            (last(//mssql.sql_compilations_sec.rate) + (last(//mssql.sql_compilations_sec.rate)=0))
           description: 'The ratio of SQL re-compilations per second to SQL compilations per second in percentage.'
           tags:
             -
@@ -1231,7 +1231,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(15m)} > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
               name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
@@ -1306,7 +1306,7 @@ zabbix_export:
           delay: 0;m0-59s3
           history: 7d
           value_type: FLOAT
-          params: 'last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))'
+          params: 'last(//mssql.full_scans_sec.rate) / (last(//mssql.index_searches_sec.rate) + (last(//mssql.index_searches_sec.rate)=0))'
           description: 'The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.'
           tags:
             -
@@ -1314,7 +1314,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(15m)} > 0.001'
+              expression: 'min(/MSSQL by ODBC/mssql.scan_to_search,15m) > 0.001'
               name: 'MSSQL: Index and table scans are often than index searches for 15m'
               priority: WARNING
               description: 'Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.'
@@ -1561,16 +1561,16 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/MSSQL by ODBC/mssql.uptime,30m)=1'
               name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'MSSQL: Service is unavailable'
-                  expression: '{MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0'
+                  expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/MSSQL by ODBC/mssql.uptime)<10m'
               name: 'MSSQL: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -1642,7 +1642,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2))=1 and length(last(/MSSQL by ODBC/mssql.version))>0'
               name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MSSQL version has changed. Ack to close.'
@@ -1672,7 +1672,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.WORK_FILES.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.workfiles_created_sec.rate,5m)>{$MSSQL.WORK_FILES.MAX}'
               name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
@@ -1701,7 +1701,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{min(5m)}>{$MSSQL.WORK_TABLES.MAX}'
+              expression: 'min(/MSSQL by ODBC/mssql.worktables_created_sec.rate,5m)>{$MSSQL.WORK_TABLES.MAX}'
               name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.'
@@ -1727,7 +1727,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{max(5m)}<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
+              expression: 'max(/MSSQL by ODBC/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
@@ -1751,7 +1751,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0'
               name: 'MSSQL: Service is unavailable'
               priority: DISASTER
               description: 'The TCP port of the MS SQL Server service is currently unavailable.'
@@ -1819,7 +1819,7 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.primary_recovery_health["{#GROUP_NAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health in progress'
                   priority: WARNING
                   description: 'The primary replica is in the synchronization process.'
@@ -1877,7 +1877,7 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.secondary_recovery_health["{#GROUP_NAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health in progress'
                   priority: WARNING
                   description: 'The secondary replica is in the synchronization process.'
@@ -1911,12 +1911,12 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.synchronization_health["{#GROUP_NAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': All replicas unhealthy'
                   priority: DISASTER
                   description: 'None of the availability replicas have a healthy synchronization.'
                 -
-                  expression: '{last()}=1'
+                  expression: 'last(/MSSQL by ODBC/mssql.synchronization_health["{#GROUP_NAME}"])=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Some replicas unhealthy'
                   priority: HIGH
                   description: 'The synchronization health of some, but not all, availability replicas is healthy.'
@@ -1993,14 +1993,14 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The differential backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2009,7 +2009,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
-                      expression: '{MSSQL by ODBC:mssql.backup.diff["{#DBNAME}"].last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
+                      expression: 'last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
             -
               name: 'MSSQL DB ''{#DBNAME}'': Last full backup duration'
               type: DEPENDENT
@@ -2054,14 +2054,14 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The full backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2070,7 +2070,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
-                      expression: '{MSSQL by ODBC:mssql.backup.full["{#DBNAME}"].last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
+                      expression: 'last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
             -
               name: 'MSSQL DB ''{#DBNAME}'': Last log backup duration'
               type: DEPENDENT
@@ -2115,14 +2115,14 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'The log backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2131,7 +2131,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
-                      expression: '{MSSQL by ODBC:mssql.backup.log["{#DBNAME}"].last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
+                      expression: 'last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
             -
               name: 'MSSQL DB ''{#DBNAME}'': Active transactions'
               type: DEPENDENT
@@ -2291,7 +2291,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
+                  expression: 'min(/MSSQL by ODBC/mssql.db.log_flush_waits_sec.rate["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)'
                   priority: WARNING
                   description: 'Too many commits are waiting for the log flush.'
@@ -2321,7 +2321,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
+                  expression: 'min(/MSSQL by ODBC/mssql.db.log_flush_wait_time["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)'
                   priority: WARNING
                   description: 'The wait time to flush the log is too long.'
@@ -2401,7 +2401,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
+                  expression: 'min(/MSSQL by ODBC/mssql.db.percent_log_used["{#DBNAME}"],5m)>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)'
                   priority: WARNING
                   description: 'There''s not enough space left in the log.'
@@ -2440,7 +2440,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>1'
+                  expression: 'last(/MSSQL by ODBC/mssql.db.state["{#DBNAME}"])>1'
                   name: 'MSSQL DB ''{#DBNAME}'': State is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The DB has a non-working state.'
@@ -2644,7 +2644,7 @@ zabbix_export:
                   value: 'MSSQL Job ''{#JOBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.job.runstatus["{#JOBNAME}"])=0'
                   name: 'MSSQL Job ''{#JOBNAME}'': Failed to run'
                   priority: WARNING
                   description: 'The last run of the job has failed.'
@@ -2675,7 +2675,7 @@ zabbix_export:
                   value: 'MSSQL Job ''{#JOBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
                   name: 'MSSQL Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
                   opdata: 'Job duration: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2786,7 +2786,7 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/MSSQL by ODBC/mssql.local_db.state["{#DBNAME}"])>0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The local availability database has a non-working state.'
@@ -2821,12 +2821,12 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.local_db.synchronization_health["{#DBNAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Not healthy'
                   priority: HIGH
                   description: 'The synchronization state of the local availability database is NOT SYNCHRONIZING.'
                 -
-                  expression: '{last()}=1'
+                  expression: 'last(/MSSQL by ODBC/mssql.local_db.synchronization_health["{#DBNAME}"])=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Partially healthy'
                   priority: AVERAGE
                   description: 'A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is SYNCHRONIZING.'
@@ -2987,17 +2987,17 @@ zabbix_export:
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=3'
+                  expression: 'last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])=3'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The state of the mirror database and of the database mirroring session is "Pending Failover".'
                 -
-                  expression: '{last()}=5'
+                  expression: 'last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])=5'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.'
                 -
-                  expression: '{last()}>=0 and {last()}<=2'
+                  expression: 'last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])>=0 and last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])<=2'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: INFO
                   description: 'The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".'
@@ -3031,7 +3031,7 @@ zabbix_export:
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=2'
+                  expression: 'last(/MSSQL by ODBC/mssql.mirroring.witness_state["{#DBNAME}"])=2'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" Witness is disconnected'
                   priority: WARNING
                   description: 'The state of the witness in the database mirroring session of the database is "Disconnected".'
@@ -3125,7 +3125,7 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
+                  expression: 'last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size is growing'
                   priority: HIGH
                   description: 'The log records of the primary database are not sent to the secondary databases.'
@@ -3158,7 +3158,7 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
+                  expression: 'last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size is growing'
                   priority: HIGH
                   description: 'The log records in the log files of the secondary replica have not yet been redone.'
@@ -3327,17 +3327,17 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0 or {last()}=1 or {last()}=3'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=1 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=3'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The operational state of the replica in a given availability group is "Pending" or "Offline".'
                 -
-                  expression: '{last()}=4'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=4'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The operational state of the replica in a given availability group is "Failed".'
                 -
-                  expression: '{last()}=5'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=5'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The operational state of the replica in a given availability group is "Failed, no quorum".'
@@ -3371,7 +3371,7 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} Recovery in progress'
                   priority: INFO
                   description: 'At least one joined database has a database state other than ONLINE.'
@@ -3433,18 +3433,18 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Not healthy'
                   priority: AVERAGE
                   description: 'At least one joined database is in the NOT SYNCHRONIZING state.'
                 -
-                  expression: '{last()}=1'
+                  expression: 'last(/MSSQL by ODBC/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Partially healthy'
                   priority: WARNING
                   description: 'Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.'
           trigger_prototypes:
             -
-              expression: '{MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2'
+              expression: 'last(/MSSQL by ODBC/mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 and last(/MSSQL by ODBC/mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"])=2'
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is disconnected'
               priority: WARNING
               description: |
@@ -3822,12 +3822,12 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 > 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}'
+      expression: 'last(/MSSQL by ODBC/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by ODBC/mssql.batch_requests_sec.rate)'
       name: 'MSSQL: Too frequently pointers using'
       priority: WARNING
       description: 'Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
     -
-      expression: '{MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {MSSQL by ODBC:mssql.page_reads_sec.rate.last()}'
+      expression: 'last(/MSSQL by ODBC/mssql.readahead_pages_sec.rate) > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * last(/MSSQL by ODBC/mssql.page_reads_sec.rate)'
       name: 'MSSQL: Too many physical reads occurring'
       priority: WARNING
       description: 'If this value makes up even a sizeable minority of the total Page Reads/sec (say, greater than 20% of the total page reads), you may have too many physical reads occurring.'

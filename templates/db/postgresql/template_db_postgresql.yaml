@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:26:37Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -156,7 +156,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()} > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
+              expression: 'last(/PostgreSQL/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
               name: 'PostgreSQL: Required checkpoints occurs too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
               priority: AVERAGE
               description: |
@@ -277,14 +277,14 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)} = 1'
+              expression: 'nodata(/PostgreSQL/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],30m) = 1'
               name: 'PostgreSQL: Failed to get items (no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: '{PostgreSQL:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0'
+                  expression: 'last(/PostgreSQL/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
         -
           name: 'Status: Cache hit ratio %'
           key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
@@ -298,7 +298,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{max(5m)} < {$PG.CACHE_HITRATIO.MIN.WARN}'
+              expression: 'max(/PostgreSQL/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
               name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
         -
@@ -320,7 +320,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
         -
@@ -436,7 +436,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              expression: 'min(/PostgreSQL/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
@@ -520,13 +520,13 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.PING_TIME.MAX.WARN}'
+              expression: 'min(/PostgreSQL/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.PING_TIME.MAX.WARN}'
               name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: '{PostgreSQL:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0'
+                  expression: 'last(/PostgreSQL/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
         -
           name: 'Status: Ping'
           key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
@@ -548,7 +548,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()} = 0'
+              expression: 'last(/PostgreSQL/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
         -
@@ -583,7 +583,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.REPL_LAG.MAX.WARN}'
+              expression: 'min(/PostgreSQL/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
               name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
@@ -610,7 +610,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{max(5m)}=0'
+              expression: 'max(/PostgreSQL/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m)=0'
               name: 'PostgreSQL: Replication is down'
               priority: AVERAGE
         -
@@ -715,7 +715,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()} < 10m'
+              expression: 'last(/PostgreSQL/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) < 10m'
               name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'PostgreSQL uptime is less than 10 minutes'
@@ -738,7 +738,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
         -
@@ -888,7 +888,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
@@ -919,7 +919,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
             -
@@ -1174,7 +1174,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
+                  expression: 'last(/PostgreSQL/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
@@ -1210,7 +1210,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
@@ -1289,7 +1289,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
@@ -1692,7 +1692,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1701,7 +1701,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1712,7 +1716,7 @@ zabbix_export:
                   type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1721,7 +1725,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1730,9 +1738,9 @@ zabbix_export:
                         host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '6'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1741,7 +1749,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1751,9 +1763,9 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '12'
+                  'y': '6'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1762,7 +1774,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1771,9 +1787,9 @@ zabbix_export:
                         host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '24'
+                  'y': '12'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1782,7 +1798,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1792,9 +1812,9 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '24'
+                  'y': '12'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1803,7 +1823,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1812,9 +1836,9 @@ zabbix_export:
                         host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '36'
+                  'y': '18'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1823,7 +1847,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1833,9 +1861,9 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '36'
+                  'y': '18'
                   width: '12'
-                  height: '12'
+                  height: '6'
                   fields:
                     -
                       type: INTEGER
@@ -1844,7 +1872,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1862,6 +1894,10 @@ zabbix_export:
                   height: '6'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1874,6 +1910,10 @@ zabbix_export:
                   height: '6'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1885,6 +1925,10 @@ zabbix_export:
                   width: '12'
                   height: '6'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid
@@ -1899,6 +1943,10 @@ zabbix_export:
                   height: '6'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1910,6 +1958,10 @@ zabbix_export:
                   width: '12'
                   height: '6'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid
@@ -1924,6 +1976,10 @@ zabbix_export:
                   height: '6'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1935,6 +1991,10 @@ zabbix_export:
                   width: '12'
                   height: '6'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid
@@ -1948,6 +2008,10 @@ zabbix_export:
                   width: '12'
                   height: '6'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid

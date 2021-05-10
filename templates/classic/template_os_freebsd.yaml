@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:26:34Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -27,7 +27,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{last()}<1024'
+              expression: last(/FreeBSD/kernel.maxfiles)<1024
               name: 'Configured max number of opened files is too low on {HOST.NAME}'
               priority: INFO
         -
@@ -42,7 +42,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{last()}<256'
+              expression: last(/FreeBSD/kernel.maxproc)<256
               name: 'Configured max number of processes is too low on {HOST.NAME}'
               priority: INFO
         -
@@ -56,7 +56,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              expression: '{avg(5m)}>30'
+              expression: 'avg(/FreeBSD/proc.num[,,run],5m)>30'
               name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
         -
@@ -70,7 +70,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              expression: '{avg(5m)}>300'
+              expression: 'avg(/FreeBSD/proc.num[],5m)>300'
               name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
         -
@@ -118,7 +118,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              expression: '{avg(5m)}>5'
+              expression: 'avg(/FreeBSD/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
         -
@@ -252,7 +252,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/FreeBSD/system.hostname,#1)<>last(/FreeBSD/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -288,7 +288,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{last()}<50'
+              expression: 'last(/FreeBSD/system.swap.size[,pfree])<50'
               name: 'Lack of free swap space on {HOST.NAME}'
               priority: WARNING
               description: 'It probably means that the systems requires more physical memory.'
@@ -320,7 +320,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/FreeBSD/system.uname,#1)<>last(/FreeBSD/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -338,7 +338,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{change(0)}<0'
+              expression: change(/FreeBSD/system.uptime)<0
               name: '{HOST.NAME} has just been restarted'
               priority: INFO
         -
@@ -364,7 +364,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/FreeBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/FreeBSD/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
@@ -379,7 +379,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{last()}<20M'
+              expression: 'last(/FreeBSD/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
         -
@@ -483,7 +483,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/FreeBSD/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: 'Free inodes is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -
@@ -507,7 +507,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/FreeBSD/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: 'Free disk space is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -

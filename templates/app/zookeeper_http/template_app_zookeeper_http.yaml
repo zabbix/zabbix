@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:37Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -561,7 +561,7 @@ zabbix_export:
               value: Zookeeper
           triggers:
             -
-              expression: '{min(5m)}>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
+              expression: 'min(/Zookeeper by HTTP/zookeeper.outstanding_requests,5m)>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
               name: 'Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min)'
               priority: AVERAGE
               description: 'Number of queued requests in the server. This goes up when the server receives more requests than it can process.'
@@ -661,7 +661,7 @@ zabbix_export:
               value: Zookeeper
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2))=1 and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0'
               name: 'Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper node state has changed. Ack to close.'
@@ -714,13 +714,13 @@ zabbix_export:
               value: Zookeeper
           triggers:
             -
-              expression: '{nodata(10m)}=1'
+              expression: 'nodata(/Zookeeper by HTTP/zookeeper.uptime,10m)=1'
               name: 'Zookeeper: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Zookeeper by HTTP/zookeeper.uptime)<10m'
               name: 'Zookeeper: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -756,7 +756,7 @@ zabbix_export:
               value: Zookeeper
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2))=1 and length(last(/Zookeeper by HTTP/zookeeper.version))>0'
               name: 'Zookeeper: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper version has changed. Ack to close.'
@@ -1040,7 +1040,7 @@ zabbix_export:
                   value: Zookeeper
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}'
+                  expression: 'min(/Zookeeper by HTTP/zookeeper.pending_syncs[{#SINGLETON}],5m)>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}'
                   name: 'Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min)'
                   priority: AVERAGE
                   manual_close: 'YES'
@@ -1117,7 +1117,7 @@ zabbix_export:
                   value: Zookeeper
           trigger_prototypes:
             -
-              expression: '{Zookeeper by HTTP:zookeeper.synced_followers[{#SINGLETON}].last()} < {Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1'
+              expression: 'last(/Zookeeper by HTTP/zookeeper.synced_followers[{#SINGLETON}]) < last(/Zookeeper by HTTP/zookeeper.quorum_size[{#SINGLETON}])-1'
               name: 'Zookeeper: Too few active followers'
               priority: AVERAGE
               description: 'The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended.'
@@ -1159,7 +1159,7 @@ zabbix_export:
           description: 'Request scheme which may be http or https'
   triggers:
     -
-      expression: '{Zookeeper by HTTP:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {Zookeeper by HTTP:zookeeper.max_file_descriptor_count.last()} > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'
+      expression: 'min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'
       name: 'Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.'

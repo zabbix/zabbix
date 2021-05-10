@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:35Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -541,7 +541,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              expression: 'min(/PostgreSQL Agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
@@ -1031,7 +1031,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()} > 18000000'
+              expression: 'last(/PostgreSQL Agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}"]) > 18000000'
               name: 'PostgreSQL: Oldest xid is too big'
               priority: AVERAGE
         -
@@ -1049,7 +1049,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/PostgreSQL Agent 2/pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"])=0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
         -
@@ -1126,7 +1126,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              expression: '{last()} < 600'
+              expression: 'last(/PostgreSQL Agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600'
               name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
               priority: AVERAGE
         -
@@ -1375,7 +1375,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL Agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
@@ -1406,7 +1406,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL Agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
             -
@@ -2084,7 +2084,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2093,7 +2093,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2104,7 +2108,7 @@ zabbix_export:
                   type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2113,7 +2117,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2122,9 +2130,9 @@ zabbix_export:
                         host: 'PostgreSQL Agent 2'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '5'
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2133,7 +2141,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2143,9 +2155,9 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '12'
+                  'y': '5'
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2154,7 +2166,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

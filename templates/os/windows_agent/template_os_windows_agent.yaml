@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:48Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -245,7 +245,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.INTERRUPT.CRIT.MAX}'
+              expression: 'min(/Windows CPU by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
               name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: |
@@ -258,7 +258,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
-                  expression: '{Windows CPU by Zabbix agent:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
         -
           name: 'CPU privileged time'
           key: 'perf_counter_en["\Processor Information(_total)\% Privileged Time"]'
@@ -276,17 +276,17 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.PRIV.CRIT.MAX}'
+              expression: 'min(/Windows CPU by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Privileged Time"],5m)>{$CPU.PRIV.CRIT.MAX}'
               name: 'CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: 'The CPU privileged time in the last 5 minutes exceeds {$CPU.PRIV.CRIT.MAX}%.'
               dependencies:
                 -
                   name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
-                  expression: '{Windows CPU by Zabbix agent:perf_counter_en["\Processor Information(_total)\% Interrupt Time"].min(5m)}>{$CPU.INTERRUPT.CRIT.MAX}'
+                  expression: 'min(/Windows CPU by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
-                  expression: '{Windows CPU by Zabbix agent:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
         -
           name: 'CPU user time'
           key: 'perf_counter_en["\Processor Information(_total)\% User Time"]'
@@ -339,7 +339,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -448,8 +448,8 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: |
-                {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                (({Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<5G or {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)
+                last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
@@ -461,8 +461,8 @@ zabbix_export:
               manual_close: 'YES'
             -
               expression: |
-                {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                (({Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<10G or {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)
+                last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
@@ -476,8 +476,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
-                    {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    (({Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<5G or {Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)
+                    last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
           graph_prototypes:
             -
               name: '{#FSNAME}: Disk space usage'
@@ -579,7 +579,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Windows generic by Zabbix agent/system.hostname,#1)<>last(/Windows generic by Zabbix agent/system.hostname,#2))=1 and length(last(/Windows generic by Zabbix agent/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -596,7 +596,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              expression: '{fuzzytime({$SYSTEM.FUZZYTIME.MAX})}=0'
+              expression: 'fuzzytime(/Windows generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
               name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
@@ -649,7 +649,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Windows generic by Zabbix agent/system.uptime)<10m'
               name: 'Host has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
@@ -693,14 +693,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{max(5m)}<{$MEM.PAGE_TABLE_CRIT.MIN}'
+              expression: 'max(/Windows memory by Zabbix agent/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}'
               name: 'Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
               priority: WARNING
               description: 'The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.'
               dependencies:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-                  expression: '{Windows memory by Zabbix agent:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
         -
           name: 'Memory page faults per second'
           key: 'perf_counter_en["\Memory\Page Faults/sec"]'
@@ -731,14 +731,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEM.PAGE_SEC.CRIT.MAX}'
+              expression: 'min(/Windows memory by Zabbix agent/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}'
               name: 'The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
               priority: WARNING
               description: 'The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-                  expression: '{Windows memory by Zabbix agent:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
         -
           name: 'Memory pool non-paged'
           key: 'perf_counter_en["\Memory\Pool Nonpaged Bytes"]'
@@ -770,7 +770,7 @@ zabbix_export:
           key: system.swap.free
           history: 7d
           units: B
-          params: 'last("system.swap.size[,total]") - last("system.swap.size[,total]") / 100 * last("perf_counter_en[\"\Paging file(_Total)\% Usage\"]")'
+          params: 'last(//system.swap.size[,total]) - last(//system.swap.size[,total]) / 100 * last(//perf_counter_en["\Paging file(_Total)\% Usage"])'
           description: 'The free space of swap volume/file in bytes.'
           tags:
             -
@@ -833,7 +833,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last("vm.memory.size[used]") / last("vm.memory.size[total]") * 100'
+          params: 'last(//vm.memory.size[used]) / last(//vm.memory.size[total]) * 100'
           description: 'Memory utilization in %'
           tags:
             -
@@ -841,7 +841,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -1076,9 +1076,9 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}<>2 and {diff()}=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1119,9 +1119,9 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: |
-                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}<0 and
-                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}>0 and
-                {Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2
+                change(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"])<0 and
+                last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"])>0 and
+                last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])=2
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1130,17 +1130,17 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}<>2 and {Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               expression: |
-                ({Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} or
-                {Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}) and
-                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}>0
+                (avg(/Windows network by Zabbix agent/net.if.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"]) or
+                avg(/Windows network by Zabbix agent/net.if.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"])) and
+                last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} and
-                {Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}
+                avg(/Windows network by Zabbix agent/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"]) and
+                avg(/Windows network by Zabbix agent/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFNAME}"])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
@@ -1149,16 +1149,16 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}<>2 and {Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               expression: |
-                {Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or {Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Windows network by Zabbix agent/net.if.in["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Windows network by Zabbix agent/net.if.out["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and {Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Windows network by Zabbix agent/net.if.in["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Windows network by Zabbix agent/net.if.out["{#IFNAME}",errors],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
@@ -1167,8 +1167,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}<>2 and {Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
@@ -1422,7 +1422,7 @@ zabbix_export:
                   value: 'Disk {#DEVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)}>{$VFS.DEV.UTIL.MAX.WARN}'
+                  expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
                   name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
@@ -1430,10 +1430,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
-                      expression: '{Windows physical disks by Zabbix agent:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
+                      expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                     -
                       name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
-                      expression: '{Windows physical disks by Zabbix agent:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+                      expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
             -
               name: '{#DEVNAME}: Average disk read queue length'
               key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]'
@@ -1457,7 +1457,7 @@ zabbix_export:
                   value: 'Disk {#DEVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
+                  expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                   name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
@@ -1475,7 +1475,7 @@ zabbix_export:
                   value: 'Disk {#DEVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+                  expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
                   name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
@@ -1660,7 +1660,7 @@ zabbix_export:
                   value: Services
               trigger_prototypes:
                 -
-                  expression: '{min(#3)}<>0'
+                  expression: 'min(/Windows services by Zabbix agent/service.info["{#SERVICE.NAME}",state],#3)<>0'
                   name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
                   priority: AVERAGE
                   description: 'The service has a state other than "Running" for the last three times.'
@@ -1714,16 +1714,16 @@ zabbix_export:
               newvalue: 'No such service'
   triggers:
     -
-      expression: '{Windows CPU by Zabbix agent:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Windows CPU by Zabbix agent:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 > {$CPU.QUEUE.CRIT.MAX}'
+      expression: 'min(/Windows CPU by Zabbix agent/perf_counter_en["\System\Processor Queue Length"],5m) - last(/Windows CPU by Zabbix agent/wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]) * 2 > {$CPU.QUEUE.CRIT.MAX}'
       name: 'CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
       priority: WARNING
       description: 'The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.'
       dependencies:
         -
           name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
-          expression: '{Windows CPU by Zabbix agent:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}'
+          expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
     -
-      expression: '{Windows memory by Zabbix agent:system.swap.pfree.min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Windows memory by Zabbix agent:system.swap.size[,total].last()}>0'
+      expression: 'min(/Windows memory by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent/system.swap.size[,total])>0'
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
@@ -1731,7 +1731,7 @@ zabbix_export:
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-          expression: '{Windows memory by Zabbix agent:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
+          expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
   graphs:
     -
       name: 'CPU jumps'

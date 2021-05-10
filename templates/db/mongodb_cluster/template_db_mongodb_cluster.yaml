@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:28Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -87,7 +87,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{max(5m)}<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              expression: 'max(/MongoDB cluster by Zabbix Agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
               description: |
@@ -298,7 +298,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
         -
@@ -326,7 +326,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
         -
@@ -678,7 +678,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
               priority: HIGH
               description: 'Connection to mongos proxy instance is currently unavailable.'
@@ -714,7 +714,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{nodata(10m)}=1'
+              expression: 'nodata(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime,10m)=1'
               name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
@@ -722,9 +722,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
-                  expression: '{MongoDB cluster by Zabbix Agent 2:mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"].last()}=0'
+                  expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime)<10m'
               name: 'MongoDB cluster: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -755,7 +755,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'

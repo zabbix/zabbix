@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T12:04:34Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -425,7 +425,7 @@ zabbix_export:
               value: VMware
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m'
               name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
@@ -955,7 +955,7 @@ zabbix_export:
               value: VMware
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/VMware Hypervisor/icmpping[])=0'
               name: 'VMware: Hypervisor is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept ICMP ping.'
@@ -1277,29 +1277,29 @@ zabbix_export:
               value: VMware
           triggers:
             -
-              expression: '{last()}=3'
+              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
               dependencies:
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
             -
-              expression: '{last()}=2'
+              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
               description: 'One or more components in the appliance might become overloaded soon.'
               dependencies:
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
         -
           name: 'VMware: Overall status'
           type: SIMPLE
@@ -1316,19 +1316,19 @@ zabbix_export:
               value: VMware
           triggers:
             -
-              expression: '{last()}=3'
+              expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
             -
-              expression: '{last()}=2'
+              expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
               description: 'One or more components in the appliance might become overloaded soon.'
               dependencies:
                 -
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
         -
           name: 'VMware: Uptime'
           type: SIMPLE
@@ -1344,7 +1344,7 @@ zabbix_export:
               value: VMware
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m'
               name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
@@ -1400,7 +1400,7 @@ zabbix_export:
                   value: VMware
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {last()}<{#MULTIPATH.COUNT}'
+                  expression: '(last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2))=1 and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}'
                   name: 'VMware: The multipath count has been changed'
                   opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'
                   priority: AVERAGE

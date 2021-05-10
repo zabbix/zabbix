@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:48Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -25,7 +25,7 @@ zabbix_export:
               value: 'IMAP service'
           triggers:
             -
-              expression: '{max(#3)}=0'
+              expression: 'max(/IMAP Service/net.tcp.service[imap],#3)=0'
               name: 'IMAP service is down on {HOST.NAME}'
               priority: AVERAGE
       valuemaps:

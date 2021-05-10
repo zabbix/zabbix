@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:23Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -42,7 +42,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/HOST-RESOURCES-MIB CPU SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -139,7 +139,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100'
+              params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
               description: 'Memory utilization in %'
               tags:
                 -
@@ -147,7 +147,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/HOST-RESOURCES-MIB memory SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
@@ -213,6 +213,10 @@ zabbix_export:
                   height: '5'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -222,7 +226,7 @@ zabbix_export:
                   type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -231,7 +235,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -240,9 +248,9 @@ zabbix_export:
                         host: 'HOST-RESOURCES-MIB SNMP'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '17'
+                  'y': '10'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -251,7 +259,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -306,7 +318,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100'
+              params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
@@ -355,8 +367,8 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: |
-                {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                (({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<5G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)
+                last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
@@ -368,8 +380,8 @@ zabbix_export:
               manual_close: 'YES'
             -
               expression: |
-                {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                (({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<10G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)
+                last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
@@ -383,8 +395,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
-                    {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    (({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<5G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)
+                    last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
           graph_prototypes:
             -
               name: '{#FSNAME}: Disk space usage'

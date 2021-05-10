@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:33Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -60,7 +60,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Ubiquiti AirOS SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -88,7 +88,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2))=1 and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -197,7 +197,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: '(last("vm.memory.total[memTotal.0]")-(last("vm.memory.free[memFree.0]")+last("vm.memory.buffers[memBuffer.0]")+last("vm.memory.cached[memCache.0]")))/last("vm.memory.total[memTotal.0]")*100'
+          params: '(last(//vm.memory.total[memTotal.0])-(last(//vm.memory.free[memFree.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCache.0])))/last(//vm.memory.total[memTotal.0])*100'
           description: 'Memory utilization in %'
           tags:
             -
@@ -205,7 +205,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Ubiquiti AirOS SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'

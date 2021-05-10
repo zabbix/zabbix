@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:27:42Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -32,17 +32,17 @@ zabbix_export:
               value: Nginx
           triggers:
             -
-              expression: '{min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}'
               name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Nginx: Process is not running'
-                  expression: '{Nginx by Zabbix agent:proc.num[nginx].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
                 -
                   name: 'Nginx: Service is down'
-                  expression: '{Nginx by Zabbix agent:net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
         -
           name: 'Nginx: Service status'
           key: 'net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
@@ -60,14 +60,14 @@ zabbix_export:
               value: Nginx
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
               name: 'Nginx: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Nginx: Process is not running'
-                  expression: '{Nginx by Zabbix agent:proc.num[nginx].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
         -
           name: 'Nginx: Connections accepted per second'
           type: DEPENDENT
@@ -140,7 +140,7 @@ zabbix_export:
               value: Nginx
           triggers:
             -
-              expression: '{min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}'
+              expression: 'min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
               name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               opdata: 'Current rate: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -148,10 +148,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Nginx: Process is not running'
-                  expression: '{Nginx by Zabbix agent:proc.num[nginx].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
                 -
                   name: 'Nginx: Service is down'
-                  expression: '{Nginx by Zabbix agent:net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
         -
           name: 'Nginx: Connections handled per second'
           type: DEPENDENT
@@ -302,7 +302,7 @@ zabbix_export:
               value: Nginx
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2))=1 and length(last(/Nginx by Zabbix agent/nginx.version))>0'
               name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
@@ -349,7 +349,7 @@ zabbix_export:
               value: Nginx
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
               name: 'Nginx: Process is not running'
               priority: HIGH
         -
@@ -375,8 +375,8 @@ zabbix_export:
           triggers:
             -
               expression: |
-                {str("HTTP/1.1 200")}=0 or
-                 {nodata(30m)}=1
+                find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"like","HTTP/1.1 200")=0 or
+                 nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)=1
               name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
@@ -384,10 +384,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Nginx: Process is not running'
-                  expression: '{Nginx by Zabbix agent:proc.num[nginx].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
                 -
                   name: 'Nginx: Service is down'
-                  expression: '{Nginx by Zabbix agent:net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
       macros:
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'

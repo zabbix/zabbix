@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-24T10:32:24Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -103,7 +103,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
                   description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
@@ -185,7 +185,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Pages replace rate more than 0'
                   priority: WARNING
                   description: 'There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.'
@@ -221,33 +221,33 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               dependencies:
                 -
                   name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
               name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
               name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
                   name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
           graph_prototypes:
             -
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization'
@@ -350,19 +350,19 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
                   priority: HIGH
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
                 -
-                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.WARN}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)'
                   priority: WARNING
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.WARN}ms.'
                   dependencies:
                     -
                       name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
-                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                      expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
             -
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rejected, current'
               type: JMX
@@ -391,14 +391,14 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$IGNITE.THREADS.COUNT.MAX.WARN}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$IGNITE.THREADS.COUNT.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$IGNITE.THREADS.COUNT.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of running threads is over {$IGNITE.THREADS.COUNT.MAX.WARN}.'
                   dependencies:
                     -
                       name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
-                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                      expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
             -
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs waiting, current'
               type: JMX
@@ -414,7 +414,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$IGNITE.JOBS.QUEUE.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of queued jobs is over {$IGNITE.JOBS.QUEUE.MAX.WARN}.'
@@ -653,20 +653,20 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{change()}>0'
+                  expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology'
                   priority: INFO
                   description: 'One or more server node added to the topology. Ack to close.'
                   manual_close: 'YES'
                 -
-                  expression: '{change()}<0'
+                  expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology'
                   priority: WARNING
                   description: 'One or more server node left the topology. Ack to close.'
                   manual_close: 'YES'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}>{Ignite by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}'
+              expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])'
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology'
               priority: INFO
               description: 'One or more server node left the topology. Ack to close.'
@@ -723,7 +723,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -769,13 +769,13 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{nodata(10m)}=1'
+                  expression: 'nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 10 minutes.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -828,25 +828,6 @@ zabbix_export:
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'The number of  messages received per second.'
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
-              tags:
-                -
-                  tag: Application
-                  value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
-            -
-              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate'
-              type: JMX
-              key: 'jmx["{#JMXOBJ}",ReconnectCount]'
-              history: 7d
-              value_type: FLOAT
-              username: '{$IGNITE.USER}'
-              password: '{$IGNITE.PASSWORD}'
-              description: 'Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -939,7 +920,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   priority: WARNING
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -1263,7 +1244,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
@@ -1283,7 +1264,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{max(30m)}>0'
+                  expression: 'max(/Ignite by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0'
                   name: 'Cache group [{#JMXNAME}]: Rebalance in progress'
                   priority: INFO
                   description: 'Ack to close.'
@@ -1355,7 +1336,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{max(30m)}=0'
+                  expression: 'max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0'
                   name: 'Cache group [{#JMXNAME}]: There is no copy for partitions'
                   priority: WARNING
             -
@@ -1373,7 +1354,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)'
               name: 'Cache group [{#JMXNAME}]: One or more backups are unavailable'
               priority: WARNING
           graph_prototypes:
@@ -1502,7 +1483,7 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
                   name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
                   priority: AVERAGE
                   description: 'Number of messages in queue more than {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
@@ -1733,21 +1714,21 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Ignite by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}'
+              expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/Ignite by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])'
               name: 'Cache group [{#JMXGROUP}]: All entries are in heap'
               priority: INFO
               description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
               manual_close: 'YES'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)} > {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)'
               name: 'Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m'
               priority: WARNING
               dependencies:
                 -
                   name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
               name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
               priority: AVERAGE
           graph_prototypes:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:27:26Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -52,7 +52,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/RabbitMQ cluster by HTTP/rabbitmq.get_overview,30m)=1'
               name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -934,7 +934,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1102,14 +1102,14 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
               name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: '{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
         -
           name: 'RabbitMQ: Service ping'
           type: SIMPLE
@@ -1128,7 +1128,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
               name: 'RabbitMQ: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1150,7 +1150,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1'
               name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
@@ -1158,7 +1158,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: '{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
         -
           name: 'RabbitMQ: Get node overview'
           type: HTTP_AGENT
@@ -1236,7 +1236,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{last()}=1'
+              expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.disk_free_alarm)=1'
               name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1304,7 +1304,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{last()}=1'
+              expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.mem_alarm)=1'
               name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1397,7 +1397,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2))=1 and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0'
               name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'RabbitMQ version has changed. Ack to close.'
@@ -1426,7 +1426,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{min(5m)}>0'
+              expression: 'min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0'
               name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -1457,7 +1457,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{max(5m)}=0'
+              expression: 'max(/RabbitMQ node by HTTP/rabbitmq.node.running,5m)=0'
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1465,7 +1465,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: '{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
         -
           name: 'RabbitMQ: Runtime run queue'
           type: DEPENDENT
@@ -1546,7 +1546,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m'
               name: 'RabbitMQ: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -1588,7 +1588,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck[{#SINGLETON}])=0'
                   name: 'RabbitMQ: Node healthcheck failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1653,7 +1653,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1696,7 +1696,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.local_alarms[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1739,7 +1739,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are queues that could potentially lose data if the this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1782,7 +1782,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1825,7 +1825,7 @@ zabbix_export:
                   value: RabbitMQ
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}])=0'
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -2149,7 +2149,7 @@ zabbix_export:
                   value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
+                  expression: 'min(/RabbitMQ node by HTTP/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
                   name: 'RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING

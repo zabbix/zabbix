@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-03-24T06:36:43Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -121,7 +121,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{min(10m)}>0'
+              expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0'
               name: 'ES: Cluster has the initializing shards'
               priority: AVERAGE
               description: 'The cluster has the initializing shards longer than 10 minutes.'
@@ -171,12 +171,12 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{change()}<0'
+              expression: 'change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)<0'
               name: 'ES: The number of nodes within the cluster has decreased'
               priority: INFO
               manual_close: 'YES'
             -
-              expression: '{change()}>0'
+              expression: 'change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)>0'
               name: 'ES: The number of nodes within the cluster has increased'
               priority: INFO
               manual_close: 'YES'
@@ -256,19 +256,19 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{last()}=2'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=2'
               name: 'ES: Health is RED'
               priority: HIGH
               description: |
                 One or more primary shards are unassigned, so some data is unavailable. 
                 This can occur briefly during cluster startup as primary shards are assigned.
             -
-              expression: '{last()}=255'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255'
               name: 'ES: Health is UNKNOWN'
               priority: HIGH
               description: 'The health status of the cluster is unknown or cannot be obtained.'
             -
-              expression: '{last()}=1'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1'
               name: 'ES: Health is YELLOW'
               priority: AVERAGE
               description: |
@@ -318,7 +318,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{min(10m)}>0'
+              expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0'
               name: 'ES: Cluster has the unassigned shards'
               priority: AVERAGE
               description: 'The cluster has the unassigned shards longer than 10 minutes.'
@@ -436,7 +436,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{last()}=2'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.count.master)=2'
               name: 'ES: Cluster has only two master nodes'
               priority: DISASTER
               description: 'The cluster has only two nodes with a master role and will be unavailable if one of them breaks.'
@@ -532,7 +532,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime[{#ES.NODE}])<10m'
               name: 'ES: Cluster has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -551,7 +551,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{min(5m)}>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
               name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The performance of the TCP service is very low.'
@@ -559,7 +559,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'ES: Service is down'
-                  expression: '{Elasticsearch Cluster by HTTP:net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"].last()}=0'
+                  expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
         -
           name: 'ES: Service status'
           type: SIMPLE
@@ -579,7 +579,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
               name: 'ES: Service is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept TCP connections.'
@@ -697,7 +697,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'change(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.flush.total[{#ES.NODE}]) + (change(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
+              params: 'change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
               description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
               tags:
                 -
@@ -705,7 +705,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.flush.latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
@@ -785,7 +785,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'change(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
+              params: 'change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
               description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
               tags:
                 -
@@ -793,7 +793,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.indexing.index_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
@@ -1029,7 +1029,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'change(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
+              params: 'change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
               description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
               tags:
                 -
@@ -1037,7 +1037,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.fetch_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
@@ -1167,8 +1167,8 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               params: |
-                change(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
-                ( change(es.node.indices.search.query_total[{#ES.NODE}]) + (change(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
+                change(//es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
+                ( change(//es.node.indices.search.query_total[{#ES.NODE}]) + (change(//es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
               description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
               tags:
                 -
@@ -1176,7 +1176,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.query_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: 'If latency exceeds a threshold, look for potential resource bottlenecks, or investigate whether you need to optimize your queries.'
@@ -1348,7 +1348,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                   priority: HIGH
                   description: |
@@ -1356,7 +1356,7 @@ zabbix_export:
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended 
                     guidelines stated above), or scale out the cluster by adding more nodes.
                 -
-                  expression: '{min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
                   priority: WARNING
                   description: |
@@ -1366,7 +1366,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
-                      expression: '{Elasticsearch Cluster by HTTP:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+                      expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
             -
               name: 'ES {#ES.NODE}: Node uptime'
               type: DEPENDENT
@@ -1393,7 +1393,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/Elasticsearch Cluster by HTTP/es.node.jvm.uptime[{#ES.NODE}])<10m'
                   name: 'ES {#ES.NODE}: Node {#ES.NODE} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -1484,7 +1484,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the refresh thread pool executor is over 0 for 5m.'
@@ -1574,7 +1574,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.search.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the search thread pool executor is over 0 for 5m.'
@@ -1664,7 +1664,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.write.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the write thread pool executor is over 0 for 5m.'
@@ -1872,7 +1872,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '({Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()})/({Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)>{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()}'
+      expression: '(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)'
       name: 'ES: Cluster does not have enough space for resharding'
       priority: HIGH
       description: 'There is not enough disk space for index resharding.'

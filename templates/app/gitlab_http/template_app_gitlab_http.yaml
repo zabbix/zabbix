@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:37Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -203,7 +203,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2))=1 and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
               name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'GitLab version has changed. Ack to close.'
@@ -300,7 +300,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{min(5m)}>{$GITLAB.HTTP.FAIL.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}'
               name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
               description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
@@ -365,7 +365,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/GitLab by HTTP/gitlab.liveness)=0'
               name: 'GitLab: Liveness check was failed'
               priority: HIGH
               description: 'The application server is not running or Rails Controllers are deadlocked.'
@@ -520,13 +520,13 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/GitLab by HTTP/gitlab.readiness)=0'
               name: 'GitLab: Gitlab instance is not able to accept traffic'
               priority: HIGH
               dependencies:
                 -
                   name: 'GitLab: Liveness check was failed'
-                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
+                  expression: 'last(/GitLab by HTTP/gitlab.liveness)=0'
         -
           name: 'GitLab: Redis: Client exceptions rate, cache'
           type: DEPENDENT
@@ -553,7 +553,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during  to requests to  Redis instance cache."'
@@ -583,7 +583,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during  to requests to  Redis instance queues."'
@@ -613,7 +613,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
               name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."'
@@ -919,7 +919,7 @@ zabbix_export:
               value: GitLab
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1'
               name: 'GitLab: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
@@ -927,7 +927,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'GitLab: Liveness check was failed'
-                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
+                  expression: 'last(/GitLab by HTTP/gitlab.liveness)=0'
         -
           name: 'GitLab: User CAPTCHA logins, total'
           type: DEPENDENT
@@ -1129,7 +1129,7 @@ zabbix_export:
                   value: 'GitLab: Puma stats'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)}>{$GITLAB.PUMA.QUEUE.MAX.WARN}'
+                  expression: 'min(/GitLab by HTTP/gitlab.puma.queued_connections[{#SINGLETON}],15m)>{$GITLAB.PUMA.QUEUE.MAX.WARN}'
                   name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
                   priority: WARNING
             -
@@ -1206,7 +1206,7 @@ zabbix_export:
                   value: 'GitLab: Puma stats'
           trigger_prototypes:
             -
-              expression: '{GitLab by HTTP:gitlab.puma.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.puma.max_threads[{#SINGLETON}].last()}*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
@@ -1264,7 +1264,7 @@ zabbix_export:
                   value: 'GitLab: Unicorn stats'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
+                  expression: 'min(/GitLab by HTTP/gitlab.unicorn.queued_connections[{#SINGLETON}],5m)>{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
                   name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
                   priority: WARNING
             -
@@ -1287,7 +1287,7 @@ zabbix_export:
                   value: 'GitLab: Unicorn stats'
           trigger_prototypes:
             -
-              expression: '{GitLab by HTTP:gitlab.unicorn.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.unicorn.unicorn_workers[{#SINGLETON}].last()}*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
+              expression: 'min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
@@ -1350,7 +1350,7 @@ zabbix_export:
               newvalue: Ok
   triggers:
     -
-      expression: '{GitLab by HTTP:gitlab.ruby.file_descriptors.max.min(5m)}/{GitLab by HTTP:gitlab.ruby.process_max_fds.last()}*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
+      expression: 'min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
       name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
   graphs:

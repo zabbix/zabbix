@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:36Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -81,7 +81,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              expression: '{str(Client)}=1'
+              expression: 'find(/Generic Java JMX/jmx["java.lang:type=Compilation","Name"],,"like","Client")=1'
               name: 'Compilation: {HOST.NAME} uses suboptimal JIT compiler'
               priority: INFO
               manual_close: 'YES'
@@ -788,7 +788,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              expression: '{min({$JMX.CPU.LOAD.TIME})}>{$JMX.CPU.LOAD.MAX}'
+              expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}'
               name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
               priority: AVERAGE
         -
@@ -808,7 +808,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              expression: '{nodata(5m)}=1'
+              expression: 'nodata(/Generic Java JMX/jmx["java.lang:type=Runtime","Uptime"],5m)=1'
               name: 'Runtime: JVM is not reachable'
               priority: AVERAGE
               manual_close: 'YES'
@@ -832,7 +832,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              expression: '{str(Server)}<>1'
+              expression: 'find(/Generic Java JMX/jmx["java.lang:type=Runtime","VmName"],,"like","Server")<>1'
               name: 'Runtime: {HOST.NAME} runs suboptimal VM type'
               priority: INFO
               manual_close: 'YES'
@@ -946,55 +946,55 @@ zabbix_export:
           description: 'The time during which the Non-heap memory utilization may exceed the threshold.'
   triggers:
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"].last()}'
+      expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"])'
       name: 'GarbageCollector: Concurrent Mark Sweep in fire fighting mode'
       priority: AVERAGE
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"].last()}'
+      expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"])'
       name: 'GarbageCollector: Mark Sweep Compact in fire fighting mode'
       priority: AVERAGE
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"].last()}'
+      expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"])'
       name: 'GarbageCollector: PS Mark Sweep in fire fighting mode'
       priority: AVERAGE
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.used"].min({$JMX.HEAP.MEM.USAGE.TIME})}>({Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.max"].last()}*{$JMX.HEAP.MEM.USAGE.MAX}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"].min({$JMX.NONHEAP.MEM.USAGE.TIME})}>({Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"].last()}*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Old Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)'
       name: 'MemoryPool: CMS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Old Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Old Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)'
       name: 'MemoryPool: CMS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Perm Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"].min({$JMX.MP.USAGE.TIME:"Code Cache"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"],{$JMX.MP.USAGE.TIME:"Code Cache"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"])*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)'
       name: 'MemoryPool: Code Cache memory usage more than {$JMX.MP.USAGE.MAX:"Code Cache"}% for {$JMX.MP.USAGE.TIME:"Code Cache"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)'
       name: 'MemoryPool: Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"Perm Gen"}% for {$JMX.MP.USAGE.TIME:"Perm Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Old Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)'
       name: 'MemoryPool: PS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Old Gen"}% for {$JMX.MP.USAGE.TIME:"PS Old Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)'
       name: 'MemoryPool: PS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"PS Perm Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Tenured Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Tenured Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)'
       name: 'MemoryPool: Tenured Gen memory usage more than {$JMX.MP.USAGE.MAX:"Tenured Gen"}% for {$JMX.MP.USAGE.TIME:"Tenured Gen"}'
       priority: WARNING
     -
-      expression: '{Generic Java JMX:jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"].min({$JMX.FILE.DESCRIPTORS.TIME})}>({Generic Java JMX:jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"].last()}*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
+      expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
       name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
       priority: WARNING
   graphs:

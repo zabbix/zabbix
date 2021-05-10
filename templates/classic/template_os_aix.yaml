@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:26:34Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -26,7 +26,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              expression: '{avg(5m)}>30'
+              expression: 'avg(/AIX/proc.num[,,run],5m)>30'
               name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
         -
@@ -40,7 +40,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              expression: '{avg(5m)}>300'
+              expression: 'avg(/AIX/proc.num[],5m)>300'
               name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
         -
@@ -75,7 +75,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              expression: '{avg(5m)}>5'
+              expression: 'avg(/AIX/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
         -
@@ -139,7 +139,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/AIX/system.hostname,#1)<>last(/AIX/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -270,7 +270,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              expression: '{avg(5m)}>20'
+              expression: 'avg(/AIX/system.stat[cpu,wa],5m)>20'
               name: 'Disk I/O is overloaded on {HOST.NAME}'
               priority: WARNING
               description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
@@ -460,7 +460,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/AIX/system.uname,#1)<>last(/AIX/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -478,7 +478,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{change(0)}<0'
+              expression: change(/AIX/system.uptime)<0
               name: '{HOST.NAME} has just been restarted'
               priority: INFO
         -
@@ -504,7 +504,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/AIX/vfs.file.cksum[/etc/passwd],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
@@ -519,7 +519,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{last()}<20M'
+              expression: 'last(/AIX/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
         -
@@ -623,7 +623,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/AIX/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: 'Free inodes is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -
@@ -647,7 +647,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/AIX/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: 'Free disk space is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -

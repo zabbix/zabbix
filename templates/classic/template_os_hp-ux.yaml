@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:26:33Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -30,7 +30,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              expression: '{avg(5m)}>5'
+              expression: 'avg(/HP-UX/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
         -
@@ -133,7 +133,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/HP-UX/system.hostname,#1)<>last(/HP-UX/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -166,7 +166,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/HP-UX/system.uname,#1)<>last(/HP-UX/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -192,7 +192,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              expression: '{diff(0)}>0'
+              expression: '(last(/HP-UX/vfs.file.cksum[/etc/passwd],#1)<>last(/HP-UX/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
@@ -207,7 +207,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{last()}<20M'
+              expression: 'last(/HP-UX/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
         -
@@ -311,7 +311,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/HP-UX/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: 'Free inodes is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -
@@ -335,7 +335,7 @@ zabbix_export:
                   value: Filesystems
               trigger_prototypes:
                 -
-                  expression: '{last()}<20'
+                  expression: 'last(/HP-UX/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: 'Free disk space is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -

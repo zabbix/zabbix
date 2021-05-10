@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:22Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -60,7 +60,7 @@ zabbix_export:
                   value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()} <= {#THRESH}'
+                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}'
                   name: 'SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed'
                   priority: WARNING
                   description: 'The value should be greater than THRESH.'
@@ -202,7 +202,7 @@ zabbix_export:
                   value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}>90'
+                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.percentage_used[{#NAME}])>90'
                   name: 'SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance'
                   priority: AVERAGE
             -
@@ -230,7 +230,7 @@ zabbix_export:
                   value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#2))=1 and length(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}]))>0'
                   name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
@@ -260,17 +260,17 @@ zabbix_export:
                   value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}'
+                  expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
                 -
-                  expression: '{avg(5m)}>{$SMART.TEMPERATURE.MAX.WARN}'
+                  expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
                   name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
-                      expression: '{SMART by Zabbix agent active 2:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}'
+                      expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
             -
               name: 'SMART [{#NAME}]: Self-test passed'
               type: DEPENDENT
@@ -297,7 +297,7 @@ zabbix_export:
                   value: '{#DISKTYPE} {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}="false"'
+                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.test[{#NAME}])="false"'
                   name: 'SMART [{#NAME}]: Disk self-test is not passed'
                   priority: HIGH
           overrides:

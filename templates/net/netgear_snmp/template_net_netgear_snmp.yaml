@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:25Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -48,7 +48,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Netgear Fastpath SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -97,7 +97,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2))=1 and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -126,7 +126,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2))=1 and length(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -166,7 +166,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: '(last("vm.memory.total[agentSwitchCpuProcessMemAvailable.0]")-last("vm.memory.available[agentSwitchCpuProcessMemFree.0]"))/last("vm.memory.total[agentSwitchCpuProcessMemAvailable.0]")*100'
+          params: '(last(//vm.memory.total[agentSwitchCpuProcessMemAvailable.0])-last(//vm.memory.available[agentSwitchCpuProcessMemFree.0]))/last(//vm.memory.total[agentSwitchCpuProcessMemAvailable.0])*100'
           description: 'Memory utilization in %'
           tags:
             -
@@ -174,7 +174,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Netgear Fastpath SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -206,7 +206,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1'
+                  expression: 'count(/Netgear Fastpath SNMP/sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -238,7 +238,7 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS:"failed"},eq)}=1'
+                  expression: 'count(/Netgear Fastpath SNMP/sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -285,31 +285,31 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
           trigger_prototypes:
             -
               expression: |
-                {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                 or
-                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
               name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
               expression: |
-                {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
+                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
                 or
-                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
+                last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
+              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
               name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -318,10 +318,10 @@ zabbix_export:
                 -
                   name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   expression: |
-                    {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                    avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                     or
-                    {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
-                  recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                    last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                  recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

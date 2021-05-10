@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:05:32Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -175,7 +175,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
+              expression: 'min(/Memcached/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
               name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'The max number of connections is reachedand and a new connection had to wait in the queue as a result.'
@@ -245,7 +245,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{min(5m)}>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
+              expression: 'min(/Memcached/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
               name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
               priority: WARNING
               description: |
@@ -273,7 +273,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/Memcached/memcached.cpu.sys,30m)=1'
               name: 'Memcached: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -281,7 +281,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Memcached: Service is down'
-                  expression: '{Memcached:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0'
+                  expression: 'last(/Memcached/memcached.ping["{$MEMCACHED.CONN.URI}"])=0'
         -
           name: 'Memcached: CPU user'
           type: DEPENDENT
@@ -319,7 +319,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Memcached/memcached.ping["{$MEMCACHED.CONN.URI}"])=0'
               name: 'Memcached: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -571,7 +571,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: last(/Memcached/memcached.uptime)<10m
               name: 'Memcached: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -602,7 +602,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Memcached/memcached.version,#1)<>last(/Memcached/memcached.version,#2))=1 and length(last(/Memcached/memcached.version))>0'
               name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Memcached version has changed. Ack to close.'
@@ -640,11 +640,11 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Memcached:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
+      expression: 'min(/Memcached/memcached.stats.bytes,5m)/last(/Memcached/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
       name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
       priority: WARNING
     -
-      expression: '{Memcached:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
+      expression: 'min(/Memcached/memcached.connections.current,5m)/last(/Memcached/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
       name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: 'When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.'

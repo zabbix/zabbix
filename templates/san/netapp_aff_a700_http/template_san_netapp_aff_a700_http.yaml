@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:43Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/SAN
@@ -278,9 +278,9 @@ zabbix_export:
           value_type: FLOAT
           units: '!ms'
           params: |
-            (last(netapp.cluster.statistics.latency_raw.other) - prev(netapp.cluster.statistics.latency_raw.other)) /
-            (last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) +
-            (last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) = 0) ) * 0.001
+            (last(//netapp.cluster.statistics.latency_raw.other) - last(//netapp.cluster.statistics.latency_raw.other,#2)) /
+            (last(//netapp.cluster.statistics.iops_raw.other) - last(//netapp.cluster.statistics.iops_raw.other,#2) +
+            (last(//netapp.cluster.statistics.iops_raw.other) - last(//netapp.cluster.statistics.iops_raw.other,#2) = 0) ) * 0.001
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
           tags:
             -
@@ -294,9 +294,9 @@ zabbix_export:
           value_type: FLOAT
           units: '!ms'
           params: |
-            (last(netapp.cluster.statistics.latency_raw.read) - prev(netapp.cluster.statistics.latency_raw.read)) /
-            ( last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) +
-            (last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) = 0) ) * 0.001
+            (last(//netapp.cluster.statistics.latency_raw.read) - last(//netapp.cluster.statistics.latency_raw.read,#2)) /
+            ( last(//netapp.cluster.statistics.iops_raw.read) - last(//netapp.cluster.statistics.iops_raw.read,#2) +
+            (last(//netapp.cluster.statistics.iops_raw.read) - last(//netapp.cluster.statistics.iops_raw.read,#2) = 0) ) * 0.001
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
           tags:
             -
@@ -310,9 +310,9 @@ zabbix_export:
           value_type: FLOAT
           units: '!ms'
           params: |
-            (last(netapp.cluster.statistics.latency_raw.total) - prev(netapp.cluster.statistics.latency_raw.total)) /
-            ( last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) +
-            (last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) = 0) ) * 0.001
+            (last(//netapp.cluster.statistics.latency_raw.total) - last(//netapp.cluster.statistics.latency_raw.total,#2)) /
+            ( last(//netapp.cluster.statistics.iops_raw.total) - last(//netapp.cluster.statistics.iops_raw.total,#2) +
+            (last(//netapp.cluster.statistics.iops_raw.total) - last(//netapp.cluster.statistics.iops_raw.total,#2) = 0) ) * 0.001
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
           tags:
             -
@@ -326,9 +326,9 @@ zabbix_export:
           value_type: FLOAT
           units: '!ms'
           params: |
-            (last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
-            ( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
-            (last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001
+            (last(//netapp.cluster.statistics.latency_raw.write) - last(//netapp.cluster.statistics.latency_raw.write,#2)) /
+            ( last(//netapp.cluster.statistics.iops_raw.write) - last(//netapp.cluster.statistics.iops_raw.write,#2) +
+            (last(//netapp.cluster.statistics.iops_raw.write) - last(//netapp.cluster.statistics.iops_raw.write,#2) = 0) ) * 0.001
           description: 'The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.'
           tags:
             -
@@ -532,7 +532,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              expression: '({last()}<>"ok")'
+              expression: '(last(/NetApp AFF A700 by HTTP/netapp.cluster.status)<>"ok")'
               name: 'Cluster status is abnormal'
               priority: AVERAGE
               description: 'Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.'
@@ -562,7 +562,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
               name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: '__RESOURCE__ version has changed. Ack to close.'
@@ -746,9 +746,9 @@ zabbix_export:
                   value: 'Chassis "{#ID}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}="error")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="ok")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="ok")'
                   name: '{#ID}: Chassis has something errors'
                   priority: AVERAGE
                   description: 'Something is wrong with the chassis.'
@@ -802,9 +802,9 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" disks'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"present")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="present")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])="present")'
                   name: '{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"'
                   priority: AVERAGE
                   description: 'Something is wrong with the disk.'
@@ -855,9 +855,9 @@ zabbix_export:
                   value: 'Chassis "{#CHASSISID}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}="error")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="ok")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="ok")'
                   name: '{#FRUID}: FRU of the chassis "{#ID}" state is error'
                   priority: AVERAGE
                   description: 'Something is wrong with the FRU.'
@@ -961,9 +961,9 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"online")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])="online")'
                   name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state'
                   priority: AVERAGE
                   description: 'LUNs are only available when their containers are available.'
@@ -994,9 +994,9 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"online")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])="online")'
                   name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state'
                   priority: AVERAGE
                   description: 'Normal states for a LUN are online and offline. Other states indicate errors.'
@@ -1050,7 +1050,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}"'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0'
                   name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: '{#NODENAME} version has changed. Ack to close.'
@@ -1081,7 +1081,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}"'
               trigger_prototypes:
                 -
-                  expression: '({last()}<>"normal")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.nodes.controller.over_temperature[{#NODENAME}])<>"normal")'
                   name: '{#NODENAME}: Node has over temperature'
                   priority: AVERAGE
                   description: 'The hardware shuts down if the temperature exceeds critical thresholds(item''s value is "over").'
@@ -1171,7 +1171,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}"'
               trigger_prototypes:
                 -
-                  expression: '({last()}<>"up")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.nodes.state[{#NODENAME}])<>"up")'
                   name: '{#NODENAME}: Node state is abnormal'
                   priority: AVERAGE
                   description: |
@@ -1203,7 +1203,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}"'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/NetApp AFF A700 by HTTP/netapp.nodes.uptime[{#NODENAME}])<10m'
                   name: '{#NODENAME}: Node has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -1257,9 +1257,9 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" Ethernet ports'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}="down")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="up")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up")'
                   name: '{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down'
                   priority: AVERAGE
                   description: 'Something is wrong with the ethernet port.'
@@ -1345,9 +1345,9 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" FC ports'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"online")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])="online")'
                   name: '{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"'
                   priority: AVERAGE
                   description: 'Something is wrong with the FC port.'
@@ -1425,9 +1425,9 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"running")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="running")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])="running")'
                   name: '{#SVMNAME}: SVM state is abnormal'
                   priority: AVERAGE
                   description: 'Something is wrong with the SVM.'
@@ -1574,9 +1574,9 @@ zabbix_export:
                   value: 'Volume "{#VOLUMENAME}"'
               trigger_prototypes:
                 -
-                  expression: '({diff()}=1 and {last()}<>"online")'
+                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])="online")'
                   name: '{#VOLUMENAME}: Volume state is abnormal'
                   priority: AVERAGE
                   description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
@@ -1761,9 +1761,9 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: |
-                (last(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
-                ( last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
-                (last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001
+                (last(//netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - last(//netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}],#2)) /
+                ( last(//netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}],#2) +
+                (last(//netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}],#2) = 0) ) * 0.001
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
               tags:
                 -
@@ -1777,9 +1777,9 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: |
-                (last(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
-                ( last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
-                (last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001
+                (last(//netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - last(//netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}],#2)) /
+                ( last(//netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}],#2) +
+                (last(//netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}],#2) = 0)) * 0.001
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
               tags:
                 -
@@ -1793,9 +1793,9 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: |
-                (last(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
-                ( last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
-                (last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001
+                (last(//netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - last(//netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}],#2)) /
+                ( last(//netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}],#2) +
+                (last(//netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}],#2) = 0) ) * 0.001
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
               tags:
                 -
@@ -1809,9 +1809,9 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: |
-                (last(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
-                ( last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
-                (last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001
+                (last(//netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - last(//netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}],#2)) /
+                ( last(//netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}],#2) +
+                (last(//netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - last(//netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}],#2) = 0) ) * 0.001
               description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
               tags:
                 -
