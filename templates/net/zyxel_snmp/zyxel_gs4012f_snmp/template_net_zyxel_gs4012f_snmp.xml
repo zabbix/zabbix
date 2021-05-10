@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-19T10:18:05Z</date>
+   <date>2021-05-10T18:31:46Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -1017,6 +1017,7 @@ Transmission mode</description>
                               <macro>{#ZYXEL.IF.NAME}</macro>
                               <value>.*</value>
                               <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1037,8 +1038,9 @@ Transmission mode</description>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$IFCONTROL}</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1207,14 +1209,14 @@ return JSON.stringify(outArr);
                <value>90</value>
             </macro>
             <macro>
-               <macro>{$IFCONTROL}</macro>
-               <value>NEED TRIGGERS</value>
-               <description>triggers will be created only for interfaces whose description contains the value of this macro</description>
-            </macro>
-            <macro>
                <macro>{$SNMP.TIMEOUT}</macro>
                <value>5m</value>
                <description>The time interval for SNMP agent availability trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
+               <value>NEED TRIGGERS</value>
+               <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}</macro>

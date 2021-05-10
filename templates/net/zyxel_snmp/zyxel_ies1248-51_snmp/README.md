@@ -12,6 +12,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+
 Refer to the vendor documentation.
 
 ## Zabbix configuration
@@ -22,10 +24,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$IFCONTROL} |<p>triggers will be created only for interfaces whose description contains the value of this macro</p> |`NEED TRIGGERS` |
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
 |{$ZYXEL.ADSL.ATN.MAX} |<p>Type the maximum signal attenuation</p> |`40` |
 |{$ZYXEL.ADSL.SNR.MIN} |<p>Type the minimum signal to noise margin (0-31 dB)</p> |`8` |
+|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`NEED TRIGGERS` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES} |<p>Filter of discoverable link types.</p> |`.*` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES} |<p>Filter to exclude discovered by link types.</p> |`2` |
 
@@ -39,7 +41,7 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Fan discovery |<p>An entry in fanRpmTable.</p> |SNMP |zyxel.ies1248.fan.discovery |
 |Temperature discovery |<p>An entry in tempTable.</p> |SNMP |zyxel.ies1248.temp.discovery |
-|Voltage discovery |<p>An entry in voltageTable.</p> |SNMP |zyxel.ies1248.volt.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Voltage discovery |<p>An entry in voltageTable.</p> |SNMP |zyxel.ies1248.volt.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Ethernet interface discovery |<p>-</p> |SNMP |zyxel.ies1248.net.if.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.IF.LINKSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}`</p><p>- B: {#ZYXEL.IF.LINKSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}`</p><p>- C: {#ZYXEL.IF.NAME} MATCHES_REGEX `enet`</p> |
 |ADSL interface discovery |<p>-</p> |SNMP |zyxel.ies1248.net.adsl.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.IF.LINKSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}`</p><p>- B: {#ZYXEL.IF.LINKSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}`</p><p>- C: {#ZYXEL.IF.NAME} MATCHES_REGEX `adsl`</p> |
 
@@ -74,7 +76,7 @@ There are no template links in this template.
 |Power_supply |ZYXEL IES1248-51: Nominal "{#ZYXEL.VOLT.NOMINAL}" |<p>MIB: ZYXEL-IESCOMMON-MIB</p><p>The current voltage reading.</p> |SNMP |zyxel.ies1248.volt[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |ZYXEL IES1248-51: SNMP agent availability |<p>-</p> |INTERNAL |zabbix[host,snmp,available]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |ZYXEL IES1248-51: Uptime |<p>MIB: RFC1213-MIB</p><p>The time (in hundredths of a second) since the</p><p>network management portion of the system was last</p><p>re-initialized.</p> |SNMP |zyxel.ies1248.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |ZYXEL IES1248-51: Alarm status |<p>MIB: ZYXEL-IESCOMMON-MIB</p><p>This variable indicates the alarm status of the module.</p><p>It is a bit map represented a sum, therefore, it can represent</p><p>multiple defects simultaneously. The moduleNoDefect should be set</p><p>if and only if no other flag is set.</p><p>The various bit positions are:</p><p>1   moduleNoDefect</p><p>2   moduleOverHeat</p><p>3   moduleFanRpmLow</p><p>4   moduleVoltageLow</p><p>5   moduleThermalSensorFailure</p><p>6   modulePullOut</p><p>7   powerDC48VAFailure</p><p>8   powerDC48VBFailure</p><p>9   extAlarmInputTrigger</p><p>10   moduleDown</p><p>11   mscSwitchOverOK</p><p>12   networkTopologyChange</p><p>13   macSpoof</p><p>14   cpuHigh</p><p>15   memoryUsageHigh</p><p>16   packetBufferUsageHigh</p><p>17   loopguardOccurence</p> |SNMP |zyxel.ies1248.slot.alarm<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Status |ZYXEL IES1248-51: Alarm status |<p>MIB: ZYXEL-IESCOMMON-MIB</p><p>This variable indicates the alarm status of the module.</p><p>It is a bit map represented a sum, therefore, it can represent</p><p>multiple defects simultaneously. The moduleNoDefect should be set</p><p>if and only if no other flag is set.</p><p>The various bit positions are:</p><p>1   moduleNoDefect</p><p>2   moduleOverHeat</p><p>3   moduleFanRpmLow</p><p>4   moduleVoltageLow</p><p>5   moduleThermalSensorFailure</p><p>6   modulePullOut</p><p>7   powerDC48VAFailure</p><p>8   powerDC48VBFailure</p><p>9   extAlarmInputTrigger</p><p>10   moduleDown</p><p>11   mscSwitchOverOK</p><p>12   networkTopologyChange</p><p>13   macSpoof</p><p>14   cpuHigh</p><p>15   memoryUsageHigh</p><p>16   packetBufferUsageHigh</p><p>17   loopguardOccurence</p> |SNMP |zyxel.ies1248.slot.alarm<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |ZYXEL IES1248-51: Temperature "{#ZYXEL.TEMP.ID}" |<p>MIB: ZYXEL-IESCOMMON-MIB</p><p>The current temperature measured at this sensor</p> |SNMP |zyxel.ies1248.temp[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
