@@ -254,6 +254,7 @@ class CApiInputValidator {
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
 			case API_DATE:
+			case API_NUMERIC_RANGES:
 				return true;
 
 			case API_OBJECT:
@@ -2189,6 +2190,8 @@ class CApiInputValidator {
 	 *   30,-10,0.7,-0.5
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2198,7 +2201,7 @@ class CApiInputValidator {
 	private static function validateNumericRanges($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
