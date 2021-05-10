@@ -424,7 +424,7 @@ class CControllerPopupImportCompare extends CController {
 		$change_types = [
 			'added' => self::CHANGE_ADDED,
 			'removed' => self::CHANGE_REMOVED,
-			'updated' => self::CHANGE_NONE,
+			'updated' => self::CHANGE_NONE
 		];
 
 		$rows = [];
