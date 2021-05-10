@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:34Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 53044571fb864d87af32473e08c76d0b
       template: 'Alcatel Timetra TiMOS SNMP'
       name: 'Alcatel Timetra TiMOS SNMP'
       description: |
@@ -29,6 +31,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: e28cb751b37e42d29be9f0295bd030b6
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.1.0
@@ -45,12 +48,14 @@ zabbix_export:
               value: CPU
           triggers:
             -
+              uuid: fb504a7964e94fe9af2a9d65d1c20a57
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: 2183a57a2c904632bf813c15610765f7
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -76,6 +81,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: 9f1c8827a9ef4948808bac9d76add9a8
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -102,12 +108,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
+              uuid: 3c4582706c79429dae9f9c5d2dc5163a
               expression: '{diff()}=1 and {strlen()}>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 3f2769066a184d29afd26047039b633c
           name: 'Available memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.10.0
@@ -127,6 +135,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: 9005685cea194d7c9702f19040df7b80
           name: 'Total memory'
           type: CALCULATED
           key: 'vm.memory.total[snmp]'
@@ -139,6 +148,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: f5cd1ed0f61f464f86a97485f833d832
           name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.9.0
@@ -158,6 +168,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: f223ac289a99469e8861219f4254dea6
           name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[vm.memory.util.0]'
@@ -172,12 +183,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
+              uuid: 0dc17bcbed3346018a89b2a7d0decff1
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
         -
+          uuid: fe7fa4ab68b8430c86a3adf6ba2fd048
           name: 'Entity Serial Numbers Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_NAME},1.3.6.1.4.1.6527.3.1.2.2.1.8.1.8,{#ENT_CLASS},1.3.6.1.4.1.6527.3.1.2.2.1.8.1.7,{#ENT_SN},1.3.6.1.4.1.6527.3.1.2.2.1.8.1.5]'
@@ -192,6 +205,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: ec087163f366430fbd688390bce17980
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6527.3.1.2.2.1.8.1.5.{#SNMPINDEX}'
@@ -212,12 +226,14 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
+                  uuid: f90d8e2a2c414e2f9a5f9421f75e325d
                   expression: '{diff()}=1 and {strlen()}>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
         -
+          uuid: 0fa1180b594e401a83927f6c20809a86
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6527.3.1.2.2.1.4.1.2]'
@@ -231,6 +247,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: be9fb466b33f4d078b6aae15123bc7d6
               name: '#{#SNMPINDEX}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6527.3.1.2.2.1.4.1.2.{#SNMPINDEX}'
@@ -249,12 +266,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
+                  uuid: 646c0ec9b5f84d5c81b9eca58496d623
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
                   name: '#{#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: f99bcd2eff1349f08ae23f6f9dbd6cfb
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6527.3.1.2.2.1.5.1.6]'
@@ -262,6 +281,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: a52d5ce3437f4f1ca633cc541028ccc7
               name: '#{#SNMPINDEX}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6527.3.1.2.2.1.5.1.6.{#SNMPINDEX}'
@@ -284,12 +304,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
+                  uuid: 6756b7c77f03464f83854724a166276a
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
                   name: '#{#SNMPINDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
             -
+              uuid: b73b01d720c7431085657548d620f76e
               name: '#{#SNMPINDEX}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6527.3.1.2.2.1.5.1.7.{#SNMPINDEX}'
@@ -312,12 +334,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
+                  uuid: 7eb7614684844650a1f6ccd8c4b4ecb4
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
                   name: '#{#SNMPINDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
         -
+          uuid: 6382c9595cb446778d23bb273143b27c
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6527.3.1.2.2.1.8.1.8,{#TEMP_SENSOR},1.3.6.1.4.1.6527.3.1.2.2.1.8.1.17]'
@@ -331,6 +355,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: c6a233ce51d44b63963f2345f709e6b3
               name: '{#SNMPVALUE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.{#SNMPINDEX}'
@@ -347,6 +372,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
+                  uuid: 72b4bfe7f8604e4e927ac88d1b5fb44d
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
@@ -355,6 +381,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
+                  uuid: cd5ce82f9bd448eca0ae2fee910e36fc
                   expression: '{avg(5m)}>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
@@ -368,6 +395,7 @@ zabbix_export:
                       expression: '{Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
                       recovery_expression: '{Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
                 -
+                  uuid: bf7182afed834371855325d3556a6e25
                   expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
@@ -398,6 +426,7 @@ zabbix_export:
           value: '65'
       valuemaps:
         -
+          uuid: 95a194271a584008a81564fd80189c5a
           name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
           mappings:
             -
@@ -417,6 +446,7 @@ zabbix_export:
               newvalue: deviceStateOutOfService
   graphs:
     -
+      uuid: 7300eff1609b497aa7628ed83b36a481
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -428,6 +458,7 @@ zabbix_export:
             host: 'Alcatel Timetra TiMOS SNMP'
             key: 'system.cpu.util[sgiCpuUsage.0]'
     -
+      uuid: e404b522555e4f9092930ce870649828
       name: 'Memory usage'
       ymin_type_1: FIXED
       graph_items:
@@ -445,6 +476,7 @@ zabbix_export:
             host: 'Alcatel Timetra TiMOS SNMP'
             key: 'vm.memory.available[sgiKbMemoryAvailable.0]'
     -
+      uuid: 111cde007d8342f9b743f08f12380ec3
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

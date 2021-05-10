@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:52Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
     -
+      uuid: cf0947cc05d3450b9a6d66b2eb180482
       template: 'Supermicro Aten SNMP'
       name: 'Supermicro Aten SNMP'
       description: |
@@ -23,6 +25,7 @@ zabbix_export:
           name: 'Templates/Server hardware'
       discovery_rules:
         -
+          uuid: e31995e21b3942e58b7ed451f57f0360
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.21317.1.3.1.2,{#SENSOR_DESCR},1.3.6.1.4.1.21317.1.3.1.13]'
@@ -42,6 +45,7 @@ zabbix_export:
           description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected FAN sensors (Value = 0)'
           item_prototypes:
             -
+              uuid: 5309e5fab7a44b11a8f045db2868a544
               name: '{#SENSOR_DESCR}: Fan speed, %'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.21317.1.3.1.2.{#SNMPINDEX}'
@@ -56,6 +60,7 @@ zabbix_export:
                   tag: Application
                   value: Fans
         -
+          uuid: c03c556ed8e441099513aaacaf4a3752
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.21317.1.3.1.2,{#SENSOR_DESCR},1.3.6.1.4.1.21317.1.3.1.13]'
@@ -75,6 +80,7 @@ zabbix_export:
           description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected temp sensors (Value = 0)'
           item_prototypes:
             -
+              uuid: fe3acdb63d884c10bc5abe7edf001ceb
               name: '{#SENSOR_DESCR}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.21317.1.3.1.2.{#SNMPINDEX}'
@@ -92,6 +98,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
+                  uuid: fed1291dafea4fad91ba610618ced0d3
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
@@ -100,6 +107,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
+                  uuid: 068e8b7e4a91454a814fc9dd2fa591fc
                   expression: '{avg(5m)}>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
@@ -113,6 +121,7 @@ zabbix_export:
                       expression: '{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
                       recovery_expression: '{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
                 -
+                  uuid: 50f5061eef834c57a3ac0b184d09544e
                   expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
