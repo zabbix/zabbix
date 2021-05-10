@@ -303,7 +303,8 @@ class CHistFunctionValidator extends CValidator {
 				return false;
 
 			case CHistFunctionData::PERIOD_MODE_SEC:
-				if ($time_shift !== '') {
+			case CHistFunctionData::PERIOD_MODE_SEC_ONLY:
+				if ($mode == CHistFunctionData::PERIOD_MODE_SEC_ONLY && $time_shift !== '') {
 					return false;
 				}
 
@@ -315,7 +316,7 @@ class CHistFunctionValidator extends CValidator {
 
 				return false;
 
-			case CHistFunctionData::PERIOD_MODE_NUM:
+			case CHistFunctionData::PERIOD_MODE_NUM_ONLY:
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}

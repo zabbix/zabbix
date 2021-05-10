@@ -2073,13 +2073,15 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMap']) && $valuemaps) {
 				$params = [
-					'output' => ['valuemapid', 'value', 'newvalue'],
-					'filter' => ['valuemapid' => array_keys($valuemaps)]
+					'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)],
+					'sortfield' => ['sortorder']
 				];
 				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
 
 				while ($mapping = DBfetch($query)) {
 					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'type' => $mapping['type'],
 						'value' => $mapping['value'],
 						'newvalue' => $mapping['newvalue']
 					];

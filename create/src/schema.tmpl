@@ -722,7 +722,9 @@ FIELD		|valuemap_mappingid|t_id	|	|NOT NULL	|0
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemap
 FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|newvalue	|t_varchar(64)	|''	|NOT NULL	|0
-UNIQUE		|1		|valuemapid,value
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|valuemapid,value,type
 
 TABLE|media|mediaid|ZBX_DATA
 FIELD		|mediaid	|t_id		|	|NOT NULL	|0
@@ -1750,7 +1752,8 @@ TABLE|lld_override_opinventory|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
 FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 
-TABLE|trigger_queue||0
+TABLE|trigger_queue|trigger_queueid|0
+FIELD		|trigger_queueid|t_id		|	|NOT NULL	|0
 FIELD		|objectid	|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
@@ -1855,4 +1858,4 @@ INDEX		|1		|reportid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030187	|5030187
+ROW		|5030201	|5030201

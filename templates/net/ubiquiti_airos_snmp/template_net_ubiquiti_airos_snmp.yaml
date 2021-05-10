@@ -3,11 +3,9 @@ zabbix_export:
   date: '2021-05-09T00:00:00Z'
   groups:
     -
-      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
-      uuid: 6c235d126c1f4895acfe2156b140a886
       template: 'Ubiquiti AirOS SNMP'
       name: 'Ubiquiti AirOS SNMP'
       description: |
@@ -46,7 +44,6 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
-          uuid: 1aaf7d729983431cb28351e7ba0c8235
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2
@@ -63,14 +60,12 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: ad5caba38dd74f78954ed1be1ba4d698
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Ubiquiti AirOS SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
-          uuid: 9e8ab4b180f24b64bcddfc1606d616d0
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.2.840.10036.3.1.2.1.4.5
@@ -93,15 +88,13 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 86cde0de58e441aca885dd3af5540744
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2))=1 and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
-          uuid: e770de183b1e4ffc9348750520719b41
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.2.840.10036.3.1.2.1.3.5
@@ -124,7 +117,6 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
-          uuid: 6393f8a84fd4417abdccd8bd867aac7e
           name: 'Memory (buffers)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.3.0
@@ -144,7 +136,6 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: 224c8d32f0d649b3b94b77e960934f15
           name: 'Memory (cached)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.4.0
@@ -164,7 +155,6 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: 401b95eff89743cba6942606ac051b01
           name: 'Free memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.2.0
@@ -182,7 +172,6 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: eefa6d2e8560407f82bbb8783bb399ad
           name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.1.0
@@ -202,14 +191,13 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: 29df9ffb192d4434a88ac6a413b9569d
           name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: '(last("vm.memory.total[memTotal.0]")-(last("vm.memory.free[memFree.0]")+last("vm.memory.buffers[memBuffer.0]")+last("vm.memory.cached[memCache.0]")))/last("vm.memory.total[memTotal.0]")*100'
+          params: '(last(//vm.memory.total[memTotal.0])-(last(//vm.memory.free[memFree.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCache.0])))/last(//vm.memory.total[memTotal.0])*100'
           description: 'Memory utilization in %'
           tags:
             -
@@ -217,8 +205,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              uuid: 5a8f0074e35849a289901c637de8bb08
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Ubiquiti AirOS SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -231,7 +218,6 @@ zabbix_export:
           value: '90'
   graphs:
     -
-      uuid: acb2b7447a6449a591db186a4db81643
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -243,7 +229,6 @@ zabbix_export:
             host: 'Ubiquiti AirOS SNMP'
             key: 'system.cpu.util[loadValue.2]'
     -
-      uuid: cbce9bb057b14b8eb81f8cbb463442d6
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

@@ -31,6 +31,7 @@ class CNumberParser extends CParser {
 	*/
 	private $options = [
 		'with_minus' => true,
+		'with_float' => true,
 		'with_suffix' => false
 	];
 
@@ -84,22 +85,25 @@ class CNumberParser extends CParser {
 
 		$fragment = substr($source, $pos);
 
+		$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
 		$pattern = $this->options['with_suffix']
-			? '/^'.ZBX_PREG_NUMBER.'(?<suffix>['.self::$suffixes.'])?/'
-			: '/^'.ZBX_PREG_NUMBER.'/';
+			? '/^'.$pattern.'(?<suffix>['.self::$suffixes.'])?/'
+			: '/^'.$pattern.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {
 			return self::PARSE_FAIL;
 		}
 
-		if ($matches['number'][0] === '-' && !$this->options['with_minus']) {
+		$number = $this->options['with_float'] ? $matches['number'] : $matches['int'];
+
+		if ($number[0] === '-' && !$this->options['with_minus']) {
 			return self::PARSE_FAIL;
 		}
 
 		$this->length = strlen($matches[0]);
 		$this->match = $matches[0];
 
-		$this->number = $matches['number'];
+		$this->number = $number;
 		$this->suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : null;
 
 		return ($pos + $this->length < strlen($source)) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;

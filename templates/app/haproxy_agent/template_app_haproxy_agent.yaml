@@ -3,11 +3,9 @@ zabbix_export:
   date: '2021-05-09T00:00:00Z'
   groups:
     -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
-      uuid: 812073bf8df143bcae2a84b32c3965e5
       template: 'HAProxy by Zabbix agent'
       name: 'HAProxy by Zabbix agent'
       description: |
@@ -29,7 +27,6 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
-          uuid: 29381f1e0bdc4628a82ef1b7724f2e6f
           name: 'HAProxy: Uptime'
           type: DEPENDENT
           key: haproxy.uptime
@@ -57,14 +54,12 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              uuid: 30d9ccb2845548e19f0a9e5ff93656bd
-              expression: '{last()}<10m'
+              expression: 'last(/HAProxy by Zabbix agent/haproxy.uptime)<10m'
               name: 'HAProxy: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
-          uuid: e930e70fb1b44d9cbe673f35133c6e77
           name: 'HAProxy: Version'
           type: DEPENDENT
           key: haproxy.version
@@ -91,14 +86,12 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              uuid: 4aa1e7a150be441490b570bda832e7d7
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2))=1 and length(last(/HAProxy by Zabbix agent/haproxy.version))>0'
               name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'HAProxy version has changed. Ack to close.'
               manual_close: 'YES'
         -
-          uuid: c224cfe9b7474f9e80618dde78cfcb11
           name: 'HAProxy: Service response time'
           key: 'net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
           history: 7d
@@ -110,17 +103,15 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              uuid: b310c762faa64032bc47c077dfcbc5ad
-              expression: '{min(5m)}>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
               name: 'HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'HAProxy: Service is down'
-                  expression: '{HAProxy by Zabbix agent:net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"].last()}=0'
+                  expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
         -
-          uuid: 97e45c508f5a4df78fc783382088e233
           name: 'HAProxy: Service status'
           key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
           history: 7d
@@ -137,13 +128,11 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              uuid: 711288c9efdb411e96cad7c4844cae6b
-              expression: '{last()}=0'
+              expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
               name: 'HAProxy: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
         -
-          uuid: e70009bd4e3041a3952738673ebb5c29
           name: 'HAProxy: Get stats page'
           key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
           history: 1h
@@ -155,7 +144,6 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
-          uuid: aabdb5706b6744379561f269e0709141
           name: 'HAProxy: Get stats'
           key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           history: 1h
@@ -180,7 +168,6 @@ zabbix_export:
               value: 'Zabbix raw items'
       discovery_rules:
         -
-          uuid: 9899f0a11ece4b9194ca44a8fc34b066
           name: 'BACKEND discovery'
           type: DEPENDENT
           key: haproxy.backend.discovery
@@ -199,7 +186,6 @@ zabbix_export:
           description: 'Discovery backends'
           item_prototypes:
             -
-              uuid: 3df452e68f144fc3a8e5ff7644ace606
               name: 'HAProxy Backend {#PXNAME}: Responses denied per second'
               type: DEPENDENT
               key: 'haproxy.backend.dresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -222,7 +208,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy backend {#PXNAME}'
             -
-              uuid: 5e315f24828d45b285e92971d5456234
               name: 'HAProxy Backend {#PXNAME}: Errors connection per second'
               type: DEPENDENT
               key: 'haproxy.backend.econ.rate[{#PXNAME}:{#SVNAME}]'
@@ -245,7 +230,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy backend {#PXNAME}'
             -
-              uuid: f1ca728c571e4cf4ac9ebc36e96df27e
               name: 'HAProxy Backend {#PXNAME}: Response errors per second'
               type: DEPENDENT
               key: 'haproxy.backend.eresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -269,13 +253,11 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: cdc9843690874f04a3830847beab59ce
-                  expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
             -
-              uuid: 389e5f77b422419386c2fa21db612697
               name: 'HAProxy Backend {#PXNAME}: Unassigned requests'
               type: DEPENDENT
               key: 'haproxy.backend.qcur[{#PXNAME}:{#SVNAME}]'
@@ -295,13 +277,11 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 906376c30e594f4a9c24d880179a6d52
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
             -
-              uuid: a58ff94387824acb81b27cab5cfc680a
               name: 'HAProxy Backend {#PXNAME}: Time in queue'
               type: DEPENDENT
               key: 'haproxy.backend.qtime[{#PXNAME}:{#SVNAME}]'
@@ -327,13 +307,11 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: dfd2644529b54e38828174323f72a796
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
             -
-              uuid: 7e801fd81fed448db7dd6c6eeaa398d5
               name: 'HAProxy Backend {#PXNAME}: Responses time'
               type: DEPENDENT
               key: 'haproxy.backend.rtime[{#PXNAME}:{#SVNAME}]'
@@ -359,13 +337,11 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: f25505af8ecb4074bc720811a10aa000
-                  expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
             -
-              uuid: 5826a63314314ef297c81749561574d2
               name: 'HAProxy Backend {#PXNAME}: Status'
               type: DEPENDENT
               key: 'haproxy.backend.status[{#PXNAME}:{#SVNAME}]'
@@ -394,13 +370,11 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 6dda3d4377d54298a005b032ec9fa403
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.backend.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy backend {#PXNAME}: Server is DOWN'
                   priority: AVERAGE
                   description: 'Backend is not available.'
             -
-              uuid: bebad9eb0731474db798eacde7771238
               name: 'HAProxy Backend {#PXNAME}: Redispatched requests per second'
               type: DEPENDENT
               key: 'haproxy.backend.wredis.rate[{#PXNAME}:{#SVNAME}]'
@@ -423,7 +397,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy backend {#PXNAME}'
             -
-              uuid: 0f09a6b800d747f4beed96a25b5cfa49
               name: 'HAProxy Backend {#PXNAME}: Retried connections per second'
               type: DEPENDENT
               key: 'haproxy.backend.wretr.rate[{#PXNAME}:{#SVNAME}]'
@@ -447,7 +420,6 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
           graph_prototypes:
             -
-              uuid: a8518997e8ce40339f5d2384a011f3ba
               name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
               graph_items:
                 -
@@ -474,7 +446,6 @@ zabbix_export:
               lld_macro: '{#SVNAME}'
               path: $.svname
         -
-          uuid: 2ac1d12c3a1645bbbab84fa8d75cc435
           name: 'TCP BACKEND discovery'
           type: DEPENDENT
           key: haproxy.backend_tcp.discovery
@@ -493,7 +464,6 @@ zabbix_export:
           description: 'Discovery TCP backends'
           item_prototypes:
             -
-              uuid: 5edcdf01a2574bc3bf2d1b065bdc7ff0
               name: 'HAProxy TCP Backend {#PXNAME}: Responses denied per second'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.dresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -516,7 +486,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Backend {#PXNAME}'
             -
-              uuid: f4f6126e7b82479e8bb40ecc3807cb92
               name: 'HAProxy TCP Backend {#PXNAME}: Errors connection per second'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.econ.rate[{#PXNAME}:{#SVNAME}]'
@@ -539,7 +508,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Backend {#PXNAME}'
             -
-              uuid: 80490424531148fa844c4a3c72506b0b
               name: 'HAProxy TCP Backend {#PXNAME}: Response errors per second'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.eresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -563,13 +531,11 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: d85cdda1727c4c35b54a0358a5a1ea17
-                  expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
             -
-              uuid: 4cebbf12459f45afa115e10a089b6998
               name: 'HAProxy TCP Backend {#PXNAME}: Unassigned requests'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.qcur[{#PXNAME}:{#SVNAME}]'
@@ -589,13 +555,11 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 25682266eda0406aa4956fd2229c861b
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
             -
-              uuid: 74a53a9623c146a7876a6ed09025e768
               name: 'HAProxy TCP Backend {#PXNAME}: Time in queue'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.qtime[{#PXNAME}:{#SVNAME}]'
@@ -621,13 +585,11 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: ec36653c1a4e4307a20d528268ae641e
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
             -
-              uuid: 1497dcd89ce340ee9b0af1d0981ca06f
               name: 'HAProxy TCP Backend {#PXNAME}: Responses time'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.rtime[{#PXNAME}:{#SVNAME}]'
@@ -653,13 +615,11 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 6810c7b3d96145e9b4dd0e3d16b1df0b
-                  expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
             -
-              uuid: 2e62a43dfc5c4e1388c8d487af18fe85
               name: 'HAProxy TCP Backend {#PXNAME}: Status'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.status[{#PXNAME}:{#SVNAME}]'
@@ -688,13 +648,11 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 981632af5b724300984061d24e057873
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.backend_tcp.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy TCP Backend {#PXNAME}: Server is DOWN'
                   priority: AVERAGE
                   description: 'Backend is not available.'
             -
-              uuid: f15cf5dac6af4cff8df89698e7c23fd3
               name: 'HAProxy TCP Backend {#PXNAME}: Redispatched requests per second'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]'
@@ -717,7 +675,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Backend {#PXNAME}'
             -
-              uuid: af33b17bacb64ab28d96236505acb4c1
               name: 'HAProxy TCP Backend {#PXNAME}: Retried connections per second'
               type: DEPENDENT
               key: 'haproxy.backend_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]'
@@ -741,7 +698,6 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
           graph_prototypes:
             -
-              uuid: 78115ef121914e79b7f6b9b228643cb3
               name: 'HAProxy: TCP Backend {#PXNAME} Redispatched requests and retried connections per second'
               graph_items:
                 -
@@ -768,7 +724,6 @@ zabbix_export:
               lld_macro: '{#SVNAME}'
               path: $.svname
         -
-          uuid: 69264415d8644ef597affd3dc95d42b2
           name: 'FRONTEND discovery'
           type: DEPENDENT
           key: haproxy.frontend.discovery
@@ -787,7 +742,6 @@ zabbix_export:
           description: 'Discovery frontends'
           item_prototypes:
             -
-              uuid: 434f9c1dd63946d3a181c42bcee94e07
               name: 'HAProxy Frontend {#PXNAME}: Incoming traffic'
               type: DEPENDENT
               key: 'haproxy.frontend.bin[{#PXNAME}:{#SVNAME}]'
@@ -816,7 +770,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 047ec4b444af4bc38f74eb7fabf2fb94
               name: 'HAProxy Frontend {#PXNAME}: Outgoing traffic'
               type: DEPENDENT
               key: 'haproxy.frontend.bout[{#PXNAME}:{#SVNAME}]'
@@ -844,7 +797,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 4542ee3da6334468b6a146083bfa1208
               name: 'HAProxy Frontend {#PXNAME}: Denied requests per second'
               type: DEPENDENT
               key: 'haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}]'
@@ -868,13 +820,11 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 91e034781180416d96f1fc5c12d79984
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
             -
-              uuid: 2da48ea7b7fb4432b041b9706017778e
               name: 'HAProxy Frontend {#PXNAME}: Request errors per second'
               type: DEPENDENT
               key: 'haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}]'
@@ -898,13 +848,11 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: eb88e27302c648c284ec760276449e0d
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
             -
-              uuid: d4d6d7092c524a4aa9ac83f9506fcb44
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 1xx per second'
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -927,7 +875,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 34bb4142cb4c48678f1136ed7a582ff7
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 2xx per second'
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -950,7 +897,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 3d6966759c864b0d94daceead022e421
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 3xx per second'
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -973,7 +919,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 3fe3871812254cf0a228b6607f02ea12
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 4xx per second'
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -996,7 +941,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 85d7aa81598b48ee9d40ce3e5b7fc7ea
               name: 'HAProxy Frontend {#PXNAME}: Number of responses with codes 5xx per second'
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -1019,7 +963,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 24ee024f493e47f4b4405bc469976c8e
               name: 'HAProxy Frontend {#PXNAME}: Sessions rate'
               type: DEPENDENT
               key: 'haproxy.frontend.rate[{#PXNAME}:{#SVNAME}]'
@@ -1038,7 +981,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 2290bc0944774d54a89d5b6195f81ad4
               name: 'HAProxy Frontend {#PXNAME}: Requests rate'
               type: DEPENDENT
               key: 'haproxy.frontend.req_rate[{#PXNAME}:{#SVNAME}]'
@@ -1057,7 +999,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: b01d1b02b9da4609acaa278cf5f2ebbd
               name: 'HAProxy Frontend {#PXNAME}: Established sessions'
               type: DEPENDENT
               key: 'haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]'
@@ -1076,7 +1017,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 4ed338fd24e14aeda1f6058a36371455
               name: 'HAProxy Frontend {#PXNAME}: Session limits'
               type: DEPENDENT
               key: 'haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]'
@@ -1099,14 +1039,13 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy frontend {#PXNAME}'
             -
-              uuid: 4aedda0904954ade92a4aad6460d759b
               name: 'HAProxy Frontend {#PXNAME}: Session utilization'
               type: CALCULATED
               key: 'haproxy.frontend.sutil[{#PXNAME}:{#SVNAME}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'
+              params: 'last(//haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(//haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
               tags:
                 -
@@ -1114,14 +1053,12 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 6346f79904674880a12f88fd45dd1064
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.sutil[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
                   description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
           graph_prototypes:
             -
-              uuid: 30141ef1c5bf4c4a9cca0f8ce2ea3373
               name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
               graph_items:
                 -
@@ -1136,7 +1073,6 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
                     key: 'haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}]'
             -
-              uuid: f6a6bb900b4e45c9af863e6e0aa9af8a
               name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
               graph_items:
                 -
@@ -1153,7 +1089,6 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
                     key: 'haproxy.frontend.bout[{#PXNAME}:{#SVNAME}]'
             -
-              uuid: 065d1ef09a404cf1bcc67f0e987482ab
               name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
               graph_items:
                 -
@@ -1168,7 +1103,6 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
                     key: 'haproxy.frontend.rate[{#PXNAME}:{#SVNAME}]'
             -
-              uuid: 3ce6177d02a045219cec0d348b970860
               name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
               type: STACKED
               graph_items:
@@ -1214,7 +1148,6 @@ zabbix_export:
               lld_macro: '{#SVNAME}'
               path: $.svname
         -
-          uuid: 62bacaf6c72f4262a816de823188f6e6
           name: 'TCP FRONTEND discovery'
           type: DEPENDENT
           key: haproxy.frontend_tcp.discovery
@@ -1233,7 +1166,6 @@ zabbix_export:
           description: 'Discovery TCP frontends'
           item_prototypes:
             -
-              uuid: e568e7771b1a415786867386a95d4294
               name: 'HAProxy TCP Frontend {#PXNAME}: Incoming traffic'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.bin[{#PXNAME}:{#SVNAME}]'
@@ -1262,7 +1194,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: 5ec9f9ee699a4d41862425fc69872fc4
               name: 'HAProxy TCP Frontend {#PXNAME}: Outgoing traffic'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.bout[{#PXNAME}:{#SVNAME}]'
@@ -1290,7 +1221,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: 76bd6bc39c3943f7b4a194474bac7cac
               name: 'HAProxy TCP Frontend {#PXNAME}: Denied requests per second'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}]'
@@ -1314,13 +1244,11 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 6df816cc6ef047b1b9927c6a9774ff17
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
             -
-              uuid: e64e40cf028f4576b61856d40f4e5339
               name: 'HAProxy TCP Frontend {#PXNAME}: Request errors per second'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}]'
@@ -1344,13 +1272,11 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: 754125aa47d54e0db1194a1cb532162a
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
             -
-              uuid: dceea3c5dd1a452b9e3157682e0a0009
               name: 'HAProxy TCP Frontend {#PXNAME}: Sessions rate'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.rate[{#PXNAME}:{#SVNAME}]'
@@ -1369,7 +1295,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: c23b05569c684c1c84b11d101feb7936
               name: 'HAProxy TCP Frontend {#PXNAME}: Requests rate'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.req_rate[{#PXNAME}:{#SVNAME}]'
@@ -1388,7 +1313,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: eee3bd5cedaa47cc833457729fca70ff
               name: 'HAProxy TCP Frontend {#PXNAME}: Established sessions'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]'
@@ -1407,7 +1331,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: 4e0f8d9561af4595bdf66f05b027c304
               name: 'HAProxy TCP Frontend {#PXNAME}: Session limits'
               type: DEPENDENT
               key: 'haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]'
@@ -1430,14 +1353,13 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP Frontend {#PXNAME}'
             -
-              uuid: e85f043c43ad4f959d975e7b0dc55062
               name: 'HAProxy TCP Frontend {#PXNAME}: Session utilization'
               type: CALCULATED
               key: 'haproxy.frontend_tcp.sutil[{#PXNAME}:{#SVNAME}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100'
+              params: 'last(//haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(//haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
               tags:
                 -
@@ -1445,14 +1367,12 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  uuid: d5372417b840419892cd89f835ae2682
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.sutil[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
                   description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
           graph_prototypes:
             -
-              uuid: c5696eca752f4b3d80a3f2be1b68ff69
               name: 'HAProxy: TCP Frontend {#PXNAME} Errors and denials per second'
               graph_items:
                 -
@@ -1467,7 +1387,6 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
                     key: 'haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}]'
             -
-              uuid: ef9c4033083042689c5eb8e16996ef93
               name: 'HAProxy: TCP Frontend {#PXNAME} In/Out traffic'
               graph_items:
                 -
@@ -1484,7 +1403,6 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
                     key: 'haproxy.frontend_tcp.bout[{#PXNAME}:{#SVNAME}]'
             -
-              uuid: 0a8d9093d857414d992ead1ddb371d89
               name: 'HAProxy: TCP Frontend {#PXNAME} Requests and sessions per second'
               graph_items:
                 -
@@ -1511,7 +1429,6 @@ zabbix_export:
               lld_macro: '{#SVNAME}'
               path: $.svname
         -
-          uuid: a2f7f79b8f094afd93648f62f99d3369
           name: 'Servers discovery'
           type: DEPENDENT
           key: haproxy.server.discovery
@@ -1531,7 +1448,6 @@ zabbix_export:
           description: 'Discovery servers'
           item_prototypes:
             -
-              uuid: 537f0b807f784b6cba1032ff77fad499
               name: 'HAProxy {#PXNAME} {#SVNAME}: Responses denied per second'
               type: DEPENDENT
               key: 'haproxy.server.dresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -1554,7 +1470,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
-              uuid: f688e1e62fa94d1db1d59735094f0bc4
               name: 'HAProxy {#PXNAME} {#SVNAME}: Errors connection per second'
               type: DEPENDENT
               key: 'haproxy.server.econ.rate[{#PXNAME}:{#SVNAME}]'
@@ -1577,7 +1492,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
-              uuid: bdcac24a8b1e4dd5a441edb61ca13156
               name: 'HAProxy {#PXNAME} {#SVNAME}: Response errors per second'
               type: DEPENDENT
               key: 'haproxy.server.eresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -1601,13 +1515,11 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: e742edd42f9e42ccac5ff5800f4593ce
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
             -
-              uuid: 3af9ae3041bb4cd588cc6048370d9be7
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 4xx per second'
               type: DEPENDENT
               key: 'haproxy.server.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -1630,7 +1542,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
-              uuid: 9f2f6e181dca47ab8e1ae9064ab9fe15
               name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 5xx per second'
               type: DEPENDENT
               key: 'haproxy.server.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]'
@@ -1653,7 +1564,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
-              uuid: 03c6d54204104fa0a320ff76204fc825
               name: 'HAProxy {#PXNAME} {#SVNAME}: Unassigned requests'
               type: DEPENDENT
               key: 'haproxy.server.qcur[{#PXNAME}:{#SVNAME}]'
@@ -1673,13 +1583,11 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: cfbc69d35f39447ca59d682d91f36aa0
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
             -
-              uuid: 58c074ebc26145a6847d425d51f7cbca
               name: 'HAProxy {#PXNAME} {#SVNAME}: Time in queue'
               type: DEPENDENT
               key: 'haproxy.server.qtime[{#PXNAME}:{#SVNAME}]'
@@ -1705,13 +1613,11 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: d61418a1a6ee42028ddb8b125a56d5d3
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
             -
-              uuid: 25c22d3eca2d4eb7b83791d36edcf470
               name: 'HAProxy {#PXNAME} {#SVNAME}: Responses time'
               type: DEPENDENT
               key: 'haproxy.server.rtime[{#PXNAME}:{#SVNAME}]'
@@ -1737,13 +1643,11 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: 54b4e33d47a04f76b679a4b98e63ce4d
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
             -
-              uuid: 973e886a54374bd4815f71d9f9174e80
               name: 'HAProxy {#PXNAME} {#SVNAME}: Status'
               type: DEPENDENT
               key: 'haproxy.server.status[{#PXNAME}:{#SVNAME}]'
@@ -1772,13 +1676,11 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: a35f6318b291415caeaaa99e138e5aa5
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.server.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Server is DOWN'
                   priority: WARNING
                   description: 'Server is not available.'
             -
-              uuid: 606acc119e0d4d9c934e200e037434fe
               name: 'HAProxy {#PXNAME} {#SVNAME}: Redispatched requests per second'
               type: DEPENDENT
               key: 'haproxy.server.wredis.rate[{#PXNAME}:{#SVNAME}]'
@@ -1801,7 +1703,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
             -
-              uuid: 1e2188320b834562b6b33e96f90a5b44
               name: 'HAProxy {#PXNAME} {#SVNAME}: Retried connections per second'
               type: DEPENDENT
               key: 'haproxy.server.wretr.rate[{#PXNAME}:{#SVNAME}]'
@@ -1825,7 +1726,6 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
           graph_prototypes:
             -
-              uuid: e3e10b66deb14b33a436481cc34eeb84
               name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
               graph_items:
                 -
@@ -1852,7 +1752,6 @@ zabbix_export:
               lld_macro: '{#SVNAME}'
               path: $.svname
         -
-          uuid: fbfa819bc0a94f6cba0742720d7edeb0
           name: 'TCP Servers discovery'
           type: DEPENDENT
           key: haproxy.server_tcp.discovery
@@ -1872,7 +1771,6 @@ zabbix_export:
           description: 'Discovery tcp servers'
           item_prototypes:
             -
-              uuid: a7fa3228a8a041909f097f8c190b1cfa
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Responses denied per second'
               type: DEPENDENT
               key: 'haproxy.server_tcp.dresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -1895,7 +1793,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
-              uuid: 42685995eda24ad989c75c6c84be1cab
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Errors connection per second'
               type: DEPENDENT
               key: 'haproxy.server_tcp.econ.rate[{#PXNAME}:{#SVNAME}]'
@@ -1918,7 +1815,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
-              uuid: 7f934575adf74088b1a54a18ee7f6588
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Response errors per second'
               type: DEPENDENT
               key: 'haproxy.server_tcp.eresp.rate[{#PXNAME}:{#SVNAME}]'
@@ -1942,13 +1838,11 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: dd061bdb66514f22892fffaa7308fe57
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
             -
-              uuid: cdbde77e14d44ce995b2cd507c798af8
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Unassigned requests'
               type: DEPENDENT
               key: 'haproxy.server_tcp.qcur[{#PXNAME}:{#SVNAME}]'
@@ -1968,13 +1862,11 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: 82b8e843a1334f699c27d3652a95e786
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
             -
-              uuid: 4c47503f5cfd4c1dba06fc8d7ebef10e
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Time in queue'
               type: DEPENDENT
               key: 'haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}]'
@@ -2000,13 +1892,11 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: cd9797e393c245ccbbf798d3beab2f24
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
             -
-              uuid: dbe0b535d99b446983c16961d61e6e59
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Responses time'
               type: DEPENDENT
               key: 'haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}]'
@@ -2032,13 +1922,11 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: 56a10000b6f44a8dafae64d5767162a0
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
             -
-              uuid: a27c1ade85c3495b98218653b4db8d8f
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Status'
               type: DEPENDENT
               key: 'haproxy.server_tcp.status[{#PXNAME}:{#SVNAME}]'
@@ -2067,13 +1955,11 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  uuid: ba2bd85c89514dd3ab0f9eb7223ea8c9
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.server_tcp.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Server is DOWN'
                   priority: WARNING
                   description: 'Server is not available.'
             -
-              uuid: 56961f549cc0462fb44fb34a9c104204
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Redispatched requests per second'
               type: DEPENDENT
               key: 'haproxy.server_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]'
@@ -2096,7 +1982,6 @@ zabbix_export:
                   tag: Application
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
             -
-              uuid: 132a91508f504442829dec435722c912
               name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Retried connections per second'
               type: DEPENDENT
               key: 'haproxy.server_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]'
@@ -2120,7 +2005,6 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
           graph_prototypes:
             -
-              uuid: d27d532c321e465f9f3a4b865028c176
               name: 'HAProxy: TCP {#PXNAME} {#SVNAME} Response time and time in queue'
               graph_items:
                 -
@@ -2209,7 +2093,6 @@ zabbix_export:
           description: 'The scheme of HAProxy stats page(http/https).'
       dashboards:
         -
-          uuid: 6d515de988274ac6b31938eebd175973
           name: 'HAProxy Backend performance'
           pages:
             -
@@ -2238,7 +2121,6 @@ zabbix_export:
                         name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                         host: 'HAProxy by Zabbix agent'
         -
-          uuid: 7c4decb2fefc4cfe9c4a3f8717d710ca
           name: 'HAProxy Frontend performance'
           pages:
             -
@@ -2340,7 +2222,6 @@ zabbix_export:
                         name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
                         host: 'HAProxy by Zabbix agent'
         -
-          uuid: ebc5a517fa544fada42550059c014c5b
           name: 'HAProxy Server performance'
           pages:
             -
@@ -2370,7 +2251,6 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
       valuemaps:
         -
-          uuid: 4980ec41c6644ecb9d5b52027a381fd8
           name: 'Service state'
           mappings:
             -

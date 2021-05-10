@@ -3690,6 +3690,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			ZBX_STR2UCHAR(trigger->state, row[7]);
 			trigger->lastchange = atoi(row[8]);
 			trigger->locked = 0;
+			trigger->timer_revision = 0;
 
 			zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
@@ -3726,10 +3727,14 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 			/* force trigger list update for items used in removed trigger */
 
-			zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
-					&functionids);
+			if (NULL != trigger->expression_bin)
+			{
+				zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
+						&functionids);
+			}
 
-			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode &&
+					NULL != trigger->recovery_expression_bin)
 			{
 				zbx_get_serialized_expression_functionids(trigger->recovery_expression,
 						trigger->recovery_expression_bin, &functionids);
@@ -4190,6 +4195,9 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
 		if (ZBX_TRIGGER_TIMER_DEFAULT == trigger->timer)
+			continue;
+
+		if (trigger->timer_revision == trigger->revision)
 			continue;
 
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))

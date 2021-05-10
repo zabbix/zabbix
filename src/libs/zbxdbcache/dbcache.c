@@ -63,7 +63,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;
 
-#define ZBX_IDS_SIZE	9
+#define ZBX_IDS_SIZE	10
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 

@@ -60,13 +60,18 @@ class CMathFunctionValidator extends CValidator {
 		$num_required_parameters = $this->options['parameters'][$token['data']['function']];
 		$num_parameters = count($token['data']['parameters']);
 
-		if (($num_required_parameters == -1 && $num_parameters == 0)
-				|| ($num_required_parameters != -1 && $num_parameters != $num_required_parameters)) {
-			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
-
-			return false;
+		if (is_array($num_required_parameters)) {
+			$is_valid = ($num_required_parameters[0] === null || $num_parameters >= $num_required_parameters[0])
+				&& ($num_required_parameters[1] === null || $num_parameters <= $num_required_parameters[1]);
+		}
+		else {
+			$is_valid = $num_parameters == $num_required_parameters;
 		}
 
-		return true;
+		if (!$is_valid) {
+			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
+		}
+
+		return $is_valid;
 	}
 }

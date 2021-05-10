@@ -2099,6 +2099,17 @@ size_t	zbx_strlen_utf8(const char *text)
 	return n;
 }
 
+char	*zbx_strshift_utf8(char *text, size_t num)
+{
+	while ('\0' != *text && 0 < num)
+	{
+		if (0x80 != (0xc0 & *(++text)))
+			num--;
+	}
+
+	return text;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_utf8_char_len                                                *
@@ -4375,7 +4386,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 
 		if (0 != (token_search & ZBX_TOKEN_SEARCH_REFERENCES))
 		{
-			while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			while (NULL != (dollar = strchr(dollar, '$')) && ptr > dollar)
 			{
 				if (0 == isdigit(dollar[1]))
 				{
@@ -4394,7 +4405,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 		}
 
-		if (NULL == ptr || '\0' == *ptr)
+		if ('\0' == *ptr)
 			return FAIL;
 
 		if ('\0' == ptr[1])

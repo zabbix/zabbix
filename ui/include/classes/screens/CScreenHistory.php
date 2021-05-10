@@ -424,7 +424,7 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
-					$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
+					$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
@@ -508,7 +508,7 @@ class CScreenHistory extends CScreenBase {
 							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 
-						$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
+						$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 
 						$row[] = ($value === '') ? '' : new CPre($value);
 					}

@@ -256,7 +256,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$valuemap = ($this->getInput('valuemapid', 0) != 0)
 			? API::ValueMap()->get([
 				'output' => [],
-				'selectMappings' => ['newvalue', 'value'],
+				'selectMappings' => ['type', 'newvalue', 'value'],
 				'valuemapids' => $this->getInput('valuemapid')
 			])[0]
 			: [];
@@ -294,7 +294,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
-				$item_test_data['hostid'] = $this->getInput('hostid');
+				$item_test_data['host']['hostid'] = $this->getInput('hostid');
 			}
 
 			// Only non-empty fields need to be sent to server.
@@ -422,7 +422,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						];
 
 						if ($valuemap) {
-							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'], $valuemap);
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],
+								$result['result'], $valuemap
+							);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

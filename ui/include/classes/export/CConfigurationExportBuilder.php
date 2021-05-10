@@ -441,16 +441,22 @@ class CConfigurationExportBuilder {
 	 * @param array $valuemaps
 	 */
 	protected function formatValueMaps(array $valuemaps) {
-		$result = [];
-
 		CArrayHelper::sort($valuemaps, ['name']);
 
-		foreach ($valuemaps as $valuemap) {
-			CArrayHelper::sort($valuemap['mappings'], ['value']);
-			$result[] = $valuemap;
+		foreach ($valuemaps as &$valuemap) {
+			foreach ($valuemap['mappings'] as &$mapping) {
+				if ($mapping['type'] == VALUEMAP_MAPPING_TYPE_EQUAL) {
+					unset($mapping['type']);
+				}
+				elseif ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {
+					unset($mapping['value']);
+				}
+			}
+			unset($mapping);
 		}
+		unset($valuemap);
 
-		return $result;
+		return $valuemaps;
 	}
 
 	/**

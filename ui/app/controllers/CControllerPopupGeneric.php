@@ -1348,7 +1348,7 @@ class CControllerPopupGeneric extends CController {
 
 				$db_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
-					'selectMappings' => ['value', 'newvalue'],
+					'selectMappings' => ['type', 'value', 'newvalue'],
 					'hostids' => $hostids,
 					'limit' => $limit
 				]);
@@ -1356,7 +1356,6 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
-					order_result($db_valuemap['mappings'], 'value');
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
 						'hostname' => $hosts[$db_valuemap['hostid']]['name'],

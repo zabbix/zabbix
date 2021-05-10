@@ -388,13 +388,13 @@ class CMacrosResolverGeneral {
 							$function_parameters = [];
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw->type) {
+								switch ($param_raw['type']) {
 									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw->match;
+										$function_parameters[] = $param_raw['raw'];
 										break;
 
 									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw->match);
+										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
 										break;
 								}
 							}
@@ -748,8 +748,9 @@ class CMacrosResolverGeneral {
 		}
 
 		$options = [
-			'output' => ['valuemapid', 'value', 'newvalue'],
-			'filter' => ['valuemapid' => array_keys($valuemapids)]
+			'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+			'filter' => ['valuemapid' => array_keys($valuemapids)],
+			'sortfield' => ['sortorder']
 		];
 		$db_mappings = DBselect(DB::makeSql('valuemap_mapping', $options));
 
@@ -757,6 +758,7 @@ class CMacrosResolverGeneral {
 
 		while ($db_mapping  = DBfetch($db_mappings)) {
 			$db_valuemaps[$db_mapping['valuemapid']]['mappings'][] = [
+				'type' => $db_mapping['type'],
 				'value' => $db_mapping['value'],
 				'newvalue' => $db_mapping['newvalue']
 			];

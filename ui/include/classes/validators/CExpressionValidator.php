@@ -29,11 +29,13 @@ class CExpressionValidator extends CValidator {
 	 *
 	 * Supported options:
 	 *   'calculated' => false  Validate expression as part of calculated item formula.
+	 *   'partial' => false     Validate partial expression (relaxed requirements).
 	 *
 	 * @var array
 	 */
 	private $options = [
-		'calculated' => false
+		'calculated' => false,
+		'partial' => false
 	];
 
 	/**
@@ -44,7 +46,7 @@ class CExpressionValidator extends CValidator {
 	private $math_function_data;
 
 	/**
-	 * Known math functions along with number of required parameters.
+	 * Known math functions along with number or range of required parameters.
 	 *
 	 * @var array
 	 */
@@ -90,7 +92,7 @@ class CExpressionValidator extends CValidator {
 		}
 
 		if (!$this->options['calculated']) {
-			if (!self::hasHistoryFunctions($tokens)) {
+			if (!$this->options['partial'] && !self::hasHistoryFunctions($tokens)) {
 				$this->setError(_('trigger expression must contain at least one /host/key reference'));
 
 				return false;
@@ -188,7 +190,7 @@ class CExpressionValidator extends CValidator {
 	}
 
 	/**
-	 * Check if history function tokens are contained within the hierarchy of given tokens.
+	 * Check if there are history function tokens within the hierarchy of given tokens.
 	 *
 	 * @param array $tokens
 	 *
