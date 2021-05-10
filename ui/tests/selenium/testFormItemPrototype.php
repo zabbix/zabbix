@@ -951,22 +951,22 @@ class testFormItemPrototype extends CLegacyWebTest {
 						$mappings = [];
 						$i = 0;
 						foreach ($db_mappings as $db_mapping) {
-							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
-
 							if ($db_mapping['name'] === $valuemap_name) {
-								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
-								$i++;
-								// Only the first three mappings are displayed in the form for each value mapping
-								if ($i < 4) {
-									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								if ($i < 3) {
+									$mappings[] = '='.$db_mapping['value'].' ⇒ '.$db_mapping['newvalue'];
+									$i++;
 								}
 								else {
-									$this->assertTrue(str_contains($mappings_text, '…'));
+									$mappings[] = '…';
 
 									break;
 								}
 							}
 						}
+						// Transform newlines in value map table text.
+						$source = $value_mapping->getColumn('Mapping')->getText();
+						$text = rtrim(preg_replace("/(.*)\n⇒\n(.*)\n?/", "\\1 ⇒ \\2\n", $source), "\n");
+						$this->assertEquals(implode("\n", $mappings), $text);
 					}
 				}
 				else {
