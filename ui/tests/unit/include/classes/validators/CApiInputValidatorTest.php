@@ -3952,7 +3952,7 @@ class CApiInputValidatorTest extends TestCase {
 				'20.0-30.0000',
 				'/1/numeric_ranges',
 				'20.0-30.0000'
-			],
+			]
 		];
 	}
 
