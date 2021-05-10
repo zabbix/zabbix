@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:49Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
     -
+      uuid: f01bd64eef4049fabe087cccae590226
       template: 'Intel SR1530 IPMI'
       name: 'Intel SR1530 IPMI'
       groups:
@@ -13,6 +15,7 @@ zabbix_export:
           name: 'Templates/Server hardware'
       items:
         -
+          uuid: f1d7b90d87c6411e9d887d223b4f9022
           name: 'BB +1.8V SM'
           type: IPMI
           key: bb_1.8v_sm
@@ -26,6 +29,7 @@ zabbix_export:
               value: Voltage
           triggers:
             -
+              uuid: 7271d1d3c4354c17b03090dbb93b0cad
               expression: '{last()}<1.597 or {last()}>2.019'
               name: 'BB +1.8V SM Critical [{ITEM.VALUE}]'
               priority: DISASTER
@@ -34,6 +38,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
             -
+              uuid: fa3eb0e436264e45b7be571e6ce72080
               expression: '{last()}<1.646 or {last()}>1.960'
               name: 'BB +1.8V SM Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
@@ -45,6 +50,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
         -
+          uuid: 21820c76180446ff9965f8937e6d1ba0
           name: 'BB +3.3V'
           type: IPMI
           key: bb_3.3v
@@ -58,6 +64,7 @@ zabbix_export:
               value: Voltage
           triggers:
             -
+              uuid: cf5703af99d24992ab6af7330077d43b
               expression: '{last()}<2.876 or {last()}>3.729'
               name: 'BB +3.3V Critical [{ITEM.VALUE}]'
               priority: DISASTER
@@ -66,6 +73,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
             -
+              uuid: 0a4b1f7849574424a38f58525ce9bcc1
               expression: '{last()}<2.970 or {last()}>3.618'
               name: 'BB +3.3V Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
@@ -77,6 +85,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
         -
+          uuid: 7bd5269be38c417aba374c9e8af28f8c
           name: 'BB +3.3V STBY'
           type: IPMI
           key: bb_3.3v_stby
@@ -90,10 +99,12 @@ zabbix_export:
               value: Voltage
           triggers:
             -
+              uuid: 35e20744ea45480a81bf4d6121b97cba
               expression: '{last()}<2.876 or {last()}>3.729'
               name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
               priority: DISASTER
             -
+              uuid: 22d099c5aec14b4c90738df31f73bdf7
               expression: '{last()}<2.970 or {last()}>3.618'
               name: 'BB +3.3V STBY Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
@@ -102,6 +113,7 @@ zabbix_export:
                   name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
                   expression: '{Intel SR1530 IPMI:bb_3.3v_stby.last()}<2.876 or {Intel SR1530 IPMI:bb_3.3v_stby.last()}>3.729'
         -
+          uuid: 7931e499e1894942a4763432a6a446fd
           name: 'BB +5.0V'
           type: IPMI
           key: bb_5.0v
@@ -115,6 +127,7 @@ zabbix_export:
               value: Voltage
           triggers:
             -
+              uuid: 3a4cfcd304894382a2bae9b7693757c8
               expression: '{last()}<4.362 or {last()}>5.663'
               name: 'BB +5.0V Critical [{ITEM.VALUE}]'
               priority: DISASTER
@@ -123,6 +136,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
             -
+              uuid: 86ccb70e147d4b59bef1a417e06d990f
               expression: '{last()}<4.483 or {last()}>5.495'
               name: 'BB +5.0V Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
@@ -134,6 +148,7 @@ zabbix_export:
                   name: Power
                   expression: '{Intel SR1530 IPMI:power.last()}=0'
         -
+          uuid: 2e6d7059cbb349889c639e9fba09bd8c
           name: 'BB Ambient Temp'
           type: IPMI
           key: bb_ambient_temp
@@ -147,10 +162,12 @@ zabbix_export:
               value: Temperature
           triggers:
             -
+              uuid: 291842e787254fa68c04f782d2e1db9f
               expression: '{last()}<5 or {last()}>66'
               name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
               priority: DISASTER
             -
+              uuid: 86332bed26f74948bdca7682f981a148
               expression: '{last()}<10 or {last()}>61'
               name: 'BB Ambient Temp Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
@@ -159,6 +176,7 @@ zabbix_export:
                   name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
                   expression: '{Intel SR1530 IPMI:bb_ambient_temp.last()}<5 or {Intel SR1530 IPMI:bb_ambient_temp.last()}>66'
         -
+          uuid: 1821294a921d401f822678ce1d246163
           name: Power
           type: IPMI
           key: power
@@ -170,10 +188,12 @@ zabbix_export:
               value: Voltage
           triggers:
             -
+              uuid: c47075cf457042ed8e6e2db7c622f27b
               expression: '{last()}=0'
               name: Power
               priority: WARNING
         -
+          uuid: efc577d6deba4f46b1fe79e6a1a26fdd
           name: 'Processor Vcc'
           type: IPMI
           key: processor_vcc
@@ -186,6 +206,7 @@ zabbix_export:
               tag: Application
               value: Voltage
         -
+          uuid: 89e5edc9cd6d4984a7a76320f7800ae9
           name: 'System Fan 3'
           type: IPMI
           key: system_fan_3
@@ -199,6 +220,7 @@ zabbix_export:
               value: Fans
   graphs:
     -
+      uuid: e1fff55999a6420f987659ca0dc8c102
       name: 'Fan speed and ambient temperature'
       graph_items:
         -
@@ -215,6 +237,7 @@ zabbix_export:
             host: 'Intel SR1530 IPMI'
             key: system_fan_3
     -
+      uuid: bec82c29b93c4841a89d0978a899c70b
       name: Voltage
       yaxismax: '5.5'
       ymin_type_1: FIXED

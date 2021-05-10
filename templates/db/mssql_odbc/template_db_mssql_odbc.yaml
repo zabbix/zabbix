@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-25T13:08:40Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
+      uuid: 001a1677f6a949b6bddfdb2926023300
       template: 'MSSQL by ODBC'
       name: 'MSSQL by ODBC'
       description: |
@@ -29,6 +31,7 @@ zabbix_export:
           name: Templates/Databases
       items:
         -
+          uuid: cae1f9b034b04357b038212b04cac794
           name: 'MSSQL: Get job status'
           type: ODBC
           key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
@@ -64,6 +67,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 9b106ca122fb4b75a761e80f4239f906
           name: 'MSSQL: Get last backup'
           type: ODBC
           key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
@@ -92,6 +96,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: ff07b83d161c4e0fbddf8c2e2c282258
           name: 'MSSQL: Get performance counters'
           type: ODBC
           key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
@@ -142,6 +147,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 9a83826b50ac4928b9a716cf94ed6b61
           name: 'MSSQL: Auto-param attempts per second'
           type: DEPENDENT
           key: mssql.autoparam_attempts_sec.rate
@@ -165,6 +171,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 1d49af2907d541719e4482439de3ef40
           name: 'MSSQL: Average latch wait time'
           type: CALCULATED
           key: mssql.average_latch_wait_time
@@ -182,6 +189,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: f9d78cd9c941471287a24ca94005e9ac
           name: 'MSSQL: Average latch wait time base'
           type: DEPENDENT
           key: mssql.average_latch_wait_time_base
@@ -200,6 +208,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 7248e70669674ef5a7a85deb20b1fe8e
           name: 'MSSQL: Average latch wait time raw'
           type: DEPENDENT
           key: mssql.average_latch_wait_time_raw
@@ -219,6 +228,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 2915866b5891480aafd73463aca88a21
           name: 'MSSQL: Total average wait time'
           type: CALCULATED
           key: mssql.average_wait_time
@@ -237,11 +247,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 71dd750e1158417b93d0759232489206
               expression: '{min(5m)}>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
               name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
               priority: WARNING
               description: 'An average wait time longer than 500ms may indicate excessive blocking. This value should generally correlate to ''Lock Waits/sec'' and move up or down with it accordingly.'
         -
+          uuid: 2a63096aa40a4374bdd7426b9fe0767e
           name: 'MSSQL: Total average wait time base'
           type: DEPENDENT
           key: mssql.average_wait_time_base
@@ -260,6 +272,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: f0cd7858dabf4b7da93314dc9a8ddeaa
           name: 'MSSQL: Total average wait time raw'
           type: DEPENDENT
           key: mssql.average_wait_time_raw
@@ -279,6 +292,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 00b6e46811fd43a396e2a38dd976d220
           name: 'MSSQL: Batch requests per second'
           type: DEPENDENT
           key: mssql.batch_requests_sec.rate
@@ -303,6 +317,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: ed950d204a1f40a6925856828c7807aa
           name: 'MSSQL: Buffer cache hit ratio'
           type: DEPENDENT
           key: mssql.buffer_cache_hit_ratio
@@ -324,11 +339,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 226510a84a17485aa1ca4b524c27c57a
               expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'Too low buffer cache hit ratio.'
             -
+              uuid: ea5cf8f07c66454ebe71e45f4314ed8e
               expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
               name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
               priority: WARNING
@@ -338,6 +355,7 @@ zabbix_export:
                   name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
                   expression: '{MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
         -
+          uuid: 1900fc83a4d74c599f5f3438450b5d8b
           name: 'MSSQL: Cache hit ratio'
           type: DEPENDENT
           key: mssql.cache_hit_ratio
@@ -358,6 +376,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 064e1279ae0a4260ab02c08cd3c3f77d
           name: 'MSSQL: Cache objects in use'
           type: DEPENDENT
           key: mssql.cache_objects_in_use
@@ -376,6 +395,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: de8c0d7f9c0b42438560dc28e47fdd19
           name: 'MSSQL: Cache object counts'
           type: DEPENDENT
           key: mssql.cache_object_counts
@@ -394,6 +414,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: ae2d22cd04ed452dbdb04ae3f71b8586
           name: 'MSSQL: Cache pages'
           type: DEPENDENT
           key: mssql.cache_pages
@@ -412,6 +433,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: d72b6aadab0c4d6d83bc72da0ce661c3
           name: 'MSSQL: Checkpoint pages per second'
           type: DEPENDENT
           key: mssql.checkpoint_pages_sec.rate
@@ -435,6 +457,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 9c1ca822375644669821fe1bea4c5f2a
           name: 'MSSQL: Database pages'
           type: DEPENDENT
           key: mssql.database_pages
@@ -453,6 +476,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 871e3520aac84c18bcaf2f3a0d565b79
           name: 'MSSQL: Total data file size'
           type: DEPENDENT
           key: mssql.data_files_size
@@ -476,6 +500,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 4cdecc74a6e44b57b17f44988d3ffa21
           name: 'MSSQL: Total errors per second'
           type: DEPENDENT
           key: mssql.errors_sec.rate
@@ -499,6 +524,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 5ed7f6931c42424f8ec3dbe2e6c46f03
           name: 'MSSQL: Failed auto-params per second'
           type: DEPENDENT
           key: mssql.failed_autoparams_sec.rate
@@ -522,6 +548,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: cee8f4d47d41463299c50b5c7925a650
           name: 'MSSQL: Forwarded records per second'
           type: DEPENDENT
           key: mssql.forwarded_records_sec.rate
@@ -545,6 +572,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 22d1a41352c4477ba3db5d1a9e038597
           name: 'MSSQL: Free list stalls per second'
           type: DEPENDENT
           key: mssql.free_list_stalls_sec.rate
@@ -570,11 +598,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: d22b828c4faf46f28eba242801743237
               expression: '{min(5m)}>{$MSSQL.FREE_LIST_STALLS.MAX}'
               name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
               priority: WARNING
               description: 'Some requests have to wait for a free page.'
         -
+          uuid: ace67686bb93456c80b40be1f33c173f
           name: 'MSSQL: Full scans per second'
           type: DEPENDENT
           key: mssql.full_scans_sec.rate
@@ -598,6 +628,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: f2539791f65a40569bcf6b1c89647904
           name: 'MSSQL: Granted Workspace Memory'
           type: DEPENDENT
           key: mssql.granted_workspace_memory
@@ -621,6 +652,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 585f1a22108143d8b39337900da8860c
           name: 'MSSQL: Index searches per second'
           type: DEPENDENT
           key: mssql.index_searches_sec.rate
@@ -644,6 +676,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: eafdabca35bd40a58432dd36a210a4e4
           name: 'MSSQL: Errors per second (Info errors)'
           type: DEPENDENT
           key: mssql.info_errors_sec.rate
@@ -667,6 +700,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: b68d1f8108d7494b9d4d891911708c72
           name: 'MSSQL: Errors per second (Kill connection errors)'
           type: DEPENDENT
           key: mssql.kill_connection_errors_sec.rate
@@ -690,6 +724,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: c1242c5530654057bca59cb9ad12c319
           name: 'MSSQL: Latch waits per second'
           type: DEPENDENT
           key: mssql.latch_waits_sec.rate
@@ -714,6 +749,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 66cc84326bd146ac89f91ddeaa61f63a
           name: 'MSSQL: Lazy writes per second'
           type: DEPENDENT
           key: mssql.lazy_writes_sec.rate
@@ -738,11 +774,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: c57b4f0c6a4f442187ed895e7290eea7
               expression: '{min(5m)}>{$MSSQL.LAZY_WRITES.MAX}'
               name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The number of buffers written per second by the buffer manager''s lazy writer exceeds the threshold.'
         -
+          uuid: 1b4c71c016504eb08b1a49146095c231
           name: 'MSSQL: Total lock requests per second'
           type: DEPENDENT
           key: mssql.lock_requests_sec.rate
@@ -768,11 +806,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: e7f115f1ebd44f038c828e82229a3c63
               expression: '{min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}'
               name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
               priority: WARNING
               description: 'Number of new locks and lock conversions per second requested from the lock manager is high.'
         -
+          uuid: 0ac1aab7013249c6a0beb89217bf52c6
           name: 'MSSQL: Total lock requests per second that timed out'
           type: DEPENDENT
           key: mssql.lock_timeouts_sec.rate
@@ -798,11 +838,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 8cc002a387a64998b0ba214f0bce0edf
               expression: '{min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}'
               name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
               priority: WARNING
               description: 'The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.'
         -
+          uuid: 77be28b4732d4665a4e880f2ea309245
           name: 'MSSQL: Total lock requests per second that required waiting'
           type: DEPENDENT
           key: mssql.lock_waits_sec.rate
@@ -828,11 +870,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 60ee685f970a4c27927afa9c3a4cd09d
               expression: '{min(5m)}>0'
               name: 'MSSQL: Some blocking is occurring for 5m'
               priority: AVERAGE
               description: 'Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.'
         -
+          uuid: bf4ef99559f94147b9b64144f6b795c0
           name: 'MSSQL: Lock wait time'
           type: DEPENDENT
           key: mssql.lock_wait_time
@@ -857,6 +901,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: c7856bdb5285421cb79cec0782fa1188
           name: 'MSSQL: Logins per second'
           type: DEPENDENT
           key: mssql.logins_sec.rate
@@ -880,6 +925,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: cf4af2cbeaff42b2a71c91544286998f
           name: 'MSSQL: Logouts per second'
           type: DEPENDENT
           key: mssql.logouts_sec.rate
@@ -903,6 +949,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: e0620ce52e6d4269b9d12e82c749a146
           name: 'MSSQL: Total log file size'
           type: DEPENDENT
           key: mssql.log_files_size
@@ -926,6 +973,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 636e7c85a79947a39f7b176e8e3c5b82
           name: 'MSSQL: Total log file used size'
           type: DEPENDENT
           key: mssql.log_files_used_size
@@ -949,6 +997,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 28c1045fb77249aea23f55f48dd89c69
           name: 'MSSQL: Maximum workspace memory'
           type: DEPENDENT
           key: mssql.maximum_workspace_memory
@@ -972,6 +1021,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: d39c5f2b89de4bc88c7724a8e2b270d7
           name: 'MSSQL: Memory grants outstanding'
           type: DEPENDENT
           key: mssql.memory_grants_outstanding
@@ -990,6 +1040,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: cb468e25c20f43f08fcefd45354ff882
           name: 'MSSQL: Memory grants pending'
           type: DEPENDENT
           key: mssql.memory_grants_pending
@@ -1008,6 +1059,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 18c0d77ded2b4533a559643006a93406
           name: 'MSSQL: Total lock requests per second that have deadlocks'
           type: DEPENDENT
           key: mssql.number_deadlocks_sec.rate
@@ -1033,11 +1085,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: e3bf25b59c844ef6b1aa8c1b93c58148
               expression: '{min(5m)}>{$MSSQL.DEADLOCKS.MAX}'
               name: 'MSSQL: Number of deadlock is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many deadlocks are occurring currently.'
         -
+          uuid: bbb7fcac41b2403ab0b0c76f3437e81f
           name: 'MSSQL: Errors per second (DB offline errors)'
           type: DEPENDENT
           key: mssql.offline_errors_sec.rate
@@ -1061,6 +1115,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 94a869db684046d9b65db9ee022a9c9e
           name: 'MSSQL: Page life expectancy'
           type: DEPENDENT
           key: mssql.page_life_expectancy
@@ -1082,11 +1137,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 89434a715e704fb6b8e3f03d624bf410
               expression: '{max(15m)}<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
               name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
               priority: HIGH
               description: 'The page stays in the buffer pool without references of less time than the threshold value.'
         -
+          uuid: 628f787578e04b83882aca052a7f976a
           name: 'MSSQL: Page lookups per second'
           type: DEPENDENT
           key: mssql.page_lookups_sec.rate
@@ -1111,6 +1168,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 433257a5dfe4488c8073db03bfb05315
           name: 'MSSQL: Page reads per second'
           type: DEPENDENT
           key: mssql.page_reads_sec.rate
@@ -1135,11 +1193,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 512c8694e2a94db48a899279cfc86ebf
               expression: '{min(5m)}>{$MSSQL.PAGE_READS.MAX}'
               name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page reads are issued too frequently.'
         -
+          uuid: fc3dd6a1bf1242769e2b58f25421a19d
           name: 'MSSQL: Page splits per second'
           type: DEPENDENT
           key: mssql.page_splits_sec.rate
@@ -1163,6 +1223,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: a8b3639fe7b44d88a75e724c083518b5
           name: 'MSSQL: Page writes per second'
           type: DEPENDENT
           key: mssql.page_writes_sec.rate
@@ -1187,11 +1248,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 519bbbdf578b480cb25e2cc8df446cd4
               expression: '{min(5m)}>{$MSSQL.PAGE_WRITES.MAX}'
               name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page writes are issued too frequently.'
         -
+          uuid: 76918163a16e4ad786bed2040acc8061
           name: 'MSSQL: Percent of Adhoc queries running'
           type: CALCULATED
           key: mssql.percent_of_adhoc_queries
@@ -1209,11 +1272,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 5e706bb4d7b142fea03cdc0a61190574
               expression: '{min(15m)} > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
               name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.'
         -
+          uuid: ceab0472883f47b0a18b04fc6f7438ab
           name: 'MSSQL: Percent of Recompiled Transact-SQL Objects'
           type: CALCULATED
           key: mssql.percent_recompilations_to_compilations
@@ -1231,11 +1296,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: bdba4e6518b94bea922527c117d5d5f1
               expression: '{min(15m)} > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
               name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
         -
+          uuid: 5c0bee24f9494bb49860171ff875caf7
           name: 'MSSQL: Number of blocked processes'
           type: DEPENDENT
           key: mssql.processes_blocked
@@ -1254,6 +1321,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: fc14b0c814234b12a3943eb0435cd28c
           name: 'MSSQL: Read-ahead pages per second'
           type: DEPENDENT
           key: mssql.readahead_pages_sec.rate
@@ -1277,6 +1345,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: be47be0cbb924982aaf9573c5a233144
           name: 'MSSQL: Safe auto-params per second'
           type: DEPENDENT
           key: mssql.safe_autoparams_sec.rate
@@ -1300,6 +1369,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 9ce27df57ebc4ecca1a4741e66c9fba0
           name: 'MSSQL: Full scans to Index searches ratio'
           type: CALCULATED
           key: mssql.scan_to_search
@@ -1314,11 +1384,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: bac76f9ba1c145a8b9248415951bf038
               expression: '{min(15m)} > 0.001'
               name: 'MSSQL: Index and table scans are often than index searches for 15m'
               priority: WARNING
               description: 'Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.'
         -
+          uuid: e9ea451a38424f6b9da59b8bbb068b51
           name: 'MSSQL: SQL compilations per second'
           type: DEPENDENT
           key: mssql.sql_compilations_sec.rate
@@ -1342,6 +1414,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: a72415acabda46309c4dbc692e026cc2
           name: 'MSSQL: SQL re-compilations per second'
           type: DEPENDENT
           key: mssql.sql_recompilations_sec.rate
@@ -1365,6 +1438,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 595aa3989b4e41cc8649827525adc0a0
           name: 'MSSQL: Table lock escalations per second'
           type: DEPENDENT
           key: mssql.table_lock_escalations.rate
@@ -1388,6 +1462,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 37269b33e05349a1bfd05e4e493da6d4
           name: 'MSSQL: Target pages'
           type: DEPENDENT
           key: mssql.target_pages
@@ -1406,6 +1481,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 2679f7e843e549ce9468f6cab05a71d5
           name: 'MSSQL: Target server memory'
           type: DEPENDENT
           key: mssql.target_server_memory
@@ -1429,6 +1505,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 8c7d63f3689f464394a6035a3cad4009
           name: 'MSSQL: Total latch wait Time'
           type: DEPENDENT
           key: mssql.total_latch_wait_time
@@ -1453,6 +1530,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 9112ed9b9d3741018d40f2dc892fa0f6
           name: 'MSSQL: Total server memory'
           type: DEPENDENT
           key: mssql.total_server_memory
@@ -1476,6 +1554,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 273b373d8b41411fafcfd1e93bb8ce2c
           name: 'MSSQL: Total transactions number'
           type: DEPENDENT
           key: mssql.transactions
@@ -1494,6 +1573,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 127e1f73ce414eeb87d2cbfef46ccdef
           name: 'MSSQL: Total transactions per second'
           type: DEPENDENT
           key: mssql.transactions_sec.rate
@@ -1517,6 +1597,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: ef6450dfcb9a476ca1bf97524e05d43d
           name: 'MSSQL: Unsafe auto-params per second'
           type: DEPENDENT
           key: mssql.unsafe_autoparams_sec.rate
@@ -1540,6 +1621,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 27449e795c0a4e4e90c9ee6b6bf3df90
           name: 'MSSQL: Uptime'
           type: DEPENDENT
           key: mssql.uptime
@@ -1561,6 +1643,7 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 773b4dd539e244848a37f879efd10b48
               expression: '{nodata(30m)}=1'
               name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
@@ -1570,12 +1653,14 @@ zabbix_export:
                   name: 'MSSQL: Service is unavailable'
                   expression: '{MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0'
             -
+              uuid: d2a60ddb79bc4417ae4bf571eef62cc7
               expression: '{last()}<10m'
               name: 'MSSQL: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 4e13bfc5927a421fb2996eec7e013448
           name: 'MSSQL: Number users connected'
           type: DEPENDENT
           key: mssql.user_connections
@@ -1594,6 +1679,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 5942cad838e8430a9ff71293dec52af8
           name: 'MSSQL: Errors per second (User errors)'
           type: DEPENDENT
           key: mssql.user_errors_sec.rate
@@ -1617,6 +1703,7 @@ zabbix_export:
               tag: Application
               value: MSSQL
         -
+          uuid: 7013504d4a6c4b40a0aab11dab15d107
           name: 'MSSQL: Version'
           type: DEPENDENT
           key: mssql.version
@@ -1642,12 +1729,14 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 2a07926c093f47eb844461b4d5287c9f
               expression: '{diff()}=1 and {strlen()}>0'
               name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MSSQL version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: ea84affd97864dfaad7edf31e16e1300
           name: 'MSSQL: Work files created per second'
           type: DEPENDENT
           key: mssql.workfiles_created_sec.rate
@@ -1672,11 +1761,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: c6117932cdee4bf9aec91a052a88bcc6
               expression: '{min(5m)}>{$MSSQL.WORK_FILES.MAX}'
               name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
         -
+          uuid: a38e7fdf994842558227dfad03e9943b
           name: 'MSSQL: Work tables created per second'
           type: DEPENDENT
           key: mssql.worktables_created_sec.rate
@@ -1701,11 +1792,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: e910eed6b9a2473ebe16a24ec70f7ed2
               expression: '{min(5m)}>{$MSSQL.WORK_TABLES.MAX}'
               name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.'
         -
+          uuid: d93779b26c1a4784be31d32130eebf92
           name: 'MSSQL: Worktables from cache ratio'
           type: DEPENDENT
           key: mssql.worktables_from_cache_ratio
@@ -1727,11 +1820,13 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: 311947b9aa2044e594b0c6c672d35f21
               expression: '{max(5m)}<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
         -
+          uuid: c0302965c2574b43955a1d37a8fce9eb
           name: 'MSSQL: Service''s TCP port state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]'
@@ -1751,12 +1846,14 @@ zabbix_export:
               value: MSSQL
           triggers:
             -
+              uuid: e7c06bcc57f24dc9addaabdd3079462b
               expression: '{last()}=0'
               name: 'MSSQL: Service is unavailable'
               priority: DISASTER
               description: 'The TCP port of the MS SQL Server service is currently unavailable.'
       discovery_rules:
         -
+          uuid: 2a5ddb4df6e14ebd94517cbd2a1f8295
           name: 'Availability groups discovery'
           type: ODBC
           key: 'db.odbc.discovery[availability_groups,"{$MSSQL.DSN}"]'
@@ -1769,6 +1866,7 @@ zabbix_export:
           description: 'Discovery of the existing availability groups.'
           item_prototypes:
             -
+              uuid: 7cdafac918494002a219345f648747ba
               name: 'MSSQL AG ''{#GROUP_NAME}'': Get replica states'
               type: ODBC
               key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
@@ -1790,6 +1888,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: 381c88cf5b0c47319b036e79265b0a20
               name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health'
               type: DEPENDENT
               key: 'mssql.primary_recovery_health["{#GROUP_NAME}"]'
@@ -1819,11 +1918,13 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: cd3010b7d050418784652e986a8109bc
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health in progress'
                   priority: WARNING
                   description: 'The primary replica is in the synchronization process.'
             -
+              uuid: df51dcd0ef864705bc542e1233c1135b
               name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica name'
               type: DEPENDENT
               key: 'mssql.primary_replica["{#GROUP_NAME}"]'
@@ -1848,6 +1949,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
             -
+              uuid: d2e76a734bd84484b6bd59b33c921f34
               name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health'
               type: DEPENDENT
               key: 'mssql.secondary_recovery_health["{#GROUP_NAME}"]'
@@ -1877,11 +1979,13 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: 9f798e917b484e5d8ee1f09a5e8dd999
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health in progress'
                   priority: WARNING
                   description: 'The secondary replica is in the synchronization process.'
             -
+              uuid: fe59d23d0ba44777b0abf1a35b2c014e
               name: 'MSSQL AG ''{#GROUP_NAME}'': Synchronization health'
               type: DEPENDENT
               key: 'mssql.synchronization_health["{#GROUP_NAME}"]'
@@ -1911,11 +2015,13 @@ zabbix_export:
                   value: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: 1c66ae5bbf794c878b875fd4afca3395
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': All replicas unhealthy'
                   priority: DISASTER
                   description: 'None of the availability replicas have a healthy synchronization.'
                 -
+                  uuid: 49afb67081604f2491168152ca98045e
                   expression: '{last()}=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'': Some replicas unhealthy'
                   priority: HIGH
@@ -1926,6 +2032,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: 2e38ea24c9bf4a5480df0816b7c659b3
           name: 'Database discovery'
           type: ODBC
           key: 'db.odbc.discovery[dbname,"{$MSSQL.DSN}"]'
@@ -1950,6 +2057,7 @@ zabbix_export:
           description: 'Scanning databases in DBMS.'
           item_prototypes:
             -
+              uuid: 9c9dab20d8fa46f888c6aa7c7c9bf1b9
               name: 'MSSQL DB ''{#DBNAME}'': Last diff backup duration'
               type: DEPENDENT
               key: 'mssql.backup.diff.duration["{#DBNAME}"]'
@@ -1971,6 +2079,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: bd663e1e9b40469cb4ca430186b049db
               name: 'MSSQL DB ''{#DBNAME}'': Last diff backup (time ago)'
               type: DEPENDENT
               key: 'mssql.backup.diff["{#DBNAME}"]'
@@ -1993,6 +2102,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 272b4e9da69b46d29f16171fc48060bb
                   expression: '{last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2000,6 +2110,7 @@ zabbix_export:
                   description: 'The differential backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
+                  uuid: 77cf33c7c19f4154b4d4ecb57abd0627
                   expression: '{last()}>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2011,6 +2122,7 @@ zabbix_export:
                       name: 'MSSQL DB ''{#DBNAME}'': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
                       expression: '{MSSQL by ODBC:mssql.backup.diff["{#DBNAME}"].last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}'
             -
+              uuid: 52929d988ad34aac945ff2ce9e448261
               name: 'MSSQL DB ''{#DBNAME}'': Last full backup duration'
               type: DEPENDENT
               key: 'mssql.backup.full.duration["{#DBNAME}"]'
@@ -2032,6 +2144,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 06d0ac1eeca843a289defa1cf1d728a3
               name: 'MSSQL DB ''{#DBNAME}'': Last full backup (time ago)'
               type: DEPENDENT
               key: 'mssql.backup.full["{#DBNAME}"]'
@@ -2054,6 +2167,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 040e227312224231b25ef52a6a795be0
                   expression: '{last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2061,6 +2175,7 @@ zabbix_export:
                   description: 'The full backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
+                  uuid: 289544b45edf482385cf613662a8b09d
                   expression: '{last()}>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2072,6 +2187,7 @@ zabbix_export:
                       name: 'MSSQL DB ''{#DBNAME}'': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
                       expression: '{MSSQL by ODBC:mssql.backup.full["{#DBNAME}"].last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}'
             -
+              uuid: 218241c7c5a648a59021999f97516349
               name: 'MSSQL DB ''{#DBNAME}'': Last log backup duration'
               type: DEPENDENT
               key: 'mssql.backup.log.duration["{#DBNAME}"]'
@@ -2093,6 +2209,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: c5e796bc904848efb2557c8a9a07b828
               name: 'MSSQL DB ''{#DBNAME}'': Last log backup'
               type: DEPENDENT
               key: 'mssql.backup.log["{#DBNAME}"]'
@@ -2115,6 +2232,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: a62db273e37745bdb099202cd1635391
                   expression: '{last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2122,6 +2240,7 @@ zabbix_export:
                   description: 'The log backup has not been executed for a long time.'
                   manual_close: 'YES'
                 -
+                  uuid: 522df468dd574b10aa7f29afc9d9272f
                   expression: '{last()}>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}'
                   opdata: 'Time since last backup: {ITEM.LASTVALUE1}'
@@ -2133,6 +2252,7 @@ zabbix_export:
                       name: 'MSSQL DB ''{#DBNAME}'': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
                       expression: '{MSSQL by ODBC:mssql.backup.log["{#DBNAME}"].last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}'
             -
+              uuid: f4f218f22d6d48419260003880b38abd
               name: 'MSSQL DB ''{#DBNAME}'': Active transactions'
               type: DEPENDENT
               key: 'mssql.db.active_transactions["{#DBNAME}"]'
@@ -2151,6 +2271,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: ff3916f807784639a1821229d4d722d8
               name: 'MSSQL DB ''{#DBNAME}'': Data file size'
               type: DEPENDENT
               key: 'mssql.db.data_files_size["{#DBNAME}"]'
@@ -2174,6 +2295,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 0d7bdf4c18fa49e79926e6f6d078d50f
               name: 'MSSQL DB ''{#DBNAME}'': Log bytes flushed per second'
               type: DEPENDENT
               key: 'mssql.db.log_bytes_flushed_sec.rate["{#DBNAME}"]'
@@ -2198,6 +2320,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 85536311e68047a6a8bf13c51c8d0647
               name: 'MSSQL DB ''{#DBNAME}'': Log file size'
               type: DEPENDENT
               key: 'mssql.db.log_files_size["{#DBNAME}"]'
@@ -2221,6 +2344,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 75fd2f42e274471c97cb23dc740863b8
               name: 'MSSQL DB ''{#DBNAME}'': Log file used size'
               type: DEPENDENT
               key: 'mssql.db.log_files_used_size["{#DBNAME}"]'
@@ -2244,6 +2368,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: c10b6f364aa547d8b4abe431ae27d70b
               name: 'MSSQL DB ''{#DBNAME}'': Log flushes per second'
               type: DEPENDENT
               key: 'mssql.db.log_flushes_sec.rate["{#DBNAME}"]'
@@ -2267,6 +2392,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 5404c8682b294a06a3027dc10d0b43fc
               name: 'MSSQL DB ''{#DBNAME}'': Log flush waits per second'
               type: DEPENDENT
               key: 'mssql.db.log_flush_waits_sec.rate["{#DBNAME}"]'
@@ -2291,11 +2417,13 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 844d5a584aa9493997a13decc88d2908
                   expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)'
                   priority: WARNING
                   description: 'Too many commits are waiting for the log flush.'
             -
+              uuid: f1abdb0800534f6bbf9f1403e7dea9e4
               name: 'MSSQL DB ''{#DBNAME}'': Log flush wait time'
               type: DEPENDENT
               key: 'mssql.db.log_flush_wait_time["{#DBNAME}"]'
@@ -2321,11 +2449,13 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: ea9605fdb4f74a6ea9e1138bfcf58f0f
                   expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)'
                   priority: WARNING
                   description: 'The wait time to flush the log is too long.'
             -
+              uuid: fdb24058e54243e8b5a888ec40d506e9
               name: 'MSSQL DB ''{#DBNAME}'': Log growths'
               type: DEPENDENT
               key: 'mssql.db.log_growths["{#DBNAME}"]'
@@ -2344,6 +2474,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: a1a96d8bfef740ec9c8eadd9704ab605
               name: 'MSSQL DB ''{#DBNAME}'': Log shrinks'
               type: DEPENDENT
               key: 'mssql.db.log_shrinks["{#DBNAME}"]'
@@ -2362,6 +2493,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 26d1515df1be450e861e4f7a9f76b03d
               name: 'MSSQL DB ''{#DBNAME}'': Log truncations'
               type: DEPENDENT
               key: 'mssql.db.log_truncations["{#DBNAME}"]'
@@ -2380,6 +2512,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Database ''{#DBNAME}'''
             -
+              uuid: 9f9cda56992841408ab8307b7019b76f
               name: 'MSSQL DB ''{#DBNAME}'': Percent log used'
               type: DEPENDENT
               key: 'mssql.db.percent_log_used["{#DBNAME}"]'
@@ -2401,11 +2534,13 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 232e52be25a54ca2bbf498c8f7ec1746
                   expression: '{min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
                   name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)'
                   priority: WARNING
                   description: 'There''s not enough space left in the log.'
             -
+              uuid: fe7d7c3e0aab43d79c00eaceb39c8c6c
               name: 'MSSQL DB ''{#DBNAME}'': State'
               type: DEPENDENT
               key: 'mssql.db.state["{#DBNAME}"]'
@@ -2440,11 +2575,13 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 5ca7a82ed06e4fa2abb5ab418f7291ab
                   expression: '{last()}>1'
                   name: 'MSSQL DB ''{#DBNAME}'': State is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The DB has a non-working state.'
             -
+              uuid: 267b1d54c40641f5aeb4e3e7adfa4680
               name: 'MSSQL DB ''{#DBNAME}'': Transactions per second'
               type: DEPENDENT
               key: 'mssql.db.transactions_sec.rate["{#DBNAME}"]'
@@ -2469,6 +2606,7 @@ zabbix_export:
                   value: 'MSSQL Database ''{#DBNAME}'''
           graph_prototypes:
             -
+              uuid: ac52c952ba954065bbbb5c722630cd0b
               name: 'MSSQL DB ''{#DBNAME}'': Log size'
               graph_items:
                 -
@@ -2483,6 +2621,7 @@ zabbix_export:
                     host: 'MSSQL by ODBC'
                     key: 'mssql.db.log_files_used_size["{#DBNAME}"]'
             -
+              uuid: 49d3be5c3ce34cfc9c13456a2ae301f6
               name: 'MSSQL DB ''{#DBNAME}'': Number of Log changes'
               graph_items:
                 -
@@ -2503,6 +2642,7 @@ zabbix_export:
                     host: 'MSSQL by ODBC'
                     key: 'mssql.db.log_truncations["{#DBNAME}"]'
             -
+              uuid: 9553b9169f5e441abecfde1c07ca1a4e
               name: 'MSSQL DB ''{#DBNAME}'': Size'
               graph_items:
                 -
@@ -2516,6 +2656,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: 6d972c575a944d49badfc2e6a614f686
           name: 'Job discovery'
           type: ODBC
           key: 'db.odbc.discovery[jobname,"{$MSSQL.DSN}"]'
@@ -2537,6 +2678,7 @@ zabbix_export:
           description: 'Scanning jobs in DBMS.'
           item_prototypes:
             -
+              uuid: 3ceba63a77e24628a2ee9439d574bac5
               name: 'MSSQL Job ''{#JOBNAME}'': Last run date-time'
               type: DEPENDENT
               key: 'mssql.job.lastrundatetime["{#JOBNAME}"]'
@@ -2562,6 +2704,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Job ''{#JOBNAME}'''
             -
+              uuid: b9984c1238554a559b444853e9f66653
               name: 'MSSQL Job ''{#JOBNAME}'': Last run status message'
               type: DEPENDENT
               key: 'mssql.job.lastrunstatusmessage["{#JOBNAME}"]'
@@ -2587,6 +2730,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Job ''{#JOBNAME}'''
             -
+              uuid: 1c725adad98f44158b43127d4c5fb0f3
               name: 'MSSQL Job ''{#JOBNAME}'': Next run date-time'
               type: DEPENDENT
               key: 'mssql.job.nextrundatetime["{#JOBNAME}"]'
@@ -2612,6 +2756,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Job ''{#JOBNAME}'''
             -
+              uuid: eaa43a261e114979af236698ea7ae32c
               name: 'MSSQL Job ''{#JOBNAME}'': Run status'
               type: DEPENDENT
               key: 'mssql.job.runstatus["{#JOBNAME}"]'
@@ -2644,12 +2789,14 @@ zabbix_export:
                   value: 'MSSQL Job ''{#JOBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 2bce411660964a7aa981f957333ad42c
                   expression: '{last()}=0'
                   name: 'MSSQL Job ''{#JOBNAME}'': Failed to run'
                   priority: WARNING
                   description: 'The last run of the job has failed.'
                   manual_close: 'YES'
             -
+              uuid: 69da58fe4c7e42028fa96388df526103
               name: 'MSSQL Job ''{#JOBNAME}'': Run duration'
               type: DEPENDENT
               key: 'mssql.job.run_duration["{#JOBNAME}"]'
@@ -2675,6 +2822,7 @@ zabbix_export:
                   value: 'MSSQL Job ''{#JOBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 1392c9c6ff974baca56ae8d326fb251f
                   expression: '{last()}>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
                   name: 'MSSQL Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
                   opdata: 'Job duration: {ITEM.LASTVALUE1}'
@@ -2687,6 +2835,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: f7395d344b67423dadcefe3f94ad159d
           name: 'Local database discovery'
           type: ODBC
           key: 'db.odbc.discovery[local_db,"{$MSSQL.DSN}"]'
@@ -2704,6 +2853,7 @@ zabbix_export:
           description: 'Discovery of the local availability databases.'
           item_prototypes:
             -
+              uuid: 7eda3060b4bc446fb458bec5967b7d3c
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Get local DB states'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
@@ -2729,6 +2879,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: 7e4baf2802394b93bf5770f4f72d7f05
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Suspended'
               type: DEPENDENT
               key: 'mssql.local_db.is_suspended["{#DBNAME}"]'
@@ -2754,6 +2905,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
             -
+              uuid: f8111429599e49bd947a12b9771d1a3d
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': State'
               type: DEPENDENT
               key: 'mssql.local_db.state["{#DBNAME}"]'
@@ -2786,11 +2938,13 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: c33636f43cd94a5296df691e46c8fbd7
                   expression: '{last()}>0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The local availability database has a non-working state.'
             -
+              uuid: e7d7fbac95e94c45b6515c8e1b7baf1a
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Synchronization health'
               type: DEPENDENT
               key: 'mssql.local_db.synchronization_health["{#DBNAME}"]'
@@ -2821,11 +2975,13 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 19c15e353d324d1cb8c0e7baa870dffc
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Not healthy'
                   priority: HIGH
                   description: 'The synchronization state of the local availability database is NOT SYNCHRONIZING.'
                 -
+                  uuid: 368f0313a8db489b904926ded35a03d8
                   expression: '{last()}=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Partially healthy'
                   priority: AVERAGE
@@ -2836,6 +2992,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: 8354506d23b241c689079eb8ff1acb72
           name: 'Mirroring discovery'
           type: ODBC
           key: 'db.odbc.discovery[mirrors,"{$MSSQL.DSN}"]'
@@ -2854,6 +3011,7 @@ zabbix_export:
             of the sysadmin fixed server role.
           item_prototypes:
             -
+              uuid: 082fb332849e4633a169f1a6dbe3a8c5
               name: 'MSSQL Mirroring ''{#DBNAME}'': Get the mirror state'
               type: ODBC
               key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
@@ -2877,6 +3035,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: faccb61c8215482ab375c03444a0e8fd
               name: 'MSSQL Mirroring ''{#DBNAME}'': Role'
               type: DEPENDENT
               key: 'mssql.mirroring.role["{#DBNAME}"]'
@@ -2904,6 +3063,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
             -
+              uuid: 19cdd945ced447d28b7480c07c1f61bc
               name: 'MSSQL Mirroring ''{#DBNAME}'': Role sequence'
               type: DEPENDENT
               key: 'mssql.mirroring.role_sequence["{#DBNAME}"]'
@@ -2926,6 +3086,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
             -
+              uuid: bedb23d788074424afdb2751c8a7e2b7
               name: 'MSSQL Mirroring ''{#DBNAME}'': Safety level'
               type: DEPENDENT
               key: 'mssql.mirroring.safety_level["{#DBNAME}"]'
@@ -2954,6 +3115,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
             -
+              uuid: 5df06f00a6194242af45ff5cccf43988
               name: 'MSSQL Mirroring ''{#DBNAME}'': State'
               type: DEPENDENT
               key: 'mssql.mirroring.state["{#DBNAME}"]'
@@ -2987,21 +3149,25 @@ zabbix_export:
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: d43575a9b27e450d9eddc38d03fb6602
                   expression: '{last()}=3'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The state of the mirror database and of the database mirroring session is "Pending Failover".'
                 -
+                  uuid: 4e67812ae61c42b2801d0387e29a7dce
                   expression: '{last()}=5'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.'
                 -
+                  uuid: 41a78c9c04754b8ea99229767153b4e5
                   expression: '{last()}>=0 and {last()}<=2'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
                   priority: INFO
                   description: 'The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".'
             -
+              uuid: 7e4763d493a745e99082ca71a54c23c2
               name: 'MSSQL Mirroring ''{#DBNAME}'': Witness state'
               type: DEPENDENT
               key: 'mssql.mirroring.witness_state["{#DBNAME}"]'
@@ -3031,12 +3197,14 @@ zabbix_export:
                   value: 'MSSQL Mirroring ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 363317b6ed9e402a99d23e9c35e3ee48
                   expression: '{last()}=2'
                   name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" Witness is disconnected'
                   priority: WARNING
                   description: 'The state of the witness in the database mirroring session of the database is "Disconnected".'
           graph_prototypes:
             -
+              uuid: 9bf9203bd4b449b39e288fbb79f9d627
               name: 'MSSQL Mirroring ''{#DBNAME}'': States'
               graph_items:
                 -
@@ -3056,6 +3224,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: f9691782f89c459c849c00c68775b4bd
           name: 'Non-local database discovery'
           type: ODBC
           key: 'db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]'
@@ -3073,6 +3242,7 @@ zabbix_export:
           description: 'Discovery of the non-local (not local to the SQL Server instance) availability databases.'
           item_prototypes:
             -
+              uuid: da05efa5ffab475fa95718e8e0069c80
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Get non-local DB states'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
@@ -3097,6 +3267,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: 32d3797d6b22413e98aa206d3092947f
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size'
               type: DEPENDENT
               key: 'mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]'
@@ -3125,11 +3296,13 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: c507de9d1c5f42d3a53ad82b373254f5
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size is growing'
                   priority: HIGH
                   description: 'The log records of the primary database are not sent to the secondary databases.'
             -
+              uuid: 66d9735553754192bb9acf7b27c1501f
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size'
               type: DEPENDENT
               key: 'mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]'
@@ -3158,6 +3331,7 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               trigger_prototypes:
                 -
+                  uuid: 950ac4dc379543e2848a2edd77b2413d
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size is growing'
                   priority: HIGH
@@ -3168,6 +3342,7 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          uuid: 8c279cd6442f48bb9c6001ea6d3acfa0
           name: 'Replication discovery'
           type: ODBC
           key: 'db.odbc.discovery[replicas,"{$MSSQL.DSN}"]'
@@ -3183,6 +3358,7 @@ zabbix_export:
           description: 'Discovery of the database replicas.'
           item_prototypes:
             -
+              uuid: 287c420d8d5346d7a21de580ce1836eb
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Get the replica state'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
@@ -3211,6 +3387,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: 7403de703b024d428edfc59f3aa9181b
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Connected state'
               type: DEPENDENT
               key: 'mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3240,6 +3417,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
             -
+              uuid: 51cb8f4fe5954c0ea21eff6102034862
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Is local'
               type: DEPENDENT
               key: 'mssql.replica.is_local["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3267,6 +3445,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
             -
+              uuid: ec1b71f75c4247c28d5830bd8004f0ac
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Join state'
               type: DEPENDENT
               key: 'mssql.replica.join_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3294,6 +3473,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
             -
+              uuid: ad3e6d5bf510496eb050b9a05f8341e1
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Operational state'
               type: DEPENDENT
               key: 'mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3327,21 +3507,25 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: 80cb80df1a1d4258a0fd7dba4abc047d
                   expression: '{last()}=0 or {last()}=1 or {last()}=3'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: WARNING
                   description: 'The operational state of the replica in a given availability group is "Pending" or "Offline".'
                 -
+                  uuid: 2e53082d8fe84efe8a441c797bd0ffa6
                   expression: '{last()}=4'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The operational state of the replica in a given availability group is "Failed".'
                 -
+                  uuid: 132c57b6bcde4685b7bd385d1c189bda
                   expression: '{last()}=5'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
                   priority: HIGH
                   description: 'The operational state of the replica in a given availability group is "Failed, no quorum".'
             -
+              uuid: 2a58cab2197348d997bdb69bb128414d
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Recovery health'
               type: DEPENDENT
               key: 'mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3371,11 +3555,13 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: 2b935fee52d344c8837d1c6ba684eed5
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} Recovery in progress'
                   priority: INFO
                   description: 'At least one joined database has a database state other than ONLINE.'
             -
+              uuid: 5139a4cef5ac46d2ab34cd8bda1c84ac
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Role'
               type: DEPENDENT
               key: 'mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3404,6 +3590,7 @@ zabbix_export:
                   tag: Application
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
             -
+              uuid: 5655f95df0e043acba246f65e4905b0d
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Sync health'
               type: DEPENDENT
               key: 'mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"]'
@@ -3433,17 +3620,20 @@ zabbix_export:
                   value: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               trigger_prototypes:
                 -
+                  uuid: f8e35baa4b514d7d9c68b4cf7eb23033
                   expression: '{last()}=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Not healthy'
                   priority: AVERAGE
                   description: 'At least one joined database is in the NOT SYNCHRONIZING state.'
                 -
+                  uuid: a36973a563254d42aad05698c9195dc8
                   expression: '{last()}=1'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Partially healthy'
                   priority: WARNING
                   description: 'Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.'
           trigger_prototypes:
             -
+              uuid: c22f1dbbc5444bc1b8997115b229238d
               expression: '{MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2'
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is disconnected'
               priority: WARNING
@@ -3602,6 +3792,7 @@ zabbix_export:
           description: 'The maximum number of work tables created per second - for the trigger expression.'
       valuemaps:
         -
+          uuid: c66ee50a8b3f4b6788b732bb8a6b514e
           name: 'MSSQL - Yes / No'
           mappings:
             -
@@ -3611,6 +3802,7 @@ zabbix_export:
               value: '1'
               newvalue: 'Yes'
         -
+          uuid: bfbb00eb85d747dabeda2954a5d659b7
           name: 'MSSQL AG Connected state'
           mappings:
             -
@@ -3620,6 +3812,7 @@ zabbix_export:
               value: '1'
               newvalue: Connected
         -
+          uuid: 47413c135c094cdc8b59f18a9b195a78
           name: 'MSSQL AG Join state'
           mappings:
             -
@@ -3632,6 +3825,7 @@ zabbix_export:
               value: '2'
               newvalue: 'Joined, failover cluster instance'
         -
+          uuid: a570f341d9a8470797aecfebd376b2b8
           name: 'MSSQL AG Operational state'
           mappings:
             -
@@ -3656,6 +3850,7 @@ zabbix_export:
               value: '6'
               newvalue: 'Replica is not local'
         -
+          uuid: 4ec6a96ff6c64756b2f27e47972fd9f6
           name: 'MSSQL AG Recovery health'
           mappings:
             -
@@ -3668,6 +3863,7 @@ zabbix_export:
               value: '2'
               newvalue: 'Replica is not local'
         -
+          uuid: 596556fba6064efb8155233371eb2950
           name: 'MSSQL AG Role'
           mappings:
             -
@@ -3680,6 +3876,7 @@ zabbix_export:
               value: '2'
               newvalue: Secondary
         -
+          uuid: 2ab0923b3ce14ffc9dd454114f6b15be
           name: 'MSSQL AG Synchronization health'
           mappings:
             -
@@ -3692,6 +3889,7 @@ zabbix_export:
               value: '2'
               newvalue: Healthy
         -
+          uuid: bac1a10dad134d50add5bc9550e2ebf3
           name: 'MSSQL DB state'
           mappings:
             -
@@ -3722,6 +3920,7 @@ zabbix_export:
               value: '10'
               newvalue: OFFLINE_SECONDARY
         -
+          uuid: eefa6e0e6f8b4facbc12004437b7ee8f
           name: 'MSSQL Job Run Status'
           mappings:
             -
@@ -3743,6 +3942,7 @@ zabbix_export:
               value: '5'
               newvalue: Unknown
         -
+          uuid: 09aaa82ccd6a444b80d5d3bb182fbafd
           name: 'MSSQL Mirroring Role'
           mappings:
             -
@@ -3755,6 +3955,7 @@ zabbix_export:
               value: '2'
               newvalue: Mirror
         -
+          uuid: f1c105c262c5476798a93eaa4c46fbda
           name: 'MSSQL Mirroring State'
           mappings:
             -
@@ -3782,6 +3983,7 @@ zabbix_export:
               value: '7'
               newvalue: 'Database is inaccessible or is not mirrored'
         -
+          uuid: e70421b2c3db4ce1937791bdb432040e
           name: 'MSSQL Safety level'
           mappings:
             -
@@ -3797,6 +3999,7 @@ zabbix_export:
               value: '3'
               newvalue: 'Database is inaccessible or is not mirrored'
         -
+          uuid: aa9de6e21d08486db04f29e10d11a94c
           name: 'MSSQL Witness state'
           mappings:
             -
@@ -3812,6 +4015,7 @@ zabbix_export:
               value: '3'
               newvalue: 'No witness exists'
         -
+          uuid: 03cde96b90a641598db572a662dc2064
           name: 'Service state'
           mappings:
             -
@@ -3822,17 +4026,20 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
+      uuid: 6e1efba7491e4a2e92a703a37be636ac
       expression: '{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 > 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}'
       name: 'MSSQL: Too frequently pointers using'
       priority: WARNING
       description: 'Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
     -
+      uuid: dbce85415d124d6597213cd9d86329a9
       expression: '{MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {MSSQL by ODBC:mssql.page_reads_sec.rate.last()}'
       name: 'MSSQL: Too many physical reads occurring'
       priority: WARNING
       description: 'If this value makes up even a sizeable minority of the total Page Reads/sec (say, greater than 20% of the total page reads), you may have too many physical reads occurring.'
   graphs:
     -
+      uuid: d2db0e08beb6445a8b5dd9fb46249265
       name: 'MSSQL: Access methods'
       graph_items:
         -
@@ -3871,6 +4078,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.worktables_created_sec.rate
     -
+      uuid: f22186d86d9346fe9e1f3292e1f0017c
       name: 'MSSQL: Auto-params'
       graph_items:
         -
@@ -3897,6 +4105,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.unsafe_autoparams_sec.rate
     -
+      uuid: 24ef7368fb364616892c4928ba6167c6
       name: 'MSSQL: Cache objects'
       graph_items:
         -
@@ -3911,6 +4120,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.cache_objects_in_use
     -
+      uuid: 1f713999d38745b6bb2828e397a32970
       name: 'MSSQL: Compilations'
       graph_items:
         -
@@ -3925,6 +4135,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.sql_compilations_sec.rate
     -
+      uuid: 91af398cfb86472ba4a69e3df0816be7
       name: 'MSSQL: Database pages'
       graph_items:
         -
@@ -3939,6 +4150,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.target_pages
     -
+      uuid: 0c9aaf223d6f4ba9bd17b0289af4bbe2
       name: 'MSSQL: Errors'
       graph_items:
         -
@@ -3971,6 +4183,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.user_errors_sec.rate
     -
+      uuid: e35985317393409b9a764adcb05f07d0
       name: 'MSSQL: Locks'
       graph_items:
         -
@@ -4003,6 +4216,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.average_wait_time
     -
+      uuid: 8796ad9cc04f48cdbe8ef2cb5f429997
       name: 'MSSQL: Logins per second and Logouts per second'
       graph_items:
         -
@@ -4017,6 +4231,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.logouts_sec.rate
     -
+      uuid: bc588f8933d846a19accdb66eb29ccb9
       name: 'MSSQL: Memory/cache load'
       graph_items:
         -
@@ -4031,6 +4246,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.buffer_cache_hit_ratio
     -
+      uuid: 3d431f6cc6d34ef5820f2a24f3872b41
       name: 'MSSQL: Memory grants outstanding and pending'
       graph_items:
         -
@@ -4045,6 +4261,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.memory_grants_pending
     -
+      uuid: 0f0bc58e0c18421591d265f81c000021
       name: 'MSSQL: Page life expectancy'
       graph_items:
         -
@@ -4053,6 +4270,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.page_life_expectancy
     -
+      uuid: 2b1d0e42f61a4312998775d21f7cabb7
       name: 'MSSQL: Pages'
       graph_items:
         -
@@ -4097,6 +4315,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.lazy_writes_sec.rate
     -
+      uuid: 2e9273b0472c4a3e9049bea3548301d5
       name: 'MSSQL: Processes blocked'
       graph_items:
         -
@@ -4105,6 +4324,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.processes_blocked
     -
+      uuid: f124ce3778bd4722bf0d2d598ac31b0f
       name: 'MSSQL: Server memory'
       graph_items:
         -
@@ -4131,6 +4351,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.maximum_workspace_memory
     -
+      uuid: 59ffd52c5c334d20870fc209c6c61398
       name: 'MSSQL: Transactions'
       graph_items:
         -
@@ -4145,6 +4366,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.batch_requests_sec.rate
     -
+      uuid: 6979c0bcba0e4ac08c6bfefa0c648d40
       name: 'MSSQL: Waits per second'
       graph_items:
         -
@@ -4159,6 +4381,7 @@ zabbix_export:
             host: 'MSSQL by ODBC'
             key: mssql.lock_waits_sec.rate
     -
+      uuid: 41cc736d93ce45d6aeb6dede77c97f08
       name: 'MSSQL: Wait times'
       graph_items:
         -

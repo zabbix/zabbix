@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-15T12:10:26Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
       name: Templates/Power
   templates:
     -
+      uuid: 32d3c78ff44c4c3c9ff5b893ad7f5fc9
       template: 'APC Smart-UPS RT 1000 XL SNMP'
       name: 'APC Smart-UPS RT 1000 XL SNMP'
       description: |
@@ -23,6 +25,7 @@ zabbix_export:
           name: Templates/Power
       items:
         -
+          uuid: 6ac68411ef214cc7aa49d39d58ce3c6a
           name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
@@ -48,11 +51,13 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: c8d96d216f4d43dea343777322a962e0
               expression: '{last()} < {$BATTERY.CAPACITY.MIN.WARN}'
               name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
+          uuid: 7f3b05afa58142d5b8670c40c196baf8
           name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
@@ -73,6 +78,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 87b91005f5ff4ba5b0086e25eaa799bd
           name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
@@ -97,6 +103,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 44a33eba233e4bd7ac51ca2dcabf2939
           name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
@@ -117,11 +124,13 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: fbe310b19a0343b5a4a4511aa9c28a66
               expression: '{last()}=2'
               name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
         -
+          uuid: 95749270e6234d6cbd1edb0c5e1118e0
           name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
@@ -146,6 +155,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 047a5a3a957949d288588eb11f36f25e
           name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
@@ -172,16 +182,19 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: 2b0be928450f4225835b6a0311534ef9
               expression: '{last()}=4'
               name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
             -
+              uuid: 7c1a180878474327b74bb41d6c483ed3
               expression: '{last()}=3'
               name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
         -
+          uuid: 04cd5e06823846b58ad57e2c358f346e
           name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
@@ -207,11 +220,13 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: c57320aa8a554f13b6eec4d882dcd38b
               expression: '{min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}'
               name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
+          uuid: 8ee98deaf4bf46afb06f694d19757237
           name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
@@ -235,6 +250,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 4cb80c94f3d14674bc7a3933c7571eac
           name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
@@ -277,6 +293,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 700a78a4ab3c441496ecafc5ddde6a9d
           name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
@@ -301,11 +318,13 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: 4344b8998372420788697e5be2d58859
               expression: '{min({$TIME.PERIOD})} > 0 and ({min({$TIME.PERIOD})} > {$UPS.INPUT_FREQ.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_FREQ.MIN.WARN})'
               name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
+          uuid: e2b5b824c4704293ad68185971e9fb03
           name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
@@ -330,11 +349,13 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: 481f73af8ee742149b40cd4a090c039a
               expression: '{min({$TIME.PERIOD})} > 0 and ({min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN})'
               name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
+          uuid: 861757e4bb1a4dc6ac1c8ef94d973328
           name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
@@ -358,6 +379,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: 1d9d7ef724ff41eda4fd536df6af93cb
           name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
@@ -383,12 +405,14 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: d488803bbebc44be91e9f47d193f36b8
               expression: '{min({$TIME.PERIOD})} > {$UPS.OUTPUT.MAX.WARN}'
               name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
         -
+          uuid: 3edf5e7776ae4cc6aebcedcbf4ab8d78
           name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
@@ -415,50 +439,62 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: fd5888e0762f45a0a2e6b1e6746b739d
               expression: '{last()}=16'
               name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
             -
+              uuid: 030fb29dd55448de863d3df3e719e40e
               expression: '{last()}=10'
               name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
             -
+              uuid: bf7feb9c6cb24f3db051bc74eb9d7a2c
               expression: '{last()}=7'
               name: 'UPS is Off'
               priority: AVERAGE
             -
+              uuid: 3b48aa4fe6724ebca2c263460b820fa9
               expression: '{last()}=3'
               name: 'UPS is on battery'
               priority: AVERAGE
             -
+              uuid: ab2d47d833794df7b35cde81d890b605
               expression: '{last()}=4'
               name: 'UPS is on Smart Boost'
               priority: AVERAGE
             -
+              uuid: 504ab69399594a83af048d835ab0d405
               expression: '{last()}=12'
               name: 'UPS is On Smart Trim'
               priority: AVERAGE
             -
+              uuid: 511b59ef46a7457292f7ffee5b0801f3
               expression: '{last()}=8'
               name: 'UPS is Rebooting'
               priority: AVERAGE
             -
+              uuid: 702425222104447db03b5c598768c7d6
               expression: '{last()}=11'
               name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
             -
+              uuid: 15105081cf9040baaf032bc0e079d30d
               expression: '{last()}=6'
               name: 'UPS is Software Bypass'
               priority: AVERAGE
             -
+              uuid: 6b8b0a2cdbeb4e8db8c09ff8a69fa15b
               expression: '{last()}=9'
               name: 'UPS is Switched Bypass'
               priority: AVERAGE
             -
+              uuid: 49f27a60946644caa06d0b014e4deb6e
               expression: '{last()}=5'
               name: 'UPS is Timed Sleeping'
               priority: AVERAGE
         -
+          uuid: bcb28618699448ea8d9d056bad203a0e
           name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
@@ -482,6 +518,7 @@ zabbix_export:
             -
               tag: Status
         -
+          uuid: d633cd3273e74209a1b0c6b761028e0a
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
@@ -494,6 +531,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: 50cc8e7cea0c40948c006623dfa94dae
           name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
@@ -517,6 +555,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: e0d638ab398f40e8a9555925cd8ba907
           name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -539,6 +578,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: 031b9d385cae4641b9ecfb76c4174262
           name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
@@ -561,6 +601,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: 320221ba30744ca78b8dce03dccd549b
           name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
@@ -581,6 +622,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: e4d9441075954c068b6fd92bbff49cef
           name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
@@ -605,12 +647,14 @@ zabbix_export:
               tag: General
           triggers:
             -
+              uuid: e810ed46b87b433c9f64a2f81252e5c5
               expression: '{diff()}=1 and {strlen()}>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 4e7a9b6aa8dd4371b83bf47f8246cebf
           name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
@@ -636,6 +680,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: 9ebb979a5e4a45fd9acf956df034f9be
           name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
@@ -659,6 +704,7 @@ zabbix_export:
             -
               tag: General
         -
+          uuid: bbcb555846df4169bc7aead77403e8eb
           name: Uptime
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
@@ -681,6 +727,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: 5aa41e64e019490d9b20598325a7cc1e
               expression: '{last()}<10m'
               name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
@@ -691,6 +738,7 @@ zabbix_export:
                   name: 'No SNMP data collection'
                   expression: '{APC Smart-UPS RT 1000 XL SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0'
         -
+          uuid: f24fc7ed9ffa4884891a01a0f1565fc4
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
@@ -707,6 +755,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
+              uuid: 040900315fdf4fc08e44ba48ddc75b8b
               expression: '{max({$SNMP.TIMEOUT})}=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -714,6 +763,7 @@ zabbix_export:
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
       discovery_rules:
         -
+          uuid: 9389b159502e4242b02a11104124bae5
           name: 'External bad battery packs discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.6]'
@@ -722,6 +772,7 @@ zabbix_export:
           description: 'Discovery of the number of external defective battery packs.'
           item_prototypes:
             -
+              uuid: 202a5c9f91c64011a915157a07245a6d
               name: '{#SNMPINDEX}: External battery packs bad'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.6.0
@@ -742,6 +793,7 @@ zabbix_export:
                 -
                   tag: Status
         -
+          uuid: ec66331f2ae64801a3ef51d6dec5a00f
           name: 'External battery packs discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CARTRIDGE_STATUS},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7,{#BATTERY_PACK},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.1,{#CARTRIDGE_INDEX},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.2]'
@@ -757,6 +809,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 8d1574f1c1d442529509580309153564
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery estimated replace date'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.8.{#SNMPINDEX}'
@@ -777,6 +830,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: 3c829e3adec64fb39334dbacc03a3229
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery pack cartridge health'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7.{#SNMPINDEX}'
@@ -804,6 +858,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: 12d76cd591c84e8cbe64e39116b27a50
                   expression: '{regexp("^(0)[0|1]{15}$")}=1'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -818,6 +873,7 @@ zabbix_export:
                       bit 5 Battery measured lifetime near end, order replacement cartridge
                       bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge
             -
+              uuid: 15f52cb076cb414fb794113e9981fdde
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.10.{#SNMPINDEX}'
@@ -850,6 +906,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: d112feeac5a149d78cee45b8b9d30d6a
                   expression: '{regexp("^(0{16})$")}=0'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -869,6 +926,7 @@ zabbix_export:
                     bit 10 DisconnectedFrame
                     bit 11 FirmwareMismatch
             -
+              uuid: e0d8f68302264c1b9420284f3e3a0272
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.5.{#SNMPINDEX}'
@@ -893,11 +951,13 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: 28eaa5b47b6b4ddcb6b98b7d1f1dcc97
                   expression: '{min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
                   opdata: 'Current temperature: {ITEM.LASTVALUE1}'
                   priority: HIGH
             -
+              uuid: bca352c952174256b9cfbcffb86fbf90
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.4.{#SNMPINDEX}'
@@ -918,6 +978,7 @@ zabbix_export:
                 -
                   tag: General
         -
+          uuid: 19379361227740c3bf8bc9852886538d
           name: 'External sensor port 1 discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#EXTERNAL_SENSOR1_NAME},1.3.6.1.4.1.318.1.1.25.1.2.1.3]'
@@ -926,6 +987,7 @@ zabbix_export:
           description: uioSensorStatusTable
           item_prototypes:
             -
+              uuid: d9c8acbf3a90411582404c9d5cfa9f70
               name: '{#EXTERNAL_SENSOR1_NAME}: Humidity sensor'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.7.1.1
@@ -947,6 +1009,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: 1a475822bc324bbf8c4aa15c34734270
               name: '{#EXTERNAL_SENSOR1_NAME}: Sensor alarm status'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.9.1.1
@@ -971,21 +1034,25 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: cf3931f71420447cb791f5c1de4f7cbd
                   expression: '{last()}=3'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical'
                   priority: HIGH
                   description: 'The external sensor has returned a value greater than the critical threshold.'
                 -
+                  uuid: eaa3114455aa435a81d7c430825af0f2
                   expression: '{last()}=4'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable'
                   priority: INFO
                   description: 'The external sensor does not work or is not connected.'
                 -
+                  uuid: eac666e57fcb4f8bb3bf2c043e1687d9
                   expression: '{last()}=2'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning'
                   priority: AVERAGE
                   description: 'The external sensor has returned a value greater than the warning threshold.'
             -
+              uuid: 6d1005b2b6ad41369174d93b1ebe1959
               name: '{#EXTERNAL_SENSOR1_NAME}: Temperature sensor'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.6.1.1
@@ -1023,6 +1090,7 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
         -
+          uuid: c4df3e0e0eba4585bdd01358f9d7f5d9
           name: 'External sensor port 2 discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#EXTERNAL_SENSOR2_NAME},1.3.6.1.4.1.318.1.1.25.1.2.2.3]'
@@ -1031,6 +1099,7 @@ zabbix_export:
           description: uioSensorStatusTable
           item_prototypes:
             -
+              uuid: 7d08e2a5df41454f863f5b50a911f819
               name: '{#EXTERNAL_SENSOR2_NAME}: Humidity sensor'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.7.1.1
@@ -1052,6 +1121,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: 4774fd152aab49de9064490cf7ec1d0a
               name: '{#EXTERNAL_SENSOR2_NAME}: Sensor alarm status'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.9.1.1
@@ -1076,21 +1146,25 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: 12bfc00135e34e93857eff517946ac95
                   expression: '{last()}=3'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical'
                   priority: HIGH
                   description: 'The external sensor has returned a value greater than the critical threshold.'
                 -
+                  uuid: 92d16e8d456540969953cc881bbfa82a
                   expression: '{last()}=4'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable'
                   priority: INFO
                   description: 'The external sensor does not work or is not connected.'
                 -
+                  uuid: 7bc5c68f1ff54cb5942cf33a391aa23b
                   expression: '{last()}=2'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning'
                   priority: AVERAGE
                   description: 'The external sensor has returned a value greater than the warning threshold.'
             -
+              uuid: d94425f2025045459af40e8fcb72734e
               name: '{#EXTERNAL_SENSOR2_NAME}: Temperature sensor'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.6.1.1
@@ -1128,6 +1202,7 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
         -
+          uuid: 68610f5b6df44229bcb0ad4b0fa1c3f8
           name: 'Input phases discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#PHASEINDEX},1.3.6.1.4.1.318.1.1.1.9.2.3.1.2.1.1]'
@@ -1136,6 +1211,7 @@ zabbix_export:
           description: 'The input phase identifier. OID upsPhaseInputPhaseIndex.1.1'
           item_prototypes:
             -
+              uuid: d17e9bb868b143dca508c4f79092cd6e
               name: '{#PHASEINDEX}: Phase input current'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.1.1.{#PHASEINDEX}'
@@ -1160,6 +1236,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: cf03abf328754a4082017f480051292f
               name: '{#PHASEINDEX}: Phase input voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.1.1.{#PHASEINDEX}'
@@ -1181,11 +1258,13 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: 309d43050f574a8aa0e0bc1f0c962eda
                   expression: '{min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
                   priority: HIGH
         -
+          uuid: a7b39188df294ec182c3e1f2a2417154
           name: 'Output phases discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#PHASEINDEX},1.3.6.1.4.1.318.1.1.1.9.3.3.1.2.1.1]'
@@ -1194,6 +1273,7 @@ zabbix_export:
           description: 'The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1'
           item_prototypes:
             -
+              uuid: 638c63c2f4ad4cad8ed71a796d78705b
               name: '{#PHASEINDEX}: Phase output current'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.3.3.1.4.1.1.{#PHASEINDEX}'
@@ -1219,6 +1299,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: ba4a2ae8abea4e2692b9a43231783648
               name: '{#PHASEINDEX}: Phase output load, %'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.1.1.{#PHASEINDEX}'
@@ -1240,6 +1321,7 @@ zabbix_export:
                 -
                   tag: Status
             -
+              uuid: 4e22c7f6d7e14b20b3720e082042fd4f
               name: '{#PHASEINDEX}: Phase output voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.3.3.1.3.1.1.{#PHASEINDEX}'
@@ -1261,6 +1343,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
+                  uuid: 99b3166f9cb64e5381d3fde4f8afb741
                   expression: '{min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
@@ -1302,179 +1385,9 @@ zabbix_export:
           macro: '{$UPS.OUTPUT.MAX.WARN}'
           value: '80'
           description: 'Maximum output load in % for trigger expression.'
-      dashboards:
-        -
-          name: 'UPS Summary'
-          pages:
-            -
-              widgets:
-                -
-                  type: PLAIN_TEXT
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'system.uptime[sysUpTime.0]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: PLAIN_TEXT
-                  x: '8'
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'input.fail[upsAdvInputLineFailCause]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: PLAIN_TEXT
-                  x: '16'
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'output.status[upsBasicOutputStatus]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: PLAIN_TEXT
-                  'y': '2'
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'battery.status[upsBasicBatteryStatus]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: PLAIN_TEXT
-                  x: '8'
-                  'y': '2'
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: PLAIN_TEXT
-                  x: '16'
-                  'y': '2'
-                  width: '8'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: GRAPH_CLASSIC
-                  'y': '4'
-                  width: '8'
-                  height: '7'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        name: 'Capacity of the UPS batteries'
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: GRAPH_CLASSIC
-                  x: '8'
-                  'y': '4'
-                  width: '8'
-                  height: '7'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        name: Voltage
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
-                -
-                  type: GRAPH_CLASSIC
-                  x: '16'
-                  'y': '4'
-                  width: '8'
-                  height: '7'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        name: Output
-                        host: 'APC Smart-UPS RT 1000 XL SNMP'
       valuemaps:
         -
+          uuid: b2af1e2dcb874d43949c383f9b347f36
           name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'
           mappings:
             -
@@ -1490,6 +1403,7 @@ zabbix_export:
               value: '4'
               newvalue: 'Not applicable'
         -
+          uuid: b06b54b07e6840e5a0c52ba7a6acf86a
           name: 'PowerNet-MIB::upsAdvBatteryReplaceIndicator'
           mappings:
             -
@@ -1499,6 +1413,7 @@ zabbix_export:
               value: '2'
               newvalue: 'battery Needs Replacing'
         -
+          uuid: a62f96735c47467da94b6bcf98cc013d
           name: 'PowerNet-MIB::upsAdvInputLineFailCause'
           mappings:
             -
@@ -1532,6 +1447,7 @@ zabbix_export:
               value: '10'
               newvalue: 'Rate of Voltage Change'
         -
+          uuid: ed12e8780c384caba8035fbb1c78e115
           name: 'PowerNet-MIB::upsBasicBatteryStatus'
           mappings:
             -
@@ -1547,6 +1463,7 @@ zabbix_export:
               value: '4'
               newvalue: 'In Fault Condition'
         -
+          uuid: ae2ed0c2c99a4ad496f7a35226e3d4f0
           name: 'PowerNet-MIB::upsBasicOutputStatus'
           mappings:
             -
@@ -1628,6 +1545,7 @@ zabbix_export:
               value: '26'
               newvalue: 'Charger Only'
         -
+          uuid: 8cddc4f99ecb4866b1638b82b145ea8b
           name: zabbix.host.available
           mappings:
             -
@@ -1641,6 +1559,7 @@ zabbix_export:
               newvalue: unknown
   graphs:
     -
+      uuid: a0d8e0338b8d4fd2bd6fdf537373d63c
       name: 'Capacity of the UPS batteries'
       type: PIE
       graph_items:
@@ -1650,6 +1569,7 @@ zabbix_export:
             host: 'APC Smart-UPS RT 1000 XL SNMP'
             key: 'battery.capacity[upsHighPrecBatteryCapacity]'
     -
+      uuid: 0817d2550d9642fe95ce182dce5cefd8
       name: Output
       graph_items:
         -
@@ -1664,6 +1584,7 @@ zabbix_export:
             host: 'APC Smart-UPS RT 1000 XL SNMP'
             key: 'output.load[upsHighPrecOutputLoad]'
     -
+      uuid: ce2f4070e7a14d8283d0a8aff0fcd5e6
       name: Voltage
       graph_items:
         -

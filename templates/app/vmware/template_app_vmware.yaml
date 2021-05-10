@@ -1,248 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T12:04:30Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
-      template: VMware
-      name: VMware
-      description: |
-        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.38
-      templates:
-        -
-          name: 'VMware macros'
-      groups:
-        -
-          name: Templates/Applications
-      items:
-        -
-          name: 'VMware: Event log'
-          type: SIMPLE
-          key: 'vmware.eventlog[{$VMWARE.URL},skip]'
-          history: 7d
-          trends: '0'
-          value_type: LOG
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/5.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
-          tags:
-            -
-              tag: Application
-              value: VMware
-        -
-          name: 'VMware: Full name'
-          type: SIMPLE
-          key: 'vmware.fullname[{$VMWARE.URL}]'
-          delay: 1h
-          history: 7d
-          trends: '0'
-          value_type: CHAR
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'VMware service full name.'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
-          tags:
-            -
-              tag: Application
-              value: VMware
-        -
-          name: 'VMware: Version'
-          type: SIMPLE
-          key: 'vmware.version[{$VMWARE.URL}]'
-          delay: 1h
-          history: 7d
-          trends: '0'
-          value_type: CHAR
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'VMware service version.'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
-          tags:
-            -
-              tag: Application
-              value: VMware
-      discovery_rules:
-        -
-          name: 'Discover VMware clusters'
-          type: SIMPLE
-          key: 'vmware.cluster.discovery[{$VMWARE.URL}]'
-          delay: 1h
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'Discovery of clusters'
-          item_prototypes:
-            -
-              name: 'VMware: Status of "{#CLUSTER.NAME}" cluster'
-              type: SIMPLE
-              key: 'vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]'
-              history: 7d
-              username: '{$VMWARE.USERNAME}'
-              password: '{$VMWARE.PASSWORD}'
-              description: 'VMware cluster status.'
-              valuemap:
-                name: 'VMware status'
-              tags:
-                -
-                  tag: Application
-                  value: VMware
-        -
-          name: 'Discover VMware datastores'
-          type: SIMPLE
-          key: 'vmware.datastore.discovery[{$VMWARE.URL}]'
-          delay: 1h
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          item_prototypes:
-            -
-              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
-              type: SIMPLE
-              key: 'vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]'
-              history: 7d
-              username: '{$VMWARE.USERNAME}'
-              password: '{$VMWARE.PASSWORD}'
-              description: 'Amount of time for a read operation from the datastore (milliseconds).'
-              tags:
-                -
-                  tag: Application
-                  value: VMware
-            -
-              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
-              type: SIMPLE
-              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]'
-              delay: 5m
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              username: '{$VMWARE.USERNAME}'
-              password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore space in percentage from total.'
-              tags:
-                -
-                  tag: Application
-                  value: VMware
-            -
-              name: 'VMware: Total size of datastore {#DATASTORE}'
-              type: SIMPLE
-              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]'
-              delay: 5m
-              history: 7d
-              units: B
-              username: '{$VMWARE.USERNAME}'
-              password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore space in bytes.'
-              tags:
-                -
-                  tag: Application
-                  value: VMware
-            -
-              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
-              type: SIMPLE
-              key: 'vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]'
-              history: 7d
-              username: '{$VMWARE.USERNAME}'
-              password: '{$VMWARE.PASSWORD}'
-              description: 'Amount of time for a write operation to the datastore (milliseconds).'
-              tags:
-                -
-                  tag: Application
-                  value: VMware
-        -
-          name: 'Discover VMware hypervisors'
-          type: SIMPLE
-          key: 'vmware.hv.discovery[{$VMWARE.URL}]'
-          delay: 1h
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'Discovery of hypervisors.'
-          host_prototypes:
-            -
-              host: '{#HV.UUID}'
-              name: '{#HV.NAME}'
-              group_links:
-                -
-                  group:
-                    name: Templates/Applications
-              group_prototypes:
-                -
-                  name: '{#CLUSTER.NAME}'
-                -
-                  name: '{#DATACENTER.NAME}'
-              templates:
-                -
-                  name: 'VMware Hypervisor'
-              macros:
-                -
-                  macro: '{$VMWARE.HV.UUID}'
-                  value: '{#HV.UUID}'
-                  description: 'UUID of hypervisor.'
-              custom_interfaces: 'YES'
-              interfaces:
-                -
-                  ip: '{#HV.IP}'
-        -
-          name: 'Discover VMware VMs'
-          type: SIMPLE
-          key: 'vmware.vm.discovery[{$VMWARE.URL}]'
-          delay: 1h
-          username: '{$VMWARE.USERNAME}'
-          password: '{$VMWARE.PASSWORD}'
-          description: 'Discovery of guest virtual machines.'
-          host_prototypes:
-            -
-              host: '{#VM.UUID}'
-              name: '{#VM.NAME}'
-              group_links:
-                -
-                  group:
-                    name: Templates/Applications
-              group_prototypes:
-                -
-                  name: '{#CLUSTER.NAME} (vm)'
-                -
-                  name: '{#DATACENTER.NAME} (vm)'
-                -
-                  name: '{#HV.NAME}'
-              templates:
-                -
-                  name: 'VMware Guest'
-              macros:
-                -
-                  macro: '{$VMWARE.VM.UUID}'
-                  value: '{#VM.UUID}'
-                  description: 'UUID of guest virtual machine.'
-              custom_interfaces: 'YES'
-              interfaces:
-                -
-                  ip: '{#VM.IP}'
-      valuemaps:
-        -
-          name: 'VMware status'
-          mappings:
-            -
-              value: '0'
-              newvalue: gray
-            -
-              value: '1'
-              newvalue: green
-            -
-              value: '2'
-              newvalue: yellow
-            -
-              value: '3'
-              newvalue: red
-    -
+      uuid: 7942fb93ae3b47cf9ca0ea4beb0675ce
       template: 'VMware Guest'
       name: 'VMware Guest'
       description: 'Template tooling version used: 0.38'
@@ -254,6 +19,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: 061eed2d40d5427092b50172ea0a9c41
           name: 'VMware: Cluster name'
           type: SIMPLE
           key: 'vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -274,6 +40,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 31389342688f4b0696a49431923a528f
           name: 'VMware: CPU latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -287,6 +54,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: bbfb146e74144160b2e47c0f2cdc6c20
           name: 'VMware: Number of virtual CPUs'
           type: SIMPLE
           key: 'vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -305,6 +73,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: f4d72109b7ee4e0bb65aab1de85b6b05
           name: 'VMware: CPU readiness latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -318,6 +87,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: ff0a31df94784cfbbf10deca55f76145
           name: 'VMware: CPU ready'
           type: SIMPLE
           key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -331,6 +101,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 50de05f27f33425cb207a3fdece7ecb1
           name: 'VMware: CPU swap-in latence in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -344,6 +115,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 50606be978814b51b4bae54340965cdc
           name: 'VMware: CPU usage in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -357,6 +129,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: ea416ff054cc4031ac6b5cf446156540
           name: 'VMware: CPU usage'
           type: SIMPLE
           key: 'vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -370,6 +143,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 3e70b5d443b942db974b5f92a7acce19
           name: 'VMware: Datacenter name'
           type: SIMPLE
           key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -390,6 +164,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: e645130999db470fbbf14a8055c95b23
           name: 'VMware: Guest memory swapped'
           type: SIMPLE
           key: 'vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -403,6 +178,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 521a0396514845e3bc5d3dc54ec3d940
           name: 'VMware: Uptime of guest OS'
           type: SIMPLE
           key: 'vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -417,12 +193,14 @@ zabbix_export:
               value: VMware
           triggers:
             -
+              uuid: 3dde49c3bf8347eaa18ccccbfa30a8fe
               expression: '{last()}<10m'
               name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: fedec469a1d040ae971e0013102e1e7c
           name: 'VMware: Hypervisor name'
           type: SIMPLE
           key: 'vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -443,6 +221,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: fbe7477fd85a4ee39a9226b2c6995446
           name: 'VMware: Ballooned memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -456,6 +235,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 9e7b9360e4d84e9397b5f0a7ab074726
           name: 'VMware: Compressed memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -469,6 +249,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 04a40f805fed4ddfa1590274a996a019
           name: 'VMware: Host memory consumed'
           type: SIMPLE
           key: 'vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -482,6 +263,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 6563409185804ed89b49dfde92edfa10
           name: 'VMware: Private memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -495,6 +277,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: c6a539ee57bf48f78342358c391c65ea
           name: 'VMware: Shared memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.shared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -508,6 +291,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: b064f0e0a53f4f6588827100becb4335
           name: 'VMware: Swapped memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -521,6 +305,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: e960399726a240de9ecc12eff65415ae
           name: 'VMware: Guest memory usage'
           type: SIMPLE
           key: 'vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -534,6 +319,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 6fcbe4e95fce445aa417b9738004391f
           name: 'VMware: Host memory usage'
           type: SIMPLE
           key: 'vmware.vm.memory.size.usage.host[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -547,6 +333,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 9533bc39366443fe8a3808190801441a
           name: 'VMware: Memory size'
           type: SIMPLE
           key: 'vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -566,6 +353,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: e82daa73e03e43b9838d9e414d710e38
           name: 'VMware: Host memory usage in percents'
           type: SIMPLE
           key: 'vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -579,6 +367,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 0943ff346c9d4cc69fc773843066c473
           name: 'VMware: Power state'
           type: SIMPLE
           key: 'vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -598,6 +387,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 13173517c99e4a87aa6750392d14b255
           name: 'VMware: Committed storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.committed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -611,6 +401,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 8183cf2c54774d7eb544f645d5c26b8c
           name: 'VMware: Uncommitted storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -624,6 +415,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 35aa9ee1743e4c1787c426da20f48097
           name: 'VMware: Unshared storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -637,6 +429,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 4c3b010d7ea74da6b0dc1dd4e625bbb0
           name: 'VMware: Uptime'
           type: SIMPLE
           key: 'vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -651,6 +444,7 @@ zabbix_export:
               value: VMware
       discovery_rules:
         -
+          uuid: 914634668bab4266bd641ee224dbc1e4
           name: 'Network device discovery'
           type: SIMPLE
           key: 'vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -660,6 +454,7 @@ zabbix_export:
           description: 'Discovery of all network devices.'
           item_prototypes:
             -
+              uuid: 1a7452a0061b45b1b1904e3ff64cf49f
               name: 'VMware: Number of bytes received on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
@@ -673,6 +468,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 863c3aee5d9248d48adbf86832fa6c8e
               name: 'VMware: Number of packets received on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
@@ -685,6 +481,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 0993e42664a14cd7936351c55b1d64a4
               name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
@@ -698,6 +495,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 144a2ed3f76e49af92462e0fea275ede
               name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
@@ -710,6 +508,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 9c3cd13576cc4c0a8972fa188f911e96
               name: 'VMware: Network utilization on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]'
@@ -728,6 +527,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
         -
+          uuid: b1543bdfb5a342d7ad694c87248fe173
           name: 'Disk device discovery'
           type: SIMPLE
           key: 'vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -737,6 +537,7 @@ zabbix_export:
           description: 'Discovery of all disk devices.'
           item_prototypes:
             -
+              uuid: a4886b1072314819aaf21183949c94bb
               name: 'VMware: Average number of outstanding read requests to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.readoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
@@ -749,6 +550,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 172e4882d39f49d486ab5590163fdd4b
               name: 'VMware: Average read latency to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
@@ -762,6 +564,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 4fe54828be084b15bb92507106756a5f
               name: 'VMware: Average write latency to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
@@ -775,6 +578,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: a74614af101c404eb7ebec10319dca05
               name: 'VMware: Average number of outstanding write requests to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.writeoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
@@ -787,6 +591,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: bd151efc8a0b41e9b64cbf21303fc659
               name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
@@ -800,6 +605,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: e6248013150d4f23a0774f6cc80e8df3
               name: 'VMware: Average number of reads from the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
@@ -812,6 +618,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 7ea68380b855460b8e51281223659661
               name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
@@ -825,6 +632,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 8344a1066f5c4ef49894d2d18fac2339
               name: 'VMware: Average number of writes to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
@@ -837,6 +645,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
         -
+          uuid: 44ff9ef164dc4d20acf06b3368d64456
           name: 'Mounted filesystem discovery'
           type: SIMPLE
           key: 'vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -846,6 +655,7 @@ zabbix_export:
           description: 'Discovery of all guest file systems.'
           item_prototypes:
             -
+              uuid: 622e96310f9d4f54b4ed82f655fa153b
               name: 'VMware: Free disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free]'
@@ -859,6 +669,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 3103537bb1d24633a064d173b3b530f2
               name: 'VMware: Free disk space on {#FSNAME} (percentage)'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree]'
@@ -873,6 +684,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 08d05eac03994b56867ec302a346735c
               name: 'VMware: Total disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]'
@@ -892,6 +704,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 09bb15da42464d8295d5e94b1d42cc87
               name: 'VMware: Used disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},used]'
@@ -906,6 +719,7 @@ zabbix_export:
                   value: VMware
       valuemaps:
         -
+          uuid: 78f08f5c5c0047b999a2e8daa96cf8b7
           name: 'VMware VirtualMachinePowerState'
           mappings:
             -
@@ -918,6 +732,7 @@ zabbix_export:
               value: '2'
               newvalue: suspended
     -
+      uuid: 5899b2f0aced4085b5ac25d0461b3425
       template: 'VMware Hypervisor'
       name: 'VMware Hypervisor'
       description: 'Template tooling version used: 0.38'
@@ -929,6 +744,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: 3010cb082f23478b858912f944347530
           name: 'VMware: Hypervisor ping'
           type: SIMPLE
           key: 'icmpping[]'
@@ -947,12 +763,14 @@ zabbix_export:
               value: VMware
           triggers:
             -
+              uuid: b2ba4c5e95504c04b59bd1bcda3532ad
               expression: '{last()}=0'
               name: 'VMware: Hypervisor is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept ICMP ping.'
               manual_close: 'YES'
         -
+          uuid: af4d0877fda84753816c817ad76162f1
           name: 'VMware: Cluster name'
           type: SIMPLE
           key: 'vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -973,6 +791,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: c4ebd62118464e7a8d1945f80d70f8ae
           name: 'VMware: CPU usage in percents'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -986,6 +805,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 1bff6fbd300d4455a787a273d957bba3
           name: 'VMware: CPU usage'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -999,6 +819,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: aad168c33cd14f76aa14ab5ca26498ec
           name: 'VMware: CPU utilization'
           type: SIMPLE
           key: 'vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1012,6 +833,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: e4d27d7f9b9048d4ae6c60cbdd6c0091
           name: 'VMware: Datacenter name'
           type: SIMPLE
           key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1032,6 +854,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 5c29837f75f04d7f9a5786691b3dd991
           name: 'VMware: Full name'
           type: SIMPLE
           key: 'vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1052,6 +875,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: ad0053d57b834e6a9776c08e1c455d55
           name: 'VMware: CPU frequency'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1066,6 +890,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 3f0c35fcef9e4699ac5a1c51d80f8da4
           name: 'VMware: CPU model'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1081,6 +906,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: c99a5bf2e3904f97b3d361ca20af7883
           name: 'VMware: CPU cores'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1099,6 +925,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 89cb0a4809e7454a862f398a0e9d6bed
           name: 'VMware: CPU threads'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.threads[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1112,6 +939,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: ce89c38e6e5d4338a30ee150be1b2b67
           name: 'VMware: Total memory'
           type: SIMPLE
           key: 'vmware.hv.hw.memory[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1126,6 +954,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 7ed7ac26da384bcda976badf24ebbec1
           name: 'VMware: Model'
           type: SIMPLE
           key: 'vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1141,6 +970,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 6c4aab55b3e640779a25ac90b9ca2a43
           name: 'VMware: Bios UUID'
           type: SIMPLE
           key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1156,6 +986,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: aec06090d16d4bdd8ed3494b448f19d8
           name: 'VMware: Vendor'
           type: SIMPLE
           key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1171,6 +1002,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 21020a79436a49c38caf8941f6b68da3
           name: 'VMware: Ballooned memory'
           type: SIMPLE
           key: 'vmware.hv.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1184,6 +1016,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 93d680d6886d446badbbe995ddd9ba9c
           name: 'VMware: Used memory'
           type: SIMPLE
           key: 'vmware.hv.memory.used[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1197,6 +1030,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 33f78ab6ee6c4e7585a83a60cdecab6f
           name: 'VMware: Number of bytes received'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
@@ -1210,6 +1044,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: b013afcba08b47f4a5b590a59f464a58
           name: 'VMware: Number of bytes transmitted'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
@@ -1223,6 +1058,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: e4116d7c7e234c5ebd5784f42ade1f2e
           name: 'VMware: Power usage maximum allowed'
           type: SIMPLE
           key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]'
@@ -1241,6 +1077,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 179a981cf30f4f77869e3b50dc2bc333
           name: 'VMware: Power usage'
           type: SIMPLE
           key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1254,6 +1091,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 36b28fccf6db4c49bf20157c419400d0
           name: 'VMware: Health state rollup'
           type: SIMPLE
           key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1269,6 +1107,7 @@ zabbix_export:
               value: VMware
           triggers:
             -
+              uuid: 87c78ee0d9544fefae95a6aed99e8e87
               expression: '{last()}=3'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
@@ -1278,6 +1117,7 @@ zabbix_export:
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
                   expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
             -
+              uuid: 97d13204ec20467a8d6d54300b43e757
               expression: '{last()}=2'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
@@ -1293,6 +1133,7 @@ zabbix_export:
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
                   expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2'
         -
+          uuid: 0cec294521314c5482233b5b96e90c8d
           name: 'VMware: Overall status'
           type: SIMPLE
           key: 'vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1308,11 +1149,13 @@ zabbix_export:
               value: VMware
           triggers:
             -
+              uuid: b0801afa334e42c5b03420eb0066cab9
               expression: '{last()}=3'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
             -
+              uuid: 200229a724cb4697a1c7d9e29b71c7d5
               expression: '{last()}=2'
               name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
@@ -1322,6 +1165,7 @@ zabbix_export:
                   name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
                   expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
         -
+          uuid: ecad96137494476293b57a0440de3f65
           name: 'VMware: Uptime'
           type: SIMPLE
           key: 'vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1336,12 +1180,14 @@ zabbix_export:
               value: VMware
           triggers:
             -
+              uuid: 21dc3455bcf8490e90f9ff325bc6adac
               expression: '{last()}<10m'
               name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 222ad20887cf479b8e81a4c338078d17
           name: 'VMware: Version'
           type: SIMPLE
           key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1357,6 +1203,7 @@ zabbix_export:
               tag: Application
               value: VMware
         -
+          uuid: 2045df572e864834bd4bd97046353f4e
           name: 'VMware: Number of guest VMs'
           type: SIMPLE
           key: 'vmware.hv.vm.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1371,6 +1218,7 @@ zabbix_export:
               value: VMware
       discovery_rules:
         -
+          uuid: fb7774df87994355baff7402d9fabcc2
           name: 'Datastore discovery'
           type: SIMPLE
           key: 'vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1379,6 +1227,7 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           item_prototypes:
             -
+              uuid: 65e6c165c3674953b2845d4101a9a6bf
               name: 'VMware: Multipath count for datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
@@ -1392,6 +1241,7 @@ zabbix_export:
                   value: VMware
               trigger_prototypes:
                 -
+                  uuid: 38dfb01025164883a199293c98d38ebc
                   expression: '{diff()}=1 and {last()}<{#MULTIPATH.COUNT}'
                   name: 'VMware: The multipath count has been changed'
                   opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'
@@ -1399,6 +1249,7 @@ zabbix_export:
                   description: 'The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).'
                   manual_close: 'YES'
             -
+              uuid: 259d1ff4bde143248f7ee2f7f880cb62
               name: 'VMware: Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
@@ -1411,6 +1262,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: f36245398cc4460a9cb4ec741612693b
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
               key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]'
@@ -1426,6 +1278,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: cc83e8f5ec08483db75482706bf01aba
               name: 'VMware: Total size of datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
@@ -1440,6 +1293,7 @@ zabbix_export:
                   tag: Application
                   value: VMware
             -
+              uuid: 9db980d8f5f44af5ad11a5949d80031d
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
@@ -1453,6 +1307,7 @@ zabbix_export:
                   value: VMware
       valuemaps:
         -
+          uuid: 25d04e2838af4fcca9ddd21df6781497
           name: 'Service state'
           mappings:
             -
@@ -1462,6 +1317,7 @@ zabbix_export:
               value: '1'
               newvalue: Up
         -
+          uuid: 2b324fd8d7624874a3a81449b62c2cd6
           name: 'VMware status'
           mappings:
             -
@@ -1477,6 +1333,7 @@ zabbix_export:
               value: '3'
               newvalue: red
     -
+      uuid: 214366d2deb14a0ca6d19d8a54a3b88e
       template: 'VMware macros'
       name: 'VMware macros'
       description: 'Template tooling version used: 0.38'
