@@ -1,13 +1,16 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:42:10Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
     -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
     -
+      uuid: 45486dbbf5bf49f28866fcb212731cf0
       template: 'Linux block devices by Zabbix agent'
       name: 'Linux block devices by Zabbix agent'
       description: 'Template tooling version used: 0.38'
@@ -16,6 +19,7 @@ zabbix_export:
           name: Templates/Modules
       discovery_rules:
         -
+          uuid: 4f3743bbc7ca4da89f833b72eb9e23b7
           name: 'Block devices discovery'
           key: vfs.dev.discovery
           delay: 1h
@@ -37,6 +41,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 7d0ed5b91e844c5ba5bd31860f4eaee5
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
               type: DEPENDENT
               key: 'vfs.dev.queue_size[{#DEVNAME}]'
@@ -64,6 +69,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: 92de75ec84994081831753c64c234b41
               name: '{#DEVNAME}: Disk read request avg waiting time (r_await)'
               type: CALCULATED
               key: 'vfs.dev.read.await[{#DEVNAME}]'
@@ -77,6 +83,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: 8a00f63fdfc844d88941795ff0ca1e8b
               name: '{#DEVNAME}: Disk read rate'
               type: DEPENDENT
               key: 'vfs.dev.read.rate[{#DEVNAME}]'
@@ -101,6 +108,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: 9f1253dfd045447fbe4769e00fdf4fc7
               name: '{#DEVNAME}: Disk read time (rate)'
               type: DEPENDENT
               key: 'vfs.dev.read.time.rate[{#DEVNAME}]'
@@ -128,6 +136,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: 00942e8bc61b423d84479cfc37b3f184
               name: '{#DEVNAME}: Disk utilization'
               type: DEPENDENT
               key: 'vfs.dev.util[{#DEVNAME}]'
@@ -156,6 +165,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: 0edcba521a6348629740e5b80034cb28
               name: '{#DEVNAME}: Disk write request avg waiting time (w_await)'
               type: CALCULATED
               key: 'vfs.dev.write.await[{#DEVNAME}]'
@@ -169,6 +179,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: c9dcb1acf07441d2b6ea9eb520c96aff
               name: '{#DEVNAME}: Disk write rate'
               type: DEPENDENT
               key: 'vfs.dev.write.rate[{#DEVNAME}]'
@@ -193,6 +204,7 @@ zabbix_export:
                   tag: Application
                   value: 'Disk {#DEVNAME}'
             -
+              uuid: 30c2ee8fd86a4d369d4fc0b2c713dec2
               name: '{#DEVNAME}: Disk write time (rate)'
               type: DEPENDENT
               key: 'vfs.dev.write.time.rate[{#DEVNAME}]'
@@ -220,6 +232,7 @@ zabbix_export:
                   tag: Application
                   value: 'Zabbix raw items'
             -
+              uuid: e25a03160e3243b5a33dfd834055b6e4
               name: '{#DEVNAME}: Get stats'
               key: 'vfs.file.contents[/sys/block/{#DEVNAME}/stat]'
               history: '0'
@@ -237,6 +250,7 @@ zabbix_export:
                   value: 'Zabbix raw items'
           trigger_prototypes:
             -
+              uuid: 13feb5c731a34a52b3d6740da9b9b0ae
               expression: 'min(/Linux block devices by Zabbix agent/vfs.dev.read.await[{#DEVNAME}],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or min(/Linux block devices by Zabbix agent/vfs.dev.write.await[{#DEVNAME}],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
               name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
@@ -244,6 +258,7 @@ zabbix_export:
               manual_close: 'YES'
           graph_prototypes:
             -
+              uuid: 96ca565847ac46ffb7456fbfa4513922
               name: '{#DEVNAME}: Disk average waiting time'
               graph_items:
                 -
@@ -259,6 +274,7 @@ zabbix_export:
                     host: 'Linux block devices by Zabbix agent'
                     key: 'vfs.dev.write.await[{#DEVNAME}]'
             -
+              uuid: 15b73630b3224b5a87ef3631dfdfe566
               name: '{#DEVNAME}: Disk read/write rates'
               graph_items:
                 -
@@ -274,6 +290,7 @@ zabbix_export:
                     host: 'Linux block devices by Zabbix agent'
                     key: 'vfs.dev.write.rate[{#DEVNAME}]'
             -
+              uuid: 8f7b0b21edeb4bf6b340852a3ace455c
               name: '{#DEVNAME}: Disk utilization and queue'
               graph_items:
                 -
@@ -312,6 +329,7 @@ zabbix_export:
           value: '20'
           description: 'Disk write average response time (in ms) before the trigger would fire'
     -
+      uuid: f8f7908280354f2abeed07dc788c3747
       template: 'Linux by Zabbix agent'
       name: 'Linux by Zabbix agent'
       description: |
@@ -344,6 +362,7 @@ zabbix_export:
           name: 'Templates/Operating systems'
       dashboards:
         -
+          uuid: e9ca2f8e715f428b8edc0129aa0c79de
           name: 'System performance'
           pages:
             -
@@ -533,6 +552,7 @@ zabbix_export:
                         name: 'Interface {#IFNAME}: Network traffic'
                         host: 'Linux by Zabbix agent'
     -
+      uuid: d4e080814aad467dbf6b95c46b862c28
       template: 'Linux CPU by Zabbix agent'
       name: 'Linux CPU by Zabbix agent'
       description: 'Template tooling version used: 0.38'
@@ -541,6 +561,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: c0c12ca155b042b2b5f33d9ced5f1cd2
           name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
@@ -555,6 +576,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 9c7bd054537a449c84959c68850a232b
           name: 'Load average (1m avg)'
           key: 'system.cpu.load[all,avg1]'
           history: 7d
@@ -564,6 +586,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: dd912665ba1c4934af0bf3cb22cb925c
           name: 'Load average (5m avg)'
           key: 'system.cpu.load[all,avg5]'
           history: 7d
@@ -573,6 +596,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 9298150efe98434694bc3ef940e4da3f
           name: 'Load average (15m avg)'
           key: 'system.cpu.load[all,avg15]'
           history: 7d
@@ -582,6 +606,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: a735c884e70349f78c66233047f7afe6
           name: 'Number of CPUs'
           key: system.cpu.num
           history: 7d
@@ -595,6 +620,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: f3ec31faa3ca4be6a176bc47679d18f7
           name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
@@ -609,6 +635,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 57074f87ab8e410ea6b0cb4708ab627e
           name: 'CPU utilization'
           type: DEPENDENT
           key: system.cpu.util
@@ -632,6 +659,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
+              uuid: 3fc512aaaa004c74bc27a71191919aea
               expression: 'min(/Linux CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -645,6 +673,7 @@ zabbix_export:
                     and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg5])>0
                     and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg15])>0
         -
+          uuid: 8778c8da3e45497584428b512f278fb9
           name: 'CPU guest time'
           key: 'system.cpu.util[,guest]'
           history: 7d
@@ -656,6 +685,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 61e4250a2b0341f684ebc8adb568822f
           name: 'CPU guest nice time'
           key: 'system.cpu.util[,guest_nice]'
           history: 7d
@@ -667,6 +697,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 5cb0b9e7dacf4507bd0007e923f8a970
           name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
@@ -678,6 +709,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 9e9fac69e7b646e2946987bdb3f36103
           name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
           history: 7d
@@ -689,6 +721,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: c078212326f04fd8878eee4b63e3ef7e
           name: 'CPU iowait time'
           key: 'system.cpu.util[,iowait]'
           history: 7d
@@ -700,6 +733,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: ca4c30b1c8a24edea59f6a2d76158f5f
           name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
           history: 7d
@@ -711,6 +745,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 6eab3a98207a4aa397083de9773560d2
           name: 'CPU softirq time'
           key: 'system.cpu.util[,softirq]'
           history: 7d
@@ -722,6 +757,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: d540fcdaaebc47dbbc52f6b92331ae61
           name: 'CPU steal time'
           key: 'system.cpu.util[,steal]'
           history: 7d
@@ -733,6 +769,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: a0e8576ca7cd47a8adf72bfcde1065be
           name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
@@ -744,6 +781,7 @@ zabbix_export:
               tag: Application
               value: CPU
         -
+          uuid: 3e37c91b2d304a5583f0578b99ec8eec
           name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
@@ -763,6 +801,7 @@ zabbix_export:
           value: '1.5'
           description: 'Load per CPU considered sustainable. Tune if needed.'
     -
+      uuid: fdcdd5810fba49928922a683d32aa76f
       template: 'Linux filesystems by Zabbix agent'
       name: 'Linux filesystems by Zabbix agent'
       description: 'Template tooling version used: 0.38'
@@ -771,6 +810,7 @@ zabbix_export:
           name: Templates/Modules
       discovery_rules:
         -
+          uuid: 1ec7965ad995437da2dc1f94749f3230
           name: 'Mounted filesystem discovery'
           key: vfs.fs.discovery
           delay: 1h
@@ -798,6 +838,7 @@ zabbix_export:
           description: 'Discovery of file systems of different types.'
           item_prototypes:
             -
+              uuid: 8d6496b8be814dc885a1efb42823ae4f
               name: '{#FSNAME}: Free inodes in %'
               key: 'vfs.fs.inode[{#FSNAME},pfree]'
               history: 7d
@@ -809,6 +850,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
               trigger_prototypes:
                 -
+                  uuid: f6ffdb39d4de474d8eb31f51fc3e49d1
                   expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
@@ -817,6 +859,7 @@ zabbix_export:
                     It may become impossible to write to disk if there are no index nodes left.
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                 -
+                  uuid: 451ccdeaef7b4656aa41bbca932cee5b
                   expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
@@ -829,6 +872,7 @@ zabbix_export:
                       name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                       expression: 'min(/Linux filesystems by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
             -
+              uuid: a39947b5a940441a961f685b430cd7e9
               name: '{#FSNAME}: Space utilization'
               key: 'vfs.fs.size[{#FSNAME},pused]'
               history: 7d
@@ -840,6 +884,7 @@ zabbix_export:
                   tag: Application
                   value: 'Filesystem {#FSNAME}'
             -
+              uuid: e6ce1925a65d4b1fa954ac55fcd39b04
               name: '{#FSNAME}: Total space'
               key: 'vfs.fs.size[{#FSNAME},total]'
               history: 7d
@@ -850,6 +895,7 @@ zabbix_export:
                   tag: Application
                   value: 'Filesystem {#FSNAME}'
             -
+              uuid: 74c773bffa8e41f2a3cd7abf0b710fcf
               name: '{#FSNAME}: Used space'
               key: 'vfs.fs.size[{#FSNAME},used]'
               history: 7d
@@ -861,6 +907,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
+              uuid: de6f63de45d04a148bea3c1adeeb3669
               expression: |
                 last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
@@ -874,6 +921,7 @@ zabbix_export:
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
             -
+              uuid: 27556726692d4fb4ae6596452f0fad65
               expression: |
                 last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
@@ -894,6 +942,7 @@ zabbix_export:
                     ((last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Linux filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
           graph_prototypes:
             -
+              uuid: 3ccd5c1a0e15489c9b57030ee634b8e3
               name: '{#FSNAME}: Disk space usage'
               width: '600'
               height: '340'
@@ -944,6 +993,7 @@ zabbix_export:
           macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
     -
+      uuid: 38f973ee1556494fadeacb2f6b1ec987
       template: 'Linux generic by Zabbix agent'
       name: 'Linux generic by Zabbix agent'
       description: 'Template tooling version used: 0.38'
@@ -952,6 +1002,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: 5dc4ebda1b9244e7a9f901209b78570f
           name: 'Maximum number of open file descriptors'
           key: kernel.maxfiles
           delay: 1h
@@ -968,10 +1019,12 @@ zabbix_export:
               value: General
           triggers:
             -
+              uuid: abf2e035f1e54971a0795152f922271b
               expression: 'last(/Linux generic by Zabbix agent/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}'
               name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
         -
+          uuid: a82525acd1bd4039860ad2d750476760
           name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
@@ -988,6 +1041,7 @@ zabbix_export:
               value: General
           triggers:
             -
+              uuid: 079c2be2b0a44965a8e83cedba222b8d
               expression: 'last(/Linux generic by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}'
               name: 'Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})'
               priority: INFO
@@ -996,6 +1050,7 @@ zabbix_export:
                   name: 'Getting closer to process limit (over 80% used)'
                   expression: 'last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80'
         -
+          uuid: 0207b131fa26435ba6b5979c46719bc8
           name: 'Number of processes'
           key: proc.num
           history: 7d
@@ -1004,6 +1059,7 @@ zabbix_export:
               tag: Application
               value: General
         -
+          uuid: fa98827fe6474bf692d6aba3273836f7
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
@@ -1012,6 +1068,7 @@ zabbix_export:
               tag: Application
               value: General
         -
+          uuid: 48c251895f234f4595c4133015c27a18
           name: 'System boot time'
           key: system.boottime
           delay: 15m
@@ -1027,6 +1084,7 @@ zabbix_export:
               tag: Application
               value: General
         -
+          uuid: f744b8e0be46431e8088803b3a1b210d
           name: 'System name'
           key: system.hostname
           delay: 1h
@@ -1046,12 +1104,14 @@ zabbix_export:
               value: General
           triggers:
             -
+              uuid: dcbdc722758b432db9a80aa480527428
               expression: '(last(/Linux generic by Zabbix agent/system.hostname,#1)<>last(/Linux generic by Zabbix agent/system.hostname,#2))=1 and length(last(/Linux generic by Zabbix agent/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: ac41daaa287944f3b0429c6fb2bca09c
           name: 'System local time'
           key: system.localtime
           history: 7d
@@ -1063,12 +1123,14 @@ zabbix_export:
               value: General
           triggers:
             -
+              uuid: 1c10773b3d87415aacf39f82acbda1e2
               expression: 'fuzzytime(/Linux generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
               name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
         -
+          uuid: 2e6e1ac8eb724a47b6c50b6c352ee3f7
           name: 'Operating system architecture'
           key: system.sw.arch
           delay: 1h
@@ -1086,6 +1148,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: a40ad2e2bda3453b873d634e6a003dc2
           name: 'Operating system'
           key: system.sw.os
           delay: 1h
@@ -1104,6 +1167,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
+              uuid: 6afd7f044836452990f1fceea197d09d
               expression: '(last(/Linux generic by Zabbix agent/system.sw.os,#1)<>last(/Linux generic by Zabbix agent/system.sw.os,#2))=1 and length(last(/Linux generic by Zabbix agent/system.sw.os))>0'
               name: 'Operating system description has changed'
               priority: INFO
@@ -1114,6 +1178,7 @@ zabbix_export:
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: '(last(/Linux generic by Zabbix agent/system.hostname,#1)<>last(/Linux generic by Zabbix agent/system.hostname,#2))=1 and length(last(/Linux generic by Zabbix agent/system.hostname))>0'
         -
+          uuid: 1097f843e7324a1fa0508544ddddd556
           name: 'Software installed'
           key: system.sw.packages
           delay: 1h
@@ -1130,6 +1195,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: b3a8feced15d4a09a8a2d8d1d8c9a546
           name: 'System description'
           key: system.uname
           delay: 1h
@@ -1147,6 +1213,7 @@ zabbix_export:
               tag: Application
               value: General
         -
+          uuid: 0a49428e394c4431bf97aa8787637bff
           name: 'System uptime'
           key: system.uptime
           delay: 30s
@@ -1160,12 +1227,14 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: 2b612f4d65f4444c8a0609362c48463b
               expression: 'last(/Linux generic by Zabbix agent/system.uptime)<10m'
               name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The host uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: c595adf482c04553a2477bc1d929bc8d
           name: 'Number of logged in users'
           key: system.users.num
           history: 7d
@@ -1175,6 +1244,7 @@ zabbix_export:
               tag: Application
               value: General
         -
+          uuid: a10cff7883a4433bb744ebc2264fa13d
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd]'
           delay: 15m
@@ -1192,6 +1262,7 @@ zabbix_export:
               value: Security
           triggers:
             -
+              uuid: b1987329335d4e84816cac7b6b3b8a14
               expression: '(last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed'
               priority: INFO
@@ -1214,6 +1285,7 @@ zabbix_export:
           macro: '{$SYSTEM.FUZZYTIME.MAX}'
           value: '60'
     -
+      uuid: 06c211e947414638bd00e555e206d03d
       template: 'Linux memory by Zabbix agent'
       name: 'Linux memory by Zabbix agent'
       description: 'Template tooling version used: 0.38'
@@ -1222,6 +1294,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: e65616ce708743a6a7b8fea2ec89620b
           name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 7d
@@ -1232,6 +1305,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: da85940246a044398668403af8ce0bb6
           name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 7d
@@ -1243,6 +1317,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: 0067f617f90643d8b5721a659992db77
           name: 'Total swap space'
           key: 'system.swap.size[,total]'
           history: 7d
@@ -1253,6 +1328,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: e9aa329aff2c443595cd77443a512a1a
           name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
@@ -1263,6 +1339,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: 20299d21c1ee47a284f54e3b9c8ac919
           name: 'Available memory in %'
           key: 'vm.memory.size[pavailable]'
           history: 7d
@@ -1274,6 +1351,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: b2f541b33a32428aa7644825d54f706a
           name: 'Total memory'
           key: 'vm.memory.size[total]'
           history: 7d
@@ -1284,6 +1362,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: bb852083c6aa43119bfb1d0756d9f1f7
           name: 'Memory utilization'
           type: DEPENDENT
           key: vm.memory.utilization
@@ -1305,6 +1384,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
+              uuid: 2bbf8fa9ad2e42bd8cb2c0a0360a6ece
               expression: 'min(/Linux memory by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -1326,6 +1406,7 @@ zabbix_export:
           macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
     -
+      uuid: 18ecfb2a7e754315bb8d7f71917153da
       template: 'Linux network interfaces by Zabbix agent'
       name: 'Linux network interfaces by Zabbix agent'
       description: |
@@ -1339,6 +1420,7 @@ zabbix_export:
           name: Templates/Modules
       discovery_rules:
         -
+          uuid: aea284394a914ede923d0004369184cf
           name: 'Network interface discovery'
           key: net.if.discovery
           delay: 1h
@@ -1357,6 +1439,7 @@ zabbix_export:
           description: 'Discovery of network interfaces.'
           item_prototypes:
             -
+              uuid: 5a57cd0076d346ae953d0c85ff64ecaf
               name: 'Interface {#IFNAME}: Inbound packets discarded'
               key: 'net.if.in["{#IFNAME}",dropped]'
               delay: 3m
@@ -1371,6 +1454,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: f0c78df653744f03aaef06f909525a3d
               name: 'Interface {#IFNAME}: Inbound packets with errors'
               key: 'net.if.in["{#IFNAME}",errors]'
               delay: 3m
@@ -1385,6 +1469,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: 544b545925344458ae3895198fa5b00a
               name: 'Interface {#IFNAME}: Bits received'
               key: 'net.if.in["{#IFNAME}"]'
               delay: 3m
@@ -1404,6 +1489,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: 3502455ff20742439521d5b9d2f015a3
               name: 'Interface {#IFNAME}: Outbound packets discarded'
               key: 'net.if.out["{#IFNAME}",dropped]'
               delay: 3m
@@ -1418,6 +1504,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: 0044c70afff64bf99ecec9173ef7a0f8
               name: 'Interface {#IFNAME}: Outbound packets with errors'
               key: 'net.if.out["{#IFNAME}",errors]'
               delay: 3m
@@ -1432,6 +1519,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: efa9c1b34b86486c9260730316c7a67c
               name: 'Interface {#IFNAME}: Bits sent'
               key: 'net.if.out["{#IFNAME}"]'
               delay: 3m
@@ -1451,6 +1539,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}'
             -
+              uuid: f9d88bf4e5b245ed80870b50506e7db3
               name: 'Interface {#IFNAME}: Operational status'
               key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]'
               history: 7d
@@ -1496,6 +1585,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}'
               trigger_prototypes:
                 -
+                  uuid: dfbb7154d64147f49fc54f6d74f17828
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1511,6 +1601,7 @@ zabbix_export:
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
             -
+              uuid: 09bb129b088d493990bb4fa381eacad8
               name: 'Interface {#IFNAME}: Interface type'
               key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/type"]'
               delay: 1h
@@ -1533,6 +1624,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}'
           trigger_prototypes:
             -
+              uuid: ec807ac9ad2f4787b7e58b17b6b1ff42
               expression: |
                 change(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])<0 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0
                 and
@@ -1555,6 +1647,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))=1)'
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
+              uuid: 2ef8e08af04c4bf6ade48e3165a8fc8e
               expression: |
                 min(/Linux network interfaces by Zabbix agent/net.if.in["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Linux network interfaces by Zabbix agent/net.if.out["{#IFNAME}",errors],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1574,6 +1667,7 @@ zabbix_export:
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -
+              uuid: 4b1489e1d06a4443a4f379854936cfee
               name: 'Interface {#IFNAME}: Network traffic'
               graph_items:
                 -
@@ -1633,6 +1727,7 @@ zabbix_export:
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
       dashboards:
         -
+          uuid: 1cbc445224b14af1b72f1580d7444ba5
           name: 'Network interfaces'
           pages:
             -
@@ -1662,6 +1757,7 @@ zabbix_export:
                         host: 'Linux network interfaces by Zabbix agent'
       valuemaps:
         -
+          uuid: 8513cf23b8d34952b92a31bbd82a31d3
           name: 'IF-MIB::ifOperStatus'
           mappings:
             -
@@ -1683,6 +1779,7 @@ zabbix_export:
               value: '7'
               newvalue: lowerLayerDown
         -
+          uuid: e2db25377a2b49c897bbb8b6c30831e2
           name: 'Linux::Interface protocol types'
           mappings:
             -
@@ -1879,11 +1976,13 @@ zabbix_export:
               newvalue: 'Vsock monitor header'
   triggers:
     -
+      uuid: 613c30a98cf044b1b46a3d1d50f90eb8
       expression: 'last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80'
       name: 'Getting closer to process limit (over 80% used)'
       opdata: '{ITEM.LASTVALUE1} active, {ITEM.LASTVALUE2} limit.'
       priority: WARNING
     -
+      uuid: ca29e34e69254ed5b2f4894b0a73dc18
       expression: 'min(/Linux memory by Zabbix agent/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux memory by Zabbix agent/system.swap.size[,total])>0'
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
@@ -1897,11 +1996,13 @@ zabbix_export:
           name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: 'min(/Linux memory by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory by Zabbix agent/vm.memory.size[total])>0'
     -
+      uuid: 9c498cec23e54c6f817a3ec85f6a99c5
       expression: 'min(/Linux memory by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux memory by Zabbix agent/vm.memory.size[total])>0'
       name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -
+      uuid: 879f471cf0194bcc91ffb53e4f153e37
       expression: |
         min(/Linux CPU by Zabbix agent/system.cpu.load[all,avg1],5m)/last(/Linux CPU by Zabbix agent/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux CPU by Zabbix agent/system.cpu.load[all,avg5])>0
@@ -1912,6 +2013,7 @@ zabbix_export:
       description: 'Per CPU load average is too high. Your system may be slow to respond.'
   graphs:
     -
+      uuid: 7036809e95be49b4959fefe8e89a5e90
       name: 'CPU jumps'
       graph_items:
         -
@@ -1926,6 +2028,7 @@ zabbix_export:
             host: 'Linux CPU by Zabbix agent'
             key: system.cpu.intr
     -
+      uuid: 345236549e004d4da84b47bc797d248e
       name: 'CPU usage'
       type: STACKED
       ymin_type_1: FIXED
@@ -1985,6 +2088,7 @@ zabbix_export:
             host: 'Linux CPU by Zabbix agent'
             key: 'system.cpu.util[,guest_nice]'
     -
+      uuid: 4c14e3706a3c4c48b1fabf7d8d0991a8
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -1996,6 +2100,7 @@ zabbix_export:
             host: 'Linux CPU by Zabbix agent'
             key: system.cpu.util
     -
+      uuid: b089fd66c95b4e8ca923820a13f8dd16
       name: 'Memory usage'
       ymin_type_1: FIXED
       graph_items:
@@ -2013,6 +2118,7 @@ zabbix_export:
             host: 'Linux memory by Zabbix agent'
             key: 'vm.memory.size[available]'
     -
+      uuid: 83c385fe3aef4aa9b862ed4718e428d3
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -2024,6 +2130,7 @@ zabbix_export:
             host: 'Linux memory by Zabbix agent'
             key: vm.memory.utilization
     -
+      uuid: 644864fece6e4c0c9484c57e24808691
       name: Processes
       graph_items:
         -
@@ -2044,6 +2151,7 @@ zabbix_export:
             host: 'Linux generic by Zabbix agent'
             key: kernel.maxproc
     -
+      uuid: 71e4089be866400a9f0a520ba271c243
       name: 'Swap usage'
       graph_items:
         -
@@ -2058,6 +2166,7 @@ zabbix_export:
             host: 'Linux memory by Zabbix agent'
             key: 'system.swap.size[,total]'
     -
+      uuid: 479ffa370eef48caba68f06e63e73344
       name: 'System load'
       ymin_type_1: FIXED
       graph_items:

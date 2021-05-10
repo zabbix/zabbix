@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:41:17Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
+      uuid: 2d20a2fbd540492089fdcafc8feb60e3
       template: 'Morningstar TriStar MPPT 600V SNMP'
       name: 'Morningstar TriStar MPPT 600V SNMP'
       description: |
@@ -18,6 +20,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: 2e83c42d78e8486f936733e3cb6dee6b
           name: 'Array: Array Current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.31.0
@@ -37,6 +40,7 @@ zabbix_export:
               tag: Application
               value: Array
         -
+          uuid: 9750ce4073d9467fa18f0e35f990c081
           name: 'Array: Sweep Pmax'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.33.0
@@ -56,6 +60,7 @@ zabbix_export:
               tag: Application
               value: Array
         -
+          uuid: de36a1087b2d4ade8369c620c794c881
           name: 'Array: Sweep Vmp'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.34.0
@@ -75,6 +80,7 @@ zabbix_export:
               tag: Application
               value: Array
         -
+          uuid: a8f4819131fe4247aef9b1cd819b47d9
           name: 'Array: Sweep Voc'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.35.0
@@ -94,6 +100,7 @@ zabbix_export:
               tag: Application
               value: Array
         -
+          uuid: e13c3135ce8649ea9c88d4f9eb56219e
           name: 'Array: Voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.30.0
@@ -113,6 +120,7 @@ zabbix_export:
               tag: Application
               value: Array
         -
+          uuid: 058dc403d9b541978aebcb2944ecf75f
           name: 'Battery: Battery Voltage discovery'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.36.0
@@ -133,6 +141,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 5e42ba3c9a764b9690feb04d4bf7df45
           name: 'Battery: Charge Current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.42.0
@@ -152,6 +161,7 @@ zabbix_export:
               tag: Application
               value: Battery
         -
+          uuid: 6e168ff947324068aad1fc16d577369d
           name: 'Battery: Output Power'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.44.0
@@ -171,6 +181,7 @@ zabbix_export:
               tag: Application
               value: Battery
         -
+          uuid: aa20a89288c444a492910cb1a7f19499
           name: 'Battery: Charge State'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.46.0
@@ -206,11 +217,13 @@ zabbix_export:
               value: Battery
           triggers:
             -
+              uuid: ed2b56b78fce47f88b679774640706b5
               expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               name: 'Battery: Device charge in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 6f21bda91cc640809f0f4faf04ba86f4
               expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
               name: 'Battery: Device charge in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -220,6 +233,7 @@ zabbix_export:
                   name: 'Battery: Device charge in critical state'
                   expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
         -
+          uuid: 3d67ceefb2c443d38051e2d22aca45ce
           name: 'Counter: Charge Amp-hours'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.50.0
@@ -239,6 +253,7 @@ zabbix_export:
               tag: Application
               value: Counter
         -
+          uuid: 1a7ff2c884784eb4817956e0ecd5b718
           name: 'Counter: Charge KW-hours'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.52.0
@@ -258,6 +273,7 @@ zabbix_export:
               tag: Application
               value: Counter
         -
+          uuid: a2b5a78fe649480ea0cc580b5fa30bde
           name: 'Status: Alarms'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.57.0
@@ -329,151 +345,181 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: fd0377f578b246089917742a2b337679
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","alarm21Internal")=2'
               name: 'Status: Device has "alarm21Internal" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 2db45cb3ecff4dfab1a82184ef22d536
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
               name: 'Status: Device has "arrayCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 7d34a76e824c4100ae2b3079e55ae176
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2'
               name: 'Status: Device has "batterySense" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 81516ce837ea41ba9c771fbd608dcfc4
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
               name: 'Status: Device has "batterySenseDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 9a4680a9d54f49bda10cde6e5e392ade
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2'
               name: 'Status: Device has "controllerWasReset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 1d8f8a564cb44bfbb7a8c9c1305c5f95
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: f344a2c4f3e649838d516f55939a91cf
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2'
               name: 'Status: Device has "currentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 9d6899d80c074afb88a972fe1713e0c7
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","derateLimit")=2'
               name: 'Status: Device has "derateLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 7dea60a28bf04fe8a6f7fea32543259c
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","ee-i2cRetryLimit")=2'
               name: 'Status: Device has "ee-i2cRetryLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 46afb35d5e044df9a2e3d8bd391782f6
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","ethernetAlarm")=2'
               name: 'Status: Device has "ethernetAlarm" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: d2e21676d81f451eacacde5fc033d4f0
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","extflashFault")=2'
               name: 'Status: Device has "extflashFault" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: a2fd20f6bae44b908c878afd880dc785
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","fp12VoltageOutOfRange")=2'
               name: 'Status: Device has "fp12VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 14e5df0c146e416182af69262c6077bb
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 181bcff36bf44ef2a2fb5cacdbf19d26
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 49b0074f1d53429c8fa2194d9e942340
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2'
               name: 'Status: Device has "highArrayVCurrentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 0b4d2c0ccd234710a1a326da3bd9a334
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2'
               name: 'Status: Device has "highTemperatureCurrentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: c584964c020740d78db710a4c6740b32
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2'
               name: 'Status: Device has "highVoltageDisconnect" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 02980ad4e53948ffa17a1ab4074b6f5f
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","lvd")=2'
               name: 'Status: Device has "lvd" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 25be19114f82439a9d86c75d45c4f3ef
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2'
               name: 'Status: Device has "maxAdcValueReached" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: c8aaab6f1bf1488094e13ebccf6ef710
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2'
               name: 'Status: Device has "mosfetSOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: c367d824c6e547df90c972d696ee7b50
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","p3VoltageOutOfRange")=2'
               name: 'Status: Device has "p3VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 5fb8e57f4b204629a9f4d04e68b21526
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","p12VoltageOutOfRange")=2'
               name: 'Status: Device has "p12VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 0d86947d0cfd46e6b2d9f1fc31beb294
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: c64436400bf04c9386801cea0f942ade
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2'
               name: 'Status: Device has "rtsMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 66c2a52234814a30a36431b14723c821
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: dcf333740c5e44dfa7f8d8a30b4a43fb
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","slaveControlFault")=2'
               name: 'Status: Device has "slaveControlFault" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 1eb76e5e8f1e4682a957352762800ad9
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","software")=2'
               name: 'Status: Device has "software" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 3779871620694258b7f7e5554a6b5907
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2'
               name: 'Status: Device has "systemMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
+              uuid: 90f14a21332c4cb4919dcf291c4ab1a1
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
         -
+          uuid: 81efe20cce1b4b26a6eda83e86fbd49c
           name: 'Status: Faults'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.55.0
@@ -542,146 +588,175 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: 9f75cd7918fe49b5b5e752461f1f673b
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: cd2010625070486790e86f615e2962f2
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 58bf031aa64e4887ae1ed48058f74f72
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","batteryLvd")=2'
               name: 'Status: Device has "batteryLvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: f01f23fe25314f81b788726926c7d17f
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","blockbusBoot")=2'
               name: 'Status: Device has "blockbusBoot" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: c175677792c7450d8d1d7195fcbaca9d
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","chargeSlaveControlTimeout")=2'
               name: 'Status: Device has "chargeSlaveControlTimeout" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 9699f16e0bb14cd88f10378e95a389af
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","controllerWasReset")=2'
               name: 'Status: Device has "controllerWasReset" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: f69f280df17747a882d5db06b9d3a7fa
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","currentSensorReferenceOutOfRange")=2'
               name: 'Status: Device has "currentSensorReferenceOutOfRange" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 5fa536fb32f04c3bad46d127a758e785
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: bc1c0578e0ff416a96ce40ba8d581179
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2'
               name: 'Status: Device has "dipSwitchChange" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 6d2d1a5e853549f1bf8af41f3eb1fb8b
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2'
               name: 'Status: Device has "eepromRetryLimit" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: caed8f82d19f4eb19d5e0c97cf5ec857
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault16Software")=2'
               name: 'Status: Device has "fault16Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: b318b77317cc493d9cc8d37e0071c10d
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault17Software")=2'
               name: 'Status: Device has "fault17Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: c5782075467548be846e322cdc5c3443
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault18Software")=2'
               name: 'Status: Device has "fault18Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: df354bf0e8354afaa03179ae0c8f8b38
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault19Software")=2'
               name: 'Status: Device has "fault19Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: b5cfffdcf10f48bab5370d4c84351175
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault20Software")=2'
               name: 'Status: Device has "fault20Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: f468de2645c04352850ec864ba18c307
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault21Software")=2'
               name: 'Status: Device has "fault21Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 216585e531ab498981d347f436d455e6
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fetShort")=2'
               name: 'Status: Device has "fetShort" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 2608824da11a44e4a64c963295bb157f
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fpgaVersion")=2'
               name: 'Status: Device has "fpgaVersion" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 2f95a2c500af4ad3a4d290e33cbcb4c7
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","hscomm")=2'
               name: 'Status: Device has "hscomm" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 0c63b8d221004042a3ae0660a4e0135b
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","hscommMaster")=2'
               name: 'Status: Device has "hscommMaster" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: d61f3e277b0a4a5bb672c5b3df145a25
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","ia-refSlaveModeTimeout")=2'
               name: 'Status: Device has "ia-refSlaveModeTimeout" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: ad89ede8386b462a891f628f7a6938cc
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 8aac3970be23425c99d39a7b1143013b
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","powerboardCommunicationFault")=2'
               name: 'Status: Device has "powerboardCommunicationFault" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 143b9b4ccbbc4752b126d56d7c722452
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rs232SerialToMeterBridge")=2'
               name: 'Status: Device has "rs232SerialToMeterBridge" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 2fe5a93ba83a4023a51435aa1ffc9766
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: caed24a4047442ff99bd6b40e77240e6
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: abb46e6c3ba44b369cce10d9fc6689a7
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","slave")=2'
               name: 'Status: Device has "slave" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 22d88b6e0da6484e91c7b73c77cc2de7
               expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","softwareFault")=2'
               name: 'Status: Device has "softwareFault" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
+          uuid: e6a4dd0a61c8479985a1179842d22766
           name: 'Status: Uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
@@ -700,18 +775,21 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: 5393dee9b39d438a8c1553a0be0fb0f2
               expression: 'last(/Morningstar TriStar MPPT 600V SNMP/status.uptime)<10m'
               name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
             -
+              uuid: 37456b9f0a1448039179123e717a2724
               expression: 'nodata(/Morningstar TriStar MPPT 600V SNMP/status.uptime,5m)=1'
               name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
               manual_close: 'YES'
         -
+          uuid: 738f2e6d143a4e6db3ecf2736ca843cb
           name: 'Battery: Target Voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.45.0
@@ -736,6 +814,7 @@ zabbix_export:
               tag: Application
               value: Battery
         -
+          uuid: 4f3fdc6382704fb584fbe11264a0e5c2
           name: 'Temperature: Battery'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.48.0
@@ -756,16 +835,19 @@ zabbix_export:
               value: Temperature
           triggers:
             -
+              uuid: f3c20d3d6a224edeabae8ebc03ce998f
               expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: 992c1a38df034f55ac29128e079159ae
               expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
+              uuid: c3272e09df5d4fa6934d71cfa6ed904b
               expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -775,6 +857,7 @@ zabbix_export:
                   name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
                   expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
             -
+              uuid: 707a3f3f5ad74ed3808fc207a7c8328f
               expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -784,6 +867,7 @@ zabbix_export:
                   name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
                   expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
         -
+          uuid: d3abc18d718540039adcfcb4a74bea43
           name: 'Temperature: Heatsink'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.7.49.0
@@ -804,6 +888,7 @@ zabbix_export:
               value: Temperature
       discovery_rules:
         -
+          uuid: 7ba9493b38174751b448419b0b03312e
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
@@ -811,6 +896,7 @@ zabbix_export:
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             -
+              uuid: 429d19822647434ca7df7016f44d690f
               name: 'Battery: Voltage{#SINGLETON}'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.7.36.0
@@ -831,16 +917,19 @@ zabbix_export:
                   value: Battery
               trigger_prototypes:
                 -
+                  uuid: 86a619c71e4c4dedbe93d1fbf9793fc8
                   expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
+                  uuid: 8b81cb919683418195353635c9146826
                   expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
+                  uuid: d5990a11b40140439238bd0427339ca2
                   expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -850,6 +939,7 @@ zabbix_export:
                       name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                       expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                 -
+                  uuid: eb48bb2d8db646e5b5de7ae83dd524ca
                   expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -860,6 +950,7 @@ zabbix_export:
                       expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
           graph_prototypes:
             -
+              uuid: 592990e094e842f68463ab542878d5a9
               name: 'Battery: Voltage{#SINGLETON}'
               graph_items:
                 -
@@ -951,6 +1042,7 @@ zabbix_export:
           macro: '{$VOLTAGE.MIN.WARN}'
       valuemaps:
         -
+          uuid: 8a0dfdf98d254c219905751cccc878d7
           name: 'TriStar MPPT 600V charge state'
           mappings:
             -
@@ -988,6 +1080,7 @@ zabbix_export:
               newvalue: Fixed
   graphs:
     -
+      uuid: 6627675fc86645a88d7be9a80c91a8b4
       name: 'Array: Voltage'
       graph_items:
         -
@@ -1011,6 +1104,7 @@ zabbix_export:
             host: 'Morningstar TriStar MPPT 600V SNMP'
             key: 'array.voltage[arrayVoltage.0]'
     -
+      uuid: 711c5f397c5e4031b36070d20debcc13
       name: 'Battery: Current'
       graph_items:
         -
@@ -1020,6 +1114,7 @@ zabbix_export:
             host: 'Morningstar TriStar MPPT 600V SNMP'
             key: 'charge.current[batteryCurrent.0]'
     -
+      uuid: 12163228805449dcb48116a1a0b470d9
       name: 'Battery: Output Power (Watts)'
       graph_items:
         -
@@ -1029,6 +1124,7 @@ zabbix_export:
             host: 'Morningstar TriStar MPPT 600V SNMP'
             key: 'charge.output_power[ outputPower.0]'
     -
+      uuid: 09e9cd48bb6241e8b667e6e1b9f7c3ad
       name: 'Temperature: Battery/Heatsink'
       graph_items:
         -

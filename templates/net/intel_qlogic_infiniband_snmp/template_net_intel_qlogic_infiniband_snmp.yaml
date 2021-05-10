@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:41:20Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 6f7f2c44e13a46a4b219fbb5db92f3f7
       template: 'Intel_Qlogic Infiniband SNMP'
       name: 'Intel_Qlogic Infiniband SNMP'
       description: |
@@ -25,6 +27,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: 9cfafe1389af4e569886c5acd8d95de9
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
@@ -50,6 +53,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
+              uuid: 7b222dd1c5e44e62a6cf0d537b3f5330
               expression: '(last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware,#1)<>last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware,#2))=1 and length(last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -57,6 +61,7 @@ zabbix_export:
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 656086e221e84a9a90cc16855f564571
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
@@ -83,6 +88,7 @@ zabbix_export:
               value: Inventory
       discovery_rules:
         -
+          uuid: 74e3c6efb7f24ffaa2b59c3518d37b32
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.10222.2.1.6.5.1.2]'
@@ -91,6 +97,7 @@ zabbix_export:
           description: 'icsChassisFanDescription of icsChassisFanTable'
           item_prototypes:
             -
+              uuid: c0bcbe5b06e34e65b1ea5d24e5c7bf18
               name: '{#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.10222.2.1.6.5.1.3.{#SNMPINDEX}'
@@ -109,12 +116,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
+                  uuid: 062d4194e17b48319c1cfd836d258720
                   expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: 757aae6d5bcc40f5a14f1c3225569892
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.10222.2.1.4.7.1.2]'
@@ -123,6 +132,7 @@ zabbix_export:
           description: 'A textual description of the power supply, that can be assigned by the administrator.'
           item_prototypes:
             -
+              uuid: 2fbaed6a1a0d4b5b85be9f48d0fd7862
               name: '{#SNMPVALUE}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.10222.2.1.4.7.1.3.{#SNMPINDEX}'
@@ -149,12 +159,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
+                  uuid: f69fae167afa42daae7e6ea1021119b2
                   expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
+                  uuid: 14a3a65a5c1f4b58a9c08bce79d495b5
                   expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -165,6 +177,7 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Power supply is in critical state'
                       expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
+          uuid: 9c408be55f0b4b1384191275f1b624a8
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.4.1.10222.2.1.9.8.1.2,{#SENSOR_INFO},1.3.6.1.4.1.10222.2.1.9.8.1.7]'
@@ -180,6 +193,7 @@ zabbix_export:
           description: 'Discovering sensor''s table with temperature filter'
           item_prototypes:
             -
+              uuid: 16048f5e4b6a497d8007336a3faa7ccf
               name: '{#SENSOR_INFO}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.10222.2.1.9.8.1.3.{#SNMPINDEX}'
@@ -197,6 +211,7 @@ zabbix_export:
                   tag: Application
                   value: Temperature
             -
+              uuid: 943a4862c1e34cc1a30364a2677b327b
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.10222.2.1.9.8.1.8.{#SNMPINDEX}'
@@ -213,6 +228,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
+                  uuid: 9d277c891c974a409f2c5326e21afea8
                   expression: 'avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
@@ -221,6 +237,7 @@ zabbix_export:
                   priority: AVERAGE
           trigger_prototypes:
             -
+              uuid: d5c52931e88a4cbd9d432879cc59a923
               expression: |
                 avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                 or
@@ -232,6 +249,7 @@ zabbix_export:
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
+              uuid: 9294357c735b45bda8ecbc58a53a565f
               expression: |
                 avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
                 or
@@ -251,6 +269,7 @@ zabbix_export:
                     last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                   recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
         -
+          uuid: 1b369978fa354767834598c87c0df1e0
           name: 'Unit Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.10222.2.1.1.9.1.3,{#ENT_NAME},1.3.6.1.4.1.10222.2.1.1.9.1.2]'
@@ -264,6 +283,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: fe7ccdebf77246009bc91f9a18cc8ddb
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.10222.2.1.1.10.1.1.{#SNMPINDEX}'
@@ -286,6 +306,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
+                  uuid: 3c3e8cc96b8a4ee4b56c4264967f4355
                   expression: '(last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#2))=1 and length(last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -318,6 +339,7 @@ zabbix_export:
           value: '2'
       valuemaps:
         -
+          uuid: 39299506ad14445fa7b7a9e78cc54619
           name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
           mappings:
             -
@@ -333,6 +355,7 @@ zabbix_export:
               value: '4'
               newvalue: offline
         -
+          uuid: 535cb21845474749994bf7c395e39312
           name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
           mappings:
             -
@@ -360,6 +383,7 @@ zabbix_export:
               value: '8'
               newvalue: notPresent
         -
+          uuid: 4c80241c4d5d4b949577e9741710a32b
           name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
           mappings:
             -
