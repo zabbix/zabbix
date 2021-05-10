@@ -57,18 +57,54 @@ class C52ImportConverterTest extends CImportConverterTest {
 							'template' => 'Template',
 							'uuid' => generateUuidV4('Template'),
 							'items' => [
-								$calculated + ['params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])'],
-								$calculated + ['params' => 'avg(/Zabbix Server/zabbix[wcache,values],600s)'],
-								$calculated + ['params' => 'last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes])'],
-								$calculated + ['params' => '100*last(/'.'/net.if.in[eth0,bytes])/(last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes]))'],
-								$calculated + ['params' => 'last(/'.'/grpsum["video","net.if.out[eth0,bytes]","last"]) / last(/'.'/grpsum["video","nginx_stat.sh[active]","last"])'],
-								$calculated + ['params' => 'last(/'.'/es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) + (last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) = 0) )'],
-								$calculated + ['params' => 'last(/'.'/haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(/'.'/haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'],
-								$calculated + ['params' => 'last(/'.'/php-fpm.listen_queue)/(last(/'.'/php-fpm.listen_queue_len)+last(/'.'/php-fpm.listen_queue_len)=0)*100'],
-								$calculated + ['params' => 'last(/'.'/vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(/'.'/vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'],
-								$calculated + ['params' => 'last(/'.'/system.swap.size[,total]) - last(/'.'/system.swap.size[,total]) / 100 * last(/'.'/perf_counter_en["\\Paging file(_Total)\% Usage"])'],
-								$calculated + ['params' => 'avg(/zbxnext_6451/agent_numeric[wcache,values],600s)'],
-								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,"12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
+								$calculated + [
+									'params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'avg(/Zabbix Server/zabbix[wcache,values],600s)',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes])',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => '100*last(/'.'/net.if.in[eth0,bytes])/(last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes]))',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/grpsum["video","net.if.out[eth0,bytes]","last"]) / last(/'.'/grpsum["video","nginx_stat.sh[active]","last"])',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) + (last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) = 0) )',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(/'.'/haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/php-fpm.listen_queue)/(last(/'.'/php-fpm.listen_queue_len)+last(/'.'/php-fpm.listen_queue_len)=0)*100',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(/'.'/vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'last(/'.'/system.swap.size[,total]) - last(/'.'/system.swap.size[,total]) / 100 * last(/'.'/perf_counter_en["\\Paging file(_Total)\% Usage"])',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'avg(/zbxnext_6451/agent_numeric[wcache,values],600s)',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,"12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								]
 							]
 						]
 					]
@@ -84,6 +120,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
+											'name' => 'trigger-3',
 											'expression' => '{min(5m)}=1',
 											'recovery_expression' => ''
 										]
@@ -102,6 +139,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 									'key' => 'key',
 									'triggers' => [
 										[
+											'name' => 'trigger-3',
 											'expression' => 'min(/hostname/key,5m)=1',
 											'recovery_expression' => ''
 										]
@@ -116,6 +154,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-4',
 							'expression' => '{hostname:key.min(5m)}=1',
 							'recovery_expression' => '{hostname:key.min(5m)}<>1'
 						]
@@ -124,6 +163,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-4',
 							'expression' => 'min(/hostname/key,5m)=1',
 							'recovery_expression' => 'min(/hostname/key,5m)<>1'
 						]
@@ -186,6 +226,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
+							'name' => 'trigger-5',
 							'expression' => '{hostname:grpmin["host group","item",last,5m].date()}=5',
 							'recovery_expression' => ''
 						]
@@ -206,6 +247,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
+							'name' => 'trigger-5',
 							'expression' => '(date()=5) or (last(/hostname/grpmin["host group","item",last,5m])<>last(/hostname/grpmin["host group","item",last,5m]))',
 							'recovery_expression' => ''
 						]
@@ -216,6 +258,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-6',
 							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}',
 							'expression' => '{k:system.cpu.load.last(5s, 1d)} > 5',
 							'recovery_expression' => ''
@@ -225,6 +268,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-6',
 							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}',
 							'expression' => 'last(/k/system.cpu.load,#1:now-1d) > 5',
 							'recovery_expression' => ''
@@ -943,7 +987,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 							[
 								'key' => 'drule8',
 								'host_prototypes' => [
-									['name' => 'Host B']
+									['host' => 'Host B']
 								]
 							]
 						]
@@ -954,7 +998,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 							[
 								'key' => 'drule9',
 								'host_prototypes' => [
-									['name' => 'Host C']
+									['host' => 'Host C']
 								]
 							]
 						]
@@ -969,7 +1013,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 							[
 								'key' => 'drule8',
 								'host_prototypes' => [
-									['name' => 'Host B', 'uuid' => generateUuidV4('Template T/drule8/Host B')]
+									['host' => 'Host B', 'uuid' => generateUuidV4('Template T/drule8/Host B')]
 								],
 								'uuid' => generateUuidV4('Template T/drule8')
 							]
@@ -982,7 +1026,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 							[
 								'key' => 'drule9',
 								'host_prototypes' => [
-									['name' => 'Host C', 'uuid' => generateUuidV4('Template T/drule9/Host C')]
+									['host' => 'Host C', 'uuid' => generateUuidV4('Template T/drule9/Host C')]
 								],
 								'uuid' => generateUuidV4('Template T/drule9')
 							]

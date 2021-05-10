@@ -648,7 +648,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTriggers(), [
 			[
-				'uuid' => 'fe9cb3ea1d4d485c9ff7f8a749dc9380',
+				'uuid' => 'ed06ed0623ef4e23bfd1a7e5e5ffce72',
 				'expression' => 'last(/export-host/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -673,7 +673,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
-				'uuid' => 'ba2b1992cfcc4c3c84d7908a9afd3f3d',
+				'uuid' => '6fbffaa155174cdd89e7f5a5999da9bf',
 				'expression' => 'last(/export-host/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -692,7 +692,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger2'
 			],
 			[
-				'uuid' => 'cd79d05182bc4974b745f0076a4edef4',
+				'uuid' => 'c1046f1cf0c3434b979a374f66a17dfa',
 				'expression' => 'last(/export-template/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -717,7 +717,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => 'trigger'
 			],
 			[
-				'uuid' => 'b43057d7c32e4698a462143b889cfe87',
+				'uuid' => '3229895257e64d7399434434ccaa1f2d',
 				'expression' => 'last(/export-template/item)<>0',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
@@ -1514,7 +1514,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'trigger_prototypes' => [
 						[
-							'uuid' => 'e0ead3b167ea4af3a4a1766db2ffc6dc',
+							'uuid' => '4650de0e6c2e4bfe8abe5a4225b477db',
 							'expression' => 'last(/export-template/lld-item)=0',
 							'description' => 'lld-trigger',
 							'url' => '',
@@ -2236,7 +2236,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals($adapter->getTriggers(), [
 				[
-					'uuid' => '8aece41340ce47ecab3e0ac69313fb6d',
+					'uuid' => '4b481ada990d4511894db8f49239c611',
 					'type' => '0',
 					'expression' => 'last(/Template_Linux/vfs.fs.size[/,pfree])<10',
 					'url' => 'http://www.zabbix.com/',
@@ -2255,7 +2255,7 @@ class CImportDataAdapterTest extends TestCase {
 					'dependencies' => []
 				],
 				[
-					'uuid' => '0117c941adb04a728bb79e156179f97f',
+					'uuid' => '37d8550be8a64440a265004dfdad0a4a',
 					'type' => '1',
 					'expression' => 'last(/Template_Simple/net.tcp.service[ftp,,21])<>0 or last(/Template_Simple/net.tcp.service[ftp,,{$PORT.FTP}])<>0',
 					'url' => 'triggers.php',
