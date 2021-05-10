@@ -186,6 +186,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
+							'name' => 'trigger-4a',
 							'expression' => '{hostname:grpmin["host group","item",last,5m].last()}=5',
 							'recovery_expression' => ''
 						]
@@ -206,6 +207,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
+							'name' => 'trigger-4a',
 							'expression' => 'last(/hostname/grpmin["host group","item",last,5m])=5',
 							'recovery_expression' => ''
 						]
@@ -283,6 +285,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-7',
 							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}',
 							'expression' => '{k:system.cpu.load.last(5s)} > 5',
 							'recovery_expression' => ''
@@ -292,6 +295,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'name' => 'trigger-7',
 							'event_name' => '{?date()}',
 							'expression' => 'last(/k/system.cpu.load) > 5',
 							'recovery_expression' => ''
