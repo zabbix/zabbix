@@ -2411,7 +2411,6 @@ static int	validate_params_and_get_data(DC_ITEM *item, const char *parameters, c
 		case ZBX_VALUE_NVALUES:
 			nvalues = arg1;
 			break;
-		case ZBX_VALUE_NONE:
 		default:
 			*error = zbx_strdup(*error, "invalid type of first argument");
 			THIS_SHOULD_NEVER_HAPPEN;
