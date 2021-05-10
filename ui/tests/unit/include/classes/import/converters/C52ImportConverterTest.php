@@ -207,6 +207,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 					],
 					'triggers' => [
 						[
+							'uuid' => '2c3a57cd91cd48419e10c719668b3238',
 							'name' => 'trigger-4a',
 							'expression' => 'last(/hostname/grpmin["host group","item",last,5m])=5',
 							'recovery_expression' => ''
@@ -295,6 +296,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'triggers' => [
 						[
+							'uuid' => '986f30da4e0f46f6abf9a440866c6e45',
 							'name' => 'trigger-7',
 							'event_name' => '{?date()}',
 							'expression' => 'last(/k/system.cpu.load) > 5',
