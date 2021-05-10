@@ -456,6 +456,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 					['template' => 'Template OS ab'],
 					['template' => 'Template OS abc'],
 					['template' => 'Template MODULE abc'],
+					['template' => 'Template OS SNMPv2'],
+					['template' => 'Template OS ab SNMPv1']
 				]
 			],
 			[
@@ -463,7 +465,9 @@ class C52ImportConverterTest extends CImportConverterTest {
 					['template' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
 					['template' => 'Template OS ab', 'uuid' => generateUuidV4('Template OS ab')],
 					['template' => 'Template OS abc', 'uuid' => generateUuidV4('abc')],
-					['template' => 'Template MODULE abc', 'uuid' => generateUuidV4('Template MODULE abc')]
+					['template' => 'Template MODULE abc', 'uuid' => generateUuidV4('Template MODULE abc')],
+					['template' => 'Template OS ab', 'uuid' => generateUuidV4('SNMP')],
+					['template' => 'Template OS ab', 'uuid' => generateUuidV4('ab SNMP')]
 				]
 			]
 		];

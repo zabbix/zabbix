@@ -122,14 +122,8 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertTemplates(array $templates): array {
-		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
-
 		foreach ($templates as &$template) {
-			$short_template_name = $template['template'];
-			if (preg_match($old_name_match, $short_template_name, $match)) {
-				$short_template_name = $match['mapped_name'];
-			}
-
+			$short_template_name = self::prepareTemplateName($template['template']);
 			$template['uuid'] = generateUuidV4($short_template_name);
 
 			if (array_key_exists('items', $template)) {
@@ -585,7 +579,6 @@ class C52ImportConverter extends CConverter {
 		$expression_converter = new C52TriggerExpressionConverter();
 		$event_name_converter = new C52EventNameConverter();
 
-		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
 		$expression_parser = new CExpressionParser();
 
 		foreach ($triggers as &$trigger) {
@@ -620,9 +613,7 @@ class C52ImportConverter extends CConverter {
 
 				if ($expression_parser->parse($new_trigger_expression) == CParser::PARSE_SUCCESS) {
 					foreach ($expression_parser->getResult()->getHosts() as $old_name) {
-						$new_name = preg_match($old_name_match, $old_name, $match)
-							? $match['mapped_name']
-							: $old_name;
+						$new_name = self::prepareTemplateName($old_name);
 						$new_trigger_expression = triggerExpressionReplaceHost($new_trigger_expression, $old_name, $new_name);
 					}
 				}
@@ -634,9 +625,7 @@ class C52ImportConverter extends CConverter {
 
 					if ($expression_parser->parse($new_trigger_recovery_expression) == CParser::PARSE_SUCCESS) {
 						foreach ($expression_parser->getResult()->getHosts() as $old_name) {
-							$new_name = preg_match($old_name_match, $old_name, $match)
-								? $match['mapped_name']
-								: $old_name;
+							$new_name = self::prepareTemplateName($old_name);
 							$new_trigger_recovery_expression = triggerExpressionReplaceHost($new_trigger_recovery_expression,
 								$old_name, $new_name
 							);
@@ -665,14 +654,17 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertGraphs(array $graphs): array {
 		$result = [];
-		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
 
 		foreach ($graphs as $graph) {
-			$templates_names = array_column($graph['graph_items'], 'host');
 			$seed = [$graph['name']];
+			$templates_names = [];
+
+			foreach ($graph['graph_items'] as $graph_item) {
+				$templates_names[] = $graph_item['item']['host'];
+			}
 
 			foreach ($templates_names as $template_name) {
-				$seed[] = preg_match($old_name_match, $template_name, $match) ? $match['mapped_name'] : $template_name;
+				$seed[] = self::prepareTemplateName($template_name);
 			}
 
 			$graph['uuid'] = generateUuidV4(implode('/', $seed));
@@ -681,5 +673,24 @@ class C52ImportConverter extends CConverter {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Rename template name to be used for UUID generation.
+	 *
+	 * @static
+	 *
+	 * @param string $template_name
+	 *
+	 * @return string
+	 */
+	private static function prepareTemplateName(string $template_name): string {
+		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
+
+		$new_template_name = preg_match($old_name_match, $template_name, $match)
+			? $match['mapped_name']
+			: $template_name;
+
+		return str_replace('SNMPv2', 'SNMP', $new_template_name);
 	}
 }
