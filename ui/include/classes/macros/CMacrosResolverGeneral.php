@@ -388,13 +388,13 @@ class CMacrosResolverGeneral {
 							$function_parameters = [];
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw->type) {
+								switch ($param_raw['type']) {
 									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw->match;
+										$function_parameters[] = $param_raw['raw'];
 										break;
 
 									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw->match);
+										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
 										break;
 								}
 							}
