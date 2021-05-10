@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:30Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -51,7 +51,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware,#1)<>last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -79,7 +79,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber,#1)<>last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber,#2))=1 and length(last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -110,13 +110,13 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#FAN_INDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Fan {#FAN_INDEX}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -124,7 +124,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#FAN_INDEX}: Fan is in critical state'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
           name: 'PSU Discovery'
           type: SNMP_AGENT
@@ -150,13 +150,13 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#PSU_INDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'PSU {#PSU_INDEX}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -164,7 +164,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PSU {#PSU_INDEX}: Power supply is in critical state'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
           name: 'Temperature Discovery Chassis'
           type: SNMP_AGENT
@@ -197,17 +197,17 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"Chassis"}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Chassis"}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Chassis"}-3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"Chassis"}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Chassis"}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Chassis"}-3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -215,12 +215,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Chassis #{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Chassis"}'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Chassis"}'
-                      recovery_expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Chassis"}-3'
+                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Chassis"}'
+                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Chassis"}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Chassis"}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Chassis"}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Chassis"}+3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -254,17 +254,17 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -272,12 +272,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -359,7 +359,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -383,7 +383,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -445,7 +445,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Brocade_Foundry Stackable SNMP/system.hw.firmware,#1)<>last(/Brocade_Foundry Stackable SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade_Foundry Stackable SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -483,7 +483,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}],#2))=1 and length(last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}]))>0'
                   name: 'Unit {#SNMPVALUE}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
@@ -513,13 +513,13 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -527,7 +527,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
           name: 'PSU Discovery'
           type: SNMP_AGENT
@@ -553,13 +553,13 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -567,7 +567,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
           name: 'Stack Discovery'
           type: SNMP_AGENT
@@ -627,17 +627,17 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -645,12 +645,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE

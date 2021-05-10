@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:39Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -37,14 +37,14 @@ zabbix_export:
               value: IIS
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/IIS by Zabbix agent/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0'
               name: 'IIS: Port {$IIS.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
-                  expression: '{IIS by Zabbix agent:service_state[W3SVC].last()}<>0'
+                  expression: 'last(/IIS by Zabbix agent/service_state[W3SVC])<>0'
         -
           name: 'IIS: Anonymous users per second'
           key: 'perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60]'
@@ -406,7 +406,7 @@ zabbix_export:
               value: IIS
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m'
               name: 'IIS: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -549,14 +549,14 @@ zabbix_export:
               value: IIS
           triggers:
             -
-              expression: '{last()}<>0'
+              expression: 'last(/IIS by Zabbix agent/service_state[W3SVC])<>0'
               name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
               priority: HIGH
               description: 'The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.'
               dependencies:
                 -
                   name: 'IIS: Windows process Activation Service (WAS) is not the running'
-                  expression: '{IIS by Zabbix agent:service_state[WAS].last()}<>0'
+                  expression: 'last(/IIS by Zabbix agent/service_state[WAS])<>0'
         -
           name: 'IIS: Windows Process Activation Service (WAS) state'
           key: 'service_state[WAS]'
@@ -575,7 +575,7 @@ zabbix_export:
               value: IIS
           triggers:
             -
-              expression: '{last()}<>0'
+              expression: 'last(/IIS by Zabbix agent/service_state[WAS])<>0'
               name: 'IIS: Windows process Activation Service (WAS) is not the running'
               priority: HIGH
               description: 'Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.'
@@ -615,7 +615,7 @@ zabbix_export:
                   value: '{#APPPOOL}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   name: 'IIS: Application pool {#APPPOOL} is not in Running state'
                   priority: HIGH
             -
@@ -631,7 +631,7 @@ zabbix_export:
                   value: '{#APPPOOL}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m'
                   name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -652,7 +652,7 @@ zabbix_export:
                   value: '{#APPPOOL}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  expression: '(last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2))=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   name: 'IIS: Application pool {#APPPOOL} has been recycled'
                   priority: INFO
             -
@@ -672,13 +672,13 @@ zabbix_export:
                   value: '{#APPPOOL}'
               trigger_prototypes:
                 -
-                  expression: '{min({$IIS.QUEUE.MAX.TIME})}>{$IIS.QUEUE.MAX.WARN}'
+                  expression: 'min(/IIS by Zabbix agent/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}'
                   name: 'IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'IIS: Application pool {#APPPOOL} is not in Running state'
-                      expression: '{IIS by Zabbix agent:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                      expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
           lld_macro_paths:
             -
               lld_macro: '{#APPPOOL}'

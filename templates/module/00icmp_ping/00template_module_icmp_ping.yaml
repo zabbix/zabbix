@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:51Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -29,7 +29,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{max(#3)}=0'
+              expression: 'max(/ICMP Ping/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -46,14 +46,14 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{min(5m)}>{$ICMP_LOSS_WARN} and {min(5m)}<100'
+              expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: '{ICMP Ping:icmpping.max(#3)}=0'
+                  expression: 'max(/ICMP Ping/icmpping,#3)=0'
         -
           name: 'ICMP response time'
           type: SIMPLE
@@ -67,17 +67,17 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{avg(5m)}>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: '{ICMP Ping:icmppingloss.min(5m)}>{$ICMP_LOSS_WARN} and {ICMP Ping:icmppingloss.min(5m)}<100'
+                  expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: '{ICMP Ping:icmpping.max(#3)}=0'
+                  expression: 'max(/ICMP Ping/icmpping,#3)=0'
       macros:
         -
           macro: '{$ICMP_LOSS_WARN}'

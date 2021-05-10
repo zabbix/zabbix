@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:20Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -69,9 +69,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.alerter.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.alerter.avg.busy,10m)<65'
               name: 'Zabbix alerter processes more than 75% busy'
               priority: AVERAGE
         -
@@ -95,9 +95,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.alert_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.alert_manager.avg.busy,10m)<65'
               name: 'Zabbix alert manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -121,9 +121,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.alert_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.alert_syncer.avg.busy,10m)<65'
               name: 'Zabbix alert syncer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -147,9 +147,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.availability_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.availability_manager.avg.busy,10m)<65'
               name: 'Zabbix availability manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -173,9 +173,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.configuration_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.configuration_syncer.avg.busy,10m)<65'
               name: 'Zabbix configuration syncer processes more than 75% busy'
               priority: AVERAGE
               description: 'Zabbix configuration syncer processes more than 75% busy'
@@ -200,9 +200,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.discoverer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.discoverer.avg.busy,10m)<65'
               name: 'Zabbix discoverer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -226,9 +226,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.escalator.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.escalator.avg.busy,10m)<65'
               name: 'Zabbix escalator processes more than 75% busy'
               priority: AVERAGE
         -
@@ -252,9 +252,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.history_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.history_poller.avg.busy,10m)<65'
               name: 'Zabbix history poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -278,9 +278,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.history_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.history_syncer.avg.busy,10m)<65'
               name: 'Zabbix history syncer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -304,9 +304,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(30m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.housekeeper.avg.busy,30m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(30m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.housekeeper.avg.busy,30m)<65'
               name: 'Zabbix housekeeper processes more than 75% busy'
               priority: AVERAGE
         -
@@ -330,9 +330,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.http_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.http_poller.avg.busy,10m)<65'
               name: 'Zabbix http poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -356,9 +356,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.icmp_pinger.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.icmp_pinger.avg.busy,10m)<65'
               name: 'Zabbix icmp pinger processes more than 75% busy'
               priority: AVERAGE
         -
@@ -382,9 +382,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.ipmi_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.ipmi_manager.avg.busy,10m)<65'
               name: 'Zabbix ipmi manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -408,9 +408,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.ipmi_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.ipmi_poller.avg.busy,10m)<65'
               name: 'Zabbix ipmi poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -434,9 +434,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.java_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.java_poller.avg.busy,10m)<65'
               name: 'Zabbix java poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -460,9 +460,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.lld_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.lld_manager.avg.busy,10m)<65'
               name: 'Zabbix LLD manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -486,9 +486,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.lld_worker.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.lld_worker.avg.busy,10m)<65'
               name: 'Zabbix LLD worker processes more than 75% busy'
               priority: AVERAGE
         -
@@ -512,9 +512,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.poller.avg.busy,10m)<65'
               name: 'Zabbix poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -538,9 +538,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.preprocessing_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.preprocessing_manager.avg.busy,10m)<65'
               name: 'Zabbix preprocessing manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -564,9 +564,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.preprocessing_worker.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.preprocessing_worker.avg.busy,10m)<65'
               name: 'Zabbix preprocessing worker processes more than 75% busy'
               priority: AVERAGE
         -
@@ -590,88 +590,10 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.proxy_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.proxy_poller.avg.busy,10m)<65'
               name: 'Zabbix proxy poller processes more than 75% busy'
-              priority: AVERAGE
-        -
-          name: 'Utilization of self-monitoring internal processes, in %'
-          type: DEPENDENT
-          key: process.self-monitoring.avg.busy
-          delay: '0'
-          history: 1w
-          value_type: FLOAT
-          units: '%'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.data.process[''self-monitoring''].busy.avg'
-          master_item:
-            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
-          tags:
-            -
-              tag: Application
-              value: 'Zabbix server'
-          triggers:
-            -
-              expression: '{avg(10m)}>75'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
-              name: 'Zabbix self-monitoring processes more than 75% busy'
-              priority: AVERAGE
-        -
-          name: 'Utilization of snmp trapper data collector processes, in %'
-          type: DEPENDENT
-          key: process.snmp_trapper.avg.busy
-          delay: '0'
-          history: 1w
-          value_type: FLOAT
-          units: '%'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.data.process[''snmp trapper''].busy.avg'
-          master_item:
-            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
-          tags:
-            -
-              tag: Application
-              value: 'Zabbix server'
-          triggers:
-            -
-              expression: '{avg(10m)}>75'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
-              name: 'Zabbix snmp trapper processes more than 75% busy'
-              priority: AVERAGE
-        -
-          name: 'Utilization of task manager internal processes, in %'
-          type: DEPENDENT
-          key: process.task_manager.avg.busy
-          delay: '0'
-          history: 1w
-          value_type: FLOAT
-          units: '%'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.data.process[''task manager''].busy.avg'
-          master_item:
-            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
-          tags:
-            -
-              tag: Application
-              value: 'Zabbix server'
-          triggers:
-            -
-              expression: '{avg(10m)}>75'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
-              name: 'Zabbix task manager processes more than 75% busy'
               priority: AVERAGE
         -
           name: 'Utilization of report manager internal processes, in %'
@@ -694,9 +616,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.report_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.report_manager.avg.busy,10m)<65'
               name: 'Zabbix report manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -720,10 +642,88 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.report_writer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.report_writer.avg.busy,10m)<65'
               name: 'Zabbix report writer processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of self-monitoring internal processes, in %'
+          type: DEPENDENT
+          key: process.self-monitoring.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''self-monitoring''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              expression: 'avg(/Remote Zabbix server/process.self-monitoring.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server/process.self-monitoring.avg.busy,10m)<65'
+              name: 'Zabbix self-monitoring processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of snmp trapper data collector processes, in %'
+          type: DEPENDENT
+          key: process.snmp_trapper.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''snmp trapper''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              expression: 'avg(/Remote Zabbix server/process.snmp_trapper.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server/process.snmp_trapper.avg.busy,10m)<65'
+              name: 'Zabbix snmp trapper processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of task manager internal processes, in %'
+          type: DEPENDENT
+          key: process.task_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''task manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              expression: 'avg(/Remote Zabbix server/process.task_manager.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server/process.task_manager.avg.busy,10m)<65'
+              name: 'Zabbix task manager processes more than 75% busy'
               priority: AVERAGE
         -
           name: 'Utilization of timer internal processes, in %'
@@ -746,9 +746,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.timer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.timer.avg.busy,10m)<65'
               name: 'Zabbix timer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -772,9 +772,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.trapper.avg.busy,10m)<65'
               name: 'Zabbix trapper processes more than 75% busy'
               priority: AVERAGE
         -
@@ -798,9 +798,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.unreachable_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.unreachable_poller.avg.busy,10m)<65'
               name: 'Zabbix unreachable poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -824,9 +824,9 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{avg(10m)}>75'
+              expression: 'avg(/Remote Zabbix server/process.vmware_collector.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{avg(10m)}<65'
+              recovery_expression: 'avg(/Remote Zabbix server/process.vmware_collector.avg.busy,10m)<65'
               name: 'Zabbix vmware collector processes more than 75% busy'
               priority: AVERAGE
         -
@@ -850,7 +850,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>75'
+              expression: 'max(/Remote Zabbix server/rcache.buffer.pused,10m)>75'
               name: 'More than 75% used in the configuration cache'
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
@@ -913,7 +913,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>95'
+              expression: 'max(/Remote Zabbix server/vcache.buffer.pused,10m)>95'
               name: 'More than 95% used in the value cache'
               priority: AVERAGE
               description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file'
@@ -984,7 +984,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{last()}=1'
+              expression: 'last(/Remote Zabbix server/vcache.cache.mode)=1'
               name: 'Zabbix value cache working in low memory mode'
               priority: HIGH
         -
@@ -1013,7 +1013,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Remote Zabbix server/version,#1)<>last(/Remote Zabbix server/version,#2))=1 and length(last(/Remote Zabbix server/version))>0'
               name: 'Zabbix version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix server version has changed. Ack to close.'
@@ -1039,7 +1039,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>75'
+              expression: 'max(/Remote Zabbix server/vmware.buffer.pused,10m)>75'
               name: 'More than 75% used in the vmware cache'
               priority: AVERAGE
               description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file'
@@ -1064,7 +1064,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>75'
+              expression: 'max(/Remote Zabbix server/wcache.history.pused,10m)>75'
               name: 'More than 75% used in the history cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file'
@@ -1089,7 +1089,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>75'
+              expression: 'max(/Remote Zabbix server/wcache.index.pused,10m)>75'
               name: 'More than 75% used in the history index cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file'
@@ -1114,7 +1114,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{max(10m)}>75'
+              expression: 'max(/Remote Zabbix server/wcache.trend.pused,10m)>75'
               name: 'More than 75% used in the trends cache'
               priority: AVERAGE
               description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file'
@@ -1289,7 +1289,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              expression: '{min(10m)}>100'
+              expression: 'min(/Remote Zabbix server/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
               name: 'More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
               description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes'

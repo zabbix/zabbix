@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:34Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -481,7 +481,7 @@ zabbix_export:
               value: MongoDB
           triggers:
             -
-              expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
         -
@@ -509,7 +509,7 @@ zabbix_export:
               value: MongoDB
           triggers:
             -
-              expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
         -
@@ -891,7 +891,7 @@ zabbix_export:
               value: MongoDB
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               name: 'MongoDB: Connection to MongoDB is unavailable'
               priority: HIGH
               description: 'Connection to MongoDB instance is currently unavailable.'
@@ -939,7 +939,7 @@ zabbix_export:
               value: MongoDB
           triggers:
             -
-              expression: '{nodata(10m)}=1'
+              expression: 'nodata(/MongoDB node by Zabbix Agent 2/mongodb.uptime,10m)=1'
               name: 'MongoDB: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
@@ -947,9 +947,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'MongoDB: Connection to MongoDB is unavailable'
-                  expression: '{MongoDB node by Zabbix Agent 2:mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"].last()}=0'
+                  expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.uptime)<10m'
               name: 'MongoDB: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -980,7 +980,7 @@ zabbix_export:
               value: MongoDB
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB version has changed. Ack to close.'
@@ -2106,7 +2106,7 @@ zabbix_export:
                   value: 'MongoDB Replica Set: {#RS_NAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MONGODB.REPL.LAG.MAX.WARN}'
+                  expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}'
                   name: 'MongoDB: Replication lag with primary is too high (over {$MONGODB.REPL.LAG.MAX.WARN} in 5m)'
                   priority: WARNING
             -
@@ -2365,7 +2365,7 @@ zabbix_export:
                   value: 'MongoDB Replica Set: {#RS_NAME}'
               trigger_prototypes:
                 -
-                  expression: '{change()}=1'
+                  expression: 'change(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}])=1'
                   recovery_mode: NONE
                   name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
@@ -2450,7 +2450,7 @@ zabbix_export:
                   value: 'MongoDB Replica Set: {#RS_NAME}'
           trigger_prototypes:
             -
-              expression: '{MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy_count[{#RS_NAME}].last()}>0  and {MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy[{#RS_NAME}].strlen()}>0'
+              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0  and length(last(/MongoDB node by Zabbix Agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0'
               name: 'MongoDB: There are unhealthy replicas in ReplicaSet'
               priority: AVERAGE
           graph_prototypes:
@@ -2743,7 +2743,7 @@ zabbix_export:
                   value: MongoDB
               trigger_prototypes:
                 -
-                  expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  expression: 'max(/MongoDB node by Zabbix Agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   name: 'MongoDB: Available WiredTiger read tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
@@ -2805,7 +2805,7 @@ zabbix_export:
                   value: MongoDB
               trigger_prototypes:
                 -
-                  expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  expression: 'max(/MongoDB node by Zabbix Agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   name: 'MongoDB: Available WiredTiger write tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
@@ -2961,7 +2961,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{MongoDB node by Zabbix Agent 2:mongodb.connections.current.min(5m)}/({MongoDB node by Zabbix Agent 2:mongodb.connections.available.last()}+{MongoDB node by Zabbix Agent 2:mongodb.connections.current.last()})*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
+      expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix Agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix Agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
       name: 'MongoDB: Total number of open connections is too high (over {$MONGODB.CONNS.PCT.USED.MAX.WARN%} in 5m)'
       priority: WARNING
       description: 'Too few available connections. If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.'

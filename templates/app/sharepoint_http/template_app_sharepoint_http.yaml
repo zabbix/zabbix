@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:27:41Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -178,7 +178,7 @@ zabbix_export:
               value: Sharepoint
           triggers:
             -
-              expression: '{last()}<>200'
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200'
               name: 'Sharepoint: Error getting directory structure.'
               priority: WARNING
               description: 'Error getting directory structure. Check the Zabbix server log for more details.'
@@ -209,7 +209,7 @@ zabbix_export:
               value: Sharepoint
           triggers:
             -
-              expression: '{last()}>2000'
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000'
               name: 'Sharepoint: Server responds slowly to API request'
               priority: WARNING
         -
@@ -246,7 +246,7 @@ zabbix_export:
               value: Sharepoint
           triggers:
             -
-              expression: '{last()}>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
               name: 'Sharepoint: Bad health score'
               priority: AVERAGE
       discovery_rules:
@@ -411,7 +411,7 @@ zabbix_export:
                   value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  expression: '(last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2))=1'
                   name: 'Sharepoint: Sharepoint object is changed'
                   opdata: '{#SHAREPOINT.LLD.FULL_PATH}'
                   priority: INFO

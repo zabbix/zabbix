@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:50Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -126,7 +126,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2))=1 and length(last(/Generic SNMP/system.name))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -175,7 +175,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Generic SNMP/system.uptime[sysUpTime.0])<10m'
               name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
@@ -183,7 +183,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'No SNMP data collection'
-                  expression: '{Generic SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0'
+                  expression: 'max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
         -
           name: 'SNMP agent availability'
           type: INTERNAL
@@ -197,7 +197,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{max({$SNMP.TIMEOUT})}=0'
+              expression: 'max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -205,7 +205,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: '{Generic SNMP:icmpping.max(#3)}=0'
+                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'

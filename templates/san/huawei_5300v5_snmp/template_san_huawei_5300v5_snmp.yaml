@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:28:44Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/SAN
@@ -95,7 +95,7 @@ zabbix_export:
               value: Huawei
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2))=1 and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0'
               name: 'OceanStor 5300 V5: Storage version has been changed'
               priority: INFO
               description: 'OceanStor 5300 V5 version has changed. Ack to close.'
@@ -131,7 +131,7 @@ zabbix_export:
                   value: 'BBU {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1'
                   name: 'BBU {#ID} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
             -
@@ -156,7 +156,7 @@ zabbix_export:
                   value: 'BBU {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>2'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2'
                   name: 'BBU {#ID} on {#LOCATION}: Running status is not Online'
                   priority: AVERAGE
         -
@@ -182,7 +182,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -209,7 +209,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1'
                   name: 'Controller {#ID}: Health status is not Normal'
                   priority: HIGH
             -
@@ -226,7 +226,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.MEM.MAX.TIME})}>{$HUAWEI.5300.MEM.MAX.WARN}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}'
                   name: 'Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME})'
                   priority: AVERAGE
             -
@@ -249,7 +249,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2))=1'
                   name: 'Controller {#ID}: Role has been changed'
                   priority: WARNING
                   manual_close: 'YES'
@@ -275,7 +275,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>27'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27'
                   name: 'Controller {#ID}: Running status is not Online'
                   priority: AVERAGE
           graph_prototypes:
@@ -336,7 +336,7 @@ zabbix_export:
                   value: 'Disk {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1'
                   name: 'Disk {#MODEL} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
             -
@@ -361,7 +361,7 @@ zabbix_export:
                   value: 'Disk {#MODEL}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>27'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27'
                   name: 'Disk {#MODEL} on {#LOCATION}: Running status is not Online'
                   priority: AVERAGE
             -
@@ -378,7 +378,7 @@ zabbix_export:
                   value: 'Disk {#MODEL}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
                   name: 'Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -412,7 +412,7 @@ zabbix_export:
                   value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1'
                   name: 'Enclosure {#NAME}: Health status is not Normal'
                   priority: HIGH
             -
@@ -437,7 +437,7 @@ zabbix_export:
                   value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>27'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27'
                   name: 'Enclosure {#NAME}: Running status is not Online'
                   priority: AVERAGE
             -
@@ -454,7 +454,7 @@ zabbix_export:
                   value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}'
                   name: 'Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -488,7 +488,7 @@ zabbix_export:
                   value: 'FAN {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1'
                   name: 'FAN {#ID} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
             -
@@ -513,7 +513,7 @@ zabbix_export:
                   value: 'FAN {#ID}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>2'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2'
                   name: 'FAN {#ID} on {#LOCATION}: Running status is not Running'
                   priority: AVERAGE
         -
@@ -543,7 +543,7 @@ zabbix_export:
                   value: 'LUN {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
                   name: 'LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})'
                   priority: WARNING
             -
@@ -708,7 +708,7 @@ zabbix_export:
                   value: 'LUN {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1'
                   name: 'LUN {#NAME}: Status is not Normal'
                   priority: AVERAGE
           graph_prototypes:
@@ -795,7 +795,7 @@ zabbix_export:
                   value: 'Node {#NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -815,7 +815,7 @@ zabbix_export:
                   value: 'Node {#NODE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
                   name: 'Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})'
                   priority: WARNING
             -
@@ -988,7 +988,7 @@ zabbix_export:
               key: 'huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]'
               history: 7d
               units: '%'
-              params: 'last("huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, \"{#NAME}\"]")/last("huawei.5300.v5[hwInfoStoragePoolTotalCapacity, \"{#NAME}\"]")*100'
+              params: 'last(//huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"])/last(//huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"])*100'
               description: 'Used capacity of a storage pool in percents.'
               tags:
                 -
@@ -996,7 +996,7 @@ zabbix_export:
                   value: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
-                  expression: '{min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}>{#THRESHOLD}'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}'
                   name: 'Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%)'
                   priority: AVERAGE
             -
@@ -1021,7 +1021,7 @@ zabbix_export:
                   value: 'Pool {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1'
                   name: 'Pool {#NAME}: Health status is not Normal'
                   priority: HIGH
             -
@@ -1046,7 +1046,7 @@ zabbix_export:
                   value: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>27'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27'
                   name: 'Pool {#NAME}: Running status is not Online'
                   priority: AVERAGE
             -

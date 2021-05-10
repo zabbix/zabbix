@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:26:28Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -692,7 +692,7 @@ zabbix_export:
               value: Docker
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/Docker/docker.name,30m)=1'
               name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -700,7 +700,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Docker: Service is down'
-                  expression: '{Docker:docker.ping.last()}=0'
+                  expression: last(/Docker/docker.ping)=0
         -
           name: 'Docker: NCPU'
           type: DEPENDENT
@@ -868,7 +868,7 @@ zabbix_export:
               value: Docker
           triggers:
             -
-              expression: '{last()}=0'
+              expression: last(/Docker/docker.ping)=0
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -920,7 +920,7 @@ zabbix_export:
               value: Docker
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Docker/docker.server_version,#1)<>last(/Docker/docker.server_version,#2))=1 and length(last(/Docker/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
@@ -1150,7 +1150,7 @@ zabbix_export:
                   value: 'Docker: Container {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Docker/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
@@ -1778,7 +1778,7 @@ zabbix_export:
                   value: 'Docker: Container {#NAME}'
           trigger_prototypes:
             -
-              expression: '{Docker:docker.container_info.state.exitcode["{#NAME}"].last()}>0 and {Docker:docker.container_info.state.running["{#NAME}"].last()}=0'
+              expression: 'last(/Docker/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker/docker.container_info.state.running["{#NAME}"])=0'
               name: 'Container {#NAME}: Container has been stopped with error code'
               opdata: 'Exit code: {ITEM.LASTVALUE1}'
               priority: AVERAGE

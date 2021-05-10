@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:31Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -50,7 +50,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware,#1)<>last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware,#2))=1 and length(last(/Intel_Qlogic Infiniband SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -109,7 +109,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -149,13 +149,13 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_WARN_STATUS},eq)}=1'
+                  expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -163,7 +163,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Power supply is in critical state'
-                      expression: '{Intel_Qlogic Infiniband SNMP:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
           name: 'Temperature Discovery'
           type: SNMP_AGENT
@@ -213,31 +213,31 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
           trigger_prototypes:
             -
               expression: |
-                {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                 or
-                {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+              recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
               name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
               expression: |
-                {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
+                avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
                 or
-                {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
+              recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
               name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -246,10 +246,10 @@ zabbix_export:
                 -
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   expression: |
-                    {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                    avg(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                     or
-                    {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
-                  recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                    last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                  recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
         -
           name: 'Unit Discovery'
           type: SNMP_AGENT
@@ -286,7 +286,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}],#2))=1 and length(last(/Intel_Qlogic Infiniband SNMP/system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'

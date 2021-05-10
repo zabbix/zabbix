@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:43Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -125,7 +125,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+last(php-fpm.listen_queue_len)=0)*100'
+          params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+last(//php-fpm.listen_queue_len)=0)*100'
           description: 'Queue utilization'
           tags:
             -
@@ -133,7 +133,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{min(15m)}  > {$PHP_FPM.QUEUE.WARN.MAX}'
+              expression: 'min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m)  > {$PHP_FPM.QUEUE.WARN.MAX}'
               name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
               priority: WARNING
               description: 'The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.'
@@ -207,7 +207,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{last()}=0 or {nodata(3m)}=1'
+              expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
               name: 'PHP-FPM: Service is down'
               priority: HIGH
               manual_close: 'YES'
@@ -309,7 +309,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{diff()}=1'
+              expression: '(last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2))=1'
               name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM manager changed. Ack to close.'
@@ -338,7 +338,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{min(#3)}>0'
+              expression: 'min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0'
               name: 'PHP-FPM: Detected slow requests'
               priority: WARNING
               description: 'PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).'
@@ -382,7 +382,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1'
               name: 'PHP-FPM: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -390,9 +390,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PHP-FPM: Service is down'
-                  expression: '{PHP-FPM by HTTP:php-fpm.ping.last()}=0 or {PHP-FPM by HTTP:php-fpm.ping.nodata(3m)}=1'
+                  expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/PHP-FPM by HTTP/php-fpm.uptime)<10m'
               name: 'PHP-FPM: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -425,7 +425,7 @@ zabbix_export:
               value: PHP-FPM
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2))=1 and length(last(/PHP-FPM by HTTP/php-fpm.version))>0'
               name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM version has changed. Ack to close.'

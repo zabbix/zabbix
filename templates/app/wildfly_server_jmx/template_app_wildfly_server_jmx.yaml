@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-30T13:05:10Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -42,12 +42,12 @@ zabbix_export:
               value: WildFly
           triggers:
             -
-              expression: '{nodata(15m)}=1'
+              expression: 'nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1'
               name: 'WildFly: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
             -
-              expression: '{last()}<10m'
+              expression: 'last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
               name: 'WildFly: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -136,7 +136,7 @@ zabbix_export:
               value: WildFly
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2))=1 and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
               name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
@@ -163,7 +163,7 @@ zabbix_export:
               value: WildFly
           triggers:
             -
-              expression: '{str(ok)}=0'
+              expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
               name: 'WildFly: Server needs to restart for configuration change.'
               priority: WARNING
         -
@@ -188,13 +188,13 @@ zabbix_export:
               value: WildFly
           triggers:
             -
-              expression: '{str(running)}=0'
+              expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","serverState"],,"like","running")=0'
               name: 'WildFly: Server controller is not in RUNNING state'
               priority: WARNING
               dependencies:
                 -
                   name: 'WildFly: Server needs to restart for configuration change.'
-                  expression: '{WildFly Server by JMX:jmx["jboss.as:management-root=server","runtimeConfigurationState"].str(ok)}=0'
+                  expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
         -
           name: 'WildFly: Transactions: Aborted, rate'
           type: JMX
@@ -523,7 +523,7 @@ zabbix_export:
                   value: 'WildFly deployment [{#DEPLOYMENT}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2))=1 and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0'
                   name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Deployment status has changed. Ack to close.'
@@ -740,7 +740,7 @@ zabbix_export:
                   value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
               trigger_prototypes:
                 -
-                  expression: '{max(5m)}=0'
+                  expression: 'max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m'
                   priority: WARNING
             -
@@ -958,11 +958,11 @@ zabbix_export:
                   value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled'
                   priority: INFO
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled'
                   priority: INFO
                   description: 'Zabbix has not received data for items for the last 15 minutes'
@@ -987,7 +987,7 @@ zabbix_export:
                   value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0'
                   name: 'WildFly {#JMX_DATA_SOURCE}: There are timeout  connections'
                   priority: WARNING
             -
@@ -1006,7 +1006,7 @@ zabbix_export:
                   value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$WILDFLY.CONN.WAIT.MAX.WARN}'
+                  expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}'
                   name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m)'
                   priority: WARNING
             -
@@ -1248,7 +1248,7 @@ zabbix_export:
                   value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
           trigger_prototypes:
             -
-              expression: '{WildFly Server by JMX:jmx["{#JMXOBJ}",InUseCount].min(5m)}/{WildFly Server by JMX:jmx["{#JMXOBJ}",AvailableCount].last()}*100>{$WILDFLY.CONN.USAGE.WARN.MAX}'
+              expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}'
               name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m)'
               priority: HIGH
           graph_prototypes:
@@ -1367,7 +1367,7 @@ zabbix_export:
                   value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
               trigger_prototypes:
                 -
-                  expression: '{last()}>0'
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",errorCount])>0'
                   name: 'WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener.'
                   priority: WARNING
             -

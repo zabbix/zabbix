@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:35Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -52,7 +52,7 @@ zabbix_export:
               value: Ceph
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
@@ -555,21 +555,21 @@ zabbix_export:
               value: Ceph
           triggers:
             -
-              expression: '{last()}=2'
+              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
               name: 'Ceph: Cluster in ERROR state'
               priority: AVERAGE
               manual_close: 'YES'
             -
-              expression: '{last()}=1'
+              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=1'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{last()}=0'
+              recovery_expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=0'
               name: 'Ceph: Cluster in WARNING state'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Ceph: Cluster in ERROR state'
-                  expression: '{Ceph by Zabbix Agent2:ceph.overall_status.last()}=2'
+                  expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
         -
           name: 'Ceph: Number of Placement Groups in Active state'
           type: DEPENDENT
@@ -839,7 +839,7 @@ zabbix_export:
               value: Ceph
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Ceph by Zabbix Agent2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
@@ -1150,7 +1150,7 @@ zabbix_export:
                   value: 'Ceph {#HOST} OSD [{#CLASS}]'
               trigger_prototypes:
                 -
-                  expression: '{last()} = 0'
+                  expression: 'last(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},up]) = 0'
                   name: 'Ceph: OSD osd.{#OSDNAME} is down'
                   priority: AVERAGE
                   description: |
@@ -1158,15 +1158,15 @@ zabbix_export:
                     The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
           trigger_prototypes:
             -
-              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100'
+              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_nearfull_ratio)*100'
               name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
               priority: WARNING
               dependencies:
                 -
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
-                  expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+                  expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
             -
-              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE
           graph_prototypes:

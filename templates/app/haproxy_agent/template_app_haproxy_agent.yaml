@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:27:36Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -54,7 +54,7 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/HAProxy by Zabbix agent/haproxy.uptime)<10m'
               name: 'HAProxy: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -86,7 +86,7 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2))=1 and length(last(/HAProxy by Zabbix agent/haproxy.version))>0'
               name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'HAProxy version has changed. Ack to close.'
@@ -103,14 +103,14 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              expression: '{min(5m)}>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
               name: 'HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'HAProxy: Service is down'
-                  expression: '{HAProxy by Zabbix agent:net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"].last()}=0'
+                  expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
         -
           name: 'HAProxy: Service status'
           key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
@@ -128,7 +128,7 @@ zabbix_export:
               value: HAProxy
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
               name: 'HAProxy: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -253,7 +253,7 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
@@ -277,7 +277,7 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
@@ -307,7 +307,7 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
@@ -337,7 +337,7 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}'
                   name: 'HAProxy backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
@@ -370,7 +370,7 @@ zabbix_export:
                   value: 'HAProxy backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.backend.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy backend {#PXNAME}: Server is DOWN'
                   priority: AVERAGE
                   description: 'Backend is not available.'
@@ -531,7 +531,7 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
@@ -555,7 +555,7 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
@@ -585,7 +585,7 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
@@ -615,7 +615,7 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.BACK_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.backend_tcp.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}'
                   name: 'HAProxy TCP Backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
@@ -648,7 +648,7 @@ zabbix_export:
                   value: 'HAProxy TCP Backend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.backend_tcp.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy TCP Backend {#PXNAME}: Server is DOWN'
                   priority: AVERAGE
                   description: 'Backend is not available.'
@@ -820,7 +820,7 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
@@ -848,7 +848,7 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
@@ -1045,7 +1045,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'
+              params: 'last(//haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(//haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
               tags:
                 -
@@ -1053,7 +1053,7 @@ zabbix_export:
                   value: 'HAProxy frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.sutil[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
                   name: 'HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
                   description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
@@ -1244,7 +1244,7 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
@@ -1272,7 +1272,7 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
@@ -1359,7 +1359,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100'
+              params: 'last(//haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(//haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100'
               description: 'Percentage of sessions used (scur / slim * 100).'
               tags:
                 -
@@ -1367,7 +1367,7 @@ zabbix_export:
                   value: 'HAProxy TCP Frontend {#PXNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend_tcp.sutil[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
                   name: 'HAProxy TCP Frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
                   description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
@@ -1515,7 +1515,7 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
@@ -1583,7 +1583,7 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
@@ -1613,7 +1613,7 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
@@ -1643,7 +1643,7 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
@@ -1676,7 +1676,7 @@ zabbix_export:
                   value: 'HAProxy {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.server.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy {#PXNAME} {#SVNAME}: Server is DOWN'
                   priority: WARNING
                   description: 'Server is not available.'
@@ -1838,7 +1838,7 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.eresp.rate[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
@@ -1862,7 +1862,7 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.qcur[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
@@ -1892,7 +1892,7 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
@@ -1922,7 +1922,7 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
+                  expression: 'min(/HAProxy by Zabbix agent/haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
@@ -1955,7 +1955,7 @@ zabbix_export:
                   value: 'HAProxy TCP {#PXNAME} {#SVNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max(#5)}=0'
+                  expression: 'max(/HAProxy by Zabbix agent/haproxy.server_tcp.status[{#PXNAME}:{#SVNAME}],#5)=0'
                   name: 'HAProxy TCP {#PXNAME} {#SVNAME}: Server is DOWN'
                   priority: WARNING
                   description: 'Server is not available.'
@@ -2100,7 +2100,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2109,7 +2109,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2124,7 +2128,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2133,7 +2137,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2144,7 +2152,7 @@ zabbix_export:
                   type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2153,7 +2161,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2162,9 +2174,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '5'
                   width: '12'
-                  height: '13'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2173,7 +2185,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2183,9 +2199,9 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '12'
+                  'y': '5'
                   width: '12'
-                  height: '13'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2194,7 +2210,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2209,7 +2229,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2218,7 +2238,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

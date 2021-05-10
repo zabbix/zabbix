@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:38Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -65,7 +65,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  expression: '(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2))=1 and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0'
                   name: 'Broker {#JMXBROKERNAME}: Version has been changed'
                   priority: INFO
                   description: 'Broker {#JMXBROKERNAME} version has changed. Ack to close.'
@@ -105,17 +105,17 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                 -
-                  expression: '{min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
-                      expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ}, MemoryPercentUsage].min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                      expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
             -
               name: 'Broker {#JMXBROKERNAME}: Storage limit'
               type: JMX
@@ -151,17 +151,17 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                 -
-                  expression: '{min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
-                      expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},StorePercentUsage].min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                      expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
             -
               name: 'Broker {#JMXBROKERNAME}: Temp limit'
               type: JMX
@@ -197,17 +197,17 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.TEMP.MAX.HIGH}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
                   name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                 -
-                  expression: '{min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.TEMP.MAX.WARN}'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.WARN}'
                   name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
-                      expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TempPercentUsage].min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}>{$ACTIVEMQ.TEMP.MAX.HIGH}'
+                      expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
             -
               name: 'Broker {#JMXBROKERNAME}: Consumers count total'
               type: JMX
@@ -223,7 +223,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max({$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})}<{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
+                  expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalConsumerCount],{$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Consumers count is too low (below {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
             -
@@ -266,7 +266,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}>{avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}'
+                  expression: 'avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalEnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})>avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalEnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})'
                   name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
                   priority: AVERAGE
                   description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
@@ -285,7 +285,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max({$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})}<{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
+                  expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalProducerCount],{$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Producers count is too low (below {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
             -
@@ -309,7 +309,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m'
                   name: 'Broker {#JMXBROKERNAME}: Broker has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -514,7 +514,7 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ExpiredCount])>{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.'
@@ -534,11 +534,11 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)'
                   priority: HIGH
                 -
-                  expression: '{last()}>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)'
                   priority: AVERAGE
             -
@@ -569,27 +569,27 @@ zabbix_export:
                   value: '{#JMXBROKERNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})}>{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1'
+                  expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},QueueSize],{$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})>{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'Queue size is higher than threshold. It may indicate performance problems.'
           trigger_prototypes:
             -
-              expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}<{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
+              expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ConsumerCount],{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})<{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and last(/Apache ActiveMQ by JMX/jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}])>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].min({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}>={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
+              recovery_expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ConsumerCount],{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})>={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'
             -
-              expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}'
+              expression: 'avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},EnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})>avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},DequeueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})'
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
               priority: AVERAGE
               description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
             -
-              expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}<{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
+              expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ProducerCount],{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})<{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and last(/Apache ActiveMQ by JMX/jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}])>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].min({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}>={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
+              recovery_expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ProducerCount],{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})>={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'

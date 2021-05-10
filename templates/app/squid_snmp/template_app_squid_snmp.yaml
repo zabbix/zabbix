@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:35Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -36,7 +36,7 @@ zabbix_export:
               value: Squid
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Squid SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0'
               name: 'Squid: Port {$SQUID.HTTP.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -151,7 +151,7 @@ zabbix_export:
               value: Squid
           triggers:
             -
-              expression: '{last()}<{$SQUID.FILE.DESC.WARN.MIN}'
+              expression: 'last(/Squid SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
               name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
         -
@@ -898,7 +898,7 @@ zabbix_export:
               value: Squid
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Squid SNMP/squid[cacheUptime])<10m'
               name: 'Squid: Squid has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -923,7 +923,7 @@ zabbix_export:
               value: Squid
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2))=1 and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
               priority: INFO
               description: 'Squid version has changed. Ack to close.'
@@ -961,16 +961,16 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Squid SNMP:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}'
+      expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
       name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
     -
-      expression: '{Squid SNMP:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100'
+      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapHighWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: HIGH
     -
-      expression: '{Squid SNMP:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100'
+      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapLowWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: WARNING

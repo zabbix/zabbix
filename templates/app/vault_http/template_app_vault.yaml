@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:40Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -279,13 +279,13 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{strlen()}>0'
+              expression: 'length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0'
               name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
               priority: WARNING
               dependencies:
                 -
                   name: 'Vault: Vault server is sealed'
-                  expression: '{HashiCorp Vault by HTTP:vault.health.sealed.last()}=1'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
         -
           name: 'Vault: Get tokens'
           type: SCRIPT
@@ -401,7 +401,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.check)=0'
               name: 'Vault: Vault server is not responding'
               priority: HIGH
         -
@@ -547,7 +547,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}=1'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
               name: 'Vault: Vault server is sealed'
               priority: AVERAGE
               description: 'https://www.vaultproject.io/docs/concepts/seal'
@@ -607,7 +607,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2))=1 and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
               name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Vault version has changed. Ack to close.'
@@ -1021,7 +1021,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
               name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h'
@@ -1051,7 +1051,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
               name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h'
@@ -1182,7 +1182,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
               name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h'
@@ -1651,7 +1651,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m'
               name: 'Vault: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -2502,13 +2502,13 @@ zabbix_export:
                   value: 'Vault: Token {#TOKEN_NAME}'
               trigger_prototypes:
                 -
-                  expression: '{strlen()}>0'
+                  expression: 'length(last(/HashiCorp Vault by HTTP/vault.token_via_accessor.error["{#ACCESSOR}"]))>0'
                   name: 'Vault: Token [{#TOKEN_NAME}] lookup error occurred'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Vault: Vault server is sealed'
-                      expression: '{HashiCorp Vault by HTTP:vault.health.sealed.last()}=1'
+                      expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
             -
               name: 'Token [{#TOKEN_NAME}] has TTL'
               type: DEPENDENT
@@ -2558,17 +2558,17 @@ zabbix_export:
                   value: 'Vault: Token {#TOKEN_NAME}'
           trigger_prototypes:
             -
-              expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
               name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
               priority: AVERAGE
             -
-              expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.WARN}'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}'
               name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN})'
               priority: WARNING
               dependencies:
                 -
                   name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
-                  expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
           master_item:
             key: vault.get_tokens
           lld_macro_paths:
@@ -2782,7 +2782,7 @@ zabbix_export:
               newvalue: 'True'
   triggers:
     -
-      expression: '{HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
+      expression: 'min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}'
       name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
   graphs:

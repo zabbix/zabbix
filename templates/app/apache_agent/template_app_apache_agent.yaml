@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T11:27:43Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -137,7 +137,7 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Apache by Zabbix agent/apache.uptime)<10m'
               name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -168,7 +168,7 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2))=1 and length(last(/Apache by Zabbix agent/apache.version))>0'
               name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
@@ -419,17 +419,17 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
               name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: '{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0'
+                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
                 -
                   name: 'Apache: Service is down'
-                  expression: '{Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
         -
           name: 'Apache: Service ping'
           key: 'net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
@@ -447,14 +447,14 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
               name: 'Apache: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: '{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0'
+                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
         -
           name: 'Apache: CPU utilization'
           key: 'proc.cpu.util["{$APACHE.PROCESS_NAME}"]'
@@ -496,7 +496,7 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
               name: 'Apache: Process is not running'
               priority: HIGH
         -
@@ -560,7 +560,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1'
               name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
@@ -568,10 +568,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: '{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0'
+                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
                 -
                   name: 'Apache: Service is down'
-                  expression: '{Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
       discovery_rules:
         -
           name: 'Event MPM discovery'

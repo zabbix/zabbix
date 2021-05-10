@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:48Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -26,24 +26,24 @@ zabbix_export:
               value: Temperature
           triggers:
             -
-              expression: '{last()}<5 or {last()}>90'
+              expression: 'last(/Intel SR1630 IPMI/baseboard_temp)<5 or last(/Intel SR1630 IPMI/baseboard_temp)>90'
               name: 'Baseboard Temp Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<10 or {last()}>83'
+              expression: 'last(/Intel SR1630 IPMI/baseboard_temp)<10 or last(/Intel SR1630 IPMI/baseboard_temp)>83'
               name: 'Baseboard Temp Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'Baseboard Temp Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:baseboard_temp.last()}<5 or {Intel SR1630 IPMI:baseboard_temp.last()}>90'
+                  expression: 'last(/Intel SR1630 IPMI/baseboard_temp)<5 or last(/Intel SR1630 IPMI/baseboard_temp)>90'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'BB +1.05V PCH'
           type: IPMI
@@ -58,24 +58,24 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<0.953 or {last()}>1.149'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.05v_pch)<0.953 or last(/Intel SR1630 IPMI/bb_1.05v_pch)>1.149'
               name: 'BB +1.05V PCH Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<0.985 or {last()}>1.117'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.05v_pch)<0.985 or last(/Intel SR1630 IPMI/bb_1.05v_pch)>1.117'
               name: 'BB +1.05V PCH Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +1.05V PCH Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_1.05v_pch.last()}<0.953 or {Intel SR1630 IPMI:bb_1.05v_pch.last()}>1.149'
+                  expression: 'last(/Intel SR1630 IPMI/bb_1.05v_pch)<0.953 or last(/Intel SR1630 IPMI/bb_1.05v_pch)>1.149'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'BB +1.1V P1 Vccp'
           type: IPMI
@@ -90,24 +90,24 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<0.683 or {last()}>1.543'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)<0.683 or last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)>1.543'
               name: 'BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<0.708 or {last()}>1.501'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)<0.708 or last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)>1.501'
               name: 'BB +1.1V P1 Vccp Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}<0.683 or {Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}>1.543'
+                  expression: 'last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)<0.683 or last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)>1.543'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'BB +1.5V P1 DDR3'
           type: IPMI
@@ -122,24 +122,24 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<1.362 or {last()}>1.635'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)<1.362 or last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)>1.635'
               name: 'BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<1.401 or {last()}>1.589'
+              expression: 'last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)<1.401 or last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)>1.589'
               name: 'BB +1.5V P1 DDR3 Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}<1.362 or {Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}>1.635'
+                  expression: 'last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)<1.362 or last(/Intel SR1630 IPMI/bb_1.5v_p1_ddr3)>1.635'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'BB +3.3V'
           type: IPMI
@@ -154,24 +154,24 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<2.982 or {last()}>3.625'
+              expression: 'last(/Intel SR1630 IPMI/bb_3.3v)<2.982 or last(/Intel SR1630 IPMI/bb_3.3v)>3.625'
               name: 'BB +3.3V Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<3.067 or {last()}>3.525'
+              expression: 'last(/Intel SR1630 IPMI/bb_3.3v)<3.067 or last(/Intel SR1630 IPMI/bb_3.3v)>3.525'
               name: 'BB +3.3V Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +3.3V Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_3.3v.last()}<2.982 or {Intel SR1630 IPMI:bb_3.3v.last()}>3.625'
+                  expression: 'last(/Intel SR1630 IPMI/bb_3.3v)<2.982 or last(/Intel SR1630 IPMI/bb_3.3v)>3.625'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'BB +3.3V STBY'
           type: IPMI
@@ -186,17 +186,17 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<2.982 or {last()}>3.625'
+              expression: 'last(/Intel SR1630 IPMI/bb_3.3v_stby)<2.982 or last(/Intel SR1630 IPMI/bb_3.3v_stby)>3.625'
               name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
               priority: DISASTER
             -
-              expression: '{last()}<3.067 or {last()}>3.525'
+              expression: 'last(/Intel SR1630 IPMI/bb_3.3v_stby)<3.067 or last(/Intel SR1630 IPMI/bb_3.3v_stby)>3.525'
               name: 'BB +3.3V STBY Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_3.3v_stby.last()}<2.982 or {Intel SR1630 IPMI:bb_3.3v_stby.last()}>3.625'
+                  expression: 'last(/Intel SR1630 IPMI/bb_3.3v_stby)<2.982 or last(/Intel SR1630 IPMI/bb_3.3v_stby)>3.625'
         -
           name: 'BB +5.0V'
           type: IPMI
@@ -211,24 +211,24 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}<4.471 or {last()}>5.538'
+              expression: 'last(/Intel SR1630 IPMI/bb_5.0v)<4.471 or last(/Intel SR1630 IPMI/bb_5.0v)>5.538'
               name: 'BB +5.0V Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<4.630 or {last()}>5.380'
+              expression: 'last(/Intel SR1630 IPMI/bb_5.0v)<4.630 or last(/Intel SR1630 IPMI/bb_5.0v)>5.380'
               name: 'BB +5.0V Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'BB +5.0V Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:bb_5.0v.last()}<4.471 or {Intel SR1630 IPMI:bb_5.0v.last()}>5.538'
+                  expression: 'last(/Intel SR1630 IPMI/bb_5.0v)<4.471 or last(/Intel SR1630 IPMI/bb_5.0v)>5.538'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: 'Front Panel Temp'
           type: IPMI
@@ -243,24 +243,24 @@ zabbix_export:
               value: Temperature
           triggers:
             -
-              expression: '{last()}<0 or {last()}>48'
+              expression: 'last(/Intel SR1630 IPMI/front_panel_temp)<0 or last(/Intel SR1630 IPMI/front_panel_temp)>48'
               name: 'Front Panel Temp Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<5 or {last()}>44'
+              expression: 'last(/Intel SR1630 IPMI/front_panel_temp)<5 or last(/Intel SR1630 IPMI/front_panel_temp)>44'
               name: 'Front Panel Temp Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: 'Front Panel Temp Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:front_panel_temp.last()}<0 or {Intel SR1630 IPMI:front_panel_temp.last()}>48'
+                  expression: 'last(/Intel SR1630 IPMI/front_panel_temp)<0 or last(/Intel SR1630 IPMI/front_panel_temp)>48'
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
         -
           name: Power
           type: IPMI
@@ -273,7 +273,7 @@ zabbix_export:
               value: Voltage
           triggers:
             -
-              expression: '{last()}=0'
+              expression: 'last(/Intel SR1630 IPMI/power)=0'
               name: Power
               priority: WARNING
         -
@@ -290,24 +290,24 @@ zabbix_export:
               value: Fans
           triggers:
             -
-              expression: '{last()}<324'
+              expression: 'last(/Intel SR1630 IPMI/system_fan_2)<324'
               name: 'System Fan 2 Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<378'
+              expression: 'last(/Intel SR1630 IPMI/system_fan_2)<378'
               name: 'System Fan 2 Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
                 -
                   name: 'System Fan 2 Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:system_fan_2.last()}<324'
+                  expression: 'last(/Intel SR1630 IPMI/system_fan_2)<324'
         -
           name: 'System Fan 3'
           type: IPMI
@@ -322,24 +322,24 @@ zabbix_export:
               value: Fans
           triggers:
             -
-              expression: '{last()}<324'
+              expression: 'last(/Intel SR1630 IPMI/system_fan_3)<324'
               name: 'System Fan 3 Critical [{ITEM.VALUE}]'
               priority: DISASTER
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
             -
-              expression: '{last()}<378'
+              expression: 'last(/Intel SR1630 IPMI/system_fan_3)<378'
               name: 'System Fan 3 Non-Critical [{ITEM.VALUE}]'
               priority: HIGH
               dependencies:
                 -
                   name: Power
-                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                  expression: 'last(/Intel SR1630 IPMI/power)=0'
                 -
                   name: 'System Fan 3 Critical [{ITEM.VALUE}]'
-                  expression: '{Intel SR1630 IPMI:system_fan_3.last()}<324'
+                  expression: 'last(/Intel SR1630 IPMI/system_fan_3)<324'
   graphs:
     -
       name: 'Fan speed and temperature'

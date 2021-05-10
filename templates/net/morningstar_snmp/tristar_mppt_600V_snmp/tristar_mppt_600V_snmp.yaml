@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:28Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -206,19 +206,19 @@ zabbix_export:
               value: Battery
           triggers:
             -
-              expression: '{last()}={$CHARGE.STATE.CRIT}'
+              expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               name: 'Battery: Device charge in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{last()}={$CHARGE.STATE.WARN}'
+              expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
               name: 'Battery: Device charge in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Battery: Device charge in critical state'
-                  expression: '{Morningstar TriStar MPPT 600V SNMP:charge.state[chargeState.0].last()}={$CHARGE.STATE.CRIT}'
+                  expression: 'last(/Morningstar TriStar MPPT 600V SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
         -
           name: 'Counter: Charge Amp-hours'
           type: SNMP_AGENT
@@ -329,147 +329,147 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{count(#3,"alarm21Internal","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","alarm21Internal")=2'
               name: 'Status: Device has "alarm21Internal" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"arrayCurrentOffset","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
               name: 'Status: Device has "arrayCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"batterySense","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2'
               name: 'Status: Device has "batterySense" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"batterySenseDisconnected","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
               name: 'Status: Device has "batterySenseDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"controllerWasReset","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2'
               name: 'Status: Device has "controllerWasReset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"currentLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"currentOffset","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2'
               name: 'Status: Device has "currentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"derateLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","derateLimit")=2'
               name: 'Status: Device has "derateLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"ee-i2cRetryLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","ee-i2cRetryLimit")=2'
               name: 'Status: Device has "ee-i2cRetryLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"ethernetAlarm","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","ethernetAlarm")=2'
               name: 'Status: Device has "ethernetAlarm" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"extflashFault","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","extflashFault")=2'
               name: 'Status: Device has "extflashFault" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"fp12VoltageOutOfRange","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","fp12VoltageOutOfRange")=2'
               name: 'Status: Device has "fp12VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"heatsinkTempSensorOpen","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"heatsinkTempSensorShorted","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"highArrayVCurrentLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2'
               name: 'Status: Device has "highArrayVCurrentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"highTemperatureCurrentLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2'
               name: 'Status: Device has "highTemperatureCurrentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"highVoltageDisconnect","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2'
               name: 'Status: Device has "highVoltageDisconnect" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"lvd","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","lvd")=2'
               name: 'Status: Device has "lvd" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"maxAdcValueReached","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2'
               name: 'Status: Device has "maxAdcValueReached" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"mosfetSOpen","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2'
               name: 'Status: Device has "mosfetSOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"p3VoltageOutOfRange","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","p3VoltageOutOfRange")=2'
               name: 'Status: Device has "p3VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"p12VoltageOutOfRange","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","p12VoltageOutOfRange")=2'
               name: 'Status: Device has "p12VoltageOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"rtsDisconnected","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"rtsMiswire","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2'
               name: 'Status: Device has "rtsMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"rtsShorted","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"slaveControlFault","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","slaveControlFault")=2'
               name: 'Status: Device has "slaveControlFault" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","software")=2'
               name: 'Status: Device has "software" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"systemMiswire","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2'
               name: 'Status: Device has "systemMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              expression: '{count(#3,"uncalibrated","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -542,142 +542,142 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{count(#3,"arrayHvd","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"batteryHvd","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"batteryLvd","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","batteryLvd")=2'
               name: 'Status: Device has "batteryLvd" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"blockbusBoot","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","blockbusBoot")=2'
               name: 'Status: Device has "blockbusBoot" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"chargeSlaveControlTimeout","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","chargeSlaveControlTimeout")=2'
               name: 'Status: Device has "chargeSlaveControlTimeout" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"controllerWasReset","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","controllerWasReset")=2'
               name: 'Status: Device has "controllerWasReset" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"currentSensorReferenceOutOfRange","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","currentSensorReferenceOutOfRange")=2'
               name: 'Status: Device has "currentSensorReferenceOutOfRange" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"customSettingsEdit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"dipSwitchChange","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2'
               name: 'Status: Device has "dipSwitchChange" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"eepromRetryLimit","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2'
               name: 'Status: Device has "eepromRetryLimit" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault16Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault16Software")=2'
               name: 'Status: Device has "fault16Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault17Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault17Software")=2'
               name: 'Status: Device has "fault17Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault18Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault18Software")=2'
               name: 'Status: Device has "fault18Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault19Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault19Software")=2'
               name: 'Status: Device has "fault19Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault20Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault20Software")=2'
               name: 'Status: Device has "fault20Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fault21Software","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fault21Software")=2'
               name: 'Status: Device has "fault21Software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fetShort","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fetShort")=2'
               name: 'Status: Device has "fetShort" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"fpgaVersion","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","fpgaVersion")=2'
               name: 'Status: Device has "fpgaVersion" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"hscomm","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","hscomm")=2'
               name: 'Status: Device has "hscomm" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"hscommMaster","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","hscommMaster")=2'
               name: 'Status: Device has "hscommMaster" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"ia-refSlaveModeTimeout","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","ia-refSlaveModeTimeout")=2'
               name: 'Status: Device has "ia-refSlaveModeTimeout" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"overcurrent","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"powerboardCommunicationFault","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","powerboardCommunicationFault")=2'
               name: 'Status: Device has "powerboardCommunicationFault" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"rs232SerialToMeterBridge","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rs232SerialToMeterBridge")=2'
               name: 'Status: Device has "rs232SerialToMeterBridge" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"rtsDisconnected","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"rtsShorted","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"slave","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","slave")=2'
               name: 'Status: Device has "slave" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{count(#3,"softwareFault","like")}=2'
+              expression: 'count(/Morningstar TriStar MPPT 600V SNMP/status.faults[faults.0],#3,"like","softwareFault")=2'
               name: 'Status: Device has "softwareFault" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -700,13 +700,13 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{last()}<10m'
+              expression: 'last(/Morningstar TriStar MPPT 600V SNMP/status.uptime)<10m'
               name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
             -
-              expression: '{nodata(5m)}=1'
+              expression: 'nodata(/Morningstar TriStar MPPT 600V SNMP/status.uptime,5m)=1'
               name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
@@ -756,33 +756,33 @@ zabbix_export:
               value: Temperature
           triggers:
             -
-              expression: '{min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
+              expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{max(5m)}<{$BATTERY.TEMP.MIN.CRIT}'
+              expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              expression: '{min(5m)}>{$BATTERY.TEMP.MAX.WARN}'
+              expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
-                  expression: '{Morningstar TriStar MPPT 600V SNMP:temp.battery[batteryTemperature.0].min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
+                  expression: 'min(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
             -
-              expression: '{max(5m)}<{$BATTERY.TEMP.MIN.WARN}'
+              expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
-                  expression: '{Morningstar TriStar MPPT 600V SNMP:temp.battery[batteryTemperature.0].max(5m)}<{$BATTERY.TEMP.MIN.CRIT}'
+                  expression: 'max(/Morningstar TriStar MPPT 600V SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
         -
           name: 'Temperature: Heatsink'
           type: SNMP_AGENT
@@ -831,33 +831,33 @@ zabbix_export:
                   value: Battery
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'
+                  expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  expression: '{max(5m)}<{#VOLTAGE.MIN.CRIT}'
+                  expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  expression: '{min(5m)}>{#VOLTAGE.MAX.WARN}'
+                  expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
-                      expression: '{Morningstar TriStar MPPT 600V SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].min(5m)}>{#VOLTAGE.MAX.CRIT}'
+                      expression: 'min(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                 -
-                  expression: '{max(5m)}<{#VOLTAGE.MIN.WARN}'
+                  expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
-                      expression: '{Morningstar TriStar MPPT 600V SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].max(5m)}<{#VOLTAGE.MIN.CRIT}'
+                      expression: 'max(/Morningstar TriStar MPPT 600V SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
           graph_prototypes:
             -
               name: 'Battery: Voltage{#SINGLETON}'

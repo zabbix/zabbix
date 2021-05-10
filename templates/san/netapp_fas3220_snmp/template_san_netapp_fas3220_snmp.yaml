@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:58Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/SAN
@@ -189,7 +189,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}=2'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"])=2'
                   name: 'Node {#NODE.NAME}: Temperature is over than recommended'
                   priority: HIGH
                   description: 'The hardware will shutdown if the temperature exceeds critical thresholds.'
@@ -213,7 +213,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeHealth, "{#NODE.NAME}"])=0'
                   name: 'Node {#NODE.NAME}: Node can not communicate with the cluster'
                   priority: HIGH
                   manual_close: 'YES'
@@ -285,7 +285,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"])<>1'
                   name: 'Node {#NODE.NAME}: NVRAM battery status is not OK'
                   priority: AVERAGE
                   manual_close: 'YES'
@@ -326,19 +326,19 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m'
                   name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
           trigger_prototypes:
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}'
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])'
               name: 'Node {#NODE.NAME}: Degraded power supplies count is more than zero'
               priority: AVERAGE
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}'
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])'
               name: 'Node {#NODE.NAME}: Failed FAN count is over than zero'
               priority: HIGH
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
@@ -365,7 +365,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} CPU'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/NetApp FAS3220 SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -430,7 +430,7 @@ zabbix_export:
                   value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$FAS3220.FS.TIME:"{#FSNAME}"})}<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
+                  expression: 'min(/NetApp FAS3220 SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
             -
@@ -507,7 +507,7 @@ zabbix_export:
                   value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max({$FAS3220.FS.TIME:"{#FSNAME}"})}>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
+                  expression: 'max(/NetApp FAS3220 SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
           graph_prototypes:
@@ -594,7 +594,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1'
                   name: 'Node {#NODE.NAME}: Node cannot takeover it''s HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}'
                   priority: HIGH
                   description: |
@@ -637,12 +637,12 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
-                  expression: '{last()}=1'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=1'
                   name: 'Node {#NODE.NAME}: HA is not licensed'
                   priority: AVERAGE
                   description: 'The value notConfigured(1) indicates that the HA is not licensed.'
                 -
-                  expression: '{last()}=5'
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5'
                   name: 'Node {#NODE.NAME}: Node has been taken over'
                   priority: HIGH
                   description: 'The thisNodeDead(5) setting indicates that this node has been takenover.'
@@ -906,25 +906,25 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: |
-                {NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
               manual_close: 'YES'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"].last()}<>2 and {NetApp FAS3220 SNMP:fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"].last()}=1'
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1'
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down'
               priority: AVERAGE
               description: 'Link state is not UP and the port status is set ''UP'' by an administrator.'
               manual_close: 'YES'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"].last()}<>0 and {NetApp FAS3220 SNMP:fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"].strlen()}>0'
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0'
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy'
               priority: INFO
               description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
@@ -1318,9 +1318,9 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}>0 and {NetApp FAS3220 SNMP:fas3220.disk[diskFailedMessage].diff()}=1'
+      expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])>0 and (last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#2))=1'
       recovery_mode: RECOVERY_EXPRESSION
-      recovery_expression: '{NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}=0'
+      recovery_expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])=0'
       name: 'NetApp FAS3220: Number of failed disks has changed'
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: WARNING

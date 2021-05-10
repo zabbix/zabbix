@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:39Z'
+  date: '2021-05-09T00:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -42,7 +42,7 @@ zabbix_export:
               value: Tomcat
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              expression: '(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#2))=1 and length(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo]))>0'
               name: 'Tomcat: Version has been changed'
               priority: INFO
               description: 'Tomcat version has changed. Ack to close.'
@@ -86,7 +86,7 @@ zabbix_export:
                   value: 'Tomcat: ProtocolHandler {#JMXVALUE}'
               trigger_prototypes:
                 -
-                  expression: '{str(off)} = 1'
+                  expression: 'find(/Apache Tomcat JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1'
                   name: '{#JMXVALUE}: Gzip compression is disabled'
                   priority: INFO
                   description: 'gzip compression is disabled for connector {#JMXVALUE}.'
@@ -425,7 +425,7 @@ zabbix_export:
                   value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
           trigger_prototypes:
             -
-              expression: '{Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
+              expression: 'min(/Apache Tomcat JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
               name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
               priority: HIGH
               description: 'When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.'
