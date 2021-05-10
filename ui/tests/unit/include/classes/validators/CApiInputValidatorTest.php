@@ -3880,7 +3880,79 @@ class CApiInputValidatorTest extends TestCase {
 				'2038-01-18',
 				'/1/date',
 				'2038-01-18'
-			]
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				null,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'',
+				'/1/numeric_ranges',
+				''
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": cannot be empty.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'length' => 5],
+				'12-15',
+				'/1/numeric_ranges',
+				'12-15'
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'length' => 5],
+				'12-150',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": value is too long.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				[],
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				true,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				false,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'aaa',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'123',
+				'/1/numeric_ranges',
+				'123'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'-5',
+				'/1/numeric_ranges',
+				'-5'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'20.0-30.0000',
+				'/1/numeric_ranges',
+				'20.0-30.0000'
+			],
 		];
 	}
 
