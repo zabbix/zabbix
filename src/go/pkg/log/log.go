@@ -51,10 +51,11 @@ var logLevel int
 var logger *log.Logger
 
 type LogStat struct {
-	logType  int
-	filename string
-	filesize int64
-	f        *os.File
+	logType     int
+	filename    string
+	filesize    int64
+	f           *os.File
+	currentSize int64
 }
 
 var logStat LogStat
@@ -184,15 +185,26 @@ func procLog(format string, args []interface{}, level int) {
 func rotateLog() {
 	if logStat.logType == File {
 		fstat, err := os.Stat(logStat.filename)
-		if err != nil {
+		if err != nil || fstat.Size() == 0 || logStat.currentSize > fstat.Size() {
+
 			logStat.f.Close()
-			log.Fatalf("Cannot read log file %s information", logStat.filename)
+
+			if logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+				logStat.logType = Undefined
+				log.Fatal(fmt.Sprintf("Cannot open log file %s", logStat.filename))
+			}
+
+			logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+			logStat.currentSize = 0
+			return
 		}
 
 		if logStat.filesize != 0 {
 			var printError string
 
-			if fstat.Size() > logStat.filesize {
+			logStat.currentSize = fstat.Size()
+
+			if logStat.currentSize > logStat.filesize {
 				filenameOld := logStat.filename + ".old"
 				logStat.f.Close()
 				os.Remove(filenameOld)
