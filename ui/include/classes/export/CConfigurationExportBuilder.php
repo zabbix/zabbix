@@ -246,6 +246,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($templates as $template) {
 			$result[] = [
+				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
@@ -528,6 +529,7 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
+				'uuid' => $discoveryRule['uuid'],
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -645,6 +647,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($httptests as $httptest) {
 			$result[] = [
+				'uuid' => $httptest['uuid'],
 				'name' => $httptest['name'],
 				'delay' => $httptest['delay'],
 				'attempts' => $httptest['retries'],
@@ -746,6 +749,10 @@ class CConfigurationExportBuilder {
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			];
 
+			if (array_key_exists('uuid', $graph)) {
+				$data['uuid'] = $graph['uuid'];
+			}
+
 			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $graph['discover'];
 			}
@@ -770,6 +777,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($hostPrototypes as $hostPrototype) {
 			$result[] = [
+				'uuid' => $hostPrototype['uuid'],
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
@@ -883,6 +891,10 @@ class CConfigurationExportBuilder {
 				'tags' => $this->formatTags($trigger['tags'])
 			];
 
+			if (array_key_exists('uuid', $trigger)) {
+				$data['uuid'] = $trigger['uuid'];
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $trigger['discover'];
 			}
@@ -965,6 +977,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($groups as $group) {
 			$result[] = [
+				'uuid' => $group['uuid'],
 				'name' => $group['name']
 			];
 		}
@@ -987,6 +1000,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($items as $item) {
 			$data = [
+				'uuid' => $item['uuid'],
 				'name' => $item['name'],
 				'type' => $item['type'],
 				'snmp_oid' => $item['snmp_oid'],
@@ -1173,6 +1187,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
+				'uuid' => $dashboard['uuid'],
 				'name' => $dashboard['name'],
 				'display_period' => $dashboard['display_period'],
 				'auto_start' => $dashboard['auto_start'],

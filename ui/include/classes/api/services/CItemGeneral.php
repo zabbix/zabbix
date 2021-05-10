@@ -567,7 +567,59 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->validateValueMaps($items);
 
+		$this->checkAndAddUuid($items, $dbHosts, $update);
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
+	 *   if it doesn't exist.
+	 *
+	 * @param array $items_to_create
+	 * @param array $db_hosts
+	 * @param bool $is_update
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
+		if ($is_update) {
+			foreach ($items_to_create as $index => &$item) {
+				if (array_key_exists('uuid', $item)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
+							_s('unexpected parameter "%1$s"', 'uuid')
+						)
+					);
+				}
+			}
+
+			return;
+		}
+
+		foreach ($items_to_create as $index => &$item) {
+			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+				$item['uuid'] = generateUuidV4();
+			}
+		}
+		unset($item);
+
+		$db_uuid = DB::select('items', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -982,6 +1034,8 @@ abstract class CItemGeneral extends CApiService {
 
 				// copying item
 				$new_item = $tpl_item;
+				unset($new_item['uuid']);
+
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];
 				}

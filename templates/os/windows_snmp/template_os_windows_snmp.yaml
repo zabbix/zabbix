@@ -3,9 +3,11 @@ zabbix_export:
   date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
     -
+      uuid: f9a59315c8944853bb91c0a9ec3056d7
       template: 'Windows SNMP'
       name: 'Windows SNMP'
       description: |

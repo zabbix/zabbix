@@ -14063,4 +14063,3 @@ void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif
-

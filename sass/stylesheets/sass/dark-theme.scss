@@ -3,6 +3,7 @@ $theme-name: 'dark';
 // Notification & Alert.
 $red: #e45959;
 $light-red: #503434;
+$lighter-red: #433131;
 
 $dark-yellow: #e99003;
 $yellow: #a78820;
@@ -177,6 +178,10 @@ $multiselect-selected-bg-color: #696969;
 		background-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
 	}
 }
+
+// Import compare.
+$toc-title-color: #f2f2f2;
+$toc-title-bg-color: #4f4f4f;
 
 
 // Important! @import string should come after variables

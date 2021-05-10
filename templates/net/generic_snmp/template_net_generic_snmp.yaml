@@ -3,9 +3,11 @@ zabbix_export:
   date: '2021-05-09T00:00:00Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 67332e679035423f85090aa985947c36
       template: 'Network Generic Device SNMP'
       name: 'Network Generic Device SNMP'
       description: |

@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');

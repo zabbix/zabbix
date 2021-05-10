@@ -60,7 +60,7 @@ class CValueMap extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['valuemapid', 'name', 'hostid']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['valuemapid', 'uuid', 'name', 'hostid']), 'default' => API_OUTPUT_EXTEND],
 			'selectMappings' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'value', 'newvalue']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
@@ -124,9 +124,11 @@ class CValueMap extends CApiService {
 	}
 
 	/**
-	 * @param array  $valuemaps
+	 * @param array $valuemaps
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps);
@@ -341,8 +343,9 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$valuemaps) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'uuid' =>		['type' => API_UUID],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'type' =>		['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
@@ -389,7 +392,7 @@ class CValueMap extends CApiService {
 		}
 
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['status'],
 			'hostids' => array_keys($hostids),
 			'templated_hosts' => true,
 			'editable' => true,
@@ -409,7 +412,45 @@ class CValueMap extends CApiService {
 			$names_by_hostid[$valuemap['hostid']][] = $valuemap['name'];
 		}
 
+		$this->checkAndAddUuid($valuemaps, $db_hosts);
 		$this->checkDuplicates($names_by_hostid);
+	}
+
+	/**
+	 * Check that only value maps on templates have UUID. Add UUID to all value maps on templates, if it doesn't exist.
+	 *
+	 * @param array $valuemaps_to_create
+	 * @param array $db_hosts
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$valuemaps_to_create, array $db_hosts): void {
+		foreach ($valuemaps_to_create as $index => &$valuemap) {
+			if ($db_hosts[$valuemap['hostid']]['status'] != HOST_STATUS_TEMPLATE
+					&& array_key_exists('uuid', $valuemap)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if ($db_hosts[$valuemap['hostid']]['status'] == HOST_STATUS_TEMPLATE
+					&& !array_key_exists('uuid', $valuemap)) {
+				$valuemap['uuid'] = generateUuidV4();
+			}
+		}
+		unset($valuemap);
+
+		$db_uuid = DB::select('valuemap', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($valuemaps_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

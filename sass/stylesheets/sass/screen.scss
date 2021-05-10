@@ -28,11 +28,13 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/dashboard";
+@import "components/diff";
 @import "components/form-search";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/tabfilter";
+@import "components/toc";
 @import "components/z-select";
 
 .link-action {
@@ -3146,6 +3148,11 @@ $form-icon-btn: (
 
 		&.modal-popup-generic {
 			min-width: 650px;
+		}
+
+		&.modal-popup-fullscreen {
+			width: calc(100vw - 40px);
+			max-width: calc(100vw - 40px);
 		}
 	}
 
@@ -6520,5 +6527,23 @@ z-select,
 
 	th {
 		color: $font-alt-color;
+	}
+}
+
+.import-compare {
+	display: flex;
+	max-height: calc(100vh - 190px);
+
+	.toc {
+		flex: 20%;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.diff {
+		flex: 80%;
+		margin-left: 5px;
+		overflow: auto;
+		border: 1px dashed $form-border-color;
 	}
 }

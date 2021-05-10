@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');

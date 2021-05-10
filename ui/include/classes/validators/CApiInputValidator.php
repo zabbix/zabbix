@@ -198,6 +198,9 @@ class CApiInputValidator {
 
 			case API_NUMERIC_RANGES:
 				return self::validateNumericRanges($rule, $data, $path, $error);
+
+			case API_UUID:
+				return self::validateUuid($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -255,6 +258,7 @@ class CApiInputValidator {
 			case API_JSONRPC_ID:
 			case API_DATE:
 			case API_NUMERIC_RANGES:
+			case API_UUID:
 				return true;
 
 			case API_OBJECT:
@@ -2221,6 +2225,43 @@ class CApiInputValidator {
 
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * UUIDv4 validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuid(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (mb_strlen($data) != 32) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', 32));
+			return false;
+		}
+
+		if (!ctype_xdigit($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$binary = hex2bin($data);
+		if ((ord($binary[6]) & 0xf0) != 0x40 || (ord($binary[8]) & 0xc0) != 0x80) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$data = strtolower($data);
 
 		return true;
 	}

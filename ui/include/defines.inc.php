@@ -21,7 +21,8 @@
 define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030181);
+
+define('ZABBIX_DB_VERSION',		5030201);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -1375,6 +1376,7 @@ define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
+define('API_UUID',					42);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1736,6 +1738,9 @@ define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
+define('ZBX_STYLE_DIFF', 'diff');
+define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
+define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
@@ -1932,6 +1937,12 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_TOC', 'toc');
+define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
+define('ZBX_STYLE_TOC_ITEM', 'toc-item');
+define('ZBX_STYLE_TOC_LIST', 'toc-list');
+define('ZBX_STYLE_TOC_ROW', 'toc-row');
+define('ZBX_STYLE_TOC_SUBLIST', 'toc-sublist');
 define('ZBX_STYLE_TOP', 'top');
 define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
