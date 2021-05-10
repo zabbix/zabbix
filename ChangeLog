@@ -1,9 +1,15 @@
 Changes for 5.4.0rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
 .........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
 
 Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+..F....... [ZBX-19306] fixed broken item configuration link in latest data results (miks)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
 ...G...... [ZBX-19297] fixed agent compilation under Windows (wiper)
@@ -201,6 +207,7 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
@@ -208,6 +215,8 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
 .......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
@@ -705,10 +714,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.12rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
 .........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
 ........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)

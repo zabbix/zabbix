@@ -989,7 +989,6 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatItems(array $items, array $simple_triggers) {
 		$result = [];
-		$expression_data = $simple_triggers ? new CTriggerExpression() : null;
 
 		CArrayHelper::sort($items, ['key_']);
 
@@ -1079,32 +1078,8 @@ class CConfigurationExportBuilder {
 
 			if ($simple_triggers) {
 				$triggers = [];
-				$prefix_length = strlen($item['host'].':'.$item['key_'].'.');
-
 				foreach ($simple_triggers as $simple_trigger) {
 					if (bccomp($item['itemid'], $simple_trigger['items'][0]['itemid']) == 0) {
-						if ($expression_data->parse($simple_trigger['expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], '',
-										$expression['pos'] + 1, $prefix_length
-									);
-								}
-							}
-						}
-
-						if ($simple_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-								&& $expression_data->parse($simple_trigger['recovery_expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['recovery_expression'] = substr_replace(
-										$simple_trigger['recovery_expression'], '', $expression['pos'] + 1,
-										$prefix_length
-									);
-								}
-							}
-						}
-
 						$triggers[] = $simple_trigger;
 					}
 				}

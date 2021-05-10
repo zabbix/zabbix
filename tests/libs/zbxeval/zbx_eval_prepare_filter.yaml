@@ -1,0 +1,156 @@
+---
+test case: Expression 'group="x"'
+in:
+  expression: 'group="x"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+---
+test case: Expression 'group="x"'
+in:
+  expression: 'group<>"x"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
+---
+test case: Expression 'group="x" and tag="a"'
+in:
+  expression: 'group="x" and tag="a"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+---
+test case: Expression 'group="x" or group="y" and tag="a"'
+in:
+  expression: 'group="x" or group="y" and tag="a"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"y"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+---
+test case: Expression 'group<>"x" or tag<>"a"'
+in:
+  expression: 'group<>"x" or tag<>"a"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+---
+test case: Expression '(group="Zabbix servers") or ("Zabbix servers"=group)'
+in:
+  expression: '(group="Zabbix servers") or ("Zabbix servers"=group)'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"Zabbix servers"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"Zabbix servers"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
+---
+test case: Expression 'group=tag'
+in:
+  expression: 'group=tag'
+out:
+  result: FAIL
+---
+test case: Expression '(group)=("x")'
+in:
+  expression: '(group)=("x")'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+---
+test case: Expression '"a"="b"'
+in:
+  expression: '"a"="b"'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"b"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+---
+test case: Expression 'group=(tag="x")'
+in:
+  expression: 'group=(tag="x")'
+out:
+  result: FAIL
+---
+test case: Expression 'tag=("x"="y")'
+in:
+  expression: 'tag=("x"="y")'
+out:
+  result: FAIL
+---
+test case: Expression 'tag'
+in:
+  expression: 'tag'
+out:
+  result: FAIL
+---
+test case: Expression 'group={$M}'
+in:
+  expression: 'group={$M}'
+out:
+  result: SUCCEED
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_USERMACRO, token: '{$M}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
+---
+test case: Expression 'tag=("a" or  "b")'
+in:
+  expression: 'tag=("a" or  "b")'
+out:
+  result: FAIL
+---
+test case: Expression 'tag=("a" or tag = "b")'
+in:
+  expression: 'tag=("a" or tag = "b")'
+out:
+  result: FAIL
+---
+test case: Expression 'group="xyz" = tag'
+in:
+  expression: 'group="xyz" = tag'
+out:
+  result: FAIL
+...
+
+
+

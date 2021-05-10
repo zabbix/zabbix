@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,375 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class C52ImportConverterTest extends CImportConverterTest {
+
+	public function importConvertProviderData(): array {
+		$calculated = ['type' => CXmlConstantName::CALCULATED, 'key' => ''];
+
+		return [
+			[
+				[],
+				[]
+			],
+			[
+				[
+					'templates' => [
+						[
+							'template' => 'Template',
+							'items' => [
+								$calculated + ['params' => '100*last("vfs.fs.size[/,free]")/last("vfs.fs.size[/,total]")'],
+								$calculated + ['params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'],
+								$calculated + ['params' => 'last("net.if.in[eth0,bytes]")+last("net.if.out[eth0,bytes]")'],
+								$calculated + ['params' => '100*last("net.if.in[eth0,bytes]")/(last("net.if.in[eth0,bytes]")+last("net.if.out[eth0,bytes]"))'],
+								$calculated + ['params' => 'last("grpsum[\\"video\\",\\"net.if.out[eth0,bytes]\\",\\"last\\"]") / last("grpsum[\\"video\\",\\"nginx_stat.sh[active]\\",\\"last\\"]")'],
+								$calculated + ['params' => 'last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'],
+								$calculated + ['params' => 'last(haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'],
+								$calculated + ['params' => 'last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+last(php-fpm.listen_queue_len)=0)*100'],
+								$calculated + ['params' => 'last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100'],
+								$calculated + ['params' => 'last("system.swap.size[,total]") - last("system.swap.size[,total]") / 100 * last("perf_counter_en[\\"\\Paging file(_Total)\\% Usage\\"]")'],
+								$calculated + ['params' => 'avg("zbxnext_6451:'."\n\r\n".'agent_numeric[wcache,values]",600)'],
+								$calculated + ['params' => 'abschange("trap1") + avg(trap1,1h,1d) + band(trap1,,12)=4 + count(trap1,10m) + count(trap1,10m,"error",eq) + count(trap1,10m,12) + count(trap1, 10m,12,gt) + count(trap1, #10,12,gt) + count(trap1, 10m,12,gt,1d) + count(trap1,10m,6/7,band) + count(trap1, 10m,,,1d) + count(trap1,10m,"56",eq) + count("Zabbix server:trap3",10m,error,eq) + date("trap1") + dayofmonth(trap1) + dayofweek(trap1) + delta(trap1,30s) + diff(trap1) + forecast(trap1,#10,,1h) + forecast(trap1,1h,,30m) + forecast(trap1,1h,1d,12h) + forecast(trap1,1h,,10m,exponential) + forecast(trap1,1h,,2h,polynomial3,max) + fuzzytime(trap1,40) + count(trap2,10m,56,eq)']
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'template' => 'Template',
+							'uuid' => generateUuidV4('Template'),
+							'items' => [
+								$calculated + ['params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])'],
+								$calculated + ['params' => 'avg(/Zabbix Server/zabbix[wcache,values],600s)'],
+								$calculated + ['params' => 'last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes])'],
+								$calculated + ['params' => '100*last(/'.'/net.if.in[eth0,bytes])/(last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes]))'],
+								$calculated + ['params' => 'last(/'.'/grpsum["video","net.if.out[eth0,bytes]","last"]) / last(/'.'/grpsum["video","nginx_stat.sh[active]","last"])'],
+								$calculated + ['params' => 'last(/'.'/es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) + (last(/'.'/es.node.indices.flush.total[{#ES.NODE}]) = 0) )'],
+								$calculated + ['params' => 'last(/'.'/haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(/'.'/haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100'],
+								$calculated + ['params' => 'last(/'.'/php-fpm.listen_queue)/(last(/'.'/php-fpm.listen_queue_len)+last(/'.'/php-fpm.listen_queue_len)=0)*100'],
+								$calculated + ['params' => 'last(/'.'/vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(/'.'/vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'],
+								$calculated + ['params' => 'last(/'.'/system.swap.size[,total]) - last(/'.'/system.swap.size[,total]) / 100 * last(/'.'/perf_counter_en["\\Paging file(_Total)\% Usage"])'],
+								$calculated + ['params' => 'avg(/zbxnext_6451/agent_numeric[wcache,values],600s)'],
+								$calculated + ['params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,"12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")']
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'key',
+									'triggers' => [
+										[
+											'expression' => '{min(5m)}=1',
+											'recovery_expression' => ''
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'key',
+									'triggers' => [
+										[
+											'expression' => 'min(/hostname/key,5m)=1',
+											'recovery_expression' => ''
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'expression' => '{hostname:key.min(5m)}=1',
+							'recovery_expression' => '{hostname:key.min(5m)}<>1'
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'expression' => 'min(/hostname/key,5m)=1',
+							'recovery_expression' => 'min(/hostname/key,5m)<>1'
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'AGGREGATE'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '{hostname:grpmin["host group","item",last,5m].last()}=5',
+							'recovery_expression' => ''
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'CALCULATED',
+									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => 'last(/hostname/grpmin["host group","item",last,5m])=5',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'AGGREGATE'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '{hostname:grpmin["host group","item",last,5m].date()}=5',
+							'recovery_expression' => ''
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'hostname',
+							'items' => [
+								'item' => [
+									'key' => 'grpmin["host group","item",last,5m]',
+									'type' => 'CALCULATED',
+									'params' => 'min(last_foreach(/*/item?[group="host group"],5m))'
+								]
+							]
+						]
+					],
+					'triggers' => [
+						[
+							'expression' => '(date()=5) or (last(/hostname/grpmin["host group","item",last,5m])<>last(/hostname/grpmin["host group","item",last,5m]))',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].last()}}',
+							'expression' => '{k:system.cpu.load.last(5s, 1d)} > 5',
+							'recovery_expression' => ''
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?last(/k/grpmin["zn6451","item",last,5m])}',
+							'expression' => 'last(/k/system.cpu.load,#1:now-1d) > 5',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?{k:grpmin["zn6451","item",last,5m].date()}}',
+							'expression' => '{k:system.cpu.load.last(5s)} > 5',
+							'recovery_expression' => ''
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'event_name' => '{?date()}',
+							'expression' => 'last(/k/system.cpu.load) > 5',
+							'recovery_expression' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'application' => 'MySQL'
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => '{Zabbix server:proc.num.last()} = 0',
+											'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+										]
+									],
+									'application' => ''
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => '{Zabbix server:proc.num.last()} = 0',
+												'recovery_expression' => '{Zabbix server:proc.num.last()} <> 0'
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'maps' => [
+						[
+							'name' => 'Local network',
+							'selements' => [
+								[
+									'elementtype' => '0',
+									'elements' => [
+										[
+											'host' => 'Zabbix server'
+										]
+									],
+									'evaltype' => '0',
+									'tags' => [
+										'tag' => [
+											'tag' => 'Application',
+											'value' => 'MySQL',
+											'operator' => '0'
+										]
+									]
+								],
+								[
+									'elementtype' => '2',
+									'elements' => [
+										[
+											'description' => 'trigger',
+											'expression' => 'last(/Zabbix server/proc.num) = 0',
+											'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+										]
+									],
+									'evaltype' => '0'
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger',
+												'expression' => 'last(/Zabbix server/proc.num) = 0',
+												'recovery_expression' => 'last(/Zabbix server/proc.num) <> 0'
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			$this->getGroupsUuidData(),
+			$this->getTemplateItemsUuidData(),
+			$this->getTriggerUuidData(),
+			$this->getGraphUuidData(),
+			$this->getTemplateDashboardUuidData(),
+			$this->getHttptestUuidData(),
+			$this->getValuemapsUuidData(),
+			$this->getDiscoveryRuleNameUuidData(),
+			$this->getItemPrototypeUuidData(),
+			$this->getTriggerPrototypeUuidData(),
+			$this->getGraphPrototypeUuidData(),
+			$this->getHostPrototypeUuidData(),
+			$this->getHostUuidData()
+		];
+	}
+
+	/**
+	 * @dataProvider importConvertProviderData
+	 *
+	 * @param array $data
+	 * @param array $expected
+	 */
+	public function testConvert(array $data, array $expected): void {
+		$this->assertConvert($this->createExpectedResult($expected), $this->createSource($data));
+	}
+
+	protected function createSource(array $data = []): array {
+		return [
+			'zabbix_export' => array_merge([
+				'version' => '5.2',
+				'date' => '2020-01-01T00:00:00Z'
+			], $data)
+		];
+	}
+
+	protected function createExpectedResult(array $data = []): array {
+		return [
+			'zabbix_export' => array_merge([
+				'version' => '5.4',
+				'date' => '2020-01-01T00:00:00Z'
+			], $data)
+		];
+	}
 
 	protected function getTemplateNameUuidData(): array {
 		/**
@@ -33,18 +399,18 @@ class C52ImportConverterTest extends CImportConverterTest {
 		return [
 			[
 				'templates' => [
-					['name' => 'Template OS'],
-					['name' => 'Template OS ab'],
-					['name' => 'Template OS abc'],
-					['name' => 'Template MODULE abc'],
+					['template' => 'Template OS'],
+					['template' => 'Template OS ab'],
+					['template' => 'Template OS abc'],
+					['template' => 'Template MODULE abc'],
 				]
 			],
 			[
 				'templates' => [
-					['name' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
-					['name' => 'Template OS ab', 'uuid' => generateUuidV4('Template OS ab')],
-					['name' => 'Template OS abc', 'uuid' => generateUuidV4('abc')],
-					['name' => 'Template MODULE abc', 'uuid' => generateUuidV4('Template MODULE abc')]
+					['template' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
+					['template' => 'Template OS ab', 'uuid' => generateUuidV4('Template OS ab')],
+					['template' => 'Template OS abc', 'uuid' => generateUuidV4('abc')],
+					['template' => 'Template MODULE abc', 'uuid' => generateUuidV4('Template MODULE abc')]
 				]
 			]
 		];
@@ -58,10 +424,10 @@ class C52ImportConverterTest extends CImportConverterTest {
 		return [
 			[
 				'hosts' => [
-					['name' => 'Host A', 'groups' => [['name' => 'Group B']]]
+					['host' => 'Host A', 'groups' => [['name' => 'Group B']]]
 				],
 				'templates' => [
-					['name' => 'Template A', 'groups' => [['name' => 'Group A']]]
+					['template' => 'Template A', 'groups' => [['name' => 'Group A']]]
 				],
 				'groups' => [
 					['name' => 'Group A'],
@@ -70,10 +436,10 @@ class C52ImportConverterTest extends CImportConverterTest {
 			],
 			[
 				'hosts' => [
-					['name' => 'Host A', 'groups' => [['name' => 'Group B']]]
+					['host' => 'Host A', 'groups' => [['name' => 'Group B']]]
 				],
 				'templates' => [
-					['name' => 'Template A', 'groups' => [['name' => 'Group A']], 'uuid' => generateUuidV4('Template A')]
+					['template' => 'Template A', 'groups' => [['name' => 'Group A']], 'uuid' => generateUuidV4('Template A')]
 				],
 				'groups' => [
 					['name' => 'Group A', 'uuid' => generateUuidV4('Group A')],
@@ -89,13 +455,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template C',
+						'template' => 'Template C',
 						'items' => [
 							['key' => 'item1']
 						]
 					],
 					[
-						'name' => 'Template OS Old name D',
+						'template' => 'Template OS Old name D',
 						'items' => [
 							['key' => 'item1']
 						]
@@ -105,14 +471,14 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template C',
+						'template' => 'Template C',
 						'items' => [
 							['key' => 'item1', 'uuid' => generateUuidV4('Template C/item1')]
 						],
 						'uuid' => generateUuidV4('Template C')
 					],
 					[
-						'name' => 'Template OS Old name D',
+						'template' => 'Template OS Old name D',
 						'items' => [
 							['key' => 'item1', 'uuid' => generateUuidV4('Old name D/item1')]
 						],
@@ -129,7 +495,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template E',
+						'template' => 'Template E',
 						'items' => [
 							[
 								'key' => 'item2',
@@ -152,7 +518,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template E',
+						'template' => 'Template E',
 						'items' => [
 							[
 								'key' => 'item2',
@@ -184,8 +550,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 		return [
 			[
 				'templates' => [
-					['name' => 'Template OS'],
-					['name' => 'Template OS Template G']
+					['template' => 'Template OS'],
+					['template' => 'Template OS Template G']
 				],
 				'graphs' => [
 					[
@@ -199,8 +565,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 			],
 			[
 				'templates' => [
-					['name' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
-					['name' => 'Template OS Template G', 'uuid' => generateUuidV4('Template G')]
+					['template' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
+					['template' => 'Template OS Template G', 'uuid' => generateUuidV4('Template G')]
 				],
 				'graphs' => [
 					[
@@ -222,13 +588,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template H',
+						'template' => 'Template H',
 						'dashboards' => [
 							['name' => 'Dashboard A']
 						]
 					],
 					[
-						'name' => 'Template OS Template I',
+						'template' => 'Template OS Template I',
 						'dashboards' => [
 							['name' => 'Dashboard B']
 						]
@@ -238,14 +604,14 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template H',
+						'template' => 'Template H',
 						'dashboards' => [
 							['name' => 'Dashboard A', 'uuid' => generateUuidV4('Template H/Dashboard A'), 'pages' => [[]]]
 						],
 						'uuid' => generateUuidV4('Template H')
 					],
 					[
-						'name' => 'Template OS Template I',
+						'template' => 'Template OS Template I',
 						'dashboards' => [
 							['name' => 'Dashboard B', 'uuid' => generateUuidV4('Template I/Dashboard B'), 'pages' => [[]]]
 						],
@@ -262,13 +628,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template J',
+						'template' => 'Template J',
 						'httptests' => [
 							['name' => 'HTTP Test A']
 						]
 					],
 					[
-						'name' => 'Template OS Template K',
+						'template' => 'Template OS Template K',
 						'httptests' => [
 							['name' => 'HTTP Test B']
 						]
@@ -278,14 +644,14 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template J',
+						'template' => 'Template J',
 						'httptests' => [
 							['name' => 'HTTP Test A', 'uuid' => generateUuidV4('Template J/HTTP Test A')]
 						],
 						'uuid' => generateUuidV4('Template J')
 					],
 					[
-						'name' => 'Template OS Template K',
+						'template' => 'Template OS Template K',
 						'httptests' => [
 							['name' => 'HTTP Test B', 'uuid' => generateUuidV4('Template K/HTTP Test B')]
 						],
@@ -302,14 +668,14 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template L',
+						'template' => 'Template L',
 						'items' => [
 							['key' => 'item5', 'valuemap' => ['name' => 'Value map A']],
 							['key' => 'item6', 'valuemap' => ['name' => 'Value map B']]
 						]
 					],
 					[
-						'name' => 'Template OS Template K',
+						'template' => 'Template OS Template K',
 						'items' => [
 							['key' => 'item7', 'valuemap' => ['name' => 'Value map A']],
 							['key' => 'item8', 'valuemap' => ['name' => 'Value map B']]
@@ -324,7 +690,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template L',
+						'template' => 'Template L',
 						'items' => [
 							['key' => 'item5', 'valuemap' => ['name' => 'Value map A'], 'uuid' => generateUuidV4('Template L/item5')],
 							['key' => 'item6', 'valuemap' => ['name' => 'Value map B'], 'uuid' => generateUuidV4('Template L/item6')]
@@ -336,7 +702,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						'uuid' => generateUuidV4('Template L')
 					],
 					[
-						'name' => 'Template OS Template K',
+						'template' => 'Template OS Template K',
 						'items' => [
 							['key' => 'item7', 'valuemap' => ['name' => 'Value map A'], 'uuid' => generateUuidV4('Template K/item7')],
 							['key' => 'item8', 'valuemap' => ['name' => 'Value map B'], 'uuid' => generateUuidV4('Template K/item8')]
@@ -358,13 +724,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template M',
+						'template' => 'Template M',
 						'discovery_rules' => [
 							['key' => 'drule1']
 						]
 					],
 					[
-						'name' => 'Template OS Template N',
+						'template' => 'Template OS Template N',
 						'discovery_rules' => [
 							['key' => 'drule2']
 						]
@@ -374,14 +740,14 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template M',
+						'template' => 'Template M',
 						'discovery_rules' => [
 							['key' => 'drule1', 'uuid' => generateUuidV4('Template M/drule1')]
 						],
 						'uuid' => generateUuidV4('Template M')
 					],
 					[
-						'name' => 'Template OS Template N',
+						'template' => 'Template OS Template N',
 						'discovery_rules' => [
 							['key' => 'drule2', 'uuid' => generateUuidV4('Template N/drule2')]
 						],
@@ -392,19 +758,19 @@ class C52ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
-	protected function getItemProtypeUuidData(): array {
+	protected function getItemPrototypeUuidData(): array {
 		// Use "template name/discovery rule key/item prototype key".
 		return [
 			[
 				'templates' => [
 					[
-						'name' => 'Template O',
+						'template' => 'Template O',
 						'discovery_rules' => [
 							['key' => 'drule3', 'item_prototypes' => [['key' => 'item9']]]
 						]
 					],
 					[
-						'name' => 'Template OS Template P',
+						'template' => 'Template OS Template P',
 						'discovery_rules' => [
 							['key' => 'drule4', 'item_prototypes' => [['key' => 'item10']]]
 						]
@@ -414,7 +780,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template O',
+						'template' => 'Template O',
 						'discovery_rules' => [
 							[
 								'key' => 'drule3',
@@ -427,7 +793,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						'uuid' => generateUuidV4('Template O')
 					],
 					[
-						'name' => 'Template OS Template P',
+						'template' => 'Template OS Template P',
 						'discovery_rules' => [
 							[
 								'key' => 'drule4',
@@ -444,13 +810,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
-	protected function getTriggerProtypeUuidData(): array {
+	protected function getTriggerPrototypeUuidData(): array {
 		// Use "discovery rule key/trigger prototype name/expanded expression/expanded recovery expression".
 		return [
 			[
 				'templates' => [
 					[
-						'name' => 'Template Q',
+						'template' => 'Template Q',
 						'discovery_rules' => [
 							[
 								'key' => 'drule5',
@@ -471,7 +837,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template Q',
+						'template' => 'Template Q',
 						'discovery_rules' => [
 							[
 								'key' => 'drule5',
@@ -504,13 +870,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			];
 	}
 
-	protected function getGraphProtypeUuidData(): array {
+	protected function getGraphPrototypeUuidData(): array {
 		// Use "template name/discovery rule key/graph prototype name".
 		return [
 			[
 				'templates' => [
 					[
-						'name' => 'Template R',
+						'template' => 'Template R',
 						'discovery_rules' => [
 							[
 								'key' => 'drule6',
@@ -521,7 +887,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						]
 					],
 					[
-						'name' => 'Template OS Template S',
+						'template' => 'Template OS Template S',
 						'discovery_rules' => [
 							[
 								'key' => 'drule7',
@@ -536,7 +902,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template R',
+						'template' => 'Template R',
 						'discovery_rules' => [
 							[
 								'key' => 'drule6',
@@ -549,7 +915,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						'uuid' => generateUuidV4('Template R')
 					],
 					[
-						'name' => 'Template OS Template S',
+						'template' => 'Template OS Template S',
 						'discovery_rules' => [
 							[
 								'key' => 'drule7',
@@ -566,13 +932,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			];
 	}
 
-	protected function getHosthProtypeUuidData(): array {
+	protected function getHostPrototypeUuidData(): array {
 		// Use "template name/discovery rule key/host prototype name".
 		return [
 			[
 				'templates' => [
 					[
-						'name' => 'Template T',
+						'template' => 'Template T',
 						'discovery_rules' => [
 							[
 								'key' => 'drule8',
@@ -583,7 +949,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						]
 					],
 					[
-						'name' => 'Template OS Template T',
+						'template' => 'Template OS Template T',
 						'discovery_rules' => [
 							[
 								'key' => 'drule9',
@@ -598,7 +964,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'templates' => [
 					[
-						'name' => 'Template T',
+						'template' => 'Template T',
 						'discovery_rules' => [
 							[
 								'key' => 'drule8',
@@ -611,7 +977,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 						'uuid' => generateUuidV4('Template T')
 					],
 					[
-						'name' => 'Template OS Template T',
+						'template' => 'Template OS Template T',
 						'discovery_rules' => [
 							[
 								'key' => 'drule9',
@@ -634,7 +1000,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'hosts' => [
 					[
-						'name' => 'Host',
+						'host' => 'Host',
 						'items' => [
 							[
 								'key' => 'item',
@@ -675,7 +1041,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 			[
 				'hosts' => [
 					[
-						'name' => 'Host',
+						'host' => 'Host',
 						'items' => [
 							[
 								'key' => 'item',
@@ -715,68 +1081,13 @@ class C52ImportConverterTest extends CImportConverterTest {
 			]
 		];
 	}
-	/**
-	 * Testing data provider.
-	 *
-	 * @return array
-	 */
-	public function dataProviderConvert(): array {
-		return [
-			[
-				[],
-				[]
-			],
-			$this->getTemplateNameUuidData(),
-			$this->getGroupsUuidData(),
-			$this->getTemplateItemsUuidData(),
-			$this->getTriggerUuidData(),
-			$this->getGraphUuidData(),
-			$this->getTemplateDashboardUuidData(),
-			$this->getHttptestUuidData(),
-			$this->getValuemapsUuidData(),
-			$this->getDiscoveryRuleNameUuidData(),
-			$this->getItemProtypeUuidData(),
-			$this->getTriggerProtypeUuidData(),
-			$this->getGraphProtypeUuidData(),
-			$this->getHosthProtypeUuidData(),
-			$this->getHostUuidData()
-		];
-	}
 
-	/**
-	 * @dataProvider dataProviderConvert
-	 *
-	 * @param array $data
-	 * @param array $expected
-	 */
-	public function testConvert(array $data, array $expected) {
-		$this->assertConvert($this->createExpectedResult($expected), $this->createSource($data));
-	}
-
-	protected function createSource(array $data = []) {
-		return [
-			'zabbix_export' => array_merge([
-				'version' => '5.2',
-				'date' => '2020-01-01T00:00:00Z'
-			], $data)
-		];
-	}
-
-	protected function createExpectedResult(array $data = []) {
-		return [
-			'zabbix_export' => array_merge([
-				'version' => '5.4',
-				'date' => '2020-01-01T00:00:00Z'
-			], $data)
-		];
-	}
-
-	protected function assertConvert(array $expected, array $source) {
+	protected function assertConvert(array $expected, array $source): void {
 		$result = $this->createConverter()->convert($source);
 		$this->assertEquals($expected, $result);
 	}
 
-	protected function createConverter() {
+	protected function createConverter(): C52ImportConverter {
 		return new C52ImportConverter();
 	}
 }

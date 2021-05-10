@@ -202,20 +202,6 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: valid item key type (30)
-in:
-  type: 'ITEM_TYPE_AGGREGATE'
-  key: 'key1[]'
-out:
-  return: 'SUCCEED'
----
-test case: valid item key type (31)
-in:
-  type: 'ITEM_TYPE_AGGREGATE'
-  key: 'zabbix[host,,items]'
-out:
-  return: 'SUCCEED'
----
 test case: invalid item key type (32)
 in:
   type: 'ITEM_TYPE_HTTPTEST'

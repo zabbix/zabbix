@@ -346,7 +346,8 @@ jQuery(function($) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
 						'id': data.values[i].id,
-						'name': data.values[i].name
+						'name': data.values[i].name,
+						'query': data.values[i].query
 					};
 
 					if (typeof data.values[i].prefix !== 'undefined') {

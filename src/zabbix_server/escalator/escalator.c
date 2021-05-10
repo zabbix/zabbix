@@ -1836,7 +1836,12 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_create(&functionids);
 	zbx_vector_uint64_create(&itemids);
 
-	get_functionids(&functionids, trigger.expression_orig);
+	zbx_get_serialized_expression_functionids(trigger.expression, trigger.expression_bin, &functionids);
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger.recovery_mode)
+	{
+		zbx_get_serialized_expression_functionids(trigger.recovery_expression, trigger.recovery_expression_bin,
+				&functionids);
+	}
 
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);

@@ -162,8 +162,8 @@ typedef enum
 	ITEM_TYPE_INTERNAL = 5,
 /*	ITEM_TYPE_SNMPv3,*/
 	ITEM_TYPE_ZABBIX_ACTIVE = 7,
-	ITEM_TYPE_AGGREGATE,
-	ITEM_TYPE_HTTPTEST,
+/*	ITEM_TYPE_AGGREGATE, */
+	ITEM_TYPE_HTTPTEST = 9,
 	ITEM_TYPE_EXTERNAL,
 	ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_IPMI,
@@ -1167,6 +1167,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
 
 void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
 
@@ -1439,8 +1440,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
 
 /* additional token flags */
-#define ZBX_TOKEN_TRIGGER	0x0004000
-#define ZBX_TOKEN_NUMERIC	0x0008000
 #define ZBX_TOKEN_JSON		0x0010000
 #define ZBX_TOKEN_XML		0x0020000
 #define ZBX_TOKEN_REGEXP	0x0040000
@@ -1549,10 +1548,18 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_BASIC			0x00
 #define ZBX_TOKEN_SEARCH_REFERENCES		0x01
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
+#define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
 
 typedef int zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
+
+int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token);
+
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
@@ -1615,52 +1622,6 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
-typedef union
-{
-	zbx_uint64_t	ui64;
-	double		dbl;
-
-	/* null terminated string */
-	char		*str;
-
-	/* length prefixed (4 bytes) binary data */
-	void		*bin;
-}
-zbx_variant_data_t;
-
-typedef struct
-{
-	unsigned char		type;
-	zbx_variant_data_t	data;
-}
-zbx_variant_t;
-
-#define ZBX_VARIANT_NONE	0
-#define ZBX_VARIANT_STR		1
-#define ZBX_VARIANT_DBL		2
-#define ZBX_VARIANT_UI64	3
-#define ZBX_VARIANT_BIN		4
-
-void	zbx_variant_clear(zbx_variant_t *value);
-void	zbx_variant_set_none(zbx_variant_t *value);
-void	zbx_variant_set_str(zbx_variant_t *value, char *text);
-void	zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);
-void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64);
-void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
-void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source);
-int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
-
-int	zbx_variant_convert(zbx_variant_t *value, int type);
-const char	*zbx_get_variant_type_desc(unsigned char type);
-const char	*zbx_variant_value_desc(const zbx_variant_t *value);
-const char	*zbx_variant_type_desc(const zbx_variant_t *value);
-
-int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
-
-void	*zbx_variant_data_bin_copy(const void *bin);
-void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
-zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
-
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
@@ -1675,8 +1636,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision, char **errmsg);
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
@@ -1689,6 +1648,8 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
+	ZBX_TIME_UNIT_SECOND,
+	ZBX_TIME_UNIT_MINUTE,
 	ZBX_TIME_UNIT_HOUR,
 	ZBX_TIME_UNIT_DAY,
 	ZBX_TIME_UNIT_WEEK,
@@ -1736,5 +1697,9 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *tz);
+
+/* */
+char	*zbx_substr(const char *src, size_t left, size_t right);
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 
 #endif

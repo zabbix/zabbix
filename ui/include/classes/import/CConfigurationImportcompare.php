@@ -227,7 +227,6 @@ class CConfigurationImportcompare {
 			'dashboards' => 'templateDashboards',
 			'httptests' => 'httptests',
 			'valuemaps' => 'valueMaps',
-			'triggers' => 'triggers',
 			'graphs' => 'graphs'
 		];
 
@@ -235,7 +234,8 @@ class CConfigurationImportcompare {
 		$stored_changes = [];
 
 		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
-			for ($key = 0; $key< count($diff['updated']); $key++) {
+			$updated_count = count($diff['updated']);
+			for ($key = 0; $key < $updated_count; $key++) {
 				$entity = $diff['updated'][$key];
 				$has_before_templates = array_key_exists('templates', $entity['before']);
 				$has_after_templates = array_key_exists('templates', $entity['after']);

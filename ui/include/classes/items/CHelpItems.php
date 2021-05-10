@@ -739,24 +739,6 @@ class CHelpItems {
 					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				]
 			],
-			ITEM_TYPE_AGGREGATE => [
-				[
-					'key' => 'grpavg[group,key,func,<param>]',
-					'description' => _('Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
-				],
-				[
-					'key' => 'grpmin[group,key,func,<param>]',
-					'description' => _('Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
-				],
-				[
-					'key' => 'grpmax[group,key,func,<param>]',
-					'description' => _('Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
-				],
-				[
-					'key' => 'grpsum[group,key,func,<param>]',
-					'description' => _('Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
-				]
-			],
 			ITEM_TYPE_SIMPLE => [
 				[
 					'key' => 'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',

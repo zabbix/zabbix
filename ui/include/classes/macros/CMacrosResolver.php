@@ -852,7 +852,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
+	 * Purpose: Translate {10}>10 to something like last(/localhost/system.cpu.load)>10
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[][<sources>]			  See options['source']
@@ -863,6 +863,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 * @param string $options['context']              Additional parameter in URL to identify main section.
+	 *                                                Default: 'host'.
 	 *
 	 * @return string|array
 	 */
@@ -872,7 +873,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'resolve_usermacros' => false,
 			'resolve_macros' => false,
 			'resolve_functionids' => true,
-			'sources' => ['expression']
+			'sources' => ['expression'],
+			'context' => 'host'
 		];
 
 		$functionids = [];
@@ -888,26 +890,33 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
-		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
+		$expression_parser = new CExpressionParser(['collapsed_expression' => true, 'lldmacros' => true]);
 
 		// Find macros.
 		foreach ($triggers as $key => $trigger) {
 			$functionid_macros = [];
 			$texts = [];
 			foreach ($options['sources'] as $source) {
-				if ($trigger[$source] !== '' && ($result = $expression_data->parse($trigger[$source])) !== false) {
-					foreach ($result->getTokens() as $token) {
+				if ($trigger[$source] !== ''
+						&& $expression_parser->parse($trigger[$source]) == CParser::PARSE_SUCCESS) {
+					$tokens = $expression_parser->getResult()->getTokensOfTypes([
+						CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO,
+						CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+						CExpressionParserResult::TOKEN_TYPE_STRING
+					]);
+
+					foreach ($tokens as $token) {
 						switch ($token['type']) {
-							case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
-								$functionid_macros[$token['value']] = null;
+							case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+								$functionid_macros[$token['match']] = null;
 								break;
 
-							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-								$texts[] = $token['value'];
+							case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+								$texts[] = $token['match'];
 								break;
 
-							case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-								$texts[] = $token['data']['string'];
+							case CExpressionParserResult::TOKEN_TYPE_STRING:
+								$texts[] = CExpressionParser::unquoteString($token['match']);
 								break;
 						}
 					}
@@ -1024,11 +1033,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				if ($options['resolve_macros']) {
 					$functions = $this->resolveFunctionParameters($functions);
-					foreach ($functions as &$function) {
-						$function['parameter'] = $function['parameter_expanded'];
-						unset($function['parameter_expanded']);
-					}
-					unset($function);
 				}
 
 				foreach ($macro_values as &$macros) {
@@ -1039,56 +1043,61 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							if ($options['html']) {
 								$style = ($function['status'] == ITEM_STATUS_ACTIVE)
 									? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
-									: $style = ZBX_STYLE_RED;
+									: ZBX_STYLE_RED;
 
 								if ($function['type'] == ITEM_TYPE_HTTPTEST) {
-									$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
+									$link = (new CSpan('/'.$function['host'].'/'.$function['key_']))->addClass($style);
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink($function['host'].':'.$function['key_'],
+										? (new CLink('/'.$function['host'].'/'.$function['key_'],
 											(new CUrl('disc_prototypes.php'))
 												->setArgument('form', 'update')
 												->setArgument('itemid', $function['itemid'])
 												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', array_key_exists('context', $options)
-													? $options['context']
-													: 'host'
-												)
+												->setArgument('context', $options['context'])
 										))
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass($style)
-										: (new CSpan($function['host'].':'.$function['key_']))
+										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-									? (new CLink($function['host'].':'.$function['key_'],
-										(new CUrl('items.php'))
-											->setArgument('form', 'update')
-											->setArgument('itemid', $function['itemid'])
-											->setArgument('context', array_key_exists('context', $options)
-												? $options['context']
-												: 'host'
-											)
-									))
-										->addClass(ZBX_STYLE_LINK_ALT)
-										->setAttribute('data-itemid', $function['itemid'])
-										->addClass($style)
-									: (new CSpan($function['host'].':'.$function['key_']))
-										->addClass($style);
+										? (new CLink('/'.$function['host'].'/'.$function['key_'],
+											(new CUrl('items.php'))
+												->setArgument('form', 'update')
+												->setArgument('itemid', $function['itemid'])
+												->setArgument('context', $options['context'])
+										))
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->setAttribute('data-itemid', $function['itemid'])
+											->addClass($style)
+										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
+											->addClass($style);
 								}
 
-								$value = [
-									'{', $link, '.', bold($function['function'].'('), $function['parameter'], bold(')'), '}'
-								];
+								$value = [bold($function['function'].'(')];
+								if (($pos = strpos($function['parameter'], TRIGGER_QUERY_PLACEHOLDER)) !== false) {
+									if ($pos != 0) {
+										$value[] = substr($function['parameter'], 0, $pos);
+									}
+									$value[] = $link;
+									if (strlen($function['parameter']) > $pos + 1) {
+										$value[] = substr($function['parameter'], $pos + 1);
+									}
+								}
+								else {
+									$value[] = $function['parameter'];
+								}
+								$value[] = bold(')');
 							}
 							else {
-								$value = '{'.
-									$function['host'].':'.
-									$function['key_'].'.'.
-									$function['function'].'('.$function['parameter'].')'.
-								'}';
+								$query = '/'.$function['host'].'/'.$function['key_'];
+								$params = (($pos = strpos($function['parameter'], TRIGGER_QUERY_PLACEHOLDER)) !== false)
+									? substr_replace($function['parameter'], $query, $pos, 1)
+									: $function['parameter'];
+								$value = $function['function'].'('.$params.')';
 							}
 						}
 						else {
@@ -1132,56 +1141,93 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach ($triggers as $key => $trigger) {
 			foreach ($options['sources'] as $source) {
-				if ($trigger[$source] === '' || ($result = $expression_data->parse($trigger[$source])) === false) {
+				if ($trigger[$source] === ''
+						|| $expression_parser->parse($trigger[$source]) != CParser::PARSE_SUCCESS) {
 					continue;
 				}
 
 				$expression = [];
 				$pos_left = 0;
 
-				foreach ($result->getTokens() as $token) {
-					switch ($token['type']) {
-						case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
-							if (!$options['resolve_functionids']) {
-								continue 2;
-							}
-							// break; is not missing here
+				$token_types = [
+					CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+					CExpressionParserResult::TOKEN_TYPE_STRING
+				];
+				if ($options['resolve_functionids']) {
+					$token_types[] = CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO;
+				}
+				if ($options['html']) {
+					$token_types[] = CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION;
+				}
 
-						case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-						case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+				$rigth_parentheses = [];
+				$tokens = $expression_parser->getResult()->getTokensOfTypes($token_types);
+
+				foreach ($tokens as $token) {
+					switch ($token['type']) {
+						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+						case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+						case CExpressionParserResult::TOKEN_TYPE_STRING:
+							foreach ($rigth_parentheses as $pos => $value) {
+								if ($pos < $token['pos']) {
+									if ($pos_left != $pos) {
+										$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+									}
+									$expression[] = bold($value);
+									$pos_left = $pos + strlen($value);
+									unset($rigth_parentheses[$pos]);
+								}
+							}
 							if ($pos_left != $token['pos']) {
 								$expression[] = substr($trigger[$source], $pos_left, $token['pos'] - $pos_left);
 							}
-							$pos_left = $token['pos'] + $token['length'];
+							$pos_left = ($token['type'] == CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION)
+								? $token['pos'] + strlen($token['data']['function']) + 1
+								: $token['pos'] + $token['length'];
 							break;
 					}
 
 					switch ($token['type']) {
-						case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
-							$expression[] = $macro_values[$key][$token['value']];
+						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+							$expression[] = bold($token['data']['function'].'(');
+							$rigth_parentheses[$token['pos'] + $token['length'] - 1] = ')';
+							ksort($rigth_parentheses, SORT_NUMERIC);
 							break;
 
-						case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-							if (array_key_exists($token['value'], $usermacro_values[$key])) {
+						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+							$expression[] = $macro_values[$key][$token['match']];
+							break;
+
+						case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+							if (array_key_exists($token['match'], $usermacro_values[$key])) {
 								$expression[] =
-									CTriggerExpression::quoteString($usermacro_values[$key][$token['value']], false);
+									CExpressionParser::quoteString($usermacro_values[$key][$token['match']], false);
 							}
 							else {
 								$expression[] = ($options['resolve_usermacros'] && $options['html'])
 									? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED)
-									: $token['value'];
+									: $token['match'];
 							}
 							break;
 
-						case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-							$string = strtr($token['data']['string'], $usermacro_values[$key]);
-							$expression[] = CTriggerExpression::quoteString($string, false, true);
+						case CExpressionParserResult::TOKEN_TYPE_STRING:
+							$string = strtr(CExpressionParser::unquoteString($token['match']), $usermacro_values[$key]);
+							$expression[] = CExpressionParser::quoteString($string, false, true);
 							break;
-
 					}
 				}
 
-				if ($pos_left != strlen($trigger[$source])) {
+				$len = strlen($trigger[$source]);
+				foreach ($rigth_parentheses as $pos => $value) {
+					if ($pos_left != $pos) {
+						$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+					}
+					$expression[] = bold($value);
+					$pos_left = $pos + strlen($value);
+					unset($rigth_parentheses[$pos]);
+				}
+				if ($pos_left != $len) {
 					$expression[] = substr($trigger[$source], $pos_left);
 				}
 
@@ -1815,7 +1861,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve function parameter macros to "parameter_expanded" field.
+	 * Resolve function parameter macros.
 	 *
 	 * @param array  $functions
 	 * @param string $functions[n]['hostid']
@@ -1825,20 +1871,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveFunctionParameters(array $functions) {
-		foreach ($functions as &$function) {
-			$function['parameter_expanded'] = $function['parameter'];
-		}
-		unset($function);
-
 		$types = ['usermacros' => true];
 		$macro_values = [];
 		$usermacros = [];
 
 		foreach ($functions as $key => $function) {
-			$matched_macros = $this->extractFunctionMacros($function['function'].'('.$function['parameter'].')',
-				$types
-			);
+			$functions[$key]['function_string'] = $function['function'].'('.$function['parameter'].')';
+			if (($pos = strpos($functions[$key]['function_string'], TRIGGER_QUERY_PLACEHOLDER)) !== false) {
+				$functions[$key]['function_string'] = substr_replace($functions[$key]['function_string'], '/foo/bar',
+					$pos, 1
+				);
+				$functions[$key]['function_query_pos'] = $pos;
+			}
 
+			$matched_macros = $this->extractFunctionMacros($functions[$key]['function_string'], $types);
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$function['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
@@ -1854,10 +1900,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach ($macro_values as $key => $macros) {
-			$function = $functions[$key]['function'].'('.$functions[$key]['parameter'].')';
-			$function = $this->resolveFunctionMacros($function, $macros, $types);
-			$functions[$key]['parameter_expanded'] = substr($function, strlen($functions[$key]['function']) + 1, -1);
+			$function = $this->resolveFunctionMacros($functions[$key]['function_string'], $macros, $types);
+			$function = substr_replace($function, TRIGGER_QUERY_PLACEHOLDER, $functions[$key]['function_query_pos'], 8);
+			$functions[$key]['parameter'] = substr($function, strlen($functions[$key]['function']) + 1, -1);
 		}
+
+		array_walk($functions, function (array &$function) {
+			unset($function['function_string'], $function['function_query_pos']);
+		});
 
 		return $functions;
 	}
@@ -1907,7 +1957,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// Try to create valid expression.
-				$expressionData = new CTriggerExpression();
+				$expressionData = new C10TriggerExpression();
 
 				if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
 					continue;

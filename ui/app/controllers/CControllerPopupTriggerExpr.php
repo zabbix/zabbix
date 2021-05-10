@@ -28,6 +28,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param2SecCount = [];
 	private $param2SecMode = [];
 	private $param3SecVal = [];
+	private $param_find = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
 	private $paramForecast = [];
@@ -39,6 +40,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $allowedTypesInt = [];
 	private $functions = [];
 	private $operators = [];
+	private $period_optional = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -60,6 +62,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
 				'A' => true
+			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			]
+		];
+
+		$this->period_optional = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => false
 			],
 			'shift' => [
 				'C' => _('Time shift'),
@@ -91,7 +107,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		$this->param1Str = [
 			'pattern' => [
-				'C' => 'T',
+				'C' => 'V',
 				'T' => T_ZBX_STR,
 				'A' => false
 			]
@@ -131,9 +147,9 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'v' => [
-				'C' => 'V',
-				'T' => T_ZBX_STR,
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
 				'A' => false
 			],
 			'o' => [
@@ -141,9 +157,22 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_STR,
 				'A' => false
 			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
+			'v' => [
+				'C' => 'V',
+				'T' => T_ZBX_STR,
+				'A' => false
+			]
+		];
+
+		$this->param_find = [
+			'o' => [
+				'C' => 'O',
+				'T' => T_ZBX_STR,
+				'A' => false
+			],
+			'v' => [
+				'C' => 'V',
+				'T' => T_ZBX_STR,
 				'A' => false
 			]
 		];
@@ -174,15 +203,15 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'mask' => [
-				'C' => _('Mask'),
-				'T' => T_ZBX_STR,
-				'A' => true
-			],
 			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
+			],
+			'mask' => [
+				'C' => _('Mask'),
+				'T' => T_ZBX_STR,
+				'A' => true
 			]
 		];
 
@@ -267,19 +296,13 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->functions = [
-			'abschange' => [
-				'description' => _('abschange() - Absolute difference between last and previous value'),
+			'abs' => [
+				'description' => _('abs() - Absolute value'),
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'avg' => [
 				'description' => _('avg() - Average value of a period T'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'delta' => [
-				'description' => _('delta() - Difference between MAX and MIN value of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
@@ -295,8 +318,9 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
-			'diff' => [
-				'description' => _('diff() - Difference between last and preceding values (1 - true, 0 - false)'),
+			'find' => [
+				'description' => _('find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param_find,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
@@ -304,6 +328,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('last() - Last (most recent) T value'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'length' => [
+				'description' => _('length() - Length of last (most recent) T value in characters'),
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'max' => [
@@ -322,23 +351,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('percentile() - Percentile P of a period T'),
 				'params' => $this->param3SecPercent,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'prev' => [
-				'description' => _('prev() - Previous value'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'str' => [
-				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'strlen' => [
-				'description' => _('strlen() - Length of last (most recent) T value in characters'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'sum' => [
@@ -368,32 +380,21 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
-			'regexp' => [
-				'description' => _('regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'iregexp' => [
-				'description' => _('iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
 			'logeventid' => [
-				'description' => _('logeventid() - Event ID of last log entry matching regular expression T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
+				'description' => _('logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
 			'logseverity' => [
-				'description' => _('logseverity() - Log severity of the last log entry'),
+				'description' => _('logseverity() - Log severity of the last log entry for period T'),
+				'params' => $this->period_optional,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'logsource' => [
-				'description' => _('logsource() - Log source of the last log entry matching parameter T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
+				'description' => _('logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
@@ -413,8 +414,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
-			'band' => [
-				'description' => _('band() - Bitwise AND of last (most recent) T value and mask'),
+			'bitand' => [
+				'description' => _('bitand() - Bitwise AND of last (most recent) T value and mask'),
 				'params' => $this->paramSecIntCount,
 				'allowed_types' => $this->allowedTypesInt,
 				'operators' => ['=', '<>']
@@ -441,12 +442,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('trendcount() - Number of successfully retrieved values V (which fulfill operator O) for period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'trenddelta' => [
-				'description' => _('trenddelta() - Difference between MAX and MIN value of a period T with exact period shift'),
-				'params' => $this->param1Period,
-				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'trendmax' => [
@@ -521,6 +516,9 @@ class CControllerPopupTriggerExpr extends CController {
 	}
 
 	protected function doAction() {
+		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_validator = new CExpressionValidator();
+
 		$itemid = $this->getInput('itemid', 0);
 		$function = $this->getInput('function', 'last');
 		$operator = $this->getInput('operator', '=');
@@ -530,85 +528,150 @@ class CControllerPopupTriggerExpr extends CController {
 		$params = $this->getInput('params', []);
 		$value = $this->getInput('value', 0);
 
+		$item = false;
+
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
 			$expression = utf8RawUrlDecode($expression);
 
-			$expression_data = new CTriggerExpression();
-			$result = $expression_data->parse($expression);
+			if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+				$math_function_token = null;
+				$hist_function_token = null;
+				$function_token_index = null;
+				$tokens = $expression_parser->getResult()->getTokens();
 
-			if ($result) {
-				$function_macro_tokens = $result->getTokensByType(
-					CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
-				);
+				foreach ($tokens as $index => $token) {
+					switch ($token['type']) {
+						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
+							$math_function_token = $token;
+							$function_token_index = $index;
 
-				if ($function_macro_tokens) {
-					$function_macro_token = $function_macro_tokens[0];
-					$function = $function_macro_token['data']['functionName'];
+							foreach ($token['data']['parameters'] as $parameter) {
+								foreach ($parameter['data']['tokens'] as $parameter_token) {
+									if ($parameter_token['type'] == CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
+										$hist_function_token = $parameter_token;
+										break 2;
+									}
+								}
+							}
+							break 2;
 
-					// Determine param type.
-					$params = $function_macro_token['data']['functionParams'];
-					$param_number = in_array($function, ['regexp', 'iregexp', 'str']) ? 1 : 0;
-					if (array_key_exists($param_number, $params) && is_string($params[$param_number])
-							&& $params[$param_number] !== '' && $params[$param_number][0] === '#'
-							&& !in_array($function, ['fuzzytime', 'nodata'])) {
-						$param_type = PARAM_TYPE_COUNTS;
-						$params[$param_number] = substr($params[$param_number], 1);
+						case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+							$hist_function_token = $token;
+							$function_token_index = $index;
+							break 2;
 					}
-					else {
-						$param_type = PARAM_TYPE_TIME;
-					}
+				}
 
+				if ($function_token_index !== null) {
 					/*
 					 * Try to find an operator and a value.
-					 * The value and operator can be extracted only if they immediately follow the item function macro.
+					 * The value and operator can be extracted only if they immediately follow the function.
 					 */
-					$tokens = $result->getTokens();
-					foreach ($tokens as $key => $token) {
-						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-							if (array_key_exists($key + 2, $tokens)
-									&& $tokens[$key + 1]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-									&& array_key_exists($function, $this->functions)
-									&& in_array($tokens[$key + 1]['value'],
-										$this->functions[$function]['operators'])) {
-								$operator = $tokens[$key + 1]['value'];
+					$index = $function_token_index + 1;
 
-								$value = '';
-								$i = 2;
+					if (array_key_exists($index, $tokens)
+							&& $tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
+							&& in_array($tokens[$index]['match'], ['=', '<>', '>', '<', '>=', '<='])) {
+						$operator = $tokens[$index]['match'];
+						$index++;
 
-								if (array_key_exists($key + 3, $tokens)
-										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
-									$value .= $tokens[$key + 2]['value'];
-									$i++;
-								}
-
-								$value .= ($tokens[$key + $i]['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
-									? $tokens[$key + $i]['data']['string']
-									: $tokens[$key + $i]['value'];
+						if (array_key_exists($index, $tokens)) {
+							if ($tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_NUMBER
+									|| $tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_MACRO
+									|| $tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_USER_MACRO
+									|| $tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_LLD_MACRO) {
+								$value = $tokens[$index]['match'];
 							}
-							else {
-								break;
+							elseif ($tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_STRING) {
+								$value = CExpressionParser::unquoteString($tokens[$index]['match']);
+							}
+							elseif ($tokens[$index]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
+									&& array_key_exists($index + 1, $tokens)
+									&& $tokens[$index + 1]['type'] == CExpressionParserResult::TOKEN_TYPE_NUMBER) {
+								$value = '-'.$tokens[$index + 1]['match'];
 							}
 						}
 					}
 
-					// Find the item.
-					$item = API::Item()->get([
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-						'selectHosts' => ['name'],
-						'webitems' => true,
-						'filter' => [
-							'host' => $function_macro_token['data']['host'],
-							'key_' => $function_macro_token['data']['item'],
-							'flags' => null
-						]
-					]);
+					// Get function parameters.
+					$parameters = null;
 
-					if (($item = reset($item)) !== false) {
-						$itemid = $item['itemid'];
+					if ($math_function_token) {
+						$function = $math_function_token['data']['function'];
+
+						if ($hist_function_token && $hist_function_token['data']['function'] === 'last') {
+							$parameters = $hist_function_token['data']['parameters'];
+						}
 					}
 					else {
-						error(_('Unknown host item, no such item in selected host'));
+						$function = $hist_function_token['data']['function'];
+						$parameters = $hist_function_token['data']['parameters'];
+					}
+
+					if ($parameters !== null) {
+						$host = $hist_function_token['data']['parameters'][0]['data']['host'];
+						$key = $hist_function_token['data']['parameters'][0]['data']['item'];
+
+						$items = API::Item()->get([
+							'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+							'selectHosts' => ['name'],
+							'webitems' => true,
+							'filter' => [
+								'host' => $host,
+								'key_' => $key
+							]
+						]);
+
+						if (!$items) {
+							$items = API::ItemPrototype()->get([
+								'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+								'selectHosts' => ['name'],
+								'filter' => [
+									'host' => $host,
+									'key_' => $key
+								]
+							]);
+						}
+
+						if (($item = reset($items)) === false) {
+							error(_('Unknown host item, no such item in selected host'));
+						}
+					}
+
+					$params = [];
+
+					if ($parameters !== null && array_key_exists(1, $parameters)) {
+						if ($function === "nodata" || $function === "fuzzytime") {
+							$params[] = ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
+								? CHistFunctionParser::unquoteParam($parameters[1]['match'])
+								: $parameters[1]['match'];
+						}
+						else {
+							if ($parameters[1]['type'] == CHistFunctionParser::PARAM_TYPE_PERIOD) {
+								$sec_num = $parameters[1]['data']['sec_num'];
+								if ($sec_num !== '' && $sec_num[0] === '#') {
+									$params[] = substr($sec_num, 1);
+									$param_type = PARAM_TYPE_COUNTS;
+								}
+								else {
+									$params[] = $sec_num;
+									$param_type = PARAM_TYPE_TIME;
+								}
+								$params[] = $parameters[1]['data']['time_shift'];
+							}
+							else {
+								$params[] = '';
+								$params[] = '';
+							}
+						}
+
+						for ($i = 2; $i < count($parameters); $i++) {
+							$parameter = $parameters[$i];
+							$params[] = $parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+								? CHistFunctionParser::unquoteParam($parameter['match'])
+								: $parameter['match'];
+						}
 					}
 				}
 			}
@@ -626,10 +689,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$item = reset($item);
 		}
 
-		if ($itemid) {
+		if ($item) {
 			$items = CMacrosResolverHelper::resolveItemNames([$item]);
 			$item = $items[0];
 
+			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
@@ -661,6 +725,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'params' => $params,
 			'paramtype' => $param_type,
 			'item_description' => $description,
+			'item_required' => !in_array($function, getStandaloneFunctions()),
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -701,65 +766,102 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['item_description']) {
-					if ($data['paramtype'] == PARAM_TYPE_COUNTS
-							&& array_key_exists('last', $data['params'])
-							&& $data['params']['last'] !== '') {
-						$data['params']['last'] = zbx_is_int($data['params']['last'])
-							? '#'.$data['params']['last']
-							: $data['params']['last'];
-					}
-					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
-						$data['params']['last'] = '';
-					}
-
-					// Quote function param.
-					$quoted_params = [];
-					foreach ($data['params'] as $param) {
-						$quoted_params[] = quoteFunctionParam($param);
-					}
-
-					$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
-						$item_host_data['host'],
-						$data['item_key'],
-						$function,
-						rtrim(implode(',', $quoted_params), ','),
-						$operator,
-						CTriggerExpression::quoteString($data['value'])
+				if (in_array($function, getStandaloneFunctions())) {
+					$data['expression'] = sprintf('%s()%s%s', $function, $operator,
+						CExpressionParser::quoteString($data['value'])
 					);
+				}
+				elseif ($data['item_description']) {
+					// Quote function string parameters.
+					foreach ($data['params'] as $param_key => $param) {
+						if (!in_array($param_key, ['v', 'o', 'fit', 'mode', 'pattern'])
+								|| !array_key_exists($param_key, $data['params'])
+								|| $data['params'][$param_key] === '') {
+							continue;
+						}
 
-					// Validate trigger expression.
-					$trigger_expression = new CTriggerExpression();
+						$data['params'][$param_key] = quoteFunctionParam($param, true);
+					}
 
-					if ($trigger_expression->parse($data['expression'])) {
-						$expression_data = reset($trigger_expression->expressions);
-
-						// Validate trigger function.
-						$trigger_function_validator = new CFunctionValidator();
-						$is_valid = $trigger_function_validator->validate([
-							'function' => $expression_data['function'],
-							'functionName' => $expression_data['functionName'],
-							'functionParamList' => $expression_data['functionParamList'],
-							'valueType' => $data['itemValueType']
-						]);
-
-						if ($is_valid === false) {
-							error($trigger_function_validator->getError());
+					// Combine sec|#num and <time_shift|period_shift> parameters into one.
+					if (array_key_exists('last', $data['params'])) {
+						if ($data['paramtype'] == PARAM_TYPE_COUNTS && zbx_is_int($data['params']['last'])) {
+							$data['params']['last'] = '#'.$data['params']['last'];
 						}
 					}
 					else {
-						error($trigger_expression->error);
+						$data['params']['last'] = '';
 					}
 
-					// Quote function param.
-					if (array_key_exists('insert', $data)) {
-						foreach ($data['params'] as $pnum => $param) {
-							$data['params'][$pnum] = quoteFunctionParam($param);
-						}
+					if (array_key_exists('shift', $data['params']) && $data['params']['shift'] !== '') {
+						$data['params']['last'] .= ':'.$data['params']['shift'];
+					}
+					elseif (array_key_exists('period_shift', $data['params'])
+							&& $data['params']['period_shift'] !== '') {
+						$data['params']['last'] .= ':'.$data['params']['period_shift'];
+					}
+					unset($data['params']['shift'], $data['params']['period_shift']);
+
+					$mask = '';
+					if ($function === 'bitand' && array_key_exists('mask', $data['params'])) {
+						$mask = $data['params']['mask'];
+						unset($data['params']['mask']);
+					}
+
+					$fn_params = rtrim(implode(',', $data['params']), ',');
+
+					if ($function === 'abs') {
+						$data['expression'] = sprintf('abs(last(/%s/%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CExpressionParser::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'bitand') {
+						$data['expression'] = sprintf('bitand(last(/%s/%s%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							($mask === '') ? '' : ','.$mask,
+							$operator,
+							CExpressionParser::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'length') {
+						$data['expression'] = sprintf('length(last(/%s/%s))%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							$operator,
+							CExpressionParser::quoteString($data['value'])
+						);
+					}
+					else {
+						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+							$function,
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CExpressionParser::quoteString($data['value'])
+						);
 					}
 				}
 				else {
 					error(_('Item not selected'));
+				}
+
+				if (array_key_exists('expression', $data)) {
+					// Parse and validate trigger expression.
+					if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
+						if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+							error($expression_validator->getError());
+						}
+					}
+					else {
+						error($expression_parser->getError());
+					}
 				}
 			}
 			catch (Exception $e) {

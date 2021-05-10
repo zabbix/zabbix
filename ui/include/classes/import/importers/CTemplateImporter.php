@@ -321,11 +321,13 @@ class CTemplateImporter extends CImporter {
 
 		// We need to find template that current element reference to and if it has linked templates
 		// check all them recursively.
-		foreach ($templates[$linked_template_name]['templates'] as $tpl) {
-			$circular_templates = $this->checkCircularRecursive($tpl, $templates, $checked);
+		if (array_key_exists($linked_template_name, $templates)) {
+			foreach ($templates[$linked_template_name]['templates'] as $template) {
+				$circular_templates = $this->checkCircularRecursive($template, $templates, $checked);
 
-			if ($circular_templates) {
-				return $circular_templates;
+				if ($circular_templates) {
+					return $circular_templates;
+				}
 			}
 		}
 

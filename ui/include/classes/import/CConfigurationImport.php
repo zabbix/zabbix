@@ -103,7 +103,7 @@ class CConfigurationImport {
 			|| $options['httptests']['createMissing']
 			|| $options['httptests']['deleteMissing']
 		);
-		// TODO VM: why not 'templateLinkage' ?
+
 		$options['process_templates'] = (
 			!$options['templates']['updateExisting']
 			&& ($object_options
@@ -334,8 +334,6 @@ class CConfigurationImport {
 							]
 							: [];
 
-					// TODO VM: test, how group prototypes are managed in UUID context.
-					// TODO VM: why there is no 'group_links', and how common groups can be in 'group_prototypes'?
 					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
 						if (isset($group_prototype['group'])) {
 							$groups_refs += [$group_prototype['group']['name'] => []];
@@ -1627,9 +1625,13 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$graphid = (array_key_exists('uuid', $graph))
-				? $this->referencer->findGraphidByUuid($graph['uuid'])
-				: $this->referencer->findGraphidByName($hostid, $graph['name']);
+			if ($this->isTemplateGraph($graph)) {
+				$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
+			}
+			else {
+				unset($graph['uuid']);
+				$graphid = $this->referencer->findGraphidByName($hostid, $graph['name']);
+			}
 
 			if ($graphid !== null) {
 				$graph['graphid'] = $graphid;
@@ -1652,6 +1654,26 @@ class CConfigurationImport {
 		$this->referencer->refreshGraphs();
 	}
 
+	private function isTemplateGraph(array $graph): bool {
+		if ($graph['ymin_item_1'] && $this->referencer->findTemplateidByHost($graph['ymin_item_1']['host'])) {
+			return true;
+		}
+
+		if ($graph['ymax_item_1'] && $this->referencer->findTemplateidByHost($graph['ymax_item_1']['host'])) {
+			return true;
+		}
+
+		if (array_key_exists('gitems', $graph) && $graph['gitems']) {
+			foreach ($graph['gitems'] as $gitem) {
+				if ($this->referencer->findTemplateidByHost($gitem['item']['host'])) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Import triggers.
 	 *
@@ -1670,24 +1692,16 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggerid = null;
 
-			if (array_key_exists('uuid', $trigger)) {
+			$is_template_trigger = $this->isTemplateTrigger($trigger);
+
+			if ($is_template_trigger && array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
 			}
-
-			// In import file host trigger can have UUID assigned after conversion, such should be searched by name.
-			if ($triggerid === null) {
+			elseif (!$is_template_trigger) {
+				unset($trigger['uuid']);
 				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 					$trigger['recovery_expression']
 				);
-
-				// Template triggers should only be searched by UUID.
-				if ($triggerid !== null && array_key_exists('uuid', $trigger)) {
-					$db_trigger = $this->referencer->findTriggerById($triggerid);
-
-					if ($db_trigger['uuid'] !== '' && $db_trigger['uuid'] !== $trigger['uuid']) {
-						$triggerid = null;
-					}
-				}
 			}
 
 			if ($triggerid !== null) {
@@ -1721,6 +1735,37 @@ class CConfigurationImport {
 		$this->referencer->refreshTriggers();
 
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
+	}
+
+	private function isTemplateTrigger(array $trigger): bool {
+		$expression_parser = new CExpressionParser();
+
+		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		foreach ($expression_parser->getResult()->getHosts() as $host) {
+			$host = $this->referencer->findTemplateidByHost($host);
+
+			if ($host !== null) {
+				return true;
+			}
+		}
+
+		if ($trigger['recovery_expression'] === ''
+				|| $expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		foreach ($expression_parser->getResult()->getHosts() as $host) {
+			$host = $this->referencer->findTemplateidByHost($host);
+
+			if ($host !== null) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

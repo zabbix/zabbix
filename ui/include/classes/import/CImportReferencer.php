@@ -1081,9 +1081,6 @@ class CImportReferencer {
 				$this->db_triggers[$db_trigger['triggerid']] = $db_trigger;
 			}
 		}
-
-		// TODO VM: How to check, if nonexisting trigger is from a template? Probably it can only be done by parsing the trigger expressions.
-		// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid searching them by name.
 	}
 
 	/**

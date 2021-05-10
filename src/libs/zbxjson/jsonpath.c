@@ -25,11 +25,9 @@
 #include "json.h"
 #include "json_parser.h"
 #include "jsonpath.h"
+#include "zbxvariant.h"
 
 #include "../zbxalgo/vectorimpl.h"
-
-ZBX_VECTOR_DECL(var, zbx_variant_t)
-ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
 typedef struct
 {

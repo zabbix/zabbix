@@ -21,7 +21,8 @@
 define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030183);
+
+define('ZABBIX_DB_VERSION',		5030187);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -516,7 +517,7 @@ define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters
 define('ITEM_TYPE_INTERNAL',		5);
 define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
-define('ITEM_TYPE_AGGREGATE',		8);
+define('ITEM_TYPE_AGGREGATE',		8); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_CALCULATED instead.
 define('ITEM_TYPE_HTTPTEST',		9);
 define('ITEM_TYPE_EXTERNAL',		10);
 define('ITEM_TYPE_DB_MONITOR',		11);
@@ -1264,6 +1265,8 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 	\] # match closing bracket
 ))*? # matches non comma separated brackets with parameters zero or more times
 )');
+
+define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');

@@ -30,7 +30,6 @@
 #include "poller.h"
 
 #include "checks_agent.h"
-#include "checks_aggregate.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
@@ -311,9 +310,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
-			break;
-		case ITEM_TYPE_AGGREGATE:
-			res = get_value_aggregate(item, result);
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
