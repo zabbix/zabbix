@@ -295,7 +295,7 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertItemPrototypes(array $item_prototypes, string $hostname,
-			  ?string $discovery_rule_key = null, ?string $short_template_name = null): array {
+			?string $discovery_rule_key = null, ?string $short_template_name = null): array {
 		$result = [];
 		$calculated_item_converter = new C52CalculatedItemConverter();
 		$aggregate_item_key_converter = new C52AggregateItemKeyConverter();
@@ -410,7 +410,7 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertHostPrototypes(array $host_prototypes, ?string $discovery_rule_key = null,
-			  ?string $short_template_name = null): array {
+			?string $short_template_name = null): array {
 		$result = [];
 
 		foreach ($host_prototypes as $host_prototype) {
