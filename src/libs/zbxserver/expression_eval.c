@@ -200,7 +200,7 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 /******************************************************************************
  *                                                                            *
  * Function: expression_group_free                                            *
- *                                                                            *
+ *                                                                            0*
  ******************************************************************************/
 static void	expression_group_free(zbx_expression_group_t *group)
 {
@@ -520,7 +520,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 						group->hostids.values_num);
 			}
 			else
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " 0");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (0<>0)");
 
 			last_pos = token.loc.r + 1;
 			pos = token.loc.r;
