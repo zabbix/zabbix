@@ -6517,8 +6517,7 @@ static int	DBpatch_5030189(void)
 
 static char	*update_template_name(char *old)
 {
-	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp, buffer[7];
-	int	version;
+	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
 #define STRING_SNMP_LABEL		"SNMP"
@@ -6532,13 +6531,9 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	for (version = 1; version <= 2; version++)
-	{
-		zbx_snprintf(buffer, sizeof(buffer), "%sv%d", STRING_SNMP_LABEL, version);
-		ptr_snmp = string_replace(ptr, buffer, STRING_SNMP_LABEL);
-		zbx_free(ptr);
-		ptr = ptr_snmp;
-	}
+	ptr_snmp = string_replace(ptr, "SNMPv2", STRING_SNMP_LABEL);
+	zbx_free(ptr);
+	ptr = ptr_snmp;
 
 	return ptr;
 }
@@ -6700,8 +6695,6 @@ static int	DBpatch_5030192(void)
 
 			trigger_expr = zbx_strdup(NULL, row[i + 2]);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s: trigger expression: %s", __func__, trigger_expr);
-
 			if ('\0' == *trigger_expr)
 			{
 				if (0 == i)
@@ -6756,8 +6749,6 @@ static int	DBpatch_5030192(void)
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s: result expression '%s'", __func__, composed_expr[i]);
-
 			zbx_free(trigger_expr);
 		}
 
@@ -6765,8 +6756,6 @@ static int	DBpatch_5030192(void)
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", composed_expr[0]);
 		if (NULL != composed_expr[1])
 			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", composed_expr[1]);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: seed: %s", __func__, seed);
 
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
@@ -7145,8 +7134,6 @@ static int	DBpatch_5030199(void)
 
 			trigger_expr = zbx_strdup(NULL, row[i + 2]);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "trigger expression: %s", trigger_expr);
-
 			if ('\0' == *trigger_expr)
 			{
 				if (0 == i)
@@ -7201,8 +7188,6 @@ static int	DBpatch_5030199(void)
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "result expression '%s'", composed_expr[i]);
-
 			zbx_free(trigger_expr);
 		}
 
@@ -7210,8 +7195,6 @@ static int	DBpatch_5030199(void)
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", composed_expr[0]);
 		if (NULL != composed_expr[1])
 			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", composed_expr[1]);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "seed: %s", seed);
 
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
