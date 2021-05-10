@@ -147,7 +147,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			unset($data['value_type']);
 		}
 		else {
-			$data['hostid'] = $this->getInput('hostid');
+			$data['host']['hostid'] = $this->getInput('hostid');
 		}
 
 		// Rename fields according protocol.

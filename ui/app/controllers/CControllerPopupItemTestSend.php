@@ -294,7 +294,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
-				$item_test_data['hostid'] = $this->getInput('hostid');
+				$item_test_data['host']['hostid'] = $this->getInput('hostid');
 			}
 
 			// Only non-empty fields need to be sent to server.
