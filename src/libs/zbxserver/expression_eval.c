@@ -520,7 +520,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 						group->hostids.values_num);
 			}
 			else
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " (0<>0)");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " 1=0");
 
 			last_pos = token.loc.r + 1;
 			pos = token.loc.r;
