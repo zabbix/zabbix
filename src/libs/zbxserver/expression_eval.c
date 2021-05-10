@@ -200,7 +200,7 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 /******************************************************************************
  *                                                                            *
  * Function: expression_group_free                                            *
- *                                                                            0*
+ *                                                                            *
  ******************************************************************************/
 static void	expression_group_free(zbx_expression_group_t *group)
 {
