@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:41:41Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 4b27e636b6ad4ce68511d344d5604999
       template: 'WildFly Domain by JMX'
       name: 'WildFly Domain by JMX'
       description: |
@@ -22,6 +24,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: aa30358b46024aef8fa2e3ba387c4fb9
           name: 'WildFly: Uptime'
           type: JMX
           key: 'jmx["java.lang:type=Runtime","Uptime"]'
@@ -42,12 +45,14 @@ zabbix_export:
               value: WildFly
           triggers:
             -
+              uuid: 926f1767aae74529a972c7b8b09f4442
               expression: 'last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
               name: 'WildFly: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 5c0653e99ddb4f26ae12ce4d6ce9892c
           name: 'WildFly: Launch type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","launchType"]'
@@ -68,6 +73,7 @@ zabbix_export:
               tag: Application
               value: WildFly
         -
+          uuid: 5412059106e844ae89f6f84b4da42388
           name: 'WildFly: Name'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","name"]'
@@ -90,6 +96,7 @@ zabbix_export:
               tag: Application
               value: WildFly
         -
+          uuid: d5e2f5e277874567a5d46196fd032298
           name: 'WildFly: Process type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","processType"]'
@@ -110,6 +117,7 @@ zabbix_export:
               tag: Application
               value: WildFly
         -
+          uuid: f1bb15824f384e21bb9ae1224abd18e0
           name: 'WildFly: Version'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","productVersion"]'
@@ -131,6 +139,7 @@ zabbix_export:
               value: WildFly
           triggers:
             -
+              uuid: 76d500211fd9479fafbd0fb7d41ffd68
               expression: '(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2))=1 and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
               name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -138,6 +147,7 @@ zabbix_export:
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 3af697e56771487abee9f62e453fb0c3
           name: 'Deployments discovery'
           type: JMX
           key: 'jmx.get[beans,"jboss.as.expr:deployment=*,server-group=*"]'
@@ -159,6 +169,7 @@ zabbix_export:
           description: 'Discovery deployments metrics.'
           item_prototypes:
             -
+              uuid: e6b1bebba5da4ce493ba7edf869c37b3
               name: 'WildFly deployment [{#DEPLOYMENT}]: Enabled'
               type: JMX
               key: 'jmx["{#JMXOBJ}",enabled]'
@@ -183,6 +194,7 @@ zabbix_export:
                   tag: Application
                   value: 'WildFly deployment [{#DEPLOYMENT}]'
             -
+              uuid: 45d729721df34ef297109b58027ca4c1
               name: 'WildFly deployment [{#DEPLOYMENT}]: Managed'
               type: JMX
               key: 'jmx["{#JMXOBJ}",managed]'
@@ -218,6 +230,7 @@ zabbix_export:
               lld_macro: '{#SERVER_GROUP}'
               path: '$.properties.["server-group"]'
         -
+          uuid: da7f7dfad0c1440a8980693870364baa
           name: 'Servers discovery'
           type: JMX
           key: 'jmx.get[beans,"jboss.as:host=master,server-config=*"]'
@@ -239,6 +252,7 @@ zabbix_export:
           description: 'Discovery instances in domain.'
           item_prototypes:
             -
+              uuid: d0938bbf20854315bd5cf17491b0ae1c
               name: 'WildFly domain: Server {#SERVER}: Autostart'
               type: JMX
               key: 'jmx["{#JMXOBJ}",autoStart]'
@@ -263,6 +277,7 @@ zabbix_export:
                   tag: Application
                   value: 'WildFly domain: Server [{#SERVER}]'
             -
+              uuid: bd544e2d41c148f993b84ca7d1aad4a9
               name: 'WildFly domain: Server {#SERVER}: Server group'
               type: JMX
               key: 'jmx["{#JMXOBJ}",group]'
@@ -284,12 +299,14 @@ zabbix_export:
                   value: 'WildFly domain: Server [{#SERVER}]'
               trigger_prototypes:
                 -
+                  uuid: da5368f2eec040bbb05f13faa6375052
                   expression: '(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2))=1 and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0'
                   name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Server group has changed. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 64a8a71b3d254a479ce4e5ea82f566ee
               name: 'WildFly domain: Server {#SERVER}: Status'
               type: JMX
               key: 'jmx["{#JMXOBJ}",status]'
@@ -311,6 +328,7 @@ zabbix_export:
                   value: 'WildFly domain: Server [{#SERVER}]'
               trigger_prototypes:
                 -
+                  uuid: 79409a9fae6442c9ad655655a752365d
                   expression: '(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2))=1 and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0'
                   name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
@@ -352,6 +370,7 @@ zabbix_export:
           value: zabbix
       valuemaps:
         -
+          uuid: e23e06cfd0ce4e069b9d996f101f6ee6
           name: 'WildFly flag'
           mappings:
             -

@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:41:13Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 5920713da492452889adabc25e259caa
       template: 'Netgear Fastpath SNMP'
       name: 'Netgear Fastpath SNMP'
       description: |
@@ -26,6 +28,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: e8ffc912f0ee47cca513861fcecfddb0
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.4.9.0
@@ -48,12 +51,14 @@ zabbix_export:
               value: CPU
           triggers:
             -
+              uuid: 2a95b6b774c74328bbea673cb43f28cc
               expression: 'min(/Netgear Fastpath SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: 2470e113b1174c70a1265bf4c4252b5f
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.3.0
@@ -74,6 +79,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: 697f863cf86544d4a366e8827976ed50
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.4.0
@@ -97,12 +103,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
+              uuid: b0ee223c8d404ab9a8ca5c8678fdb615
               expression: '(last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2))=1 and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 5bd8c956163d4201a7e896abde28044b
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.10.0
@@ -126,12 +134,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
+              uuid: 369010c975bd48c4921c77f41f8345a7
               expression: '(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2))=1 and length(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: f94ffd4d6eb84ae88cdf5033df65f249
           name: 'Available memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.1.0
@@ -146,6 +156,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: 98037eeab349478c8c393b163ec5193e
           name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.2.0
@@ -160,6 +171,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
+          uuid: 86ef153d78b5466cac76a32f81d8b958
           name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage.0]'
@@ -174,12 +186,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
+              uuid: 592c3a72633f49d78ed50f6ed87a8b3e
               expression: 'min(/Netgear Fastpath SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
         -
+          uuid: 8fb96a540bab4deba00626237797cb62
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.6.1.1]'
@@ -188,6 +202,7 @@ zabbix_export:
           description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::1.3.6.1.4.1.4526.10.43.1.6.1.1'
           item_prototypes:
             -
+              uuid: 9f515526de2c47108182b444d1d093c3
               name: '#{#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.4526.10.43.1.6.1.3.{#SNMPINDEX}'
@@ -206,12 +221,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
+                  uuid: 0668366db4584351af883bdd029ce80b
                   expression: 'count(/Netgear Fastpath SNMP/sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: 251d90e9c6ae4dad92328b677f6d6edf
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.7.1.1]'
@@ -220,6 +237,7 @@ zabbix_export:
           description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyIndex'
           item_prototypes:
             -
+              uuid: aa5a704044b44909b2a348184ec71bc0
               name: '#{#SNMPVALUE}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.4526.10.43.1.7.1.3.{#SNMPINDEX}'
@@ -238,12 +256,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
+                  uuid: 546f1df11e23472dbf85e7675b8c42c5
                   expression: 'count(/Netgear Fastpath SNMP/sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
         -
+          uuid: c63b577cb8544b54a40a4d86bc926ada
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.8.1.1]'
@@ -252,6 +272,7 @@ zabbix_export:
           description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsTable'
           item_prototypes:
             -
+              uuid: ac4a292ab2e548fea3326aaa92162140
               name: '#{#SNMPVALUE}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.4526.10.43.1.8.1.3.{#SNMPINDEX}'
@@ -269,6 +290,7 @@ zabbix_export:
                   tag: Application
                   value: Temperature
             -
+              uuid: 488762ecfb1549d294886681a6ec34f6
               name: '#{#SNMPVALUE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.4526.10.43.1.8.1.5.{#SNMPINDEX}'
@@ -285,6 +307,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
+                  uuid: a2f2e0ddb0214acab9ea70e328f11fe4
                   expression: 'avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
@@ -293,6 +316,7 @@ zabbix_export:
                   priority: AVERAGE
           trigger_prototypes:
             -
+              uuid: 10d97b3f09234d2ab27ae3f07129f4a0
               expression: |
                 avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
                 or
@@ -304,6 +328,7 @@ zabbix_export:
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
+              uuid: facbd50c8e5044119b012cf0286e9f55
               expression: |
                 avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
                 or
@@ -352,6 +377,7 @@ zabbix_export:
           value: '2'
       valuemaps:
         -
+          uuid: 3046d246b1064c749c1c9144442c0fac
           name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState'
           mappings:
             -
@@ -370,6 +396,7 @@ zabbix_export:
               value: '5'
               newvalue: notpresent
         -
+          uuid: d11e2b2f01c641728d1b7f764fa49f37
           name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState'
           mappings:
             -
@@ -388,6 +415,7 @@ zabbix_export:
               value: '5'
               newvalue: notpresent
         -
+          uuid: 4da55a4de7284012890e1fd5458f039a
           name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState'
           mappings:
             -
@@ -410,6 +438,7 @@ zabbix_export:
               newvalue: notoperational
   graphs:
     -
+      uuid: bcd1db5068794edd9a3d74f32bd018ed
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -421,6 +450,7 @@ zabbix_export:
             host: 'Netgear Fastpath SNMP'
             key: 'system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]'
     -
+      uuid: 1cb7d7036dfe4999b0489cc8bfa254aa
       name: 'Memory usage'
       ymin_type_1: FIXED
       graph_items:
@@ -438,6 +468,7 @@ zabbix_export:
             host: 'Netgear Fastpath SNMP'
             key: 'vm.memory.available[agentSwitchCpuProcessMemFree.0]'
     -
+      uuid: 88124449b8984ee6bca46269d1d3f1ae
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

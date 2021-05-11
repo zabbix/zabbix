@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-09T00:00:00Z'
+  date: '2021-05-10T19:41:52Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
+      uuid: 37e5eb5606bc4abba66c8b20381a1e8a
       template: 'ICMP Ping'
       name: 'ICMP Ping'
       description: |
@@ -17,6 +19,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: db5a94f6cea14deba957202b2f014469
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
@@ -29,11 +32,13 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: 4f162bd63a16400497fc997684b77ec8
               expression: 'max(/ICMP Ping/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
         -
+          uuid: 04b21adaf422473a88df2c52786474ed
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
@@ -46,6 +51,7 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: a5d280414fb745189aebe3571877cc2c
               expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
@@ -55,6 +61,7 @@ zabbix_export:
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/ICMP Ping/icmpping,#3)=0'
         -
+          uuid: a79e33e5fd264725b934f603fa071555
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
@@ -67,6 +74,7 @@ zabbix_export:
               value: Status
           triggers:
             -
+              uuid: fe9e1c62715c479a810f0feb640e3641
               expression: 'avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
@@ -87,6 +95,7 @@ zabbix_export:
           value: '0.15'
       valuemaps:
         -
+          uuid: bdb5d65d925542eaa61c302dc40fbfe8
           name: 'Service state'
           mappings:
             -
