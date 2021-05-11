@@ -703,6 +703,8 @@ static int	get_proxyconfig_table_items_ext(zbx_uint64_t proxy_hostid, const zbx_
 				" and i.hostid=h.hostid"
 				" and h.proxy_hostid=" ZBX_FS_UI64,
 				table->table, proxy_hostid);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by t.");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->recid);
 
 	if (NULL == (result = DBselect("%s", sql)))
 	{
