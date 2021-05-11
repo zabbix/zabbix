@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-04-30T12:01:48Z</date>
+    <date>2021-05-11T06:43:16Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -54,7 +54,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of alerter processes spent doing something during the last minute</description>
+                    <description>Average percentage of time alerter processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -77,7 +77,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of alert manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time alert manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -100,7 +100,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of alert syncer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time alert syncer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -123,7 +123,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of availability manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time availability manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -146,7 +146,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of configuration syncer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time configuration syncer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -169,7 +169,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of discoverer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time discoverer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -192,7 +192,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of escalator processes spent doing something during the last minute</description>
+                    <description>Average percentage of time escalator processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -215,7 +215,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of history poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time history poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -238,7 +238,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of history syncer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time history syncer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -261,7 +261,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of housekeeper processes spent doing something during the last minute</description>
+                    <description>Average percentage of time housekeeper processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -284,7 +284,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of http poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time http poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -307,7 +307,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of icmp pinger processes spent doing something during the last minute</description>
+                    <description>Average percentage of time icmp pinger processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -330,7 +330,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of ipmi manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time ipmi manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -353,7 +353,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of ipmi poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time ipmi poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -376,7 +376,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of java poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time java poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -399,7 +399,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of lld manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time lld manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -422,7 +422,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of lld worker processes spent doing something during the last minute</description>
+                    <description>Average percentage of time lld worker processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -445,7 +445,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -468,7 +468,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of preprocessing manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time preprocessing manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -491,7 +491,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of preprocessing worker processes spent doing something during the last minute</description>
+                    <description>Average percentage of time preprocessing worker processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -514,7 +514,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of proxy poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time proxy poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -537,7 +537,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of report manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time report manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -560,7 +560,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of report writer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time report writer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -583,7 +583,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of self-monitoring processes spent doing something during the last minute</description>
+                    <description>Average percentage of time self-monitoring processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -606,7 +606,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of snmp trapper processes spent doing something during the last minute</description>
+                    <description>Average percentage of time snmp trapper processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -629,7 +629,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of task manager processes spent doing something during the last minute</description>
+                    <description>Average percentage of time task manager processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -652,7 +652,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of timer processes spent doing something during the last minute</description>
+                    <description>Average percentage of time timer processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -675,7 +675,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of trapper processes spent doing something during the last minute</description>
+                    <description>Average percentage of time trapper processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -698,7 +698,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of unreachable poller processes spent doing something during the last minute</description>
+                    <description>Average percentage of time unreachable poller processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -721,7 +721,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average time of vmware collector processes spent doing something during the last minute</description>
+                    <description>Average percentage of time vmware collector processes have been busy in the last minute</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
