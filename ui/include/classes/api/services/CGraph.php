@@ -354,7 +354,7 @@ class CGraph extends CGraphGeneral {
 
 		foreach ($chdHosts as $chdHost) {
 			$tmpGraph = $graph;
-			unset($tmpGraph['uuid']);
+			$tmpGraph['uuid'] = '';
 			$tmpGraph['templateid'] = $graph['graphid'];
 
 			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);

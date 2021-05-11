@@ -397,7 +397,7 @@ class CHttpTestManager {
 				}
 
 				$newHttpTest = $httpTest;
-				unset($newHttpTest['uuid']);
+				$newHttpTest['uuid'] = '';
 				$newHttpTest['hostid'] = $hostId;
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {

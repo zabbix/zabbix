@@ -974,7 +974,7 @@ class CHostPrototype extends CHostBase {
 
 				// copy host prototype
 				$newHostPrototype = $parentHostPrototype;
-				unset($newHostPrototype['uuid']);
+				$newHostPrototype['uuid'] = '';
 				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
 				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
 
