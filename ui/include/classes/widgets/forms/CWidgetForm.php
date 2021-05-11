@@ -120,22 +120,39 @@ class CWidgetForm {
 	 * @return array
 	 */
 	protected static function convertDottedKeys(array $data) {
+		$result = [];
+		$sortkeys = [];
+
 		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
-				$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
-				unset($data[$key]);
+			if (strpos($key, '.') === false) {
+				$result[$key] = $value;
+			}
+			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
+				// Parses "word.anotherword.1.2", stores in ['word'][1]['anotherword'][2].
+				$result[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
+				$sortkeys[$matches[1]][$matches[2]] = true;
 			}
 			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', $key, $matches) === 1) {
-				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
-				unset($data[$key]);
+				// Parses "word.anotherword.1", stores in ['word'][1]['anotherword'].
+				$result[$matches[1]][$matches[3]][$matches[2]] = $value;
+				$sortkeys[$matches[1]] = [];
 			}
 			elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
-				$data[$matches[1]][$matches[2]] = $value;
-				unset($data[$key]);
+				// Parses "word.1" stores in ['word'][1].
+				$result[$matches[1]][$matches[2]] = $value;
+				$sortkeys[$matches[1]] = [];
 			}
 		}
 
-		return $data;
+		foreach ($sortkeys as $key => $sub_keys) {
+			foreach ($sub_keys as $sub_key) {
+				ksort($result[$key][$sub_key]);
+			}
+
+			ksort($result[$key]);
+		}
+
+		return $result;
 	}
 
 	/**
