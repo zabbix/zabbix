@@ -142,6 +142,9 @@ class CWidgetForm {
 				$result[$matches[1]][$matches[2]] = $value;
 				$sortkeys[$matches[1]] = [];
 			}
+			else {
+				$result[$key] = $value;
+			}
 		}
 
 		foreach ($sortkeys as $key => $sub_keys) {
