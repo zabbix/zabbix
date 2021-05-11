@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:06Z'
+  date: '2021-05-11T08:05:45Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -591,7 +591,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              uuid: 9ab8339cea2049fea6808b923fb343ed
+              uuid: 4a2936f068ed486f8c8a2cf2cfa7440b
               expression: '(last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
               name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -786,7 +786,7 @@ zabbix_export:
                   value: 'Chassis "{#ID}"'
               trigger_prototypes:
                 -
-                  uuid: e0ad6d7022e34b5b9d2a7653583d947c
+                  uuid: 381eb797545d452a84d3dba43865bbed
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="ok")'
@@ -845,7 +845,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" disks'
               trigger_prototypes:
                 -
-                  uuid: ecaa5631a522406ba7bbf209d67b2207
+                  uuid: 72c1925f51c149eca27c7ddd1c81e44f
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])="present")'
@@ -901,7 +901,7 @@ zabbix_export:
                   value: 'Chassis "{#CHASSISID}"'
               trigger_prototypes:
                 -
-                  uuid: 8e16050a1a6d4948a4fb5f6e887c088f
+                  uuid: a17cb2ea98b6415d9e22e7f591d80adb
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="ok")'
@@ -1012,7 +1012,7 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  uuid: 4442f06b8bb64da284e7f40d45d1a524
+                  uuid: 7a4e0a681edd4db6b701b131fea0e5e4
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])="online")'
@@ -1047,7 +1047,7 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  uuid: 1fa6db8e33b2496da6e20a045ea75f2a
+                  uuid: 5b065dd69e654bee881ae60464a5c9fe
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])="online")'
@@ -1106,7 +1106,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}"'
               trigger_prototypes:
                 -
-                  uuid: 95f2446e620a424b80ba8aa6cf8a370e
+                  uuid: 34092a7ade784221ae50eb74a6fbcb5d
                   expression: '(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0'
                   name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
@@ -1324,7 +1324,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" Ethernet ports'
               trigger_prototypes:
                 -
-                  uuid: 087955e4bdf6472a96677be7fa7d7e5c
+                  uuid: 0fa3a54b559349d58b616720ee33cdf5
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up")'
@@ -1416,7 +1416,7 @@ zabbix_export:
                   value: 'Node "{#NODENAME}" FC ports'
               trigger_prototypes:
                 -
-                  uuid: 6f6ddc8eaffd475ea5b4070ccd5d63ce
+                  uuid: a985c047b9834081bf21ae50836cef46
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])="online")'
@@ -1500,7 +1500,7 @@ zabbix_export:
                   value: 'SVM "{#SVMNAME}"'
               trigger_prototypes:
                 -
-                  uuid: 7355373952c14e129d1f4b5393e8e216
+                  uuid: 7c5695fd13a4489ca1c9772f1d3376a7
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])="running")'
@@ -1656,7 +1656,7 @@ zabbix_export:
                   value: 'Volume "{#VOLUMENAME}"'
               trigger_prototypes:
                 -
-                  uuid: c533162b34064387b627982eabf4e209
+                  uuid: b00f339ed1a9450ba096cabababcf76e
                   expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])="online")'

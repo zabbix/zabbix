@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:52Z'
+  date: '2021-05-11T08:05:34Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -276,7 +276,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: df4768a9a1b84070a8eef099c5768286
+                  uuid: 35d62eb5323141a3a3f3afc4c9250243
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -318,7 +318,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
           trigger_prototypes:
             -
-              uuid: 12d34f87d8a54c30a7df457a2f531c4c
+              uuid: 9f1f6cff58454b469f588af8624f9078
               expression: |
                 change(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
@@ -346,7 +346,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
-              uuid: 1ee0a4fd4b934d4da93b492d9e784535
+              uuid: 913c87be8cd94aeb8a3f9e008a4cd560
               expression: |
                 (avg(/Interfaces SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
                 avg(/Interfaces SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
@@ -366,7 +366,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
-              uuid: c467cd13d7b946fc81cc4a49522f6d33
+              uuid: 15b436b13012415bb9773d3ddab22178
               expression: |
                 min(/Interfaces SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Interfaces SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}

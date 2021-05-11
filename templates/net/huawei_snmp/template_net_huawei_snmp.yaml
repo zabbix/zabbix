@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:15Z'
+  date: '2021-05-11T08:05:04Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -55,7 +55,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: f239ccc2aa8c4fa49bab6d29039504a3
+                  uuid: ba459f7ce17a4f71a46fa1a0337f0f89
                   expression: 'count(/Huawei VRP SNMP/sensor.fan.status[hwEntityFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -128,7 +128,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: b1bc064390b1472a9c0f1bfc992ce9df
+                  uuid: d28db9267b9d488f8f359dd7d14d2ac1
                   expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -137,7 +137,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 628e73d7e6824142a74f8f6d754fe520
+                  uuid: c54c36491adf4a488d11f2538b337129
                   expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -151,7 +151,7 @@ zabbix_export:
                       expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: 4ef7b70cdb1e4af5b5b84807501e3eca
+                  uuid: 7b2cffb3ad47440d8b79b39958794ed9
                   expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
@@ -177,7 +177,7 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  uuid: 5da698424cef403b9a2ab14c6c8ca6de
+                  uuid: 66bfe7805cae4447a32a6e5877e1231b
                   expression: 'min(/Huawei VRP SNMP/system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#ENT_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -205,7 +205,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  uuid: 62ff6301f17c4abd821475d9e423f3ea
+                  uuid: e379ca4d50a3434e82841e8884a84656
                   expression: '(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -253,7 +253,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  uuid: d8028d43cdd347fa8254cad787a5da46
+                  uuid: 698067d647424c96addeb3c9f960dd07
                   expression: '(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
@@ -278,7 +278,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: 224097ebbfd7401ba6f928504ae967f3
+                  uuid: 2d93533c7cc74dc9a85e280605e21e7d
                   expression: 'min(/Huawei VRP SNMP/vm.memory.util[hwEntityMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE

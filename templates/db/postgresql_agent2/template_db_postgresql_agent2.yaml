@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:04Z'
+  date: '2021-05-11T08:05:43Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -570,7 +570,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 28f8cb12ba9745148ef6c33aba55d86a
+              uuid: 1d0903401af64d93ac16761808d672ca
               expression: 'min(/PostgreSQL Agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
@@ -1453,7 +1453,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: c2fff89e4ed34f3b9f277d5016a73a91
+                  uuid: 05ac4216e1a941df8880224ffd38b806
                   expression: 'min(/PostgreSQL Agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
@@ -1486,7 +1486,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: 0522bf801ae948e98dc0987a14156420
+                  uuid: dd948e3ec19c419e8c9a62ace8d1695f
                   expression: 'min(/PostgreSQL Agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH

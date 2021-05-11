@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:04Z'
+  date: '2021-05-11T08:05:43Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -81,7 +81,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: 7013811fd49542c89e1a13e426f168c2
+              uuid: 0f984c4458ae4a7f9388b1edb42090bf
               expression: 'min(/MySQL by Zabbix agent 2/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}'
               name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -153,7 +153,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: 1108f4da441e43748bf81cbb24661247
+              uuid: d785a37fe8d7484d9998e47e0e1d741f
               expression: 'max(/MySQL by Zabbix agent 2/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}'
               name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
@@ -505,7 +505,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: 7bad2fb31fc746dc995f3098eebfe979
+              uuid: 8c4e0c429c8241e28b930bfce7e29be8
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
               name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
@@ -536,7 +536,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: f7a927874bc04c5bae21ce694e96c634
+              uuid: 322b61acd92e46f787e96486d2553886
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
               name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
@@ -567,7 +567,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: 41625c1f507d432ab92ba4e8dd24e10b
+              uuid: 86ed19d4ddc84f0da4a77c1dcbdf8c60
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
               name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
@@ -1047,7 +1047,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: b5cd3920a6434c27a92096ccb10dd486
+              uuid: 8ffcb17b0a644c5e8a2842b34d5713a8
               expression: 'min(/MySQL by Zabbix agent 2/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
               name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
@@ -1155,7 +1155,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: 313acb34fd0d46888d0be0930752d427
+              uuid: 6f4edf8bfca0477b8b28a8ff811476b3
               expression: 'nodata(/MySQL by Zabbix agent 2/mysql.uptime,30m)=1'
               name: 'MySQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
@@ -1189,7 +1189,7 @@ zabbix_export:
               value: MySQL
           triggers:
             -
-              uuid: e13a6138e0c241c8a24cdb6d01d25e41
+              uuid: e22c2e2213d74df98d344a95c8a96b6d
               expression: '(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#1)<>last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#2))=1 and length(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]))>0'
               name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
@@ -1416,7 +1416,7 @@ zabbix_export:
                   value: MySQL
               trigger_prototypes:
                 -
-                  uuid: b2c7559322704815a5876948c56bb046
+                  uuid: 373e215000a64e05b0379f186141067f
                   expression: 'min(/MySQL by Zabbix agent 2/mysql.replication.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
                   name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
@@ -1450,7 +1450,7 @@ zabbix_export:
                   value: MySQL
               trigger_prototypes:
                 -
-                  uuid: 43cffac6ca324272b0ab46f21b8c48f8
+                  uuid: efe46a25a1fd48e1a7504a9b06c26aee
                   expression: 'count(/MySQL by Zabbix agent 2/mysql.replication.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
                   name: 'MySQL: The slave I/O thread is not connected to a replication master'
                   priority: WARNING
@@ -1459,7 +1459,7 @@ zabbix_export:
                       name: 'MySQL: The slave I/O thread is not running'
                       expression: 'count(/MySQL by Zabbix agent 2/mysql.replication.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                 -
-                  uuid: e206383a4e554df3b2c553882a02a31b
+                  uuid: 369f7ade45cd4ca39f5aa47d638e5e00
                   expression: 'count(/MySQL by Zabbix agent 2/mysql.replication.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The slave I/O thread is not running'
                   priority: AVERAGE
@@ -1493,7 +1493,7 @@ zabbix_export:
                   value: MySQL
               trigger_prototypes:
                 -
-                  uuid: 64f63ef0704647b9b8a7e11c4811783f
+                  uuid: 9099f769af4c4008a69098f9e9f63673
                   expression: 'count(/MySQL by Zabbix agent 2/mysql.replication.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The SQL thread is not running'
                   priority: WARNING

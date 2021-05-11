@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:07Z'
+  date: '2021-05-11T08:05:45Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -101,7 +101,7 @@ zabbix_export:
               value: Huawei
           triggers:
             -
-              uuid: 57bfd7dc0a124a81b57264885d9a3535
+              uuid: b6eb791cc14644dfb0a69a2cce150ab1
               expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2))=1 and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0'
               name: 'OceanStor 5300 V5: Storage version has been changed'
               priority: INFO
@@ -196,7 +196,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  uuid: a3f1f17b6d9a4b489aa0e53e666e790f
+                  uuid: a51b4e42efaa4924b6c2990c9c0abf30
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -244,7 +244,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  uuid: b5dedf7c238e4ba89682a99f1eda4bab
+                  uuid: 8d4fe305737f41a595c1d2efb3e8a153
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}'
                   name: 'Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME})'
                   priority: AVERAGE
@@ -269,7 +269,7 @@ zabbix_export:
                   value: 'Controller {#ID}'
               trigger_prototypes:
                 -
-                  uuid: b6c304e306004694a99c6525d97e694e
+                  uuid: 8b8ec3f843e74533a43f24393004cc84
                   expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2))=1'
                   name: 'Controller {#ID}: Role has been changed'
                   priority: WARNING
@@ -409,7 +409,7 @@ zabbix_export:
                   value: 'Disk {#MODEL}'
               trigger_prototypes:
                 -
-                  uuid: 4d75ba4a2842403db110ab769e289b8c
+                  uuid: 906de152d3594f1d8cc15b4b717d6202
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
                   name: 'Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
@@ -492,7 +492,7 @@ zabbix_export:
                   value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
-                  uuid: 7aa78b5e17314e73b65ae854d1ea9d1a
+                  uuid: 622fcc16c03e4ba4ad8371ea5c1c314f
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}'
                   name: 'Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
@@ -589,7 +589,7 @@ zabbix_export:
                   value: 'LUN {#NAME}'
               trigger_prototypes:
                 -
-                  uuid: 6069698629fe4548ad2296b8046ccf0b
+                  uuid: aae494cb840049fb83df354c13daaf53
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
                   name: 'LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})'
                   priority: WARNING
@@ -858,7 +858,7 @@ zabbix_export:
                   value: 'Node {#NODE}'
               trigger_prototypes:
                 -
-                  uuid: f0a08cc24f2748cf836db08b6307d983
+                  uuid: 8495a55d6549460d9b132675a39b818b
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -880,7 +880,7 @@ zabbix_export:
                   value: 'Node {#NODE}'
               trigger_prototypes:
                 -
-                  uuid: f061761bb80d48c99847f78f3144a105
+                  uuid: 8f54bfe029fe43c7a049c6a97c8598bf
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
                   name: 'Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})'
                   priority: WARNING
@@ -1074,7 +1074,7 @@ zabbix_export:
                   value: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
-                  uuid: 5f26a26765884d34b60d5d9da8b13abd
+                  uuid: 2ea46713fe664a64a851edca422257f8
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}'
                   name: 'Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%)'
                   priority: AVERAGE

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:46Z'
+  date: '2021-05-11T08:05:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -35,7 +35,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 8755977383c4490c85ba7e97878c1eec
+              uuid: 77e66d2f6b0e48fa8a7ec5dd213eab35
               expression: 'avg(/Remote Zabbix proxy/process.availability_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.availability_manager.avg.busy,10m)<65'
@@ -62,7 +62,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 295839aa8c76479b8b1b8d3eb7856af9
+              uuid: 67089f59f77641c8ab487e2c44d563a2
               expression: 'avg(/Remote Zabbix proxy/process.configuration_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.configuration_syncer.avg.busy,10m)<65'
@@ -89,7 +89,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: f8d4099f3cf840c68272fd6ea2965dbd
+              uuid: f2208ef37274449fb2b61f5f55e615f1
               expression: 'avg(/Remote Zabbix proxy/process.data_sender.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.data_sender.avg.busy,10m)<65'
@@ -116,7 +116,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 86bfaa08481e48a6ac9c87cf1b9413cb
+              uuid: c5a739eef8cb43f099ee902c9eb23d6e
               expression: 'avg(/Remote Zabbix proxy/process.discoverer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.discoverer.avg.busy,10m)<65'
@@ -143,7 +143,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 05c2a7a506a24a53a5d0cf0c156bb033
+              uuid: f75e8a72ae1642999c7560387f189129
               expression: 'avg(/Remote Zabbix proxy/process.heartbeat_sender.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.heartbeat_sender.avg.busy,10m)<65'
@@ -170,7 +170,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: f2fb852846c8427eb64d10d9b1a0c23b
+              uuid: afcd2486a21b42ae97f53353b3642301
               expression: 'avg(/Remote Zabbix proxy/process.history_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.history_poller.avg.busy,10m)<65'
@@ -197,7 +197,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: d402cfcfebdf49429ef07d414e6da28b
+              uuid: 872ca8a02ff948d0ab4f5000249bbf5b
               expression: 'avg(/Remote Zabbix proxy/process.history_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.history_syncer.avg.busy,10m)<65'
@@ -224,7 +224,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 2ae2aed2f4934a8ab0d468a8c5a0f2ae
+              uuid: 43d8ef15170e4edd80eea85ad9990d73
               expression: 'avg(/Remote Zabbix proxy/process.housekeeper.avg.busy,30m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.housekeeper.avg.busy,30m)<65'
@@ -251,7 +251,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 4eb9758b51664bd8a40fb5370692fc8d
+              uuid: 9c391ba5350d401b9ca56f7cd29cd457
               expression: 'avg(/Remote Zabbix proxy/process.http_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.http_poller.avg.busy,10m)<65'
@@ -278,7 +278,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 676ad74d5189464dab1ea84ff4bc22a4
+              uuid: 8a0abc8ff0dd42b0926b5840fe5b0e2f
               expression: 'avg(/Remote Zabbix proxy/process.icmp_pinger.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.icmp_pinger.avg.busy,10m)<65'
@@ -305,7 +305,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: d17527d53bf641c984648760642312bb
+              uuid: a2aed809416b46beba8ed63554d9b7d5
               expression: 'avg(/Remote Zabbix proxy/process.ipmi_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.ipmi_manager.avg.busy,10m)<65'
@@ -332,7 +332,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: bbca6c1b16134c4bbedc43623a2e75a1
+              uuid: e7c748c36e5740d684a5c4c68682f321
               expression: 'avg(/Remote Zabbix proxy/process.ipmi_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.ipmi_poller.avg.busy,10m)<65'
@@ -359,7 +359,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 2a0a002fe552436faf19d9f6b6aa209f
+              uuid: ef46070fc30b46c7be1ce3574e578449
               expression: 'avg(/Remote Zabbix proxy/process.java_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.java_poller.avg.busy,10m)<65'
@@ -386,7 +386,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 1677cc3183ac42ee85003574dd9a4019
+              uuid: 6afb9db9e11842c28c059abd31c7a134
               expression: 'avg(/Remote Zabbix proxy/process.poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.poller.avg.busy,10m)<65'
@@ -413,7 +413,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: ce1f44c5912c41a280c9f8838ae5249b
+              uuid: fee719ea91524972897c19ce4b17bd54
               expression: 'avg(/Remote Zabbix proxy/process.self-monitoring.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.self-monitoring.avg.busy,10m)<65'
@@ -440,7 +440,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: f2c12407d2564f81838a5193ba2d3d72
+              uuid: 9ca70574386f4b968bcda64a5d267d58
               expression: 'avg(/Remote Zabbix proxy/process.snmp_trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.snmp_trapper.avg.busy,10m)<65'
@@ -467,7 +467,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 0c3bfb8f707f4c67ac817a8deb990d3d
+              uuid: 9d7d15a747484530a61102175cbc4478
               expression: 'avg(/Remote Zabbix proxy/process.task_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.task_manager.avg.busy,10m)<65'
@@ -494,7 +494,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: e9c86b0420da4ca9b22aa6bc2d6ef725
+              uuid: 49a9e3e1b17146f7861daf6994956d4f
               expression: 'avg(/Remote Zabbix proxy/process.trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.trapper.avg.busy,10m)<65'
@@ -521,7 +521,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: e91a83f73ab24bc68246f5af502ab96c
+              uuid: e446ec803eaf4ace9b7d1fdc7a89cba6
               expression: 'avg(/Remote Zabbix proxy/process.unreachable_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.unreachable_poller.avg.busy,10m)<65'
@@ -548,7 +548,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 1588a81e3ecc443aaf7d2bf7f8d84d54
+              uuid: 30147687074f45e7ab0dce81a1b7cf07
               expression: 'avg(/Remote Zabbix proxy/process.vmware_collector.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy/process.vmware_collector.avg.busy,10m)<65'
@@ -575,7 +575,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: cbacb695e8474b72bec8042cbc3e4f7a
+              uuid: 6aaad09f92f3419c9aa7164f2191a45a
               expression: 'max(/Remote Zabbix proxy/rcache.buffer.pused,10m)>75'
               name: 'More than 75% used in the configuration cache'
               priority: AVERAGE
@@ -607,7 +607,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 744c117a0b5e4f7f877f0b4d8f7e45c9
+              uuid: 224ec99fda0d443cba8a6c75da5a27cb
               expression: '(last(/Remote Zabbix proxy/version,#1)<>last(/Remote Zabbix proxy/version,#2))=1 and length(last(/Remote Zabbix proxy/version))>0'
               name: 'Zabbix version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -634,7 +634,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 405938e7ee364c86a397938a9a1da4ac
+              uuid: ac2a42046de340e1968802d92678947c
               expression: 'max(/Remote Zabbix proxy/vmware.buffer.pused,10m)>75'
               name: 'More than 75% used in the vmware cache'
               priority: AVERAGE
@@ -660,7 +660,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 485cb1a354f840d1b54fdc516ce96c49
+              uuid: c14095c38d17486fa8fde22bd5a9d737
               expression: 'max(/Remote Zabbix proxy/wcache.history.pused,10m)>75'
               name: 'More than 75% used in the history cache'
               priority: AVERAGE
@@ -686,7 +686,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: ae91150467ff4aa0b20f45c0ccc86ca2
+              uuid: 43f9a4fc049e45e5b8bbb0980b518dd0
               expression: 'max(/Remote Zabbix proxy/wcache.index.pused,10m)>75'
               name: 'More than 75% used in the history index cache'
               priority: AVERAGE
@@ -870,7 +870,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 23a6d7a6dbcd4170a62fa995c696be03
+              uuid: 71cd927153ef4b8480a8f13fc6b4def8
               expression: 'min(/Remote Zabbix proxy/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
               name: 'More than 100 items having missing data for more than 10 minutes'
               priority: WARNING

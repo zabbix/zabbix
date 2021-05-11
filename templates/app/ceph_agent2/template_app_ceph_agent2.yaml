@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:29Z'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -56,7 +56,7 @@ zabbix_export:
               value: Ceph
           triggers:
             -
-              uuid: d49bb7a9cfb54adc9dc9c116c2eb1679
+              uuid: 716f166b3943443aba70a4faed882ffb
               expression: '(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1223,7 +1223,7 @@ zabbix_export:
                     The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
           trigger_prototypes:
             -
-              uuid: 12d993e62f124a87a1ec6462633ffca4
+              uuid: cd04e8d542a04bdf89abad7ee4719e75
               expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_nearfull_ratio)*100'
               name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
               priority: WARNING
@@ -1232,7 +1232,7 @@ zabbix_export:
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
                   expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
             -
-              uuid: 3c55961c4f0f4313ba4ecb8edc21019b
+              uuid: 5d7a028166584c29b959914ce904a713
               expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE

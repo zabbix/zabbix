@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:31Z'
+  date: '2021-05-11T08:05:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -56,7 +56,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 75f15ddde3e94692b4e9c03a982c3122
+              uuid: ae7f1953f9b94c9c907d7bd7627d389d
               expression: 'nodata(/RabbitMQ cluster by HTTP/rabbitmq.get_overview,30m)=1'
               name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
@@ -1155,7 +1155,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: 077cff01b33645feacfc3fbb242df854
+              uuid: 220eedd4f69b43fabe233b5127e09c50
               expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
               name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
@@ -1207,7 +1207,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 8b711d05770940d6857494f72b3cb191
+              uuid: d4452f05d08343c7a374da412c0f1de6
               expression: 'nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1'
               name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
@@ -1468,7 +1468,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: c5940c19ae2745c5954f93a783f0a8ca
+              uuid: 19989038dfe84fcdb12262ee3782ab41
               expression: '(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2))=1 and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0'
               name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1499,7 +1499,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: 3f92f121d05e42bb822a8f6c22edadcc
+              uuid: 943d239a9fa5443dac3205c65a4da033
               expression: 'min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0'
               name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1532,7 +1532,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: 58c7bf82121d40fea29f60f909a0ff5c
+              uuid: 4b15e72e2133458ebac9c72c5fcb90e6
               expression: 'max(/RabbitMQ node by HTTP/rabbitmq.node.running,5m)=0'
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -2259,7 +2259,7 @@ zabbix_export:
                   value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               trigger_prototypes:
                 -
-                  uuid: 2caf1757f8c443cba81f91e7fe258a2a
+                  uuid: b6f52153a22144338e6d002287446ac1
                   expression: 'min(/RabbitMQ node by HTTP/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
                   name: 'RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'

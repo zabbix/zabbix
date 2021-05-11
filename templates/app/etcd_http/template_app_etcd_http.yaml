@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:31Z'
+  date: '2021-05-11T08:05:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -45,7 +45,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: e9a34b9e5b2f4c73a1b15cf7ef15b51e
+              uuid: 7c87424c4fb34c56bc9b976755b4ec02
               expression: '(last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2))=1 and length(last(/Etcd by HTTP/etcd.cluster.version))>0'
               name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -418,7 +418,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: 5c7f708f78d641f8b6b1f74d06aa76a6
+              uuid: 0302957e0f6b43389546e1cfb958ed9c
               expression: 'min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}'
               name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
@@ -486,7 +486,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: ebce46d4aea84d18a8c7d0935653ce15
+              uuid: 44d66eb1a332418daf4c3a1110db5458
               expression: 'nodata(/Etcd by HTTP/etcd.is.leader,30m)=1'
               name: 'Etcd: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
@@ -590,7 +590,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: 6d42b29eab6040ed9c0c243cc734a292
+              uuid: 1ea623927179489890a5a73eeb8177f7
               expression: '(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}'
               name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
               priority: WARNING
@@ -766,7 +766,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: 276f05b6773a40b7995469bf07505b7e
+              uuid: 432cea8bddd742ca98528be2fbc7e35e
               expression: 'min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
               name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
@@ -795,7 +795,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: 28f4105868d443cb8a0f6f7165e3356e
+              uuid: 5feefc4dd5d14fe2b56dd63029b57026
               expression: 'min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
               name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
               priority: WARNING
@@ -935,7 +935,7 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              uuid: 32b6b7bc359544019a278fffc9009cca
+              uuid: cfb2fc467b224ef694d59b5c081ed965
               expression: '(last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2))=1 and length(last(/Etcd by HTTP/etcd.server.version))>0'
               name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1137,7 +1137,7 @@ zabbix_export:
                   value: Etcd
               trigger_prototypes:
                 -
-                  uuid: 89903554a34b4a1483b8f5435029367f
+                  uuid: 459b6ee5735047d597a6a4ab41b76e21
                   expression: 'min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}'
                   name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)'
                   priority: WARNING
@@ -1396,7 +1396,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      uuid: ae60fab553c64eabbfb03d629ff0f6db
+      uuid: c45583928d204c04ad8884115e1e35c5
       expression: 'min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}'
       name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING

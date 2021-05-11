@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:38Z'
+  date: '2021-05-11T08:05:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -423,7 +423,7 @@ zabbix_export:
                   value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               trigger_prototypes:
                 -
-                  uuid: f4db9b6f831144dd9e9d4c64c6e57256
+                  uuid: d1683e2fcdda45969ff451e43ae696c2
                   expression: '(last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2))=1'
                   name: 'Sharepoint: Sharepoint object is changed'
                   opdata: '{#SHAREPOINT.LLD.FULL_PATH}'

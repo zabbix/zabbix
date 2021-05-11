@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:55Z'
+  date: '2021-05-11T08:05:37Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -93,7 +93,7 @@ zabbix_export:
                   value: 'IPMI {#SENSOR_TYPE}'
               trigger_prototypes:
                 -
-                  uuid: fbec2b99a9e949f6b9d313f511535bac
+                  uuid: efe107571d704895bbb43c95407e6689
                   expression: '(last(/Chassis by IPMI/ipmi.state_text[{#SENSOR_ID}],#1)<>last(/Chassis by IPMI/ipmi.state_text[{#SENSOR_ID}],#2))=1'
                   name: 'IPMI: {#SENSOR_ID} value has changed'
                   priority: INFO
@@ -164,7 +164,7 @@ zabbix_export:
                   value: 'IPMI {#SENSOR_TYPE}'
               trigger_prototypes:
                 -
-                  uuid: 0bdbe5d39b6346328c0a19fad61cbf90
+                  uuid: e9c37c1847d64920b80a20cc764b6c81
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_CRIT}'
                   name: 'IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)'
                   priority: HIGH
@@ -174,7 +174,7 @@ zabbix_export:
                       name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
                 -
-                  uuid: 82ea95804dc64578848617c3d39e0ec7
+                  uuid: 0fc9d9baa3dd4d3db841e2153b6c39b2
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_WARN}'
                   name: 'IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m)'
                   priority: WARNING
@@ -187,13 +187,13 @@ zabbix_export:
                       name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
                 -
-                  uuid: 9d21060df0024858a95990504a7e2af1
+                  uuid: 2c3dbc3f68db44f1924682a8241e0086
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}'
                   name: 'IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)'
                   priority: DISASTER
                   description: 'The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.'
                 -
-                  uuid: 7ddde536688e47948278015df2a1822f
+                  uuid: adbb7e20a46d42329e4744548aa9d5f6
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_CRIT}'
                   name: 'IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)'
                   priority: HIGH
@@ -203,7 +203,7 @@ zabbix_export:
                       name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
                 -
-                  uuid: 3a61097cb942413ebabd1d47369e879d
+                  uuid: 7b712e7b11a34635948517467f77ad9d
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_WARN}'
                   name: 'IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)'
                   priority: WARNING
@@ -216,7 +216,7 @@ zabbix_export:
                       name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
                       expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
                 -
-                  uuid: e4a324798c574e0d9f70bff553e4dcdf
+                  uuid: b078ee6b820f44f2871c2e3fcd0ce4cf
                   expression: 'min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}'
                   name: 'IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)'
                   priority: DISASTER

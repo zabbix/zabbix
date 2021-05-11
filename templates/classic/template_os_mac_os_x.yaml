@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:44Z'
+  date: '2021-05-11T08:05:28Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -119,7 +119,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: a80abf98913a4611a1fd4f716b9f9b67
+              uuid: 3cf40421e61b41bab7697bbf9a2649d6
               expression: 'avg(/Mac OS X/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
@@ -170,7 +170,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: bf7dbc1163a04ef7acbeba01a3895019
+              uuid: ffb713a281a543879e4196e4207bdd62
               expression: '(last(/Mac OS X/system.hostname,#1)<>last(/Mac OS X/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
@@ -206,7 +206,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: 638241883e9f470f87b924d103cc6780
+              uuid: 55d8650af70d4aeea56345985e454df9
               expression: '(last(/Mac OS X/system.uname,#1)<>last(/Mac OS X/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
@@ -255,7 +255,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              uuid: 298b572c0117487eb5ef460c620de438
+              uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
               expression: '(last(/Mac OS X/vfs.file.cksum[/etc/passwd],#1)<>last(/Mac OS X/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING

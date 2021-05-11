@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:36Z'
+  date: '2021-05-11T08:05:21Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -554,7 +554,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 857819d9851546f4a9d6e674572c5367
+              uuid: 000d3e773f6e4ebf89f16daa2ce8c168
               expression: 'nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1'
               name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
@@ -1154,7 +1154,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: 3640cf0944d14865b3f6df1e8ae76d24
+              uuid: 5cb80a7552d74e44a83d0825f039f89f
               expression: 'min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
               name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
@@ -1459,7 +1459,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: abdfc235c198421ba6d87e1d4ea1d39f
+              uuid: daf98bb4593d4697bc51423b2f65ba41
               expression: '(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2))=1 and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0'
               name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1490,7 +1490,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: 1dab579b767d4816b306b6dd1ab88912
+              uuid: 5bed266725e94000804b0ecc7bce6209
               expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0'
               name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1523,7 +1523,7 @@ zabbix_export:
               value: RabbitMQ
           triggers:
             -
-              uuid: e4dc6aaaf80e4282926c54a6bdc8dcae
+              uuid: 253acf98446e4790975b330d44dd6b96
               expression: 'max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0'
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -1646,7 +1646,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 872a38f85e3a4253a47c94f13f6ac866
+              uuid: 4f2a88d09b1b49879d80e0794ec19e0e
               expression: 'nodata(/RabbitMQ node by Zabbix agent/web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1'
               name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
@@ -2307,7 +2307,7 @@ zabbix_export:
                   value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               trigger_prototypes:
                 -
-                  uuid: 431268af929a49e5b7e95a3ff59c7651
+                  uuid: 58986cee2b4846b3b7bd3caf772d7ac6
                   expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
                   name: 'RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'

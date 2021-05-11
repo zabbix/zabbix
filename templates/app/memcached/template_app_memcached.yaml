@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:25Z'
+  date: '2021-05-11T08:04:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -184,7 +184,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              uuid: 829e1be75a5044d69910b25ff4af237b
+              uuid: 922a59008cd94e0688db8528be296f89
               expression: 'min(/Memcached/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
               name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
@@ -258,7 +258,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              uuid: 1b8e03a4aea244619b57c69ba7a013c8
+              uuid: 33c9b918d21343dea3bcd2c3e3505fc5
               expression: 'min(/Memcached/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
               name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
               priority: WARNING
@@ -288,7 +288,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              uuid: ed079d680b4c42beba993ff255089ec0
+              uuid: a30bb4344e714b7f984e86046797b9b1
               expression: 'nodata(/Memcached/memcached.cpu.sys,30m)=1'
               name: 'Memcached: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
@@ -635,7 +635,7 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              uuid: 940b4ecfcc724fcf8d71951c4cee6126
+              uuid: 086e757b4a2048eabd5e91b4a0ccc07b
               expression: '(last(/Memcached/memcached.version,#1)<>last(/Memcached/memcached.version,#2))=1 and length(last(/Memcached/memcached.version))>0'
               name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -675,12 +675,12 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      uuid: a777ad9047d04381b6fefe1419557713
+      uuid: e6129a8ace1945fa9020c6c0008cb19c
       expression: 'min(/Memcached/memcached.stats.bytes,5m)/last(/Memcached/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
       name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
       priority: WARNING
     -
-      uuid: 37802376f059457da6d1d4550bd4c382
+      uuid: 61021d383c9f41b990292bab2738356d
       expression: 'min(/Memcached/memcached.connections.current,5m)/last(/Memcached/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
       name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
       priority: WARNING

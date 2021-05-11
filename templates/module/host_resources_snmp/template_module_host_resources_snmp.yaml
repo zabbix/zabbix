@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:54Z'
+  date: '2021-05-11T08:05:36Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -45,7 +45,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: fe7a62d1ff714b6b8a1160feb5ff0e45
+              uuid: bb8b2193ed4c437284d569a38f500367
               expression: 'min(/HOST-RESOURCES-MIB CPU SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -156,7 +156,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: a67793178b8a4be498ec1460bb8a461f
+                  uuid: fb87fa900e404e2ba53fa5769fecc511
                   expression: 'min(/HOST-RESOURCES-MIB memory SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -384,7 +384,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
-              uuid: 02534b93144946e389a3ffb41867443c
+              uuid: 9fbb4a0ceeba4c9e935f54610d5f1afb
               expression: |
                 last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
@@ -398,7 +398,7 @@ zabbix_export:
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
             -
-              uuid: e73f17290b0346deb169f0e6766b3eba
+              uuid: 5db5f43d1c3b4b1f91bef16ec1090945
               expression: |
                 last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/HOST-RESOURCES-MIB storage SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:25Z'
+  date: '2021-05-11T08:05:13Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -51,14 +51,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: f404fa64ee3c40dd87526b6e922b0715
+                  uuid: a9f5e9e2a65143298910e354e832bf2f
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  uuid: 0e09c5b691374639b4cbfd9073402f88
+                  uuid: 58cf2c24afd74e5cb048557e8e52138e
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
                   name: '{#SENSOR_INFO}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -95,14 +95,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 97cc3af1a88746b3847a196c1091a910
+                  uuid: 5796e1e85ea949d0b86ce83f5daae958
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
                   name: '{#SENSOR_INFO}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  uuid: 503f176185df46e29a98f9e9dc29ef42
+                  uuid: 93892fed243f4f0b8c26ab67fa6e1800
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
                   name: '{#SENSOR_INFO}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -159,7 +159,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 8159958d04a84507b5d5e2f1baefb948
+                  uuid: 2bb01154728b47c69514f7399f3bfabc
                   expression: 'avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
@@ -168,7 +168,7 @@ zabbix_export:
                   priority: AVERAGE
           trigger_prototypes:
             -
-              uuid: db3a2b24c4014e8e9a992a66898ce4e0
+              uuid: f356f7fbc2de423db3bac09bc4683ae2
               expression: |
                 avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
@@ -182,7 +182,7 @@ zabbix_export:
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
-              uuid: 1e9f13790a1f451da9577ab2db9ccc53
+              uuid: 2c151dd93b7f4096b9eb6c73c315ffec
               expression: |
                 avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}
                 or
@@ -349,7 +349,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: eb241250ee984ac3a8e79c1fe57d2b13
+                  uuid: 74c44bdc890f467cb1a8cdc175a54a76
                   expression: 'min(/Cisco CISCO-MEMORY-POOL-MIB SNMP/vm.memory.util[vm.memory.util.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -424,7 +424,7 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  uuid: 99d6ce6dfa1d474fbfae5b83c6479e8e
+                  uuid: be863abc1e3440a9bd35c4db77f83961
                   expression: 'min(/Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP/system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -496,7 +496,7 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  uuid: cf98ae5c5f7e4ea1a902005062414e1d
+                  uuid: 52d3b9d4d52e4f289221f4b5ade177d7
                   expression: 'min(/Cisco CISCO-PROCESS-MIB SNMP/system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -579,7 +579,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 2870574500184ba7ae783bd5b051f946
+              uuid: 4100a7125272484c81c4f599eff82793
               expression: '(last(/Cisco Inventory SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber,#2))=1 and length(last(/Cisco Inventory SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -613,7 +613,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: f7b175a60a1540cb9b02c45917362d9e
+              uuid: e417e0edd4eb417d99816dd9cf4f20e9
               expression: '(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#2))=1 and length(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
@@ -661,7 +661,7 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  uuid: 0de96646852d454980fc9683cfa59ede
+                  uuid: ff15aaac7c4947b6a07a38dec4d1466d
                   expression: '(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -780,7 +780,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: 9d97a750d01b48a7b937e3d7a8e8551e
+              uuid: 0833b9a8f2ba4c009ca038cc409236d8
               expression: 'min(/Cisco OLD-CISCO-CPU-MIB SNMP/system.cpu.util[avgBusy5],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'

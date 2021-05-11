@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:57Z'
+  date: '2021-05-11T08:05:38Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -99,7 +99,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 61b66ae397d3410590dd2191c3467e0d
+              uuid: 7e8d377e1b49469a8b19b94e6dad97ce
               expression: '(last(/HP iLO SNMP/system.hw.serialnumber,#1)<>last(/HP iLO SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP iLO SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -129,14 +129,14 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 0335bcb0a891421ebc24369811a47ea2
+              uuid: 6d0d0554e1c945dc90701aebd531f9cb
               expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
             -
-              uuid: af74471e58254f4f8ce9cb939159c8ab
+              uuid: 273c27c7929649f1a45ddc92c09ab982
               expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -199,14 +199,14 @@ zabbix_export:
                   value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  uuid: e4b481d00a6a4d0d8a29a9d799626617
+                  uuid: b3049aa19e5d45d28937c1af262aba3e
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  uuid: 12eabd826b694ee2a65019c5afed0c0c
+                  uuid: 384fd446bcb042f89ca348ec7459f1aa
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:\"degraded\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -269,14 +269,14 @@ zabbix_export:
                   value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  uuid: dabf91236780416fbc9d4cececbcebc0
+                  uuid: a4c81fb1ef6140199bbde241691183cd
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  uuid: 802eba637fa547b8a2f317c2f4698a14
+                  uuid: 7370a7c6388c4ff8b094959ca0c34a72
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -287,7 +287,7 @@ zabbix_export:
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                       expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
                 -
-                  uuid: 007eee02dd0345f2b681e85cff9b57bc
+                  uuid: 4db3b402580c43eba0d9dc6349cf95ca
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_OK_STATUS:\"enabled\"}")=1 and last(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -361,14 +361,14 @@ zabbix_export:
                   value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  uuid: cff2da457cb344b99f8b7d7f0a1497c2
+                  uuid: a318564fe4eb488eba251f3cba3d31b6
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults'
                 -
-                  uuid: 6a532604599b446b8a7dc6c0938545b1
+                  uuid: 6b65d2b2477c4567953fcec31b1ab9a3
                   expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS}")=1'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -421,14 +421,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: 289750475f9048dcaf8520e33b3b5057
+                  uuid: 0731e25040504428acb466b0d4e2803a
                   expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  uuid: a82df54cc1b04c449807ef5a7a2d28dd
+                  uuid: c8c9ea062fa849b0b550ad4dd1d2cec7
                   expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS}")=1'
                   name: 'Fan {#SNMPINDEX}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -527,7 +527,7 @@ zabbix_export:
                   value: 'Physical disks'
               trigger_prototypes:
                 -
-                  uuid: 539fa68fd63449d08fde34c7725cb621
+                  uuid: 87bcd812474b44729da19f49344ba976
                   expression: '(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
@@ -591,7 +591,7 @@ zabbix_export:
                   value: 'Physical disks'
               trigger_prototypes:
                 -
-                  uuid: 6fe3ce58f54c4650ba42f32409afc884
+                  uuid: 180f8f9124a041d0bf1c350d0226c3d3
                   expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDrive\"}")=1 or count(/HP iLO SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDriveSSDWearOut\"}")=1'
                   name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -630,14 +630,14 @@ zabbix_export:
                   value: 'Physical disks'
               trigger_prototypes:
                 -
-                  uuid: 9aac16a2790742e1aa6fead9ebe7a4a3
+                  uuid: 95e887baa0b9480a8a59848b07418c6b
                   expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
                   name: '{#DISK_LOCATION}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
                 -
-                  uuid: ee59faec50624c0a928b22eed2100cb3
+                  uuid: 857540089794495799eb1a04b172c70c
                   expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS}")=1'
                   name: '{#DISK_LOCATION}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -689,14 +689,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 97f3cd999d244aac88d282c6cc9ee71c
+                  uuid: 7a34714fcbb74294af97bc4f39c21413
                   expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  uuid: e3b59cb3378d46ba84de18a0aee203a3
+                  uuid: db7679204aa544cb8ffe38df5c68b7ce
                   expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -1468,14 +1468,14 @@ zabbix_export:
                   value: 'Virtual disks'
               trigger_prototypes:
                 -
-                  uuid: 908690f6b73d4e61abcb89feaefa4a65
+                  uuid: 3f809df0d34f47a2bc1addbf2f4387ac
                   expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check virtual disk for warnings or errors'
                 -
-                  uuid: 54436d6421d648c6bc706df74d17118b
+                  uuid: 439b8dfa246f42d190d8f4deeebfeb53
                   expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS}")=1'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'

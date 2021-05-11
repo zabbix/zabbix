@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:16Z'
+  date: '2021-05-11T08:05:05Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -425,151 +425,151 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 38add0e4701542eab6404fe213c890bc
+              uuid: a2d0ab5150dd4bad8b5ec4f2c6aa13f8
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
               name: 'Status: Device has "arrayCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 11474e381d6d4f2d9870387e090cbb91
+              uuid: cc6a15f16fd8470a9dcd9a9e01cba61c
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
               name: 'Status: Device has "batterySenseDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: f6bb46bea26643fbb058c6c3f3761a6d
+              uuid: 55d4726d9b9047c79cf690353d950797
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
               name: 'Status: Device has "batterySenseOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 10ed811580134f289068001249e7e2e9
+              uuid: 7f015198395042219666cde4458d407c
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
               name: 'Status: Device has "controllerReset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 93ebc526f39245c1b8d3fe2c2fbc5ec6
+              uuid: 48339339e5a7465fbc67266998c9a8fe
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 17d71bead9364fb5abc2dfaf78629dd4
+              uuid: c88074037099498c896bb4793e04fea3
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
               name: 'Status: Device has "currentMeasurementError" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 8f9301b6c6ad43c487a48670ed70f3fa
+              uuid: cecd8ee17e5143ffb46495e927750c82
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
               name: 'Status: Device has "eepromAccessFailure" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: d475ca449b644c52bfacba3777c1a1c0
+              uuid: 4affa15e1c1c42459ea8dd6820d1c008
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
               name: 'Status: Device has "fp10SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 2664edbf44834f6fab7d1cb8fdbc2efb
+              uuid: 41e4225072a3468696cfb534c65b9736
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
               name: 'Status: Device has "heatsinkTempLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 2055c60cbcdc430cbdb5f9f53d0e22b2
+              uuid: 5d269997a57d44ceb545e751e8e2d919
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: d5881c60240b449baecf88c2a82e267b
+              uuid: a8342a4e2fff40a7b830086dec303fd9
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 0e288d130bca47a699d0b73f9bca6902
+              uuid: 32e5b7ae81ce4ebea9b05ff7ab411e5a
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
               name: 'Status: Device has "hightInputVoltageLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 67a16a3b9bd64fbd9f6305e28a513f3d
+              uuid: c10d27c1d9d54b8981a639e7bf0dfc02
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempLimit")=2'
               name: 'Status: Device has "inductorTempLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 49d5ef3f0a154017bab053a4e4341542
+              uuid: 9f80959684b34b6498a1634097cd0d22
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorOpen")=2'
               name: 'Status: Device has "inductorTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: a78c4d501bfb452486b4aed0b4bda00f
+              uuid: cc735ddcc98e4c099bb770e2b2a171b5
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorShorted")=2'
               name: 'Status: Device has "inductorTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 3213610cba8e48d79f0099c0f6006ffe
+              uuid: 217935cd6c7547bc95f5af51b3e643d4
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
               name: 'Status: Device has "loadCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 53096949f10841029e89ca78187e0e54
+              uuid: cb05261f120240bf944b304ffc4979e6
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
               name: 'Status: Device has "loadLvd" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 84b0d70348394289a352957ca1f72bea
+              uuid: 1ed1de932e084ce5ba03747bdd8ca4e5
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
               name: 'Status: Device has "logTimeout" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 402d663a3c1d4431bd1427452e1c9995
+              uuid: 8824f80f1ef245508d6d0d660e3cabf1
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
               name: 'Status: Device has "mosfetOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 4c0a1157e88b4bbb866e274a278b01ae
+              uuid: 59569aaebf32403c9fd310f6b26845b0
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
               name: 'Status: Device has "p12SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: a4de90fef5f54914abddcc13715087f9
+              uuid: 4775d3a7b843455eb404661c070be092
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
               name: 'Status: Device has "p33SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 80fd749e5b04462a8291b00e2f3f3917
+              uuid: 2015d2b876564ad79699a23fc6b60f07
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 0c54eea999274163a8bc7c019c722d0d
+              uuid: cce1eb2bee094a3b9a993ec2d60d182b
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: ecaaec9b2fda4724ac23c2e440884b7f
+              uuid: 7a07b757660a4c9a879ac03a94832720
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","tb5v")=2'
               name: 'Status: Device has "tb5v" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: b7900423ca1147c9b3ef9f5cc0d6b784
+              uuid: 39205fc6d2cd4888994cccb016b4b2f8
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -627,73 +627,73 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 7ec639a671dd418395eb22ade0034059
+              uuid: 8322f8ca8e2e462a8799dc399f17ba27
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 38b26257e57449108f5d3859784c2486
+              uuid: 6a138cd2af754bb3a22173e8da28b254
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: e79ea9870f8749498283bbb16dcc3d16
+              uuid: 8e42cf21ec10409da840021bfd26f74c
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
               name: 'Status: Device has "batteryLowVoltageDisconnect" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 352222e0738c420fb5c0c78dd85b63d5
+              uuid: d1112d9828064a879d56626ac6339dbf
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 496ead435cc54182bff850b7d23d1956
+              uuid: 75a67f17a33e41eea34585fade6319ef
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: b9ea0bf233bd47958c48e9787c0de319
+              uuid: 4502112383524f0499ea13e6f83ce789
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
               name: 'Status: Device has "localTempSensorDamaged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: bfa4cfe378fe4fea9a08219dbdc73a7f
+              uuid: f1489dc1f8574895bd233b14ce080748
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
               name: 'Status: Device has "mosfetSShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 026961d66d3548d3a1bfa55ff2f545da
+              uuid: 4ea903d3e8644ddaa5309eaa9715b894
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: d662417171eb407e84a56b1e7f2aed1e
+              uuid: e12a29ec16ea423cb69ca4ce460f201b
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
               name: 'Status: Device has "rtsNoLongerValid" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 6325a6ce18ea4699b77ce91dfb16361e
+              uuid: 3ec4307bb2c444fc8eca27f9b7a136e2
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 0f7a990edcdd4b0ab70588de6e2c4c62
+              uuid: 915c00d98e144ee7a9a2d50d0bd474c0
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
               name: 'Status: Device has "slaveTimeout" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 5787ca3ab1124c6b8aad76a65541eb7a
+              uuid: 9aac314eef594a8d86fd4b88308428e5
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -747,49 +747,49 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: bfba4d2c13884342b30f72b513df39ee
+              uuid: 93750f768ba94f1bb9302fc17c76faeb
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 216bca0d366c4c2db387308a95cb1db0
+              uuid: 456e2c36369f4519b2c80bcfe1acb4b0
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 16068aeb99574612ba1f625f873c6e58
+              uuid: 359df17c40684187b7ae92c8aa0c9624
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
               name: 'Status: Device has "externalShortCircuit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: b0cfd65085c34858a69121adb6b8a552
+              uuid: 6dadf09064304f4381ad9ed0436e562a
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
               name: 'Status: Device has "highTempDisconnect" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 019ece2873d042808fa943b93b8d3c33
+              uuid: bc41145ae8074290913a47cc3fd11e1e
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
               name: 'Status: Device has "loadHvd" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 7685649fc49e42db9f953a4ef0595d23
+              uuid: 8c8a7021928e4bf78b6309574e298876
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
               name: 'Status: Device has "mosfetShorted" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 89d2f2e6ab01408eb931a764392fff48
+              uuid: b7d3f05837bd4d788d14f1aaf18b0482
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 1093940ea3284565a35494bdc5674108
+              uuid: 801728740c1948b1a751469e6443daab
               expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -821,7 +821,7 @@ zabbix_export:
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
             -
-              uuid: 724df1f192a14120b82ea13093bf63ab
+              uuid: 59cbcaaee8304b38a1144b3abf40bd9d
               expression: 'nodata(/Morningstar ProStar MPPT SNMP/status.uptime,5m)=1'
               name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
@@ -897,19 +897,19 @@ zabbix_export:
               value: Temperature
           triggers:
             -
-              uuid: de594b281866467397e993c24ee8e4ad
+              uuid: c74e1d3be1c24bde986bbce068db4bb8
               expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 4f03e93cc7744715980dbbdd1d5b7b5d
+              uuid: 0c2180ae5deb41adb503e37bf91c34e2
               expression: 'max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: acd178214cf141b8b22ece12b173dfb6
+              uuid: 1ab91d781c734f1eb2b9552f6dee9370
               expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -919,7 +919,7 @@ zabbix_export:
                   name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
                   expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
             -
-              uuid: 3e6aff58601a4ddab59a69d1a28ebfc3
+              uuid: 6ec855dc6a5c42a79f1f40e14655418a
               expression: 'max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -981,19 +981,19 @@ zabbix_export:
                   value: Battery
               trigger_prototypes:
                 -
-                  uuid: 82b7e4818cdd4508a22239122370d8b8
+                  uuid: 402f73ca5b8d412689a7e715223e890d
                   expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 056360e5d0b54843b8e556a8fd98331f
+                  uuid: 753a0d25832d434186f586f895124f31
                   expression: 'max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 7eb1afecdd514bab8a89dd21933d17a6
+                  uuid: 66e1fdfbfa5740dfa8945626f7f8be78
                   expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1003,7 +1003,7 @@ zabbix_export:
                       name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                       expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                 -
-                  uuid: d04ed6ef79234d279443cae0aebd1aa8
+                  uuid: c9f3d03ce06641eb9b184f511a3a0341
                   expression: 'max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'

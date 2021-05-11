@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:28Z'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -618,13 +618,13 @@ zabbix_export:
               value: Kafka
           triggers:
             -
-              uuid: 3f72056de46c470eaffecb4150a304d0
+              uuid: 39bfa825d88145d5a687ba07f6b5596e
               expression: 'nodata(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)=1'
               name: 'Kafka: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
             -
-              uuid: d6f2954505124871a8b292a4b6664c44
+              uuid: 91c95d4543ae436d986881e76f090aec
               expression: 'max(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}'
               name: 'Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
@@ -680,7 +680,7 @@ zabbix_export:
               value: Kafka
           triggers:
             -
-              uuid: 8acd836865f842d79def85f1426c87d2
+              uuid: 92ecd7eb1eae49d9886ecac7b8f2084a
               expression: '(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#1)<>last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#2))=1 and length(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"]))>0'
               name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -859,7 +859,7 @@ zabbix_export:
               value: Kafka
           triggers:
             -
-              uuid: 78f2ae6da15242e6aa773234e1185427
+              uuid: 8f070e06520b4b299fcfffa952d318fc
               expression: 'max(/Apache Kafka by JMX/jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"],15m)<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}'
               name: 'Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
@@ -1040,7 +1040,7 @@ zabbix_export:
               value: Kafka
           triggers:
             -
-              uuid: 964a916b6e2e4d0db888ddb89240b856
+              uuid: 423144ac14694a71b9ab563eacfa840d
               expression: 'find(/Apache Kafka by JMX/jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"],,"regexp","CONNECTED")=0'
               name: 'Kafka: Broker is not connected to ZooKeeper'
               priority: AVERAGE

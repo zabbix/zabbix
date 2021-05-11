@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:33Z'
+  date: '2021-05-11T08:05:18Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -128,7 +128,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              uuid: 133f9dc5ad6e45db944399534a20378f
+              uuid: ee59684bb2044540ad0306a5b6deb408
               expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0'
               name: 'ES: Cluster has the initializing shards'
               priority: AVERAGE
@@ -338,7 +338,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              uuid: 5f714f60e5304c3f96a865815615e6da
+              uuid: 35bdd54f27a64009b96a06a12508f99c
               expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0'
               name: 'ES: Cluster has the unassigned shards'
               priority: AVERAGE
@@ -584,7 +584,7 @@ zabbix_export:
               value: 'ES cluster'
           triggers:
             -
-              uuid: dba10edf6c8a4a41a27da4155bea813d
+              uuid: 2a3f3b96e5dd47de998ccc17f109e149
               expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
               name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
@@ -747,7 +747,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: ba7345ec837944b29fb8eaeaec8b0a6e
+                  uuid: 6c2ea291374b4de1ab06ddeccba635b1
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.flush.latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
@@ -840,7 +840,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: 665e343430cd4aff8bd40cee62016659
+                  uuid: 2755b3f8811a45fba7c48347707ceaf8
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.indexing.index_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
@@ -1095,7 +1095,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: c5af1b140e164e7a8cf359635c898c7d
+                  uuid: 6edd6851f31842659a57e29c444a9b32
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.fetch_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
@@ -1241,7 +1241,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: 3d8398e320b4495fa5350abfe7014fd5
+                  uuid: 1892000290c843e887d128bf9f97c869
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.indices.search.query_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
@@ -1421,7 +1421,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: 21cf9057140b408b89247034d299ba9c
+                  uuid: 9d199607ddda48eebe9f93cae6d6575d
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                   priority: HIGH
@@ -1430,7 +1430,7 @@ zabbix_export:
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended 
                     guidelines stated above), or scale out the cluster by adding more nodes.
                 -
-                  uuid: f6ff14189872489cbc51f65a1ec8d162
+                  uuid: bbba4a577a2c4328b2392fdeb1ff9bb4
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
                   priority: WARNING
@@ -1565,7 +1565,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: 2f7cb5d8eb574030b4ac437f4defd0c3
+                  uuid: b416941e8e0141c6af27c62f052ac860
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
@@ -1660,7 +1660,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: 6f3b36a122304ae69007eba4f780be05
+                  uuid: 5cfd3f9924614a4283f1255752b672f0
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.search.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
@@ -1755,7 +1755,7 @@ zabbix_export:
                   value: 'ES {#ES.NODE}'
               trigger_prototypes:
                 -
-                  uuid: ea466d8a654e42b4a394ced283469402
+                  uuid: 1f5e30a34bb84cef831670974ec7c3e8
                   expression: 'min(/Elasticsearch Cluster by HTTP/es.node.thread_pool.write.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
