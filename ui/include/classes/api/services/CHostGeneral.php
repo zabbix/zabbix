@@ -281,7 +281,10 @@ abstract class CHostGeneral extends CHostBase {
 			$templ_triggerids[] = $db_trigger['triggerid'];
 		}
 
-		$triggerids = [ZBX_FLAG_DISCOVERY_NORMAL => [], ZBX_FLAG_DISCOVERY_PROTOTYPE => []];
+		$upd_triggers = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
 
 		if ($templ_triggerids) {
 			$sql_distinct = ($targetids !== null) ? ' DISTINCT' : '';
@@ -301,31 +304,44 @@ abstract class CHostGeneral extends CHostBase {
 			);
 
 			while ($db_trigger = DBfetch($db_triggers)) {
-				$triggerids[$db_trigger['flags']][] = $db_trigger['triggerid'];
+				$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+					'values' => ['templateid' => 0],
+					'where' => ['triggerid' => $db_trigger['triggerid']]
+				];
+			}
+
+			$db_triggers = DBselect(
+				'SELECT DISTINCT t.triggerid,t.flags'.
+				' FROM triggers t,functions f,items i, hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND '.dbConditionInt('t.triggerid', array_keys(
+						$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+					))
+			);
+
+			while ($db_trigger = DBfetch($db_triggers)) {
+				$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
 			}
 		}
 
-		if ($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]) {
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CTriggerManager::delete($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
 			}
 			else {
-				DB::update('triggers', [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_NORMAL]]
-				]);
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 		}
 
-		if ($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				CTriggerPrototypeManager::delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			}
 			else {
-				DB::update('triggers', [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
-				]);
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 		}
 
