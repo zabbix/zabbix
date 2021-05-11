@@ -6693,12 +6693,16 @@ static int	DBpatch_5030192(void)
 			if ('\0' == *trigger_expr)
 			{
 				if (0 == i)
-					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s", __func__, row[0]);
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
 				zbx_free(trigger_expr);
 				continue;
 			}
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION,
+					&error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
@@ -6715,11 +6719,11 @@ static int	DBpatch_5030192(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
-						&functionid))
+				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s, is_uint64_n error",
-							__func__, row[0]);
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}
@@ -7135,12 +7139,16 @@ static int	DBpatch_5030199(void)
 			if ('\0' == *trigger_expr)
 			{
 				if (0 == i)
-					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s", __func__, row[0]);
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
 				zbx_free(trigger_expr);
 				continue;
 			}
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_TRIGGER_EXPRESSION_LLD,
+					&error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
@@ -7157,11 +7165,11 @@ static int	DBpatch_5030199(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
-						&functionid))
+				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s, is_uint64_n error",
-							__func__, row[0]);
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}
