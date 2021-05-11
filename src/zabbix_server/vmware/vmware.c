@@ -3071,6 +3071,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
+					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"	\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:propSet>"								\
@@ -3277,6 +3278,7 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
+ *             hv_data      - [IN] the hv data with scsi topology info        *
  *             hvid         - [IN] the vmware hypervisor id                   *
  *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
@@ -3286,7 +3288,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *hvid, xmlDoc **xdoc, char **error)
+		xmlDoc *hv_data, const char *hvid, xmlDoc **xdoc, char **error)
 {
 #	define ZBX_POST_HV_MP_DETAILS									\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -3295,8 +3297,8 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 			"<ns0:specSet>"									\
 				"<ns0:propSet>"								\
 					"<ns0:type>HostSystem</ns0:type>"				\
-					"<ns0:pathSet>config.storageDevice.scsiLun</ns0:pathSet>"	\
 					"<ns0:pathSet>config.storageDevice.multipathInfo</ns0:pathSet>"	\
+					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
@@ -3307,22 +3309,43 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char	tmp[MAX_STRING_LEN], *hvid_esc;
-	int	ret = FAIL;
+#	define ZBX_POST_SCSI_INFO									\
+		"<urn:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</urn:pathSet>"		\
+		"<urn:pathSet>config.storageDevice.scsiLun[\"%s\"].uuid</urn:pathSet>"
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __func__, hvid);
+	zbx_vector_str_t	scsi_luns;
+	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
+	int			i, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
+
+	zbx_vector_str_create(&scsi_luns);
+	zbx_xml_read_values(hv_data, "//scsiLun/target/lun/scsiLun", &scsi_luns);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() scsiLun:'%d'", __func__, scsi_luns.values_num);
+
+	if (0 == scsi_luns.values_num)
+		goto out;
+
+	for (i = 0; i < scsi_luns.values_num; i++)
+	{
+		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i], scsi_luns.values[i]);
+	}
+
 	hvid_esc = xml_escape_dyn(hvid);
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_MP_DETAILS,
-			vmware_service_objects[service->type].property_collector, hvid_esc);
+	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
+			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
 
 	zbx_free(hvid_esc);
+	zbx_free(scsi_req);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
 		goto out;
 
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
+	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
+	zbx_vector_str_destroy(&scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -3533,7 +3556,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
 {
 	char			*value;
-	xmlDoc			*details = NULL, *details_multipath = NULL;
+	xmlDoc			*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t	datastores, vms;
 	int			i, j, ret = FAIL;
 
@@ -3579,7 +3602,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastore are connected to hypervisor \"%s\"", __func__,
 			datastores.values_num, hv->id);
 
-	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, id, &details_multipath, error))
+	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, details, id, &multipath_data, error))
 		goto out;
 
 	for (i = 0; i < datastores.values_num; i++)
@@ -3605,7 +3628,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		dsname->name = zbx_strdup(NULL, ds->name);
 		zbx_vector_vmware_hvdisk_create(&dsname->hvdisks);
 
-		for (j = 0; j < ds->diskextents.values_num; j++)
+		for (j = 0; NULL != multipath_data && j < ds->diskextents.values_num; j++)
 		{
 			zbx_vmware_diskextent_t	*diskextent = ds->diskextents.values[j];
 			zbx_vmware_hvdisk_t	hvdisk;
@@ -3613,7 +3636,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(details_multipath, tmp, &hvdisk.multipath_total) ||
+			if (SUCCEED != vmware_get_multipath_count(multipath_data, tmp, &hvdisk.multipath_total) ||
 					0 == hvdisk.multipath_total)
 			{
 				continue;
@@ -3621,7 +3644,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(details_multipath, tmp, &hvdisk.multipath_active))
+			if (SUCCEED != vmware_get_multipath_count(multipath_data, tmp, &hvdisk.multipath_active))
 				hvdisk.multipath_active = 0;
 
 			hvdisk.partitionid = diskextent->partitionid;
@@ -3654,7 +3677,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	ret = SUCCEED;
 out:
-	zbx_xml_free_doc(details_multipath);
+	zbx_xml_free_doc(multipath_data);
 	zbx_xml_free_doc(details);
 
 	zbx_vector_str_clear_ext(&vms, zbx_str_free);
