@@ -1,0 +1,1 @@
+.......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
