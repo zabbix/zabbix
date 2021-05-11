@@ -312,7 +312,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			$db_triggers = DBselect(
 				'SELECT DISTINCT t.triggerid,t.flags'.
-				' FROM triggers t,functions f,items i, hosts h'.
+				' FROM triggers t,functions f,items i,hosts h'.
 				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
@@ -362,6 +362,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($tpl_graphids) {
+			$upd_graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			];
+
 			$sql = ($targetids !== null)
 				? 'SELECT DISTINCT g.graphid,g.flags'.
 					' FROM graphs g,graphs_items gi,items i'.
@@ -375,41 +380,56 @@ abstract class CHostGeneral extends CHostBase {
 
 			$db_graphs = DBSelect($sql);
 
-			$graphs = [
-				ZBX_FLAG_DISCOVERY_NORMAL => [],
-				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-			];
 			while ($db_graph = DBfetch($db_graphs)) {
-				$graphs[$db_graph['flags']][] = $db_graph['graphid'];
+				$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
+					'values' => ['templateid' => 0],
+					'where' => ['graphid' => $db_graph['graphid']]
+				];
 			}
 
-			if ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			$db_graphs = DBselect(
+				'SELECT DISTINCT g.graphid,g.flags'.
+				' FROM graphs g,graphs_items gi,items i,hosts h'.
+				' WHERE g.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND '.dbConditionInt('g.graphid', array_keys(
+						$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+					))
+			);
+
+			while ($db_graph = DBfetch($db_graphs)) {
+				$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 				if ($clear) {
-					CGraphPrototypeManager::delete($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 				}
 				else {
-					DB::update('graphs', [
-						'values' => ['templateid' => 0],
-						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
-					]);
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 				}
 			}
 
-			if ($graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
 				if ($clear) {
-					CGraphManager::delete($graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
 				}
 				else {
-					DB::update('graphs', [
-						'values' => ['templateid' => 0],
-						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_NORMAL]]
-					]);
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
 				}
 			}
 		}
 		/* }}} GRAPHS */
 
 		/* ITEMS, DISCOVERY RULES {{{ */
+		$upd_items = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_RULE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
 		$sqlFrom = ' items i1,items i2,hosts h';
 		$sqlWhere = ' i2.itemid=i1.templateid'.
 			' AND '.dbConditionInt('i2.hostid', $templateids).
@@ -422,12 +442,9 @@ abstract class CHostGeneral extends CHostBase {
 		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
+
 		$dbItems = DBSelect($sql);
-		$upd_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
+
 		while ($item = DBfetch($dbItems)) {
 			if ($clear) {
 				$upd_items[$item['flags']][$item['itemid']] = true;
