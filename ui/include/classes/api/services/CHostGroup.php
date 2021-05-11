@@ -719,7 +719,8 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
+			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
@@ -727,6 +728,35 @@ class CHostGroup extends CApiService {
 		}
 
 		$this->checkDuplicates(zbx_objectValues($groups, 'name'));
+		$this->checkAndAddUuid($groups);
+	}
+
+	/**
+	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 *
+	 * @param array $groups_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$groups_to_create): void {
+		foreach ($groups_to_create as &$group) {
+			if (!array_key_exists('uuid', $group)) {
+				$group['uuid'] = generateUuidV4();
+			}
+		}
+		unset($group);
+
+		$db_uuid = DB::select('hstgrp', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

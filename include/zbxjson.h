@@ -80,6 +80,7 @@
 #define ZBX_PROTO_TAG_JMX_ENDPOINT		"jmx_endpoint"
 #define ZBX_PROTO_TAG_EVENTID			"eventid"
 #define ZBX_PROTO_TAG_NAME			"name"
+#define ZBX_PROTO_TAG_SEVERITY			"severity"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
 #define ZBX_PROTO_TAG_GROUPS			"groups"
 #define ZBX_PROTO_TAG_TAGS			"tags"
@@ -167,6 +168,15 @@
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
 #define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
 #define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
+#define ZBX_PROTO_TAG_DASHBOARDID		"dashboardid"
+#define ZBX_PROTO_TAG_USERID			"userid"
+#define ZBX_PROTO_TAG_PERIOD			"period"
+#define ZBX_PROTO_TAG_NOW			"now"
+#define ZBX_PROTO_TAG_SESSIONID			"sessionid"
+#define ZBX_PROTO_TAG_SIGN			"sign"
+#define ZBX_PROTO_TAG_DETAIL			"detail"
+#define ZBX_PROTO_TAG_RECIPIENT			"recipient"
+#define ZBX_PROTO_TAG_RECIPIENTS		"recipients"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -201,6 +211,8 @@
 
 #define ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
+
+#define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 
 typedef enum
 {
@@ -277,8 +289,6 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
-
-void	zbx_json_log(const struct zbx_json_parse *jp, int loglevel);
 
 /* jsonpath support */
 

@@ -1528,7 +1528,7 @@ class testFormWeb extends CLegacyWebTest {
 				$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 				$this->zbxTestInputType('description', $trigger);
-				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
+				$expressionTrigger = 'last(/'.$this->host.'/'.$trigger.')=0';
 				$this->zbxTestInputTypeWait('expression', $expressionTrigger);
 				$this->zbxTestClickWait('add');
 

@@ -16,6 +16,7 @@ OBJS = \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\misc.o \
+	$(OUTPUTDIR)\time.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
@@ -77,10 +78,10 @@ CGO_LDFLAGS += $(LDFLAGS)
 
 PKG=zabbix.com/pkg/version
 
-GOLDFLAGS = -X $(PKG).titleMessage=zabbix_agent2
-GOLDFLAGS += -X $(PKG).compileOs=windows
+GOLDFLAGS = -X $(PKG).compileOs=windows
 GOLDFLAGS += -X $(PKG).compileArch=$(GOARCH)
 GOLDFLAGS += -X main.confDefault=zabbix_agent2.win.conf
+GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 all: $(TARGETBIN)
 
@@ -97,6 +98,9 @@ $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\alias.o: $(TOPDIR)\src\libs\zbxcommon\alias.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxcommon\time.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcrypto\tls_version.c

@@ -22,24 +22,25 @@
 
 #include "common.h"
 
-#define zbx_serialize_prepare_str(len, str)			\
-	str##_len = (NULL != str ? strlen(str) + 1 : 0);	\
+#define zbx_serialize_prepare_str(len, str)				\
+	str##_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
 	len += str##_len + sizeof(zbx_uint32_t)
 
-#define zbx_serialize_prepare_str_len(len, str, str_len)	\
-	str_len = (NULL != str ? strlen(str) + 1 : 0);		\
+#define zbx_serialize_prepare_str_len(len, str, str_len)			\
+	str_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);		\
 	len += str_len + sizeof(zbx_uint32_t)
 
 #define zbx_serialize_prepare_value(len, value)			\
-	len += sizeof(value)
+	len += (zbx_uint32_t)sizeof(value)
 
-#define zbx_serialize_uint64(buffer, value) (memcpy(buffer, &value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
+#define zbx_serialize_uint64(buffer, value)			\
+	(memcpy(buffer, (const zbx_uint64_t *)&value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
 
-#define zbx_serialize_int(buffer, value) (memcpy(buffer, (int *)&value, sizeof(int)), sizeof(int))
+#define zbx_serialize_int(buffer, value) (memcpy(buffer, (const int *)&value, sizeof(int)), sizeof(int))
 
-#define zbx_serialize_short(buffer, value) (memcpy(buffer, (short *)&value, sizeof(short)), sizeof(short))
+#define zbx_serialize_short(buffer, value) (memcpy(buffer, (const short *)&value, sizeof(short)), sizeof(short))
 
-#define zbx_serialize_double(buffer, value) (memcpy(buffer, (double *)&value, sizeof(double)), sizeof(double))
+#define zbx_serialize_double(buffer, value) (memcpy(buffer, (const double *)&value, sizeof(double)), sizeof(double))
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
@@ -116,5 +117,11 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 #endif
+
+
+/* complex serialization/deserialization functions */
+
+zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value);
+zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32_t *value);
 
 /* ZABBIX_SERIALIZE_H */

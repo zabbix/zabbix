@@ -1,6 +1,27 @@
 Changes for 5.4.0rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
+.........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
+
+Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+..F....... [ZBX-19306] fixed broken item configuration link in latest data results (miks)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+...G...... [ZBX-19297] fixed agent compilation under Windows (wiper)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0beta3
+
+New features:
+A.F.....ST [ZBXNEXT-6478] added dashboard based pdf report support (abakaldin, agriscenko, ashubin, esneiders, wiper)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in the template MSSQL by ODBC (mchudinov)
+.........T [ZBXNEXT-6571] added templates with multi-page dashboards (afayantsev)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
 .........T [ZBXNEXT-6504] added Templates "TiDB by HTTP", "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
@@ -10,6 +31,9 @@ A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, 
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
 .........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
 ..F....... [ZBX-19240] fixed JavaScript errors upon copying map or map navigation tree widgets (averza)
 .......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
@@ -183,12 +207,22 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
 .........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
 .......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
 .........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
@@ -675,6 +709,31 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.12rc1
+
+New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
+.........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
+
+Bug fixes:
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.11
+
+5.0.11rc1 was released as 5.0.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.11rc1
@@ -2716,6 +2775,8 @@ Changes for 4.0.31rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxtrapper.a
+noinst_LIBRARIES = libzbxtrapper.a libzbxtrapper_server.a libzbxtrapper_proxy.a
 
 libzbxtrapper_a_SOURCES = \
 	active.c \
@@ -20,4 +20,13 @@ libzbxtrapper_a_SOURCES = \
 	trapper_item_test.c \
 	trapper_item_test.h \
 	trapper.c \
-	trapper.h
+	trapper.h \
+	trapper_request.h
+
+libzbxtrapper_server_a_SOURCES = \
+	trapper_server.c \
+	trapper_request.h
+
+libzbxtrapper_proxy_a_SOURCES = \
+	trapper_proxy.c \
+	trapper_request.h

@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "dbcache.h"
+#include "zbxvariant.h"
 
 typedef struct
 {

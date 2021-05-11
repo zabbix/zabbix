@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:36Z'
+  date: '2021-05-11T08:05:16Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: cbf70ed444394566bcf213dd63d4d352
       template: 'Microsoft Exchange Server 2016 by Zabbix agent'
       name: 'Microsoft Exchange Server 2016 by Zabbix agent'
       description: |
@@ -22,6 +24,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: b4978a9a4cff4ce88fbc82683b61eec4
           name: 'MS Exchange: Databases total mounted'
           key: 'perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -37,6 +40,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 9b59700d8db8472fbde41c85c7a06ffc
           name: 'MS Exchange [Client Access Server]: ActiveSync: ping command pending'
           key: 'perf_counter_en["\MSExchange ActiveSync\Ping Commands Pending", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -48,6 +52,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: fa70b4e2d17c44c6945dd2d1c971c34c
           name: 'MS Exchange [Client Access Server]: ActiveSync: requests per second'
           key: 'perf_counter_en["\MSExchange ActiveSync\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -59,6 +64,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 8528015c73134a239d7ac235464788dd
           name: 'MS Exchange [Client Access Server]: ActiveSync: sync commands per second'
           key: 'perf_counter_en["\MSExchange ActiveSync\Sync Commands/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -70,6 +76,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 456cb7af0b224a59afabae36d24d2cbc
           name: 'MS Exchange [Client Access Server]: Autodiscover: requests per second'
           key: 'perf_counter_en["\MSExchangeAutodiscover\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -81,6 +88,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: b9a539175cbb4259b064a787a25e9dbe
           name: 'MS Exchange [Client Access Server]: Availability Service: availability requests per second'
           key: 'perf_counter_en["\MSExchange Availability Service\Availability Requests (sec)", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -92,6 +100,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 3c2a83dfef35497baf8c38b801854882
           name: 'MS Exchange [Client Access Server]: Outlook Web App: current unique users'
           key: 'perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -103,6 +112,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 2c7fd331673e4d84aa09551222469b08
           name: 'MS Exchange [Client Access Server]: Outlook Web App: requests per second'
           key: 'perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -114,6 +124,7 @@ zabbix_export:
               tag: Application
               value: 'MS Exchange'
         -
+          uuid: 9808449df53148a9a988a69d66944371
           name: 'MS Exchange [Client Access Server]: MSExchangeWS: requests per second'
           key: 'perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -126,12 +137,14 @@ zabbix_export:
               value: 'MS Exchange'
       discovery_rules:
         -
+          uuid: f3d6e34eaff844bfab582cb55d679e82
           name: 'Databases discovery'
           key: 'perf_instance.discovery["MSExchange Active Manager"]'
           delay: 1h
           description: 'Discovery of Exchange databases.'
           item_prototypes:
             -
+              uuid: 0b2d46b766f24947b76b49d8368044a5
               name: 'Active Manager [{#INSTANCE}]: Database copy role'
               key: 'perf_counter_en["\MSExchange Active Manager({#INSTANCE})\Database Copy Role Active"]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -150,6 +163,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 9ad0743878ed411ab1e76b8e774e91e9
               name: 'Information Store [{#INSTANCE}]: Page faults per second'
               key: 'perf_counter_en["\MSExchange Database({#INF.STORE})\Database Page Fault Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -162,11 +176,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.DB.FAULTS.TIME})}>{$MS.EXCHANGE.DB.FAULTS.WARN}'
+                  uuid: 07e0dce4546b4d15bfbb34fa2044c319
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database({#INF.STORE})\Database Page Fault Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.FAULTS.TIME})>{$MS.EXCHANGE.DB.FAULTS.WARN}'
                   name: 'Information Store [{#INSTANCE}]: Page faults is too high (>{$MS.EXCHANGE.DB.FAULTS.WARN} for {$MS.EXCHANGE.DB.FAULTS.TIME})'
                   priority: AVERAGE
                   description: 'Too much page faults stalls for database "{#INSTANCE}". This counter should be 0 on production servers.'
             -
+              uuid: 1af9e0b4abb74e07af1d0d183333f0c4
               name: 'Information Store [{#INSTANCE}]: Log records stalled'
               key: 'perf_counter_en["\MSExchange Database({#INF.STORE})\Log Record Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -179,11 +195,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{avg({$MS.EXCHANGE.LOG.STALLS.TIME})}>{$MS.EXCHANGE.LOG.STALLS.WARN}'
+                  uuid: 688cbee95ef2432abc03c81d39049a44
+                  expression: 'avg(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database({#INF.STORE})\Log Record Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.LOG.STALLS.TIME})>{$MS.EXCHANGE.LOG.STALLS.WARN}'
                   name: 'Information Store [{#INSTANCE}]: Log records stalls is too high (>{$MS.EXCHANGE.LOG.STALLS.WARN} for {$MS.EXCHANGE.LOG.STALLS.TIME})'
                   priority: AVERAGE
                   description: 'Stalled log records too high. The average value should be less than 10 threads waiting.'
             -
+              uuid: 1b53de26c73a49bdb7fe55328db03ddd
               name: 'Information Store [{#INSTANCE}]: Log threads waiting'
               key: 'perf_counter_en["\MSExchange Database({#INF.STORE})\Log Threads Waiting", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -195,6 +213,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 1da31e52e5dd4b72bea5811a9bb06a01
               name: 'Database Counters [{#INSTANCE}]: Active database read operations per second'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -206,6 +225,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 0bc5750ca13f4f738904e45f9860b76a
               name: 'Database Counters [{#INSTANCE}]: Active database read operations latency'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -224,11 +244,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.DB.ACTIVE.READ.TIME})}>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}'
+                  uuid: 053583bbe81d4ce0961ee365cee5a802
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.ACTIVE.READ.TIME})>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}'
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}s for {$MS.EXCHANGE.DB.ACTIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 20ms on average.'
             -
+              uuid: 3095c843659341fd854fb297a9fdf14a
               name: 'Database Counters [{#INSTANCE}]: Passive database read operations latency'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -247,11 +269,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.DB.PASSIVE.READ.TIME})}>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}'
+                  uuid: 4a07a86df67b4aa08e538d4463c2d3df
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.PASSIVE.READ.TIME})>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}'
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}s for {$MS.EXCHANGE.DB.PASSIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 200ms on average.'
             -
+              uuid: 7456bcbbac114ead9c417bcbeefa0e1c
               name: 'Database Counters [{#INSTANCE}]: Active database write operations per second'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -263,6 +287,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: e45413cc0e46458f9a00132b30c7c354
               name: 'Database Counters [{#INSTANCE}]: Active database write operations latency'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -281,11 +306,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME})}>{$MS.EXCHANGE.DB.ACTIVE.WRITE.WARN}'
+                  uuid: 87cc1ca8b39541e89eb02a1c094892c0
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME})>{$MS.EXCHANGE.DB.ACTIVE.WRITE.WARN}'
                   name: 'Database Counters [{#INSTANCE}]: Average write time latency is too high for {$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME}'
                   priority: WARNING
                   description: 'Should be less than 50ms on average.'
             -
+              uuid: 5b7fc1949b67404584d2809556f3d595
               name: 'Database Counters [{#INSTANCE}]: Passive database write operations latency'
               key: 'perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -303,6 +330,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 6128c55bf63a4c48981dfccd077b4635
               name: 'Information Store [{#INSTANCE}]: Active mailboxes count'
               key: 'perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Active mailboxes"]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -314,6 +342,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 4db79306eb044db899be5e7672651959
               name: 'Information Store [{#INSTANCE}]: Database state'
               key: 'perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Database State"]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -336,6 +365,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 6bc9bc6d20df4de89ff03d63f21f6eab
               name: 'Information Store [{#INSTANCE}]: RPC requests latency'
               key: 'perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -354,11 +384,13 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.RPC.TIME})}>{$MS.EXCHANGE.RPC.WARN}'
+                  uuid: b9b2f224082a4ec687d121534402170c
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.RPC.TIME})>{$MS.EXCHANGE.RPC.WARN}'
                   name: 'Information Store [{#INSTANCE}]: RPC Requests latency is too high (>{$MS.EXCHANGE.RPC.WARN}s for {$MS.EXCHANGE.RPC.TIME})'
                   priority: WARNING
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
             -
+              uuid: 5321c367d288406d8d9eac217a444e9c
               name: 'Information Store [{#INSTANCE}]: RPC requests per second'
               key: 'perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Operations/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -370,6 +402,7 @@ zabbix_export:
                   tag: Application
                   value: 'Database {#INSTANCE}'
             -
+              uuid: 701d6a4fcfe14f899e0282eb75e08753
               name: 'Information Store [{#INSTANCE}]: RPC requests total'
               key: 'perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC requests", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -382,18 +415,21 @@ zabbix_export:
                   value: 'Database {#INSTANCE}'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.RPC.COUNT.TIME})}>{$MS.EXCHANGE.RPC.COUNT.WARN}'
+                  uuid: 6349d2b6cd13413187b8c77e10fa96a2
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC requests", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.RPC.COUNT.TIME})>{$MS.EXCHANGE.RPC.COUNT.WARN}'
                   name: 'Information Store [{#INSTANCE}]: RPC Requests total count is too high (>{$MS.EXCHANGE.RPC.COUNT.WARN} for {$MS.EXCHANGE.RPC.COUNT.TIME})'
                   priority: WARNING
                   description: 'Should be below 70 at all times.'
           trigger_prototypes:
             -
-              expression: '{Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}>{Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}'
+              uuid: 2eb26276a3a24ce4af517ff8740f4566
+              expression: 'avg(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})>avg(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})'
               name: 'Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME}'
               priority: WARNING
               description: 'Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.'
           graph_prototypes:
             -
+              uuid: d3de0d2651bf49bc856c3354437cea70
               name: 'Database Counters [{#INSTANCE}]: Read and write stats'
               graph_items:
                 -
@@ -451,12 +487,14 @@ zabbix_export:
                   
                   return JSON.stringify(data);
         -
+          uuid: 635f8c96cf544dcd97e4a58b2e9353de
           name: 'LDAP discovery'
           key: 'perf_instance_en.discovery["MSExchange ADAccess Domain Controllers"]'
           delay: 1h
           description: 'Discovery of domain controller.'
           item_prototypes:
             -
+              uuid: b1c046c5aca04b85bf907f83c05b4142
               name: 'Domain Controller [{#INSTANCE}]: Read time'
               key: 'perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -475,11 +513,13 @@ zabbix_export:
                   value: 'MS Exchange'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.LDAP.TIME})}>{$MS.EXCHANGE.LDAP.WARN}'
+                  uuid: 799366198fd04746bf265431c00269ab
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.LDAP.TIME})>{$MS.EXCHANGE.LDAP.WARN}'
                   name: 'Domain Controller [{#INSTANCE}]: LDAP read time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
             -
+              uuid: c7326e542e534afd9a1df9a8ec1226e4
               name: 'Domain Controller [{#INSTANCE}]: Search time'
               key: 'perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -498,12 +538,14 @@ zabbix_export:
                   value: 'MS Exchange'
               trigger_prototypes:
                 -
-                  expression: '{min({$MS.EXCHANGE.LDAP.TIME})}>{$MS.EXCHANGE.LDAP.WARN}'
+                  uuid: 0db1b4e3f149481e8b04fe8b5eafa508
+                  expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent/perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.LDAP.TIME})>{$MS.EXCHANGE.LDAP.WARN}'
                   name: 'Domain Controller [{#INSTANCE}]: LDAP search time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
           graph_prototypes:
             -
+              uuid: 68caa8f72b21476f8f18695843c14328
               name: 'Domain Controller [{#INSTANCE}]: Timings'
               graph_items:
                 -
@@ -518,12 +560,14 @@ zabbix_export:
                     host: 'Microsoft Exchange Server 2016 by Zabbix agent'
                     key: 'perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}]'
         -
+          uuid: 8a1cb7e22e55406e8e721a2189d7e00d
           name: 'Web services discovery'
           key: 'perf_instance_en.discovery["Web Service"]'
           delay: 1h
           description: 'Discovery of Exchange web services.'
           item_prototypes:
             -
+              uuid: 3c3d1881bb294a31afa09605699a6965
               name: 'Web Service [{#INSTANCE}]: Current connections'
               key: 'perf_counter_en["\Web Service({#INSTANCE})\Current Connections", {$MS.EXCHANGE.PERF.INTERVAL}]'
               delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -609,6 +653,7 @@ zabbix_export:
           description: 'Threshold for RPC requests latency trigger.'
       valuemaps:
         -
+          uuid: 4a0e19e58ade4e8c878a6b87f4021416
           name: 'Exchange database copy role'
           mappings:
             -
@@ -618,6 +663,7 @@ zabbix_export:
               value: '1'
               newvalue: Active
         -
+          uuid: 2d131c4a033c4145a6bd66ec4c0c030a
           name: 'Exchange database state'
           mappings:
             -
@@ -631,6 +677,7 @@ zabbix_export:
               newvalue: Healthy
   graphs:
     -
+      uuid: 47dd0ffded994286a6110082c1693433
       name: 'MS Exchange [Client Access Server]: Request rate'
       graph_items:
         -

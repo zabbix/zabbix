@@ -132,8 +132,6 @@ class CItem extends CItemGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 		$this->validateGet($options);
 
-		$this->validateGet($options);
-
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;

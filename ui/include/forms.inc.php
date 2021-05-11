@@ -188,7 +188,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_tags') {
+				if ($name === 'subfilter_tags') {
 					continue;
 				}
 				$show_item &= $value;
@@ -854,11 +854,9 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
+
 	if ($data['is_discovery_rule']) {
-		unset($data['types'][ITEM_TYPE_AGGREGATE],
-			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP]
-		);
+		unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP]);
 	}
 
 	// item
@@ -1839,30 +1837,32 @@ function getTriggerFormData(array $data) {
 
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
 
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
 
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-					$data['expression_action'], $data['expr_temp']
+					$data['expression_action'], $data['expr_temp'], $error
 				);
 
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
-					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
 
 					if ($analyze !== false) {
 						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
+						error(_s('Cannot build expression tree: %1$s.', $error));
 						show_messages(false, '', _('Expression syntax error.'));
 					}
 
 					$data['expr_temp'] = '';
 				}
 				else {
+					error(_s('Cannot build expression tree: %1$s.', $error));
 					show_messages(false, '', _('Expression syntax error.'));
 				}
 			}
@@ -1872,6 +1872,7 @@ function getTriggerFormData(array $data) {
 			$data['expression_field_readonly'] = true;
 		}
 		else {
+			error(_s('Cannot build expression tree: %1$s.', $error));
 			show_messages(false, '', _('Expression syntax error.'));
 			$data['expression_field_name'] = 'expression';
 			$data['expression_field_value'] = $data['expression'];
@@ -1887,30 +1888,32 @@ function getTriggerFormData(array $data) {
 
 	// Trigger recovery expression constructor.
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
 
 		if ($analyze !== false) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
-					$data['recovery_expression_action'], $data['recovery_expr_temp']
+					$data['recovery_expression_action'], $data['recovery_expr_temp'], $error
 				);
 
 				if ($new_expr !== false) {
 					$data['recovery_expression'] = $new_expr;
-					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
 
 					if ($analyze !== false) {
 						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 					}
 					else {
+						error(_s('Cannot build expression tree: %1$s.', $error));
 						show_messages(false, '', _('Recovery expression syntax error.'));
 					}
 
 					$data['recovery_expr_temp'] = '';
 				}
 				else {
+					error(_s('Cannot build expression tree: %1$s.', $error));
 					show_messages(false, '', _('Recovery expression syntax error.'));
 				}
 			}
@@ -1920,6 +1923,7 @@ function getTriggerFormData(array $data) {
 			$data['recovery_expression_field_readonly'] = true;
 		}
 		else {
+			error(_s('Cannot build expression tree: %1$s.', $error));
 			show_messages(false, '', _('Recovery expression syntax error.'));
 			$data['recovery_expression_field_name'] = 'recovery_expression';
 			$data['recovery_expression_field_value'] = $data['recovery_expression'];

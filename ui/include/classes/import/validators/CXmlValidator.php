@@ -51,6 +51,7 @@ class CXmlValidator extends CXmlValidatorGeneral {
 		]];
 
 		$strict = $this->getStrict();
+		$is_preview = $this->isPreview();
 
 		$data = $this
 			->setStrict(true)
@@ -70,6 +71,7 @@ class CXmlValidator extends CXmlValidatorGeneral {
 
 		$data['zabbix_export'] = $this->factory->getObject($version)
 			->setStrict($strict)
+			->setPreview($is_preview)
 			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;

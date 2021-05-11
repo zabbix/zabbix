@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:50Z'
+  date: '2021-05-11T08:05:33Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
+      uuid: 8aa4557f6c3f4aadbc03447fca3af9f6
       template: 'Zabbix agent'
       name: 'Zabbix agent'
       description: |
@@ -17,6 +19,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: f46c6142cf434df1b6abe9334bf6c84c
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
@@ -33,6 +36,7 @@ zabbix_export:
               tag: Application
               value: 'Monitoring agent'
         -
+          uuid: 37a952edc12f47d6ac6f3ca04eb41326
           name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
@@ -44,6 +48,7 @@ zabbix_export:
               tag: Application
               value: 'Monitoring agent'
         -
+          uuid: 3a6af03a083b4366bd1d4c6ccf06ca88
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
@@ -60,6 +65,7 @@ zabbix_export:
               tag: Application
               value: 'Monitoring agent'
         -
+          uuid: 49708b126e3844b898d2625f77c0030c
           name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
@@ -73,7 +79,8 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{max({$AGENT.TIMEOUT})}=0'
+              uuid: 6767f9c764bb42dfa961baacf879f45c
+              expression: 'max(/Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
               name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
@@ -85,6 +92,7 @@ zabbix_export:
           description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
       valuemaps:
         -
+          uuid: 0d5e922550954e6bad89b22f1d9d0c65
           name: zabbix.host.available
           mappings:
             -
@@ -97,12 +105,14 @@ zabbix_export:
               value: '2'
               newvalue: unknown
         -
+          uuid: e5a39fd666b04b70b6eea53e2373b564
           name: 'Zabbix agent ping status'
           mappings:
             -
               value: '1'
               newvalue: Up
     -
+      uuid: 650bec3f2f364a478b82317396949459
       template: 'Zabbix agent active'
       name: 'Zabbix agent active'
       description: |
@@ -114,6 +124,7 @@ zabbix_export:
           name: Templates/Modules
       items:
         -
+          uuid: ca27c17d8ca34643a7db8b99d2cc3025
           name: 'Host name of Zabbix agent running'
           type: ZABBIX_ACTIVE
           key: agent.hostname
@@ -131,6 +142,7 @@ zabbix_export:
               tag: Application
               value: 'Monitoring agent'
         -
+          uuid: 0f86ec6cde2249f7946c678f9fd2665a
           name: 'Zabbix agent ping'
           type: ZABBIX_ACTIVE
           key: agent.ping
@@ -144,12 +156,14 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{nodata({$AGENT.NODATA_TIMEOUT})}=1'
+              uuid: 6bbb74c522d44baea8c6ceb666423da2
+              expression: 'nodata(/Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1'
               name: 'Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
               priority: AVERAGE
               description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
               manual_close: 'YES'
         -
+          uuid: 41fb0f76fa1d464f8ab67f744fc29e8b
           name: 'Version of Zabbix agent running'
           type: ZABBIX_ACTIVE
           key: agent.version
@@ -173,6 +187,7 @@ zabbix_export:
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
       valuemaps:
         -
+          uuid: 9bf3eef7e8d8402ca6f826b377ea2db6
           name: 'Zabbix agent ping status'
           mappings:
             -

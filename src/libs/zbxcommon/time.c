@@ -22,12 +22,17 @@
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
-static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0, 0};
+static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, 1, SEC_PER_MIN, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0,
+		0};
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 {
 	switch (*text)
 	{
+		case 's':
+			return ZBX_TIME_UNIT_SECOND;
+		case 'm':
+			return ZBX_TIME_UNIT_MINUTE;
 		case 'h':
 			return ZBX_TIME_UNIT_HOUR;
 		case 'd':
@@ -315,8 +320,11 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 	if (0 != tm->tm_sec)
 	{
 		tm->tm_sec = 0;
-		tm->tm_min++;
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MINUTE);
 	}
+
+	if (ZBX_TIME_UNIT_MINUTE == base)
+		return;
 
 	if (0 != tm->tm_min)
 	{
@@ -400,6 +408,8 @@ void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
 			ZBX_FALLTHROUGH;
 		case ZBX_TIME_UNIT_HOUR:
 			tm->tm_min = 0;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_MINUTE:
 			tm->tm_sec = 0;
 			break;
 		default:

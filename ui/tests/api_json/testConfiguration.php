@@ -45,7 +45,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => ''
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json, raw.'
 			],
 			[
 				'export' => [
@@ -56,7 +56,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => 'æų'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json, raw.'
 			],
 			// Check unexpected parameter.
 			[
@@ -145,8 +145,7 @@ class testConfiguration extends CAPITest {
 			['hosts'],
 			['images'],
 			['maps'],
-			['templates'],
-			['valueMaps']
+			['templates']
 		];
 	}
 
@@ -402,8 +401,8 @@ class testConfiguration extends CAPITest {
 			]],
 			[[
 				'parameter' => 'groups',
-				'expected' => ['createMissing'],
-				'unexpected' => ['deleteMissing', 'updateExisting']
+				'expected' => ['createMissing', 'updateExisting'],
+				'unexpected' => ['deleteMissing']
 			]],
 			[[
 				'parameter' => 'hosts',

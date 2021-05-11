@@ -1,6 +1,7 @@
 // Notification & alert
 $red: #e33734 !default;
 $light-red: #ed9898 !default;
+$lighter-red: #e3c5c5 !default;
 
 $orange: #f24f1d !default;
 
@@ -212,3 +213,9 @@ $preloader-accent-color: #0275b8 !default;
 // Dashboard list table.
 $dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
 $dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;
+
+// Import compare.
+$toc-title-color: #ffffff !default;
+$toc-title-bg-color: #768d99 !default;
+$diff-added-bg-color: $lighter-green !default;
+$diff-removed-bg-color: $lighter-red !default;

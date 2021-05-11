@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-24T10:32:24Z'
+  date: '2021-05-11T08:05:45Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
+      uuid: ab05dbb15ff047f192782f617f0627ac
       template: 'Ignite by JMX'
       name: 'Ignite by JMX'
       description: |
@@ -23,6 +25,7 @@ zabbix_export:
           name: Templates/Databases
       discovery_rules:
         -
+          uuid: 2aa2cf6500b347e083c492aa2eade85a
           name: 'Data region metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]'
@@ -43,6 +46,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 56780f0bc58e499bb452e5879961ac9d
               name: 'Data region {#JMXNAME}: Allocation, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",AllocationRate]'
@@ -58,6 +62,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: 9b3528eb623c4fdda10228671268bcdb
               name: 'Data region {#JMXNAME}: Checkpoint buffer size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CheckpointBufferSize]'
@@ -73,6 +78,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: 21f8fc17522d40cc8723053e8ed8716f
               name: 'Data region {#JMXNAME}: Dirty pages'
               type: JMX
               key: 'jmx["{#JMXOBJ}",DirtyPages]'
@@ -87,6 +93,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: 8bcc78ee4e984f9c8c07b60e5dd35c42
               name: 'Data region {#JMXNAME}: Eviction, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",EvictionRate]'
@@ -103,12 +110,14 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  uuid: e210c54ba16f4d879d8a4fb88c365c53
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
                   description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 7fa689749cd64474af294976e4bc7762
               name: 'Data region {#JMXNAME}: Size, max'
               type: JMX
               key: 'jmx["{#JMXOBJ}",MaxSize]'
@@ -124,6 +133,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: bb0dd42c5a3c400f95a7084792e7522e
               name: 'Data region {#JMXNAME}: Offheap size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",OffHeapSize]'
@@ -139,6 +149,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: a793c5e41891467fb3ee53722f9fae13
               name: 'Data region {#JMXNAME}: Offheap used size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",OffheapUsedSize]'
@@ -154,6 +165,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: b4fb229defdb434b8307d91e2f17f5db
               name: 'Data region {#JMXNAME}: Pages fill factor'
               type: JMX
               key: 'jmx["{#JMXOBJ}",PagesFillFactor]'
@@ -169,6 +181,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: 4ca77d42a8f44e278b44417d33094535
               name: 'Data region {#JMXNAME}: Pages replace, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",PagesReplaceRate]'
@@ -185,11 +198,13 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>0'
+                  uuid: 70ef41de47b2463a9c580e790754a49c
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Pages replace rate more than 0'
                   priority: WARNING
                   description: 'There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.'
             -
+              uuid: b62d56147b3d43aebd1f3c9eb13a8e05
               name: 'Data region {#JMXNAME}: Allocated, bytes'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalAllocatedSize]'
@@ -205,6 +220,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
             -
+              uuid: 14b02d5526c44f2599e1893b815b1d2b
               name: 'Data region {#JMXNAME}: Used checkpoint buffer size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
@@ -221,35 +237,40 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+              uuid: 480b7cc1a967436b8620f9552f8ac4f6
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
+              uuid: 67eddf17affd49b7844cd0846bc56f7d
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               dependencies:
                 -
                   name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+              uuid: 736fbc965aa448309d022de34354decf
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
               name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
+              uuid: 6ded19e7616b45f08e37e716d8256c5e
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
               name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
                   name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
           graph_prototypes:
             -
+              uuid: 0ac5a59cc5a64e2ea6bc6e266919ecca
               name: 'Data region {#JMXNAME}: Checkpoint buffer utilization'
               graph_items:
                 -
@@ -265,6 +286,7 @@ zabbix_export:
                     host: 'Ignite by JMX'
                     key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
             -
+              uuid: 330be15755ca4b5dbee88e21b2e58df2
               name: 'Data region {#JMXNAME}: DataRegion utilisation'
               graph_items:
                 -
@@ -301,6 +323,7 @@ zabbix_export:
               parameters:
                 - 3h
         -
+          uuid: 92f16f4d02e149c5ae5b09f1007cead8
           name: 'Local node metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]'
@@ -309,6 +332,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: 7f8721ab4e6c4b23bd1e948f8c1c4480
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs active, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentActiveJobs]'
@@ -322,6 +346,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 13b1867082c340d0a6f317c94376a055
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentCancelledJobs]'
@@ -335,6 +360,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 832c3683406c460c826522f8b2e3aafa
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentPmeDuration]'
@@ -350,20 +376,23 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                  uuid: 81587d91606348a6b5385d4b59331adf
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
                   priority: HIGH
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
                 -
-                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.WARN}'
+                  uuid: 0de7ca62c7044e48a8931cf0dfe8ce34
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)'
                   priority: WARNING
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.WARN}ms.'
                   dependencies:
                     -
                       name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
-                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                      expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
             -
+              uuid: 6b68ba90e40b4fa0a798dfde64ba8f01
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rejected, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentRejectedJobs]'
@@ -377,6 +406,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: c459658bf32f4ca5aac6cfe1f8a8cc5b
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Threads count, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentThreadCount]'
@@ -391,15 +421,17 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$IGNITE.THREADS.COUNT.MAX.WARN}'
+                  uuid: 8c4ddb0485464c409077f86241956a56
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$IGNITE.THREADS.COUNT.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$IGNITE.THREADS.COUNT.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of running threads is over {$IGNITE.THREADS.COUNT.MAX.WARN}.'
                   dependencies:
                     -
                       name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
-                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                      expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
             -
+              uuid: e29b01d139bd4d7e8248ccddb2a19baa
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs waiting, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CurrentWaitingJobs]'
@@ -414,11 +446,13 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(15m)} > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
+                  uuid: a723fdecd1b34609b92bb351b1b44a46
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$IGNITE.JOBS.QUEUE.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of queued jobs is over {$IGNITE.JOBS.QUEUE.MAX.WARN}.'
             -
+              uuid: 5f61ae253e4f459ebc403ca69d85a617
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Heap memory used'
               type: JMX
               key: 'jmx["{#JMXOBJ}",HeapMemoryUsed]'
@@ -433,6 +467,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 923c561a1a504ce399bf6b1892e29a3e
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalCancelledJobs]'
@@ -452,6 +487,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: d6044f18b5e741818ca299ce8b19ccdb
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs executed, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalExecutedJobs]'
@@ -471,6 +507,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 15135ffe1ec74e8c920ee4c70b986904
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rejects, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalRejectedJobs]'
@@ -491,6 +528,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
           graph_prototypes:
             -
+              uuid: 40e5feb97990445da11d8d8f49643882
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs current state'
               graph_items:
                 -
@@ -517,6 +555,7 @@ zabbix_export:
                     host: 'Ignite by JMX'
                     key: 'jmx["{#JMXOBJ}",CurrentCancelledJobs]'
             -
+              uuid: cd3eedf54f44492d83138e3f8adf2564
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rate'
               graph_items:
                 -
@@ -554,6 +593,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: 1b3b0461964a418a962539ec4c17aca6
           name: 'Cluster metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]'
@@ -562,6 +602,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: 238c39ab7d5640abb3a81f0a51acc065
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline'
               type: JMX
               key: 'jmx["{#JMXOBJ}",ActiveBaselineNodes]'
@@ -580,6 +621,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 4edffa6b8f294d959797a5c6ca4ccc5a
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalBaselineNodes]'
@@ -598,6 +640,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: a4116287c8a34359a46eff1217f7418d
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Client'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalClientNodes]'
@@ -616,6 +659,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 517a320bd6964ec7906bf6b0408d834b
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, total'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalNodes]'
@@ -634,6 +678,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 9cfa72ba360840d9b87de9c59b780529
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Server'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalServerNodes]'
@@ -653,20 +698,23 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{change()}>0'
+                  uuid: e2c38e56189d4ed79bac6bd4ca8e477c
+                  expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology'
                   priority: INFO
                   description: 'One or more server node added to the topology. Ack to close.'
                   manual_close: 'YES'
                 -
-                  expression: '{change()}<0'
+                  uuid: 81efb2805dbc49719a316d1992aaac3a
+                  expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology'
                   priority: WARNING
                   description: 'One or more server node left the topology. Ack to close.'
                   manual_close: 'YES'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}>{Ignite by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}'
+              uuid: 17f9fd03d3144812bf776c0f8ca836e4
+              expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])'
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology'
               priority: INFO
               description: 'One or more server node left the topology. Ack to close.'
@@ -689,6 +737,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: c1513c51c41046c288b9add14feaabdb
           name: 'Ignite kernal metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]'
@@ -697,6 +746,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: b9e23036503a4227bfbb21969583120e
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version'
               type: JMX
               key: 'jmx["{#JMXOBJ}",FullVersion]'
@@ -723,12 +773,14 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 08a1f4bd227e4f96b501a4681bf9fc8f
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: cfa6cb5b02634c9d803b7c3a0774a7ce
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Local node ID'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeId]'
@@ -749,6 +801,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: d48d3694467e4153af369475672e4811
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Uptime'
               type: JMX
               key: 'jmx["{#JMXOBJ}",UpTime]'
@@ -769,13 +822,15 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{nodata(10m)}=1'
+                  uuid: d90f8b10d32240d882317bf9fb628eae
+                  expression: 'nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 10 minutes.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}<10m'
+                  uuid: f3415dd32a3b450f80b29b83bd54fdef
+                  expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
@@ -798,6 +853,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: afd0c3182f8d4a299a180848eb096b95
           name: 'TCP Ccmmunication SPI metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]'
@@ -806,6 +862,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: c6d996a3b2754963a916f44e8e99e828
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication outbound messages queue'
               type: JMX
               key: 'jmx["{#JMXOBJ}",OutboundMessagesQueueSize]'
@@ -819,6 +876,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 8a25c98dd3374e78ba26cebea1eaaebc
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages received, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",ReceivedMessagesCount]'
@@ -839,25 +897,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
-              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate'
-              type: JMX
-              key: 'jmx["{#JMXOBJ}",ReconnectCount]'
-              history: 7d
-              value_type: FLOAT
-              username: '{$IGNITE.USER}'
-              password: '{$IGNITE.PASSWORD}'
-              description: 'Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.'
-              preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
-              tags:
-                -
-                  tag: Application
-                  value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
-            -
+              uuid: 6eacaf2c8e9e4f53991d547f81731780
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages sent, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",SentMessagesCount]'
@@ -879,6 +919,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
           graph_prototypes:
             -
+              uuid: 9a116cfc05bc46d1bab248048f125a78
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages rate'
               graph_items:
                 -
@@ -910,6 +951,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: bab4df33f0bb4b5d892438865b6a97f2
           name: 'TCP discovery SPI'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]'
@@ -918,6 +960,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: d7a4b267f29b4baab3af479e7b49ae66
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Coordinator]'
@@ -939,12 +982,14 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 82e24abcc7874382a2af0018a4a001e1
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   priority: WARNING
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 7b7a7edb2602436c8b53d6f9f4ea2236
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery message worker queue'
               type: JMX
               key: 'jmx["{#JMXOBJ}",MessageWorkerQueueSize]'
@@ -958,6 +1003,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: d933d5036b1f41358130c512af1161c6
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes failed'
               type: JMX
               key: 'jmx["{#JMXOBJ}",NodesFailed]'
@@ -971,6 +1017,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 4464386c72704016a790371e8117896c
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes joined'
               type: JMX
               key: 'jmx["{#JMXOBJ}",NodesJoined]'
@@ -984,6 +1031,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: fda81af6a86948b394b53f1ec505993a
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes left'
               type: JMX
               key: 'jmx["{#JMXOBJ}",NodesLeft]'
@@ -997,6 +1045,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 57aeab81263f45fba8189347d5446045
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery reconnect, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",ReconnectCount]'
@@ -1016,6 +1065,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 615e7eb22a2d46ab863628d40bff4d7d
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: TotalProcessedMessages'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalProcessedMessages]'
@@ -1036,6 +1086,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: b896207c7fda48ea9265cebfee12f6df
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery messages received, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalReceivedMessages]'
@@ -1057,6 +1108,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
           graph_prototypes:
             -
+              uuid: 348631d78d0644209001b054f18b2dc9
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate'
               graph_items:
                 -
@@ -1088,6 +1140,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: 709e596e106b40869be746dc84214c06
           name: 'Transaction metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]'
@@ -1096,6 +1149,7 @@ zabbix_export:
           password: '{$IGNITE.PASSWORD}'
           item_prototypes:
             -
+              uuid: 9bdf9d13664b405f9737590323bc4a1c
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Locked keys'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LockedKeysNumber]'
@@ -1109,6 +1163,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: ac461a17802440a8906ea7471659935a
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions owner, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",OwnerTransactionsNumber]'
@@ -1122,6 +1177,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 3754810fbb1f47fe858880ada9f40921
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions committed, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TransactionsCommittedNumber]'
@@ -1136,6 +1192,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: ff5a1a7f579c430c8f1860d241bd8b2f
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions holding lock, current'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]'
@@ -1149,6 +1206,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
             -
+              uuid: 3de3a27adea84e9cbb2cae812a3bc9c6
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions rolledback, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TransactionsRolledBackNumber]'
@@ -1164,6 +1222,7 @@ zabbix_export:
                   value: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
           graph_prototypes:
             -
+              uuid: a10ff3fbfd92437ca24cddd82afe3572
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions'
               graph_items:
                 -
@@ -1178,6 +1237,7 @@ zabbix_export:
                     host: 'Ignite by JMX'
                     key: 'jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]'
             -
+              uuid: 0f84dd85e01d475fa1257085814800da
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions rate'
               graph_items:
                 -
@@ -1209,6 +1269,7 @@ zabbix_export:
                   
                   return JSON.stringify(data)
         -
+          uuid: aefce82342554933ae1214dcd7ca708b
           name: 'Cache groups'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]'
@@ -1229,6 +1290,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 0014580397654a279b3c8906e457ee74
               name: 'Cache group [{#JMXNAME}]: Backups'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Backups]'
@@ -1242,6 +1304,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
             -
+              uuid: 8b5acfc3a3c64714b57381fc0ae6b1a6
               name: 'Cache group [{#JMXNAME}]: Caches'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Caches]'
@@ -1263,12 +1326,14 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: b500b51a688d4b55942ce7311e82c54f
+                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 253059e09010451f94ad0e6b10be7cc5
               name: 'Cache group [{#JMXNAME}]: Local node partitions, moving'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]'
@@ -1283,12 +1348,14 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{max(30m)}>0'
+                  uuid: 32a4aa1043b44c6198f01951d9ac32b4
+                  expression: 'max(/Ignite by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0'
                   name: 'Cache group [{#JMXNAME}]: Rebalance in progress'
                   priority: INFO
                   description: 'Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 84edf5609ef94d0185a15a606384e609
               name: 'Cache group [{#JMXNAME}]: Local node partitions, owning'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]'
@@ -1302,6 +1369,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
             -
+              uuid: 314499dd6d214bdcbc524f83c6cbaa2b
               name: 'Cache group [{#JMXNAME}]: Local node entries, renting'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]'
@@ -1315,6 +1383,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
             -
+              uuid: 06aff67a70624af899b2f111d7e6c34b
               name: 'Cache group [{#JMXNAME}]: Local node partitions, renting'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]'
@@ -1328,6 +1397,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
             -
+              uuid: 6888861452b64b9e90ece1d1ab97ab4d
               name: 'Cache group [{#JMXNAME}]: Partition copies, max'
               type: JMX
               key: 'jmx["{#JMXOBJ}",MaximumNumberOfPartitionCopies]'
@@ -1341,6 +1411,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
             -
+              uuid: 9910268fcb3a46aca2eeaf581420ca31
               name: 'Cache group [{#JMXNAME}]: Partition copies, min'
               type: JMX
               key: 'jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies]'
@@ -1355,10 +1426,12 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{max(30m)}=0'
+                  uuid: 8755dd8b09e347659aee2450bcdd5c28
+                  expression: 'max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0'
                   name: 'Cache group [{#JMXNAME}]: There is no copy for partitions'
                   priority: WARNING
             -
+              uuid: edc59b661b004f9a8687b6a6b0e1dc09
               name: 'Cache group [{#JMXNAME}]: Partitions'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Partitions]'
@@ -1373,11 +1446,13 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}'
+              uuid: 1b85d75607294d6a8fded5b85f7f9a4a
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)'
               name: 'Cache group [{#JMXNAME}]: One or more backups are unavailable'
               priority: WARNING
           graph_prototypes:
             -
+              uuid: ffb5efed84144196a631b0bdef33a13e
               name: 'Cache group [{#JMXNAME}]: Partitions'
               graph_items:
                 -
@@ -1425,6 +1500,7 @@ zabbix_export:
               parameters:
                 - 3h
         -
+          uuid: d532f96029b7415fac925e6fd53100f4
           name: 'Thread pool metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]'
@@ -1445,6 +1521,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 1646bb35234742bb894a5abfd1fbf021
               name: 'Thread pool [{#JMXNAME}]: Pool size, core'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CorePoolSize]'
@@ -1459,6 +1536,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
             -
+              uuid: 959cfe87996b4d6886bb90db2265deef
               name: 'Thread pool [{#JMXNAME}]: Pool size, max'
               type: JMX
               key: 'jmx["{#JMXOBJ}",MaximumPoolSize]'
@@ -1473,6 +1551,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
             -
+              uuid: 6c7897c2f2c842988a1e6802eb11adde
               name: 'Thread pool [{#JMXNAME}]: Pool size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",PoolSize]'
@@ -1487,6 +1566,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
             -
+              uuid: 0b4b22918f374603a2f14efc95c217da
               name: 'Thread pool [{#JMXNAME}]: Queue size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",QueueSize]'
@@ -1502,12 +1582,14 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
+                  uuid: 1d29e40969d54e9090724c8a774eaf4d
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
                   name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
                   priority: AVERAGE
                   description: 'Number of messages in queue more than {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
           graph_prototypes:
             -
+              uuid: 112c375ee9264c1996ea8c35e467f4a4
               name: 'Thread pool [{#JMXNAME}]: Thread pool size'
               graph_items:
                 -
@@ -1549,6 +1631,7 @@ zabbix_export:
               parameters:
                 - 3h
         -
+          uuid: b050fc87d8a3400282739f03c1a5fefd
           name: 'Cache metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]'
@@ -1569,6 +1652,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 372f156464634c2b98c2ce3bfe9ac2f4
               name: 'Cache group [{#JMXGROUP}]: Cache gets, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheGets]'
@@ -1589,6 +1673,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 5e633d192b3a472e9a29b4e0a0013ab1
               name: 'Cache group [{#JMXGROUP}]: Cache hits, pct'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheHitPercentage]'
@@ -1604,6 +1689,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 0d79c416c12748f9a3471003ce4d88fb
               name: 'Cache group [{#JMXGROUP}]: Cache misses, pct'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheMissPercentage]'
@@ -1619,6 +1705,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: fb324608d65545c79e71df0978d0d053
               name: 'Cache group [{#JMXGROUP}]: Cache puts, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CachePuts]'
@@ -1639,6 +1726,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 503f39545fa04af79e8dc85f0550ed6b
               name: 'Cache group [{#JMXGROUP}]: Cache removals, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheRemovals]'
@@ -1659,6 +1747,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 182dea03e7d64425aea8c64e1d5714ba
               name: 'Cache group [{#JMXGROUP}]: Cache size'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheSize]'
@@ -1673,6 +1762,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 74119c1570c24155b450db6e5c1126cd
               name: 'Cache group [{#JMXGROUP}]: Cache transaction commits, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheTxCommits]'
@@ -1693,6 +1783,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: 34d8a8ac772a48c486bfb101e7129fd8
               name: 'Cache group [{#JMXGROUP}]: Cache transaction rollbacks, rate'
               type: JMX
               key: 'jmx["{#JMXOBJ}",CacheTxRollbacks]'
@@ -1713,6 +1804,7 @@ zabbix_export:
                   tag: Application
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
             -
+              uuid: cb6b9006d41c46f29ff902a76a27c6f5
               name: 'Cache group [{#JMXGROUP}]: Cache heap entries'
               type: JMX
               key: 'jmx["{#JMXOBJ}",HeapEntriesCount]'
@@ -1733,25 +1825,29 @@ zabbix_export:
                   value: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
           trigger_prototypes:
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Ignite by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}'
+              uuid: 97aa5e21a05743b9bb6714d7d5d28a67
+              expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/Ignite by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])'
               name: 'Cache group [{#JMXGROUP}]: All entries are in heap'
               priority: INFO
               description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
               manual_close: 'YES'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)} > {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}'
+              uuid: bfc948858de94088a96c9eddb14b893d
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)'
               name: 'Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m'
               priority: WARNING
               dependencies:
                 -
                   name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
-                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+                  expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
             -
-              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+              uuid: 1d80fe9b052444359eca04629e45e799
+              expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0'
               name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
               priority: AVERAGE
           graph_prototypes:
             -
+              uuid: 50482d45d20a42e581cfdb0a40a9a9dc
               name: 'Cache group [{#JMXGROUP}]: Cache hits'
               graph_items:
                 -
@@ -1766,6 +1862,7 @@ zabbix_export:
                     host: 'Ignite by JMX'
                     key: 'jmx["{#JMXOBJ}",CacheMissPercentage]'
             -
+              uuid: 1ce594e3eed64627a337e690b772a741
               name: 'Cache group [{#JMXGROUP}]: Cache ops'
               graph_items:
                 -
@@ -1786,6 +1883,7 @@ zabbix_export:
                     host: 'Ignite by JMX'
                     key: 'jmx["{#JMXOBJ}",CacheRemovals]'
             -
+              uuid: 91e7fb726cf24bbf9aab6467b9e3a217
               name: 'Cache group [{#JMXGROUP}]: Cache transactions'
               graph_items:
                 -

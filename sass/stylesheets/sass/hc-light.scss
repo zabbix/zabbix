@@ -220,6 +220,12 @@ $multiselect-selected-bg-color: #777777;
 $dashboard-shared-bg-color: #555555;
 $dashboard-my-bg-color: #555555;
 
+// Import compare.
+$toc-title-color: #ffffff;
+$toc-title-bg-color: #333333;
+$diff-added-bg-color: transparent;
+$diff-removed-bg-color: transparent;
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 
@@ -1215,6 +1221,18 @@ td.inactive-bg {
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -285px;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -419px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -419px -8px;
 	}
 }
 

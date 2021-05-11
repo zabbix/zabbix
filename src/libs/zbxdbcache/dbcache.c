@@ -63,7 +63,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;
 
-#define ZBX_IDS_SIZE	9
+#define ZBX_IDS_SIZE	10
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
@@ -1649,11 +1649,22 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	if (0 != item_num)
 	{
 		DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
+		prepare_triggers((DC_TRIGGER **)trigger_order.values, trigger_order.values_num);
 		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 	}
 
 	if (0 != timers_num)
+	{
+		int	offset = trigger_order.values_num;
+
 		zbx_dc_get_triggers_by_timers(&trigger_info, &trigger_order, timers);
+
+		if (offset != trigger_order.values_num)
+		{
+			prepare_triggers((DC_TRIGGER **)trigger_order.values + offset,
+					trigger_order.values_num - offset);
+		}
+	}
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	evaluate_expressions(&trigger_order);
@@ -2071,7 +2082,10 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (i != item_diff->values_num)
-			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff);
+		{
+			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
+					ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
+		}
 
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
@@ -2101,7 +2115,6 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	size_t			sql_offset = 0;
 	int			i;
 	zbx_vector_ptr_t	item_diff;
 	zbx_item_diff_t		*diffs;
@@ -2113,8 +2126,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	/* preallocate zbx_item_diff_t structures for item_diff vector */
 	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2133,30 +2144,26 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		zbx_vector_ptr_append(&item_diff, diff);
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-		if (0 == (ZBX_DC_FLAG_META & history[i].flags))
-			continue;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update item_rtdata"
-				" set lastlogsize=" ZBX_FS_UI64
-					",mtime=%d"
-				" where itemid=" ZBX_FS_UI64 ";\n",
-				history[i].lastlogsize, history[i].mtime, history[i].itemid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
 	if (0 != item_diff.values_num)
+	{
+		size_t	sql_offset = 0;
+
+		zbx_vector_ptr_sort(&item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diff,
+				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
 		DCconfig_items_apply_changes(&item_diff);
+	}
 
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_free(diffs);

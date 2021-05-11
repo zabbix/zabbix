@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
@@ -517,13 +516,6 @@ if (hasRequest('form')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
 			order_result($data['dbTemplate']['valuemaps'], 'name');
-
-			foreach ($data['dbTemplate']['valuemaps'] as &$valuemap) {
-				order_result($valuemap['mappings'], 'value');
-				$valuemap['mappings'] = array_values($valuemap['mappings']);
-			}
-			unset($valuemap);
-
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}

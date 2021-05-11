@@ -843,10 +843,52 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
 			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "event_suppress"))
+			0 == strcmp(tablename, "event_suppress") ||
+			0 == strcmp(tablename, "trigger_queue"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBextract_version                                                *
+ *                                                                            *
+ * Purpose: connects to DB and tries to detect DB version                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	DBextract_version(struct zbx_json *json)
+{
+	zbx_uint32_t	ret;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	ret = zbx_dbms_version_extract(json);
+	DBclose();
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBflush_version_requirements                                     *
+ *                                                                            *
+ * Purpose: writes a json entry in DB with the result for the front-end       *
+ *                                                                            *
+ * Parameters: version - [IN] entry of DB versions                            *
+ *                                                                            *
+ ******************************************************************************/
+void	DBflush_version_requirements(const char *version)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
+
+	DBclose();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -855,14 +897,20 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
+ * Parameters: db_version - [IN] version of DB                                *
+ *                                                                            *
+ * Return value: SUCCEED - if optional features were checked successfully     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-void	DBcheck_capabilities(void)
+int	DBcheck_capabilities(zbx_uint32_t db_version)
 {
+	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
 #define MIN_TIMESCALEDB_VERSION			10500
-	int		postgresql_version, timescaledb_version;
+	int		timescaledb_version;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -880,22 +928,20 @@ void	DBcheck_capabilities(void)
 	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
+	ret = FAIL;	/* In case of major upgrade, db_extension may be missing */
+
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))
+	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
-				postgresql_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
+				(unsigned long)db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
+		goto clean;
 	}
 
 	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
@@ -904,15 +950,18 @@ void	DBcheck_capabilities(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
 				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		goto clean;
 	}
+
+	ret = SUCCEED;
 clean:
 	DBfree_result(result);
 out:
 	DBclose();
+#else
+	ZBX_UNUSED(db_version);
 #endif
+	return ret;
 }
 
 #define MAX_EXPRESSIONS	950

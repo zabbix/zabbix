@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:40Z'
+  date: '2021-05-11T08:05:20Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 2f82248e411340429d390e8389850401
       template: 'HashiCorp Vault by HTTP'
       name: 'HashiCorp Vault by HTTP'
       description: |
@@ -21,6 +23,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: cd948f4219164c77a17b56f1b01767d0
           name: 'Vault: Check mountpoint discovery'
           type: DEPENDENT
           key: vault.check_mountpoint_discovery
@@ -65,6 +68,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 940cacdb967c40a1b9fba1c143c8589b
           name: 'Vault: Check replication discovery'
           type: DEPENDENT
           key: vault.check_replication_discovery
@@ -93,6 +97,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: f9c8f0ec3a5640af8464f69d1cebbd42
           name: 'Vault: Check storage discovery'
           type: DEPENDENT
           key: vault.check_storage_discovery
@@ -138,6 +143,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: febb5558b1944187a0ac6e87ed153267
           name: 'Vault: Check WAL discovery'
           type: DEPENDENT
           key: vault.check_wal_discovery
@@ -166,6 +172,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 9607f909cfed4515bed2e0ea16749e0d
           name: 'Vault: Clear metrics'
           type: DEPENDENT
           key: vault.clear_metrics
@@ -186,6 +193,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: a78063c1186540fb88d3b958b14250bf
           name: 'Vault: Get health'
           type: HTTP_AGENT
           key: vault.get_health
@@ -210,6 +218,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: f92c90b99edc42d9b170d775c714fa0a
           name: 'Vault: Get leader'
           type: HTTP_AGENT
           key: vault.get_leader
@@ -231,6 +240,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 4ccc4256252f4345a264db340f4ddbf5
           name: 'Vault: Get metrics'
           type: HTTP_AGENT
           key: vault.get_metrics
@@ -253,6 +263,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: cf264b78e4c44d49a81eac141a86d011
           name: 'Vault: Get metrics error'
           type: DEPENDENT
           key: vault.get_metrics.error
@@ -279,14 +290,16 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{strlen()}>0'
+              uuid: a43a4139d225461289d16b7a78002cb0
+              expression: 'length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0'
               name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
               priority: WARNING
               dependencies:
                 -
                   name: 'Vault: Vault server is sealed'
-                  expression: '{HashiCorp Vault by HTTP:vault.health.sealed.last()}=1'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
         -
+          uuid: e8cb015d45ad4e3b9f87d3cbbae3a980
           name: 'Vault: Get tokens'
           type: SCRIPT
           key: vault.get_tokens
@@ -374,6 +387,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: df395f64c8fc45d2a9442bb655474b4a
           name: 'Vault: Healthcheck'
           type: DEPENDENT
           key: vault.health.check
@@ -401,10 +415,12 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 93b4ae5089834a87ae41091fc9773501
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.check)=0'
               name: 'Vault: Vault server is not responding'
               priority: HIGH
         -
+          uuid: 05c46e931d29415f9a6a32f4dadd1eed
           name: 'Vault: Initialized'
           type: DEPENDENT
           key: vault.health.initialized
@@ -434,6 +450,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 75a3c56f1bb24646927cf9b490471cae
           name: 'Vault: Performance standby'
           type: DEPENDENT
           key: vault.health.performance_standby
@@ -463,6 +480,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 488a43102a304f7ab4d2586088a2fded
           name: 'Vault: Disaster Recovery replication'
           type: DEPENDENT
           key: vault.health.replication_dr_mode
@@ -490,6 +508,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 509982bde325478a9d77f99c256f1068
           name: 'Vault: Performance replication'
           type: DEPENDENT
           key: vault.health.replication_performance_mode
@@ -517,6 +536,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: e6d2183bb8b14fa3a647d5cea1f56d4c
           name: 'Vault: Sealed'
           type: DEPENDENT
           key: vault.health.sealed
@@ -547,11 +567,13 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}=1'
+              uuid: 3f4ebf7094914c219ac32132400f90c8
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
               name: 'Vault: Vault server is sealed'
               priority: AVERAGE
               description: 'https://www.vaultproject.io/docs/concepts/seal'
         -
+          uuid: 0641c979cf774d97a9bc52dbaffe8a0f
           name: 'Vault: Standby'
           type: DEPENDENT
           key: vault.health.standby
@@ -581,6 +603,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: e7e79cc09faa409dbe3fa74e1db4cb5f
           name: 'Vault: Version'
           type: DEPENDENT
           key: vault.health.version
@@ -607,12 +630,14 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: ee9a561165b847c2a0719a767e5c4fe9
+              expression: '(last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2))=1 and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
               name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Vault version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 77da3cf43b0d4a449399f3de6d5e8477
           name: 'Vault: HA enabled'
           type: DEPENDENT
           key: vault.leader.ha_enabled
@@ -641,6 +666,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: ea6a7f625c144dc6beff71d3a19004ab
           name: 'Vault: Is leader'
           type: DEPENDENT
           key: vault.leader.is_self
@@ -669,6 +695,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: f23cbc80bf2d4064bf45cc27f6ec752e
           name: 'Vault: Audit log request failures, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.request.failure.rate
@@ -694,6 +721,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 33f2ce934ae5451dace5f880b3a2e6b7
           name: 'Vault: Audit log requests, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.request.rate
@@ -720,6 +748,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 6b8b37e62e374bc38994c5dcc6f0fc6d
           name: 'Vault: Audit log response failures, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.response.failure.rate
@@ -745,6 +774,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: c336a5cecd4641b58be6ab1ba511f6ef
           name: 'Vault: Audit log response, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.response.rate
@@ -771,6 +801,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: e1d11f77e8394b22b88ddcf9a1b8159b
           name: 'Vault: Barrier DELETE ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.delete.rate
@@ -796,6 +827,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 8a854323d051485091917391c630cc28
           name: 'Vault: Barrier LIST ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.list.rate
@@ -821,6 +853,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 1dbf0413b1574f6e9b04abe5d06ab8aa
           name: 'Vault: Barrier PUT ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.put.rate
@@ -846,6 +879,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: f0069229811749e5b399f1214176ae11
           name: 'Vault: Cache hit, rate'
           type: DEPENDENT
           key: vault.metrics.cache.hit.rate
@@ -871,6 +905,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 4df07a4ea4a048c7bc11b21b56cf96c6
           name: 'Vault: Cache miss, rate'
           type: DEPENDENT
           key: vault.metrics.cache.miss.rate
@@ -896,6 +931,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: d99841c57aa349ae8676072e12add35c
           name: 'Vault: Cache write, rate'
           type: DEPENDENT
           key: vault.metrics.cache.write.rate
@@ -921,6 +957,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 004f1eebd08c46d4bbdab7a6c6e3f3ec
           name: 'Vault: Check token, rate'
           type: DEPENDENT
           key: vault.metrics.core.check.token.rate
@@ -946,6 +983,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 77bf09bd2b554e5a8d0dde53045f05c7
           name: 'Vault: Fetch ACL and token, rate'
           type: DEPENDENT
           key: vault.metrics.core.fetch.acl_and_token
@@ -971,6 +1009,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 4ddf18c7768147a396fe13608b5508fb
           name: 'Vault: Requests, rate'
           type: DEPENDENT
           key: vault.metrics.core.handle.request
@@ -996,6 +1035,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 2aa54d38cc2541e3ae4df89e86d63d20
           name: 'Vault: Leadership setup failed, counter'
           type: DEPENDENT
           key: vault.metrics.core.leadership.setup_failed
@@ -1021,11 +1061,13 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+              uuid: c68ab0c784314291bde1cc8693fd5959
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
               name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h'
         -
+          uuid: f0ca68774b5842d7803d2c2619958184
           name: 'Vault: Leadership setup lost, counter'
           type: DEPENDENT
           key: vault.metrics.core.leadership_lost
@@ -1051,11 +1093,13 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+              uuid: 8d7f4f51272a4ce5a3a7ab9642e51d63
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
               name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h'
         -
+          uuid: 2bdb273b513d4a06914cd6ea11ac2368
           name: 'Vault: Post-unseal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.post_unseal
@@ -1076,6 +1120,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 81738d2323a94aa8a7f2b1d9721ac9f9
           name: 'Vault: Pre-seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.pre_seal
@@ -1096,6 +1141,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 42d7e5c3d5b24a65b9821e1aaf0df2a0
           name: 'Vault: Seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal
@@ -1117,6 +1163,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 95f6ab7294c547e7976a292447ef31fb
           name: 'Vault: Internal seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal_internal
@@ -1137,6 +1184,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: e0ecf5aa8c2a4e0886b5a12588839efd
           name: 'Vault: Requested seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal_with_request
@@ -1157,6 +1205,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 1d66f20a1d594b4fa7c81849b83a4ef9
           name: 'Vault: Leadership step downs, counter'
           type: DEPENDENT
           key: vault.metrics.core.step_down
@@ -1182,11 +1231,13 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+              uuid: 5f2895eb5a94441f858c573584ec8b19
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
               name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
               priority: AVERAGE
               description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h'
         -
+          uuid: 075c83114d1746b6b773579404e0268d
           name: 'Vault: Unseal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.unseal
@@ -1207,6 +1258,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 5edebc9e295844ee8716d2b17152bdd9
           name: 'Vault: Fetch lease times, counter'
           type: DEPENDENT
           key: vault.metrics.expire.fetch.lease.times
@@ -1227,6 +1279,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 7f3ab929e48848e294cfa68b8e1783ad
           name: 'Vault: Fetch lease times by token, counter'
           type: DEPENDENT
           key: vault.metrics.expire.fetch.lease.times.by_token
@@ -1247,6 +1300,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 66f1855a47624f10ae69735053e326f1
           name: 'Vault: Number of expiring leases'
           type: DEPENDENT
           key: vault.metrics.expire.num_leases
@@ -1267,6 +1321,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: b160780f06c846809f7aca043777754f
           name: 'Vault: Register ops, count'
           type: DEPENDENT
           key: vault.metrics.expire.register
@@ -1288,6 +1343,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 89dcbfb69b8a44dcbf330d16d292ec1b
           name: 'Vault: Register auth ops, count'
           type: DEPENDENT
           key: vault.metrics.expire.register.auth
@@ -1309,6 +1365,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 2d418cd62ada44c6bd527db8da0731e1
           name: 'Vault: Expire renew, count'
           type: DEPENDENT
           key: vault.metrics.expire.renew
@@ -1330,6 +1387,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 091c66e0f2794a72a97ddfc3a7142b72
           name: 'Vault: Renew token, count'
           type: DEPENDENT
           key: vault.metrics.expire.renew_token
@@ -1351,6 +1409,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 21a1b8470a31484da1e3fd76d3c8094b
           name: 'Vault: Expire revoke, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke
@@ -1372,6 +1431,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: bc023bdad9504a86b17d2308db62e98f
           name: 'Vault: Revoke secrets by token, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.by_token
@@ -1393,6 +1453,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 6bed679f33b4415d833cb5033c5f824c
           name: 'Vault: Expire revoke force, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.force
@@ -1414,6 +1475,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 93041bd251d148c39e6e2e162f6f1078
           name: 'Vault: Expire revoke prefix, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.prefix
@@ -1435,6 +1497,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 5c3e5032315e466e81fca67ea880b33a
           name: 'Vault: Policy DELETE ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.delete_policy.rate
@@ -1460,6 +1523,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: bd790a83c48e4ea6bcc9271703036101
           name: 'Vault: Policy GET ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.get_policy.rate
@@ -1485,6 +1549,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 6650bc3487934dcebc2e1f4da2e1db13
           name: 'Vault: Policy LIST ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.list_policies.rate
@@ -1510,6 +1575,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: c8010706f8274e898812b722a82e9add
           name: 'Vault: Policy SET ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.set_policy.rate
@@ -1535,6 +1601,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: d7602cb55879403982afeabecb4c130a
           name: 'Vault: Process CPU seconds, total'
           type: DEPENDENT
           key: vault.metrics.process.cpu.seconds.total
@@ -1557,6 +1624,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 095af4564c5445c0be7ad38811404535
           name: 'Vault: Open file descriptors, max'
           type: DEPENDENT
           key: vault.metrics.process.max.fds
@@ -1582,6 +1650,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 0b2c6c947c46409b93acea8e67a0f058
           name: 'Vault: Open file descriptors, current'
           type: DEPENDENT
           key: vault.metrics.process.open.fds
@@ -1603,6 +1672,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: ddd6b5b8206442a7b5f0026e82bc2bd2
           name: 'Vault: Process resident memory'
           type: DEPENDENT
           key: vault.metrics.process.resident_memory.bytes
@@ -1625,6 +1695,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 241f8503d30c41df9e902cf31ddf715e
           name: 'Vault: Uptime'
           type: DEPENDENT
           key: vault.metrics.process.uptime
@@ -1651,12 +1722,14 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: a60eed70ecbc44fa935ec87d83fe4793
+              expression: 'last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m'
               name: 'Vault: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: bf3a561bc96b46fc9a818a9f43c57be5
           name: 'Vault: Process virtual memory, current'
           type: DEPENDENT
           key: vault.metrics.process.virtual_memory.bytes
@@ -1679,6 +1752,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 17c568d745534c218dc292043234b215
           name: 'Vault: Process virtual memory, max'
           type: DEPENDENT
           key: vault.metrics.process.virtual_memory.max.bytes
@@ -1705,6 +1779,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 58e6fbc8a6084008b08c7fc03ad4a703
           name: 'Vault: Runtime allocated bytes'
           type: DEPENDENT
           key: vault.metrics.runtime.alloc.bytes
@@ -1727,6 +1802,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 3b2208b0248b4288ad91a8a5e3090b29
           name: 'Vault: Runtime freed objects'
           type: DEPENDENT
           key: vault.metrics.runtime.free.count
@@ -1748,6 +1824,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: c1a159a37d4e4130a4a19d0ded2b0b72
           name: 'Vault: Runtime heap objects'
           type: DEPENDENT
           key: vault.metrics.runtime.heap.objects
@@ -1769,6 +1846,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: f8f0f80be7514fe5b085f04858ac4d7a
           name: 'Vault: Runtime malloc count'
           type: DEPENDENT
           key: vault.metrics.runtime.malloc.count
@@ -1790,6 +1868,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: b728e92f88db47308272eff7e3bb8c08
           name: 'Vault: Runtime num goroutines'
           type: DEPENDENT
           key: vault.metrics.runtime.num_goroutines
@@ -1811,6 +1890,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 9af322bade374b45b78d949e632747a8
           name: 'Vault: Runtime sys bytes'
           type: DEPENDENT
           key: vault.metrics.runtime.sys.bytes
@@ -1833,6 +1913,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 38f50f3173c346cebe6e321347e0270f
           name: 'Vault: Runtime GC runs, total'
           type: DEPENDENT
           key: vault.metrics.runtime.total.gc.runs
@@ -1853,6 +1934,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 20f0708b63784c4190e8e6256f2d57f3
           name: 'Vault: Secret kv entries'
           type: DEPENDENT
           key: vault.metrics.secret.kv.count
@@ -1877,6 +1959,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 568b4b77ae58468da7bb407d349bd330
           name: 'Vault: Token secret lease creation, rate'
           type: DEPENDENT
           key: vault.metrics.secret.lease.creation.rate
@@ -1906,6 +1989,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 37576dbac47349fca97fe27c4906124d
           name: 'Vault: Token count, total'
           type: DEPENDENT
           key: vault.metrics.token
@@ -1930,6 +2014,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 4c7ae38abae146fdbaf334501b3644f1
           name: 'Vault: Token count by auth, total'
           type: DEPENDENT
           key: vault.metrics.token.by_auth
@@ -1954,6 +2039,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 2f9011a7dd6f4b078402dbb50256ee0a
           name: 'Vault: Token count by policy, total'
           type: DEPENDENT
           key: vault.metrics.token.by_policy
@@ -1978,6 +2064,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: c5b512233ae745c390d85e604bf7449e
           name: 'Vault: Token count by ttl, total'
           type: DEPENDENT
           key: vault.metrics.token.by_ttl
@@ -2002,6 +2089,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 1a203f57eb0647ca98a848913bb5b707
           name: 'Vault: Token create, count'
           type: DEPENDENT
           key: vault.metrics.token.create
@@ -2023,6 +2111,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 0033d69a310041e58107e06a296492bd
           name: 'Vault: Token createAccessor, count'
           type: DEPENDENT
           key: vault.metrics.token.createAccessor
@@ -2044,6 +2133,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 3c73e0cdfe4147abb86ce939189e4cec
           name: 'Vault: Token creation, rate'
           type: DEPENDENT
           key: vault.metrics.token.creation.rate
@@ -2073,6 +2163,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: ad0c38837e774d9b8164bad51ae9fd4c
           name: 'Vault: Token lookup, rate'
           type: DEPENDENT
           key: vault.metrics.token.lookup.rate
@@ -2098,6 +2189,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 0d30ca2565b24659839e7e31fc8f6739
           name: 'Vault: Token revoke, count'
           type: DEPENDENT
           key: vault.metrics.token.revoke
@@ -2119,6 +2211,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: c851263be6d94ab39b548a57bbad4eab
           name: 'Vault: Token revoke tree, count'
           type: DEPENDENT
           key: vault.metrics.token.revoke.tree
@@ -2140,6 +2233,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 830ff368911c4532b10ff1e8c6c9e59b
           name: 'Vault: Token store, count'
           type: DEPENDENT
           key: vault.metrics.token.store
@@ -2161,6 +2255,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: 2f0e733e6b1c406b88d012e727ab0169
           name: 'Vault: Runtime GC pause, total'
           type: DEPENDENT
           key: vault.metrics.total.gc.pause
@@ -2186,6 +2281,7 @@ zabbix_export:
               tag: Application
               value: Vault
         -
+          uuid: f616fbcd3d20456bb34cde735cf7fad5
           name: 'Vault: Barrier GET ops, rate'
           type: DEPENDENT
           key: vault.metrics.vault.barrier.get.rate
@@ -2212,6 +2308,7 @@ zabbix_export:
               value: Vault
       discovery_rules:
         -
+          uuid: ca7bbea60da54770b164ee11d9cd325f
           name: 'Mountpoint metrics discovery'
           type: DEPENDENT
           key: vault.mountpoint.discovery
@@ -2219,6 +2316,7 @@ zabbix_export:
           description: 'Mountpoint metrics discovery.'
           item_prototypes:
             -
+              uuid: 3956d1e526d944c7b68d09a1cf52f11e
               name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.rollback.attempt.rate[{#MOUNTPOINT}]'
@@ -2244,6 +2342,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Mountpoint {#MOUNTPOINT}'
             -
+              uuid: e0a4232e6a20433ba26e4313ff9ec1bc
               name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.route.rollback.rate[{#MOUNTPOINT}]'
@@ -2271,6 +2370,7 @@ zabbix_export:
           master_item:
             key: vault.check_mountpoint_discovery
         -
+          uuid: f2015f2394a64e7e923a2030400bcd69
           name: 'Replication metrics discovery'
           type: DEPENDENT
           key: vault.replication.discovery
@@ -2278,6 +2378,7 @@ zabbix_export:
           description: 'Discovery for replication metrics.'
           item_prototypes:
             -
+              uuid: af047eca9606472680288e5b5703bca9
               name: 'Vault: Stream WAL guard found, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.logshipper.streamWALs.guard_found[{#SINGLETON}]'
@@ -2299,6 +2400,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: df61d6db369540fd9934648189e9175a
               name: 'Vault: Stream WAL missing guard, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.logshipper.streamWALs.missing_guard[{#SINGLETON}]'
@@ -2320,6 +2422,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: 288ffb2cd8bc45f39a7e6d98a2100022
               name: 'Vault: Last remote WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.fsm.last_remote_wal[{#SINGLETON}]'
@@ -2341,6 +2444,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: ca9c56e53093436f99a6a80f499aac45
               name: 'Vault: Merkle commit index{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.merkle.commit_index[{#SINGLETON}]'
@@ -2362,6 +2466,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: 854a4541b78c4df6b9d4971d71c7df49
               name: 'Vault: Last DR WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_dr_wal[{#SINGLETON}]'
@@ -2383,6 +2488,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: 5aed3273a8c24236817f8bd3b5860f87
               name: 'Vault: Last performance WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_performance_wal[{#SINGLETON}]'
@@ -2404,6 +2510,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Replication'
             -
+              uuid: f5bcef9569f44212b813cc0ec821b1ea
               name: 'Vault: Last WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_wal[{#SINGLETON}]'
@@ -2427,6 +2534,7 @@ zabbix_export:
           master_item:
             key: vault.check_replication_discovery
         -
+          uuid: ef703fedc3b347e9bb878d159d6756d8
           name: 'Storage metrics discovery'
           type: DEPENDENT
           key: vault.storage.discovery
@@ -2441,6 +2549,7 @@ zabbix_export:
           description: 'Storage backend metrics discovery.'
           item_prototypes:
             -
+              uuid: 0cdb0bcf0ff448ff8c5d673f9b66d17a
               name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.storage.rate[{#STORAGE}, {#OPERATION}]'
@@ -2468,6 +2577,7 @@ zabbix_export:
           master_item:
             key: vault.check_storage_discovery
         -
+          uuid: d580dee4c0bc4a0db91c9c5af70965af
           name: 'Token metrics discovery'
           type: DEPENDENT
           key: vault.tokens.discovery
@@ -2475,6 +2585,7 @@ zabbix_export:
           description: 'Tokens metrics doscovery.'
           item_prototypes:
             -
+              uuid: 9a9359e74c3a48b1bbada84d772e665a
               name: 'Token [{#TOKEN_NAME}] error'
               type: DEPENDENT
               key: 'vault.token_via_accessor.error["{#ACCESSOR}"]'
@@ -2502,14 +2613,16 @@ zabbix_export:
                   value: 'Vault: Token {#TOKEN_NAME}'
               trigger_prototypes:
                 -
-                  expression: '{strlen()}>0'
+                  uuid: 8cd5d903d4e74974a8469554b737ee3d
+                  expression: 'length(last(/HashiCorp Vault by HTTP/vault.token_via_accessor.error["{#ACCESSOR}"]))>0'
                   name: 'Vault: Token [{#TOKEN_NAME}] lookup error occurred'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Vault: Vault server is sealed'
-                      expression: '{HashiCorp Vault by HTTP:vault.health.sealed.last()}=1'
+                      expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
             -
+              uuid: caa3f9ca96b14b929dd75238602fead9
               name: 'Token [{#TOKEN_NAME}] has TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.has_ttl["{#ACCESSOR}"]'
@@ -2538,6 +2651,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: Token {#TOKEN_NAME}'
             -
+              uuid: 0f872d9d811c44f6a9a9f8f5089ca0a1
               name: 'Token [{#TOKEN_NAME}] TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.ttl["{#ACCESSOR}"]'
@@ -2558,17 +2672,19 @@ zabbix_export:
                   value: 'Vault: Token {#TOKEN_NAME}'
           trigger_prototypes:
             -
-              expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+              uuid: f4f0db7e26d9470a86d11e86d1ae26e2
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
               name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
               priority: AVERAGE
             -
-              expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.WARN}'
+              uuid: 0e2143a2a46d44778db34ac9af69bbfc
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}'
               name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN})'
               priority: WARNING
               dependencies:
                 -
                   name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
-                  expression: '{HashiCorp Vault by HTTP:vault.token_via_accessor.has_ttl["{#ACCESSOR}"].last()}=1 and {HashiCorp Vault by HTTP:vault.token_via_accessor.ttl["{#ACCESSOR}"].last()}<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
           master_item:
             key: vault.get_tokens
           lld_macro_paths:
@@ -2579,6 +2695,7 @@ zabbix_export:
               lld_macro: '{#TOKEN_NAME}'
               path: $.token_name
         -
+          uuid: ce7b2bb4c09c42d5a4b9e92c1c3dee23
           name: 'WAL metrics discovery'
           type: DEPENDENT
           key: vault.wal.discovery
@@ -2586,6 +2703,7 @@ zabbix_export:
           description: 'Discovery for WAL metrics.'
           item_prototypes:
             -
+              uuid: 7e21309d1778466cae08e6424108d0e9
               name: 'Vault: Delete WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.deletewals[{#SINGLETON}]'
@@ -2607,6 +2725,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: WAL'
             -
+              uuid: 80d5a79d35bc4b3a970f311b0c8c3fbf
               name: 'Vault: Flush ready WAL, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.flushready[{#SINGLETON}]'
@@ -2628,6 +2747,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: WAL'
             -
+              uuid: daee033751164b6591d326d2d59b7e3a
               name: 'Vault: GC deleted WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.gc.deleted[{#SINGLETON}]'
@@ -2649,6 +2769,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: WAL'
             -
+              uuid: b45b43ac739246719e517d04eb384787
               name: 'Vault: WALs on disk, total{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.gc.total[{#SINGLETON}]'
@@ -2670,6 +2791,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: WAL'
             -
+              uuid: b1e306d6136a4b6d933bd2154b3d5d6e
               name: 'Vault: Load WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.loadWAL[{#SINGLETON}]'
@@ -2691,6 +2813,7 @@ zabbix_export:
                   tag: Application
                   value: 'Vault: WAL'
             -
+              uuid: de8fea26aa1546d2bdf1ec7dd5205a3b
               name: 'Vault: Persist WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.persistwals[{#SINGLETON}]'
@@ -2763,6 +2886,7 @@ zabbix_export:
           description: 'Token TTL warning threshold.'
       valuemaps:
         -
+          uuid: 547a6b8002d44a8f8f363023c6097b1e
           name: 'Service state'
           mappings:
             -
@@ -2772,6 +2896,7 @@ zabbix_export:
               value: '1'
               newvalue: Up
         -
+          uuid: 46edbd58c7384b53bb31775244c23343
           name: 'Vault flag'
           mappings:
             -
@@ -2782,11 +2907,13 @@ zabbix_export:
               newvalue: 'True'
   triggers:
     -
-      expression: '{HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
+      uuid: ebe6f65e82ed4f00bd7c5be30841a25c
+      expression: 'min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}'
       name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
   graphs:
     -
+      uuid: b4fc517d099340558fe813c6fb8c6be2
       name: 'Vault: Cache rate'
       graph_items:
         -
@@ -2810,6 +2937,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.cache.write.rate
     -
+      uuid: 81fa6888cef7496eb46a15f11e8a238c
       name: 'Vault: Expiring leases'
       graph_items:
         -
@@ -2819,6 +2947,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.expire.num_leases
     -
+      uuid: a96e30071bef4da6839e405ae5b183c5
       name: 'Vault: K/V secret engine entries'
       graph_items:
         -
@@ -2828,6 +2957,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.secret.kv.count
     -
+      uuid: e7e470ee9e914d4d9fc81b598889f873
       name: 'Vault: Requests rate'
       graph_items:
         -
@@ -2837,6 +2967,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.core.handle.request
     -
+      uuid: 2e4eda3a71b74e14a0c4843a96a53dbc
       name: 'Vault: Runtime memory'
       graph_items:
         -
@@ -2860,6 +2991,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.process.virtual_memory.bytes
     -
+      uuid: db2043aa454a440995a178e342d3eca5
       name: 'Vault: Token checks'
       graph_items:
         -
@@ -2869,6 +3001,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.core.check.token.rate
     -
+      uuid: 39770778f73c49b0a333d313b76f4020
       name: 'Vault: Token lookup'
       graph_items:
         -
@@ -2878,6 +3011,7 @@ zabbix_export:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.token.lookup.rate
     -
+      uuid: 6b23dff0bd364416b520cca9dab56b47
       name: 'Vault: Tokens count'
       graph_items:
         -
