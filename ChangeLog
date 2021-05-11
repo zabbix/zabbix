@@ -9,6 +9,10 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
+...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
+.......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
+........S. [ZBX-19321] fixed missing event tags in case of multiple problems (dgoloscapov)
 ...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
