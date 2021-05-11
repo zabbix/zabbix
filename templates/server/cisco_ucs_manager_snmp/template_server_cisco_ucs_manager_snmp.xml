@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-03T19:37:16Z</date>
+   <date>2021-05-11T18:40:35Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -11,7 +11,8 @@
       <template>
          <template>Template Server Cisco UCS Manager SNMP</template>
          <name>Template Server Cisco UCS Manager SNMP</name>
-         <description>Template Server Cisco UCS Manager&#13;
+         <description>This is a template for Cisco UCS Manager monitoring via Zabbix SNMP Agent that works without any external scripts.&#13;
+&#13;
 &#13;
 MIBs used:&#13;
 CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
@@ -21,7 +22,7 @@ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB&#13;
 CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 IF-MIB&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
