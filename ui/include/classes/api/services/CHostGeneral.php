@@ -403,101 +403,97 @@ abstract class CHostGeneral extends CHostBase {
 		if (!is_null($targetids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid,h.name as host'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
 		$dbItems = DBSelect($sql);
-		$items = [
+		$upd_items = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
 			ZBX_FLAG_DISCOVERY_RULE => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		while ($item = DBfetch($dbItems)) {
-			$items[$item['flags']][$item['itemid']] = [
-				'name' => $item['name'],
-				'host' => $item['host']
-			];
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else{
-				DB::update('items', [
-					'values' => ['templateid' => 0],
-					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_RULE])]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_RULE] as $discoveryRule) {
-					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
-				}
-			}
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])) {
-			if ($clear) {
-				CItemManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else{
-				DB::update('items', [
-					'values' => ['templateid' => 0, 'valuemapid' => 0],
-					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL])]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item) {
-					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $item['host']));
-				}
-			}
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-
-			if ($clear) {
-				// Deletes item prototypes and related entities.
-				CItemPrototypeManager::delete($item_prototypeids);
+				$upd_items[$item['flags']][$item['itemid']] = true;
 			}
 			else {
-				DB::update('items', [
-					'values' => ['templateid' => 0, 'valuemapid' => 0],
-					'where' => ['itemid' => $item_prototypeids]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
-					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
+				$upd_item = ['templateid' => 0];
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_item['uuid'] = generateUuidV4();
 				}
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$upd_item['valuemapid'] = 0;
+				}
+
+				$upd_items[$item['flags']][$item['itemid']] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			if ($clear) {
+				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */
 
 		// host prototypes
 		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
-		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY_RULE])) {
-			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_RULE]);
-
-			$hostPrototypes = DBfetchArrayAssoc(DBSelect(
-				'SELECT DISTINCT h.hostid,h.host,h3.host AS parent_host'.
+		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			$host_prototypes = DBSelect(
+				'SELECT DISTINCT h.hostid,h3.status as host_status'.
 				' FROM hosts h'.
 					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
 					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
 					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
 					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', $discoveryRuleIds)
-			), 'hostid');
-			if ($hostPrototypes) {
-				DB::update('hosts', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($hostPrototypes)]
-				]);
+				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
+			);
+
+			$upd_host_prototypes = [];
+
+			while ($host_prototype = DBfetch($host_prototypes)) {
+				$upd_host_prototype = ['templateid' => 0];
+				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_host_prototype['uuid'] = generateUuidV4();
+				}
+
+				$upd_host_prototypes[$host_prototype['hostid']] = [
+					'values' => $upd_host_prototype,
+					'where' => ['hostid' => $host_prototype['hostid']]
+				];
+			}
+
+			if ($upd_host_prototypes) {
+				DB::update('hosts', $upd_host_prototypes);
 				DB::update('group_prototype', [
 					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($hostPrototypes)]
+					'where' => ['hostid' => array_keys($upd_host_prototypes)]
 				]);
-				foreach ($hostPrototypes as $hostPrototype) {
-					info(_s('Unlinked: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parent_host']));
-				}
 			}
 		}
 
