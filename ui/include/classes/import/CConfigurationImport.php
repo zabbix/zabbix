@@ -2739,7 +2739,7 @@ class CConfigurationImport {
 
 				if ($missing_master_itemids) {
 					$options = [
-						'output' => ['key_', 'type', 'hostid', 'master_itemid'],
+						'output' => ['uuid', 'key_', 'type', 'hostid', 'master_itemid'],
 						'itemids' => $missing_master_itemids,
 						'preservekeys' => true
 					];
