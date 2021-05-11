@@ -294,6 +294,12 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
+#define ZBX_XPATH_HV_SCSI_TOPOLOGY									\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"				\
+		"[text()='config.storageDevice.scsiTopology']][1]"					\
+		"/*[local-name()='val']/*[local-name()='adapter']/*[local-name()='target']"		\
+		"/*[local-name()='lun']/*[local-name()='scsiLun']"
+
 #define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
 		"count(/*/*/*/*/*/*/*[local-name()='val']/*[local-name()='lun']"			\
 		"/*[local-name()='path'][*[local-name()='state'][text()='active'] and "			\
@@ -3310,8 +3316,8 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		ZBX_POST_VSPHERE_FOOTER
 
 #	define ZBX_POST_SCSI_INFO									\
-		"<urn:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</urn:pathSet>"		\
-		"<urn:pathSet>config.storageDevice.scsiLun[\"%s\"].uuid</urn:pathSet>"
+		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"		\
+		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].uuid</ns0:pathSet>"
 
 	zbx_vector_str_t	scsi_luns;
 	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
@@ -3320,11 +3326,14 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
 
 	zbx_vector_str_create(&scsi_luns);
-	zbx_xml_read_values(hv_data, "//scsiLun/target/lun/scsiLun", &scsi_luns);
+	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() scsiLun:'%d'", __func__, scsi_luns.values_num);
 
 	if (0 == scsi_luns.values_num)
+	{
+		ret = SUCCEED;
 		goto out;
+	}
 
 	for (i = 0; i < scsi_luns.values_num; i++)
 	{
@@ -3334,7 +3343,6 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	hvid_esc = xml_escape_dyn(hvid);
 	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
 			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
-
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
@@ -3350,6 +3358,7 @@ out:
 
 	return ret;
 
+#	undef	ZBX_POST_SCSI_INFO
 #	undef	ZBX_POST_HV_MP_DETAILS
 }
 
