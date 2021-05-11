@@ -300,18 +300,20 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"/*[local-name()='val']/*[local-name()='adapter']/*[local-name()='target']"		\
 		"/*[local-name()='lun']/*[local-name()='scsiLun']"
 
-#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
-		"count(/*/*/*/*/*/*/*[local-name()='val']/*[local-name()='lun']"			\
-		"/*[local-name()='path'][*[local-name()='state'][text()='active'] and "			\
-		"../*[local-name()='id']=../../../../*[local-name()='propSet']/*[local-name()='val']"	\
-		"/*[local-name()='ScsiLun']/*[local-name()='uuid'][../*[local-name()='canonicalName']"	\
-		"[text()='%s']]])"
+#define ZBX_XPATH_HV_MULTIPATH(state)									\
+		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
+		"/*[local-name()='lun']/*[local-name()='path'][" state					\
+		"../*[local-name()='id']=../../../../*[local-name()='propSet']/*[local-name()='val']["	\
+		"substring(../*[local-name()='name'],1,string-length(../*[local-name()='name'])"	\
+		" - string-length('uuid'))=substring(../../*[local-name()='propSet']"			\
+		"[*[local-name()='val'][text()='%s']]/*[local-name()='name'],1,"			\
+		"string-length(../*[local-name()='name']) - string-length('uuid'))]])"
 
-#define ZBX_XPATH_HV_MULTIPATH_PATHS()									\
-		"count(/*/*/*/*/*/*/*[local-name()='val']/*[local-name()='lun']"			\
-		"/*[local-name()='path'][../*[local-name()='id']=../../../../*[local-name()='propSet']"	\
-		"/*[local-name()='val']/*[local-name()='ScsiLun']/*[local-name()='uuid']"		\
-		"[../*[local-name()='canonicalName'][text()='%s']]])"
+
+#define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
+#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
+		ZBX_XPATH_HV_MULTIPATH("*[local-name()='state'][text()='active'] and ")
+
 
 #define ZBX_XPATH_DS_INFO_EXTENT()									\
 		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
