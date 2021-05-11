@@ -492,11 +492,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				return;
 			}
 
-			if ($param !== '' && $param[0] === '"' && substr($param, -1) === '"') {
-				return;
-			}
-
-			$param = '"'.str_replace('"', '\\"', $param).'"';
+			$param = CHistFunctionParser::quoteParam($param);
 		});
 
 		// Remove empty parameters from the end of the parameters array.

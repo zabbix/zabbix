@@ -1071,6 +1071,121 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '1h']
 			],
 			[
+				'nodata(/host/key, "\\\\1h\\\\")', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'nodata(/host/key, "\\\\1h\\\\")',
+					'function' => 'nodata',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 18,
+							'match' => '"\\\\1h\\\\"',
+							'length' => 8
+						]
+					]
+				],
+				['/host/key', '\\1h\\']
+			],
+			[
+				'nodata(/host/key, "\\"")', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'nodata(/host/key, "\\"")',
+					'function' => 'nodata',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 18,
+							'match' => '"\\""',
+							'length' => 4
+						]
+					]
+				],
+				['/host/key', '"']
+			],
+			[
+				'find(/host/key,,"like","\\"")', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'find(/host/key,,"like","\\"")',
+					'function' => 'find',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 15,
+							'match' => '',
+							'length' => 0
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 16,
+							'match' => '"like"',
+							'length' => 6
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 23,
+							'match' => '"\\""',
+							'length' => 4
+						]
+					]
+				],
+				['/host/key', '', 'like', '"']
+			],
+			[
+				'nodata(/host/key, "\\\\1h\\")', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
 				'last(/{HOST.HOST}/key)', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
