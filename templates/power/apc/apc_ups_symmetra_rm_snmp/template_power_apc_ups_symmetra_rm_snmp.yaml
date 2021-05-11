@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:08Z'
+  date: '2021-05-11T08:04:59Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -220,7 +220,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: d4785c48d2f94292800c71ca4cfc099f
+              uuid: 0b4490eaaf964fdabf228d34d2992d30
               expression: 'min(/APC UPS Symmetra RM SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
               name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -318,7 +318,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: 50d19b1d1c7c48e8b5f0c7d39fd9c5aa
+              uuid: af166242e3674f2da489a232c7bba6f1
               expression: 'min(/APC UPS Symmetra RM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC UPS Symmetra RM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC UPS Symmetra RM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
               name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
@@ -349,7 +349,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: 0d7fb8f2aca348719e976e486401d2f3
+              uuid: 3b51bbae66914b19a93e7a2da289b056
               expression: 'min(/APC UPS Symmetra RM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC UPS Symmetra RM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS Symmetra RM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
               name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
@@ -405,7 +405,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: 9ca9e7c592d345e9abe7020056091e7f
+              uuid: a25499c49d0043cda248136eb6307ef9
               expression: 'min(/APC UPS Symmetra RM SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
               name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
@@ -647,7 +647,7 @@ zabbix_export:
               tag: General
           triggers:
             -
-              uuid: 6303b6d8ba574f3f923ecf7a13603464
+              uuid: e3cf119c19b54dddb3d26d9b789ea4f5
               expression: '(last(/APC UPS Symmetra RM SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra RM SNMP/system.name[sysName.0],#2))=1 and length(last(/APC UPS Symmetra RM SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -755,7 +755,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: d36ee673417646d9bffaea03bfbf93d0
+              uuid: 56f25581382a43efbddd4aba44aa86b3
               expression: 'max(/APC UPS Symmetra RM SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -858,7 +858,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 18506e43b61b4d1fad4d8ff88e1b424c
+                  uuid: 002caa5fac72437187ab9711eb2fc7ad
                   expression: 'find(/APC UPS Symmetra RM SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0|1]{15}$")=1'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -906,7 +906,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 51dce9917f524a56b6d6e76c0cb162aa
+                  uuid: 9ca2e1e1a81e4e2388f735c03f9bc1de
                   expression: 'find(/APC UPS Symmetra RM SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -951,7 +951,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 7d678bc8b4784132a83339fd32d31df2
+                  uuid: b9a868a2f4a0410e9a03744eef9a5515
                   expression: 'min(/APC UPS Symmetra RM SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
                   opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -1258,7 +1258,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 2f4348cce79c4a8cb8ef165315812efa
+                  uuid: 341c10188b984ce7aac7bb995847b69e
                   expression: 'min(/APC UPS Symmetra RM SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS Symmetra RM SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
@@ -1343,7 +1343,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: ca01b3a0035f4691882bca39e84a5a0d
+                  uuid: 85551dd4ca0b4ef6994348891ad77b57
                   expression: 'min(/APC UPS Symmetra RM SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS Symmetra RM SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'

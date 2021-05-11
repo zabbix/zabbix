@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:18Z'
+  date: '2021-05-11T08:05:07Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -168,25 +168,25 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 281655d3611c4976a813e2021d9c6d58
+              uuid: 6181b0f6c4cf4febaa86039dae994f30
               expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: c7fbff45821e45a597781e3d7b5fff2a
+              uuid: ebe250d8faf543429bd5732114f05fd4
               expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShort")=2'
               name: 'Status: Device has "heatsinkTempSensorShort" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 9f25b31f229448689a41d0e79005e075
+              uuid: ff3ee8e7bd074037a99a56f02dfaff72
               expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","suresineHot")=2'
               name: 'Status: Device has "suresineHot" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: c77b206d2b624b738fc7556beb58c236
+              uuid: 64c7437f53f74578a85b358f73529322
               expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","unknownAlarm")=2'
               name: 'Status: Device has "unknownAlarm" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -240,49 +240,49 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 226d1245b46d451296f7582aef688b53
+              uuid: 438d1fb319234de9aaa74fa565e6c661
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: e29f9ac281dd4b27a09b9c229a468582
+              uuid: 174685e8f89f4e21b7275db6be7623b2
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 2874cad1a9164b64a8085dee1336a3ad
+              uuid: 283d5eb818744b25b4275509b0492bfd
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2'
               name: 'Status: Device has "highVoltageDisconnect" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 52b688c0367e4e6e84f34570f37ca9c3
+              uuid: a271f6d0e1504e46966da689b91cf1f7
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 200ea1a1c5c345d4a5be772691a7afc1
+              uuid: 88df087dcb434c5d9980d249f077a661
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","reset")=2'
               name: 'Status: Device has "reset" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: d9dff1589c7b44b8935ed3edb5c0879f
+              uuid: 9fa2ec74f9b34f0082d9173f57e1edf6
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 372fe47a9a384991acfabab2a4d074e5
+              uuid: 970e89c852c34a219ad0c1fce357e97a
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","suresineHot")=2'
               name: 'Status: Device has "suresineHot" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 1c84f7fdc7a24dada9658a93b6952164
+              uuid: fe023e11a544470cb09db1585d7f1e83
               expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","unknownFault")=2'
               name: 'Status: Device has "unknownFault" faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -314,7 +314,7 @@ zabbix_export:
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
             -
-              uuid: c47df737c7d6495387e9e51ce4245b4c
+              uuid: db5506294fd945659eae945014332a62
               expression: 'nodata(/Morningstar SureSine SNMP/status.uptime,5m)=1'
               name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
@@ -381,19 +381,19 @@ zabbix_export:
                   value: Battery
               trigger_prototypes:
                 -
-                  uuid: ad3240419e854143b74a27168718c3d4
+                  uuid: 4b27f6ecdc674803a883a8a60e3ddce2
                   expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 08d60e6cd8b34892a07308bd94b75812
+                  uuid: dfbcd455a92d423fbb841f2d6b6293a8
                   expression: 'max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 64598184eff14293a9dd6657674e682b
+                  uuid: e0173479978841ec8607430cf2fb356e
                   expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -403,7 +403,7 @@ zabbix_export:
                       name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                       expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                 -
-                  uuid: 06cd98b131354b1497a8a4e329fc8ff2
+                  uuid: 75a433d7ec28440f947a4aaed3aed33d
                   expression: 'max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:58Z'
+  date: '2021-05-11T08:05:39Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -165,7 +165,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: 3190c68cbf1a4a30b3b19d297f351673
+              uuid: 4ecadb993aa74126a807df3af4b892ed
               expression: 'min(/ClickHouse by HTTP/clickhouse.distributed.files,5m)>{$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN}'
               name: 'ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
               priority: WARNING
@@ -247,7 +247,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: 04495ffab294498e83874614cf217340
+              uuid: 164dc9841cdd4b77a650792cf1bac701
               expression: 'min(/ClickHouse by HTTP/clickhouse.insert.delay,5m)>{$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN}'
               name: 'ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min)'
               priority: WARNING
@@ -418,7 +418,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: eae5d2f04c8b4c9484ae0608d9d5c419
+              uuid: 21e6d3c6047145c59cbd00032699ee99
               expression: 'min(/ClickHouse by HTTP/clickhouse.max.part.count.for.partition,5m)>{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} * 0.9'
               name: 'ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
               priority: WARNING
@@ -642,7 +642,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: 07ba92a42dd8483c87a77c08f9435ae5
+              uuid: d49b9e8978bd416f81ea01b935879d81
               expression: 'min(/ClickHouse by HTTP/clickhouse.network.error.rate,5m)>{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}'
               name: 'ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
@@ -847,7 +847,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: 6e12164677494d8a84caf56967418941
+              uuid: fc47a407b15744e79b70088ec249951a
               expression: 'min(/ClickHouse by HTTP/clickhouse.replicas.max.absolute.delay,5m)>{$CLICKHOUSE.REPLICA.MAX.WARN}'
               name: 'ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
               priority: WARNING
@@ -1066,7 +1066,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: b61cc4ecfa464e21ad1f16f24ef17a1d
+              uuid: dfd9500636824ebf9d51d93650d62613
               expression: '(last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2))=1 and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0'
               name: 'ClickHouse: Configuration has been changed'
               priority: INFO
@@ -1123,7 +1123,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: c02ac31b5296464cbba25a7518367de4
+              uuid: 975cebc1b4324f83b5a8853fd666a179
               expression: 'nodata(/ClickHouse by HTTP/clickhouse.uptime,30m)=1'
               name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
@@ -1172,7 +1172,7 @@ zabbix_export:
               value: ClickHouse
           triggers:
             -
-              uuid: 87bd64ad9350475497b6d49463379160
+              uuid: 244dcf8dc8584e1686585160c261ef85
               expression: '(last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2))=1 and length(last(/ClickHouse by HTTP/clickhouse.version))>0'
               name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1289,7 +1289,7 @@ zabbix_export:
               value: 'ClickHouse ZooKeeper'
           triggers:
             -
-              uuid: 5b99f70d221444079d9eb1335ffc8648
+              uuid: 655622aa6c5c48c8b38d5a519602ef05
               expression: 'min(/ClickHouse by HTTP/clickhouse.zookeper.session,5m)>1'
               name: 'ClickHouse: Too many ZooKeeper sessions opened'
               priority: WARNING
@@ -1588,7 +1588,7 @@ zabbix_export:
                   value: 'ClickHouse: "{#DB}.{#TABLE}" replica status'
               trigger_prototypes:
                 -
-                  uuid: d0c0dc20f42947eb8732e0bc8b529d39
+                  uuid: 7cfd2342d3654407a941cb56fde5c6bf
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_readonly["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica is readonly'
                   priority: WARNING
@@ -1616,7 +1616,7 @@ zabbix_export:
                   value: 'ClickHouse: "{#DB}.{#TABLE}" replica status'
               trigger_prototypes:
                 -
-                  uuid: e0f71b65a7ac4e638204c58e6170237c
+                  uuid: 765475cc0be84ce1b85d1f026d08c326
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica session is expired'
                   priority: WARNING
@@ -1643,7 +1643,7 @@ zabbix_export:
                   value: 'ClickHouse: "{#DB}.{#TABLE}" replica status'
               trigger_prototypes:
                 -
-                  uuid: 9e40d063b04c4e529b82986264867d19
+                  uuid: 0b06b448c0ad433c94c2a3788ca53e1a
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.lag["{#DB}.{#TABLE}"],5m) > {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}'
                   name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)'
                   priority: WARNING
@@ -1744,7 +1744,7 @@ zabbix_export:
                   value: 'ClickHouse: "{#DB}.{#TABLE}" replica status'
               trigger_prototypes:
                 -
-                  uuid: c887a5d96b1c4a91909263bb9249cfd2
+                  uuid: 6fe0a15168db4abfa1cd2a2ee45d62ad
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.queue_size["{#DB}.{#TABLE}"],5m)>{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN:"{#TABLE}"}'
                   name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)'
                   priority: WARNING
@@ -1769,7 +1769,7 @@ zabbix_export:
                   value: 'ClickHouse: "{#DB}.{#TABLE}" replica status'
           trigger_prototypes:
             -
-              uuid: 379ccd1ee81b46eba3d5a197ee12fcad
+              uuid: f46f1b8d75c54129b6e2ff9ede2501b5
               expression: 'max(/ClickHouse by HTTP/clickhouse.replica.active_replicas["{#DB}.{#TABLE}"],5m) < last(/ClickHouse by HTTP/clickhouse.replica.total_replicas["{#DB}.{#TABLE}"])'
               name: 'ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas'
               priority: WARNING

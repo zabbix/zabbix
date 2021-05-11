@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:06Z'
+  date: '2021-05-11T08:04:57Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -220,7 +220,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: f2f6665f9ff44befa3d8bf1a975dcc82
+              uuid: 1c67af712882479bbf7143bd3e16ed77
               expression: 'min(/APC Smart-UPS 3000 XLM SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
               name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -318,7 +318,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: c1cae8ba959d47a1bb7a483d81b3a3e3
+              uuid: 78e47553d4bb488991067f53cc8f8a01
               expression: 'min(/APC Smart-UPS 3000 XLM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS 3000 XLM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS 3000 XLM SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
               name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
@@ -349,7 +349,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: 7af69178dbe24ed28e3cbe5f4b2dc0ee
+              uuid: 28ad85fa6035433f9a7ec45a8393b603
               expression: 'min(/APC Smart-UPS 3000 XLM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS 3000 XLM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS 3000 XLM SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
               name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
@@ -405,7 +405,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: ae08950d9865489e98db66640942d1da
+              uuid: f667172a5cf44ed6b98f2bb38a3f3806
               expression: 'min(/APC Smart-UPS 3000 XLM SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
               name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
@@ -647,7 +647,7 @@ zabbix_export:
               tag: General
           triggers:
             -
-              uuid: 391d9d9d89ce4c4a977d4cb5203b93d8
+              uuid: c9b1f69a882148a180ec1e2600068671
               expression: '(last(/APC Smart-UPS 3000 XLM SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS 3000 XLM SNMP/system.name[sysName.0],#2))=1 and length(last(/APC Smart-UPS 3000 XLM SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -755,7 +755,7 @@ zabbix_export:
               tag: Status
           triggers:
             -
-              uuid: 8aa7674108df47088a4d12ea09c32242
+              uuid: 71994587c45546bfb0950606d7f69936
               expression: 'max(/APC Smart-UPS 3000 XLM SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -858,7 +858,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 054c08a5f48e4bebb9aafbbd82d6f4a5
+                  uuid: 400987be93b34a78865685fedb72a5ee
                   expression: 'find(/APC Smart-UPS 3000 XLM SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0|1]{15}$")=1'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -906,7 +906,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 63a8d0bd2efd42f090755b0df714c249
+                  uuid: 03a100c0bb8d457690e2467c502fcadb
                   expression: 'find(/APC Smart-UPS 3000 XLM SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
@@ -951,7 +951,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: b72814e3e25d405e96e640b97ee3664d
+                  uuid: 9760f6a951a64e3fa6c67a9dd751f79a
                   expression: 'min(/APC Smart-UPS 3000 XLM SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
                   opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -1258,7 +1258,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 9dbe9ef61ebe4cf2b3983c0efd43cebd
+                  uuid: 709ad3894aca49f0be051d338d4ffaed
                   expression: 'min(/APC Smart-UPS 3000 XLM SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS 3000 XLM SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
@@ -1343,7 +1343,7 @@ zabbix_export:
                   tag: Status
               trigger_prototypes:
                 -
-                  uuid: 41ed5de05e4b4043a2430424a1474812
+                  uuid: dbdf66b61dce4b6dbf49371e9b1f8146
                   expression: 'min(/APC Smart-UPS 3000 XLM SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS 3000 XLM SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'

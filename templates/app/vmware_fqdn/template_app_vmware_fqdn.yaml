@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:37Z'
+  date: '2021-05-11T08:05:22Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1502,7 +1502,7 @@ zabbix_export:
                   value: VMware
               trigger_prototypes:
                 -
-                  uuid: 0d653d38ecc84ae1bbf737e8687b4e2f
+                  uuid: 8f1de4827ba446ef902ca5fa44109c6d
                   expression: '(last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2))=1 and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}'
                   name: 'VMware: The multipath count has been changed'
                   opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:55Z'
+  date: '2021-05-11T08:05:36Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -98,7 +98,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 67a6468727e744f5b9caaa1490b1c9aa
+                  uuid: 1a48aee477d54d34bdea47fc6027968c
                   expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -107,7 +107,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 5354a5223784456580f00765aac71b24
+                  uuid: 2c2914d1c8c846d180ee308fa861540e
                   expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -121,7 +121,7 @@ zabbix_export:
                       expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: 50a52138cec34772937e5b7fcb33604f
+                  uuid: 1439e7a34bbf4046836890f208f99a48
                   expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'

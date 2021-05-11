@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:25Z'
+  date: '2021-05-11T08:05:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -63,7 +63,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: 5b78f59f3f674796a658c410c8a6e321
+              uuid: 0a779320c2ba4494b8c55aef969e7c9d
               expression: 'min(/Ubiquiti AirOS SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -93,7 +93,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 81e9752720eb4974b7c3f237617bc79b
+              uuid: ab4a91cf3c2a4305a59727558c00a1f8
               expression: '(last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2))=1 and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -217,7 +217,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              uuid: 96db09feb4454a5d8eb7dfe7e87005f2
+              uuid: 30c0c80ae6df45bb96c434016e394bba
               expression: 'min(/Ubiquiti AirOS SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE

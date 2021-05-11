@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:28Z'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -982,7 +982,7 @@ zabbix_export:
               value: Squid
           triggers:
             -
-              uuid: acebc2a920604bf58b935b90288903a2
+              uuid: c5991152d2da4df7ae0d978233c5a859
               expression: '(last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2))=1 and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
               priority: INFO
@@ -1022,7 +1022,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      uuid: fd81709d1d3c475e9f99a6641d0e4d81
+      uuid: 89a1cfe0f02f4da880f197c2e5605db8
       expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
       name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING

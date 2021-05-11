@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:28Z'
+  date: '2021-05-11T08:04:17Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -33,7 +33,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: 35b7375988ef4bcb9accde7a55959917
+              uuid: 6721e8fbe5ee45aa9d06b698210a268a
               expression: 'avg(/HP-UX/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
@@ -144,7 +144,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: d9cab0e587ba4f44b3339a6c136890ef
+              uuid: 07215ae05345423d8625962b85d9d4ec
               expression: '(last(/HP-UX/system.hostname,#1)<>last(/HP-UX/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
@@ -180,7 +180,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: d2103a2987f94871a988a0d48a527469
+              uuid: 34f76014b2d3434a8d1f1f0657b5605f
               expression: '(last(/HP-UX/system.uname,#1)<>last(/HP-UX/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
@@ -209,7 +209,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              uuid: fd78565deb1a4cb290dbe6916bc2b146
+              uuid: f65c254d50e2454d9840784ff979f5d3
               expression: '(last(/HP-UX/vfs.file.cksum[/etc/passwd],#1)<>last(/HP-UX/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING

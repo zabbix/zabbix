@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:27Z'
+  date: '2021-05-11T08:04:16Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -63,7 +63,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: 712a579fe05f46b4aaa0541c71f4d48e
+              uuid: d67740bc103348ab8ab11df2bdb0ad8f
               expression: 'avg(/OpenBSD/proc.num[,,run],5m)>30'
               name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
@@ -79,7 +79,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: 5bb5869a81bf4b559aaab97f407fbf58
+              uuid: dd1b0c14e6dd439ea8f7323cdcc607de
               expression: 'avg(/OpenBSD/proc.num[],5m)>300'
               name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
@@ -131,7 +131,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: cba2e563c43147bbb2940919d51533bb
+              uuid: 1128bfb41f5f420c81feffb1d395cf9f
               expression: 'avg(/OpenBSD/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
@@ -275,7 +275,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: 54e7e539902447aea3db4716a7a99da7
+              uuid: d6927a9b74eb4cb8b15400baf784fc36
               expression: '(last(/OpenBSD/system.hostname,#1)<>last(/OpenBSD/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
@@ -350,7 +350,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: f19f8f5d3aa549c4b278d45095c86e1e
+              uuid: 3d3bcd54f24448c1a11746a4e75ea736
               expression: '(last(/OpenBSD/system.uname,#1)<>last(/OpenBSD/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
@@ -399,7 +399,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              uuid: 092129d6d21c455d80e524ce5a5a4031
+              uuid: 9db4055df94d414d86938066ed05dbc5
               expression: '(last(/OpenBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/OpenBSD/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING

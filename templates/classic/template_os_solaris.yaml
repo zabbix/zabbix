@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:30Z'
+  date: '2021-05-11T08:04:19Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -46,7 +46,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: add06c1202704368ad41e785b9103a5d
+              uuid: 6504ba0f7fa445ea9083af008d52c525
               expression: 'avg(/Solaris/proc.num[,,run],5m)>30'
               name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
@@ -62,7 +62,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: c4a2c5d68ab04ce8bdf9e0033cd88bfe
+              uuid: cc2731add899436ca2c12fff13c838fb
               expression: 'avg(/Solaris/proc.num[],5m)>300'
               name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
@@ -114,7 +114,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: 72da82fb700c4604ae70883f3f020b6b
+              uuid: e7ef1c2b702440a3a7a20a544446a068
               expression: 'avg(/Solaris/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
@@ -196,7 +196,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: e2e68aaa825f4bb38c47e8510e30f25d
+              uuid: 280634a65c9d4702a4913c9c2cd5869c
               expression: 'avg(/Solaris/system.cpu.util[,iowait],5m)>20'
               name: 'Disk I/O is overloaded on {HOST.NAME}'
               priority: WARNING
@@ -250,7 +250,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: f3fd936e496a4f5e84a13284d0d93f89
+              uuid: cc5a9c97827f4091b83af8be33d58560
               expression: '(last(/Solaris/system.hostname,#1)<>last(/Solaris/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
@@ -325,7 +325,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: 325fef9ebe734dd6bcb51cbcb33189ea
+              uuid: dc293e688ac54ac0aee61e398d8bc5c5
               expression: '(last(/Solaris/system.uname,#1)<>last(/Solaris/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
@@ -374,7 +374,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              uuid: ab3be8dae14344e2aafd901b61b81b0c
+              uuid: 50e5be0acabb41658ec82772d9ec234e
               expression: '(last(/Solaris/vfs.file.cksum[/etc/passwd],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING

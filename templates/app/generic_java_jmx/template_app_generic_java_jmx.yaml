@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:30Z'
+  date: '2021-05-11T08:05:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -87,7 +87,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              uuid: d9e5241d491b43eca4a6163c2dfc180f
+              uuid: 691f051584d74995b757b4be5e3824fe
               expression: 'find(/Generic Java JMX/jmx["java.lang:type=Compilation","Name"],,"like","Client")=1'
               name: 'Compilation: {HOST.NAME} uses suboptimal JIT compiler'
               priority: INFO
@@ -839,7 +839,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              uuid: d222519eb6be4689990abf410e12502f
+              uuid: cc6cc7942e434b8589ff28a0b3112fc7
               expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}'
               name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
               priority: AVERAGE
@@ -861,7 +861,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              uuid: 80a1d47cb13f4f70bf380b943b762de4
+              uuid: c82c23dc5be34bb68ec8b152b3be367b
               expression: 'nodata(/Generic Java JMX/jmx["java.lang:type=Runtime","Uptime"],5m)=1'
               name: 'Runtime: JVM is not reachable'
               priority: AVERAGE
@@ -887,7 +887,7 @@ zabbix_export:
               value: JMX
           triggers:
             -
-              uuid: fd657c73b52f4cda9dfb6463ef6d9358
+              uuid: 560edfbeb7654f1eb7315389f08ef1b3
               expression: 'find(/Generic Java JMX/jmx["java.lang:type=Runtime","VmName"],,"like","Server")<>1'
               name: 'Runtime: {HOST.NAME} runs suboptimal VM type'
               priority: INFO
@@ -1022,52 +1022,52 @@ zabbix_export:
       name: 'GarbageCollector: PS Mark Sweep in fire fighting mode'
       priority: AVERAGE
     -
-      uuid: a074220076f04faa9dfce5f87220d218
+      uuid: 69fda060b5004d12b6af0ba5f73cec6d
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
       priority: WARNING
     -
-      uuid: 044cb43d18974e7d8445810223dafa22
+      uuid: 2b4dfda1100d4feeaa66218e57786f38
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
       priority: WARNING
     -
-      uuid: 5765b6426bf7450ea20d342fc89d92f3
+      uuid: e8efca02403d44de916b6266e06dd230
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)'
       name: 'MemoryPool: CMS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Old Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Old Gen"}'
       priority: WARNING
     -
-      uuid: e86a92501b68481cabd7d4ef08ea6027
+      uuid: 1c2d038eaa8546ee81e5498ee1b67433
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)'
       name: 'MemoryPool: CMS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Perm Gen"}'
       priority: WARNING
     -
-      uuid: 2465feedb9594c3c807196b3d54fd213
+      uuid: 2624989d3a3340c1b8bcb3ba8e2c2a4a
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"],{$JMX.MP.USAGE.TIME:"Code Cache"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"])*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)'
       name: 'MemoryPool: Code Cache memory usage more than {$JMX.MP.USAGE.MAX:"Code Cache"}% for {$JMX.MP.USAGE.TIME:"Code Cache"}'
       priority: WARNING
     -
-      uuid: 447ba571b9864b79a8bae67d4f1b00e6
+      uuid: 385f7b11df2c42d19a52502bd63c861f
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)'
       name: 'MemoryPool: Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"Perm Gen"}% for {$JMX.MP.USAGE.TIME:"Perm Gen"}'
       priority: WARNING
     -
-      uuid: 5a020eea7e704ef7bdedf0586a246977
+      uuid: 00f060e8925946c3a1d9b0cdfae10f59
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)'
       name: 'MemoryPool: PS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Old Gen"}% for {$JMX.MP.USAGE.TIME:"PS Old Gen"}'
       priority: WARNING
     -
-      uuid: 201b756f533b4a1ba2cf6099d4abb74d
+      uuid: 2e10427bbac64a7a9d44344b6c862952
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)'
       name: 'MemoryPool: PS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"PS Perm Gen"}'
       priority: WARNING
     -
-      uuid: e8a8db7c1610482c96619771ff817f1f
+      uuid: ed73f2cee57c4f7d8c581190bd9a70a6
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Tenured Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)'
       name: 'MemoryPool: Tenured Gen memory usage more than {$JMX.MP.USAGE.MAX:"Tenured Gen"}% for {$JMX.MP.USAGE.TIME:"Tenured Gen"}'
       priority: WARNING
     -
-      uuid: 2841cfacb93d4e9abae87221290d334f
+      uuid: 726a3b8a6209451b9a6cca63a3195a0c
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
       name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
       priority: WARNING

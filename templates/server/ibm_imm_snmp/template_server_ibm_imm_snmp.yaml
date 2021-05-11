@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:56Z'
+  date: '2021-05-11T08:05:38Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -88,7 +88,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 47f025b793864ca9a32d2bf6b8d8deed
+              uuid: b2bf06198d5840c6905ea6cf6d9e443c
               expression: '(last(/IBM IMM SNMP/system.hw.serialnumber,#1)<>last(/IBM IMM SNMP/system.hw.serialnumber,#2))=1 and length(last(/IBM IMM SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -114,14 +114,14 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: f716e15aba8b4ec9a5aefb9a491f6e1d
+              uuid: ea8fbc9446d34033b60a8214b8199ea1
               expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               name: 'System is in unrecoverable state!'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
             -
-              uuid: 957d4c880f4a4601a7d567a54ca48040
+              uuid: a76c198aeb7d452a8c710ddde21aa12e
               expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -132,7 +132,7 @@ zabbix_export:
                   name: 'System is in unrecoverable state!'
                   expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
             -
-              uuid: b1fc92a9ca3849a4a1b7cc06e88c40cf
+              uuid: acd147a3d41b49478410f4d49562cde2
               expression: 'count(/IBM IMM SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -196,7 +196,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: 30d56a5c0b9345c1b0add2261745e2e3
+                  uuid: b2d4ae5922174af6b0ef274accc8ae21
                   expression: 'count(/IBM IMM SNMP/sensor.fan.status[fanHealthStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: '{#FAN_DESCR}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -243,7 +243,7 @@ zabbix_export:
                   value: 'Physical disks'
               trigger_prototypes:
                 -
-                  uuid: b4a1327e6a134d76bc0bb7c485535f2e
+                  uuid: 45eb3fe3369a41b199179e2eca725027
                   expression: 'count(/IBM IMM SNMP/system.hw.physicaldisk.status[diskHealthStatus.{#SNMPINDEX}],#1,"ne","{$DISK_OK_STATUS}")=1'
                   name: '{#SNMPINDEX}: Physical disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -277,7 +277,7 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 5eba8ca9d7b643129c928bd558f943e4
+                  uuid: 4e7767484cff49b098e73b068ef04160
                   expression: 'count(/IBM IMM SNMP/sensor.psu.status[powerHealthStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: '{#PSU_DESCR}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -316,7 +316,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: cbb7e181d6c747cc9e62da84d0ce1f0e
+                  uuid: 958eebe18bd94670b2b9029064a84bc9
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -325,7 +325,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 5ee5e69e287641f286388edf01546f6d
+                  uuid: ecb8ac5828e44a94a32164dce9811fbc
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -339,7 +339,7 @@ zabbix_export:
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: 483fd5865d274a28a83cc05073b077aa
+                  uuid: 8ff82421c9f74d509766e7dc139ab2c8
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
@@ -379,7 +379,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 267ae6fd941c484d9897b7abab07f6c7
+                  uuid: 615967071d6b40f6b02e386c9586a66e
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
@@ -388,7 +388,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: ff542a12c8894fc5a274594862f97bf5
+                  uuid: e6bcdf201e304471aa84cc8d34b290ec
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
@@ -402,7 +402,7 @@ zabbix_export:
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
                 -
-                  uuid: 52252fb9afd7473fa4e05dbcec6a38cf
+                  uuid: dd773e52746840e4b6f7517740873102
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
@@ -442,7 +442,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: e2c05706ebcc4eaf904ba100d78c72d4
+                  uuid: e994d3d8398147c49062bc712dc4c204
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
@@ -451,7 +451,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 37b0d6c5e5374e4eb9085fe58811fc3e
+                  uuid: 3b7396311de1487e90416aa2c42cb03d
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
@@ -465,7 +465,7 @@ zabbix_export:
                       expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                       recovery_expression: 'max(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                 -
-                  uuid: a98802e8893f41c196a296b102f8dd5d
+                  uuid: e39d0e009efb4216ac7cbbe544ad4bc0
                   expression: 'avg(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/IBM IMM SNMP/sensor.temp.value[tempReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'

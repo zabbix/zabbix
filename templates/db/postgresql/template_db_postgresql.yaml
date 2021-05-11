@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:34Z'
+  date: '2021-05-11T08:04:22Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -291,7 +291,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: b5d6e86c862740d5b1d0fe49ecd8a7d5
+              uuid: 768d28b9360b46cda3065f5082ba97ac
               expression: 'nodata(/PostgreSQL/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],30m) = 1'
               name: 'PostgreSQL: Failed to get items (no data for 30m)'
               priority: WARNING
@@ -314,7 +314,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 55f6c16df3cd4ae0a7f4db9060d0a7f5
+              uuid: 4d87cc71b40f4b59ad27f30f33b15a69
               expression: 'max(/PostgreSQL/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
               name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
@@ -338,7 +338,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: b73b0e8d3efb4d58aed5edb438944701
+              uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
               expression: '(last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
@@ -461,7 +461,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 3555fccf464040e98b86281a129f1822
+              uuid: 54ef12b8ff1e4383a3097c71478ceefa
               expression: 'min(/PostgreSQL/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
@@ -551,7 +551,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 988dd5f8607f4e9481b15bb4c9f9b6e9
+              uuid: e19b5630737b4c63886b5df77a3c748c
               expression: 'min(/PostgreSQL/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.PING_TIME.MAX.WARN}'
               name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
@@ -620,7 +620,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 155d4e8915044613838d2f85c512d084
+              uuid: 11831c52e86445498eed42de6a629b65
               expression: 'min(/PostgreSQL/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
               name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
@@ -650,7 +650,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: c1e96b0820fb4460bd121b7893310bb0
+              uuid: aef1e1d2bab540f8ab738b4a3fad863c
               expression: 'max(/PostgreSQL/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m)=0'
               name: 'PostgreSQL: Replication is down'
               priority: AVERAGE
@@ -787,7 +787,7 @@ zabbix_export:
               value: PostgreSQL
           triggers:
             -
-              uuid: 14ffea66f065426f86f04575c9c59729
+              uuid: 8111eb42b0e74fffb43da474677ebc2f
               expression: '(last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
@@ -946,7 +946,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: d336bc7d7d974615b54ff743413e7dc5
+                  uuid: 3b51f02258bd4e02829f04ca016dd01d
                   expression: 'min(/PostgreSQL/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
@@ -979,7 +979,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: 00fd68a95388437da983cf5aeedaf1a9
+                  uuid: 3bee63fa04d94586937e22aafab9bdd8
                   expression: 'min(/PostgreSQL/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
@@ -1285,7 +1285,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: 7fb8b20d6565439982761b7d7a74d9e3
+                  uuid: ef7d3c9866df44aa9b378e7f125a34de
                   expression: 'min(/PostgreSQL/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
@@ -1369,7 +1369,7 @@ zabbix_export:
                   value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  uuid: 9cdceacd8c634d45a3b50aa708ef6bf0
+                  uuid: facc8f6976664da4ad5567d270f0f311
                   expression: 'min(/PostgreSQL/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING

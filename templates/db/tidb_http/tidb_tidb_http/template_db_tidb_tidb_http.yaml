@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:59Z'
+  date: '2021-05-11T08:05:41Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -75,7 +75,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: cc10fd44d3d74ab9ae2b23c1697508ec
+              uuid: 4125d55d9931455091d2f3a0b25e9678
               expression: 'min(/TiDB by HTTP/tidb.ddl_waiting_jobs,5m)>{$TIDB.DDL.WAITING.MAX.WARN}'
               name: 'TiDB: Too many DDL waiting jobs (over {$TIDB.DDL.WAITING.MAX.WARN} for 5m)'
               priority: WARNING
@@ -106,7 +106,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: 25722112434847ed981d27dad674ba11
+              uuid: b4948f37af804c01a2b8887f9e89ec90
               expression: 'min(/TiDB by HTTP/tidb.domain_load_schema.failed.rate,5m)>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
               name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -245,7 +245,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: 747408f16ba840d9956359300632e9f0
+              uuid: 575a4821ed8c4a1881b7f9bd264b1929
               expression: 'min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}'
               name: 'TiDB: Heap memory usage is too high (over {$TIDB.HEAP.USAGE.MAX.WARN} for 5m)'
               priority: WARNING
@@ -277,7 +277,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: 11de043b4eb34203a31667f188708479
+              uuid: eb3c09904fa843d78401b00eff4f6a08
               expression: 'max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}'
               name: 'TiDB: Too few keep alive operations (less {$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -309,7 +309,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: 3b29523d915d4e168cd6ad0aba6c88a7
+              uuid: c3c1f6eab224453b92534d5393aca2b7
               expression: 'min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
               name: 'TiDB: Too many time jump backs (over {$TIDB.TIME_JUMP_BACK.MAX.WARN} for 5m)'
               priority: WARNING
@@ -555,7 +555,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: d4805361a5194dcfa3ae2f62afd54988
+              uuid: b077eb1afe6a4da79707987324fb40c8
               expression: 'min(/TiDB by HTTP/tidb.session_schema_lease_error.outdate.rate,5m)>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
               name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -772,7 +772,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: dac345a466684644a6a7d36f25200c16
+              uuid: d3cb81c46e414ff2a7e411a877b899ef
               expression: 'min(/TiDB by HTTP/tidb.tikvclient_region_err.rate,5m)>{$TIDB.REGION_ERROR.MAX.WARN}'
               name: 'TiDB: Too many region related errors (over {$TIDB.REGION_ERROR.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -863,7 +863,7 @@ zabbix_export:
               value: 'TiDB node'
           triggers:
             -
-              uuid: aae812297b5d4cd4b72d409816c5f571
+              uuid: 5f863fc0944848fdad145f42c94dbea3
               expression: '(last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2))=1 and length(last(/TiDB by HTTP/tidb.version))>0'
               name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1149,7 +1149,7 @@ zabbix_export:
                   value: 'TiDB node'
               trigger_prototypes:
                 -
-                  uuid: 2fcf0cdc3e9b4d73a4573e657f7b9578
+                  uuid: 2d24956d0a4f459fad155590376696c1
                   expression: 'min(/TiDB by HTTP/tidb.tikvclient_gc_action.rate[{#TYPE}],5m)>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
                   name: 'TiDB: Too many failed GC-related operations (over {$TIDB.GC_ACTIONS.ERRORS.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
@@ -1303,7 +1303,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      uuid: 10f82be1f65c4f36a4f54f624eb70155
+      uuid: cfd6ba0dbf294b9e9ab6afc7d44be7b3
       expression: 'min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}'
       name: 'TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING

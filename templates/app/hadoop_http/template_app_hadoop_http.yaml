@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:40Z'
+  date: '2021-05-11T08:05:24Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -193,7 +193,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: f462d6bb12104a058161918f18b97bb2
+              uuid: 3b92daaaddb74105a5e57c4b381e3060
               expression: 'min(/Hadoop by HTTP/hadoop.namenode.missing_blocks,15m)>0'
               name: 'NameNode: Cluster has missing blocks'
               priority: AVERAGE
@@ -223,7 +223,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: d13c06cca55345269ccce63de5bf94ca
+              uuid: b2d1a26791aa4b16865b4410c50c7ceb
               expression: 'min(/Hadoop by HTTP/hadoop.namenode.num_dead_data_nodes,5m)>0'
               name: 'NameNode: Cluster has DataNodes in Dead state'
               priority: AVERAGE
@@ -320,7 +320,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: cc5850af8c6a4a0d9c89384eee9042c4
+              uuid: 3104295848c5497085f397b8f3e06ef6
               expression: 'max(/Hadoop by HTTP/hadoop.namenode.percent_remaining,15m)<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}'
               name: 'NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)'
               priority: WARNING
@@ -429,7 +429,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: be86e5a923f648b6b9e10cc8f8d6b7fd
+              uuid: 9fac0ae651ab40a08551945eb0a93b68
               expression: 'nodata(/Hadoop by HTTP/hadoop.namenode.uptime,30m)=1'
               name: 'NameNode: Failed to fetch NameNode API page (or no data for 30m)'
               priority: WARNING
@@ -467,7 +467,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: 947ceff67480477eaf8ebc1d958a4bf3
+              uuid: fcf791b6d0594dbb9ddfc3f93bc94825
               expression: 'min(/Hadoop by HTTP/hadoop.namenode.volume_failures_total,15m)>0'
               name: 'NameNode: Cluster has volume failures'
               priority: AVERAGE
@@ -528,7 +528,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: 27043b687b5e41c78e95a313414b3022
+              uuid: eb02a30f45394e4d84d9d7239002ed40
               expression: 'max(/Hadoop by HTTP/hadoop.resourcemanager.num_active_nm,5m)=0'
               name: 'ResourceManager: Cluster has no active NodeManagers'
               priority: HIGH
@@ -657,7 +657,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: f2bacdf44c6c4ab78557b65d8c9a2b6a
+              uuid: 0f35a0fa7a404559a3df225b906f0653
               expression: 'min(/Hadoop by HTTP/hadoop.resourcemanager.num_unhealthy_nm,15m)>0'
               name: 'ResourceManager: Cluster has unhealthy NodeManagers'
               priority: AVERAGE
@@ -709,7 +709,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: a9a1b10830bf4e5fa34c81e040cceca9
+              uuid: 7d4d026992344602a199966a8308a571
               expression: 'nodata(/Hadoop by HTTP/hadoop.resourcemanager.uptime,30m)=1'
               name: 'ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)'
               priority: WARNING
@@ -741,7 +741,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: 5c54acfc4c2447bf98e75ff77b20f0b5
+              uuid: 4e4a6ab28fe5492d8fe4e291b8a586dc
               expression: 'min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"],5m)>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}'
               name: 'NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
@@ -765,7 +765,7 @@ zabbix_export:
               value: Hadoop
           triggers:
             -
-              uuid: 6b445006a38945a5a5ca6d1a9024a5fc
+              uuid: e8e55f4c7e9e4823927a8c1345d3b941
               expression: 'min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"],5m)>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}'
               name: 'ResourceManager: Service response time is too high (over {$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
@@ -1047,7 +1047,7 @@ zabbix_export:
                   value: 'Hadoop DataNode {#HOSTNAME}'
               trigger_prototypes:
                 -
-                  uuid: 19762d7bc50e4de291e821c82d2250b2
+                  uuid: 3eccb9daf76f4bde88b424cf6f2d21f6
                   expression: 'nodata(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}],30m)=1'
                   name: '{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)'
                   priority: WARNING
@@ -1353,7 +1353,7 @@ zabbix_export:
                   value: 'Hadoop NodeManager {#HOSTNAME}'
               trigger_prototypes:
                 -
-                  uuid: 78114571ad4647d3ae52ac99b625ef02
+                  uuid: 6f8a6308d4334dd9bebe7af2fa3fb831
                   expression: 'nodata(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}],30m)=1'
                   name: '{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)'
                   priority: WARNING

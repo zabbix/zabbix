@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:14Z'
+  date: '2021-05-11T08:05:04Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -52,7 +52,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: ebf934f9523140ae9f4cbc14f904b708
+              uuid: 883e49e933bd4cfda0e7dde774604a0a
               expression: 'min(/HP Enterprise Switch SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -86,7 +86,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 86a45af67dd44cb5897a657d0a0460b5
+              uuid: a9dcdf4129d041eca8dadc8bfbc455ee
               expression: '(last(/HP Enterprise Switch SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch SNMP/system.hw.firmware,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -116,7 +116,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 1c9fe29505204929835eb903b2fbf273
+              uuid: 6b9b9b0d1ff24074bb344d04efe53444
               expression: '(last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -217,14 +217,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: 1d0424d7e6e84ae596bcce50e1ad86ee
+                  uuid: 4fba6383ed4c4cd89b349a5dfccb7909
                   expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  uuid: ceae010d60784689b1a0d62c8406bb33
+                  uuid: 6cf626561b33468cb1e2c9e590334c4b
                   expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -304,7 +304,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: eadc68e1bf684dbe9f517bac084a8556
+                  uuid: 4fe0382fdee141adac03788c8810e387
                   expression: 'min(/HP Enterprise Switch SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -380,14 +380,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 37a4a731812d4980953f245b9c03cbd9
+                  uuid: 81553d4157ce4c938c25b9403c5e572a
                   expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  uuid: 04140f49dfe04c358bbdc150b7e6c6b4
+                  uuid: aeb31d4c3958433c9a0105f79156094a
                   expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -437,7 +437,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: d55afe36f6e9432fa0470f80f875448c
+                  uuid: 5d0d743c7f5449f4a429845ab3894d19
                   expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -446,7 +446,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: e3135c4235f24ea9b09f06a23419ac1b
+                  uuid: b549cc5016884818bf416c415618171f
                   expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -460,7 +460,7 @@ zabbix_export:
                       expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: bccac63dd676408b89c24f2a1c6c0636
+                  uuid: a4294d3ad024438aaba4234811d65582
                   expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'

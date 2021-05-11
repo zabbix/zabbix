@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:09Z'
+  date: '2021-05-11T08:05:47Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -124,7 +124,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 792991156fd14c608e27dec64967e328
+              uuid: e33fafc8476e404aa4150d0d491f4c83
               expression: 'nodata(/Linux by Prom/node_exporter.get,30m)=1'
               name: 'node_exporter is not available (or no data for 30m)'
               priority: WARNING
@@ -688,7 +688,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: 47a4262452ef4bb7acc2446c1d942302
+              uuid: 4c924f8243a7431886a2d69368cb7142
               expression: 'min(/Linux by Prom/system.cpu.util[node_exporter],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -756,7 +756,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              uuid: d2783ce58f9a41839ee7ae779c5e89b5
+              uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
               expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MAX})=0'
               name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
@@ -791,7 +791,7 @@ zabbix_export:
               value: General
           triggers:
             -
-              uuid: b7867b921e6f42c9b96751b1ba9e89c4
+              uuid: e827e944568b46e284820630482317bd
               expression: '(last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2))=1 and length(last(/Linux by Prom/system.name[node_exporter]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -846,7 +846,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: ff796210e58441b78a34ddc8787c3008
+              uuid: 00974d5b128c4b1db64ca100770fb11b
               expression: '(last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2))=1 and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
               name: 'Operating system description has changed'
               priority: INFO
@@ -1010,7 +1010,7 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              uuid: ebb0411d9f9242afb80732c77831b8cf
+              uuid: 72304b3a167e41ccbcdb75568c65294a
               expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -1296,7 +1296,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: 3dd1f29234b4400bb438bebd3dca10b0
+                  uuid: e35b59dc09754451a721793831edc3d4
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1336,7 +1336,7 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
           trigger_prototypes:
             -
-              uuid: f8a8bb089303463f8a4de5953e3226aa
+              uuid: 96bbb9726ef149a5b97f96d54502593a
               expression: |
                 change(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])>0
                 and (
@@ -1364,7 +1364,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
-              uuid: e718b1614c6c42a8af86aeb53b8aa02d
+              uuid: 08d5857e474042b5906288156c8c5d52
               expression: |
                 change(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])>0
                 and
@@ -1387,7 +1387,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
-              uuid: 5c7884278ac941ab852c2b94a49d4ee8
+              uuid: 11e2c8023463482da878cdad5bb7de76
               expression: |
                 (avg(/Linux by Prom/net.if.in[node_exporter,"{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"]) or
                 avg(/Linux by Prom/net.if.out[node_exporter,"{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])) and
@@ -1407,7 +1407,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
-              uuid: 0c7891a3bb5e4963b5bc54d843855600
+              uuid: 6e8269b2260e42de97aec08043a768df
               expression: |
                 min(/Linux by Prom/net.if.in.errors[node_exporter,"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Linux by Prom/net.if.out.errors[node_exporter"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1697,7 +1697,7 @@ zabbix_export:
                   value: 'Zabbix raw items'
           trigger_prototypes:
             -
-              uuid: 5e7802f52a454aedb8f1666caf71a383
+              uuid: 412381f71bba441b955898839f81d51c
               expression: 'min(/Linux by Prom/vfs.dev.read.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or min(/Linux by Prom/vfs.dev.write.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
               name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
@@ -1863,7 +1863,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
               trigger_prototypes:
                 -
-                  uuid: cfd57cc9d7314ba5ac4275539452fd42
+                  uuid: 27cabcc9d9644ba6b7bd8c92a740e3cc
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
@@ -1872,7 +1872,7 @@ zabbix_export:
                     It may become impossible to write to disk if there are no index nodes left.
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                 -
-                  uuid: f94c0af576cb43e3aa66b9efa9f14b01
+                  uuid: c639215f6dd94c71aebf97265a282a0d
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
@@ -1936,7 +1936,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
-              uuid: 46ba93d3ce5c43f8bbc6e9417f838f61
+              uuid: d5687d7aa0484b389f0bd168d50ee1e6
               expression: |
                 last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
@@ -1950,7 +1950,7 @@ zabbix_export:
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
             -
-              uuid: a385bfb31a274c8ca1c3daf58f6050e4
+              uuid: 8f765148cfd64d5ebda93f39d0b20e36
               expression: |
                 last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<10G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
@@ -2561,7 +2561,7 @@ zabbix_export:
               newvalue: 'Vsock monitor header'
   triggers:
     -
-      uuid: 785257dfb159402d9ce56b47be02f52d
+      uuid: 16e6a4d340164dee9379a3fc0aac0576
       expression: 'min(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
@@ -2575,13 +2575,13 @@ zabbix_export:
           name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
     -
-      uuid: cf5d2e49f7b74b25860073beb1c86abb
+      uuid: f78ed17586964a46a9de0c4f183984f6
       expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
       name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -
-      uuid: 239ddc57555844829523e8422252dbbb
+      uuid: e5897641e5594bf6b7b18ae4e107bd50
       expression: |
         min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0

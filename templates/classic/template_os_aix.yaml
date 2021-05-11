@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:30Z'
+  date: '2021-05-11T08:04:19Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -29,7 +29,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: 62ed425e2416497092ba48a1e2111bc3
+              uuid: 458180bc0f14468386429964f877cce7
               expression: 'avg(/AIX/proc.num[,,run],5m)>30'
               name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
@@ -45,7 +45,7 @@ zabbix_export:
               value: Processes
           triggers:
             -
-              uuid: cbdd436dfcc046d4bf75a6cf42e40f3c
+              uuid: 874ef8fe4a6445ff971800d2d9a50541
               expression: 'avg(/AIX/proc.num[],5m)>300'
               name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
@@ -83,7 +83,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: 8ae8ac5a947344369acd7de6c608f4f6
+              uuid: fdbedf15fe474fd18c045c62cf8cc7d6
               expression: 'avg(/AIX/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
@@ -152,7 +152,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: 3ada862470d8486aa0c489485d4e19d6
+              uuid: d1e70b7f465447a3ab575b3fd28755a1
               expression: '(last(/AIX/system.hostname,#1)<>last(/AIX/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
@@ -293,7 +293,7 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: 6d3352a741884c73b0a01b8372323e04
+              uuid: c030cc99975d4fe3911789e58bbd5050
               expression: 'avg(/AIX/system.stat[cpu,wa],5m)>20'
               name: 'Disk I/O is overloaded on {HOST.NAME}'
               priority: WARNING
@@ -501,7 +501,7 @@ zabbix_export:
               value: OS
           triggers:
             -
-              uuid: 294081138474461b8bc6d13bcc69d852
+              uuid: 3a736e64211744aea480a60b2c48a036
               expression: '(last(/AIX/system.uname,#1)<>last(/AIX/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
@@ -550,7 +550,7 @@ zabbix_export:
               value: Security
           triggers:
             -
-              uuid: 836d01728d274b618ae466f3943b4f57
+              uuid: c75ee957fd6c43b2aba9919d5e1af4a1
               expression: '(last(/AIX/vfs.file.cksum[/etc/passwd],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:58Z'
+  date: '2021-05-11T08:05:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -190,7 +190,7 @@ zabbix_export:
               value: 'PD instance'
           triggers:
             -
-              uuid: e0e2d4f5a4a14feebb61409014e94a2e
+              uuid: 6fb6045405af4c89b09750f57ada472a
               expression: '(last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2))=1 and length(last(/TiDB PD by HTTP/pd.version))>0'
               name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -472,7 +472,7 @@ zabbix_export:
                   value: 'TiDB cluster'
           trigger_prototypes:
             -
-              uuid: fecf63d033b146d986f03e8d34e2d884
+              uuid: 843d566b33bc401390c2a633d08bb033
               expression: 'min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}'
               name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
@@ -788,14 +788,14 @@ zabbix_export:
                   value: 'TiDB cluster'
               trigger_prototypes:
                 -
-                  uuid: 101bb66de2a948169aad0b0790dcf35e
+                  uuid: 2bc6b48bbfd8436e80903ea947571501
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0'
                   name: 'TiDB cluster: There are unresponsive peers'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
                 -
-                  uuid: e1db516832aa44a99642c1f597656d3b
+                  uuid: 1f80bd81d11345f59699617113a0cad5
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}'
                   name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER

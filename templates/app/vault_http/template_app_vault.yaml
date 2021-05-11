@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:35Z'
+  date: '2021-05-11T08:05:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -630,7 +630,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              uuid: 2663caf45d4b48efad19e0cfdd9c446e
+              uuid: ee9a561165b847c2a0719a767e5c4fe9
               expression: '(last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2))=1 and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
               name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1061,7 +1061,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              uuid: 2d4252891dbf4b4296d28cfb95506819
+              uuid: c68ab0c784314291bde1cc8693fd5959
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
               name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
@@ -1093,7 +1093,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              uuid: d365119cc7ac406a8f1f9cd87b658bfd
+              uuid: 8d7f4f51272a4ce5a3a7ab9642e51d63
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
               name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
@@ -1231,7 +1231,7 @@ zabbix_export:
               value: Vault
           triggers:
             -
-              uuid: d0dc94ef70e34e8cb77b26b44e451831
+              uuid: 5f2895eb5a94441f858c573584ec8b19
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
               name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
               priority: AVERAGE
@@ -2907,7 +2907,7 @@ zabbix_export:
               newvalue: 'True'
   triggers:
     -
-      uuid: 3059977384c54991839c20b4f5ebc767
+      uuid: ebe6f65e82ed4f00bd7c5be30841a25c
       expression: 'min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}'
       name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING

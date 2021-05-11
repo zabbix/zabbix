@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:35Z'
+  date: '2021-05-11T08:05:21Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -142,7 +142,7 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              uuid: 7ee45f25ba5340fa929baf73c3940101
+              uuid: db396445cc5042f89f31dc12cb99c32e
               expression: 'nodata(/Apache by HTTP/apache.get_status,30m)=1'
               name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
@@ -252,7 +252,7 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              uuid: 4199138cff584ebd951e46efa720c41e
+              uuid: 5296d69af0704d0e8a07398f0b4c9685
               expression: '(last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2))=1 and length(last(/Apache by HTTP/apache.version))>0'
               name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -519,7 +519,7 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              uuid: d66c14d27f2e47b58c0fdace967e9669
+              uuid: ffbb564032c7462eb0bb9b4c2f700559
               expression: 'min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
               name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING

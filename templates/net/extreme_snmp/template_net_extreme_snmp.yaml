@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:13Z'
+  date: '2021-05-11T08:05:03Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -67,7 +67,7 @@ zabbix_export:
               value: Temperature
           triggers:
             -
-              uuid: 83f2fde548744ecfae75551824f68d6b
+              uuid: 54362c94be0243ffb907905def0ad06a
               expression: 'avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_WARN:""}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_WARN:""}-3'
@@ -84,7 +84,7 @@ zabbix_export:
                     last(/Extreme EXOS SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
                   recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT:""}-3'
             -
-              uuid: 18c59107c35641bfb53bacc1dfbe4552
+              uuid: 91a10b28c7a14dd09110448a28a328f9
               expression: 'avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT_LOW:""}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'min(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT_LOW:""}+3'
@@ -109,7 +109,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: 975ce9f926454ff180c60fd143118310
+              uuid: a77bbfe0755f4901b67a7957805bc566
               expression: 'min(/Extreme EXOS SNMP/system.cpu.util[extremeCpuMonitorTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -137,7 +137,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 108fc335483b44dab13d5abe6cbd38b9
+              uuid: dd9fbc501f9047fd8fae9dfd741e3778
               expression: '(last(/Extreme EXOS SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS SNMP/system.hw.firmware,#2))=1 and length(last(/Extreme EXOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -188,7 +188,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 63c246e264ce4b9fb4504de0de3df319
+              uuid: db1760a34c884b1aa36e4fc4639791dd
               expression: '(last(/Extreme EXOS SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS SNMP/system.hw.serialnumber,#2))=1 and length(last(/Extreme EXOS SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -241,7 +241,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 40945230de95470cb8d163c6e692ab25
+              uuid: af6a823b8f2d4fddae970828d0a3a9c9
               expression: '(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2))=1 and length(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
@@ -290,7 +290,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: b700ed5a00c542adb3824e9548b43897
+                  uuid: bd0c753f33c441a0bf4567f8b81186d6
                   expression: 'count(/Extreme EXOS SNMP/sensor.fan.status[extremeFanOperational.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -360,7 +360,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: da49e149b8c24cf0b64f684fa55f8235
+                  uuid: 50733fd8b4a641708e3a90292f182f20
                   expression: 'min(/Extreme EXOS SNMP/vm.memory.util[{#SNMPVALUE}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -425,7 +425,7 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 491d56be6a2c4384b72b2aec0b70fb53
+                  uuid: 710f1bf31381470f9a13c45f887bda4e
                   expression: 'count(/Extreme EXOS SNMP/sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -495,7 +495,7 @@ zabbix_export:
               newvalue: presentPowerOff
   triggers:
     -
-      uuid: 56b45bac2a804425898a5da666cc1136
+      uuid: 132d3e7a1fab4cc08fcbb12eef4e9494
       expression: |
         avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT:""}
         or

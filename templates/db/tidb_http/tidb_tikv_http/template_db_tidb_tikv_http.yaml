@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:59Z'
+  date: '2021-05-11T08:05:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -149,7 +149,7 @@ zabbix_export:
               value: 'TiKV node'
           triggers:
             -
-              uuid: f82a8e43852546b7b22b26a8b1eb8fd4
+              uuid: 31eca27ff6ce4ed78ee428ed3b8d8806
               expression: 'min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
               name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
@@ -500,12 +500,12 @@ zabbix_export:
               value: 'TiKV node'
           triggers:
             -
-              uuid: da724f2f1f514ff98fa89683dd1861c6
+              uuid: be07ed23d6e040bd90866a4981d3c712
               expression: 'min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}'
               name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
               priority: AVERAGE
             -
-              uuid: 3cd5138c05e54c61ad477446d4970240
+              uuid: f26874f910e34933983685ae43a90bee
               expression: 'min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}'
               name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
               priority: AVERAGE
@@ -967,7 +967,7 @@ zabbix_export:
                   value: 'TiKV node'
               trigger_prototypes:
                 -
-                  uuid: edc1b649a9724ca88329e77ae7a1201a
+                  uuid: 1f65b64824d64852aaa609df5f3e27fd
                   expression: 'min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}'
                   name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER

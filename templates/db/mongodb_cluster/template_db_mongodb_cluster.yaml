@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:58Z'
+  date: '2021-05-11T08:05:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -92,7 +92,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              uuid: 2bdd799a5e59475aa3c634829686315d
+              uuid: eae86b6f98db49099259a466b78d1c59
               expression: 'max(/MongoDB cluster by Zabbix Agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
@@ -315,7 +315,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              uuid: c458e42fa3ad4f99852caba9f4116bb9
+              uuid: 67db1f543818476ca0b07e2cc1709452
               expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
@@ -345,7 +345,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              uuid: 660e5e61b7cf47548281e9772c2254f6
+              uuid: 5ea8cf9c955940a6a580cd6f4bb2cc78
               expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
@@ -753,7 +753,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              uuid: a20d9178e2ae44a394212380ed9d0836
+              uuid: ee70d6da232a4068b574c9c147c622c9
               expression: 'nodata(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime,10m)=1'
               name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
@@ -797,7 +797,7 @@ zabbix_export:
               value: 'MongoDB sharded cluster'
           triggers:
             -
-              uuid: 72c18e97f57b4af29c9291950f493bca
+              uuid: 921ee489887943838d69558f103ad646
               expression: '(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO

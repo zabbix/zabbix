@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:48Z'
+  date: '2021-05-11T08:05:31Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -28,7 +28,7 @@ zabbix_export:
               value: 'IMAP service'
           triggers:
             -
-              uuid: 8665dfea11584c0da6c56b3c46c5bd2b
+              uuid: 075e6217564d45fdb713f810a9eef87c
               expression: 'max(/IMAP Service/net.tcp.service[imap],#3)=0'
               name: 'IMAP service is down on {HOST.NAME}'
               priority: AVERAGE

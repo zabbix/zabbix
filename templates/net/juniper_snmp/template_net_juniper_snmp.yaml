@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:25Z'
+  date: '2021-05-11T08:05:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -78,7 +78,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: f209837c40cd4e3dbe841c439a030676
+              uuid: 9f1f3316ed6f4d50a4c9f71a15f35d50
               expression: '(last(/Juniper SNMP/system.hw.serialnumber,#1)<>last(/Juniper SNMP/system.hw.serialnumber,#2))=1 and length(last(/Juniper SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -112,7 +112,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 2876a88117c64e6aab5d21e95d14049b
+              uuid: 1190bb9c05424ac5a0052bd191c274f2
               expression: 'count(/Juniper SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -146,7 +146,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 6222b573c18446d4af7a8161d6e07a58
+              uuid: 9249511ecf4a4a2d952aa0c4fe55a5d0
               expression: '(last(/Juniper SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper SNMP/system.sw.os[sysDescr.0],#2))=1 and length(last(/Juniper SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
@@ -189,7 +189,7 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  uuid: 10919751e3804d1189856a181868bccf
+                  uuid: 248c49bc4f47437b9b91e20b57da197d
                   expression: 'min(/Juniper SNMP/system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -214,7 +214,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: 0449137ee3d14017ab670d57761293c9
+                  uuid: ab1f3dcba55d41da974c3ac60ca5b8f2
                   expression: 'min(/Juniper SNMP/vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -271,7 +271,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: ec074c1bbbf644bb866869dd187fcfec
+                  uuid: f8f1dee0b0ff465d98c6f6bcdfaff17f
                   expression: 'count(/Juniper SNMP/sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -307,7 +307,7 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: 5c3b4c8818c94032aff8f9dacd663c3e
+                  uuid: e577226331f6483fbd1e414bb7d365f7
                   expression: 'count(/Juniper SNMP/sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -348,7 +348,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 507936bd77a74a9ba500671db9d8ed6d
+                  uuid: c82ca2b550f540b7a4c8f9548e15cfb0
                   expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -357,7 +357,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 49523740c0054bff83f26664ec15ee23
+                  uuid: 51113c80e4bd46de8ea247e0bd3b19dd
                   expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -371,7 +371,7 @@ zabbix_export:
                       expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: 9688deb24a264f7294d7e97f9d01cc97
+                  uuid: 35b56753b2424f0989ca09cb67f7d9a3
                   expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'

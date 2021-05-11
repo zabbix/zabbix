@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:41Z'
+  date: '2021-05-11T08:05:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -70,7 +70,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              uuid: 626c38723c724b2a906155ab66f9ae93
+              uuid: 5ec22ac264d445769039bd4c13e41bf7
               expression: 'min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
               name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
               priority: WARNING
@@ -1719,7 +1719,7 @@ zabbix_export:
               value: Jenkins
           triggers:
             -
-              uuid: 3fd92a8677824ab1ae91d8d89e4abc58
+              uuid: 3dd66b51ed1b4fc2a250daf3e9999e4f
               expression: '(last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2))=1 and length(last(/Jenkins by HTTP/jenkins.version))>0'
               name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO

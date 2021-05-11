@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:12Z'
+  date: '2021-05-11T08:05:03Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -55,7 +55,7 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              uuid: 42d9d40ffa184d8a9377ad6c055be425
+              uuid: 621c4933fd9c4b78aae1eedada7ffedf
               expression: 'min(/D-Link DES_DGS Switch SNMP/system.cpu.util[agentCPUutilizationIn1min.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -83,7 +83,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 14007fd2492b45be8d9b70ac2628b6b2
+              uuid: 40a2ad291ded4bf9bc72adc2b8653b98
               expression: '(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#2))=1 and length(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -140,7 +140,7 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: d6c6ecbe9fa041fa99417825386c6015
+              uuid: 3aa2e47f4b8145b8a5e4f67b0987ca2b
               expression: '(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#2))=1 and length(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -206,7 +206,7 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  uuid: e10f70eff8f44007a8c04aa507a2abc0
+                  uuid: e8cb2d8bc3ee44c58c5111d3ead41d1b
                   expression: 'count(/D-Link DES_DGS Switch SNMP/sensor.fan.status[swFanStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -238,7 +238,7 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  uuid: 51c68f543926487c9d717806de658743
+                  uuid: 29352d2cb80f47d98ca6c6d6d366a29f
                   expression: 'min(/D-Link DES_DGS Switch SNMP/vm.memory.util[agentDRAMutilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -297,7 +297,7 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  uuid: f57997a5b3a14fd3b45327c85426ec83
+                  uuid: aabaa197e62649cd929353f131c3fa00
                   expression: 'count(/D-Link DES_DGS Switch SNMP/sensor.psu.status[swPowerStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -329,7 +329,7 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 46e3a4f2b36348748b4a785b60787ed9
+                  uuid: 0cbd0c61e07245af863a19f296f38195
                   expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
@@ -338,7 +338,7 @@ zabbix_export:
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: b9de6c0405854316a92aa51335b92359
+                  uuid: bc0c87dbf83e49dab264e9f2bf1bb418
                   expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
@@ -352,7 +352,7 @@ zabbix_export:
                       expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  uuid: bc85a7aba9b14ec586d865faf734f4cc
+                  uuid: 8d93aea3774d4a3bbd98127273c648d1
                   expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'min(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'

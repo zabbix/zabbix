@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:34Z'
+  date: '2021-05-11T08:05:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -45,7 +45,7 @@ zabbix_export:
               value: Tomcat
           triggers:
             -
-              uuid: 7e9c951cdf564e68801b6cdc7f7e2baa
+              uuid: 152d235652914aa2af78334385334214
               expression: '(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#2))=1 and length(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo]))>0'
               name: 'Tomcat: Version has been changed'
               priority: INFO
@@ -92,7 +92,7 @@ zabbix_export:
                   value: 'Tomcat: ProtocolHandler {#JMXVALUE}'
               trigger_prototypes:
                 -
-                  uuid: d364a774901e4bdfb9473f1b46461ad2
+                  uuid: 7d707de73a164f1db6b69e4dcb8c6ae9
                   expression: 'find(/Apache Tomcat JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1'
                   name: '{#JMXVALUE}: Gzip compression is disabled'
                   priority: INFO
@@ -450,7 +450,7 @@ zabbix_export:
                   value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
           trigger_prototypes:
             -
-              uuid: 447bfd8cf32e474998e4ed8a85b618d9
+              uuid: 7a15296553a447f6aebf4958631b6704
               expression: 'min(/Apache Tomcat JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
               name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
               priority: HIGH

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:40:23Z'
+  date: '2021-05-11T08:04:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -726,7 +726,7 @@ zabbix_export:
               value: Docker
           triggers:
             -
-              uuid: e58c79010cd54edeb2a00f837f1d0703
+              uuid: 2c62bb4d95684e6984447027d117ff4d
               expression: 'nodata(/Docker/docker.name,30m)=1'
               name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
@@ -966,7 +966,7 @@ zabbix_export:
               value: Docker
           triggers:
             -
-              uuid: 73e1a414035047a3a3a9b4a8c62481d1
+              uuid: f5f4fb1337264ac2bec6b6505dfe180b
               expression: '(last(/Docker/docker.server_version,#1)<>last(/Docker/docker.server_version,#2))=1 and length(last(/Docker/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1207,7 +1207,7 @@ zabbix_export:
                   value: 'Docker: Container {#NAME}'
               trigger_prototypes:
                 -
-                  uuid: bf14e1819ec54b898a37a4f2e74290b9
+                  uuid: ee70b91196494eccb54772b22051a456
                   expression: '(last(/Docker/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING

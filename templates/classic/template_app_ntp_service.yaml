@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:49Z'
+  date: '2021-05-11T08:05:32Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -28,7 +28,7 @@ zabbix_export:
               value: 'NTP service'
           triggers:
             -
-              uuid: c03ef9e956f1497d8a23289920ba3909
+              uuid: 6c7f4d7e2719401d8fd8f99ae8fc2d34
               expression: 'max(/NTP Service/net.udp.service[ntp],#3)=0'
               name: 'NTP service is down on {HOST.NAME}'
               priority: AVERAGE

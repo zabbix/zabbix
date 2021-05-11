@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:41:52Z'
+  date: '2021-05-11T08:05:34Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -32,7 +32,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 4f162bd63a16400497fc997684b77ec8
+              uuid: b030876299434f3ba43e11c584104a81
               expression: 'max(/ICMP Ping/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
@@ -51,7 +51,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: a5d280414fb745189aebe3571877cc2c
+              uuid: 42c4b0310aaf4b9c8cb502542b7dea90
               expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
@@ -74,7 +74,7 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: fe9e1c62715c479a810f0feb640e3641
+              uuid: 32b4d8f3eba34bd380803410111d4b7f
               expression: 'avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'

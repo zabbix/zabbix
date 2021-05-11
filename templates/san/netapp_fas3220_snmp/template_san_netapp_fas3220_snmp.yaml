@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-10T19:42:07Z'
+  date: '2021-05-11T08:05:46Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -391,7 +391,7 @@ zabbix_export:
                   value: 'Node {#NODE.NAME} CPU'
               trigger_prototypes:
                 -
-                  uuid: ff2754b8c5dd4963a83b974f7b024c8c
+                  uuid: adb98d2d2f13435bbe1897208bb86989
                   expression: 'min(/NetApp FAS3220 SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -460,7 +460,7 @@ zabbix_export:
                   value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  uuid: 17f9f0e0ca5e4c0b90e5be28b16f9809
+                  uuid: 6ab014a44ad84966a97125c478b10789
                   expression: 'min(/NetApp FAS3220 SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
@@ -543,7 +543,7 @@ zabbix_export:
                   value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  uuid: b0eb3b6afc234219ac7468d7ebce045b
+                  uuid: 712d9096c8064ef19005c4989794db45
                   expression: 'max(/NetApp FAS3220 SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
@@ -962,7 +962,7 @@ zabbix_export:
                   value: '{#IFDESCR}'
           trigger_prototypes:
             -
-              uuid: ee0284a9768a44b6a9de47b9d09750b3
+              uuid: 9ea5b5b667df4bd1943892150c9f2fda
               expression: |
                 min(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1388,7 +1388,7 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      uuid: 0674ec876871465e80adb2d71844753c
+      uuid: 3e2d95918f364248ae07a2e436a986a0
       expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])>0 and (last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#2))=1'
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])=0'
