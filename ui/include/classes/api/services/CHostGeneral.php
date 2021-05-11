@@ -315,7 +315,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			if (!$clear) {
+			if (!$clear && ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 				$db_triggers = DBselect(
 					'SELECT DISTINCT t.triggerid,t.flags'.
 					' FROM triggers t,functions f,items i,hosts h'.
@@ -399,7 +399,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			if (!$clear) {
+			if (!$clear && ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 				$db_graphs = DBselect(
 					'SELECT DISTINCT g.graphid,g.flags'.
 					' FROM graphs g,graphs_items gi,items i,hosts h'.
