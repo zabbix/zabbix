@@ -130,7 +130,7 @@ class CWidgetForm {
 			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
 				// Parses "word.anotherword.1.2", stores in ['word'][1]['anotherword'][2].
 				$result[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
-				$sortkeys[$matches[1]][$matches[2]] = true;
+				$sortkeys[$matches[1]][$matches[2]] = [];
 			}
 			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', $key, $matches) === 1) {
 				// Parses "word.anotherword.1", stores in ['word'][1]['anotherword'].
@@ -145,8 +145,10 @@ class CWidgetForm {
 		}
 
 		foreach ($sortkeys as $key => $sub_keys) {
-			foreach ($sub_keys as $sub_key) {
-				ksort($result[$key][$sub_key]);
+			foreach (array_keys($sub_keys) as $sub_key) {
+				foreach (array_keys($result[$key]) as $i) {
+					ksort($result[$key][$i][$sub_key]);
+				}
 			}
 
 			ksort($result[$key]);
