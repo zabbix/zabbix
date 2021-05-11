@@ -3638,6 +3638,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		dsname = (zbx_vmware_dsname_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dsname_t));
 		dsname->name = zbx_strdup(NULL, ds->name);
 		zbx_vector_vmware_hvdisk_create(&dsname->hvdisks);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): for %d diskextents check multipath at ds:\"%s\"", __func__,
+				ds->diskextents.values_num, ds->name);
 
 		for (j = 0; NULL != multipath_data && j < ds->diskextents.values_num; j++)
 		{
