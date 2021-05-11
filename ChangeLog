@@ -2062,6 +2062,7 @@ Changes for 4.0.31rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-18168] improved regular expression compilation and runtime error reporting (Andris)
 .......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
