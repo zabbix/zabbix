@@ -314,7 +314,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
 		ZBX_XPATH_HV_MULTIPATH("*[local-name()='state'][text()='active'] and ")
 
-
 #define ZBX_XPATH_DS_INFO_EXTENT()									\
 		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
 
@@ -4575,8 +4574,8 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			(SUCCEED == ret ? xml_event.id : 0));
 	return ret;
 
 #	undef ZBX_POST_VMWARE_LASTEVENT
