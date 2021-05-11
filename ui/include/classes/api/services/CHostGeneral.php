@@ -304,26 +304,33 @@ abstract class CHostGeneral extends CHostBase {
 			);
 
 			while ($db_trigger = DBfetch($db_triggers)) {
-				$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => $db_trigger['triggerid']]
-				];
+				if ($clear) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
+				}
+				else {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['triggerid' => $db_trigger['triggerid']]
+					];
+				}
 			}
 
-			$db_triggers = DBselect(
-				'SELECT DISTINCT t.triggerid,t.flags'.
-				' FROM triggers t,functions f,items i,hosts h'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=h.hostid'.
-					' AND h.status='.HOST_STATUS_TEMPLATE.
-					' AND '.dbConditionInt('t.triggerid', array_keys(
-						$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-					))
-			);
+			if (!$clear) {
+				$db_triggers = DBselect(
+					'SELECT DISTINCT t.triggerid,t.flags'.
+					' FROM triggers t,functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('t.triggerid', array_keys(
+							$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
 
-			while ($db_trigger = DBfetch($db_triggers)) {
-				$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
+				while ($db_trigger = DBfetch($db_triggers)) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
+				}
 			}
 		}
 
@@ -381,26 +388,33 @@ abstract class CHostGeneral extends CHostBase {
 			$db_graphs = DBSelect($sql);
 
 			while ($db_graph = DBfetch($db_graphs)) {
-				$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
-					'values' => ['templateid' => 0],
-					'where' => ['graphid' => $db_graph['graphid']]
-				];
+				if ($clear) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
+				}
+				else {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $db_graph['graphid']]
+					];
+				}
 			}
 
-			$db_graphs = DBselect(
-				'SELECT DISTINCT g.graphid,g.flags'.
-				' FROM graphs g,graphs_items gi,items i,hosts h'.
-				' WHERE g.graphid=gi.graphid'.
-					' AND gi.itemid=i.itemid'.
-					' AND i.hostid=h.hostid'.
-					' AND h.status='.HOST_STATUS_TEMPLATE.
-					' AND '.dbConditionInt('g.graphid', array_keys(
-						$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-					))
-			);
+			if (!$clear) {
+				$db_graphs = DBselect(
+					'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i,hosts h'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('g.graphid', array_keys(
+							$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
 
-			while ($db_graph = DBfetch($db_graphs)) {
-				$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
+				while ($db_graph = DBfetch($db_graphs)) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
+				}
 			}
 
 			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
@@ -531,42 +545,50 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		// http tests
+		$upd_httptests = [];
+
 		$sqlWhere = '';
 		if (!is_null($targetids)) {
 			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,ht1.name,h.name as host'.
-				' FROM httptest ht1'.
-				' INNER JOIN httptest ht2 ON ht2.httptestid=ht1.templateid'.
-				' INNER JOIN hosts h ON h.hostid=ht1.hostid'.
-				' WHERE '.dbConditionInt('ht2.hostid', $templateids).
+		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
+				' FROM httptest ht1,httptest ht2,hosts h'.
+				' WHERE ht1.templateid=ht2.httptestid'.
+					' AND ht1.hostid=h.hostid'.
+					' AND '.dbConditionInt('ht2.hostid', $templateids).
 				$sqlWhere;
-		$dbHttpTests = DBSelect($sql);
-		$httpTests = [];
-		while ($httpTest = DBfetch($dbHttpTests)) {
-			$httpTests[$httpTest['httptestid']] = [
-				'name' => $httpTest['name'],
-				'host' => $httpTest['host']
-			];
+
+		$httptests = DBSelect($sql);
+
+		while ($httptest = DBfetch($httptests)) {
+			if ($clear) {
+				$upd_httptests[$httptest['httptestid']] = true;
+			}
+			else {
+				$upd_httptest = ['templateid' => 0];
+				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_httptest['uuid'] = generateUuidV4();
+				}
+
+				$upd_httptests[$httptest['httptestid']] = [
+					'values' => $upd_httptest,
+					'where' => ['httptestid' => $httptest['httptestid']]
+				];
+			}
 		}
 
-		if (!empty($httpTests)) {
+		if ($upd_httptests) {
 			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($httpTests), true);
+				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
 				}
 			}
 			else {
-				DB::update('httptest', [
-					'values' => ['templateid' => 0],
-					'where' => ['httptestid' => array_keys($httpTests)]
-				]);
-				foreach ($httpTests as $httpTest) {
-					info(_s('Unlinked: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['host']));
-				}
+				DB::update('httptest', $upd_httptests);
 			}
 		}
+		SDII($upd_httptests);
 
 		parent::unlink($templateids, $targetids);
 	}
