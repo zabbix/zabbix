@@ -453,7 +453,7 @@ abstract class CHostGeneral extends CHostBase {
 		if (!is_null($targetids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
 
@@ -465,7 +465,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				$upd_item = ['templateid' => 0];
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
 					$upd_item['uuid'] = generateUuidV4();
 				}
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -588,7 +588,6 @@ abstract class CHostGeneral extends CHostBase {
 				DB::update('httptest', $upd_httptests);
 			}
 		}
-		SDII($upd_httptests);
 
 		parent::unlink($templateids, $targetids);
 	}
