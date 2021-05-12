@@ -54,14 +54,11 @@ require_once __DIR__.'/vendor/xmlseclibs/xmlseclibs.php';
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
 
-$baseurl = Utils::getSelfURLNoQuery();
-$relay_state = null;
+global $SSO;
 
 $sp_key = '';
 $sp_cert = '';
 $idp_cert = '';
-
-global $SSO;
 
 if (is_array($SSO) && array_key_exists('SP_KEY', $SSO)) {
 	if (file_exists($SSO['SP_KEY'])) {
@@ -90,6 +87,13 @@ elseif (file_exists('conf/certs/idp.crt')) {
 	$idp_cert = file_get_contents('conf/certs/idp.crt');
 }
 
+if (is_array($SSO) && array_key_exists('SETTINGS', $SSO) && array_key_exists('baseurl', $SSO['SETTINGS'])
+		&& $SSO['SETTINGS']['baseurl'] !== '') {
+	Utils::setBaseURL($SSO['SETTINGS']['baseurl']);
+}
+
+$baseurl = Utils::getSelfURLNoQuery();
+$relay_state = null;
 $settings = [
 	'sp' => [
 		'entityId' => $config['saml_sp_entityid'],
