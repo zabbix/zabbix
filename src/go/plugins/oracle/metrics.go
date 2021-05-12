@@ -123,88 +123,108 @@ var (
 	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
 	paramService  = metric.NewConnParam("Service", "Service name to be used for connection.").
 			WithDefault("XE")
+	paramTLSConnect  = metric.NewConnParam("DBTLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewConnParam("TLSCaFile", "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )
 
 var metrics = metric.MetricSet{
 	keyASMDiskGroups: metric.New("Returns ASM disk groups statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyASMDiskGroupsDiscovery: metric.New("Returns list of ASM disk groups in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyArchive: metric.New("Returns archive logs statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyArchiveDiscovery: metric.New("Returns list of archive logs in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyCDB: metric.New("Returns CDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("QueryName", "Name of a custom query "+
-				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-		}, true),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile,
+			paramTLSCertFile, paramTLSKeyFile, metric.NewParam("QueryName", "Name of a custom query "+
+				"(must be equal to a name of an SQL file without an extension).").SetRequired()}, true),
 
 	keyDataFiles: metric.New("Returns data files statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyFRA: metric.New("Returns FRA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyInstance: metric.New("Returns instance stats.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyPDB: metric.New("Returns PDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyPDBDiscovery: metric.New("Returns list of PDBs in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyPGA: metric.New("Returns PGA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyProc: metric.New("Returns processes statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyRedoLog: metric.New("Returns log file information from the control file.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keySGA: metric.New("Returns SGA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keySessions: metric.New("Returns sessions statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("LockMaxTime", "Maximum session lock duration in seconds to count "+
-				"the session as a prolongedly locked.").WithDefault("600").WithValidator(metric.NumberValidator{}),
-		}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile, metric.NewParam(
+				"LockMaxTime", "Maximum session lock duration in seconds to count "+
+					"the session as a prolongedly locked.").WithDefault("600").WithValidator(metric.NumberValidator{})}, false),
 
 	keySysMetrics: metric.New("Returns a set of system metric values.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Duration", "Capturing interval in seconds of system metric values.").
-				WithDefault("60").WithValidator(metric.SetValidator{Set: []string{"15", "60"}}),
-		}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile,
+			paramTLSCertFile, paramTLSKeyFile, metric.NewParam("Duration", "Capturing interval in seconds of system metric values.").
+				WithDefault("60").WithValidator(metric.SetValidator{Set: []string{"15", "60"}})}, false),
 
 	keySysParams: metric.New("Returns a set of system parameter values.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyTablespaces: metric.New("Returns tablespaces statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyTablespacesDiscovery: metric.New("Returns list of tablespaces in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyUser: metric.New("Returns user information.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Username", "Username for which the information is needed."),
-		}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramTLSConnect, paramTLSCaFile,
+			paramTLSCertFile, paramTLSKeyFile, metric.NewParam("Username", "Username for which the information is needed.")}, false),
 }
 
 func init() {

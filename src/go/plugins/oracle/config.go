@@ -34,6 +34,18 @@ type Session struct {
 
 	// Service name that identifies a database instance
 	Service string `conf:"optional"`
+
+	// Connection type of Oracle server.
+	DBTLSConnect string `conf:"name=DBTLSConnect,optional"`
+
+	// Certificate Authority filepath for Oracle server.
+	TLSCaFile string `conf:"name=DBTLSCAFile,optional"`
+
+	// Certificate filepath for Oracle server.
+	TLSCertFile string `conf:"name=DBTLSCertFile,optional"`
+
+	// Key filepath for Oracle server.
+	TLSKeyFile string `conf:"name=DBTLSKeyFile,optional"`
 }
 
 type PluginOptions struct {

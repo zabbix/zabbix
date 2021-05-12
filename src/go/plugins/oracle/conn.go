@@ -33,6 +33,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
+	zbxTls "zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -185,7 +186,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
+func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*OraConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -206,9 +207,16 @@ func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
 		return nil, err
 	}
 
-	connectString := fmt.Sprintf(`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+	var protocol string
+	if details.TlsConnect != "" {
+		protocol = "TCPS"
+	} else {
+		protocol = "tcp"
+	}
+
+	connectString := fmt.Sprintf(`(DESCRIPTION=(ADDRESS=(PROTOCOL=%s)(HOST=%s)(PORT=%s))`+
 		`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		uri.Host(), uri.Port(), service, c.connectTimeout/time.Second)
+		protocol, uri.Host(), uri.Port(), service, c.connectTimeout/time.Second)
 
 	connector := godror.NewConnector(godror.ConnectionParams{
 		StandaloneConnection: true,
@@ -255,14 +263,14 @@ func (c *ConnManager) get(uri uri.URI) *OraConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *OraConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details zbxTls.TlsDetails) (conn *OraConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri)
+		conn, err = c.create(uri, details)
 	}
 
 	if err != nil {

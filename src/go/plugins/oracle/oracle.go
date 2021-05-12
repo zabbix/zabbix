@@ -29,8 +29,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
-
 	"zabbix.com/pkg/plugin"
+	zbxTls "zabbix.com/pkg/tls"
 )
 
 const (
@@ -58,6 +58,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	details, err := zbxTls.NewTlsDetails(params["sessionName"], params["DBTLSConnect"],
+		params["TLSCaFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+	}
+
 	service := url.QueryEscape(params["Service"])
 
 	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, params["User"], params["Password"], uriDefaults)
@@ -74,7 +80,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*uri, details)
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
