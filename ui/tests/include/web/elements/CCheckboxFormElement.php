@@ -63,7 +63,7 @@ class CCheckboxFormElement extends CFormElement {
 	 *
 	 * @return
 	 */
-	private function setFieldValue($field, $values) {
+	protected function setFieldValue($field, $values) {
 		if ($values === null) {
 			try {
 				$this->getLabelCheckbox($this->getLabel($field))->uncheck();
