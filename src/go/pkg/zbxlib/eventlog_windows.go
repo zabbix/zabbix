@@ -143,6 +143,7 @@ import (
 )
 
 type EventLogItem struct {
+	LastTs  time.Time
 	Results []*EventLogResult
 	Output  ResultWriter
 }
@@ -178,6 +179,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	var cvalue, csource *C.char
 	var clogeventid, cseverity, ctimestamp C.int
 	var clastlogsize C.zbx_uint64_t
+	var addedNs = 1
 	for i := 0; C.get_eventlog_value(result, C.int(i), &cvalue, &csource, &clogeventid, &cseverity, &ctimestamp, &cstate,
 		&clastlogsize) != C.FAIL; i++ {
 
@@ -197,7 +199,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 				EventID:        &logeventid,
 				EventSeverity:  &severity,
 				EventTimestamp: &timestamp,
-				Ts:             time.Now().Add(time.Duration(i) * time.Nanosecond),
+				Ts:             time.Now(),
 				LastLogsize:    uint64(clastlogsize),
 			}
 
@@ -209,6 +211,14 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 			}
 
 		}
+
+		if r.Ts == item.LastTs {
+			r.Ts = r.Ts.Add(time.Duration(addedNs) * time.Nanosecond)
+			addedNs++
+		} else {
+			item.LastTs = r.Ts
+		}
+
 		item.Results = append(item.Results, &r)
 	}
 	C.free_eventlog_result(result)
