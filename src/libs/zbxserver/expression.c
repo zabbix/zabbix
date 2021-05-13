@@ -4632,6 +4632,8 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
 
+	zbx_vector_uint64_reserve(functionids, triggers->values);
+
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
@@ -4731,6 +4733,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 			continue;
 
 		zbx_eval_get_functionids(tr->eval_ctx, &funcids);
+
 		tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
 		tr_func_pos->trigger = tr;
 		tr_func_pos->start_index = functionids->values_num;

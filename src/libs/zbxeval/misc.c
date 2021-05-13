@@ -758,9 +758,6 @@ void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *func
 		if (SUCCEED == expression_extract_functionid(ctx->expression, token, &functionid))
 			zbx_vector_uint64_append(functionids, functionid);
 	}
-
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
