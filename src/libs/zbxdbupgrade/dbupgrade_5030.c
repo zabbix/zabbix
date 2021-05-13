@@ -2990,43 +2990,32 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screenid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	dashboard_userid = DBget_maxid("dashboard_user");
-
-	result = DBselect("select userid, permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
+	result = DBselect("select userid,permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3040,44 +3029,33 @@ out:
 
 static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slideshowid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	dashboard_userid = DBget_maxid("dashboard_user");
 
 	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
