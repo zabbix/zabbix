@@ -3013,8 +3013,8 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
-			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission) values"
-			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
 			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
@@ -3053,8 +3053,8 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
-			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission) values"
-			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
 			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
