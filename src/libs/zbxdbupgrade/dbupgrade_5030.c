@@ -6254,7 +6254,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 		{
 			zbx_strcpy_alloc(str, str_alloc, str_offset, request->params[3]);
 
-			if ('#' != *request->params[3] && 0 != isdigit((*str)[*str_offset - 1]))
+			if (0 != isdigit((*str)[*str_offset - 1]))
 				zbx_chrcpy_alloc(str, str_alloc, str_offset, 's');
 		}
 	}
