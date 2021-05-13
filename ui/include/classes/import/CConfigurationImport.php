@@ -684,8 +684,9 @@ class CConfigurationImport {
 		foreach ($this->getFormattedItems() as $host => $items) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			if (!$this->importedObjectContainer->isHostProcessed($hostid)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+			if ($hostid === null
+					|| (!$this->importedObjectContainer->isHostProcessed($hostid)
+						&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
 				continue;
 			}
 
@@ -896,8 +897,9 @@ class CConfigurationImport {
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			if (!$this->importedObjectContainer->isHostProcessed($hostid)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+			if ($hostid === null
+					|| (!$this->importedObjectContainer->isHostProcessed($hostid)
+						&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
 				unset($discovery_rules_by_hosts[$host]);
 			}
 		}
@@ -1513,8 +1515,9 @@ class CConfigurationImport {
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			if (!$this->importedObjectContainer->isHostProcessed($hostid)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+			if ($hostid === null
+					|| (!$this->importedObjectContainer->isHostProcessed($hostid)
+						&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
 				continue;
 			}
 

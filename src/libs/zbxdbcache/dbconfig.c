@@ -14164,6 +14164,8 @@ void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
 	zbx_vector_uint64_create(&functionids);
 
 	zbx_eval_get_functionids(ctx, &functionids);
+	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	RDLOCK_CACHE;
 

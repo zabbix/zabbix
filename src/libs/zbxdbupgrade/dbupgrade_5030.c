@@ -2990,43 +2990,32 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screenid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	dashboard_userid = DBget_maxid("dashboard_user");
-
-	result = DBselect("select userid, permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
+	result = DBselect("select userid,permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3040,44 +3029,33 @@ out:
 
 static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slideshowid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	dashboard_userid = DBget_maxid("dashboard_user");
 
 	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -4817,6 +4795,60 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbpatch_strcpy_alloc_quoted                                      *
+ *                                                                            *
+ * Purpose: quote and text to a buffer                                        *
+ *                                                                            *
+ * Parameters: str        - [OUT] the output buffer                           *
+ *             str_alloc  - [IN/OUT] an offset in the output buffer           *
+ *             str_offset - [IN/OUT] the size of the output buffer            *
+ *             source     - [IN] the source text                              *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
+{
+	char	raw[FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
+
+	zbx_strlcpy(raw, source, sizeof(raw));
+	zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+	zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_is_composite_constant                                    *
+ *                                                                            *
+ * Purpose: check for composite (consisting of macro(s) + text) constant      *
+ *                                                                            *
+ * Parameters: str - [IN] the text to check                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_is_composite_constant(const char *str)
+{
+	zbx_token_t	token;
+
+	if (SUCCEED == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_LLD_MACRO != token.type)
+			return SUCCEED;
+
+		if (0 != token.loc.l || strlen(str) - 1 != token.loc.r)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dbpatch_convert_params                                           *
  *                                                                            *
  * Purpose: convert function parameters into new syntax                       *
@@ -4894,8 +4926,12 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
 					if ('\0' != *str)
 					{
-						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
-						if (0 != isdigit(str[strlen(str) - 1]))
+						if (SUCCEED == dbpatch_is_composite_constant(str))
+							dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+						else
+							zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+						if (0 != isdigit((*out)[out_offset - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
 					}
 					zbx_free(str);
@@ -4908,29 +4944,25 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 
 					loc = &params->values[index];
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
-					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+					if (SUCCEED == dbpatch_is_composite_constant(str))
+						dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+					else
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
 					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_STR:
 				if (params->values_num > (index = va_arg(args, int)))
 				{
-					loc = &params->values[index];
-					if ('"' == parameter[loc->l])
-					{
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-								loc->r - loc->l + 1);
-					}
-					else if ('\0' != parameter[loc->l])
-					{
-						char	raw[FUNCTION_PARAM_LEN * 4 + 1], quoted[sizeof(raw)];
+					char	*str;
 
-						zbx_strlcpy(raw, parameter + loc->l, loc->r - loc->l + 2);
-						zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
-						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
-						zbx_strcpy_alloc(out, &out_alloc, &out_offset, quoted);
-						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
-					}
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+
+					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_TREND:
@@ -6211,7 +6243,21 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
 
 	if (4 == request->nparam)
-		zbx_snprintf_alloc(str, str_alloc, str_offset, ",%s", request->params[3]);
+	{
+		zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
+
+		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
+		{
+			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+		}
+		else
+		{
+			zbx_strcpy_alloc(str, str_alloc, str_offset, request->params[3]);
+
+			if (0 != isdigit((*str)[*str_offset - 1]))
+				zbx_chrcpy_alloc(str, str_alloc, str_offset, 's');
+		}
+	}
 
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
 
@@ -6517,10 +6563,9 @@ static int	DBpatch_5030189(void)
 
 static char	*update_template_name(char *old)
 {
-	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp;
+	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
-#define STRING_SNMP_LABEL		"SNMP"
 
 	ptr = old;
 
@@ -6531,11 +6576,10 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	ptr_snmp = string_replace(ptr, "SNMPv2", STRING_SNMP_LABEL);
+	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
 	zbx_free(ptr);
-	ptr = ptr_snmp;
 
-	return ptr;
+	return ptr_snmp;
 }
 
 static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
@@ -6655,8 +6699,8 @@ out:
 static int	DBpatch_5030192(void)
 {
 	int		ret = SUCCEED;
-	char		*uuid, *sql = NULL, *seed = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	DB_ROW		row;
 	DB_RESULT	result;
 
@@ -6676,9 +6720,10 @@ static int	DBpatch_5030192(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*trigger_expr;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
 		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
@@ -6688,7 +6733,7 @@ static int	DBpatch_5030192(void)
 			char			*error = NULL;
 			zbx_eval_context_t	ctx;
 
-			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			trigger_expr = row[i + 2];
 
 			if ('\0' == *trigger_expr)
 			{
@@ -6697,7 +6742,6 @@ static int	DBpatch_5030192(void)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
 							__func__, row[0]);
 				}
-				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -6750,8 +6794,6 @@ static int	DBpatch_5030192(void)
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
-
-			zbx_free(trigger_expr);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
@@ -7082,8 +7124,8 @@ out:
 static int	DBpatch_5030199(void)
 {
 	int			ret = SUCCEED;
-	char			*uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
 
@@ -7103,9 +7145,10 @@ static int	DBpatch_5030199(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*trigger_expr;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
 		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
@@ -7134,7 +7177,7 @@ static int	DBpatch_5030199(void)
 			char			*error = NULL;
 			zbx_eval_context_t	ctx;
 
-			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			trigger_expr = row[i + 2];
 
 			if ('\0' == *trigger_expr)
 			{
@@ -7143,7 +7186,6 @@ static int	DBpatch_5030199(void)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
 							__func__, row[0]);
 				}
-				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -7196,8 +7238,6 @@ static int	DBpatch_5030199(void)
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
-
-			zbx_free(trigger_expr);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s/", row[1]);
