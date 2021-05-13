@@ -6520,7 +6520,6 @@ static char	*update_template_name(char *old)
 	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
-#define STRING_SNMP_LABEL	"SNMP"
 
 	ptr = old;
 
@@ -6531,7 +6530,7 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	ptr_snmp = string_replace(ptr, "SNMPv2", STRING_SNMP_LABEL);
+	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
 	zbx_free(ptr);
 
 	return ptr_snmp;
