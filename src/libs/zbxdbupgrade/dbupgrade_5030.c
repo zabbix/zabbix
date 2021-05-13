@@ -6520,7 +6520,7 @@ static char	*update_template_name(char *old)
 	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
-#define STRING_SNMP_LABEL		"SNMP"
+#define STRING_SNMP_LABEL	"SNMP"
 
 	ptr = old;
 
@@ -6533,9 +6533,8 @@ static char	*update_template_name(char *old)
 
 	ptr_snmp = string_replace(ptr, "SNMPv2", STRING_SNMP_LABEL);
 	zbx_free(ptr);
-	ptr = ptr_snmp;
 
-	return ptr;
+	return ptr_snmp;
 }
 
 static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
