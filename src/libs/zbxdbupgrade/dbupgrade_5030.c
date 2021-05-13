@@ -4795,6 +4795,60 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbpatch_strcpy_alloc_quoted                                      *
+ *                                                                            *
+ * Purpose: quote and text to a buffer                                        *
+ *                                                                            *
+ * Parameters: str        - [OUT] the output buffer                           *
+ *             str_alloc  - [IN/OUT] an offset in the output buffer           *
+ *             str_offset - [IN/OUT] the size of the output buffer            *
+ *             source     - [IN] the source text                              *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
+{
+	char	raw[FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
+
+	zbx_strlcpy(raw, source, sizeof(raw));
+	zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+	zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_is_composite_constant                                    *
+ *                                                                            *
+ * Purpose: check for composite (consisting of macro(s) + text) constant      *
+ *                                                                            *
+ * Parameters: str - [IN] the text to check                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_is_composite_constant(const char *str)
+{
+	zbx_token_t	token;
+
+	if (SUCCEED == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_LLD_MACRO != token.type)
+			return SUCCEED;
+
+		if (0 != token.loc.l || strlen(str) - 1 != token.loc.r)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dbpatch_convert_params                                           *
  *                                                                            *
  * Purpose: convert function parameters into new syntax                       *
@@ -4872,8 +4926,12 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
 					if ('\0' != *str)
 					{
-						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
-						if (0 != isdigit(str[strlen(str) - 1]))
+						if (SUCCEED == dbpatch_is_composite_constant(str))
+							dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+						else
+							zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+						if (0 != isdigit((*out)[out_offset - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
 					}
 					zbx_free(str);
@@ -4886,29 +4944,25 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 
 					loc = &params->values[index];
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
-					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+					if (SUCCEED == dbpatch_is_composite_constant(str))
+						dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+					else
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
 					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_STR:
 				if (params->values_num > (index = va_arg(args, int)))
 				{
-					loc = &params->values[index];
-					if ('"' == parameter[loc->l])
-					{
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-								loc->r - loc->l + 1);
-					}
-					else if ('\0' != parameter[loc->l])
-					{
-						char	raw[FUNCTION_PARAM_LEN * 4 + 1], quoted[sizeof(raw)];
+					char	*str;
 
-						zbx_strlcpy(raw, parameter + loc->l, loc->r - loc->l + 2);
-						zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
-						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
-						zbx_strcpy_alloc(out, &out_alloc, &out_offset, quoted);
-						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
-					}
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+
+					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_TREND:
@@ -6189,7 +6243,21 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
 
 	if (4 == request->nparam)
-		zbx_snprintf_alloc(str, str_alloc, str_offset, ",%s", request->params[3]);
+	{
+		zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
+
+		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
+		{
+			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+		}
+		else
+		{
+			zbx_strcpy_alloc(str, str_alloc, str_offset, request->params[3]);
+
+			if (0 != isdigit((*str)[*str_offset - 1]))
+				zbx_chrcpy_alloc(str, str_alloc, str_offset, 's');
+		}
+	}
 
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
 
