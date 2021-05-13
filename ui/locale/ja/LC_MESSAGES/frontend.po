@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-11 17:05+0300\n"
-"PO-Revision-Date: 2021-04-29 09:49+0300\n"
+"POT-Creation-Date: 2021-05-13 16:28+0300\n"
+"PO-Revision-Date: 2021-05-13 11:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1619682561.000000\n"
+"X-POOTLE-MTIME: 1620898321.000000\n"
 
 #: include/classes/items/CHelpItems.php:1073
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -891,7 +891,7 @@ msgstr "ウィジェットの追加"
 
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Added"
-msgstr ""
+msgstr "追加しました"
 
 #: jsLoader.php:320
 #, c-format
@@ -956,7 +956,7 @@ msgstr "アグリゲート"
 
 #: app/views/popup.triggerexpr.php:108
 msgid "Aggregate functions"
-msgstr ""
+msgstr "集計関数"
 
 #: include/classes/widgets/CWidgetHelper.php:1108
 msgid "Aggregation function"
@@ -1511,11 +1511,11 @@ msgstr "Bind password"
 #: app/controllers/CControllerPopupTriggerExpr.php:377
 #: app/controllers/CControllerPopupTriggerExpr.php:410
 msgid "Bits to shift"
-msgstr ""
+msgstr "シフトするビット数"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Bitwise functions"
-msgstr ""
+msgstr "ビット単位関数"
 
 #: app/views/administration.user.list.php:143
 msgid "Blocked"
@@ -1894,7 +1894,7 @@ msgstr "LDAPサーバーにバインドできません。"
 #: include/forms.inc.php:1916 include/forms.inc.php:1926
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "条件式ツリーを作成できません： %1$s。"
 
 #: httpconf.php:219 httpconf.php:493 items.php:962
 msgid "Cannot clear history"
@@ -2412,7 +2412,7 @@ msgstr "ダッシュボード\"%2$s\"内で使用されているホスト\"%1$s\
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているホスト\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1188
+#: include/classes/import/CConfigurationImport.php:1190
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのホストグループ\"%1$s\"が見つかりません。"
@@ -2435,47 +2435,47 @@ msgstr "マップ\"%2$s\"で使用されているアイコン\"%1$s\"が見つ�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているアイコンのマッピング\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:930
+#: include/classes/import/CConfigurationImport.php:932
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"上のディスカバリルール\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:700
+#: include/classes/import/CConfigurationImport.php:701
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1082
+#: include/classes/import/CConfigurationImport.php:1084
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムプロトタイプ\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1599
+#: include/classes/import/CConfigurationImport.php:1602
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"のY軸の最大値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1372
+#: include/classes/import/CConfigurationImport.php:1374
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最大値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1581
+#: include/classes/import/CConfigurationImport.php:1584
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"のY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1351
+#: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1619
+#: include/classes/import/CConfigurationImport.php:1622
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"内で使用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1393
+#: include/classes/import/CConfigurationImport.php:1395
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"で使用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
@@ -2490,12 +2490,12 @@ msgstr "ダッシュボード\"%2$s\"内で使用されているアイテム\"%1
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているマップ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1211
+#: include/classes/import/CConfigurationImport.php:1213
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのテンプレート\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:982
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"の\"%2$s\"を上書きするためのテンプレート\"%1$s\"が見つかりません。"
@@ -2506,12 +2506,12 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"の\"%2$s\"を上書き
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:713
+#: include/classes/import/CConfigurationImport.php:714
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1098
+#: include/classes/import/CConfigurationImport.php:1100
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
@@ -3120,7 +3120,7 @@ msgstr "文字列が含まれない"
 #: app/controllers/CControllerPopupTriggerExpr.php:873
 #: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "Chars"
-msgstr ""
+msgstr "文字"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
@@ -4528,7 +4528,7 @@ msgstr "ハードウェア購入日"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Date and time functions"
-msgstr ""
+msgstr "日付と時刻関数"
 
 #: app/views/report.services.php:83 report4.php:175
 msgid "Day"
@@ -4574,7 +4574,7 @@ msgstr "12月"
 #: app/controllers/CControllerPopupTriggerExpr.php:860
 #: app/controllers/CControllerPopupTriggerExpr.php:1017
 msgid "Decimal places"
-msgstr ""
+msgstr "小数点以下桁数"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
@@ -5493,7 +5493,7 @@ msgstr "表示オプション"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:753
 msgid "Division denominator"
-msgstr ""
+msgstr "除算分母"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -6074,7 +6074,7 @@ msgstr "英語 (en_US)"
 #: include/classes/api/services/CValueMap.php:451
 #, c-format
 msgid "Entry with UUID \"%1$s\" already exists."
-msgstr ""
+msgstr "UUID \\\"%1$s\\\"のエントリはすでに存在します。"
 
 #: app/partials/monitoring.host.filter.php:47
 #: app/partials/monitoring.host.filter.php:196
@@ -7407,7 +7407,7 @@ msgstr "履歴データの選択"
 
 #: app/views/popup.triggerexpr.php:111
 msgid "History functions"
-msgstr ""
+msgstr "履歴関数"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
 #: app/views/popup.lldoperation.php:185
@@ -9208,18 +9208,18 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:726
-#: include/classes/import/CConfigurationImport.php:821
-#: include/classes/import/CConfigurationImport.php:858
-#: include/classes/import/CConfigurationImport.php:958
-#: include/classes/import/CConfigurationImport.php:1112
-#: include/classes/import/CConfigurationImport.php:2654
-#: include/classes/import/CConfigurationImport.php:2758
-#: include/classes/import/CConfigurationImport.php:2768
-#: include/classes/import/CConfigurationImport.php:2795
-#: include/classes/import/CConfigurationImport.php:2810
-#: include/classes/import/CConfigurationImport.php:2819
-#: include/classes/import/CConfigurationImport.php:2825
+#: include/classes/import/CConfigurationImport.php:727
+#: include/classes/import/CConfigurationImport.php:822
+#: include/classes/import/CConfigurationImport.php:859
+#: include/classes/import/CConfigurationImport.php:960
+#: include/classes/import/CConfigurationImport.php:1114
+#: include/classes/import/CConfigurationImport.php:2657
+#: include/classes/import/CConfigurationImport.php:2761
+#: include/classes/import/CConfigurationImport.php:2771
+#: include/classes/import/CConfigurationImport.php:2798
+#: include/classes/import/CConfigurationImport.php:2813
+#: include/classes/import/CConfigurationImport.php:2822
+#: include/classes/import/CConfigurationImport.php:2828
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9504,7 +9504,7 @@ msgstr "アクションの実行条件が正しくありません：%1$s。"
 #: app/controllers/CControllerPopupTriggerExpr.php:1424
 #, c-format
 msgid "Invalid condition: %1$s."
-msgstr ""
+msgstr "条件が正しくありません： %1$s。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:220
 msgid "Invalid date."
@@ -10481,7 +10481,7 @@ msgstr "凡例"
 #: app/controllers/CControllerPopupTriggerExpr.php:615
 #: app/controllers/CControllerPopupTriggerExpr.php:733
 msgid "Length"
-msgstr ""
+msgstr "長さ"
 
 #: setup.php:195
 msgid "Licensed under"
@@ -11112,7 +11112,7 @@ msgstr "正規表現と一致する"
 
 #: app/views/popup.triggerexpr.php:112
 msgid "Mathematical functions"
-msgstr ""
+msgstr "数学関数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:344
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
@@ -12011,7 +12011,7 @@ msgstr "認証ユーザー名が設定されていません。"
 
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
-msgstr ""
+msgstr "変更はありません。"
 
 #: include/classes/api/services/CCorrelation.php:1022
 #, c-format
@@ -13013,7 +13013,7 @@ msgstr "オペレータ"
 
 #: app/views/popup.triggerexpr.php:113
 msgid "Operator functions"
-msgstr ""
+msgstr "演算子関数"
 
 #: app/views/administration.mediatype.edit.php:346
 msgid "Options"
@@ -13758,7 +13758,7 @@ msgstr "電力使用量、<url> - VMwareサービスURL、<uuid> - VMwareハイ�
 
 #: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Power value"
-msgstr ""
+msgstr "指数"
 
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
@@ -13767,7 +13767,7 @@ msgstr "インストール事前準備概要"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Prediction functions"
-msgstr ""
+msgstr "予測関数"
 
 #: app/views/popup.massupdate.item.php:494
 #: include/views/configuration.host.discovery.edit.php:875
@@ -14545,7 +14545,7 @@ msgstr "%1$sの削除"
 
 #: app/controllers/CControllerPopupImportCompare.php:158
 msgid "Removed"
-msgstr ""
+msgstr "削除しました"
 
 #: jsLoader.php:321
 #, c-format
@@ -14590,7 +14590,7 @@ msgstr "依存関係を置換"
 #: app/controllers/CControllerPopupTriggerExpr.php:620
 #: app/controllers/CControllerPopupTriggerExpr.php:834
 msgid "Replacement"
-msgstr ""
+msgstr "指定文字列"
 
 #: include/classes/api/services/CReport.php:264
 #, c-format
@@ -16136,7 +16136,7 @@ msgstr "標準のアイテム"
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "Start"
-msgstr ""
+msgstr "開始位置"
 
 #: app/partials/scheduledreport.formgrid.html.php:156
 msgid "Start date"
@@ -16359,7 +16359,7 @@ msgstr "文字列"
 
 #: app/views/popup.triggerexpr.php:115
 msgid "String functions"
-msgstr ""
+msgstr "文字列関数"
 
 #: include/items.inc.php:1822 include/items.inc.php:1826
 #: include/items.inc.php:1830 include/items.inc.php:1834
@@ -17300,7 +17300,7 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガー\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
-#: include/classes/import/CConfigurationImport.php:1798
+#: include/classes/import/CConfigurationImport.php:1801
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
@@ -17407,7 +17407,7 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他�
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
-#: include/classes/import/CConfigurationImport.php:1480
+#: include/classes/import/CConfigurationImport.php:1482
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存しますが存在しません。"
@@ -17679,7 +17679,7 @@ msgstr "URL"
 #: include/classes/validators/CApiInputValidator.php:2254
 #: include/classes/validators/CApiInputValidator.php:2260
 msgid "UUIDv4 is expected"
-msgstr ""
+msgstr "UUIDv4で指定してください"
 
 #: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
@@ -18010,7 +18010,7 @@ msgstr "障害更新"
 
 #: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Updated"
-msgstr ""
+msgstr "更新しました"
 
 #: include/classes/api/services/CHost.php:1292
 #, c-format
@@ -19615,7 +19615,7 @@ msgstr "ユーザーマクロを指定してください"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:282
 msgid "abs() - Absolute value"
-msgstr ""
+msgstr "abs() - 絶対値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:288
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
@@ -19747,7 +19747,7 @@ msgstr "昇順"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:295
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
-msgstr ""
+msgstr "ascii() - 値の左端の文字のASCIIコードを返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
@@ -19795,35 +19795,35 @@ msgstr "avg() - 期間Tの値の平均値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:336
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
-msgstr ""
+msgstr "between() - 値が指定された範囲内であるかチェック (1 - 範囲内, 0 - その他)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:354
 msgid "bitand() - Bitwise AND"
-msgstr ""
+msgstr "bitand() - ビットAND演算"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "bitlength() - Returns the length in bits"
-msgstr ""
+msgstr "bitlength() - ビット長を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:374
 msgid "bitlshift() - Bitwise shift left"
-msgstr ""
+msgstr "bitlshift() - ビット左シフト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "bitnot() - Bitwise NOT"
-msgstr ""
+msgstr "bitnot() - ビットNOT演算"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:394
 msgid "bitor() - Bitwise OR"
-msgstr ""
+msgstr "bitor() - ビットOR演算"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:407
 msgid "bitrshift() - Bitwise shift right"
-msgstr ""
+msgstr "bitrshift() - ビット右シフト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:420
 msgid "bitxor() - Bitwise exclusive OR"
-msgstr ""
+msgstr "bitxor() - ビットXOR演算"
 
 #: app/views/administration.trigdisplay.edit.php:48
 #: app/views/administration.trigdisplay.edit.php:60
@@ -19838,7 +19838,7 @@ msgstr "ユーザー名とパスワードの両方を指定するか空である
 
 #: app/controllers/CControllerPopupTriggerExpr.php:433
 msgid "bytelength() - Returns the length in bytes"
-msgstr ""
+msgstr "bytelength() - バイト長を返す"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
@@ -19926,10 +19926,10 @@ msgstr "変更できません"
 #: include/classes/api/services/CUserMacro.php:795
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:727
-#: include/classes/import/CConfigurationImport.php:959
-#: include/classes/import/CConfigurationImport.php:1113
-#: include/classes/import/CConfigurationImport.php:2796
+#: include/classes/import/CConfigurationImport.php:728
+#: include/classes/import/CConfigurationImport.php:961
+#: include/classes/import/CConfigurationImport.php:1115
+#: include/classes/import/CConfigurationImport.php:2799
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -19977,11 +19977,11 @@ msgstr "テンプレートのディスカバリルールのプロパティを更
 
 #: app/controllers/CControllerPopupTriggerExpr.php:440
 msgid "cbrt() - Cube root"
-msgstr ""
+msgstr "cbrt() - 立方根"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:447
 msgid "ceil() - Rounds up to the nearest greater integer"
-msgstr ""
+msgstr "ceil() - 一番近くて大きい整数に切り上げる"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:454
 msgid "change() - Difference between last and previous value"
@@ -19989,7 +19989,7 @@ msgstr "change() - 最新値と前回値との差分"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:460
 msgid "char() - Returns the character which represents the given ASCII code"
-msgstr ""
+msgstr "char() - 指定されたASCIIコードの文字を返す"
 
 #: include/classes/parsers/CConditionFormula.php:219
 #, c-format
@@ -20001,7 +20001,7 @@ msgid "circular dependency is not allowed"
 msgstr "循環する依存関係は許可されていません"
 
 #: include/classes/api/services/CItemGeneral.php:2256
-#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2814
 msgid "circular item dependency is not allowed"
 msgstr "循環するアイテムの依存関係は許可されていません"
 
@@ -20016,7 +20016,7 @@ msgstr "カンマ区切りのリスト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:467
 msgid "concat() - Returns a string that is the result of concatenating value to string"
-msgstr ""
+msgstr "concat() - 値を文字列に連結した結果の文字列を返す"
 
 #: app/partials/hostmacros.inherited.list.html.php:39
 msgid "configure"
@@ -20224,7 +20224,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "floor() - Rounds down to the nearest smaller integer"
-msgstr ""
+msgstr "floor() - 最も近くて小さな整数に切り捨てる"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:580
 msgid "forecast() - Forecast for next t seconds based on period T"
@@ -20305,11 +20305,11 @@ msgstr "期間中"
 
 #: app/views/popup.valuemap.edit.php:81
 msgid "in range"
-msgstr ""
+msgstr "範囲"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:594
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
-msgstr ""
+msgstr "in() - 値がリストアップされた値と同じかチェック (1 - 同じ、0 - その他)"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
 #: app/views/administration.user.edit.php:393
@@ -20337,7 +20337,7 @@ msgstr "要素の数が正しくありません"
 #: include/classes/parsers/CExpressionParser.php:138
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\"から始まる条件式が正しくありません"
 
 #: include/classes/parsers/CParser.php:118
 #, c-format
@@ -20349,7 +20349,7 @@ msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 #: include/classes/validators/CExpressionValidator.php:172
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"の使い方が正しくありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -20385,17 +20385,17 @@ msgstr "監視間隔が正しくありません"
 #: include/classes/validators/CHistFunctionValidator.php:63
 #, c-format
 msgid "invalid fifth parameter in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内の5番目のパラメーターが正しくありません"
 
 #: include/classes/validators/CHistFunctionValidator.php:59
 #, c-format
 msgid "invalid first parameter in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内の最初のパラメーターが正しくありません"
 
 #: include/classes/validators/CHistFunctionValidator.php:62
 #, c-format
 msgid "invalid fourth parameter in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内の4番目のパラメーターが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:241
 #: include/classes/graphdraw/CPieGraphDraw.php:168
@@ -20415,12 +20415,12 @@ msgstr "ホスト名が正しくありません"
 #: include/classes/validators/CMathFunctionValidator.php:72
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内のパラメーターの数が正しくありません"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:106
 #: include/classes/validators/CApiInputValidator.php:2224
 msgid "invalid range expression"
-msgstr ""
+msgstr "範囲の条件式が正しくありません"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: include/classes/validators/CApiInputValidator.php:1598
@@ -20430,12 +20430,12 @@ msgstr "正規表現が正しくありません"
 #: include/classes/validators/CHistFunctionValidator.php:60
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内の2番目のパラメーターが正しくありません"
 
 #: include/classes/validators/CHistFunctionValidator.php:61
 #, c-format
 msgid "invalid third parameter in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"内の3番目のパラメーターが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:178
@@ -20571,7 +20571,7 @@ msgstr ""
 #: include/classes/validators/CHistFunctionValidator.php:87
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"に必須パラメーターがありません"
 
 #: include/classes/api/services/CMap.php:860
 #: include/classes/api/services/CMap.php:1328
@@ -20613,14 +20613,14 @@ msgid "maximum dependent items count reached"
 msgstr "依存アイテムの数が最大数に達しました"
 
 #: include/classes/api/services/CItemGeneral.php:2336
-#: include/classes/import/CConfigurationImport.php:2759
-#: include/classes/import/CConfigurationImport.php:2826
+#: include/classes/import/CConfigurationImport.php:2762
+#: include/classes/import/CConfigurationImport.php:2829
 msgid "maximum number of dependency levels reached"
 msgstr "依存レベルの数が最大数に達しました\""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:725
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
-msgstr ""
+msgstr "mid() - 開始位置からN文字の部分文字列を返す"
 
 #: include/classes/api/services/CItemGeneral.php:1385
 #: include/classes/graphdraw/CLineGraphDraw.php:1378
@@ -20848,11 +20848,11 @@ msgstr "percentile() - 期間TでのパーセンタイルP"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "pi() - Returns the Pi constant"
-msgstr ""
+msgstr "pi() - 円周率を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:788
 msgid "power() - The power of a base value to a power value"
-msgstr ""
+msgstr "power() - ベースの値に指数を指定したべき乗値"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
 msgid "problem pattern"
@@ -20864,7 +20864,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "rand() - A random integer value"
-msgstr ""
+msgstr "rand() - ランダムな整数値"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
@@ -20881,7 +20881,7 @@ msgstr "%1$s秒ごとに更新。"
 #: app/views/js/popup.valuemap.edit.js.php:33
 #: app/views/popup.valuemap.edit.php:82
 msgid "regexp"
-msgstr ""
+msgstr "正規表現"
 
 #: app/views/popup.lldoverride.php:150
 #: include/views/configuration.host.discovery.edit.php:734
@@ -20896,7 +20896,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:826
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
-msgstr ""
+msgstr "replace() - パターンを検索して指定文字列に置き換える"
 
 #: include/forms.inc.php:1371 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
@@ -20919,7 +20919,7 @@ msgstr "ルート"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:857
 msgid "round() - Rounds a value to decimal places"
-msgstr ""
+msgstr "round() - 小数点以下桁数で四捨五入"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:870
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -21028,7 +21028,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:911
 msgid "sqrt() - Square root of a value"
-msgstr ""
+msgstr "sqrt() - 値の平方根"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:918
 msgid "stddevpop() - Population standard deviation"
@@ -21183,7 +21183,7 @@ msgstr "トリガーは手動クローズを許可されていません"
 
 #: include/classes/validators/CExpressionValidator.php:96
 msgid "trigger expression must contain at least one /host/key reference"
-msgstr ""
+msgstr "トリガー条件式には少なくとも1つの /host/key の参照が必要です"
 
 #: include/classes/api/services/CTriggerGeneral.php:1743
 msgid "trigger prototype cannot be moved to another template or host"
@@ -21199,7 +21199,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1014
 msgid "truncate() - Truncates a value to decimal places"
-msgstr ""
+msgstr "truncate() - 小数点以下桁数で切り捨て"
 
 #: app/partials/layout.htmlpage.aside.php:74
 #: include/classes/html/CMultiSelect.php:84 jsLoader.php:317
@@ -21230,7 +21230,7 @@ msgstr "定数値 \"%1$s\" が間違っています"
 
 #: include/classes/parsers/CExpressionMacroParser.php:82
 msgid "unexpected end of expression macro"
-msgstr ""
+msgstr "条件式のマクロの末尾が間違っています"
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
@@ -21299,7 +21299,7 @@ msgstr "不明"
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
-msgstr ""
+msgstr "関数\"%1$s\"が不明です"
 
 #: app/controllers/CControllerPopupItemTestSend.php:192
 msgid "unsupported time suffix"
@@ -21350,11 +21350,11 @@ msgstr "値"
 msgid "value \"%1$s\" already exists"
 msgstr "値\"%1$s\"はすでにあります"
 
-#: include/classes/import/CConfigurationImport.php:822
-#: include/classes/import/CConfigurationImport.php:859
-#: include/classes/import/CConfigurationImport.php:2655
-#: include/classes/import/CConfigurationImport.php:2769
-#: include/classes/import/CConfigurationImport.php:2820
+#: include/classes/import/CConfigurationImport.php:823
+#: include/classes/import/CConfigurationImport.php:860
+#: include/classes/import/CConfigurationImport.php:2658
+#: include/classes/import/CConfigurationImport.php:2772
+#: include/classes/import/CConfigurationImport.php:2823
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "値\"%1$s\"が存在しません"

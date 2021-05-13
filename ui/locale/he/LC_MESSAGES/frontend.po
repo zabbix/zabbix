@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-11 17:05+0300\n"
+"POT-Creation-Date: 2021-05-13 16:28+0300\n"
 "PO-Revision-Date: 2021-04-21 13:18+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -2477,7 +2477,7 @@ msgstr "לא ניתן למצוא את המארח „%1$s” הנמצא בשימ�
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את המארח „%1$s” הנמצא בשימוש במפה „%2$s”."
 
-#: include/classes/import/CConfigurationImport.php:1188
+#: include/classes/import/CConfigurationImport.php:1190
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את קבוצת המארחים „%1$s” עבור האבטיפוס למארח „%2$s” של כלל הגילוי „%3$s” על „%4$s”."
@@ -2500,47 +2500,47 @@ msgstr "לא ניתן למצוא את הסמל „%1$s” הנמצא בשימו�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את מפת הסמלים „%1$s” בה נעשה שימוש במפה „%2$s”."
 
-#: include/classes/import/CConfigurationImport.php:930
+#: include/classes/import/CConfigurationImport.php:932
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr "לא ניתן למצוא את המנשק „%1$s” בו נעשה שימוש בכלל הגילוי „%2$s” על גבי „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:700
+#: include/classes/import/CConfigurationImport.php:701
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "לא ניתן למצוא את המנשק „%1$s” בו נעשה שימוש בפריט „%2$s” על גבי „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:1082
+#: include/classes/import/CConfigurationImport.php:1084
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את המנשק „%1$s” בו נעשה שימוש באבטיפוס של הפריט „%2$s” של כלל הגילוי „%3$s” על גבי „%4$s”."
 
-#: include/classes/import/CConfigurationImport.php:1599
+#: include/classes/import/CConfigurationImport.php:1602
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” על גבי „%2$s” שנעשה בו שימוש בתור הערך המרבי של ציר ה־Y עבור התרשים „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:1372
+#: include/classes/import/CConfigurationImport.php:1374
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” שמשמש בתור הערך המרבי של ציר ה־Y עבור אבטיפוס התרשים „%3$s” של כלל הגילוי „%4$s” תחת „%5$s”."
 
-#: include/classes/import/CConfigurationImport.php:1581
+#: include/classes/import/CConfigurationImport.php:1584
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” שמשמש בתור הערך המזערי של ציר ה־Y עבור התרשים „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:1351
+#: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” שמשמש בתור הערך המזערי של ציר ה־Y עבור אבטיפוס התרשים „%3$s” של כלל הגילוי „%4$s” תחת „%5$s”."
 
-#: include/classes/import/CConfigurationImport.php:1619
+#: include/classes/import/CConfigurationImport.php:1622
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” שנמצא בשימוש בתרשים „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:1393
+#: include/classes/import/CConfigurationImport.php:1395
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” שנמצא בשימוש באבטיפוס התרשים „%3$s” של כלל הגילוי „%4$s” תחת „%5$s”."
@@ -2555,12 +2555,12 @@ msgstr "לא ניתן למצוא את הפריט „%1$s” שנמצא בשימ�
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את המפה „%1$s“ הנמצאת בשימוש במפה „%2$s“."
 
-#: include/classes/import/CConfigurationImport.php:1211
+#: include/classes/import/CConfigurationImport.php:1213
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את התבנית „%1$s” עבור אבטיפוס המארח „%2$s” של כלל הגילוי „%3$s” תחת „%4$s”."
 
-#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:982
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את התבנית „%1$s” למעקף „%2$s” של כלל הגילוי „%3$s” על גבי „%4$s”."
@@ -2571,12 +2571,12 @@ msgstr "לא ניתן למצוא את התבנית „%1$s” למעקף „%2$s
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את ההקפצה „%1$s” שנעשה בה שימוש במפה „%2$s”."
 
-#: include/classes/import/CConfigurationImport.php:713
+#: include/classes/import/CConfigurationImport.php:714
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "לא ניתן למצוא את מפת הערכים „%1$s” שמשמשת את הפריט „%2$s” תחת „%3$s”."
 
-#: include/classes/import/CConfigurationImport.php:1098
+#: include/classes/import/CConfigurationImport.php:1100
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את מפת הערכים „%1$s” שמשמשת את אבטיפוס הפריט „%2$s” של כלל הגילוי „%3$s” תחת „%4$s”."
@@ -9295,18 +9295,18 @@ msgstr "ערך שגוי לשדה „%1$s”."
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:726
-#: include/classes/import/CConfigurationImport.php:821
-#: include/classes/import/CConfigurationImport.php:858
-#: include/classes/import/CConfigurationImport.php:958
-#: include/classes/import/CConfigurationImport.php:1112
-#: include/classes/import/CConfigurationImport.php:2654
-#: include/classes/import/CConfigurationImport.php:2758
-#: include/classes/import/CConfigurationImport.php:2768
-#: include/classes/import/CConfigurationImport.php:2795
-#: include/classes/import/CConfigurationImport.php:2810
-#: include/classes/import/CConfigurationImport.php:2819
-#: include/classes/import/CConfigurationImport.php:2825
+#: include/classes/import/CConfigurationImport.php:727
+#: include/classes/import/CConfigurationImport.php:822
+#: include/classes/import/CConfigurationImport.php:859
+#: include/classes/import/CConfigurationImport.php:960
+#: include/classes/import/CConfigurationImport.php:1114
+#: include/classes/import/CConfigurationImport.php:2657
+#: include/classes/import/CConfigurationImport.php:2761
+#: include/classes/import/CConfigurationImport.php:2771
+#: include/classes/import/CConfigurationImport.php:2798
+#: include/classes/import/CConfigurationImport.php:2813
+#: include/classes/import/CConfigurationImport.php:2822
+#: include/classes/import/CConfigurationImport.php:2828
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -17415,7 +17415,7 @@ msgstr "ההקפצה „%1$s” כבר קיימת תחת „%2$s”."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "ההקפצה „%1$s” שייכת לתבניות עם קישוריות שונה."
 
-#: include/classes/import/CConfigurationImport.php:1798
+#: include/classes/import/CConfigurationImport.php:1801
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "ההקפצה „%1$s” תלויה בהקפצה „%2$s”, שאינה קיימת."
@@ -17525,7 +17525,7 @@ msgstr "אבטיפוס ההקפצה „%1$s” שייך לתבניות עם קי
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "אבטיפוס ההקפצה „%1$s” מכיל אבות טיפוס של פריטים ממגוון כללי גילוי."
 
-#: include/classes/import/CConfigurationImport.php:1480
+#: include/classes/import/CConfigurationImport.php:1482
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "אבטיפוס ההקפצה „%1$s” תלוי בהקפצה „%2$s”, שאינה קיימת."
@@ -20053,10 +20053,10 @@ msgstr "לא ניתן לשנות"
 #: include/classes/api/services/CUserMacro.php:795
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:727
-#: include/classes/import/CConfigurationImport.php:959
-#: include/classes/import/CConfigurationImport.php:1113
-#: include/classes/import/CConfigurationImport.php:2796
+#: include/classes/import/CConfigurationImport.php:728
+#: include/classes/import/CConfigurationImport.php:961
+#: include/classes/import/CConfigurationImport.php:1115
+#: include/classes/import/CConfigurationImport.php:2799
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -20128,7 +20128,7 @@ msgid "circular dependency is not allowed"
 msgstr "אין ליצור תלות מעגלית"
 
 #: include/classes/api/services/CItemGeneral.php:2256
-#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2814
 msgid "circular item dependency is not allowed"
 msgstr "תלות מעגלית לפריט אסורה"
 
@@ -20740,8 +20740,8 @@ msgid "maximum dependent items count reached"
 msgstr "כמות הפריטים התלויים המרבית מולאה"
 
 #: include/classes/api/services/CItemGeneral.php:2336
-#: include/classes/import/CConfigurationImport.php:2759
-#: include/classes/import/CConfigurationImport.php:2826
+#: include/classes/import/CConfigurationImport.php:2762
+#: include/classes/import/CConfigurationImport.php:2829
 msgid "maximum number of dependency levels reached"
 msgstr "כמות הרמות המרבית לתלויות מולאה"
 
@@ -21477,11 +21477,11 @@ msgstr "ערך"
 msgid "value \"%1$s\" already exists"
 msgstr "הערך „%1$s” כבר קיים"
 
-#: include/classes/import/CConfigurationImport.php:822
-#: include/classes/import/CConfigurationImport.php:859
-#: include/classes/import/CConfigurationImport.php:2655
-#: include/classes/import/CConfigurationImport.php:2769
-#: include/classes/import/CConfigurationImport.php:2820
+#: include/classes/import/CConfigurationImport.php:823
+#: include/classes/import/CConfigurationImport.php:860
+#: include/classes/import/CConfigurationImport.php:2658
+#: include/classes/import/CConfigurationImport.php:2772
+#: include/classes/import/CConfigurationImport.php:2823
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "הערך „%1$s” לא נמצא"
