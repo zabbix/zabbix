@@ -2278,6 +2278,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		}
 	}
 
+	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	if (NULL != ctx.expression)

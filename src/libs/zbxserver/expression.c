@@ -4731,6 +4731,9 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 			continue;
 
 		zbx_eval_get_functionids(tr->eval_ctx, &funcids);
+		zbx_vector_uint64_sort(&funcids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&funcids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
 		tr_func_pos->trigger = tr;
 		tr_func_pos->start_index = functionids->values_num;
