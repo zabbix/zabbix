@@ -6517,10 +6517,9 @@ static int	DBpatch_5030189(void)
 
 static char	*update_template_name(char *old)
 {
-	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp;
+	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
-#define STRING_SNMP_LABEL		"SNMP"
 
 	ptr = old;
 
@@ -6531,11 +6530,10 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	ptr_snmp = string_replace(ptr, "SNMPv2", STRING_SNMP_LABEL);
+	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
 	zbx_free(ptr);
-	ptr = ptr_snmp;
 
-	return ptr;
+	return ptr_snmp;
 }
 
 static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
@@ -6655,8 +6653,8 @@ out:
 static int	DBpatch_5030192(void)
 {
 	int		ret = SUCCEED;
-	char		*uuid, *sql = NULL, *seed = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	DB_ROW		row;
 	DB_RESULT	result;
 
@@ -6676,9 +6674,10 @@ static int	DBpatch_5030192(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*trigger_expr;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
 		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
@@ -6688,7 +6687,7 @@ static int	DBpatch_5030192(void)
 			char			*error = NULL;
 			zbx_eval_context_t	ctx;
 
-			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			trigger_expr = row[i + 2];
 
 			if ('\0' == *trigger_expr)
 			{
@@ -6697,7 +6696,6 @@ static int	DBpatch_5030192(void)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
 							__func__, row[0]);
 				}
-				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -6750,8 +6748,6 @@ static int	DBpatch_5030192(void)
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
-
-			zbx_free(trigger_expr);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
@@ -7082,8 +7078,8 @@ out:
 static int	DBpatch_5030199(void)
 {
 	int			ret = SUCCEED;
-	char			*uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
 
@@ -7103,9 +7099,10 @@ static int	DBpatch_5030199(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*trigger_expr;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
 		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
@@ -7134,7 +7131,7 @@ static int	DBpatch_5030199(void)
 			char			*error = NULL;
 			zbx_eval_context_t	ctx;
 
-			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			trigger_expr = row[i + 2];
 
 			if ('\0' == *trigger_expr)
 			{
@@ -7143,7 +7140,6 @@ static int	DBpatch_5030199(void)
 					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
 							__func__, row[0]);
 				}
-				zbx_free(trigger_expr);
 				continue;
 			}
 
@@ -7196,8 +7192,6 @@ static int	DBpatch_5030199(void)
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
 			zbx_eval_clear(&ctx);
-
-			zbx_free(trigger_expr);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s/", row[1]);
