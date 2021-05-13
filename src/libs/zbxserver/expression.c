@@ -5047,7 +5047,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 			continue;
 		}
 
-		if (SUCCEED != evaluate_function2(&func->value, item, func->function, func->parameter,
+		if (SUCCEED != evaluate_function2(&func->value, (DC_ITEM *)item, func->function, func->parameter,
 				&func->timespec, &error))
 		{
 			/* compose and store error message for future use */
