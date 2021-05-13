@@ -1,1 +1,0 @@
-.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)

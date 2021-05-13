@@ -8,6 +8,10 @@ New features:
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
 .......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
 ...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
 .......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
