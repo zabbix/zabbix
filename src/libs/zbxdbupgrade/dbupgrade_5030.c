@@ -6517,7 +6517,7 @@ static int	DBpatch_5030189(void)
 
 static char	*update_template_name(char *old)
 {
-	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp;
+	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
 
 #define MIN_TEMPLATE_NAME_LEN	3
 #define STRING_SNMP_LABEL		"SNMP"
