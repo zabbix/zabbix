@@ -72,4 +72,15 @@ class CFluidFormElement extends CFormElement {
 	public function getFieldContainer($name) {
 		return $this->getLabel($name)->query('xpath:./'.self::TABLE_FORM_FIELD)->one();
 	}
+
+	/**
+	 * Get label element by text.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElement
+	 */
+	protected function findLabels($name) {
+		return $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+	}
 }
