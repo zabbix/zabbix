@@ -3452,7 +3452,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *             nodata_win - [OUT] counter of delayed values                   *
  *             info       - [OUT] address of a pointer to the info            *
  *                                     string (should be freed by the caller) *
- *             mode       - [OUT] item retrieve mode is used to retrieve only *
+ *             mode       - [IN]  item retrieve mode is used to retrieve only *
  *                                necessary data to reduce time spent holding *
  *                                read lock                                   *
  *                                                                            *
