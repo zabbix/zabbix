@@ -173,8 +173,8 @@ var (
 			WithValidator(metric.LenValidator{Max: &maxPassLen})
 	paramDatabase = metric.NewConnParam("Database", "Database name to be used for connection.").
 			WithDefault("postgres").WithValidator(metric.LenValidator{Min: &minDBNameLen, Max: &maxDBNameLen})
-	paramTLSConnect  = metric.NewConnParam("DBTLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewConnParam("TLSCaFile", "TLS ca file path.").WithDefault("")
+	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("")
 	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("")
 	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )

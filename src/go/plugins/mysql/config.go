@@ -26,13 +26,13 @@ import (
 
 // Session is a general structure for storing sessions' configuration.
 type Session struct {
-	URI          string `conf:"name=Uri,optional"`
-	Password     string `conf:"optional"`
-	User         string `conf:"optional"`
-	DBTLSConnect string `conf:"name=DBTLSConnect,optional"`
-	TLSCaFile    string `conf:"name=DBTLSCAFile,optional"`
-	TLSCertFile  string `conf:"name=DBTLSCertFile,optional"`
-	TLSKeyFile   string `conf:"name=DBTLSKeyFile,optional"`
+	URI         string `conf:"name=Uri,optional"`
+	Password    string `conf:"optional"`
+	User        string `conf:"optional"`
+	TLSConnect  string `conf:"name=TLSConnect,optional"`
+	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
+	TLSCertFile string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
 }
 
 // PluginOptions option from config file

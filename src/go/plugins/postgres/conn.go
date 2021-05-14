@@ -35,7 +35,7 @@ import (
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
-	zbxTls "zabbix.com/pkg/tls"
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -196,7 +196,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*PGConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -279,14 +279,14 @@ func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*PGConn, e
 	return c.connections[uri], nil
 }
 
-func getTLSConfig(details zbxTls.TlsDetails) (*tls.Config, error) {
+func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
 	switch details.TlsConnect {
 	case "required":
 		return &tls.Config{InsecureSkipVerify: true}, nil
 	case "verify_ca":
-		return zbxTls.CreateTlsConfig(details, true)
+		return tlsconfig.CreateTlsConfig(details, true)
 	case "verify_full":
-		return zbxTls.CreateTlsConfig(details, false)
+		return tlsconfig.CreateTlsConfig(details, false)
 	}
 
 	return nil, nil
@@ -306,7 +306,7 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, details zbxTls.TlsDetails) (conn *PGConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *PGConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 

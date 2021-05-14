@@ -123,8 +123,8 @@ var (
 	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
 	paramService  = metric.NewConnParam("Service", "Service name to be used for connection.").
 			WithDefault("XE")
-	paramTLSConnect  = metric.NewConnParam("DBTLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewConnParam("TLSCaFile", "TLS ca file path.").WithDefault("")
+	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("")
 	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("")
 	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )

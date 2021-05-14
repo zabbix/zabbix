@@ -28,12 +28,12 @@ import (
 	"sync"
 	"time"
 
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
-	zbxTls "zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -186,7 +186,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*OraConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*OraConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -263,7 +263,7 @@ func (c *ConnManager) get(uri uri.URI) *OraConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, details zbxTls.TlsDetails) (conn *OraConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *OraConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 

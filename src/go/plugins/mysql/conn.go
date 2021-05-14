@@ -28,10 +28,10 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 
 	"zabbix.com/pkg/log"
-	zbxTls "zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -142,7 +142,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*MyConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -182,19 +182,19 @@ func (c *ConnManager) create(uri uri.URI, details zbxTls.TlsDetails) (*MyConn, e
 	return c.connections[uri], nil
 }
 
-func registerTLSConfig(config *mysql.Config, details zbxTls.TlsDetails) error {
+func registerTLSConfig(config *mysql.Config, details tlsconfig.Details) error {
 	switch details.TlsConnect {
 	case "required":
 		mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
 	case "verify_ca":
-		conf, err := zbxTls.CreateTlsConfig(details, true)
+		conf, err := tlsconfig.CreateTlsConfig(details, true)
 		if err != nil {
 			return err
 		}
 
 		mysql.RegisterTLSConfig(details.SessionName, conf)
 	case "verify_full":
-		conf, err := zbxTls.CreateTlsConfig(details, false)
+		conf, err := tlsconfig.CreateTlsConfig(details, false)
 		if err != nil {
 			return err
 		}
@@ -222,7 +222,7 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, details zbxTls.TlsDetails) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *MyConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
