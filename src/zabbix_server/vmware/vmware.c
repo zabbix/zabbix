@@ -300,19 +300,18 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"/*[local-name()='val']/*[local-name()='adapter']/*[local-name()='target']"		\
 		"/*[local-name()='lun']/*[local-name()='scsiLun']"
 
+#define ZBX_XPATH_HV_LUN()										\
+		"substring-before(substring-after(/*/*/*/*/*/*[local-name()='propSet']"			\
+		"[*[local-name()='val'][text()='%s']][1]/*[local-name()='name'],'\"'),'\"')"
+
 #define ZBX_XPATH_HV_MULTIPATH(state)									\
 		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
-		"/*[local-name()='lun']/*[local-name()='path'][" state					\
-		"../*[local-name()='id']=../../../../*[local-name()='propSet']/*[local-name()='val']["	\
-		"substring(../*[local-name()='name'],1,string-length(../*[local-name()='name'])"	\
-		" - string-length('uuid'))=substring(../../*[local-name()='propSet']"			\
-		"[*[local-name()='val'][text()='%s']]/*[local-name()='name'],1,"			\
-		"string-length(../*[local-name()='name']) - string-length('uuid'))]])"
-
+		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"				\
+		"/*[local-name()='path']" state ")"
 
 #define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
 #define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
-		ZBX_XPATH_HV_MULTIPATH("*[local-name()='state'][text()='active'] and ")
+		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
 
 #define ZBX_XPATH_DS_INFO_EXTENT()									\
 		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
@@ -550,6 +549,7 @@ ZBX_HTTPPAGE;
 static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
 static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
 		char **error);
+static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num);
 static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath);
 
@@ -3317,8 +3317,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		ZBX_POST_VSPHERE_FOOTER
 
 #	define ZBX_POST_SCSI_INFO									\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"		\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].uuid</ns0:pathSet>"
+		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"
 
 	zbx_vector_str_t	scsi_luns;
 	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
@@ -3338,7 +3337,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 	for (i = 0; i < scsi_luns.values_num; i++)
 	{
-		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i], scsi_luns.values[i]);
+		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
 	}
 
 	hvid_esc = xml_escape_dyn(hvid);
@@ -3494,44 +3493,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_get_multipath_count                                       *
- *                                                                            *
- * Purpose: retrieves multipath count                                         *
- *                                                                            *
- * Parameters: xdoc           - [IN] xml document                             *
- *             xpath          - [IN] xpath                                    *
- *             multipath_num  - [OUT] count                                   *
- *                                                                            *
- * Return value: SUCCEED - the count was retrieved successfully               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_get_multipath_count(xmlDoc *xdoc, const char *xpath, int *multipath_num)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	int		ret = FAIL;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-		goto out;
-
-	if (XPATH_NUMBER == xpathObj->type)
-	{
-		*multipath_num = (int)xpathObj->floatval;
-		ret = SUCCEED;
-	}
-
-	xmlXPathFreeObject(xpathObj);
-out:
-	xmlXPathFreeContext(xpathCtx);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_dsname_compare                                            *
  *                                                                            *
  * Purpose: sorting function to sort Datastore names vector by name           *
@@ -3644,23 +3605,36 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		{
 			zbx_vmware_diskextent_t	*diskextent = ds->diskextents.values[j];
 			zbx_vmware_hvdisk_t	hvdisk;
-			char			tmp[MAX_STRING_LEN];
+			char			tmp[MAX_STRING_LEN], *lun;
 
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), diskextent->diskname);
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_LUN(),diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(multipath_data, tmp, &hvdisk.multipath_total) ||
-					0 == hvdisk.multipath_total)
+			if (NULL == (lun = zbx_xml_read_doc_value(multipath_data, tmp)))
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): not found diskextent: %s",
+						__func__, diskextent->diskname);
 				continue;
 			}
 
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), diskextent->diskname);
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), lun);
 
-			if (SUCCEED != vmware_get_multipath_count(multipath_data, tmp, &hvdisk.multipath_active))
+			if (SUCCEED != zbx_xml_read_doc_num(multipath_data, tmp, &hvdisk.multipath_total) ||
+					0 == hvdisk.multipath_total)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): for diskextent: %s not found for lun: %s",
+						__func__, diskextent->diskname, lun);
+				zbx_free(lun);
+				continue;
+			}
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), lun);
+
+			if (SUCCEED != zbx_xml_read_doc_num(multipath_data, tmp, &hvdisk.multipath_active))
 				hvdisk.multipath_active = 0;
 
 			hvdisk.partitionid = diskextent->partitionid;
 			zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, hvdisk);
+			zbx_free(lun);
 		}
 
 		zbx_vector_vmware_hvdisk_sort(&dsname->hvdisks, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -6664,6 +6638,12 @@ static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpa
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto clean;
 
+	if (XPATH_STRING == xpathObj->type)
+	{
+		value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+		goto clean;
+	}
+
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
@@ -6702,6 +6682,44 @@ static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath)
 
 	root_element = xmlDocGetRootElement(xdoc);
 	return zbx_xml_read_node_value(xdoc, root_element, xpath);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_xml_read_doc_num                                             *
+ *                                                                            *
+ * Purpose: retrieves numeric xpath value                                     *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] xml document                                      *
+ *             xpath - [IN] xpath                                             *
+ *             num   - [OUT] numeric value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the count was retrieved successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	int		ret = FAIL;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+		goto out;
+
+	if (XPATH_NUMBER == xpathObj->type)
+	{
+		*num = (int)xpathObj->floatval;
+		ret = SUCCEED;
+	}
+
+	xmlXPathFreeObject(xpathObj);
+out:
+	xmlXPathFreeContext(xpathCtx);
+
+	return ret;
 }
 
 /******************************************************************************
