@@ -36,8 +36,6 @@ class testFormUserRoles extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
@@ -662,10 +660,10 @@ class testFormUserRoles extends CWebTest {
 
 		// New role check with screenshots.
 		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
+		$this->page->removeFocus();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
-			$this->page->removeFocus();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
@@ -887,9 +885,9 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_Cancellation() {
-		foreach(['zabbix.php?action=userrole.edit', 'zabbix.php?action=userrole.edit&roleid=2'] as $link) {
+		foreach(['userrole.edit', 'userrole.edit&roleid=2'] as $link) {
 			$hash_before = CDBHelper::getHash(self::ROLE_SQL);
-			$this->page->login()->open($link);
+			$this->page->login()->open('zabbix.php?action='.$link);
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 			$form->fill(['Name' => 'cancellation_name_user']);
 			$this->query('button:Cancel')->one()->click();
@@ -905,8 +903,8 @@ class testFormUserRoles extends CWebTest {
 		$this->page->open('zabbix.php?action=userrole.list')->waitUntilReady();
 		$this->query('link:super_role')->one()->click();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-		$this->assertEquals('User cannot change the user type of own role.', $this->query('xpath://input[@id="type"]/following::span')->
-				one()->getText());
+		$this->assertEquals('User cannot change the user type of own role.',
+				$this->query('xpath://input[@id="type"]/following::span')->one()->getText());
 		$this->assertEquals('true', $form->getField('User type')->getAttribute('readonly'));
 	}
 
@@ -947,7 +945,7 @@ class testFormUserRoles extends CWebTest {
 	 * @param string $action	create or update
 	 */
 	private function checkRoleAction($data, $action) {
-		// TO DO: remove if ($action === 'create'), after ZBX-19246 fix
+		// TODO: remove if ($action === 'create'), after ZBX-19246 fix
 		if ($action === 'create') {
 			if ($data['expected'] === TEST_BAD) {
 				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
@@ -964,7 +962,7 @@ class testFormUserRoles extends CWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 
-			// TO DO: remove if ($action === 'create'), after ZBX-19246 fix
+			// TODO: remove if ($action === 'create'), after ZBX-19246 fix
 			if ($action === 'create') {
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
@@ -974,7 +972,7 @@ class testFormUserRoles extends CWebTest {
 
 			if ($action === 'create') {
 				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr(trim($data['fields']['Name'])));
-				$this->assertFalse($created_roleid === null);
+				$this->assertNotEquals(null, $created_roleid);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.$created_roleid);
 			}
 			else {
@@ -1005,33 +1003,28 @@ class testFormUserRoles extends CWebTest {
 	 * @param array $api	given data provider
 	 */
 	private function assertApi($api) {
-		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
+		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->count();
 		$api_list = [];
 		for ($i = 1; $i <= $counted; ++$i) {
 			$api_list[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
 		}
 		foreach ($api as $request) {
-			$this->assertTrue(in_array($request, $api_list));
+			$this->assertContains($request, $api_list);
 		}
 	}
 
 	/**
-	 * Checking that changes was accepted
+	 * Checking that changes were accepted
 	 *
-	 * @param array $actions	given data provider
+	 * @param array $fields	given data provider
 	 */
-	private function assertActions($actions) {
+	private function assertActions($fields) {
 		$existing_actions = ['Create and edit dashboards and screens', 'Create and edit maps', 'Create and edit maintenance',
 				'Add problem comments', 'Change severity', 'Acknowledge problems', 'Close problems', 'Execute scripts'];
 		foreach ($existing_actions as $action) {
-			if ((array_key_exists($action, $actions))) {
-				if ($this->query('xpath://label[text()="'.$action.'"]/preceding-sibling::input[@checked]')->exists()) {
-					$action_status = [$action => true];
-				}
-				else {
-					$action_status = [$action => false];
-				}
-				in_array($action_status, $actions);
+			if (array_key_exists($action, $fields)) {
+				$this->assertEquals($fields[$action], $this->query('xpath://label[text()="'.
+						$action.'"]/preceding-sibling::input[@checked]')->exists());
 			}
 		}
 	}
