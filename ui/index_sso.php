@@ -87,9 +87,15 @@ elseif (file_exists('conf/certs/idp.crt')) {
 	$idp_cert = file_get_contents('conf/certs/idp.crt');
 }
 
-if (is_array($SSO) && array_key_exists('SETTINGS', $SSO) && array_key_exists('baseurl', $SSO['SETTINGS'])
-		&& $SSO['SETTINGS']['baseurl'] !== '') {
-	Utils::setBaseURL($SSO['SETTINGS']['baseurl']);
+if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
+	if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
+			&& $SSO['SETTINGS']['baseurl'] !== '') {
+		Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
+	}
+
+	if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
+		Utils::setProxyVars(true);
+	}
 }
 
 $baseurl = Utils::getSelfURLNoQuery();
