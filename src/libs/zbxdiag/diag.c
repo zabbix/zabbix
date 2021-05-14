@@ -834,7 +834,7 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp)
 	zbx_free(msg);
 
 	diag_log_top_view(jp, "top.values", "$.top.values");
-	diag_log_top_view(jp, "top.oldest.preproc.values", "$.top.oldest.preproc.values");
+	diag_log_top_view(jp, "top.oldest.preproc.values", "$.top['oldest.preproc.values']");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
 }
