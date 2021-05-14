@@ -59,4 +59,5 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
 
 
 int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
+int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error);
 #endif /* ZABBIX_PREPROC_H */

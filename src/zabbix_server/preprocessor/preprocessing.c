@@ -1267,7 +1267,7 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
+static int	preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error, zbx_uint32_t code)
 {
 	int		ret;
 	unsigned char	*data, *result;
@@ -1275,8 +1275,8 @@ int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **er
 
 	data_len = zbx_preprocessor_pack_top_items_request(&data, limit);
 
-	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TOP_ITEMS,
-			SEC_PER_MIN, data, data_len, &result, error)))
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, code, SEC_PER_MIN, data, data_len,
+			&result, error)))
 	{
 		goto out;
 	}
@@ -1287,4 +1287,28 @@ out:
 	zbx_free(data);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_get_top_items                                   *
+ *                                                                            *
+ * Purpose: get the top N items by the number of queued values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
+{
+	return preprocessor_get_top_items(limit, items, error, ZBX_IPC_PREPROCESSOR_TOP_ITEMS);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_get_top_items                                   *
+ *                                                                            *
+ * Purpose: get the top N items by the number of queued values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error)
+{
+	return preprocessor_get_top_items(limit, items, error, ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS);
 }
