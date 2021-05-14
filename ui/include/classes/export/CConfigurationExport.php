@@ -225,12 +225,42 @@ class CConfigurationExport {
 		}
 
 		if ($options['maps']) {
-			$this->gatherMaps($options['maps']);
+			$options['images'] = array_merge($options['images'], $this->gatherMaps($options['maps']));
+		}
+
+		if ($options['images']) {
+			$this->gatherImages($options['images']);
 		}
 
 		if ($options['mediaTypes']) {
 			$this->gatherMediaTypes($options['mediaTypes']);
 		}
+	}
+
+	/**
+	 * Gather image data for export.
+	 *
+	 * @param array $imageids
+	 *
+	 */
+	protected function gatherImages(array $imageids) {
+		$images = API::Image()->get([
+			'output' => ['imageid', 'name', 'imagetype'],
+			'imageids' => $imageids,
+			'select_image' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($images as &$image) {
+			$image = [
+				'name' => $image['name'],
+				'imagetype' => $image['imagetype'],
+				'encodedImage' => $image['image']
+			];
+		}
+		unset($image);
+
+		$this->data['images'] = $images;
 	}
 
 	/**
@@ -1141,9 +1171,11 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get maps for export from database.
+	 * Get maps for export from database and collect image IDs used in maps for later usage.
 	 *
 	 * @param array $mapIds
+	 *
+	 * @return array
 	 */
 	protected function gatherMaps(array $mapIds) {
 		$sysmaps = API::Map()->get([
@@ -1161,27 +1193,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		$this->prepareMapExport($sysmaps);
+		$imageids = $this->prepareMapExport($sysmaps);
 
 		$this->data['maps'] = $sysmaps;
 
-		$images = API::Image()->get([
-			'output' => ['imageid', 'name', 'imagetype'],
-			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
-			'select_image' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($images as &$image) {
-			$image = [
-				'name' => $image['name'],
-				'imagetype' => $image['imagetype'],
-				'encodedImage' => $image['image']
-			];
-		}
-		unset($image);
-
-		$this->data['images'] = $images;
+		return $imageids;
 	}
 
 	/**
@@ -1351,9 +1367,12 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Change map elements real database selement id and icons ids to unique field references.
+	 * Change map elements real database selement id and icons ids to unique field references. Gather image IDs for
+	 * later usage.
 	 *
 	 * @param array $exportMaps
+	 *
+	 * @return array
 	 */
 	protected function prepareMapExport(array &$exportMaps) {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
@@ -1458,6 +1477,8 @@ class CConfigurationExport {
 			unset($link);
 		}
 		unset($sysmap);
+
+		return $imageIds;
 	}
 
 	/**
