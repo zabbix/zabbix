@@ -1938,11 +1938,9 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
  ******************************************************************************/
 static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_HISTORY *h)
 {
-	zbx_uint64_t	flags;
+	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
 	zbx_item_diff_t	*diff;
-
-	flags = item->host.proxy_hostid == 0 ? ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK : 0;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
 	{
@@ -1997,7 +1995,6 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 	diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 	diff->itemid = item->itemid;
-	diff->lastclock = h->ts.sec;
 	diff->flags = flags;
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & flags))
@@ -2097,8 +2094,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		diff->itemid = history[i].itemid;
 		diff->state = history[i].state;
-		diff->lastclock = history[i].ts.sec;
-		diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK;
+		diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
 
 		if (0 != (ZBX_DC_FLAG_META & history[i].flags))
 		{
