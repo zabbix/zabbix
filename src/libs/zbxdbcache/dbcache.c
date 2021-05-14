@@ -1558,9 +1558,12 @@ static void	DCsync_trends(void)
  *                                                                            *
  * Parameters: history           - [IN] array of history data                 *
  *             history_num       - [IN] number of history structures          *
+ *             history_itemids   - [IN] the item identifiers                  *
+ *                                      (used for item lookup)                *
+ *             history_items     - [IN] the items                             *
+ *             history_errcodes  - [IN] item error codes                      *
  *             timers            - [IN] the trigger timers                    *
  *             trigger_diff      - [OUT] trigger updates                      *
- *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
 static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
@@ -2948,12 +2951,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
+	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
-	int				item_retrieve_mode;
 
 	item_retrieve_mode = NULL == CONFIG_EXPORT_DIR ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
