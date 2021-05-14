@@ -1152,6 +1152,33 @@ static int	preproc_sort_item_by_values_desc(const void *d1, const void *d2)
 	return i2->values_num - i1->values_num;
 }
 
+static	void	preprocessor_get_items_view(zbx_preprocessing_manager_t *manager, zbx_hashset_t *items,
+		zbx_vector_ptr_t *view)
+{
+	zbx_preproc_item_stats_t	*item;
+	zbx_list_iterator_t		iterator;
+	zbx_preprocessing_request_t	*request;
+
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
+	{
+		zbx_list_iterator_peek(&iterator, (void **)&request);
+
+		if (NULL == (item = zbx_hashset_search(items, &request->value.itemid)))
+		{
+			zbx_preproc_item_stats_t	item_local = {.itemid = request->value.itemid};
+
+			item = zbx_hashset_insert(items, &item_local, sizeof(item_local));
+			zbx_vector_ptr_append(view, item);
+		}
+		/* There might be processed, but not yet flushed items at the start of queue with    */
+		/* freed preprocessing steps and steps_num being zero. Because of that keep updating */
+		/* items steps_num to have preprocessing steps of last queued item.                  */
+		item->steps_num = request->steps_num;
+		item->values_num++;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_get_top_items                                       *
@@ -1171,9 +1198,6 @@ static void	preprocessor_get_top_items(zbx_preprocessing_manager_t *manager, zbx
 	zbx_uint32_t			data_len;
 	zbx_hashset_t			items;
 	zbx_vector_ptr_t		view;
-	zbx_list_iterator_t		iterator;
-	zbx_preprocessing_request_t	*request;
-	zbx_preproc_item_stats_t	*item;
 	int				items_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1183,24 +1207,7 @@ static void	preprocessor_get_top_items(zbx_preprocessing_manager_t *manager, zbx
 	zbx_hashset_create(&items, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_ptr_create(&view);
 
-	zbx_list_iterator_init(&manager->queue, &iterator);
-	while (SUCCEED == zbx_list_iterator_next(&iterator))
-	{
-		zbx_list_iterator_peek(&iterator, (void **)&request);
-
-		if (NULL == (item = zbx_hashset_search(&items, &request->value.itemid)))
-		{
-			zbx_preproc_item_stats_t	item_local = {.itemid = request->value.itemid};
-
-			item = zbx_hashset_insert(&items, &item_local, sizeof(item_local));
-			zbx_vector_ptr_append(&view, item);
-		}
-		/* There might be processed, but not yet flushed items at the start of queue with    */
-		/* freed preprocessing steps and steps_num being zero. Because of that keep updating */
-		/* items steps_num to have preprocessing steps of last queued item.                  */
-		item->steps_num = request->steps_num;
-		item->values_num++;
-	}
+	preprocessor_get_items_view(manager, &items, &view);
 
 	zbx_vector_ptr_sort(&view, preproc_sort_item_by_values_desc);
 	items_num = MIN(limit, view.values_num);
