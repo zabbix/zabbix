@@ -5,7 +5,7 @@ Bug fixes:
 ........S. [ZBX-19368] reduced functionids sorting when extracting functionids from expressions during trigger processing (wiper)
 ..F....... [ZBX-19370] fixed displaying time in popups of graph widgets (ashubin, averza)
 ........S. [ZBX-19366] fixed duplicate key error for screen and slideshow in dbupgrade patch (MVekslers)
-A......... [ZBXNEXT-6411] fixed incorect argument type in item/discovery rule/web scenario import (vmurzins)
+A......... [ZBXNEXT-6411] fixed incorrect argument type in item/discovery rule/web scenario import (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0rc1
