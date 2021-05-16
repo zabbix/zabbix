@@ -186,15 +186,13 @@ class CScreenItem extends CApiService {
 			}
 		}
 
-		if (!$dbScreens) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$dbScreenItems = DB::select($this->tableName(), [
-			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'],
-			'filter' => ['screenid' => array_keys($dbScreens)],
-			'preservekeys' => true
-		]);
+		$dbScreenItems = $dbScreens
+			? DB::select($this->tableName(), [
+				'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'],
+				'filter' => ['screenid' => array_keys($dbScreens)],
+				'preservekeys' => true
+			])
+			: [];
 
 		$this->checkInput($screenItems, $dbScreenItems);
 		$this->checkDuplicateResourceInCell(array_merge($screenItems, $dbScreenItems), $dbScreens);
@@ -306,17 +304,15 @@ class CScreenItem extends CApiService {
 			$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
 		}
 
-		if (!$dbScreens) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$dbScreenItems = DB::select($this->tableName(), [
-			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
-				'style'
-			],
-			'filter' => ['screenid' => array_keys($dbScreens)],
-			'preservekeys' => true
-		]);
+		$dbScreenItems = $dbScreens
+			? DB::select($this->tableName(), [
+				'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
+					'style'
+				],
+				'filter' => ['screenid' => array_keys($dbScreens)],
+				'preservekeys' => true
+			])
+			: [];
 
 		$screenItems = $this->extendObjects($this->tableName(), $screenItems,
 			['screenid', 'x', 'y', 'rowspan', 'colspan', 'style']

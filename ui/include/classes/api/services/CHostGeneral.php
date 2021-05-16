@@ -162,7 +162,9 @@ abstract class CHostGeneral extends CHostBase {
 				]
 			]);
 			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
+			if ($hostMacroIds) {
+				API::UserMacro()->delete($hostMacroIds);
+			}
 		}
 
 		if (isset($data['groupids'])) {
