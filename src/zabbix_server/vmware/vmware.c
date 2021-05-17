@@ -3691,7 +3691,8 @@ out:
  *                                                                            *
  * Purpose: reads events from "latest page" and moves it back in time         *
  *                                                                            *
- * Parameters: easyhandle     - [IN] the CURL handle                          *
+ * Parameters: service        - [IN] the vmware service                       *
+ *             easyhandle     - [IN] the CURL handle                          *
  *             event_session  - [IN] event session (EventHistoryCollector)    *
  *                                   identifier                               *
  *             xdoc           - [OUT] the result as xml document              *
@@ -3917,7 +3918,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *                                                                            *
  * Parameters: events     - [IN/OUT] the array of parsed events               *
  *             last_key   - [IN] the key of last parsed event                 *
- *             is_prop    - [IN] read events form RetrieveProperties XML      *
+ *             is_prop    - [IN] read events from RetrieveProperties XML      *
  *             xdoc       - [IN] xml document with eventlog records           *
  *             alloc_sz   - [OUT] allocated memory size for events            *
  *             node_count - [OUT] count of xml event nodes                    *
@@ -4066,12 +4067,13 @@ clean:
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
+#	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
 #	define RETURNVAL_TAG	0
 #	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
 
 	char		*event_session = NULL, *err = NULL;
-	int		ret = FAIL, node_count = 1, soap_retry,
+	int		ret = FAIL, node_count = 1, soap_retry = ATTEMPTS_NUM,
 			soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 	zbx_uint64_t	eventlog_last_key;
@@ -4116,7 +4118,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 		if (0 != events->values_num && (LAST_KEY(events) - eventlog_last_key -1) < (unsigned int)soap_count)
 		{
-			soap_count = LAST_KEY(events) - eventlog_last_key - 1;
+			soap_count = (int)(LAST_KEY(events) - eventlog_last_key - 1);
 		}
 
 		if (!ZBX_IS_RUNNING() || (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle,
@@ -4126,7 +4128,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		}
 
 		if (0 != node_count)
-			soap_retry = 4;
+			soap_retry = ATTEMPTS_NUM;
 	}
 	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, RETURNVAL_TAG, doc, alloc_sz,
 			&node_count) || (0 == node_count && 0 < soap_retry--));
