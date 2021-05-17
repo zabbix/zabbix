@@ -1,0 +1,881 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-24T11:46:47Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'TiDB PD by HTTP'
+      name: 'TiDB PD by HTTP'
+      description: |
+        The template to monitor PD server of TiDB cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        Don't forget to change the macros {$PD.URL}, {$PD.PORT}.
+        
+        Template `TiDB PD by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: 'PD instance'
+        -
+          name: 'TiDB cluster'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'PD: Get instance metrics'
+          type: HTTP_AGENT
+          key: pd.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get TiDB PD instance metrics.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - ''
+          url: '{$PD.URL}:{$PD.PORT}/metrics'
+        -
+          name: 'PD: Get instance status'
+          type: HTTP_AGENT
+          key: pd.get_status
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get TiDB PD instance status info.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status": "0"}'
+          url: '{$PD.URL}:{$PD.PORT}/pd/api/v1/status'
+        -
+          name: 'PD: GRPC Commands total, rate'
+          type: DEPENDENT
+          key: pd.grpc_command.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which gRPC commands are completed.'
+          applications:
+            -
+              name: 'PD instance'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "grpc_server_handling_seconds_count")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: pd.get_metrics
+        -
+          name: 'PD: Status'
+          type: DEPENDENT
+          key: pd.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Status of PD instance.'
+          applications:
+            -
+              name: 'PD instance'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: pd.get_status
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'PD: Instance is not responding'
+              priority: AVERAGE
+        -
+          name: 'PD: Uptime'
+          type: DEPENDENT
+          key: pd.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          description: 'The runtime of each PD instance.'
+          applications:
+            -
+              name: 'PD instance'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.start_timestamp
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //use boottime to calculate uptime
+                  return (Math.floor(Date.now()/1000)-Number(value));
+                  
+          master_item:
+            key: pd.get_status
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'PD: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'PD: Version'
+          type: DEPENDENT
+          key: pd.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the PD instance.'
+          applications:
+            -
+              name: 'PD instance'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: pd.get_status
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'PD: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'PD version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Cluster metrics discovery'
+          type: DEPENDENT
+          key: pd.cluster.discovery
+          delay: '0'
+          description: 'Discovery cluster specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB cluster: Number of regions'
+              type: DEPENDENT
+              key: 'pd.cluster_status.leader_count[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The total count of cluster Regions.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "leader_count")].value.first()'
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Current peer count'
+              type: DEPENDENT
+              key: 'pd.cluster_status.region_count[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The current count of all cluster peers.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "region_count")].value.first()'
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Storage capacity'
+              type: DEPENDENT
+              key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The total storage capacity for this TiDB cluster.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "storage_capacity")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Storage size'
+              type: DEPENDENT
+              key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The storage size that is currently used by the TiDB cluster.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "storage_size")].value.first()'
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Disconnect stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_disconnected[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of disconnected stores.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_disconnected_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{last()}>0'
+                  name: 'TiDB cluster: There are disconnected TiKV nodes'
+                  priority: WARNING
+                  description: 'PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.'
+            -
+              name: 'TiDB cluster: Down stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_down[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of down stores.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_down_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{last()}>0'
+                  name: 'TiDB cluster: There are offline TiKV nodes'
+                  priority: AVERAGE
+                  description: 'PD has not received a TiKV heartbeat for a long time.'
+            -
+              name: 'TiDB cluster: Lowspace stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_low_space[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of low space stores.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_low_space_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{last()}>0'
+                  name: 'TiDB cluster: There are low space TiKV nodes'
+                  priority: AVERAGE
+                  description: 'Indicates that there is no sufficient space on the TiKV node.'
+            -
+              name: 'TiDB cluster: Offline stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_offline_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Tombstone stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_tombstone[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of tombstone stores.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_tombstone_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Unhealth stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_unhealth[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of unhealthy stores.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_unhealth_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'TiDB cluster: Normal stores'
+              type: DEPENDENT
+              key: 'pd.cluster_status.store_up[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The count of healthy storage instances.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_cluster_status" && @.labels.type == "store_up_count")].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: pd.get_metrics
+          trigger_prototypes:
+            -
+              expression: '{TiDB PD by HTTP:pd.cluster_status.storage_size[{#SINGLETON}].min(5m)}/{TiDB PD by HTTP:pd.cluster_status.storage_capacity[{#SINGLETON}].last()}*100>{$PD.STORAGE_USAGE.MAX.WARN}'
+              name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
+              priority: WARNING
+              description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
+          graph_prototypes:
+            -
+              name: 'TiDB cluster: Storage Usage[{#SINGLETON}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'TiDB PD by HTTP'
+                    key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'TiDB PD by HTTP'
+                    key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="pd_cluster_status")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'gRPC commands discovery'
+          type: DEPENDENT
+          key: pd.grpc_command.discovery
+          delay: '0'
+          description: 'Discovery grpc commands specific metrics.'
+          item_prototypes:
+            -
+              name: 'PD: GRPC Commands: {#GRPC_METHOD}, rate'
+              type: DEPENDENT
+              key: 'pd.grpc_command.rate[{#GRPC_METHOD}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The rate per command type at which gRPC commands are completed.'
+              applications:
+                -
+                  name: 'PD instance'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "grpc_server_handling_seconds_count" && @.labels.grpc_method == "{#GRPC_METHOD}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: pd.get_metrics
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "grpc_server_handling_seconds_count")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var grpc_method = item.labels.grpc_method;
+                  if (!(lookup[grpc_method])) {
+                  lookup[grpc_method] = 1;
+                  result.push({ "{#GRPC_METHOD}": grpc_method });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Region discovery'
+          type: DEPENDENT
+          key: pd.region.discovery
+          delay: '0'
+          description: 'Discovery region specific metrics.'
+          item_prototypes:
+            -
+              name: 'PD: Region heartbeat: error, rate'
+              type: DEPENDENT
+              key: 'pd.region_heartbeat.error.rate[{#STORE_ADDRESS}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The count of heartbeats with the error status per second.'
+              application_prototypes:
+                -
+                  name: 'TiDB Store [{#STORE_ADDRESS}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.status == "err" && @.labels.type == "report" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'PD: Region heartbeat: active, rate'
+              type: DEPENDENT
+              key: 'pd.region_heartbeat.ok.rate[{#STORE_ADDRESS}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The count of heartbeats with the ok status per second.'
+              application_prototypes:
+                -
+                  name: 'TiDB Store [{#STORE_ADDRESS}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.status == "ok" && @.labels.type == "report" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'PD: Region schedule push: total, rate'
+              type: DEPENDENT
+              key: 'pd.region_heartbeat.push.err.rate[{#STORE_ADDRESS}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              application_prototypes:
+                -
+                  name: 'TiDB Store [{#STORE_ADDRESS}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.type == "push" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: pd.get_metrics
+            -
+              name: 'PD: Region heartbeat: total, rate'
+              type: DEPENDENT
+              key: 'pd.region_heartbeat.rate[{#STORE_ADDRESS}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The count of heartbeats reported to PD per instance per second.'
+              application_prototypes:
+                -
+                  name: 'TiDB Store [{#STORE_ADDRESS}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.type == "report" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: pd.get_metrics
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "pd_scheduler_region_heartbeat")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var address = item.labels.address;
+                  if (!(lookup[address])) {
+                  lookup[address] = 1;
+                  result.push({ "{#STORE_ADDRESS}": address });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Region labels discovery'
+          type: DEPENDENT
+          key: pd.region_labels.discovery
+          delay: '0'
+          description: 'Discovery region labels specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB cluster: Regions label: {#TYPE}'
+              type: DEPENDENT
+              key: 'pd.region_labels[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of Regions in different label levels.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_regions_label_level" && @.labels.type == "{#TYPE}")].value.first()'
+              master_item:
+                key: pd.get_metrics
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "pd_regions_label_level")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Region status discovery'
+          type: DEPENDENT
+          key: pd.region_status.discovery
+          delay: '0'
+          description: 'Discovery region status specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB cluster: Regions status: {#TYPE}'
+              type: DEPENDENT
+              key: 'pd.region_status[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_regions_status" && @.labels.type == "{#TYPE}")].value.first()'
+              master_item:
+                key: pd.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'TiDB cluster: There are unresponsive peers'
+                  discover: NO_DISCOVER
+                  priority: WARNING
+                  description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
+                -
+                  expression: '{min(5m)}>{$PD.MISS_REGION.MAX.WARN}'
+                  name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
+                  discover: NO_DISCOVER
+                  priority: WARNING
+                  description: 'The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.'
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "pd_regions_status")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            -
+              name: 'Too many missed regions trigger'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: miss_peer_region_count
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Too many missed regions'
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'Unresponsive peers trigger'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: down_peer_region_count
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'There are unresponsive peers'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          name: 'Running scheduler discovery'
+          type: DEPENDENT
+          key: pd.scheduler.discovery
+          delay: '0'
+          description: 'Discovery scheduler specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB cluster: Scheduler status: {#KIND}'
+              type: DEPENDENT
+              key: 'pd.scheduler[{#KIND}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The current running schedulers.'
+              applications:
+                -
+                  name: 'TiDB cluster'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "pd_regions_status" && @.labels.type == "allow" && @.labels.kind == "{#KIND}")].value.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: pd.get_metrics
+          master_item:
+            key: pd.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "pd_scheduler_status" && @.labels.type == "allow")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#KIND}": item.labels.kind,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      macros:
+        -
+          macro: '{$PD.MISS_REGION.MAX.WARN}'
+          value: '100'
+          description: 'Maximum number of missed regions'
+        -
+          macro: '{$PD.PORT}'
+          value: '2379'
+          description: 'The port of PD server metrics web endpoint'
+        -
+          macro: '{$PD.STORAGE_USAGE.MAX.WARN}'
+          value: '80'
+          description: 'Maximum percentage of cluster space used'
+        -
+          macro: '{$PD.URL}'
+          value: localhost
+          description: 'PD server URL'
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
