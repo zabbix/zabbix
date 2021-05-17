@@ -210,7 +210,6 @@ type ResultWriter interface {
 }
 
 type LogItem struct {
-	LastTs  time.Time
 	Results []*LogResult
 	Output  ResultWriter
 }
@@ -267,7 +266,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	var cvalue *C.char
 	var clastlogsize C.zbx_uint64_t
 	var cstate, cmtime C.int
-	var addedNs = 1
+	logTs := time.Now()
 	for i := 0; C.get_log_value(result, C.int(i), &cvalue, &cstate, &clastlogsize, &cmtime) != C.FAIL; i++ {
 		var value string
 		var err error
@@ -279,20 +278,14 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 		r := &LogResult{
 			Value:       &value,
-			Ts:          time.Now(),
+			Ts:          logTs,
 			Error:       err,
 			LastLogsize: uint64(clastlogsize),
 			Mtime:       int(cmtime),
 		}
 
-		if r.Ts == item.LastTs {
-			r.Ts = r.Ts.Add(time.Duration(addedNs) * time.Nanosecond)
-			addedNs++
-		} else {
-			item.LastTs = r.Ts
-		}
-
 		item.Results = append(item.Results, r)
+		logTs = logTs.Add(time.Nanosecond)
 	}
 	C.free_log_result(result)
 
