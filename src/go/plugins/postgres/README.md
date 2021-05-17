@@ -36,6 +36,19 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
+**Plugins.Postgres.Sessions.<session_name>.TLSConnect** — Encryption type for postgres connection. "*" should be replaced with a session name.
+*Default value:* 
+*Accepted values:*  required, verify_ca, verify_full
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for postgres
+*Default value:* 
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the postgres certificate or certificate chain.
+*Default value:* 
+
+**Plugins.Postgres.Sessions.*.TLSKeyFile** — Full pathname of a file containing the postgres private key.
+*Default value:* 
+
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
 

@@ -35,6 +35,19 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
+**Plugins.Mysql.Sessions.<session_name>.TLSConnect** — Encryption type for MySQL connection. "*" should be replaced with a session name.
+*Default value:* 
+*Accepted values:*  required, verify_ca, verify_full
+
+**Plugins.Mysql.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for mysql
+*Default value:* 
+
+**Plugins.Mysql.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the mysql certificate or certificate chain.
+*Default value:* 
+
+**Plugins.Mysql.Sessions.*.TLSKeyFile** — Full pathname of a file containing the mysql private key.
+*Default value:* 
+
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
 

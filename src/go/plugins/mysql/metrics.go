@@ -73,10 +73,10 @@ var (
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
 	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
-	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("")
-	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("")
-	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
+	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
+	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
+	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
 )
 
 var metrics = metric.MetricSet{

@@ -46,16 +46,12 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	if err = tlsconfig.CheckRawParams(rawParams); err != nil {
-		return
-	}
-
 	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
 
-	details, err := tlsconfig.NewTlsDetails(params["sessionName"], params["TLSConnect"],
+	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
 		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)

@@ -187,14 +187,14 @@ func registerTLSConfig(config *mysql.Config, details tlsconfig.Details) error {
 	case "required":
 		mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
 	case "verify_ca":
-		conf, err := tlsconfig.CreateTlsConfig(details, true)
+		conf, err := tlsconfig.CreateConfig(details, true)
 		if err != nil {
 			return err
 		}
 
 		mysql.RegisterTLSConfig(details.SessionName, conf)
 	case "verify_full":
-		conf, err := tlsconfig.CreateTlsConfig(details, false)
+		conf, err := tlsconfig.CreateConfig(details, false)
 		if err != nil {
 			return err
 		}

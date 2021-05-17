@@ -284,9 +284,9 @@ func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
 	case "required":
 		return &tls.Config{InsecureSkipVerify: true}, nil
 	case "verify_ca":
-		return tlsconfig.CreateTlsConfig(details, true)
+		return tlsconfig.CreateConfig(details, true)
 	case "verify_full":
-		return tlsconfig.CreateTlsConfig(details, false)
+		return tlsconfig.CreateConfig(details, false)
 	}
 
 	return nil, nil

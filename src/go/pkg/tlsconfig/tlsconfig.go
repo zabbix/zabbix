@@ -17,7 +17,7 @@ type Details struct {
 	RawUri      string
 }
 
-func CreateTlsConfig(details Details, skipVerify bool) (*tls.Config, error) {
+func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 	rootCertPool := x509.NewCertPool()
 	pem, err := ioutil.ReadFile(details.TlsCaFile)
 	if err != nil {
@@ -43,7 +43,7 @@ func CreateTlsConfig(details Details, skipVerify bool) (*tls.Config, error) {
 	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: details.RawUri}, nil
 }
 
-func NewTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (Details, error) {
+func CreateDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (Details, error) {
 
 	if dbConnect != "" && dbConnect != "required" {
 		if caFile == "" {
@@ -71,14 +71,4 @@ func NewTlsDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (D
 	}
 
 	return Details{session, dbConnect, caFile, certFile, keyFile, uri}, nil
-}
-
-func CheckRawParams(params []string) error {
-	for _, p := range params {
-		if p == "TLSConnect" || p == "TLSCAFile" || p == "TLSCertFile" || p == "TLSKeyFile" {
-			return fmt.Errorf("tls configuration field %s, can not be set as key parameter", p)
-		}
-	}
-
-	return nil
 }
