@@ -156,6 +156,9 @@ define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
+// Allows to set "rel" tag value "noreferer" when setting target="_blank".
+define('ZBX_NOREFERER', true);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript

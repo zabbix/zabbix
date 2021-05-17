@@ -667,7 +667,7 @@ $form_list
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()
-		))->setAttribute('target', '_blank')], 'row_valuemap'
+		))->setTarget('_blank')], 'row_valuemap'
 	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),

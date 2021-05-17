@@ -594,10 +594,16 @@ class CControllerMenuPopup extends CController {
 
 				if ($events) {
 					foreach ($events[0]['urls'] as $url) {
+						$rel = 'noopener';
+						if (ZBX_NOREFERER) {
+							$rel .= ' noreferrer';
+						}
+
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
-							'target' => '_blank'
+							'target' => '_blank',
+							'rel' => $rel
 						];
 					}
 				}

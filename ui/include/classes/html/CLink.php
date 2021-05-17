@@ -51,8 +51,25 @@ class CLink extends CTag {
 		return $this;
 	}
 
+	/**
+	 * Set URL target. If target is "_blank", add "rel" tag and tag values "noopener" and "noreferrer". The "noreferrer"
+	 * depends if it is set to true in defines.inc.php.
+	 *
+	 * @param $value  URL target.
+	 *
+	 * @return CLink
+	 */
 	public function setTarget($value = null) {
 		$this->attributes['target'] = $value;
+
+		if ($value === '_blank') {
+			$this->attributes['rel'] = 'noopener';
+
+			if (ZBX_NOREFERER) {
+				$this->attributes['rel'] .= ' noreferrer';
+			}
+		}
+
 		return $this;
 	}
 
