@@ -649,9 +649,7 @@ class testFormUserRoles extends CWebTest {
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
-		foreach (['api_mode_0', 'api_mode_1'] as $id) {
-			$this->assertFalse($form->query('id', $id)->one()->isEnabled());
-		}
+		$this->assertFalse($form->getField('API methods')->isEnabled());
 		$this->assertFalse($this->query('button:Select')->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
 		$this->page->refresh()->waitUntilReady();
