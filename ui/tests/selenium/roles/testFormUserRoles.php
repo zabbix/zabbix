@@ -460,7 +460,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'actions' => true,
 					'fields' => [
 						'Name' => 'user_ui_no_actions',
 						'User type' => 'User',
@@ -479,7 +478,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'actions' => true,
 					'fields' => [
 						'Name' => 'admin_ui_no_actions',
 						'User type' => 'Admin',
@@ -499,7 +497,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'actions' => true,
 					'fields' => [
 						'Name' => 'super_admin_ui_no_Actions',
 						'User type' => 'Super admin',
@@ -614,7 +611,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'actions' => true,
 					'fields' => [
 						'Name' => 'super_admin_role',
 						'User type' => 'Super admin',
@@ -807,7 +803,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'actions' => true,
 					'fields' => [
 						'API methods' => 'Deny list',
 						'Create and edit dashboards and screens' => false,
@@ -987,43 +982,8 @@ class testFormUserRoles extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			if (array_key_exists('api_methods', $data)) {
-				$this->assertApi($data['api_methods']);
-			}
-
-			if (array_key_exists('actions', $data)) {
-				$this->assertActions($data['fields']);
-			}
-		}
-	}
-
-	/**
-	 * Checking that api request exists on page.
-	 *
-	 * @param array $api	given data provider
-	 */
-	private function assertApi($api) {
-		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->count();
-		$api_list = [];
-		for ($i = 1; $i <= $counted; ++$i) {
-			$api_list[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
-		}
-		foreach ($api as $request) {
-			$this->assertContains($request, $api_list);
-		}
-	}
-
-	/**
-	 * Checking that changes were accepted
-	 *
-	 * @param array $fields	given data provider
-	 */
-	private function assertActions($fields) {
-		$existing_actions = ['Create and edit dashboards and screens', 'Create and edit maps', 'Create and edit maintenance',
-				'Add problem comments', 'Change severity', 'Acknowledge problems', 'Close problems', 'Execute scripts'];
-		foreach ($existing_actions as $action) {
-			if (array_key_exists($action, $fields)) {
-				$this->assertEquals($fields[$action], $this->query('xpath://label[text()="'.
-						$action.'"]/preceding-sibling::input[@checked]')->exists());
+				$multiselect_field = $this->query('class:multiselect-control')->asMultiselect()->one();
+				$this->assertEquals($data['api_methods'], $multiselect_field->getValue());
 			}
 		}
 	}
