@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-17T05:54:41Z</date>
+   <date>2021-05-17T07:56:55Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -284,7 +284,7 @@ function getSipPeers() {
         }
     });
     asterisk.sip.trunks.forEach(function (trunk) {
-        var active_channels = channels.match(new RegExp('[^!]SIP/' + escChars(trunk.ObjectName), 'g'));
+        var active_channels = channels.match(new RegExp('[^!J]SIP/' + escChars(trunk.ObjectName), 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
     });
 }
