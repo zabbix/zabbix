@@ -661,7 +661,7 @@ class testFormUserRoles extends CWebTest {
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 			$this->query('button:Select')->one()->click();
 			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
-			$this->query('class:overlay-close-btn')->one()->click();
+			$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
 		}
 
 		// Screens for super admin.
