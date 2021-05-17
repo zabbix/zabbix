@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-12T12:44:23Z</date>
+    <date>2021-05-17T02:44:34Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -164,7 +164,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -191,7 +191,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -218,7 +218,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -245,7 +245,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -272,7 +272,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -299,7 +299,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -326,7 +326,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -358,7 +358,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -390,7 +390,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -417,7 +417,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -439,7 +439,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                 </item>
                 <item>
                     <name>PostgreSQL: Cache hit</name>
-                    <key>pgsql.cache.hit[&quot;{$PG.URI}&quot;]</key>
+                    <key>pgsql.cache.hit[&quot;{$PG.URI}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.PASSWORD}&quot;]</key>
                     <history>7d</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -727,7 +727,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -754,7 +754,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -841,7 +841,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>-1</error_handler_params>
                         </step>
@@ -870,7 +870,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -897,7 +897,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -942,7 +942,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -969,7 +969,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -996,7 +996,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1023,7 +1023,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1050,7 +1050,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1077,7 +1077,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1104,7 +1104,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1131,7 +1131,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1158,7 +1158,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1209,7 +1209,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                 </item>
                 <item>
                     <name>PostgreSQL: Age of oldest xid</name>
-                    <key>pgsql.oldest.xid[&quot;{$PG.URI}&quot;,&quot;{$PG.USER}&quot;]</key>
+                    <key>pgsql.oldest.xid[&quot;{$PG.URI}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.PASSWORD}&quot;]</key>
                     <history>7d</history>
                     <value_type>FLOAT</value_type>
                     <description>Age of oldest xid.</description>
@@ -1400,7 +1400,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params />
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1480,7 +1480,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1507,7 +1507,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1539,7 +1539,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1571,7 +1571,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1598,7 +1598,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1625,7 +1625,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1661,7 +1661,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1717,7 +1717,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1743,7 +1743,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1770,7 +1770,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1797,7 +1797,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1824,7 +1824,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1851,7 +1851,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1878,7 +1878,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1905,7 +1905,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1932,7 +1932,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params />
+                                    <params/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2539,8 +2539,8 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <halign>0</halign>
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
-                            <url />
-                            <application />
+                            <url/>
+                            <application/>
                             <max_columns>3</max_columns>
                         </screen_item>
                         <screen_item>
@@ -2561,8 +2561,8 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <halign>0</halign>
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
-                            <url />
-                            <application />
+                            <url/>
+                            <application/>
                             <max_columns>3</max_columns>
                         </screen_item>
                         <screen_item>
@@ -2583,8 +2583,8 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <halign>0</halign>
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
-                            <url />
-                            <application />
+                            <url/>
+                            <application/>
                             <max_columns>3</max_columns>
                         </screen_item>
                         <screen_item>
@@ -2605,8 +2605,8 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <halign>0</halign>
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
-                            <url />
-                            <application />
+                            <url/>
+                            <application/>
                             <max_columns>3</max_columns>
                         </screen_item>
                     </screen_items>
