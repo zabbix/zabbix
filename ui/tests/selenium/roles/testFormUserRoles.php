@@ -656,12 +656,11 @@ class testFormUserRoles extends CWebTest {
 		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
 		$this->page->removeFocus();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
-		$screenshot_area_api = $this->query('xpath://div[@role="dialog"]')->one();
 		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 			$this->query('button:Select')->one()->click();
-			$this->assertScreenshot($screenshot_area_api, $role.'api');
+			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
 			$this->query('class:overlay-close-btn')->one()->click();
 		}
 
