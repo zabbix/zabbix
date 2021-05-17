@@ -2829,8 +2829,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.31rc1
 
-New features:
-
 Bug fixes:
 ....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
 .......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
