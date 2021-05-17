@@ -3340,6 +3340,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
 	}
 
+	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	hvid_esc = xml_escape_dyn(hvid);
 	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
 			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
@@ -3352,7 +3353,6 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	ret = SUCCEED;
 out:
 	zbx_free(tmp);
-	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	zbx_vector_str_destroy(&scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -6700,9 +6700,9 @@ static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath)
  ******************************************************************************/
 static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num)
 {
+	int		ret = FAIL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
-	int		ret = FAIL;
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
