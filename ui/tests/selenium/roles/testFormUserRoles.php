@@ -904,7 +904,8 @@ class testFormUserRoles extends CWebTest {
 		$this->query('link:super_role')->one()->click();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$this->assertEquals('User cannot change the user type of own role.',
-				$this->query('xpath://input[@id="type"]/following::span')->one()->getText());
+				$this->query('xpath://input[@id="type"]/following::span')->one()->getText()
+		);
 		$this->assertEquals('true', $form->getField('User type')->getAttribute('readonly'));
 	}
 

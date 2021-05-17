@@ -74,11 +74,11 @@ class CFluidFormElement extends CFormElement {
 	}
 
 	/**
-	 * Get label element by text.
+	 * Get label elements by text.
 	 *
 	 * @param string $name    field label text
 	 *
-	 * @return CElement
+	 * @return CElementCollection
 	 */
 	protected function findLabels($name) {
 		return $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();

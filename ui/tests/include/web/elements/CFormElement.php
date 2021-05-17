@@ -149,11 +149,11 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * Get label element by text.
+	 * Get label elements by text.
 	 *
 	 * @param string $name    field label text
 	 *
-	 * @return CElement
+	 * @return CElementCollection
 	 */
 	protected function findLabels($name) {
 		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
