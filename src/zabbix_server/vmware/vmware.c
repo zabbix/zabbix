@@ -6706,7 +6706,7 @@ static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num)
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto out;
 
 	if (XPATH_NUMBER == xpathObj->type)
@@ -6749,7 +6749,7 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
