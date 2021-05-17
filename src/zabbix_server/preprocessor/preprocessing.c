@@ -622,19 +622,26 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
  *             data               - [IN] IPC data buffer                      *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int values_num, int values_preproc_num)
+zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
+		int pending)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0;
 
-	zbx_serialize_prepare_value(data_len, values_num);
-	zbx_serialize_prepare_value(data_len, values_preproc_num);
+	zbx_serialize_prepare_value(data_len, total);
+	zbx_serialize_prepare_value(data_len, queued);
+	zbx_serialize_prepare_value(data_len, processing);
+	zbx_serialize_prepare_value(data_len, done);
+	zbx_serialize_prepare_value(data_len, pending);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
-	ptr += zbx_serialize_value(ptr, values_num);
-	(void)zbx_serialize_value(ptr, values_preproc_num);
+	ptr += zbx_serialize_value(ptr, total);
+	ptr += zbx_serialize_value(ptr, queued);
+	ptr += zbx_serialize_value(ptr, processing);
+	ptr += zbx_serialize_value(ptr, done);
+	(void)zbx_serialize_value(ptr, pending);
 
 	return data_len;
 }
@@ -894,12 +901,16 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_ptr_t *results, zbx_vector_p
  *             data               - [IN] IPC data buffer                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_diag_stats(int *values_num, int *values_preproc_num, const unsigned char *data)
+void	zbx_preprocessor_unpack_diag_stats(int *total, int *queued, int *processing, int *done,
+		int *pending, const unsigned char *data)
 {
 	const unsigned char	*offset = data;
 
-	offset += zbx_deserialize_int(offset, values_num);
-	(void)zbx_deserialize_int(offset, values_preproc_num);
+	offset += zbx_deserialize_int(offset, total);
+	offset += zbx_deserialize_int(offset, queued);
+	offset += zbx_deserialize_int(offset, processing);
+	offset += zbx_deserialize_int(offset, done);
+	(void)zbx_deserialize_int(offset, pending);
 }
 
 /******************************************************************************
@@ -1244,7 +1255,8 @@ out:
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error)
+int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
+		int *pending, char **error)
 {
 	unsigned char	*result;
 
@@ -1254,7 +1266,7 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
 		return FAIL;
 	}
 
-	zbx_preprocessor_unpack_diag_stats(values_num, values_preproc_num, result);
+	zbx_preprocessor_unpack_diag_stats(total, queued, processing, done, pending, result);
 	zbx_free(result);
 
 	return SUCCEED;

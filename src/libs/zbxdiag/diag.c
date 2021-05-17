@@ -413,19 +413,29 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
-			int	values_num, values_preproc_num;
+			int	total, queued, processing, done, pending;
 
 			time1 = zbx_time();
-			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&values_num, &values_preproc_num, error)))
+			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&total, &queued, &processing, &done,
+					&pending, error)))
+			{
 				goto out;
+			}
 
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES))
-				zbx_json_addint64(json, "values", values_num);
+			{
+				zbx_json_addint64(json, "values", total);
+				zbx_json_addint64(json, "done", done);
+			}
 			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES_PREPROC))
-				zbx_json_addint64(json, "preproc.values", values_preproc_num);
+			{
+				zbx_json_addint64(json, "queued", queued);
+				zbx_json_addint64(json, "processing", processing);
+				zbx_json_addint64(json, "pending", pending);
+			}
 		}
 
 		if (0 != tops.values_num)
