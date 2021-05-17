@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-13 16:28+0300\n"
-"PO-Revision-Date: 2021-04-21 13:18+0300\n"
+"PO-Revision-Date: 2021-05-17 11:00+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1619003928.000000\n"
+"X-POOTLE-MTIME: 1621242019.000000\n"
 
 #: include/classes/items/CHelpItems.php:1073
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -442,7 +442,7 @@ msgstr "אסימוני API"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "Abscissa"
-msgstr ""
+msgstr "אבסיסה"
 
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
@@ -880,7 +880,7 @@ msgstr "הוספת אבטיפוס"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "הוספת דוח מתוזמן"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -900,11 +900,11 @@ msgstr "הוספה לקבוצות מארחים"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "הוספת משתמש"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "הוספת קבוצת משתמשים"
 
 #: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
@@ -2019,7 +2019,7 @@ msgstr "לא ניתן ליצור מפת סמלים"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "לא ניתן ליצור דוח מתוזמן"
 
 #: include/classes/setup/CSetupWizard.php:666
 msgid "Cannot create the configuration file."
@@ -3193,7 +3193,7 @@ msgstr "מחרוזת תווים אינה כלולה"
 #: app/controllers/CControllerPopupTriggerExpr.php:873
 #: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "Chars"
-msgstr ""
+msgstr "תווים"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
@@ -4200,7 +4200,7 @@ msgstr "יצירת מתווך"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
-msgstr ""
+msgstr "יצירת דוח"
 
 #: app/views/administration.script.list.php:34
 msgid "Create script"
@@ -4287,7 +4287,7 @@ msgstr "מארח נוכחי"
 
 #: app/views/popup.scheduledreport.subscription.php:105
 msgid "Current user"
-msgstr ""
+msgstr "משתמש נוכחי"
 
 #: include/classes/setup/CSetupWizard.php:237
 msgid "Current value"
@@ -4355,7 +4355,7 @@ msgstr "גודל מותאם אישית"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 msgid "Cycle"
-msgstr ""
+msgstr "מחזור"
 
 #: include/locales.inc.php:52
 msgid "Czech (cs_CZ)"
@@ -4651,7 +4651,7 @@ msgstr "דצמבר"
 #: app/controllers/CControllerPopupTriggerExpr.php:860
 #: app/controllers/CControllerPopupTriggerExpr.php:1017
 msgid "Decimal places"
-msgstr ""
+msgstr "מקומות עשרוניים"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
@@ -4991,7 +4991,7 @@ msgstr "למחוק את התפקידים הנבחרים?"
 
 #: app/partials/scheduledreport.formgrid.html.php:240
 msgid "Delete selected scheduled report?"
-msgstr ""
+msgstr "למחוק את הדוח המתוזמן הנבחר?"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
@@ -6129,7 +6129,7 @@ msgstr "רמת הצפנה"
 
 #: app/partials/scheduledreport.formgrid.html.php:165
 msgid "End date"
-msgstr ""
+msgstr "מועד סיום"
 
 #: app/views/popup.itemtestedit.view.php:295
 msgid "End of line sequence"
@@ -6860,7 +6860,7 @@ msgstr "מאת"
 
 #: app/views/administration.miscconfig.edit.php:34
 msgid "Frontend URL"
-msgstr ""
+msgstr "כתובת מנשק משתמש"
 
 #: app/views/administration.usergroup.edit.php:79
 #: app/views/administration.usergroup.edit.php:87
@@ -6917,7 +6917,7 @@ msgstr "כללי"
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:102
 msgid "Generate report by"
-msgstr ""
+msgstr "יצירת דוח עד"
 
 #: chart4.php:172 chart5.php:203
 #, c-format
@@ -7490,7 +7490,7 @@ msgstr "בחירת נתונים היסטוריים"
 
 #: app/views/popup.triggerexpr.php:111
 msgid "History functions"
-msgstr ""
+msgstr "פונקציות היסטוריה"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
 #: app/views/popup.lldoperation.php:185
@@ -10506,7 +10506,7 @@ msgstr "נראה לאחרונה (גיל)"
 
 #: app/partials/scheduledreport.table.html.php:43
 msgid "Last sent"
-msgstr ""
+msgstr "נשלח לאחרונה"
 
 #: app/partials/monitoring.latest.view.html.php:56
 #: app/partials/monitoring.latest.view.html.php:69
@@ -11017,7 +11017,7 @@ msgstr "ניהול אסימוני API"
 
 #: include/classes/helpers/CRoleHelper.php:504
 msgid "Manage scheduled reports"
-msgstr ""
+msgstr "ניהול דוחות מתוזמנים"
 
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:61
@@ -11209,7 +11209,7 @@ msgstr "תואם לביטוי רגולרי"
 
 #: app/views/popup.triggerexpr.php:112
 msgid "Mathematical functions"
-msgstr ""
+msgstr "פונקציות מתמטיות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:344
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
@@ -11933,7 +11933,7 @@ msgstr "תום זמן המתנה לרשת לבדיקת סוג מדיה"
 
 #: app/views/administration.miscconfig.edit.php:171
 msgid "Network timeout for scheduled report test"
-msgstr ""
+msgstr "שגיאת תום זמן המתנה לבדיקת דוח מתוזמן"
 
 #: app/views/administration.miscconfig.edit.php:157
 msgid "Network timeout for script execution"
@@ -12117,7 +12117,7 @@ msgstr "לא צוין שם משתמש לאימות."
 
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
-msgstr ""
+msgstr "אין שינויים."
 
 #: include/classes/api/services/CCorrelation.php:1022
 #, c-format
@@ -13021,7 +13021,7 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על לוח מ
 
 #: include/classes/api/services/CReport.php:342
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 
 #: include/classes/api/services/CCorrelation.php:696
 msgid "Only super admins can update correlations."
@@ -13120,7 +13120,7 @@ msgstr "מפעיל"
 
 #: app/views/popup.triggerexpr.php:113
 msgid "Operator functions"
-msgstr ""
+msgstr "פונקציות מפעיל"
 
 #: app/views/administration.mediatype.edit.php:346
 msgid "Options"
@@ -13865,7 +13865,7 @@ msgstr "ניצולת חשמל , <url> - כתובת שירות ה־VMware,‏ <uu
 
 #: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Power value"
-msgstr ""
+msgstr "ערך חזקה"
 
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
@@ -13874,7 +13874,7 @@ msgstr "תקציר טרום התקנה"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Prediction functions"
-msgstr ""
+msgstr "פונקציות חיזוי"
 
 #: app/views/popup.massupdate.item.php:494
 #: include/views/configuration.host.discovery.edit.php:875
@@ -13910,7 +13910,7 @@ msgstr "תצוגה מקדימה"
 #: app/partials/scheduledreport.formgrid.html.php:90
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
-msgstr ""
+msgstr "היום הקודם"
 
 #: app/partials/scheduledreport.formgrid.html.php:92
 #: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
@@ -14364,7 +14364,7 @@ msgstr "מען"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
-msgstr ""
+msgstr "הנמען כבר קיים."
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
@@ -14471,7 +14471,7 @@ msgstr "ביטויים רגולריים"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:52
 msgid "Related reports"
-msgstr ""
+msgstr "דוחות קשורים"
 
 #: jsLoader.php:166
 msgid "Release to create a widget."
@@ -14699,24 +14699,24 @@ msgstr "החלפת תלויות"
 #: app/controllers/CControllerPopupTriggerExpr.php:620
 #: app/controllers/CControllerPopupTriggerExpr.php:834
 msgid "Replacement"
-msgstr ""
+msgstr "החלפה"
 
 #: include/classes/api/services/CReport.php:264
 #, c-format
 msgid "Report \"%1$s\" already exists."
-msgstr ""
+msgstr "הדוח „%1$s” כבר קיים."
 
 #: app/views/js/reports.scheduledreport.edit.js.php:74
 msgid "Report generated by other users will be changed to the current user."
-msgstr ""
+msgstr "דוח שנוצר על ידי משתמשים אחרים ישתנה למשתמש הנוכחי."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:97
 msgid "Report generating test failed."
-msgstr ""
+msgstr "בדיקת יצירת דוחות נכשלה."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:94
 msgid "Report generating test successful."
-msgstr ""
+msgstr "בדיקת יצירת דוחות הצליחה."
 
 #: app/views/popup.scheduledreport.subscription.php:109
 #, c-format
@@ -14736,7 +14736,7 @@ msgstr ""
 #: include/classes/api/services/CReport.php:579
 #, c-format
 msgid "Report with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "הדוח עם המזהה „%1$s” אינו זמין."
 
 #: include/classes/helpers/CMenuHelper.php:141
 #: include/classes/helpers/CRoleHelper.php:351
@@ -15334,37 +15334,37 @@ msgstr "בדיקה מתוזמנת"
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/reports.scheduledreport.edit.php:58
 msgid "Scheduled report"
-msgstr ""
+msgstr "דוח מתוזמן"
 
 #: app/controllers/CControllerScheduledReportCreate.php:145
 msgid "Scheduled report added"
-msgstr ""
+msgstr "נוסף דוח מתוזמן"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:129
 msgid "Scheduled report created"
-msgstr ""
+msgstr "נוצר דוח מתוזמן"
 
 #: app/controllers/CControllerScheduledReportDelete.php:67
 msgid "Scheduled report deleted"
 msgid_plural "Scheduled reports deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נמחק דוח מתוזמן"
+msgstr[1] "נמחקו דוחות מתוזמנים"
 
 #: app/controllers/CControllerScheduledReportDisable.php:74
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "הושבת דוח מתוזמן"
+msgstr[1] "הושבתו דוחות מתוזמנים"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "הופעל דוח מתוזמן"
+msgstr[1] "הופעלו דוחות מתוזמנים"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
-msgstr ""
+msgstr "דוח מתוזמן עודכן"
 
 #: app/controllers/CControllerScheduledReportEdit.php:309
 #: app/controllers/CControllerScheduledReportList.php:148
@@ -15373,7 +15373,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:115
 #: include/classes/helpers/CRoleHelper.php:421
 msgid "Scheduled reports"
-msgstr ""
+msgstr "דוחות מתוזמנים"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
 #: app/views/popup.lldoperation.php:125
@@ -16249,11 +16249,11 @@ msgstr "פריטים רגילים"
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "Start"
-msgstr ""
+msgstr "התחלה"
 
 #: app/partials/scheduledreport.formgrid.html.php:156
 msgid "Start date"
-msgstr ""
+msgstr "תאריך התחלה"
 
 #: include/views/configuration.action.edit.php:174
 msgid "Start in"
@@ -16272,7 +16272,7 @@ msgstr "להתחיל מצגת אוטומטית"
 
 #: app/partials/scheduledreport.formgrid.html.php:111
 msgid "Start time"
-msgstr ""
+msgstr "שעת התחלה"
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16472,7 +16472,7 @@ msgstr "מחרוזת"
 
 #: app/views/popup.triggerexpr.php:115
 msgid "String functions"
-msgstr ""
+msgstr "פונקציות מחרוזות"
 
 #: include/items.inc.php:1822 include/items.inc.php:1826
 #: include/items.inc.php:1830 include/items.inc.php:1834
@@ -16505,11 +16505,11 @@ msgstr "תת־מפה"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:168
 msgid "Subscription"
-msgstr ""
+msgstr "מינוי"
 
 #: app/partials/scheduledreport.formgrid.html.php:192
 msgid "Subscriptions"
-msgstr ""
+msgstr "מינויים"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
@@ -16976,7 +16976,7 @@ msgstr "בדיקת פריטי „%1$s” אינה נתמכת."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:79
 msgid "Test report generating"
-msgstr ""
+msgstr "בדיקת יצירת דוחות"
 
 #: app/views/administration.regex.edit.php:119
 msgid "Test string"
@@ -17798,7 +17798,7 @@ msgstr "כתובות"
 #: include/classes/validators/CApiInputValidator.php:2254
 #: include/classes/validators/CApiInputValidator.php:2260
 msgid "UUIDv4 is expected"
-msgstr ""
+msgstr "אמור להיות UUIDv4"
 
 #: include/locales.inc.php:78
 msgid "Ukrainian (uk_UA)"
@@ -18130,7 +18130,7 @@ msgstr "עדכון תקלה"
 
 #: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Updated"
-msgstr ""
+msgstr "מעודכן"
 
 #: include/classes/api/services/CHost.php:1292
 #, c-format
@@ -18213,12 +18213,12 @@ msgstr "המשתמש „%1$s” הוא הבעלים של המפה „%2$s”."
 #: include/classes/api/services/CUser.php:1288
 #, c-format
 msgid "User \"%1$s\" is report \"%2$s\" owner."
-msgstr ""
+msgstr "הבעלות על הדוח „%2$s” היא של „%1$s”."
 
 #: include/classes/api/services/CUser.php:1296
 #, c-format
 msgid "User \"%1$s\" is report \"%2$s\" recipient."
-msgstr ""
+msgstr "הדוח „%2$s” מיועד להישלח אל „%1$s”."
 
 #: include/classes/api/services/CUser.php:1236
 #, c-format
@@ -19660,7 +19660,7 @@ msgstr "אמור להיות מחרוזת תווים"
 
 #: include/classes/validators/CApiInputValidator.php:2176
 msgid "a date in YYYY-MM-DD format is expected"
-msgstr ""
+msgstr "התאריך אמור להיות בתצורה YYYY-MM-DD"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:114
 #: include/classes/validators/CApiInputValidator.php:679
@@ -19742,7 +19742,7 @@ msgstr "אמור להיות מאקרו משתמש"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:282
 msgid "abs() - Absolute value"
-msgstr ""
+msgstr "abs()‎ - ערך מוחלט"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:288
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
@@ -19930,27 +19930,27 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "bitlength() - Returns the length in bits"
-msgstr ""
+msgstr "bitlength()‎ - מחזירה את האורך בסיביות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:374
 msgid "bitlshift() - Bitwise shift left"
-msgstr ""
+msgstr "bitlshift()‎ - הזזה לוגית לשמאל של סיביות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "bitnot() - Bitwise NOT"
-msgstr ""
+msgstr "bitnot()‎ - פעולה לא על סיביות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:394
 msgid "bitor() - Bitwise OR"
-msgstr ""
+msgstr "bitor()‎ - פעולת או על סיביות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:407
 msgid "bitrshift() - Bitwise shift right"
-msgstr ""
+msgstr "bitrshift()‎ - הזזה לוגית לימין של סיביות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:420
 msgid "bitxor() - Bitwise exclusive OR"
-msgstr ""
+msgstr "bitxor()‎ - פעולת או מוציא (XOR) על סיביות"
 
 #: app/views/administration.trigdisplay.edit.php:48
 #: app/views/administration.trigdisplay.edit.php:60
@@ -19965,7 +19965,7 @@ msgstr "שם המשתמש והססמה חייבים להיות מלאים או �
 
 #: app/controllers/CControllerPopupTriggerExpr.php:433
 msgid "bytelength() - Returns the length in bytes"
-msgstr ""
+msgstr "bytelength()‎ - מחזירה את האורך בבתים"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
@@ -20291,7 +20291,7 @@ msgstr "לא תואם"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:540
 msgid "e() - Returns Euler's number"
-msgstr ""
+msgstr "e()‎ - מחזירה את קבוע אוילר"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/correlation.inc.php:31
@@ -20317,11 +20317,11 @@ msgstr "קיים"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "exp() - Euler's number at a power of a value"
-msgstr ""
+msgstr "exp()‎ - מספר אוילר בחזקה של ערך"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "expm1() - Euler's number at a power of a value minus 1"
-msgstr ""
+msgstr "expm1()‎ - קבוע אוילר בחזקת ערך פחות 1"
 
 #: include/classes/parsers/CConditionFormula.php:214
 msgid "expression is empty"
@@ -20432,7 +20432,7 @@ msgstr "בתוך"
 
 #: app/views/popup.valuemap.edit.php:81
 msgid "in range"
-msgstr ""
+msgstr "בטווח"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:594
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
@@ -20476,7 +20476,7 @@ msgstr "שגיאת תחביר ליד „%1$s“"
 #: include/classes/validators/CExpressionValidator.php:172
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
-msgstr ""
+msgstr "שימוש שגוי בפונקציה „%1$s”"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -20625,7 +20625,7 @@ msgstr "שמאל"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:644
 msgid "left() - Returns the leftmost count characters"
-msgstr ""
+msgstr "left()‎ - מחזירה כמות כזאת של תווים משמאל"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:657
 msgid "length() - Length of last (most recent) T value in characters"
@@ -20637,11 +20637,11 @@ msgstr "רשימה של תווים"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:663
 msgid "log() - Natural logarithm"
-msgstr ""
+msgstr "log()‎ - לוגריתם טבעי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:670
 msgid "log10() - Decimal logarithm"
-msgstr ""
+msgstr "log10()‎ - לוגריתם עשרוני"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:677
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
@@ -20975,7 +20975,7 @@ msgstr "percentile()‎ - אחוזון P במשך T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "pi() - Returns the Pi constant"
-msgstr ""
+msgstr "pi()‎ - מחזירה את הקבוע פאי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:788
 msgid "power() - The power of a base value to a power value"
@@ -21008,7 +21008,7 @@ msgstr "מתרענן בכל %1$s שניות."
 #: app/views/js/popup.valuemap.edit.js.php:33
 #: app/views/popup.valuemap.edit.php:82
 msgid "regexp"
-msgstr ""
+msgstr "ביטוי רגולרי"
 
 #: app/views/popup.lldoverride.php:150
 #: include/views/configuration.host.discovery.edit.php:734
