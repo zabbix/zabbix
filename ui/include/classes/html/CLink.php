@@ -60,14 +60,10 @@ class CLink extends CTag {
 	 * @return CLink
 	 */
 	public function setTarget($value = null) {
-		$this->attributes['target'] = $value;
+		$this->setAttribute('target', $value);
 
 		if ($value === '_blank') {
-			$this->attributes['rel'] = 'noopener';
-
-			if (ZBX_NOREFERER) {
-				$this->attributes['rel'] .= ' noreferrer';
-			}
+			$this->setAttribute('rel', 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''));
 		}
 
 		return $this;
