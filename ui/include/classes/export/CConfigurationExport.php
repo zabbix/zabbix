@@ -241,7 +241,6 @@ class CConfigurationExport {
 	 * Gather image data for export.
 	 *
 	 * @param array $imageids
-	 *
 	 */
 	protected function gatherImages(array $imageids) {
 		$images = API::Image()->get([
