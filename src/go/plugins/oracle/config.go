@@ -34,18 +34,6 @@ type Session struct {
 
 	// Service name that identifies a database instance
 	Service string `conf:"optional"`
-
-	// Connection type of Oracle server.
-	TLSConnect string `conf:"name=TLSConnect,optional"`
-
-	// Certificate Authority filepath for Oracle server.
-	TLSCAFile string `conf:"name=TLSCAFile,optional"`
-
-	// Certificate filepath for Oracle server.
-	TLSCertFile string `conf:"name=TLSCertFile,optional"`
-
-	// Key filepath for Oracle server.
-	TLSKeyFile string `conf:"name=TLSKeyFile,optional"`
 }
 
 type PluginOptions struct {
