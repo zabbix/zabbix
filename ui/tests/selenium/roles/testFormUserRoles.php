@@ -96,7 +96,7 @@ class testFormUserRoles extends CWebTest {
 	public function prepareUserData() {
 		CDataHelper::call('user.create', [
 			[
-				'alias' => 'super_role_check',
+				'username' => 'super_role_check',
 				'passwd' => 'zabbix',
 				'roleid' => self::$super_roleid,
 				'usrgrps' => [
