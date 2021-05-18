@@ -1116,10 +1116,11 @@ static void	preprocessor_flush_test_result(zbx_preprocessing_manager_t *manager,
 static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, int *total, int *queued,
 		int *processing, int *done, int *pending)
 {
+#define ZBX_MAX_REQUEST_STATE_PRINT_LIMIT	25
+
 	zbx_preproc_item_stats_t	*item;
 	zbx_list_iterator_t		iterator;
 	zbx_preprocessing_request_t	*request;
-	int				limit = 25;
 	zbx_hashset_t			items;
 
 	*total = 0;
@@ -1145,7 +1146,7 @@ static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, 
 		switch(request->state)
 		{
 			case REQUEST_STATE_QUEUED:
-				if (*queued < limit)
+				if (*queued < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "oldest queued itemid: " ZBX_FS_UI64
 							" values:%d pos:%d", item->itemid, item->values_num, *total);
@@ -1153,7 +1154,7 @@ static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, 
 				(*queued)++;
 				break;
 			case REQUEST_STATE_PROCESSING:
-				if (*processing < limit)
+				if (*processing < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "oldest processing itemid: " ZBX_FS_UI64
 							" values:%d pos:%d", item->itemid, item->values_num, *total);
@@ -1161,7 +1162,7 @@ static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, 
 				(*processing)++;
 				break;
 			case REQUEST_STATE_DONE:
-				if (*done < limit)
+				if (*done < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "oldest done itemid: " ZBX_FS_UI64
 							" values:%d pos:%d", item->itemid, item->values_num, *total);
@@ -1169,7 +1170,7 @@ static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, 
 				(*done)++;
 				break;
 			case REQUEST_STATE_PENDING:
-				if (*pending < limit)
+				if (*pending < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "oldest pending itemid: " ZBX_FS_UI64
 							" values:%d pos:%d", item->itemid, item->values_num, *total);
@@ -1183,6 +1184,7 @@ static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, 
 	}
 
 	zbx_hashset_destroy(&items);
+#undef ZBX_MAX_REQUEST_STATE_PRINT_LIMIT
 }
 
 /******************************************************************************

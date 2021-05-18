@@ -615,11 +615,19 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
  *                                                                            *
  * Purpose: pack diagnostic statistics data into a single buffer that can be  *
  *          used in IPC                                                       *
- * Parameters: data               - [OUT] memory buffer for packed data       *
- *             values_num         - [IN] the number of queued values          *
- *             values_preproc_num - [IN] the number of queued values with     *
- *                                       preprocessing steps                  *
- *             data               - [IN] IPC data buffer                      *
+ * Parameters: data       - [OUT] memory buffer for packed data               *
+ *             total      - [IN] the number of values                         *
+ *             queued     - [IN] the number of values waiting to be           *
+ *                               preprocessed                                 *
+ *             processing - [IN] the number of values being preprocessed      *
+ *             done       - [IN] the number of values waiting to be flushed   *
+ *                               that are either preprocessed or did not      *
+ *                               require preprocessing                        *
+ *             pending    - [IN] the number of values pending to be           *
+ *                               preprocessed after previous value for        *
+ *                               example delta, throttling depends on         *
+ *                               previous value                               *
+ *             data       - [IN] IPC data buffer                              *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
@@ -895,10 +903,18 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_ptr_t *results, zbx_vector_p
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: values_num         - [OUT] the number of queued values         *
- *             values_preproc_num - [OUT] the number of queued values with    *
- *                                       preprocessing steps                  *
- *             data               - [IN] IPC data buffer                      *
+ * Parameters: total      - [OUT] the number of values                        *
+ *             queued     - [OUT] the number of values waiting to be          *
+ *                                preprocessed                                *
+ *             processing - [OUT] the number of values being preprocessed     *
+ *             done       - [OUT] the number of values waiting to be flushed  *
+ *                                that are either preprocessed or did not     *
+ *                                require preprocessing                       *
+ *             pending    - [OUT] the number of values pending to be          *
+ *                                preprocessed after previous value for       *
+ *                                example delta, throttling depends on        *
+ *                                previous value                              *
+ *             data       - [IN] IPC data buffer                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_unpack_diag_stats(int *total, int *queued, int *processing, int *done,
@@ -1315,9 +1331,9 @@ int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **er
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preprocessor_get_top_items                                   *
+ * Function: zbx_preprocessor_get_top_oldest_preproc_items                    *
  *                                                                            *
- * Purpose: get the top N items by the number of queued values                *
+ * Purpose: get the oldest items with preprocessing still in queue            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error)
