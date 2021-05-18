@@ -172,7 +172,6 @@ class testGraphAxis extends CWebTest {
 		}
 		catch (\Exception $ex) {
 			// Code is not missing here.
-			var_dump($ex);
 		}
 
 		$this->assertScreenshot($this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()
