@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-17T07:56:55Z</date>
+   <date>2021-05-18T06:58:16Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -206,6 +206,7 @@ var asterisk = {
         monitored_offline: 0,
         unmonitored_online: 0,
         unmonitored_offline: 0,
+        active_channels: 0,
         total: 0
     },
     iax: {
@@ -213,12 +214,14 @@ var asterisk = {
         online: 0,
         offline: 0,
         unmonitored: 0,
+        active_channels: 0,
         total: 0
     },
     pjsip: {
         trunks: [],
         available: 0,
         unavailable: 0,
+        active_channels: 0,
         total: 0
     },
     queue: {
@@ -286,6 +289,7 @@ function getSipPeers() {
     asterisk.sip.trunks.forEach(function (trunk) {
         var active_channels = channels.match(new RegExp('[^!J]SIP/' + escChars(trunk.ObjectName), 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+        asterisk.sip.active_channels += trunk.active_channels;
     });
 }
 
@@ -315,6 +319,7 @@ function getIaxPeerList() {
         var active_channels = channels.match(new RegExp('[^!](IAX2/' + escChars(trunk.ObjectName) +
             '|IAX2/' + escChars(trunk.ObjectUsername) + ')', 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+        asterisk.iax.active_channels += trunk.active_channels;
     });
 }
 
@@ -335,6 +340,7 @@ function getPjsipShowEndpoints() {
     asterisk.pjsip.trunks.forEach(function (trunk) {
         var active_channels = channels.match(new RegExp('[^!]PJSIP/' + escChars(trunk.ObjectName), 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+        asterisk.pjsip.active_channels += trunk.active_channels;
     });
 }
 
@@ -408,7 +414,7 @@ if (list.includes('QueueSummary')) {
 try {
     response = Ami.request(url, 'Logoff');
 }
-catch (e) { }
+catch (e) {}
 
 return JSON.stringify(asterisk);
 </params>
@@ -430,6 +436,29 @@ return JSON.stringify(asterisk);
                   </query_field>
                </query_fields>
                <retrieve_mode>HEADERS</retrieve_mode>
+            </item>
+            <item>
+               <name>Asterisk: IAX trunks active channels</name>
+               <type>DEPENDENT</type>
+               <key>asterisk.iax.active_channels</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of IAX trunks active channels.</description>
+               <applications>
+                  <application>
+                     <name>Asterisk</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.iax.active_channels</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>asterisk.get_stats</key>
+               </master_item>
             </item>
             <item>
                <name>Asterisk: IAX offline peers</name>
@@ -524,6 +553,29 @@ return JSON.stringify(asterisk);
                </master_item>
             </item>
             <item>
+               <name>Asterisk: PJSIP trunks active channels</name>
+               <type>DEPENDENT</type>
+               <key>asterisk.pjsip.active_channels</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of PJSIP trunks active channels.</description>
+               <applications>
+                  <application>
+                     <name>Asterisk</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.pjsip.active_channels</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>asterisk.get_stats</key>
+               </master_item>
+            </item>
+            <item>
                <name>Asterisk: PJSIP available endpoints</name>
                <type>DEPENDENT</type>
                <key>asterisk.pjsip.available</key>
@@ -586,6 +638,29 @@ return JSON.stringify(asterisk);
                   <step>
                      <type>JSONPATH</type>
                      <params>$.pjsip.unavailable</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>asterisk.get_stats</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Asterisk: SIP trunks active channels</name>
+               <type>DEPENDENT</type>
+               <key>asterisk.sip.active_channels</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of SIP trunks active channels.</description>
+               <applications>
+                  <application>
+                     <name>Asterisk</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.sip.active_channels</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1392,7 +1467,7 @@ OK</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.iax.online</key>
+                  <key>asterisk.iax.active_channels</key>
                </item>
             </graph_item>
             <graph_item>
@@ -1400,12 +1475,20 @@ OK</description>
                <color>2774A4</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.iax.offline</key>
+                  <key>asterisk.iax.online</key>
                </item>
             </graph_item>
             <graph_item>
                <sortorder>2</sortorder>
                <color>F63100</color>
+               <item>
+                  <host>Template Tel Asterisk by HTTP</host>
+                  <key>asterisk.iax.offline</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
                   <key>asterisk.iax.unmonitored</key>
@@ -1420,12 +1503,20 @@ OK</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.pjsip.available</key>
+                  <key>asterisk.pjsip.active_channels</key>
                </item>
             </graph_item>
             <graph_item>
                <sortorder>1</sortorder>
                <color>2774A4</color>
+               <item>
+                  <host>Template Tel Asterisk by HTTP</host>
+                  <key>asterisk.pjsip.available</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
                   <key>asterisk.pjsip.unavailable</key>
@@ -1440,7 +1531,7 @@ OK</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.sip.monitored_online</key>
+                  <key>asterisk.sip.active_channels</key>
                </item>
             </graph_item>
             <graph_item>
@@ -1448,7 +1539,7 @@ OK</description>
                <color>2774A4</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.sip.monitored_offline</key>
+                  <key>asterisk.sip.monitored_online</key>
                </item>
             </graph_item>
             <graph_item>
@@ -1456,12 +1547,20 @@ OK</description>
                <color>F63100</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.sip.unmonitored_online</key>
+                  <key>asterisk.sip.monitored_offline</key>
                </item>
             </graph_item>
             <graph_item>
                <sortorder>3</sortorder>
                <color>A54F10</color>
+               <item>
+                  <host>Template Tel Asterisk by HTTP</host>
+                  <key>asterisk.sip.unmonitored_online</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
                   <key>asterisk.sip.unmonitored_offline</key>
