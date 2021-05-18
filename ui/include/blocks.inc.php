@@ -636,6 +636,7 @@ function make_status_of_zbx() {
 
 						case DB_VERSION_FAILED_TO_RETRIEVE:
 							$error = _('Unable to retrieve database version.');
+							$dbversion->current_version = '';
 							break;
 					}
 
