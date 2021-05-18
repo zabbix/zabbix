@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -243,7 +243,7 @@ class CConfigurationExport {
 	 *
 	 * @param array $imageids
 	 */
-	protected function gatherImages(array $imageids) {
+	protected function gatherImages(array $imageids): void {
 		$images = API::Image()->get([
 			'output' => ['imageid', 'name', 'imagetype'],
 			'imageids' => $imageids,
