@@ -31,7 +31,24 @@ class C52AggregateItemKeyConverter extends CConverter {
 	 */
 	protected $item_key_parser;
 
-	public function __construct() {
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => false  Enable low-level discovery macros usage in time periods.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'lldmacros' => false
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+
 		$this->item_key_parser = new CItemKey();
 	}
 
@@ -68,23 +85,65 @@ class C52AggregateItemKeyConverter extends CConverter {
 
 		foreach ($host_groups as &$host_group) {
 			if ($host_group[0] === '"') {
-				$host_group = substr($host_group, 1, -1);
+				$host_group = str_replace('\\"', '"', substr($host_group, 1, -1));
 			}
 		}
+		unset($host_group);
 
 		$host_groups = array_filter($host_groups, 'strlen');
 
+		foreach ($host_groups as &$host_group) {
+			$host_group = CFilterParser::quoteString($host_group);
+		}
+		unset($host_group);
+
 		if ($host_groups) {
-			$item_key .= '?[group="'.implode('" or group="', $host_groups).'"]';
+			$item_key .= '?[group='.implode(' or group=', $host_groups).']';
 		}
 
 		$timeperiod = $this->item_key_parser->getParam(3);
 		$new_value = substr($this->item_key_parser->getKey(), 3).'('.$func_foreach.'('.$item_key;
 
 		if ($timeperiod !== null) {
-			$new_value .= ','.trim($timeperiod);
+			$timeperiod = trim($timeperiod);
+
+			if ($this->isQuotableTimeperiod($timeperiod)) {
+				$timeperiod = CHistFunctionParser::quoteParam($timeperiod);
+			}
+
+			$new_value .= ','.$timeperiod;
 		}
 
 		return $new_value.'))';
+	}
+
+	private function isQuotableTimeperiod(string $timeperiod): bool {
+		$number_parser = new CNumberParser(['with_minus' => false, 'with_suffix' => true]);
+
+		if ($number_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($user_macro_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		if ($this->options['lldmacros']) {
+			$lld_macro_parser = new CLLDMacroParser();
+
+			if ($lld_macro_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+				return false;
+			}
+
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+
+			if ($lld_macro_function_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
