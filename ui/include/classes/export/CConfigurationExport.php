@@ -226,6 +226,7 @@ class CConfigurationExport {
 
 		if ($options['maps']) {
 			$options['images'] = array_merge($options['images'], $this->gatherMaps($options['maps']));
+			$options['images'] = array_keys(array_flip($options['images']));
 		}
 
 		if ($options['images']) {
