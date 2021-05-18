@@ -659,9 +659,13 @@ class testFormUserRoles extends CWebTest {
 		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
+
+			// List of API requests.
 			$this->query('button:Select')->one()->click();
+			$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
 			$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
+			$overlay->close();
 		}
 
 		// Screens for super admin.
