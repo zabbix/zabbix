@@ -96,7 +96,7 @@ class testFormUserRoles extends CWebTest {
 	public function prepareUserData() {
 		CDataHelper::call('user.create', [
 			[
-				'alias' => 'super_role_check',
+				'username' => 'super_role_check',
 				'passwd' => 'zabbix',
 				'roleid' => self::$super_roleid,
 				'usrgrps' => [
@@ -271,13 +271,14 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
 						'Enabled' => false,
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Add problem comments' => false,
 						'Change severity' => false,
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -297,7 +298,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
 						'Enabled' => false,
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
 						'Add problem comments' => false,
@@ -305,6 +306,8 @@ class testFormUserRoles extends CWebTest {
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
+						'Manage scheduled reports' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -325,7 +328,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
 						'Enabled' => false,
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
 						'Add problem comments' => false,
@@ -333,6 +336,8 @@ class testFormUserRoles extends CWebTest {
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
+						'Manage scheduled reports' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -463,13 +468,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_no_actions',
 						'User type' => 'User',
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Add problem comments' => false,
 						'Change severity' => false,
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -481,7 +487,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_no_actions',
 						'User type' => 'Admin',
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
 						'Add problem comments' => false,
@@ -489,6 +495,8 @@ class testFormUserRoles extends CWebTest {
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
+						'Manage scheduled reports' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -500,7 +508,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_no_Actions',
 						'User type' => 'Super admin',
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Create and edit maintenance' => false,
 						'Add problem comments' => false,
@@ -508,6 +516,8 @@ class testFormUserRoles extends CWebTest {
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
+						'Manage scheduled reports' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -618,7 +628,7 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Deny list',
 						'Monitoring' => ['Overview', 'Maps'],
 						'Reports' => [],
-						'Create and edit dashboards and screens' => false
+						'Create and edit dashboards' => false
 					],
 					'message_header' => 'User role created'
 				]
@@ -811,13 +821,14 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'API methods' => 'Deny list',
-						'Create and edit dashboards and screens' => false,
+						'Create and edit dashboards' => false,
 						'Create and edit maps' => false,
 						'Add problem comments' => false,
 						'Change severity' => false,
 						'Acknowledge problems' => false,
 						'Close problems' => false,
 						'Execute scripts' => false,
+						'Manage API tokens' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role updated'
