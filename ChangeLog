@@ -1,6 +1,36 @@
+Changes for 6.0.0alpha1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0
+
+5.4.0rc2 was released as 5.4.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0rc2
+
+Bug fixes:
+....I..... [ZBX-19361] fixed number/time parameter conversion in calculated checks and period parameter conversion in aggregate checks (wiper)
+........S. [ZBX-19368] reduced functionids sorting when extracting functionids from expressions during trigger processing (wiper)
+..F....... [ZBX-19370] fixed displaying time in popups of graph widgets (ashubin, averza)
+........S. [ZBX-19366] fixed duplicate key error for screen and slideshow in dbupgrade patch (MVekslers)
+A......... [ZBXNEXT-6411] fixed incorrect argument type in item/discovery rule/web scenario import (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0rc1
 
 New features:
+........S. [ZBXNEXT-6658] added warning for unsupported DB version (arimdjonoks)
 A.F.I...S. [ZBXNEXT-6411] added uniqueness criteria in template elements and added option to compare templates before importing (akozlovs, ashubin, vmurzins)
 A.F.I..PS. [ZBXNEXT-6452] implemented new syntax for aggregated checks (averza, gcalenko, Sasha, vso, wiper)
 A.F.....S. [ZBXNEXT-114,ZBXNEXT-6572] added support of ranges and regular expressions for value mappings (akozlovs, gcalenko)
@@ -13,6 +43,7 @@ A.F.I..PS. [ZBXNEXT-6453] implemented new syntax for calculated checks (averza, 
 .........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
 
 Bug fixes:
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
 .......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
 ...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
 .......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
@@ -225,6 +256,10 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
 .......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
 ...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
 .......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
@@ -735,6 +770,10 @@ New features:
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
 .......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
 ...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
 .......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
@@ -2790,10 +2829,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.31rc1
 
-New features:
-
 Bug fixes:
-...G...PS. [ZBX-18168] improved regular expression compilation and runtime error reporting (Andris)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
 .......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
