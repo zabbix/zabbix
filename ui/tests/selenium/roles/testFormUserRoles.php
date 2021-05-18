@@ -664,7 +664,6 @@ class testFormUserRoles extends CWebTest {
 			$this->query('button:Select')->one()->click();
 			$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
-			$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
 			$overlay->close();
 		}
 
