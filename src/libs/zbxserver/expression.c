@@ -4957,7 +4957,8 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
 }
 
-static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
+static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
+		const DC_ITEM *history_items, const int *history_errcodes)
 {
 	DC_ITEM			*items = NULL;
 	char			*error = NULL;
@@ -4970,26 +4971,47 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
-
-	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_append(&itemids, func->itemid);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
-
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
-		i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL == zbx_vector_uint64_bsearch(history_itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			zbx_vector_uint64_append(&itemids, func->itemid);
+	}
 
-		if (SUCCEED != errcodes[i])
+	if (0 != itemids.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+		errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
+
+		DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, itemids.values_num,
+				ZBX_ITEM_GET_SYNC);
+	}
+
+	zbx_hashset_iter_reset(funcs, &iter);
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int		errcode;
+		const DC_ITEM	*item;
+
+		/* avoid double copying from configuration cache if already retrieved when saving history */
+		if (FAIL != (i = zbx_vector_uint64_bsearch(history_itemids, func->itemid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			item = history_items + i;
+			errcode = history_errcodes[i];
+		}
+		else
+		{
+			i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			item = items + i;
+			errcode = errcodes[i];
+		}
+
+		if (SUCCEED != errcode)
 		{
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, NULL, NULL, func->parameter,
@@ -4999,39 +5021,39 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 
 		/* do not evaluate if the item is disabled or belongs to a disabled host */
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
+		if (ITEM_STATUS_ACTIVE != item->status)
 		{
 			zbx_free(func->error);
-			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
-					items[i].key_orig, func->parameter, "item is disabled");
+			func->error = zbx_eval_format_function_error(func->function, item->host.host,
+					item->key_orig, func->parameter, "item is disabled");
 			continue;
 		}
 
-		if (HOST_STATUS_MONITORED != items[i].host.status)
+		if (HOST_STATUS_MONITORED != item->host.status)
 		{
 			zbx_free(func->error);
-			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
-					items[i].key_orig, func->parameter, "item belongs to a disabled host");
+			func->error = zbx_eval_format_function_error(func->function, item->host.host,
+					item->key_orig, func->parameter, "item belongs to a disabled host");
 			continue;
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state &&
+		if (ITEM_STATE_NOTSUPPORTED == item->state &&
 				FAIL == zbx_evaluatable_for_notsupported(func->function))
 		{
 			/* set 'unknown' error value */
 			zbx_variant_set_error(&func->value,
-					zbx_eval_format_function_error(func->function, items[i].host.host,
-							items[i].key_orig, func->parameter, "item is not supported"));
+					zbx_eval_format_function_error(func->function, item->host.host,
+							item->key_orig, func->parameter, "item is not supported"));
 			continue;
 		}
 
-		if (SUCCEED != evaluate_function2(&func->value, &items[i], func->function, func->parameter,
+		if (SUCCEED != evaluate_function2(&func->value, (DC_ITEM *)item, func->function, func->parameter,
 				&func->timespec, &error))
 		{
 			/* compose and store error message for future use */
 			zbx_variant_set_error(&func->value,
-					zbx_eval_format_function_error(func->function, items[i].host.host,
-							items[i].key_orig, func->parameter, error));
+					zbx_eval_format_function_error(func->function, item->host.host,
+							item->key_orig, func->parameter, error));
 			zbx_free(error);
 			continue;
 		}
@@ -5166,7 +5188,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers)
+static void	substitute_functions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const DC_ITEM *history_items, const int *history_errcodes)
 {
 	zbx_vector_uint64_t	functionids;
 	zbx_hashset_t		ifuncs, funcs;
@@ -5189,7 +5212,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers)
 
 	if (0 != ifuncs.num_data)
 	{
-		zbx_evaluate_item_functions(&funcs);
+		zbx_evaluate_item_functions(&funcs, history_itemids, history_items, history_errcodes);
 		zbx_substitute_functions_results(&ifuncs, triggers);
 	}
 
@@ -5272,7 +5295,8 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	evaluate_expressions(zbx_vector_ptr_t *triggers)
+void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const DC_ITEM *history_items, const int *history_errcodes)
 {
 	DB_EVENT		event;
 	DC_TRIGGER		*tr;
@@ -5304,7 +5328,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		}
 	}
 
-	substitute_functions(triggers);
+	substitute_functions(triggers, history_itemids, history_items, history_errcodes);
 
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)
