@@ -610,7 +610,7 @@ class CControllerMenuPopup extends CController {
 						$url['url'] = 'javascript: alert(\''.
 							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
 						'\');';
-						unset($url['target']);
+						unset($url['target'], $url['rel']);
 					}
 				}
 				unset($url);

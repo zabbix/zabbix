@@ -406,7 +406,7 @@ if (empty($_GET['files'])) {
 		$files[] = 'class.notifications.js';
 	}
 
-	$js .= 'ZBX_NOREFERER = '.ZBX_NOREFERER."\n";
+	$js .= 'ZBX_NOREFERER = '.ZBX_NOREFERER.";\n";
 }
 else {
 	$files = $_GET['files'];

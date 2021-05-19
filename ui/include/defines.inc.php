@@ -156,9 +156,6 @@ define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
-// Allows to set "rel" tag value "noreferer" when setting target="_blank".
-define('ZBX_NOREFERER', true);
-
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -1968,3 +1965,6 @@ define('ZBX_IFRAME_SANDBOX', '');
  *  - null - disable X-Frame-options header.
  */
 define('X_FRAME_OPTIONS', 'SAMEORIGIN');
+
+// Allows to set "rel" tag value "noreferer" when setting target="_blank".
+define('ZBX_NOREFERER', true);
