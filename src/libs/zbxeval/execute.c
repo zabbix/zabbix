@@ -1589,7 +1589,7 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 
 	p = zbx_strshift_utf8(arg->data.str, start->data.ui64 - 1);
 
-	if (srclen > start->data.ui64 + len->data.ui64)
+	if (srclen >= start->data.ui64 + len->data.ui64)
 	{
 		sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
 		strval = zbx_malloc(NULL, sz);
@@ -1778,7 +1778,7 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (src_len < start->data.ui64 + len->data.ui64)
+	if (src_len < start->data.ui64 - 1 + len->data.ui64)
 	{
 		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
 				ctx->expression + token->loc.l);
