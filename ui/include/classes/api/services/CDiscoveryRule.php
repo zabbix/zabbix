@@ -3015,37 +3015,37 @@ class CDiscoveryRule extends CItemGeneral {
 					}
 
 					foreach ($operations as &$operation) {
-						$operationid_field = 'lld_override_operationid';
+						$lld_override_operationid = $operation['lld_override_operationid'];
 
 						if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
 							foreach ($opstatus as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opstatus']['status'] = $row['status'];
 								}
 							}
 						}
 
 						foreach ($opdiscover as $row) {
-							if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+							if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 								$operation['opdiscover']['discover'] = $row['discover'];
 							}
 						}
 
 						if ($item_prototype_objectids) {
 							foreach ($ophistory as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['ophistory']['history'] = $row['history'];
 								}
 							}
 
 							foreach ($optrends as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['optrends']['trends'] = $row['trends'];
 								}
 							}
 
 							foreach ($opperiod as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opperiod']['delay'] = $row['delay'];
 								}
 							}
@@ -3053,7 +3053,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 						if ($trigger_prototype_objectids) {
 							foreach ($opseverity as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opseverity']['severity'] = $row['severity'];
 								}
 							}
@@ -3061,7 +3061,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 						if ($trigger_prototype_objectids || $host_prototype_objectids) {
 							foreach ($optag as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
 								}
 							}
@@ -3069,13 +3069,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 						if ($host_prototype_objectids) {
 							foreach ($optemplate as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['optemplate'][] = ['templateid' => $row['templateid']];
 								}
 							}
 
 							foreach ($opinventory as $row) {
-								if (bccomp($operation[$operationid_field], $row[$operationid_field]) == 0) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
 									$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
 								}
 							}
