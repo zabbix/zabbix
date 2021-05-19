@@ -845,7 +845,6 @@ void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vecto
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
-#define ZBX_HC_ITEM_STATUS_PROCESSING	2
 
 #define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
 #define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
