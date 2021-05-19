@@ -803,7 +803,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.4/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks'
       valuemaps:
         -
           uuid: 636c6915a8154b6ea1ea5b00f015c149
