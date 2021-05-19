@@ -173,8 +173,6 @@ typedef struct
 	char			*delay;
 	int			history_sec;
 	int			trends_sec;
-	int			nextcheck;
-	int			lastclock;
 	int			mtime;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
