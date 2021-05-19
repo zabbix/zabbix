@@ -2874,7 +2874,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->triggers = NULL;
 			item->update_triggers = 0;
 			item->nextcheck = 0;
-			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
 			item->mtime = atoi(row[21]);
@@ -7640,8 +7639,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 	{
 		dst_item->itemid = src_item->itemid;			/* set after lock */
 		dst_item->flags = src_item->flags;
-		dst_item->nextcheck = src_item->nextcheck;
-		dst_item->lastclock = src_item->lastclock;
 		dst_item->key = NULL;					/* set during initialization */
 	}
 
@@ -13250,9 +13247,6 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
 			dc_item->state = diff->state;
-
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK & diff->flags))
-			dc_item->lastclock = diff->lastclock;
 	}
 
 	UNLOCK_CACHE;
