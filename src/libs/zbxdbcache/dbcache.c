@@ -4047,17 +4047,35 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		item_value = &values[i];
 
+		/* a record with metadata and no value can be dropped if  */
+		/* the metadata update is copied to the last queued value */
+		if (NULL != (item = hc_get_item(item_value->itemid)) &&
+				0 != (item_value->flags & (ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_META))
+		{
+			/* items with busy status are already being processed and their */
+			/* metadata cannot be updated if only one value is queued       */
+			if (item->head != item->tail || ZBX_HC_ITEM_STATUS_NORMAL == item->status)
+			{
+				item->head->lastlogsize = item_value->lastlogsize;
+				item->head->mtime = item_value->mtime;
+				item->head->flags |= ZBX_DC_FLAG_META;
+				continue;
+			}
+		}
+
 		while (SUCCEED != hc_clone_history_data(&data, item_value))
 		{
 			UNLOCK_CACHE;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
 			sleep(1);
+			item = NULL;
 
 			LOCK_CACHE;
 		}
 
-		if (NULL == (item = hc_get_item(item_value->itemid)))
+		if (NULL == item && NULL == (item = hc_get_item(item_value->itemid)))
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
