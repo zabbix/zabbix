@@ -2778,7 +2778,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
 					'filter' => ['itemid' => $itemIds],
 					'preservekeys' => true,
-					'sortfield' => 'item_conditionid'
+					'sortfield' => ['item_conditionid']
 				]);
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
@@ -2872,7 +2872,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$conditions = DB::select('lld_override_condition', [
 					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
 					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => 'lld_override_conditionid',
+					'sortfield' => ['lld_override_conditionid'],
 					'preservekeys' => true
 				]);
 
@@ -2933,7 +2933,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$operations = DB::select('lld_override_operation', [
 					'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
 					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => 'lld_override_operationid',
+					'sortfield' => ['lld_override_operationid'],
 					'preservekeys' => true
 				]);
 
