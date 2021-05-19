@@ -4053,9 +4053,9 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
 				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
-			/* items with busy status are already being processed and their */
-			/* metadata cannot be updated if only one value is queued       */
-			if (item->head != item->tail || ZBX_HC_ITEM_STATUS_NORMAL == item->status)
+			/* skip metadata updates when only one value is queued, */
+			/* because the item might be already being processed    */
+			if (item->head != item->tail)
 			{
 				item->head->lastlogsize = item_value->lastlogsize;
 				item->head->mtime = item_value->mtime;
