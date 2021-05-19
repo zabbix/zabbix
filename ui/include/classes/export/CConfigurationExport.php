@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -1173,13 +1173,13 @@ class CConfigurationExport {
 	/**
 	 * Get maps for export from database and collect image IDs used in maps for later usage.
 	 *
-	 * @param array $mapIds
+	 * @param array $mapids
 	 *
 	 * @return array
 	 */
-	protected function gatherMaps(array $mapIds) {
+	protected function gatherMaps(array $mapids): array {
 		$sysmaps = API::Map()->get([
-			'sysmapids' => $mapIds,
+			'sysmapids' => $mapids,
 			'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 				'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 				'zindex'
@@ -1374,7 +1374,7 @@ class CConfigurationExport {
 	 *
 	 * @return array
 	 */
-	protected function prepareMapExport(array &$exportMaps) {
+	protected function prepareMapExport(array &$exportMaps): array {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
 
 		// gather element ids that must be substituted
