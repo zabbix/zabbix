@@ -4050,7 +4050,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		/* a record with metadata and no value can be dropped if  */
 		/* the metadata update is copied to the last queued value */
 		if (NULL != (item = hc_get_item(item_value->itemid)) &&
-				0 != (item_value->flags & (ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
 				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
 			/* items with busy status are already being processed and their */
