@@ -1,3 +1,10 @@
+Changes for 5.4.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0
 
 5.4.0rc2 was released as 5.4.0 without any changes
@@ -2815,11 +2822,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.31rc1
 
-New features:
-
 Bug fixes:
 ....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
-...G...PS. [ZBX-18168] improved regular expression compilation and runtime error reporting (Andris)
 .......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
 ...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
