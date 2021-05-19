@@ -2746,7 +2746,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$related_ids = $relation_map->getRelatedIds();
 
 			if ($related_ids) {
-				$application_prototypes = DB::select('application_prototype', [
+				$application_prototypes = API::getApiService()->select('application_prototype', [
 					'output' => $options['selectApplicationPrototypes'],
 					'application_prototypeids' => $related_ids,
 					'limit' => $options['limitSelects'],
@@ -2830,7 +2830,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Add LLD macro paths.
 		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
-			$lld_macro_paths = DB::select('lld_macro_path', [
+			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
 				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
 				'filter' => ['itemid' => $itemIds]
 			]);
@@ -2862,7 +2862,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$ovrd_fields = array_merge($ovrd_fields, ['formula', 'evaltype']);
 			}
 
-			$overrides = DB::select('lld_override', [
+			$overrides = API::getApiService()->select('lld_override', [
 				'output' => $this->outputExtend($options['selectOverrides'], $ovrd_fields),
 				'filter' => ['itemid' => $itemIds],
 				'preservekeys' => true

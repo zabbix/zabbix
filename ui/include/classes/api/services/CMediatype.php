@@ -1220,7 +1220,7 @@ class CMediatype extends CApiService {
 			$related_ids = $relation_map->getRelatedIds();
 
 			if ($related_ids) {
-				$message_templates = DB::select('media_type_message', [
+				$message_templates = API::getApiService()->select('media_type_message', [
 					'output' => $options['selectMessageTemplates'],
 					'mediatype_messageids' => $related_ids,
 					'preservekeys' => true
