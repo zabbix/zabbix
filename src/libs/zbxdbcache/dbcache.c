@@ -4044,7 +4044,6 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 	for (i = 0; i < values_num; i++)
 	{
 		zbx_hc_data_t	*data = NULL;
-		int		unlocked = 0;
 
 		item_value = &values[i];
 
@@ -4065,18 +4064,23 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			}
 		}
 
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		if (SUCCEED != hc_clone_history_data(&data, item_value))
 		{
-			UNLOCK_CACHE;
+			do
+			{
+				UNLOCK_CACHE;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-			sleep(1);
-			unlocked = 1;
+				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+				sleep(1);
 
-			LOCK_CACHE;
+				LOCK_CACHE;
+			}
+			while (SUCCEED != hc_clone_history_data(&data, item_value));
+
+			item = hc_get_item(item_value->itemid);
 		}
 
-		if ((NULL == item || 0 != unlocked) && NULL == (item = hc_get_item(item_value->itemid)))
+		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
