@@ -4055,7 +4055,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		{
 			/* items with busy status are already being processed and their */
 			/* metadata cannot be updated if only one value is queued       */
-			if (item->head != item->tail || ZBX_HC_ITEM_STATUS_NORMAL == item->status)
+			if (item->head != item->tail || ZBX_HC_ITEM_STATUS_PROCESSING != item->status)
 			{
 				item->head->lastlogsize = item_value->lastlogsize;
 				item->head->mtime = item_value->mtime;
@@ -4174,6 +4174,7 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = (zbx_hc_item_t *)elem->data;
+		item->status = ZBX_HC_ITEM_STATUS_PROCESSING;
 		zbx_vector_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
@@ -4232,24 +4233,22 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 	{
 		item = (zbx_hc_item_t *)history_items->values[i];
 
-		switch (item->status)
+		if (ZBX_HC_ITEM_STATUS_PROCESSING == item->status)
 		{
-			case ZBX_HC_ITEM_STATUS_BUSY:
-				/* reset item status before returning it to queue */
-				item->status = ZBX_HC_ITEM_STATUS_NORMAL;
-				hc_queue_item(item);
-				break;
-			case ZBX_HC_ITEM_STATUS_NORMAL:
-				item->values_num--;
-				data_free = item->tail;
-				item->tail = item->tail->next;
-				hc_free_data(data_free);
-				if (NULL == item->tail)
-					zbx_hashset_remove(&cache->history_items, item);
-				else
-					hc_queue_item(item);
-				break;
+			item->values_num--;
+			data_free = item->tail;
+			item->tail = item->tail->next;
+			hc_free_data(data_free);
+			if (NULL == item->tail)
+			{
+				zbx_hashset_remove(&cache->history_items, item);
+				continue;
+			}
 		}
+
+		/* reset item status before returning it to queue */
+		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+		hc_queue_item(item);
 	}
 }
 
