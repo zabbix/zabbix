@@ -731,9 +731,9 @@ class testFormItem extends CLegacyWebTest {
 				while ($row = DBfetch($valuemap_result)) {
 					$db_valuemap[] = $row['name'];
 				}
-				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
+				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.sortorder, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
 						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid'].
-						' ORDER BY m.value');
+						' ORDER BY vm.name, m.sortorder');
 
 				$valuemap_field->edit();
 				$valuemap_overlay = COverlayDialogElement::find()->one()->waitUntilReady();
