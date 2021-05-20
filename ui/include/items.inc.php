@@ -1210,7 +1210,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 		}
 
 		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
-			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS);
+			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS, true);
 			$itemids += array_column($item_column, 'itemid', 'itemid');
 		});
 	});
