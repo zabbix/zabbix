@@ -1574,7 +1574,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'operator' => 'exists'
 						],
 						[
-							'macro' => '{#MACRO2}',
+							'macro' => '{#MACRO4}',
 							'operator' => 'does not exist'
 						]
 					]
@@ -2015,7 +2015,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			if (array_key_exists('Operations', $override)) {
 				// Write Condititons from data to array.
 				$condition_text = [];
-				foreach($override['Operations'] as $operation) {
+				foreach ($override['Operations'] as $operation) {
 					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;
 
 					$condition_text[] = $fields['Object'].' '.
@@ -2030,7 +2030,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				}
 				$this->assertEquals($condition_text, $actual_conditions);
 
-				foreach($override['Operations'] as $i => $operation) {
+				foreach ($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();
 					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asCheckboxForm()->one();
 					$operation_overlay->checkValue(

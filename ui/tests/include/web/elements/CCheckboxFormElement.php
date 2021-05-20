@@ -89,7 +89,7 @@ class CCheckboxFormElement extends CFormElement {
 	 *
 	 * @throws Exception
 	 */
-	private function checkFieldValue($field, $values, $raise_exception = true) {
+	protected function checkFieldValue($field, $values, $raise_exception = true) {
 		if ($values === null) {
 			try {
 				return $this->getLabelCheckbox($this->getLabel($field))->checkValue(false, $raise_exception);
