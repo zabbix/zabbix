@@ -172,6 +172,7 @@ func newCpuUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery,
 			return
 		}
 	}
+
 	query.cmdlinePattern = pattern
 	return
 }
@@ -414,7 +415,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	return
 }
-func (p *PluginExport) prepareQueries(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
+func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
 	regxp, err := regexp.Compile(q.cmdline)
 	if err != nil {
 		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
@@ -666,7 +667,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 
 	var count int
 
-	query, flags, err := p.prepareQueries(&procQuery{name, userName, cmdline, state})
+	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
 	if err != nil {
 		p.Debugf("Failed to prepare query: %s", err.Error())
 		return count, nil
