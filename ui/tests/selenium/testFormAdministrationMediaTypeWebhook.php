@@ -175,7 +175,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with 0 in Attempts field.
@@ -189,7 +189,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with too much Attempts.
@@ -203,7 +203,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '11'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with empty Attempt interval field.
@@ -233,7 +233,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '61'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Attempt to add a webhook with custom concurrent sessions number out of range.
@@ -374,7 +374,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field to 0.
@@ -388,7 +388,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field too high.
@@ -402,7 +402,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '100'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field to some string.
@@ -416,7 +416,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => 'five'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Remove the value of the attempt interval field.
@@ -446,7 +446,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '61'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Set a string value in the attempt interval field.
@@ -461,7 +461,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '10seconds'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Removing the name of a webhook media type.
