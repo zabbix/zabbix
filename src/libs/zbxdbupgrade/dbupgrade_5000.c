@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
 
 extern unsigned char	program_type;
 
@@ -72,6 +73,43 @@ static int	DBpatch_5000002(void)
 	return ret;
 }
 
+static int	DBpatch_5000003(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+
+static int	DBpatch_5000004(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5000)
@@ -81,5 +119,7 @@ DBPATCH_START(5000)
 DBPATCH_ADD(5000000, 0, 1)
 DBPATCH_ADD(5000001, 0, 0)
 DBPATCH_ADD(5000002, 0, 0)
+DBPATCH_ADD(5000003, 0, 0)
+DBPATCH_ADD(5000004, 0, 0)
 
 DBPATCH_END()
