@@ -32,7 +32,7 @@ class testFormUserRoles extends CWebTest {
 
 	use TableTrait;
 
-	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid';
+	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid ORDER BY r.roleid, rr.role_ruleid';
 
 	/**
 	 * Attach MessageBehavior to the test.
