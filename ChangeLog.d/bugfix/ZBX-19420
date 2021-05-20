@@ -1,0 +1,1 @@
+........S. [ZBX-19420] fixed crash when comparing two out of range floating values in string format (wiper)
