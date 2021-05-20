@@ -597,8 +597,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019-25-09 00:00:00'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021-25-09 00:00:00'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
@@ -607,8 +607,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019.07.31 15:53:07'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021.07.31 15:53:07'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]

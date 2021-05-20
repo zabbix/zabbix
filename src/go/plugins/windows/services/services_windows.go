@@ -420,7 +420,7 @@ func (p *Plugin) exportServices(params []string) (result interface{}, err error)
 	}
 
 	stateFilter := stateFlagAll
-	if len(params) > 1 && params[1] != "" {
+	if len(params) > 1 && params[1] != "all" && params[1] != "" {
 		switch params[1] {
 		case "stopped":
 			stateFilter = stateFlagStopped

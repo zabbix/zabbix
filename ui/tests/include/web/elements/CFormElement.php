@@ -127,8 +127,7 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getLabel($name) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
-		$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		$labels = $this->findLabels($name);
 
 		if ($labels->isEmpty()) {
 			throw new Exception('Failed to find form label by name: "'.$name.'".');
@@ -147,6 +146,18 @@ class CFormElement extends CElement {
 		}
 
 		return $labels->first();
+	}
+
+	/**
+	 * Get label elements by text.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElementCollection
+	 */
+	protected function findLabels($name) {
+		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
+		return $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
 	}
 
 	/**
