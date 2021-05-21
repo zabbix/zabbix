@@ -10,6 +10,13 @@ Changes for 5.4.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-19348] use MNT_NOWAIT for VFS_FS_DISCOVERY on BSDs (dgoloscapov)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19420] fixed crash when comparing two out of range floating values in string format (wiper)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+..F....... [ZBX-19105] fixed value mappings with duplicate names after update of existing value mapping (ashubin, gcalenko)
+.......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0
