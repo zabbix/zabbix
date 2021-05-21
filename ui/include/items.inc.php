@@ -1196,7 +1196,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS);
+	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	$items_left = ZBX_MAX_TABLE_COLUMNS;
 	$itemids = [];
 	array_walk($data, function (array &$item_columns) use (&$itemids, &$items_left) {
