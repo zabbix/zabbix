@@ -268,7 +268,7 @@ Modbus address:0x0032&#13;
                <value_type>FLOAT</value_type>
                <units>Ah</units>
                <description>MIB: TRISTAR-MPPT&#13;
-Description:Ah Charge Resetable&#13;
+Description:Ah Charge Resettable&#13;
 Scaling Factor:1.0&#13;
 Units:Ah&#13;
 Range:[0.0, 5000]&#13;
@@ -288,7 +288,7 @@ Modbus addresses:H=0x0034 L=0x0035</description>
                <value_type>FLOAT</value_type>
                <units>!kWh</units>
                <description>MIB: TRISTAR-MPPT&#13;
-Description:kWh Charge Resetable&#13;
+Description:kWh Charge Resettable&#13;
 Scaling Factor:1.0&#13;
 Units:kWh&#13;
 Range:[0.0, 65535.0]&#13;

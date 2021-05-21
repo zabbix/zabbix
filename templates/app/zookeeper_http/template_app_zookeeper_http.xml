@@ -1368,7 +1368,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}</macro>
                <value>85</value>
-               <description>Maximum percentage of file descriptors usage alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}</macro>

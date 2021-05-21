@@ -4534,7 +4534,8 @@ span.is-loading {
     top: 42px;
     bottom: 42px; }
 
-.menu-popup-preloader {
+.menu-popup-preloader,
+.hintbox-preloader {
   background: #ebeef0;
   border: 1px solid #ccd5d9;
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5);
@@ -4544,8 +4545,12 @@ span.is-loading {
   right: auto;
   bottom: auto;
   z-index: 1010; }
-  .menu-popup-preloader::before {
+  .menu-popup-preloader::before,
+  .hintbox-preloader::before {
     background: #ebeef0; }
+
+.hintbox-preloader {
+  position: absolute; }
 
 .browser-logo-chrome, .browser-logo-ff, .browser-logo-ed, .browser-logo-opera, .browser-logo-safari {
   background: url("../img/browser-sprite.png?20200407") no-repeat;

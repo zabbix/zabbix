@@ -106,8 +106,9 @@ require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
 require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormItemPrototypePreprocessing.php';
-require_once dirname(__FILE__).'/testFormItemTestHost.php';
-require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
+require_once dirname(__FILE__).'/testFormTestItem.php';
+require_once dirname(__FILE__).'/testFormTestItemPrototype.php';
+require_once dirname(__FILE__).'/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
@@ -163,6 +164,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -256,8 +258,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItemPreprocessingTest');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormItemPrototypePreprocessing');
-		$suite->addTestSuite('testFormItemTestHost');
-		$suite->addTestSuite('testFormItemTestTemplate');
+		$suite->addTestSuite('testFormTestItem');
+		$suite->addTestSuite('testFormTestItemPrototype');
+		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
@@ -313,6 +316,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testSID');
 
 		return $suite;
 	}

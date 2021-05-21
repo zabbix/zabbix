@@ -88,6 +88,7 @@ class CRouter {
 		'favourite.delete'				=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'gui.edit'						=> ['CControllerGuiEdit',							'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'					=> ['CControllerGuiUpdate',							null,					null],
+		'hint.box'						=> ['CControllerHintBox',							'layout.json',			'hint.box'],
 		'host.view'						=> ['CControllerHostView',							'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'				=> ['CControllerHostViewRefresh',					'layout.json',			'monitoring.host.view.refresh'],
 		'hostmacros.list'				=> ['CControllerHostMacrosList',					'layout.json',			'hostmacros.list'],

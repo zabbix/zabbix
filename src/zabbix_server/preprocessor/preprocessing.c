@@ -136,13 +136,14 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_preproc_item_value_t *value)
 {
-	zbx_packed_field_t	fields[23], *offset = fields;	/* 23 - max field count */
+	zbx_packed_field_t	fields[24], *offset = fields;	/* 24 - max field count */
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
 	result_marker = (NULL != value->result_ptr->result);
 
 	*offset++ = PACKED_FIELD(&value->itemid, sizeof(zbx_uint64_t));
+	*offset++ = PACKED_FIELD(&value->hostid, sizeof(zbx_uint64_t));
 	*offset++ = PACKED_FIELD(&value->item_value_type, sizeof(unsigned char));
 	*offset++ = PACKED_FIELD(&value->item_flags, sizeof(unsigned char));
 	*offset++ = PACKED_FIELD(&value->state, sizeof(unsigned char));
@@ -723,6 +724,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 	unsigned char	*offset = data, ts_marker, result_marker, log_marker;
 
 	offset += zbx_deserialize_uint64(offset, &value->itemid);
+	offset += zbx_deserialize_uint64(offset, &value->hostid);
 	offset += zbx_deserialize_char(offset, &value->item_value_type);
 	offset += zbx_deserialize_char(offset, &value->item_flags);
 	offset += zbx_deserialize_char(offset, &value->state);
@@ -992,9 +994,10 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                                                                            *
  * Function: zbx_preprocess_item_value                                        *
  *                                                                            *
- * Purpose: perform item value preprocessing and dependend item processing    *
+ * Purpose: perform item value preprocessing and dependent item processing    *
  *                                                                            *
  * Parameters: itemid          - [IN] the itemid                              *
+ *             itemid          - [IN] the hostid                              *
  *             item_value_type - [IN] the item value type                     *
  *             item_flags      - [IN] the item flags (e. g. lld rule)         *
  *             result          - [IN] agent result containing the value       *
@@ -1005,10 +1008,10 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
+		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
-	zbx_preproc_item_value_t	value = {.itemid = itemid, .item_value_type = item_value_type,
+	zbx_preproc_item_value_t	value = {.itemid = itemid, .hostid = hostid, .item_value_type = item_value_type,
 					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
 	zbx_result_ptr_t		result_ptr = {.result = result};
 	size_t				value_len = 0, len;

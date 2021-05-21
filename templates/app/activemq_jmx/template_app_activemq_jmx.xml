@@ -195,7 +195,7 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}</expression>
-                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higer than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}</name>
+                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}</name>
                            <priority>AVERAGE</priority>
                            <description>This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.</description>
                         </trigger_prototype>
@@ -261,9 +261,9 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1</expression>
-                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higer than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}</name>
                            <priority>AVERAGE</priority>
-                           <description>Queue size is higer than treshold. It may indicate performance problems.</description>
+                           <description>Queue size is higher than threshold. It may indicate performance problems.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -280,9 +280,9 @@ Template tooling version used: 0.38</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}</expression>
-                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}</name>
                      <priority>AVERAGE</priority>
-                     <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
+                     <description>Enqueue rate is higher than dequeue rate. It may indicate performance problems.</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Template App Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
@@ -704,9 +704,9 @@ Template tooling version used: 0.38</description>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}&gt;{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}</expression>
-                     <name>Broker {#JMXBROKERNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}</name>
+                     <name>Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}</name>
                      <priority>AVERAGE</priority>
-                     <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
+                     <description>Enqueue rate is higher than dequeue rate. It may indicate performance problems.</description>
                   </trigger_prototype>
                </trigger_prototypes>
                <graph_prototypes>

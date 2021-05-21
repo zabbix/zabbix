@@ -31,7 +31,7 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
-	private function checkHostPermissions(array $hostids) {
+	protected function checkHostPermissions(array $hostids) {
 		if ($hostids) {
 			$hostids = array_unique($hostids);
 
@@ -169,71 +169,60 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	protected function link(array $templateIds, array $targetIds) {
-		$hostsLinkageInserts = parent::link($templateIds, $targetIds);
+		$hosts_linkage_inserts = parent::link($templateIds, $targetIds);
+		$templates_hostids = [];
+		$link_requests = [];
 
-		foreach ($hostsLinkageInserts as $hostTplIds){
-			Manager::Application()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
+		foreach ($hosts_linkage_inserts as $host_tpl_ids) {
+			$templates_hostids[$host_tpl_ids['templateid']][] = $host_tpl_ids['hostid'];
+		}
+
+		foreach ($templates_hostids as $templateid => $hostids) {
+			Manager::Application()->link($templateid, $hostids);
 
 			// Fist link web items, so that later regular items can use web item as their master item.
-			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
+			Manager::HttpTest()->link($templateid, $hostids);
+		}
 
-			API::Item()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_request = [
+				'hostids' => reset($templates_hostids),
+				'templateids' => [$templateid]
+			];
+			unset($templates_hostids[$templateid]);
 
-			API::DiscoveryRule()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_request['hostids'] === $hostids) {
+					$link_request['templateids'][] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
 
-			API::ItemPrototype()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
+			$link_requests[] = $link_request;
+		}
 
-			API::HostPrototype()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
+		foreach ($link_requests as $link_request) {
+			API::Item()->syncTemplates($link_request);
+			API::DiscoveryRule()->syncTemplates($link_request);
+			API::ItemPrototype()->syncTemplates($link_request);
+			API::HostPrototype()->syncTemplates($link_request);
 		}
 
 		// we do linkage in two separate loops because for triggers you need all items already created on host
-		foreach ($hostsLinkageInserts as $hostTplIds){
-			API::Trigger()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
-
-			API::TriggerPrototype()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
-
-			API::GraphPrototype()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
-
-			API::Graph()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
+		foreach ($link_requests as $link_request){
+			API::Trigger()->syncTemplates($link_request);
+			API::TriggerPrototype()->syncTemplates($link_request);
+			API::GraphPrototype()->syncTemplates($link_request);
+			API::Graph()->syncTemplates($link_request);
 		}
 
-		foreach ($hostsLinkageInserts as $hostTplIds){
-			API::Trigger()->syncTemplateDependencies([
-				'templateids' => $hostTplIds['templateid'],
-				'hostids' => $hostTplIds['hostid']
-			]);
-
-			API::TriggerPrototype()->syncTemplateDependencies([
-				'templateids' => $hostTplIds['templateid'],
-				'hostids' => $hostTplIds['hostid']
-			]);
+		foreach ($link_requests as $link_request){
+			API::Trigger()->syncTemplateDependencies($link_request);
+			API::TriggerPrototype()->syncTemplateDependencies($link_request);
 		}
 
-		return $hostsLinkageInserts;
+		return $hosts_linkage_inserts;
 	}
 
 	/**

@@ -86,10 +86,13 @@ class CAPIHelper {
 
 		if ($response !== false) {
 			$debug['response'] = $response;
-			$response = json_decode($response, true);
 
-			if (!is_array($response)) {
-				throw new Exception('API response is not in JSON format');
+			if ($response !== '') {
+				$response = json_decode($response, true);
+
+				if (!is_array($response)) {
+					throw new Exception('API response is not in JSON format');
+				}
 			}
 		}
 		else {

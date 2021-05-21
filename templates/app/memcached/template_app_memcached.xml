@@ -301,7 +301,7 @@ Template tooling version used: 0.35</description>
                      <expression>{min(5m)}&gt;{$MEMCACHED.CONN.THROTTLED.MAX.WARN}</expression>
                      <name>Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
-                     <description>Number of times a client connection was throttled is too hight.&#13;
+                     <description>Number of times a client connection was throttled is too high.&#13;
 When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</description>
                   </trigger>
                </triggers>

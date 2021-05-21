@@ -1353,6 +1353,8 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
 		goto out;
 
+	zbx_vc_flush_stats();
+
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
@@ -1464,6 +1466,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
+			zbx_vc_flush_stats();
 			zbx_history_value_print(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
@@ -4670,6 +4673,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		pos++;
 	}
 
+	zbx_vc_flush_stats();
+
 	zbx_free(user_alias);
 	zbx_free(user_name);
 	zbx_free(user_surname);
@@ -5049,7 +5054,8 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
 }
 
-static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs)
+static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *unknown_msgs,
+		const zbx_vector_uint64_t *history_itemids, const DC_ITEM *history_items, const int *history_errcodes)
 {
 	DC_ITEM			*items = NULL;
 	char			*error = NULL;
@@ -5062,29 +5068,48 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_uint64_reserve(&itemids, funcs->num_data);
-
-	zbx_hashset_iter_reset(funcs, &iter);
-	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_append(&itemids, func->itemid);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
-
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int	ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
+		if (FAIL == zbx_vector_uint64_bsearch(history_itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			zbx_vector_uint64_append(&itemids, func->itemid);
+	}
+
+	if (0 != itemids.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+		errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
+
+		DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, itemids.values_num,
+				ZBX_ITEM_GET_SYNC);
+	}
+
+	zbx_hashset_iter_reset(funcs, &iter);
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	errcode, ret_unknown = 0;	/* flag raised if current function evaluates to ZBX_UNKNOWN */
 		char	*unknown_msg;
+		const DC_ITEM	*item;
 
-		i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		/* avoid double copying from configuration cache if already retrieved when saving history */
+		if (FAIL != (i = zbx_vector_uint64_bsearch(history_itemids, func->itemid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			item = history_items + i;
+			errcode = history_errcodes[i];
+		}
+		else
+		{
+			i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			item = items + i;
+			errcode = errcodes[i];
+		}
 
-		if (SUCCEED != errcodes[i])
+		if (SUCCEED != errcode)
 		{
 			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
 					" item does not exist.",
@@ -5094,19 +5119,19 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 
 		/* do not evaluate if the item is disabled or belongs to a disabled host */
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
+		if (ITEM_STATUS_ACTIVE != item->status)
 		{
 			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
 					" item is disabled.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter);
+					item->host.host, item->key_orig, func->function, func->parameter);
 			continue;
 		}
 
-		if (HOST_STATUS_MONITORED != items[i].host.status)
+		if (HOST_STATUS_MONITORED != item->host.status)
 		{
 			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
 					" item belongs to a disabled host.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter);
+					item->host.host, item->key_orig, func->function, func->parameter);
 			continue;
 		}
 
@@ -5115,19 +5140,19 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 		/*     evaluated to regular numbers even for NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(func->function))
+		if (ITEM_STATE_NOTSUPPORTED == item->state && FAIL == evaluatable_for_notsupported(func->function))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,
 					"Cannot evaluate function \"%s:%s.%s(%s)\": item is not supported.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter);
+					item->host.host, item->key_orig, func->function, func->parameter);
 
 			zbx_free(func->error);
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
 
-		if (0 == ret_unknown && SUCCEED != evaluate_function(&func->value, &items[i], func->function,
+		if (0 == ret_unknown && SUCCEED != evaluate_function(&func->value, (DC_ITEM *)item, func->function,
 				func->parameter, &func->timespec, &error))
 		{
 			/* compose and store error message for future use */
@@ -5135,7 +5160,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			{
 				unknown_msg = zbx_dsprintf(NULL,
 						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
-						items[i].host.host, items[i].key_orig, func->function,
+						item->host.host, item->key_orig, func->function,
 						func->parameter, error);
 
 				zbx_free(func->error);
@@ -5145,7 +5170,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			{
 				unknown_msg = zbx_dsprintf(NULL,
 						"Cannot evaluate function \"%s:%s.%s(%s)\".",
-						items[i].host.host, items[i].key_orig,
+						item->host.host, item->key_orig,
 						func->function, func->parameter);
 
 				zbx_free(func->error);
@@ -5164,6 +5189,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			func->value = zbx_strdup(func->value, buffer);
 		}
 	}
+
+	zbx_vc_flush_stats();
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
 	zbx_vector_uint64_destroy(&itemids);
@@ -5305,7 +5332,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *unknown_msgs)
+static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *unknown_msgs,
+		const zbx_vector_uint64_t *history_itemids, const DC_ITEM *history_items, const int *history_errcodes)
 {
 	zbx_vector_uint64_t	functionids;
 	zbx_hashset_t		ifuncs, funcs;
@@ -5328,7 +5356,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *u
 
 	if (0 != ifuncs.num_data)
 	{
-		zbx_evaluate_item_functions(&funcs, unknown_msgs);
+		zbx_evaluate_item_functions(&funcs, unknown_msgs, history_itemids, history_items, history_errcodes);
 		zbx_substitute_functions_results(&ifuncs, triggers);
 	}
 
@@ -5352,7 +5380,8 @@ empty:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	evaluate_expressions(zbx_vector_ptr_t *triggers)
+void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const DC_ITEM *history_items, const int *history_errcodes)
 {
 	DB_EVENT		event;
 	DC_TRIGGER		*tr;
@@ -5382,7 +5411,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	/* Therefore initialize error messages vector but do not reserve any space. */
 	zbx_vector_ptr_create(&unknown_msgs);
 
-	substitute_functions(triggers, &unknown_msgs);
+	substitute_functions(triggers, &unknown_msgs, history_itemids, history_items, history_errcodes);
 
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)

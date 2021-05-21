@@ -310,68 +310,97 @@ class CTemplate extends CHostGeneral {
 
 		$this->validateCreate($templates);
 
-		$templateIds = [];
+		$ins_templates = [];
 
-		foreach ($templates as $key => $template) {
-			$templates[$key]['groups'] = zbx_toArray($template['groups']);
-		}
-
-		$ins_tags = [];
-		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
+		foreach ($templates as &$template) {
+			// If visible name is not given or empty it should be set to host name.
+			if (!array_key_exists('name', $template) || trim($template['name']) === '') {
 				$template['name'] = $template['host'];
 			}
 
-			$newTemplateIds = DB::insert('hosts', [[
-				'host' => $template['host'],
-				'name' => $template['name'],
-				'description' => isset($template['description']) ? $template['description'] : null,
-				'status' => HOST_STATUS_TEMPLATE
-			]]);
+			$ins_templates[] = array_intersect_key($template, array_flip(['host', 'name', 'description'])) +
+				['status' => HOST_STATUS_TEMPLATE];
+		}
+		unset($template);
 
-			$templateId = reset($newTemplateIds);
+		$hosts_groups = [];
+		$hosts_tags = [];
+		$hosts_macros = [];
+		$templates_hostids = [];
+		$hostids = [];
 
-			$templateIds[] = $templateId;
+		$templateids = DB::insert('hosts', $ins_templates);
+
+		foreach ($templates as $index => &$template) {
+			$template['templateid'] = $templateids[$index];
+
+			foreach (zbx_toArray($template['groups']) as $group) {
+				$hosts_groups[] = [
+					'hostid' => $template['templateid'],
+					'groupid' => $group['groupid']
+				];
+			}
 
 			if (array_key_exists('tags', $template)) {
 				foreach (zbx_toArray($template['tags']) as $tag) {
-					$ins_tags[] = ['hostid' => $templateId] + $tag;
+					$hosts_tags[] = ['hostid' => $template['templateid']] + $tag;
 				}
 			}
 
-			foreach ($template['groups'] as $group) {
-				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
-
-				$result = DBexecute(
-					'INSERT INTO hosts_groups (hostgroupid,hostid,groupid)'.
-					' VALUES ('.zbx_dbstr($hostGroupId).','.zbx_dbstr($templateId).','.zbx_dbstr($group['groupid']).')'
-				);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
+			if (array_key_exists('macros', $template)) {
+				foreach (zbx_toArray($template['macros']) as $macro) {
+					$hosts_macros[] = ['hostid' => $template['templateid']] + $macro;
 				}
 			}
 
-			$template['templateid'] = $templateId;
+			if (array_key_exists('templates', $template)) {
+				foreach (zbx_toArray($template['templates']) as $link_template) {
+					$templates_hostids[$link_template['templateid']][] = $template['templateid'];
+				}
+			}
 
-			$result = $this->massAdd([
-				'templates' => $template,
-				'templates_link' => isset($template['templates']) ? $template['templates'] : null,
-				'macros' => isset($template['macros']) ? $template['macros'] : null,
-				'hosts' => isset($template['hosts']) ? $template['hosts'] : null
-			]);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
+			if (array_key_exists('hosts', $template)) {
+				foreach (zbx_toArray($template['hosts']) as $host) {
+					$templates_hostids[$template['templateid']][] = $host['hostid'];
+					$hostids[$host['hostid']] = true;
+				}
 			}
 		}
+		unset($template);
 
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
+		DB::insertBatch('hosts_groups', $hosts_groups);
+
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
 		}
 
-		return ['templateids' => $templateIds];
+		if ($hosts_macros) {
+			API::UserMacro()->create($hosts_macros);
+		}
+
+		if ($hostids) {
+			$this->checkHostPermissions(array_keys($hostids));
+		}
+
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_hostids = reset($templates_hostids);
+			$link_templateids = [$templateid];
+			unset($templates_hostids[$templateid]);
+
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_hostids === $hostids) {
+					$link_templateids[] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
+
+			$this->link($link_templateids, $link_hostids);
+		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templates);
+
+		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
 	/**
@@ -601,17 +630,15 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$options = [
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name'],
 			'templateids' => $templateids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		];
-		$delTemplates = $this->get($options);
-		foreach ($templateids as $templateid) {
-			if (!isset($delTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		]);
+
+		if (array_diff_key(array_flip($templateids), $db_templates)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		API::Template()->unlink($templateids, null, true);
@@ -791,49 +818,13 @@ class CTemplate extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		// TODO: remove info from API
-		foreach ($delTemplates as $template) {
-			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
+		foreach ($db_templates as $db_template) {
+			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
-	}
-
-	/**
-	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
-	 *
-	 * @param array $hostids    an array of host or template IDs
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given hosts.
-	 *
-	 * @return void
-	 */
-	protected function checkHostPermissions(array $hostids) {
-		if ($hostids) {
-			$hostids = array_unique($hostids);
-
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count == count($hostids)) {
-				return;
-			}
-
-			$count += $this->get([
-				'countOutput' => true,
-				'templateids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
 	}
 
 	/**
