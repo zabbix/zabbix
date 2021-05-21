@@ -73,6 +73,11 @@ static char	*get_commandline(struct kinfo_proc *proc)
 
 	if (NULL == args)
 		args = zbx_malloc(args, sz);
+	else if (sz > args_alloc)
+	{
+		args = zbx_realloc(args, sz);
+		args_alloc = sz;
+	}
 
 	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
 		return NULL;
@@ -503,7 +508,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proccount++;
 	}
 	zbx_free(proc);
-	zbx_free(args);
 out:
 	SET_UI64_RESULT(result, proccount);
 
