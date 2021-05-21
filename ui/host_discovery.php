@@ -845,11 +845,6 @@ if (hasRequest('form')) {
 		$data['form'] = 'clone';
 	}
 
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
-
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 	}
