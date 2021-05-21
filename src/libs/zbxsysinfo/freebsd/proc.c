@@ -61,7 +61,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	int		mib[4], i;
 	size_t		sz;
 	static char	*args = NULL;
-	static int	args_alloc = 128;
+	static int	args_alloc = 0;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -69,7 +69,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	mib[3] = proc->ZBX_PROC_PID;
 
 	if (-1 == sysctl(mib, 4, NULL, &sz, NULL, 0))
-		sz = (size_t)args_alloc;
+		return NULL;
 
 	if (NULL == args)
 	{
