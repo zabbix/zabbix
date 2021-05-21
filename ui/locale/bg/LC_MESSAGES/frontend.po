@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-13 16:28+0300\n"
+"POT-Creation-Date: 2021-05-21 19:55+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -9601,7 +9601,7 @@ msgstr ""
 msgid "Invalid condition: %1$s."
 msgstr ""
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:220
+#: app/controllers/CControllerTimeSelectorUpdate.php:219
 msgid "Invalid date."
 msgstr ""
 
@@ -11255,7 +11255,7 @@ msgstr ""
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr ""
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:250
+#: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
 #: include/validate.inc.php:477
@@ -11497,7 +11497,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr ""
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:245
+#: app/controllers/CControllerTimeSelectorUpdate.php:244
 #: include/classes/mvc/CController.php:252
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
 #: include/validate.inc.php:470
@@ -14506,7 +14506,7 @@ msgstr "Отдалечена команда"
 #: app/partials/hostmacros.inherited.list.html.php:118
 #: app/partials/hostmacros.list.html.php:56
 #: app/partials/js/common.filter.trigger.js.php:34
-#: app/partials/js/configuration.valuemap.js.php:98
+#: app/partials/js/configuration.valuemap.js.php:106
 #: app/partials/js/scheduledreport.subscription.js.php:201
 #: app/partials/massupdate.macros.tab.php:60
 #: app/partials/massupdate.macros.tab.php:126
@@ -20220,7 +20220,7 @@ msgid "days"
 msgstr "дни"
 
 #: app/controllers/CControllerMapView.php:123
-#: app/partials/js/configuration.valuemap.js.php:148
+#: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
 #: include/classes/setup/CSetupWizard.php:496
 #: include/classes/widgets/CWidgetHelper.php:69
