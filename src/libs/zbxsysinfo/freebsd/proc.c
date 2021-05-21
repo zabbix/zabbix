@@ -72,7 +72,10 @@ static char	*get_commandline(struct kinfo_proc *proc)
 		sz = (size_t)args_alloc;
 
 	if (NULL == args)
+	{
 		args = zbx_malloc(args, sz);
+		args_alloc = sz;
+	}
 	else if (sz > args_alloc)
 	{
 		args = zbx_realloc(args, sz);
