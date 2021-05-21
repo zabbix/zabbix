@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-02 19:52+0300\n"
-"PO-Revision-Date: 2021-05-11 13:59+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2021-05-20 04:13+0300\n"
+"Last-Translator: Imagunet <soporte@imagunet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1620734346.000000\n"
+"X-POOTLE-MTIME: 1621476805.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1188,44 +1188,44 @@ msgstr "En (horas:minutos)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Al menos una acción es obligatoria."
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:706
 #: include/views/configuration.maintenance.edit.php:206
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "Al menos un grupo de host o host debe ser seleccionado."
 
 #: include/classes/api/services/CMaintenance.php:373
 #: include/classes/api/services/CMaintenance.php:381
 #: include/classes/api/services/CMaintenance.php:628
 #: include/classes/api/services/CMaintenance.php:636
 msgid "At least one maintenance period must be created."
-msgstr "Debe crearse al menos un periodo de mantenimiento."
+msgstr "Al menos un periodo de mantenimiento debe ser creado."
 
 #: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Al menos una BD MySQL, PostgreSQL u Oracle debe ser soportada."
 
 #: include/views/configuration.correlation.edit.php:154
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Al menos una operación debe ser seleccionada."
 
 #: include/views/configuration.action.edit.php:529
 msgid "At least one operation must exist."
-msgstr "Al menos debe existir una operación."
+msgstr "Al menos una operación debe existir."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:155
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Al menos una operación de actualización o mensaje es obligatoria."
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "Al menos una operación de actualización o mensaje debe existir."
 
 #: app/partials/popup.operations.php:73
 msgid "At least one user or user group must be selected."
-msgstr "Al menos debe ser seleccionado un usuario o grupo de usuarios."
+msgstr "Al menos un usuario o grupo de usuarios debe ser seleccionado."
 
 #: app/views/administration.mediatype.edit.php:338
 msgid "Attempt interval"
@@ -1827,7 +1827,7 @@ msgstr "No es posible agregar el escenario web"
 
 #: jsLoader.php:154
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "No es posible agregar widget: No hay espacio suficiente en el tablero."
 
 #: jsLoader.php:144
 msgid "Cannot add widgets in kiosk mode"
@@ -3990,7 +3990,7 @@ msgstr "Crear correlación"
 
 #: app/views/monitoring.dashboard.list.php:39
 msgid "Create dashboard"
-msgstr ""
+msgstr "Crear tablero"
 
 #: jsLoader.php:286
 msgid "Create dependent discovery rule"
@@ -4289,7 +4289,7 @@ msgstr "Oscuro"
 #: app/controllers/CControllerAuditLogList.php:217
 #: app/controllers/CControllerDashboardView.php:141 include/menu.inc.php:31
 msgid "Dashboard"
-msgstr "Panel de control"
+msgstr "Tablero"
 
 #: include/classes/api/services/CDashboard.php:435
 #, c-format
@@ -4304,7 +4304,7 @@ msgstr "La celda cell X - %2$s Y - %3$s del tablero \"%1$s\" ya está en uso."
 #: include/classes/api/services/CDashboard.php:571
 #, c-format
 msgid "Dashboard \"%1$s\" widget in cell X - %2$s Y - %3$s is out of bounds."
-msgstr ""
+msgstr "Tablero \"%1$s\" widget en celda X - %2$s Y - %3$s esta fuera de los bordes."
 
 #: app/controllers/CControllerDashboardUpdate.php:246
 msgid "Dashboard created"
@@ -4318,11 +4318,11 @@ msgstr[1] "Tableros borrados"
 
 #: app/views/dashboard.properties.edit.php:64
 msgid "Dashboard properties"
-msgstr ""
+msgstr "Propiedades de tablero"
 
 #: app/views/dashboard.sharing.edit.php:97
 msgid "Dashboard sharing"
-msgstr ""
+msgstr "Compartir tablero"
 
 #: app/controllers/CControllerDashboardShareUpdate.php:88
 #: app/controllers/CControllerDashboardUpdate.php:241
@@ -4332,7 +4332,7 @@ msgstr "Tablero actualizado"
 #: app/controllers/CControllerDashboardList.php:92
 #: app/views/monitoring.dashboard.list.php:35
 msgid "Dashboards"
-msgstr ""
+msgstr "Tableros"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:767
 #: include/views/js/monitoring.sysmaps.js.php:857
@@ -5591,7 +5591,7 @@ msgstr "Editar"
 
 #: app/views/monitoring.dashboard.view.php:90
 msgid "Edit dashboard"
-msgstr ""
+msgstr "Editar tableros"
 
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
@@ -9995,7 +9995,7 @@ msgstr ""
 
 #: include/items.inc.php:2058
 msgid "Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval."
-msgstr ""
+msgstr "El item no se actualizará. El intervalo de actualización especificado requiere al menos un intervalo flexible o agendado de actualización."
 
 #: include/items.inc.php:2063
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
@@ -11105,7 +11105,7 @@ msgstr ""
 
 #: app/controllers/CControllerMediatypeCreate.php:158
 msgid "Media type added"
-msgstr ""
+msgstr "Tipo de medio agregado"
 
 #: app/controllers/CControllerMediatypeDelete.php:66
 msgid "Media type deleted"
@@ -11116,14 +11116,14 @@ msgstr[1] "Tipos de medio eliminados"
 #: app/controllers/CControllerMediatypeDisable.php:72
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tipo de medio deshabilitado"
+msgstr[1] "Tipo de medios deshabilitados"
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tipo de medio habilitado"
+msgstr[1] "Tipo de medios habilitados"
 
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
@@ -11133,15 +11133,15 @@ msgstr ""
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:142
 msgid "Media type test failed."
-msgstr ""
+msgstr "Prueba de tipo de medio fallida."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:109
 msgid "Media type test log"
-msgstr ""
+msgstr "Log de prueba de tipo de medio"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:139
 msgid "Media type test successful."
-msgstr ""
+msgstr "Prueba de tipo de medio exitosa."
 
 #: app/controllers/CControllerMediatypeUpdate.php:173
 msgid "Media type updated"
@@ -11150,7 +11150,7 @@ msgstr "Tipo de medio actualizado"
 #: include/classes/api/services/CUser.php:620
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Tipo de medio con ID \"%1$s\" no esta disponible."
 
 #: app/views/administration.mediatype.edit.php:30
 #: app/views/administration.mediatype.list.php:31 include/menu.inc.php:175
@@ -11161,7 +11161,7 @@ msgstr "Tipos de medios"
 #: include/classes/api/services/CMediatype.php:1142
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr ""
+msgstr "Tipos de medio usados por accion \"%1$s\"."
 
 #: app/views/administration.usergroup.list.php:74
 #: include/views/configuration.hostgroups.list.php:66
@@ -11730,7 +11730,7 @@ msgstr "Nueva condición"
 
 #: app/controllers/CControllerDashboardView.php:234
 msgid "New dashboard"
-msgstr ""
+msgstr "Nuevo tablero"
 
 #: jsLoader.php:220
 msgid "New element"
@@ -12872,7 +12872,7 @@ msgstr ""
 
 #: include/classes/api/services/CDashboard.php:462
 msgid "Only super admins can set dashboard owner."
-msgstr ""
+msgstr "Solo super admins pueden definir el propietario del tablero."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Only super admins can update correlations."
@@ -13495,7 +13495,7 @@ msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:110 jsLoader.php:134
 msgid "Paste widget"
-msgstr ""
+msgstr "Pegar widget"
 
 #: jsLoader.php:223
 msgid "Paste without external links"
@@ -14273,7 +14273,7 @@ msgstr ""
 
 #: jsLoader.php:147
 msgid "Release to create a widget."
-msgstr ""
+msgstr "Soltar para crear widget."
 
 #: include/views/general.login.php:76
 msgid "Remember me for 30 days"
@@ -15358,7 +15358,7 @@ msgstr ""
 
 #: include/classes/widgets/fields/CWidgetFieldWidgetSelect.php:75
 msgid "Select widget"
-msgstr "Seleccione widget"
+msgstr "Seleccionar widget"
 
 #: app/views/administration.script.edit.php:88
 #: include/views/monitoring.history.php:190
@@ -17330,7 +17330,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1622
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "El prototipo de trigger \"%1$s\" debe tener al menos un prototipo de item."
 
 #: trigger_prototypes.php:250
 msgid "Trigger prototype added"
@@ -18034,7 +18034,7 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
-msgstr ""
+msgstr "Usuario \"%1$s\" es el propietario del tablero \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1023
 #, c-format
@@ -18888,7 +18888,7 @@ msgstr "Cuándo está activo"
 
 #: jsLoader.php:152
 msgid "Widget is too small for the specified number of columns and rows."
-msgstr ""
+msgstr "Widget muy pequeño para el numero de columnas y filas especificadas."
 
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:774
@@ -19236,7 +19236,7 @@ msgstr "Tú no tienes permiso para crear usuarios."
 
 #: jsLoader.php:145
 msgid "You do not have permissions to edit dashboard"
-msgstr ""
+msgstr "No tienes permisos para editar tableros"
 
 #: include/func.inc.php:1534
 msgid "You have no permissions to access this page."
@@ -20301,7 +20301,7 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:1209
 #: include/classes/validators/CApiInputValidator.php:1253
 msgid "must contain at least one low-level discovery macro"
-msgstr ""
+msgstr "debe tener al menos una macro de descubrimiento de bajo nivel"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
@@ -20670,7 +20670,7 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1855
 msgid "trigger expression must contain at least one host:key reference"
-msgstr ""
+msgstr "la expresión de trigger debe tener al menos una referencia de host:key"
 
 #: include/classes/api/services/CTriggerGeneral.php:1634
 msgid "trigger prototype cannot be moved to another template or host"
