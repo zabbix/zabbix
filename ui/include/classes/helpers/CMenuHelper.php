@@ -74,6 +74,10 @@ class CMenuHelper {
 				? (new CMenuItem(_('Services')))
 					->setUrl(new CUrl('srv_status.php'), 'srv_status.php')
 					->setAliases(['report.services', 'chart5.php'])
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
+				? (new CMenuItem(_('New Services')))
+					->setAction('service.list')
 				: null
 		];
 		$submenu_monitoring = array_filter($submenu_monitoring);

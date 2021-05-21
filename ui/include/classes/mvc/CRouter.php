@@ -223,6 +223,7 @@ class CRouter {
 		'script.list'								=> ['CControllerScriptList',							'layout.htmlpage',		'administration.script.list'],
 		'script.update'								=> ['CControllerScriptUpdate',							null,					null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
+		'service.list'								=> ['CControllerServiceList',							'layout.htmlpage',		'monitoring.service.list'],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],
 		'tabfilter.profile.update'					=> ['CControllerTabFilterProfileUpdate',				'layout.json',			null],
 		'template.dashboard.delete'					=> ['CControllerTemplateDashboardDelete',				null,					null],
