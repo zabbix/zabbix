@@ -346,13 +346,11 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 				: $value;
 		}, $macros);
 
-		$msg = [
+		echo makeMessageBox(ZBX_STYLE_MSG_WARNING, [[
 			'type' => 'error',
 			'message' => _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
 			'src' => ''
-		];
-
-		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
+		]]);
 	}
 
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);

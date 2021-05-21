@@ -1594,9 +1594,21 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
-{
-	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+
+/**
+ * Create a message box.
+ *
+ * @param string      $class           CSS class of the message box.
+ *                                     Possible values: ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
+ * @param array       $messages
+ * @param string|null $title
+ * @param bool        $show_close_box
+ * @param bool        $show_details
+ *
+ * @return CTag
+ */
+function makeMessageBox(string $class, array $messages, ?string $title = null, bool $show_close_box = true,
+		bool $show_details = false): CTag {
 	$msg_details = null;
 	$link_details = null;
 
@@ -1638,11 +1650,17 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$title = new CSpan($title);
 	}
 
+	$aria_labels = [
+		ZBX_STYLE_MSG_GOOD => _('Success message'),
+		ZBX_STYLE_MSG_BAD => _('Error message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message')
+	];
+
 	// Details link should be in front of title.
 	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
 		->addClass($class)
 		->setAttribute('role', 'contentinfo')
-		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
+		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1700,7 +1718,7 @@ function getMessages($good = false, $title = null, $show_close_box = true) {
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title, $show_close_box)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $messages, $title, $show_close_box)
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -1891,8 +1909,8 @@ function get_prepared_messages(array $options = []): ?string {
 
 	$html = '';
 	foreach (array_merge($messages_authentication, $messages_session, $messages_current) as $box) {
-		$html .= makeMessageBox($box['is_good'], $box['messages'], $box['title'], $box['show_close_box'],
-			$box['show_details']
+		$html .= makeMessageBox($box['is_good'] ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $box['messages'],
+			$box['title'], $box['show_close_box'], $box['show_details']
 		)->toString();
 	}
 

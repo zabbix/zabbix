@@ -205,7 +205,7 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
-			$message_box = makeMessageBox(false, $messages, null, false, true);
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, null, false, true);
 		}
 		else {
 			$message_box = null;
@@ -318,7 +318,9 @@ class CSetupWizard extends CForm {
 		if ($this->STEP_FAILED) {
 			global $ZBX_MESSAGES;
 
-			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, $ZBX_MESSAGES, _('Cannot connect to the database.'), false,
+				true
+			);
 		}
 		else {
 			$message_box = null;
@@ -464,7 +466,9 @@ class CSetupWizard extends CForm {
 
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
 
-			$message_box = makeMessageBox(false, $messages, _('Cannot create the configuration file.'), false, true);
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, _('Cannot create the configuration file.'),
+				false, true
+			);
 			$message = [
 				new CTag('p', true, _('Alternatively, you can install it manually:')),
 				new CTag('ol', true, [

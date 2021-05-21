@@ -46,7 +46,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				'message' => _('No permissions to referred object or it does not exist!')
 			]];
 
-			return $this->getOutput(makeMessageBox(false, $messages, null, false, false));
+			return $this->getOutput(makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, null, false));
 		}
 
 		$httptest['lastfailedstep'] = 0;
