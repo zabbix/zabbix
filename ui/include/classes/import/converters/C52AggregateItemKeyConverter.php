@@ -60,8 +60,6 @@ class C52AggregateItemKeyConverter extends CConverter {
 	 * @return string  Converted item key.
 	 */
 	public function convert($value) {
-		$this->item_key = '';
-
 		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {
 			return $value;
 		}
@@ -74,9 +72,8 @@ class C52AggregateItemKeyConverter extends CConverter {
 		}
 
 		$params = $params['parameters'];
-		$this->item_key = trim($this->item_key_parser->getParam(1));
+		$item_key = '/*/'.trim($this->item_key_parser->getParam(1));
 		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
-		$item_key = '/*/'.$this->item_key;
 		$host_groups = [$params[0]['raw']];
 
 		if ($params[0]['type'] == CItemKey::PARAM_ARRAY) {
