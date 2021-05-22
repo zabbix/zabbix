@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-18T06:58:16Z</date>
+   <date>2021-05-22T08:41:29Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -287,7 +287,7 @@ function getSipPeers() {
         }
     });
     asterisk.sip.trunks.forEach(function (trunk) {
-        var active_channels = channels.match(new RegExp('[^!J]SIP/' + escChars(trunk.ObjectName), 'g'));
+        var active_channels = channels.match(new RegExp('[^!J]SIP/' + escapeChars(trunk.ObjectName), 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
         asterisk.sip.active_channels += trunk.active_channels;
     });
@@ -316,8 +316,8 @@ function getIaxPeerList() {
     });
     asterisk.iax.online = asterisk.iax.total - asterisk.iax.offline;
     asterisk.iax.trunks.forEach(function (trunk) {
-        var active_channels = channels.match(new RegExp('[^!](IAX2/' + escChars(trunk.ObjectName) +
-            '|IAX2/' + escChars(trunk.ObjectUsername) + ')', 'g'));
+        var active_channels = channels.match(new RegExp('[^!](IAX2/' + escapeChars(trunk.ObjectName) +
+            '|IAX2/' + escapeChars(trunk.ObjectUsername) + ')', 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
         asterisk.iax.active_channels += trunk.active_channels;
     });
@@ -338,7 +338,7 @@ function getPjsipShowEndpoints() {
     });
     asterisk.pjsip.available = asterisk.pjsip.total - asterisk.pjsip.unavailable;
     asterisk.pjsip.trunks.forEach(function (trunk) {
-        var active_channels = channels.match(new RegExp('[^!]PJSIP/' + escChars(trunk.ObjectName), 'g'));
+        var active_channels = channels.match(new RegExp('[^!]PJSIP/' + escapeChars(trunk.ObjectName), 'g'));
         trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
         asterisk.pjsip.active_channels += trunk.active_channels;
     });
@@ -350,7 +350,7 @@ function getQueueSummary() {
     asterisk.queue.total = asterisk.queue.queues.length;
 }
 
-function escChars(str) {
+function escapeChars(str) {
     return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&amp;');
 }
 
