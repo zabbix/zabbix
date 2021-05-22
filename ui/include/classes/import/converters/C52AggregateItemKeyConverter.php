@@ -72,32 +72,18 @@ class C52AggregateItemKeyConverter extends CConverter {
 		}
 
 		$params = $params['parameters'];
-		$item_key = '/*/'.trim($this->item_key_parser->getParam(1));
-		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
-		$host_groups = [$params[0]['raw']];
-
-		if ($params[0]['type'] == CItemKey::PARAM_ARRAY) {
-			$host_groups = array_column($params[0]['parameters'], 'raw');
-		}
+		$host_groups = ($params[0]['type'] == CItemKey::PARAM_ARRAY) ? $params[0]['parameters'] : [$params[0]];
 
 		foreach ($host_groups as &$host_group) {
-			if ($host_group[0] === '"') {
-				$host_group = str_replace('\\"', '"', substr($host_group, 1, -1));
-			}
-		}
-		unset($host_group);
-
-		$host_groups = array_filter($host_groups, 'strlen');
-
-		foreach ($host_groups as &$host_group) {
+			$host_group = ($host_group['type'] == CItemKey::PARAM_QUOTED)
+				? CItemKey::unquoteParam($host_group['raw'])
+				: $host_group['raw'];
 			$host_group = CFilterParser::quoteString($host_group);
 		}
 		unset($host_group);
 
-		if ($host_groups) {
-			$item_key .= '?[group='.implode(' or group=', $host_groups).']';
-		}
-
+		$item_key = '/*/'.trim($this->item_key_parser->getParam(1)).'?[group='.implode(' or group=', $host_groups).']';
+		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
 		$timeperiod = $this->item_key_parser->getParam(3);
 		$new_value = substr($this->item_key_parser->getKey(), 3).'('.$func_foreach.'('.$item_key;
 
