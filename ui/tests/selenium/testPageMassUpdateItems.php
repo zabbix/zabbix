@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  * TODO: This annotation should be removed after ZBX-19257 is fixed.
  * @ignore-browser-errors
  */
-class testPageMassUpdateItems extends testMassUpdateItems{
+class testPageMassUpdateItems extends testMassUpdateItems {
 
 	/**
 	 * Add items for mass updating.
