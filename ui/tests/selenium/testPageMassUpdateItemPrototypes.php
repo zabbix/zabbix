@@ -44,7 +44,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m'
 			],
 			[
@@ -54,7 +54,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
 			],
 			[
@@ -64,7 +64,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY1}]',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '3m'
 			],
 			[
@@ -74,7 +74,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY2}]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '4m'
 			],
 			[
@@ -84,7 +84,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ipmi1[{#KEY}]',
 				'type' => 12,
 				'value_type' => 0,
-				'interfaceid'=> self::IPMI_INTERFACE_ID,
+				'interfaceid' => self::IPMI_INTERFACE_ID,
 				'delay' => '10m',
 				'ipmi_sensor' => 'temp'
 			],
@@ -95,7 +95,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ipmi2[{#KEY}]',
 				'type' => 12,
 				'value_type' => 3,
-				'interfaceid'=> self::IPMI_INTERFACE_ID,
+				'interfaceid' => self::IPMI_INTERFACE_ID,
 				'delay' => '11s',
 				'ipmi_sensor' => 'temp'
 			],
@@ -106,7 +106,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmp1[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '9m',
 				'snmp_oid' => '.1.3.6.1.2.1.1.1.0'
 			],
@@ -117,7 +117,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmp2[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '101s',
 				'snmp_oid' => '.1.3.8.1.2.1.1.1.0'
 			],
@@ -128,7 +128,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '22s',
 				'authtype' => 0,
 				'username' => 'username1',
@@ -141,7 +141,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '55s',
 				'authtype' => 0,
 				'username' => 'username2',
@@ -194,10 +194,10 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'value_type' => 0,
 				'delay' => '50s',
 				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'Item_tag_name',
-						'value'=> 'Item_tag_value'
+						'tag' => 'Item_tag_name',
+						'value' => 'Item_tag_value'
 					]
 				]
 			],
@@ -210,14 +210,14 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'value_type' => 0,
 				'delay' => '30s',
 				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'Item_tag_name_1',
-						'value'=> 'Item_tag_value_1'
+						'tag' => 'Item_tag_name_1',
+						'value' => 'Item_tag_value_1'
 					],
 					[
-						'tag'=> 'Item_tag_name_2',
-						'value'=> 'Item_tag_value_2'
+						'tag' => 'Item_tag_name_2',
+						'value' => 'Item_tag_value_2'
 					]
 				]
 			],
@@ -253,7 +253,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		return [
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -267,7 +267,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'7_IPMI',
 						'8_IPMI'
 					],
@@ -307,12 +307,12 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'old_tag_1',
-						'value'=> 'old_value_1'
+						'tag' => 'old_tag_1',
+						'value' => 'old_value_1'
 					]
 				],
 				'preprocessing' => [
@@ -337,16 +337,16 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'old_tag_2',
-						'value'=> 'old_value_2'
+						'tag' => 'old_tag_2',
+						'value' => 'old_value_2'
 					],
 					[
-						'tag'=> 'old_tag_3',
-						'value'=> 'old_value_3'
+						'tag' => 'old_tag_3',
+						'value' => 'old_value_3'
 					]
 				],
 				'preprocessing' => [
@@ -371,7 +371,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m'
 			],
 			[
@@ -381,7 +381,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
 			],
 			[
@@ -391,16 +391,16 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.tags.replace[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'Replace_tag_1',
-						'value'=> 'replace_value_1'
+						'tag' => 'Replace_tag_1',
+						'value' => 'replace_value_1'
 					],
 					[
-						'tag'=> 'Replace_tag_2',
-						'value'=> 'Replace_value_2'
+						'tag' => 'Replace_tag_2',
+						'value' => 'Replace_value_2'
 					]
 				]
 			],
@@ -411,12 +411,12 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.tags.replace[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'Replace_tag_3',
-						'value'=> 'Replace_value_3'
+						'tag' => 'Replace_tag_3',
+						'value' => 'Replace_value_3'
 					]
 				]
 			],
@@ -427,16 +427,16 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.tags.remove[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'remove_tag_1',
-						'value'=> 'remove_value_1'
+						'tag' => 'remove_tag_1',
+						'value' => 'remove_value_1'
 					],
 					[
-						'tag'=> 'remove_tag_2',
-						'value'=> 'remove_value_2'
+						'tag' => 'remove_tag_2',
+						'value' => 'remove_value_2'
 					]
 				]
 			],
@@ -447,12 +447,12 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.tags.remove[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'remove_tag_2',
-						'value'=> 'remove_value_2'
+						'tag' => 'remove_tag_2',
+						'value' => 'remove_value_2'
 					]
 				]
 			],
@@ -463,12 +463,12 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '3agent.tags.remove[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'tags'=> [
+				'tags' => [
 					[
-						'tag'=> 'remove_tag_3',
-						'value'=> 'remove_value_3'
+						'tag' => 'remove_tag_3',
+						'value' => 'remove_value_3'
 					]
 				]
 			]
