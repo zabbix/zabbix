@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
 
 /**
- * Test the mass update of items.
+ * Test the mass update of item prototypes.
  *
  * @backup items, interface
  */

@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  *
  * @backup items, interface
  */
-class testPageMassUpdateItems extends testMassUpdateItems{
+class testPageMassUpdateItems extends testMassUpdateItems {
 
 	/**
 	 * Add items for mass updating.

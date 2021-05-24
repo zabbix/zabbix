@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 
 /**
- * Test the mass update of items.
+ * Test the mass update of items and item prototypes.
  *
  * @backup items, interface
  */
@@ -1216,7 +1216,9 @@ class testMassUpdateItems extends CWebTest{
 	 * @param    boolean    $prototypes   true if item prototype, false if item
 	 */
 	public function executeItemsMassUpdate($data, $prototypes = false) {
-		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		}
 
 		$form = $this->openMassUpdateForm($prototypes, $data['names']);
 
@@ -1263,7 +1265,7 @@ class testMassUpdateItems extends CWebTest{
 					$container_table = $form->query('id:update_interval')->asTable()->one();
 					$container_table->getRow(0)->getColumn(1)->query('id:delay')->one()->fill($value['Delay']);
 
-					if(array_key_exists('Custom intervals', $value)){
+					if (array_key_exists('Custom intervals', $value)) {
 						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
 								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']);
 					}
@@ -1272,21 +1274,26 @@ class testMassUpdateItems extends CWebTest{
 				case 'History storage period':
 				case 'Trend storage period':
 					$form->query('id', $value['radio']['id'])->one()->asSegmentedRadio()->fill($value['radio']['value']);
-					if(array_key_exists('input', $value)){
+
+					if (array_key_exists('input', $value)) {
 						$form->query('id', $value['input']['id'])->one()->fill($value['input']['value']);
+					}
+
+					if ($value['radio']['value'] === 'Do not keep history') {
+						$this->assertFalse($form->query('id:history')->one()->isVisible());
 					}
 					break;
 
 				case 'Applications':
 					$form->query('id:massupdate_app_action')->asSegmentedRadio()->one()->fill($value['action']);
-					if(array_key_exists('applications', $value)){
+					if (array_key_exists('applications', $value)) {
 						$form->query('xpath://*[@id="applications_"]/..')->asMultiselect()->one()->fill($value['applications']);
 					}
 					break;
 
 				case 'Application prototypes':
 					$form->query('id:massupdate_app_prot_action')->asSegmentedRadio()->one()->fill($value['action']);
-					if(array_key_exists('applications', $value)){
+					if (array_key_exists('applications', $value)) {
 						$form->query('xpath://*[@id="application_prototypes_"]/..')->asMultiselect()->one()
 								->fill($value['applications']);
 					}
@@ -1354,14 +1361,19 @@ class testMassUpdateItems extends CWebTest{
 
 						case 'History storage period':
 						case 'Trend storage period':
-							if (array_key_exists('input', $value) && $value['input']['value'] === '0' ) {
+							if (CTestArrayHelper::get($value, 'input.value', 'null') === '0' ) {
 								$this->assertEquals('Do not keep '.$value['input']['id'], $form->query('id',
 										$value['radio']['id'])->one()->asSegmentedRadio()->getValue());
 							}
 							else {
 								$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
 										->one()->asSegmentedRadio()->getValue());
-								if (array_key_exists('input', $value)){
+
+								if ($value['radio']['value'] === 'Do not keep history') {
+									$this->assertFalse($form->query('id:history')->one()->isVisible());
+								}
+
+								if (array_key_exists('input', $value)) {
 									$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
 											->one()->getValue());
 								}
@@ -1378,7 +1390,7 @@ class testMassUpdateItems extends CWebTest{
 
 						case 'Update interval':
 							$this->assertEquals($value['Delay'], $form->getField($field)->getValue());
-							if(array_key_exists('Custom intervals', $value)){
+							if (array_key_exists('Custom intervals', $value)) {
 								// Remove action and index fields.
 								foreach($value['Custom intervals'] as &$interval) {
 									unset($interval['action'], $interval['index']);
@@ -1698,7 +1710,9 @@ class testMassUpdateItems extends CWebTest{
 	 * @param    boolean    $prototypes   true if item prototype, false if item
 	 */
 	public function executeItemsPreprocessingMassUpdate($data, $prototypes = false) {
-		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		}
 
 		$form = $this->openMassUpdateForm($prototypes, $data['names']);
 		$form->selectTab('Preprocessing');
