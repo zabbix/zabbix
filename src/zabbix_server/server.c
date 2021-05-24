@@ -1163,7 +1163,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	DBcheck_character_set();
 
 	if (SUCCEED == DBcheck_double_type())
+	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_ENABLED;
+		ZBX_DOUBLE_EPSILON = 2.22e-16;
+	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 
