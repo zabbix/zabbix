@@ -195,6 +195,12 @@ class CApiInputValidator {
 
 			case API_DATE:
 				return self::validateDate($rule, $data, $path, $error);
+
+			case API_NUMERIC_RANGES:
+				return self::validateNumericRanges($rule, $data, $path, $error);
+
+			case API_UUID:
+				return self::validateUuid($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -251,6 +257,8 @@ class CApiInputValidator {
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
 			case API_DATE:
+			case API_NUMERIC_RANGES:
+			case API_UUID:
 				return true;
 
 			case API_OBJECT:
@@ -313,6 +321,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -326,9 +335,27 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'calculated' => true,
+			'host_macro' => true,
+			'empty_host' => true
+		]);
+
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
+			return false;
+		}
+
+		$expression_validator = new CExpressionValidator(['calculated' => true]);
+
+		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
 			return false;
 		}
 
@@ -2031,20 +2058,19 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression([
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'lowercase_errors' => true
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
 			return false;
 		}
 
-		if (!$expression_data->expressions) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('trigger expression must contain at least one host:key reference')
-			);
+		$expression_validator = new CExpressionValidator();
+
+		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
 			return false;
 		}
 
@@ -2157,6 +2183,85 @@ class CApiInputValidator {
 			);
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Validate numeric ranges. Multiple ranges separated by comma character.
+	 * Example:
+	 *   10-20,-20--10,-5-0,0.5-0.7,-20--10,-20.20--20.10
+	 *   30,-10,0.7,-0.5
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateNumericRanges($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$parser = new CRangesParser(['with_minus' => true, 'with_float' => true, 'with_suffix' => true]);
+
+		if ($parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid range expression'));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * UUIDv4 validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuid(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (mb_strlen($data) != 32) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', 32));
+			return false;
+		}
+
+		if (!ctype_xdigit($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$binary = hex2bin($data);
+		if ((ord($binary[6]) & 0xf0) != 0x40 || (ord($binary[8]) & 0xc0) != 0x80) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$data = strtolower($data);
 
 		return true;
 	}

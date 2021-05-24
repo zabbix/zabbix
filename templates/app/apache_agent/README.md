@@ -59,7 +59,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
 
@@ -75,7 +75,7 @@ Example configuration of Apache:
 ```
 
 If you use another path, then don't forget to change `{$APACHE.STATUS.PATH}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/5.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration

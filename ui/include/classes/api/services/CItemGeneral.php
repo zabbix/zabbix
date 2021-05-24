@@ -334,7 +334,8 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'params' => ['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0]
+					'params' =>		['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+					'value_type' =>	['type' => API_INT32, 'in' => ITEM_VALUE_TYPE_UINT64.','.ITEM_VALUE_TYPE_FLOAT]
 				]];
 
 				$data = array_intersect_key($item, $api_input_rules['fields']);
@@ -446,27 +447,6 @@ abstract class CItemGeneral extends CApiService {
 						$fullItem['key_'], $fullItem['name'], $host['name'], $item_key_parser->getError()
 					])
 				);
-			}
-
-			// parameters
-			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
-				$params_num = $item_key_parser->getParamsNum();
-
-				if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
-						|| $params_num > 4 || $params_num < 3
-						|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
-						|| !str_in_array($item_key_parser->getParam(2), ['last', 'min', 'max', 'avg', 'sum', 'count'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()));
-				}
-			}
-
-			// type of information
-			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE && $fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64
-					&& $fullItem['value_type'] != ITEM_VALUE_TYPE_FLOAT) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
 			if (($fullItem['type'] == ITEM_TYPE_TRAPPER || $fullItem['type'] == ITEM_TYPE_HTTPAGENT)
@@ -587,7 +567,59 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->validateValueMaps($items);
 
+		$this->checkAndAddUuid($items, $dbHosts, $update);
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
+	 *   if it doesn't exist.
+	 *
+	 * @param array $items_to_create
+	 * @param array $db_hosts
+	 * @param bool $is_update
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
+		if ($is_update) {
+			foreach ($items_to_create as $index => &$item) {
+				if (array_key_exists('uuid', $item)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
+							_s('unexpected parameter "%1$s"', 'uuid')
+						)
+					);
+				}
+			}
+
+			return;
+		}
+
+		foreach ($items_to_create as $index => &$item) {
+			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+				$item['uuid'] = generateUuidV4();
+			}
+		}
+		unset($item);
+
+		$db_uuid = DB::select('items', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -1002,6 +1034,8 @@ abstract class CItemGeneral extends CApiService {
 
 				// copying item
 				$new_item = $tpl_item;
+				$new_item['uuid'] = '';
+
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];
 				}
@@ -2039,13 +2073,15 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMap']) && $valuemaps) {
 				$params = [
-					'output' => ['valuemapid', 'value', 'newvalue'],
-					'filter' => ['valuemapid' => array_keys($valuemaps)]
+					'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)],
+					'sortfield' => ['sortorder']
 				];
 				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
 
 				while ($mapping = DBfetch($query)) {
 					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'type' => $mapping['type'],
 						'value' => $mapping['value'],
 						'newvalue' => $mapping['newvalue']
 					];

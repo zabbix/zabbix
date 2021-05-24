@@ -1058,6 +1058,23 @@ static void	zbx_main_sigusr_handler(int flags)
 
 }
 
+static void	zbx_check_db(void)
+{
+	struct zbx_json	db_ver;
+
+	zbx_json_initarray(&db_ver, ZBX_JSON_STAT_BUF_LEN);
+
+	if (SUCCEED != DBcheck_capabilities(DBextract_version(&db_ver)) || SUCCEED != DBcheck_version())
+	{
+		zbx_json_free(&db_ver);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_history_check_version(&db_ver);
+	DBflush_version_requirements(db_ver.buffer);
+	zbx_json_free(&db_ver);
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1252,10 +1269,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	DBcheck_capabilities();
+	zbx_check_db();
 
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
 	DBcheck_character_set();
 
 	if (SUCCEED == DBcheck_double_type())

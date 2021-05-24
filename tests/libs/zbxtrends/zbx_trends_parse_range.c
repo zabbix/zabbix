@@ -51,7 +51,7 @@ DB_RESULT	__wrap_DBselect(const char *fmt, ...)
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*period, *shift;
+	const char	*param;
 	int		expected_ret, returned_ret, start, end;
 	char		*error = NULL;
 	zbx_timespec_t	ts_from, ts_start, ts_end, ts;
@@ -66,11 +66,10 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts_from))
 		fail_msg("Invalid input time format");
 
-	period = zbx_mock_get_parameter_string("in.period");
-	shift = zbx_mock_get_parameter_string("in.shift");
+	param = zbx_mock_get_parameter_string("in.param");
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	returned_ret = zbx_trends_parse_range(ts_from.sec, period, shift, &start, &end, &error);
+	returned_ret = zbx_trends_parse_range(ts_from.sec, param, &start, &end, &error);
 
 	if (FAIL == returned_ret)
 	{

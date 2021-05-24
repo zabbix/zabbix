@@ -1836,7 +1836,12 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_create(&functionids);
 	zbx_vector_uint64_create(&itemids);
 
-	get_functionids(&functionids, trigger.expression_orig);
+	zbx_get_serialized_expression_functionids(trigger.expression, trigger.expression_bin, &functionids);
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger.recovery_mode)
+	{
+		zbx_get_serialized_expression_functionids(trigger.recovery_expression, trigger.recovery_expression_bin,
+				&functionids);
+	}
 
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
@@ -1929,7 +1934,7 @@ static	int	postpone_escalation(const DB_ESCALATION *escalation)
 	DB_ROW		row;
 
 	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
-			" and status in (0,3);", escalation->eventid, escalation->actionid);
+			" and status in (0,3)", escalation->eventid, escalation->actionid);
 
 	result = DBselectN(sql, 1);
 	zbx_free(sql);

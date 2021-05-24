@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 This template works with self-hosted GitLab instances. Internal service metrics are collected from GitLab /-/metrics endpoint.
 To access the metrics, the client IP address must be [explicitly allowed](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).

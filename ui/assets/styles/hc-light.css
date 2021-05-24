@@ -1253,6 +1253,19 @@ footer {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+.diff {
+  padding: 4px;
+  background: #ffffff; }
+  .diff .diff-added {
+    background-color: transparent; }
+  .diff .diff-removed {
+    background-color: transparent; }
+  .diff pre {
+    width: max-content;
+    min-width: 100%; }
+    .diff pre > div {
+      white-space: pre; }
+
 .form-search {
   position: relative;
   height: 24px; }
@@ -1929,6 +1942,47 @@ footer {
 
 .selected.expanded .icon-home::before {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -121px -510px; }
+
+.toc .toc-row {
+  padding: 8px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 14px;
+  color: #ffffff;
+  border-bottom: 1px solid #888888;
+  background: #333333; }
+.toc .toc-arrow {
+  min-height: 14px;
+  margin-left: 12px;
+  padding: 0;
+  background-color: transparent;
+  border: 0; }
+  .toc .toc-arrow .arrow-down,
+  .toc .toc-arrow .arrow-up {
+    margin-right: 4px;
+    margin-left: -12px;
+    transform: translateY(-1px); }
+  .toc .toc-arrow .arrow-down {
+    border-top-color: #ffffff; }
+  .toc .toc-arrow .arrow-up {
+    border-bottom-color: #ffffff; }
+  .toc .toc-arrow:focus {
+    margin-bottom: -2px;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: none; }
+.toc .toc-sublist .toc-row {
+  padding-left: 20px;
+  background: #ffffff; }
+.toc .toc-sublist .toc-arrow {
+  color: #000000;
+  border-color: #000000; }
+.toc .toc-sublist .toc-sublist .toc-row {
+  padding-left: 50px; }
+.toc .toc-sublist .arrow-down {
+  border-top-color: #333333; }
+.toc .toc-sublist .arrow-up {
+  border-bottom-color: #333333; }
 
 z-select,
 .z-select {
@@ -2806,6 +2860,15 @@ form.is-loading {
     padding-top: 5px; }
   .table-forms tfoot button, .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
+  .table-forms td {
+    position: relative; }
+    .table-forms td.td-drag-icon {
+      padding: 0 11px 0 0;
+      vertical-align: middle; }
+    .table-forms td .drag-icon {
+      position: absolute;
+      top: 5px;
+      margin-right: 5px; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
@@ -2829,12 +2892,7 @@ form.is-loading {
       padding: 5px 5px 5px 0;
       position: relative; }
       .table-forms .table-forms-td-right td.td-drag-icon {
-        padding: 0 11px 0 0;
-        vertical-align: middle; }
-      .table-forms .table-forms-td-right td .drag-icon {
-        position: absolute;
-        top: 5px;
-        margin-right: 5px; }
+        padding-right: 11px; }
       .table-forms .table-forms-td-right td.center {
         text-align: center;
         vertical-align: middle; }
@@ -3953,6 +4011,9 @@ z-select[disabled] button,
       width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
+    .overlay-dialogue.modal-popup.modal-popup-fullscreen {
+      width: calc(100vw - 40px);
+      max-width: calc(100vw - 40px); }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
@@ -5248,6 +5309,9 @@ svg {
 .display-none, .table-forms li.display-none {
   display: none; }
 
+.visibility-hidden {
+  visibility: hidden; }
+
 .checkbox-list li {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6256,6 +6320,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #888888; }
 
+.mappings-table {
+  display: grid;
+  grid-template-columns: auto auto minmax(auto, 100%); }
+  .mappings-table > div {
+    text-align: left; }
+  .mappings-table > div:nth-child(3n + 2) {
+    text-align: center;
+    padding: 0 10px; }
+
 .valuemap-checkbox {
   margin-top: 10px; }
 
@@ -6264,6 +6337,19 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .subscriptions-table th {
   color: #333333; }
+
+.import-compare {
+  display: flex;
+  max-height: calc(100vh - 190px); }
+  .import-compare .toc {
+    flex: 20%;
+    overflow-y: auto;
+    overflow-x: hidden; }
+  .import-compare .diff {
+    flex: 80%;
+    margin-left: 5px;
+    overflow: auto;
+    border: 1px dashed #888888; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }

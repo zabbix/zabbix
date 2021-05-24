@@ -18,10 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.0beta3');
-define('ZABBIX_API_VERSION',	'5.4.0');
+define('ZABBIX_VERSION',		'6.0.0alpha1');
+define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030163);
+
+define('ZABBIX_DB_VERSION',		5040000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -516,7 +517,7 @@ define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters
 define('ITEM_TYPE_INTERNAL',		5);
 define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
-define('ITEM_TYPE_AGGREGATE',		8);
+define('ITEM_TYPE_AGGREGATE',		8); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_CALCULATED instead.
 define('ITEM_TYPE_HTTPTEST',		9);
 define('ITEM_TYPE_EXTERNAL',		10);
 define('ITEM_TYPE_DB_MONITOR',		11);
@@ -1173,6 +1174,15 @@ define('EXPRESSION_NOT_A_MACRO_ERROR',		'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',		'#ERROR_FUNCTION#');
 define('EXPRESSION_UNSUPPORTED_VALUE_TYPE',	'#ERROR_VALUE_TYPE#');
 
+define('ZBX_FUNCTION_TYPE_AGGREGATE',	0);
+define('ZBX_FUNCTION_TYPE_BITWISE',		1);
+define('ZBX_FUNCTION_TYPE_DATE_TIME',	2);
+define('ZBX_FUNCTION_TYPE_HISTORY',		3);
+define('ZBX_FUNCTION_TYPE_MATH',		4);
+define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
+define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
+define('ZBX_FUNCTION_TYPE_STRING',		7);
+
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
  */
@@ -1265,6 +1275,8 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 ))*? # matches non comma separated brackets with parameters zero or more times
 )');
 
+define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
+
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
 
@@ -1285,6 +1297,14 @@ define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
+
+// Value map mappings type
+define('VALUEMAP_MAPPING_TYPE_EQUAL',			0);
+define('VALUEMAP_MAPPING_TYPE_GREATER_EQUAL',	1);
+define('VALUEMAP_MAPPING_TYPE_LESS_EQUAL',		2);
+define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
+define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
+define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
 
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
@@ -1355,6 +1375,8 @@ define('API_EVENT_NAME',			37);
 define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
+define('API_NUMERIC_RANGES',		41);
+define('API_UUID',					42);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1716,6 +1738,9 @@ define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
+define('ZBX_STYLE_DIFF', 'diff');
+define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
+define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
@@ -1854,6 +1879,7 @@ define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_VALUEMAP_LIST_TABLE', 'valuemap-list-table');
 define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
+define('ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE', 'mappings-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
@@ -1911,6 +1937,12 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_TOC', 'toc');
+define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
+define('ZBX_STYLE_TOC_ITEM', 'toc-item');
+define('ZBX_STYLE_TOC_LIST', 'toc-list');
+define('ZBX_STYLE_TOC_ROW', 'toc-row');
+define('ZBX_STYLE_TOC_SUBLIST', 'toc-sublist');
 define('ZBX_STYLE_TOP', 'top');
 define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');

@@ -30,7 +30,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	protected $expression_macro_parser;
 
 	/**
-	 * @var CFunctionParser
+	 * @var C10FunctionParser
 	 */
 	protected $function_parser;
 
@@ -39,7 +39,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	 */
 	public function __construct() {
 		$this->expression_macro_parser = new CExpressionMacroParser();
-		$this->function_parser = new CFunctionParser();
+		$this->function_parser = new C10FunctionParser();
 	}
 
 	/**
@@ -64,7 +64,7 @@ class CExpressionMacroFunctionParser extends CParser {
 		}
 		$p += $this->expression_macro_parser->getLength();
 
-		if (!isset($source[$p]) || $source[$p] !== '.') {
+		if ($source[$p] !== '.') {
 			return CParser::PARSE_FAIL;
 		}
 		$p++;
@@ -82,6 +82,6 @@ class CExpressionMacroFunctionParser extends CParser {
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return (isset($source[$pos + $this->length]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
+		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
 	}
 }

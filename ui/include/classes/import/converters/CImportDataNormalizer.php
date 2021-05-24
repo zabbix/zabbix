@@ -26,7 +26,8 @@ class CImportDataNormalizer {
 
 	protected $rules;
 
-	const EOL_LF = 0x01;
+	public const EOL_LF = 0x01;
+	public const LOWERCASE = 0x02;
 
 	public function __construct(array $schema) {
 		$this->rules = $schema;
@@ -50,6 +51,10 @@ class CImportDataNormalizer {
 		if (!is_array($data)) {
 			if ($rules['type'] & XML_STRING) {
 				$data = $this->normalizeStrings($data, $rules);
+
+				if (array_key_exists('flags', $rules) && $rules['flags'] & self::LOWERCASE) {
+					$data = mb_strtolower($data);
+				}
 			}
 
 			return $data;

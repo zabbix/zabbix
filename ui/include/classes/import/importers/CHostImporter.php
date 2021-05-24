@@ -22,7 +22,7 @@
 class CHostImporter extends CImporter {
 
 	/**
-	 * @var array		a list of host IDs which were created or updated to create an interface cache for those hosts
+	 * @var array  A list of host IDs which were created or updated to create an interface cache for those hosts.
 	 */
 	protected $processedHostIds = [];
 
@@ -33,12 +33,12 @@ class CHostImporter extends CImporter {
 	 *
 	 * @throws Exception
 	 */
-	public function import(array $hosts) {
-		$hostsToCreate = [];
-		$hostsToUpdate = [];
+	public function import(array $hosts): void {
+		$hosts_to_create = [];
+		$hosts_to_update = [];
 		$valuemaps = [];
-		$templateLinkage = [];
-		$tmpls_to_clear = [];
+		$template_linkage = [];
+		$templates_to_clear = [];
 
 		foreach ($hosts as $host) {
 			/*
@@ -46,116 +46,91 @@ class CHostImporter extends CImporter {
 			 *  - save linkages to add in case if 'create new' linkages is checked;
 			 *  - calculate missing linkages in case if 'delete missing' is checked.
 			 */
-			if (!empty($host['templates'])) {
+			if (array_key_exists('templates', $host)) {
 				foreach ($host['templates'] as $template) {
-					$templateId = $this->referencer->resolveTemplate($template['name']);
-					if (!$templateId) {
+					$templateid = $this->referencer->findTemplateidByHost($template['name']);
+
+					if ($templateid === null) {
 						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
 					}
-					$templateLinkage[$host['host']][] = ['templateid' => $templateId];
+
+					$template_linkage[$host['host']][] = ['templateid' => $templateid];
 				}
 			}
+
 			unset($host['templates']);
 
 			$host = $this->resolveHostReferences($host);
 
-			if (array_key_exists('hostid', $host) && ($this->options['hosts']['updateExisting']
-					|| $this->options['process_hosts'])) {
-				$hostsToUpdate[] = $host;
+			if (array_key_exists('hostid', $host)
+					&& ($this->options['hosts']['updateExisting'] || $this->options['process_hosts'])) {
+				$hosts_to_update[] = $host;
 			}
-			else if ($this->options['hosts']['createMissing']) {
+			elseif ($this->options['hosts']['createMissing']) {
 				if (array_key_exists('hostid', $host)) {
 					throw new Exception(_s('Host "%1$s" already exists.', $host['host']));
 				}
 
-				$hostsToCreate[] = $host;
+				$hosts_to_create[] = $host;
 			}
 
-			if ($host['valuemaps']) {
+			if (array_key_exists('valuemaps', $host)) {
 				$valuemaps[$host['host']] = $host['valuemaps'];
 			}
 		}
 
-		// Get template linkages to unlink and clear.
-		if ($hostsToUpdate && $this->options['templateLinkage']['deleteMissing']) {
-			// Get already linked templates.
-			$db_template_links = API::Host()->get([
-				'output' => ['hostids'],
-				'selectParentTemplates' => ['hostid'],
-				'hostids' => array_column($hostsToUpdate, 'hostid'),
-				'preservekeys' => true
-			]);
+		if ($hosts_to_update) {
+			// Get template linkages to unlink and clear.
+			if ($this->options['templateLinkage']['deleteMissing']) {
+				// Get already linked templates.
+				$db_template_links = API::Host()->get([
+					'output' => ['hostids'],
+					'selectParentTemplates' => ['hostid'],
+					'hostids' => array_column($hosts_to_update, 'hostid'),
+					'preservekeys' => true
+				]);
 
-			foreach ($db_template_links as &$db_template_link) {
-				$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
-			}
-			unset($db_template_link);
-
-			foreach ($hostsToUpdate as $host) {
-				if (array_key_exists($host['host'], $templateLinkage)) {
-					$tmpls_to_clear[$host['hostid']] = array_diff($db_template_links[$host['hostid']],
-						array_column($templateLinkage[$host['host']], 'templateid')
-					);
+				foreach ($db_template_links as &$db_template_link) {
+					$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
 				}
-				else {
-					$tmpls_to_clear[$host['hostid']] = $db_template_links[$host['hostid']];
-				}
-			}
-		}
+				unset($db_template_link);
 
-		// create/update hosts
-		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
-			$newHostIds = API::Host()->create($hostsToCreate);
-			foreach ($newHostIds['hostids'] as $hnum => $hostId) {
-				$hostHost = $hostsToCreate[$hnum]['host'];
-				$this->processedHostIds[$hostHost] = $hostId;
-
-				$this->referencer->addHostRef($hostHost, $hostId);
-
-				if ($this->options['templateLinkage']['createMissing'] && !empty($templateLinkage[$hostHost])) {
-					API::Template()->massAdd([
-						'hosts' => ['hostid' => $hostId],
-						'templates' => $templateLinkage[$hostHost]
-					]);
-				}
-
-				if ($this->options['valueMaps']['createMissing'] && array_key_exists($hostHost, $valuemaps)) {
-					$ins_valuemaps = [];
-					foreach ($valuemaps[$hostHost] as $valuemap) {
-						$valuemap['hostid'] = $hostId;
-						$ins_valuemaps[] = $valuemap;
+				foreach ($hosts_to_update as $host) {
+					if (array_key_exists($host['host'], $template_linkage)) {
+						$templates_to_clear[$host['hostid']] = array_diff(
+							$db_template_links[$host['hostid']],
+							array_column($template_linkage[$host['host']], 'templateid')
+						);
 					}
-
-					if ($ins_valuemaps) {
-						API::ValueMap()->create($ins_valuemaps);
+					else {
+						$templates_to_clear[$host['hostid']] = $db_template_links[$host['hostid']];
 					}
 				}
 			}
-		}
 
-		if ($hostsToUpdate) {
 			if ($this->options['hosts']['updateExisting']) {
-				$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
+				$hosts_to_update = $this->addInterfaceIds($hosts_to_update);
 
-				API::Host()->update($hostsToUpdate);
+				API::Host()->update($hosts_to_update);
 			}
 
-			foreach ($hostsToUpdate as $host) {
+			foreach ($hosts_to_update as $host) {
 				$this->processedHostIds[$host['host']] = $host['hostid'];
 
 				// Drop existing template linkages if 'delete missing' selected.
-				if (array_key_exists($host['hostid'], $tmpls_to_clear) && $tmpls_to_clear[$host['hostid']]) {
+				if (array_key_exists($host['hostid'], $templates_to_clear) && $templates_to_clear[$host['hostid']]) {
 					API::Host()->massRemove([
 						'hostids' => [$host['hostid']],
-						'templateids_clear' => $tmpls_to_clear[$host['hostid']]
+						'templateids_clear' => $templates_to_clear[$host['hostid']]
 					]);
 				}
 
 				// Make new template linkages.
-				if ($this->options['templateLinkage']['createMissing'] && !empty($templateLinkage[$host['host']])) {
+				if ($this->options['templateLinkage']['createMissing']
+						&& array_key_exists($host['host'], $template_linkage)) {
 					API::Template()->massAdd([
 						'hosts' => $host,
-						'templates' => $templateLinkage[$host['host']]
+						'templates' => $template_linkage[$host['host']]
 					]);
 				}
 
@@ -165,95 +140,132 @@ class CHostImporter extends CImporter {
 				]);
 
 				if ($this->options['valueMaps']['createMissing'] && array_key_exists($host['host'], $valuemaps)) {
-					$ins_valuemaps = [];
+					$valuemaps_to_create = [];
 					$valuemap_names = array_column($db_valuemaps, 'name');
+
 					foreach ($valuemaps[$host['host']] as $valuemap) {
 						if (!in_array($valuemap['name'], $valuemap_names)) {
 							$valuemap['hostid'] = $host['hostid'];
-							$ins_valuemaps[] = $valuemap;
+							$valuemaps_to_create[] = $valuemap;
 						}
 					}
 
-					if ($ins_valuemaps) {
-						API::ValueMap()->create($ins_valuemaps);
+					if ($valuemaps_to_create) {
+						API::ValueMap()->create($valuemaps_to_create);
 					}
 				}
 
 				if ($this->options['valueMaps']['updateExisting'] && array_key_exists($host['host'], $valuemaps)) {
-					$upd_valuemaps = [];
+					$valuemaps_to_update = [];
+
 					foreach ($db_valuemaps as $db_valuemap) {
 						foreach ($valuemaps[$host['host']] as $valuemap) {
 							if ($db_valuemap['name'] === $valuemap['name']) {
 								$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
-								$upd_valuemaps[] = $valuemap;
+								$valuemaps_to_update[] = $valuemap;
 							}
 						}
 					}
 
-					if ($upd_valuemaps) {
-						API::ValueMap()->update($upd_valuemaps);
+					if ($valuemaps_to_update) {
+						API::ValueMap()->update($valuemaps_to_update);
 					}
 				}
 
 				if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
-					$del_valuemapids = [];
+					$valuemapids_to_delete = [];
+
 					if (array_key_exists($host['host'], $valuemaps)) {
 						$valuemap_names = array_column($valuemaps[$host['host']], 'name');
+
 						foreach ($db_valuemaps as $db_valuemap) {
 							if (!in_array($db_valuemap['name'], $valuemap_names)) {
-								$del_valuemapids[] = $db_valuemap['valuemapid'];
+								$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
 							}
 						}
 					}
 					else {
-						$del_valuemapids = array_column($db_valuemaps, 'valuemapid');
+						$valuemapids_to_delete = array_column($db_valuemaps, 'valuemapid');
 					}
 
-					if ($del_valuemapids) {
-						API::ValueMap()->delete($del_valuemapids);
+					if ($valuemapids_to_delete) {
+						API::ValueMap()->delete($valuemapids_to_delete);
+					}
+				}
+			}
+		}
+
+		if ($this->options['hosts']['createMissing'] && $hosts_to_create) {
+			$created_hosts = API::Host()->create($hosts_to_create);
+
+			foreach ($hosts_to_create as $index => $host) {
+				$hostid = $created_hosts['hostids'][$index];
+
+				$this->referencer->setDbHost($hostid, $host);
+				$this->processedHostIds[$host['host']] = $hostid;
+
+				if ($this->options['templateLinkage']['createMissing']
+					&& array_key_exists($host['host'], $template_linkage)) {
+					API::Template()->massAdd([
+						'hosts' => ['hostid' => $hostid],
+						'templates' => $template_linkage[$host['host']]
+					]);
+				}
+
+				if ($this->options['valueMaps']['createMissing'] && array_key_exists($host['host'], $valuemaps)) {
+					$valuemaps_to_create = [];
+
+					foreach ($valuemaps[$host['host']] as $valuemap) {
+						$valuemap['hostid'] = $hostid;
+						$valuemaps_to_create[] = $valuemap;
+					}
+
+					if ($valuemaps_to_create) {
+						API::ValueMap()->create($valuemaps_to_create);
 					}
 				}
 			}
 		}
 
 		// create interfaces cache interface_ref->interfaceid
-		$dbInterfaces = API::HostInterface()->get([
+		$db_interfaces = API::HostInterface()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $this->processedHostIds
 		]);
 
 		foreach ($hosts as $host) {
-			if (isset($this->processedHostIds[$host['host']])) {
+			if (array_key_exists($host['host'], $this->processedHostIds)) {
 				foreach ($host['interfaces'] as $interface) {
-					$hostId = $this->processedHostIds[$host['host']];
+					$hostid = $this->processedHostIds[$host['host']];
 
-					if (!isset($this->referencer->interfacesCache[$hostId])) {
-						$this->referencer->interfacesCache[$hostId] = [];
+					if (!array_key_exists($hostid, $this->referencer->interfaces_cache)) {
+						$this->referencer->interfaces_cache[$hostid] = [];
 					}
 
-					foreach ($dbInterfaces as $dbInterface) {
-						if ($hostId == $dbInterface['hostid']
-								&& $dbInterface['ip'] === $interface['ip']
-								&& $dbInterface['dns'] === $interface['dns']
-								&& $dbInterface['useip'] == $interface['useip']
-								&& $dbInterface['port'] == $interface['port']
-								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']) {
+					foreach ($db_interfaces as $db_interface) {
+						if ($db_interface['hostid'] == $hostid
+								&& $db_interface['ip'] === $interface['ip']
+								&& $db_interface['dns'] === $interface['dns']
+								&& $db_interface['useip'] == $interface['useip']
+								&& $db_interface['port'] == $interface['port']
+								&& $db_interface['type'] == $interface['type']
+								&& $db_interface['main'] == $interface['main']) {
 
 							// Check SNMP additional fields.
-							if ($dbInterface['type'] == INTERFACE_TYPE_SNMP) {
+							if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
 								// Get fields that we can compare.
-								$array_diff = array_intersect_key($dbInterface['details'], $interface['details']);
+								$array_diff = array_intersect_key($db_interface['details'], $interface['details']);
+
 								foreach (array_keys($array_diff) as $key) {
 									// Check field equality.
-									if ($dbInterface['details'][$key] != $interface['details'][$key]) {
+									if ($db_interface['details'][$key] != $interface['details'][$key]) {
 										continue 2;
 									}
 								}
 							}
 
-							$refName = $interface['interface_ref'];
-							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
+							$this->referencer->interfaces_cache[$hostid][$interface['interface_ref']]
+								= $db_interface['interfaceid'];
 						}
 					}
 				}
@@ -266,55 +278,61 @@ class CHostImporter extends CImporter {
 	 *
 	 * @return array
 	 */
-	public function getProcessedHostIds() {
+	public function getProcessedHostIds(): array {
 		return $this->processedHostIds;
 	}
 
 	/**
 	 * Change all references in host to database ids.
 	 *
-	 * @throws Exception
-	 *
 	 * @param array $host
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
-	protected function resolveHostReferences(array $host) {
-		foreach ($host['groups'] as $gnum => $group) {
-			$groupId = $this->referencer->resolveGroup($group['name']);
-			if (!$groupId) {
+	protected function resolveHostReferences(array $host): array {
+		foreach ($host['groups'] as $index => $group) {
+			$groupid = $this->referencer->findGroupidByName($group['name']);
+
+			if ($groupid === null) {
 				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
 			}
-			$host['groups'][$gnum] = ['groupid' => $groupId];
+
+			$host['groups'][$index] = ['groupid' => $groupid];
 		}
 
-		if (isset($host['proxy'])) {
-			if (empty($host['proxy'])) {
-				$proxyId = 0;
+		if (array_key_exists('proxy', $host)) {
+			if (!$host['proxy']) {
+				$proxyid = 0;
 			}
 			else {
-				$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
-				if (!$proxyId) {
+				$proxyid = $this->referencer->findProxyidByHost($host['proxy']['name']);
+
+				if ($proxyid === null) {
 					throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
 				}
 			}
 
-			$host['proxy_hostid'] = $proxyId;
+			$host['proxy_hostid'] = $proxyid;
 		}
 
-		if ($hostId = $this->referencer->resolveHost($host['host'])) {
-			$host['hostid'] = $hostId;
+		$hostid = $this->referencer->findHostidByHost($host['host']);
+
+		if ($hostid !== null) {
+			$host['hostid'] = $hostid;
 
 			if (array_key_exists('macros', $host)) {
 				foreach ($host['macros'] as &$macro) {
-					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
-						$macro['hostmacroid'] = $hostMacroId;
+					$hostmacroid = $this->referencer->findMacroid($hostid, $macro['macro']);
+
+					if ($hostmacroid !== null) {
+						$macro['hostmacroid'] = $hostmacroid;
 					}
 				}
 				unset($macro);
 			}
 		}
-
 
 		return $host;
 	}
@@ -322,85 +340,84 @@ class CHostImporter extends CImporter {
 	/**
 	 * For existing hosts we need to set an interfaceid for existing interfaces or they will be added.
 	 *
-	 * @param array $xmlHosts    hosts from XML for which interfaces will be added
+	 * @param array $hosts  Hosts from XML for which interfaces will be added.
 	 *
 	 * @return array
 	 */
-	protected function addInterfaceIds(array $xmlHosts) {
-		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => zbx_objectValues($xmlHosts, 'hostid'),
+	protected function addInterfaceIds(array $hosts): array {
+		$db_interfaces = API::HostInterface()->get([
 			'output' => API_OUTPUT_EXTEND,
+			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
 
 		// build lookup maps for:
 		// - interfaces per host
 		// - default (primary) interface ids per host per interface type
-		$dbHostInterfaces = [];
-		$dbHostMainInterfaceIds = [];
+		$db_host_interfaces = [];
+		$db_host_main_interfaceids = [];
 
-		foreach ($dbInterfaces as $dbInterface) {
-			$dbHostId = $dbInterface['hostid'];
+		foreach ($db_interfaces as $db_interface) {
+			$hostid = $db_interface['hostid'];
 
-			$dbHostInterfaces[$dbHostId][] = $dbInterface;
-			if ($dbInterface['main'] == INTERFACE_PRIMARY) {
-				$dbHostMainInterfaceIds[$dbHostId][$dbInterface['type']] = $dbInterface['interfaceid'];
+			$db_host_interfaces[$hostid][] = $db_interface;
+			if ($db_interface['main'] == INTERFACE_PRIMARY) {
+				$db_host_main_interfaceids[$hostid][$db_interface['type']] = $db_interface['interfaceid'];
 			}
 		}
 
-		foreach ($xmlHosts as &$xmlHost) {
+		foreach ($hosts as &$host) {
 			// If interfaces in XML are non-existent or empty, delete the interfaces on host.
 
-			$xmlHostId = $xmlHost['hostid'];
+			$hostid = $host['hostid'];
 
-			$currentDbHostMainInterfaceIds = isset($dbHostMainInterfaceIds[$xmlHostId])
-				? $dbHostMainInterfaceIds[$xmlHostId]
+			$main_interfaceids = array_key_exists($hostid, $db_host_main_interfaceids)
+				? $db_host_main_interfaceids[$hostid]
 				: [];
 
-			$reusedInterfaceIds = [];
+			$reused_interfaceids = [];
 
-			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
-				$xmlHostInterfaceType = $xmlHostInterface['type'];
-
+			foreach ($host['interfaces'] as &$interface) {
 				// check if an existing interfaceid from current host can be reused
 				// in case there is default (primary) interface in current host with same type
-				if ($xmlHostInterface['main'] == INTERFACE_PRIMARY
-						&& isset($currentDbHostMainInterfaceIds[$xmlHostInterfaceType])) {
-					$dbHostInterfaceId = $currentDbHostMainInterfaceIds[$xmlHostInterfaceType];
+				if ($interface['main'] == INTERFACE_PRIMARY
+						&& array_key_exists($interface['type'], $main_interfaceids)) {
+					$db_interfaceid = $main_interfaceids[$interface['type']];
 
-					$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
-					$reusedInterfaceIds[$dbHostInterfaceId] = true;
+					$interface['interfaceid'] = $db_interfaceid;
+					$reused_interfaceids[$db_interfaceid] = true;
 				}
 			}
-			unset($xmlHostInterface);
+			unset($interface);
 
 			// loop through all interfaces of current host and take interfaceids from ones that
 			// match completely, ignoring hosts from XML with set interfaceids and ignoring hosts
 			// from DB with reused interfaceids
-			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
-				if (!array_key_exists($xmlHostId, $dbHostInterfaces)) {
+			foreach ($host['interfaces'] as &$interface) {
+				if (!array_key_exists($hostid, $db_host_interfaces)) {
 					continue;
 				}
 
-				foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
-					$dbHostInterfaceId = $dbHostInterface['interfaceid'];
+				foreach ($db_host_interfaces[$hostid] as $db_host_interface) {
+					$db_interfaceid = $db_host_interface['interfaceid'];
 
-					if (!isset($xmlHostInterface['interfaceid']) && !isset($reusedInterfaceIds[$dbHostInterfaceId])
-							&& $dbHostInterface['ip'] == $xmlHostInterface['ip']
-							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
-							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
-							&& $dbHostInterface['port'] == $xmlHostInterface['port']
-							&& $dbHostInterface['type'] == $xmlHostInterface['type']) {
-						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
-						$reusedInterfaceIds[$dbHostInterfaceId] = true;
+					if (!array_key_exists('interfaceid', $interface)
+							&& !array_key_exists($db_interfaceid, $reused_interfaceids)
+							&& $db_host_interface['ip'] == $interface['ip']
+							&& $db_host_interface['dns'] == $interface['dns']
+							&& $db_host_interface['useip'] == $interface['useip']
+							&& $db_host_interface['port'] == $interface['port']
+							&& $db_host_interface['type'] == $interface['type']) {
+						$interface['interfaceid'] = $db_interfaceid;
+						$reused_interfaceids[$db_interfaceid] = true;
 						break;
 					}
 				}
 			}
-			unset($xmlHostInterface);
+			unset($interface);
 		}
-		unset($xmlHost);
+		unset($host);
 
-		return $xmlHosts;
+		return $hosts;
 	}
 }

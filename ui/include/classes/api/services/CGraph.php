@@ -354,6 +354,7 @@ class CGraph extends CGraphGeneral {
 
 		foreach ($chdHosts as $chdHost) {
 			$tmpGraph = $graph;
+			$tmpGraph['uuid'] = '';
 			$tmpGraph['templateid'] = $graph['graphid'];
 
 			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
@@ -627,7 +628,7 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 */
-	protected function validateCreate(array $graphs) {
+	protected function validateCreate(array &$graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
 		$this->validateItems($itemIds, $graphs);
 

@@ -1,9 +1,9 @@
 if SERVER
 SERVER_tests = \
-	get_trigger_expression_constant \
 	evaluate_function \
 	substitute_lld_macros \
-	macro_fmttime
+	macro_fmttime \
+	valuemaps
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -40,13 +40,13 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
@@ -55,11 +55,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
@@ -74,6 +74,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
@@ -82,18 +83,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
-
-get_trigger_expression_constant_SOURCES = \
-	get_trigger_expression_constant.c
-
-get_trigger_expression_constant_LDADD = \
-	$(COMMON_LIB_FILES)
-
-get_trigger_expression_constant_LDADD += @SERVER_LIBS@
-
-get_trigger_expression_constant_LDFLAGS = @SERVER_LDFLAGS@
-
-get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 substitute_lld_macros_SOURCES = \
@@ -139,6 +128,16 @@ evaluate_function_LDADD += @SERVER_LIBS@
 
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
+valuemaps_SOURCES = \
+	valuemaps.c \
+	$(COMMON_SRC_FILES)
+
+valuemaps_LDADD = $(COMMON_LIB_FILES)
+
+valuemaps_LDADD += @SERVER_LIBS@
+
+valuemaps_LDFLAGS = @SERVER_LDFLAGS@
+
 VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
@@ -151,12 +150,19 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_history_add_values \
 	-Wl,--wrap=zbx_history_sql_init \
 	-Wl,--wrap=zbx_history_elastic_init \
+	-Wl,--wrap=zbx_elastic_version_extract \
+	-Wl,--wrap=zbx_elastic_version_get \
 	-Wl,--wrap=time \
 	-Wl,--wrap=substitute_simple_macros \
 	-Wl,--wrap=DCget_data_expected_from \
 	-Wl,--wrap=zbx_timespec
 
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory

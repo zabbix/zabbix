@@ -30,16 +30,21 @@
 
 int	zbx_dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed);
 
-static int	str_to_function_type(const char *str)
-{
-	if (0 == strcmp(str, "ZBX_FUNCTION_TYPE_TIMER"))
-		return ZBX_FUNCTION_TYPE_TIMER;
-	if (0 == strcmp(str, "ZBX_FUNCTION_TYPE_TRENDS"))
-		return ZBX_FUNCTION_TYPE_TRENDS;
-	if (0 == strcmp(str, "ZBX_FUNCTION_TYPE_HISTORY"))
-		return ZBX_FUNCTION_TYPE_HISTORY;
+/* copiedf from zbxdbcache/dbconfig.c */
+#define ZBX_TRIGGER_TIMER_TRIGGER		0x0001
+#define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
+#define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 
-	fail_msg("unknown function type \"%s\"", str);
+static int	str_to_timer_type(const char *str)
+{
+	if (0 == strcmp(str, "ZBX_TRIGGER_TIMER_TRIGGER"))
+		return ZBX_TRIGGER_TIMER_TRIGGER;
+	if (0 == strcmp(str, "ZBX_TRIGGER_TIMER_FUNCTION_TIME"))
+		return ZBX_TRIGGER_TIMER_FUNCTION_TIME;
+	if (0 == strcmp(str, "ZBX_TRIGGER_TIMER_FUNCTION_TREND"))
+		return ZBX_TRIGGER_TIMER_FUNCTION_TREND;
+
+	fail_msg("unknown timer type \"%s\"", str);
 
 	return ZBX_FUNCTION_TYPE_UNKNOWN;
 }
@@ -60,10 +65,10 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts_from))
 		fail_msg("Invalid input time format");
 
-	timer.type = str_to_function_type(zbx_mock_get_parameter_string("in.type"));
+	timer.type = str_to_timer_type(zbx_mock_get_parameter_string("in.type"));
 	timer.parameter = zbx_mock_get_parameter_string("in.params");
 
-	if (ZBX_FUNCTION_TYPE_TRENDS == timer.type)
+	if (ZBX_TRIGGER_TIMER_FUNCTION_TREND == timer.type)
 	{
 		if (SUCCEED != zbx_trends_parse_base(timer.parameter, &timer.trend_base, &error))
 		{

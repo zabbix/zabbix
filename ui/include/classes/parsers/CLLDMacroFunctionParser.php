@@ -34,7 +34,7 @@ class CLLDMacroFunctionParser extends CParser {
 	/**
 	 * Parser for trigger functions.
 	 *
-	 * @var CFunctionParser
+	 * @var C10FunctionParser
 	 */
 	private $function_parser;
 
@@ -43,7 +43,7 @@ class CLLDMacroFunctionParser extends CParser {
 	 */
 	public function __construct() {
 		$this->lld_macro_parser = new CLLDMacroParser();
-		$this->function_parser = new CFunctionParser();
+		$this->function_parser = new C10FunctionParser();
 	}
 
 	/**

@@ -122,7 +122,6 @@
 				break;
 
 			case <?= ITEM_TYPE_INTERNAL ?>:
-			case <?= ITEM_TYPE_AGGREGATE ?>:
 			case <?= ITEM_TYPE_EXTERNAL ?>:
 				properties = {
 					key: form_data['key'].trim()

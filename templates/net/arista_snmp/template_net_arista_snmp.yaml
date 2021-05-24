@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:34Z'
+  date: '2021-05-11T08:05:14Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 26674f62500e4e79b9f470bbf962130d
       template: 'Arista SNMP'
       name: 'Arista SNMP'
       description: |
@@ -31,6 +33,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: 8954dfa9dc4445ad987f764e35c7db6e
           name: 'Get sensors'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3,{#THRESHOLD_LO_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.1,{#THRESHOLD_LO_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.2,{#THRESHOLD_HI_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.3,{#THRESHOLD_HI_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.4]'
@@ -64,6 +67,7 @@ zabbix_export:
               value: 'Zabbix raw items'
       discovery_rules:
         -
+          uuid: 54b839c0606741bfad5c84497cf1d295
           name: 'Entity discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -77,6 +81,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 161777c6b77c4c91a11e90dda46d4ec5
               name: '{#ENT_NAME}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
@@ -96,6 +101,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: 2f25bd11644d4bd3917d6c6693e74c99
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
@@ -116,12 +122,14 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 218209a40ec54a489738345c4485be83
+                  expression: '(last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
         -
+          uuid: c78a9f82601847338d687ed01577e958
           name: 'Fan discovery'
           type: DEPENDENT
           key: fan.discovery
@@ -136,6 +144,7 @@ zabbix_export:
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter'
           item_prototypes:
             -
+              uuid: 7d86974a2de14ce3a254172b6bf0761f
               name: '{#SENSOR_INFO}: Fan speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
@@ -152,7 +161,8 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  uuid: 660fd32236464fd69409099c67478ff5
+                  expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -160,9 +170,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  uuid: b1131f42627047ca9629693b91d9185e
+                  expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -170,12 +181,13 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
                       name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
-                      expression: '{Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  uuid: 0cd8e252a77b4c90a155e57aab963e5e
+                  expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -183,9 +195,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  uuid: d37c360fea9143bab6ff07699ed4acb1
+                  expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -193,11 +206,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
                       name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
-                      expression: '{Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
             -
+              uuid: c5e6aaebbf9d467488fdfa1127a31fd7
               name: '{#SENSOR_INFO}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
@@ -216,7 +230,8 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: 11dddf9f12a0423bb886808759cd429d
+                  expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -289,6 +304,7 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
         -
+          uuid: 01b83e46160a437da4345824f472cc3b
           name: 'PSU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -302,6 +318,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 3ec518948c0d4472b55adc761ef7855d
               name: '{#ENT_NAME}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.131.1.1.1.3.{#SNMPINDEX}'
@@ -318,12 +335,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: 4faa99278cd94abaace8b09529a6efaa
+                  expression: 'count(/Arista SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#ENT_NAME}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
         -
+          uuid: 50d834b15d7f4755b1ff89ddba90fa4d
           name: 'Temperature discovery'
           type: DEPENDENT
           key: temp.discovery
@@ -342,6 +361,7 @@ zabbix_export:
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
           item_prototypes:
             -
+              uuid: 2851148fc01c4ba5afb5ab6a3deba5ff
               name: '{#SENSOR_INFO}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
@@ -359,6 +379,7 @@ zabbix_export:
                   tag: Application
                   value: Temperature
             -
+              uuid: 0f769e8ce0b647989085460beb9a2155
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
@@ -382,13 +403,15 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  uuid: 791d55e21828472e93c97d8fa4f96d26
+                  expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  uuid: c65457a8a6d4427995626ff9ff12e339
+                  expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Temperature is above the warning threshold of {#THRESHOLD_HI_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -396,15 +419,17 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
-                      expression: '{Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  uuid: b521cd99d9fb4f6f9d1241ac33c01a86
+                  expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  uuid: 750888bd98fa475dba03591945416b89
+                  expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -412,7 +437,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
-                      expression: '{Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
           master_item:
             key: sensors.get
           overrides:
@@ -481,6 +506,7 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
         -
+          uuid: 3002dbe2caa042dcb2beb058b25500f8
           name: 'Voltage discovery'
           type: DEPENDENT
           key: voltage.discovery
@@ -495,6 +521,7 @@ zabbix_export:
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter'
           item_prototypes:
             -
+              uuid: 7f66af7d12864f2cbaa8a106979ec427
               name: '{#SENSOR_INFO}: Voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
@@ -512,13 +539,15 @@ zabbix_export:
                   value: Voltage
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  uuid: 1c78dea0380a4bf68b05c1323a208c3a
+                  expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
                 -
-                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  uuid: 08b4f59d66ea45eaa95426a27586c4bd
+                  expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Voltage is above the warning threshold of {#THRESHOLD_HI_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -526,15 +555,17 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
-                      expression: '{Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  uuid: d2df35a764234716a286a8019e6c9411
+                  expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
                 -
-                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  uuid: 481908babd3f44b3a73f3e0a628fe6d4
+                  expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -542,7 +573,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
-                      expression: '{Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
           master_item:
             key: sensors.get
           overrides:
@@ -629,6 +660,7 @@ zabbix_export:
           value: '90'
       valuemaps:
         -
+          uuid: 318f3041aea04848a223de86e589c232
           name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
           mappings:
             -
@@ -641,6 +673,7 @@ zabbix_export:
               value: '3'
               newvalue: nonoperational
         -
+          uuid: 15ba17df88eb435d9d48145fba8d9029
           name: 'ENTITY-STATE-MIB::EntityOperState'
           mappings:
             -

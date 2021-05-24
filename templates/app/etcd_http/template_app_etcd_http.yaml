@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:37Z'
+  date: '2021-05-11T08:05:17Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: b25b8b517a4743c48037bfa10af3dc3c
       template: 'Etcd by HTTP'
       name: 'Etcd by HTTP'
       description: |
@@ -17,6 +19,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: 32a59c8e93e141d6a471266df6dbfbd3
           name: 'Etcd: Cluster version'
           type: DEPENDENT
           key: etcd.cluster.version
@@ -42,12 +45,14 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 7c87424c4fb34c56bc9b976755b4ec02
+              expression: '(last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2))=1 and length(last(/Etcd by HTTP/etcd.cluster.version))>0'
               name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 04b0fa552b7d4267b4c5b67ee82ef5f1
           name: 'Etcd: CPU'
           type: DEPENDENT
           key: etcd.cpu.util
@@ -73,6 +78,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: bfa5bd42637642808802f7b2485a0c4d
           name: 'Etcd: DB size'
           type: DEPENDENT
           key: etcd.db.size
@@ -94,6 +100,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: a5bc7ffb090641ab92f537b38b6055e5
           name: 'Etcd: Deletes per second'
           type: DEPENDENT
           key: etcd.delete.rate
@@ -119,6 +126,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 183843bd93f84dc887a03fb638b2d323
           name: 'Etcd: Pending events'
           type: DEPENDENT
           key: etcd.events.sent.rate
@@ -138,6 +146,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 34ffab33275a400ab88e5217dee5ef96
           name: 'Etcd: Get node metrics'
           type: HTTP_AGENT
           key: etcd.get_metrics
@@ -153,6 +162,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: fdf7593420ab42b2a5af8f8b8030b517
           name: 'Etcd: Get version'
           type: HTTP_AGENT
           key: etcd.get_version
@@ -165,6 +175,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: d23baf75628043e193ba0a607e1b4215
           name: 'Etcd: RPCs received per second'
           type: DEPENDENT
           key: etcd.grpc.received.rate
@@ -197,6 +208,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: eda81182710e47e1b5f2f21bb05b4775
           name: 'Etcd: RPCs sent per second'
           type: DEPENDENT
           key: etcd.grpc.sent.rate
@@ -229,6 +241,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: bf59a130b20d480d93eb9330750e8e28
           name: 'Etcd: RPCs started per second'
           type: DEPENDENT
           key: etcd.grpc.started.rate
@@ -261,6 +274,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: e03575f4c472410eb6fbcf731ac6aab2
           name: 'Etcd: Server has a leader'
           type: DEPENDENT
           key: etcd.has.leader
@@ -287,11 +301,13 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 20165719d521453bb239d818ac57805c
+              expression: 'last(/Etcd by HTTP/etcd.has.leader)=0'
               name: 'Etcd: Member has no leader'
               priority: AVERAGE
               description: '"If a member does not have a leader, it is totally unavailable."'
         -
+          uuid: 3fde4db8b9684ba4b56ba915e48957b5
           name: 'Etcd: Node health'
           type: HTTP_AGENT
           key: etcd.health
@@ -324,7 +340,8 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 6acda7bdc9df4a4ab5b7cca76c6369f0
+              expression: 'last(/Etcd by HTTP/etcd.health)=0'
               name: 'Etcd: Node healthcheck failed'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -332,8 +349,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
-                  expression: '{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0'
+                  expression: 'last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0'
         -
+          uuid: 923a408dd4514e808b6e2137a94f8140
           name: 'Etcd: HTTP 4XX'
           type: DEPENDENT
           key: etcd.http.requests.4xx.rate
@@ -366,6 +384,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: c0f27d4bfba344079a31ce8c10b22683
           name: 'Etcd: HTTP 5XX'
           type: DEPENDENT
           key: etcd.http.requests.5xx.rate
@@ -399,11 +418,13 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{min(5m)}>{$ETCD.HTTP.FAIL.MAX.WARN}'
+              uuid: 0302957e0f6b43389546e1cfb958ed9c
+              expression: 'min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}'
               name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
               description: '"Too many reqvests failed on etcd instance with 5xx HTTP code"'
         -
+          uuid: 2a19db1c58ee4a509061fcb1b557c1a3
           name: 'Etcd: HTTP requests received'
           type: DEPENDENT
           key: etcd.http.requests.rate
@@ -436,6 +457,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: b3760811472440baad6a338f481ba13a
           name: 'Etcd: Server is a leader'
           type: DEPENDENT
           key: etcd.is.leader
@@ -464,7 +486,8 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: 44d66eb1a332418daf4c3a1110db5458
+              expression: 'nodata(/Etcd by HTTP/etcd.is.leader,30m)=1'
               name: 'Etcd: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -472,8 +495,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
-                  expression: '{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0'
+                  expression: 'last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0'
         -
+          uuid: ecd1ae9c038f4fc2b720ad562ced0191
           name: 'Etcd: Keys compacted per second'
           type: DEPENDENT
           key: etcd.keys.compacted.rate
@@ -500,6 +524,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: a3f910efb0a04cc494c07b8703f9d2ec
           name: 'Etcd: Keys expired per second'
           type: DEPENDENT
           key: etcd.keys.expired.rate
@@ -524,6 +549,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: fbda737014544cf1bcf544a48aa6e48b
           name: 'Etcd: Keys total'
           type: DEPENDENT
           key: etcd.keys.total
@@ -543,6 +569,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: e45ba61d99b8432b86f5797a2cfdb416
           name: 'Etcd: Leader changes'
           type: DEPENDENT
           key: etcd.leader.changes
@@ -563,11 +590,13 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{delta(15m)}>{$ETCD.LEADER.CHANGES.MAX.WARN}'
+              uuid: 1ea623927179489890a5a73eeb8177f7
+              expression: '(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}'
               name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
               priority: WARNING
               description: 'Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.'
         -
+          uuid: 348e15d2ec3a4bb88e2ca371f96c2f00
           name: 'Etcd: Maximum open file descriptors'
           type: DEPENDENT
           key: etcd.max.fds
@@ -588,6 +617,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: d016b8674ebd4251943f2e94b22f5ff2
           name: 'Etcd: Client gRPC received bytes per second'
           type: DEPENDENT
           key: etcd.network.grpc.received.rate
@@ -613,6 +643,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: e50d2d088c6448dbb3ecaeebc3b2b8f1
           name: 'Etcd: Client gRPC sent bytes per second'
           type: DEPENDENT
           key: etcd.network.grpc.sent.rate
@@ -638,6 +669,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: d5099d4cdb3044ba95935c2aea2b6352
           name: 'Etcd: Open file descriptors'
           type: DEPENDENT
           key: etcd.open.fds
@@ -658,6 +690,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: a2927b1e85af41cab9c28b1b79c229ea
           name: 'Etcd: Proposals applied per second'
           type: DEPENDENT
           key: etcd.proposals.applied.rate
@@ -682,6 +715,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: e829f3df055e42dfbce5f27eb7ca487c
           name: 'Etcd: Proposals committed per second'
           type: DEPENDENT
           key: etcd.proposals.committed.rate
@@ -706,6 +740,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 6b45b99526394a219d31b5c22cb98c85
           name: 'Etcd: Proposals failed per second'
           type: DEPENDENT
           key: etcd.proposals.failed.rate
@@ -731,13 +766,15 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{min(5m)}>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
+              uuid: 432cea8bddd742ca98528be2fbc7e35e
+              expression: 'min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
               name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
               description: |
                 "Normally related to two issues: temporary failures related to a leader election or 
                 longer downtime caused by a loss of quorum in the cluster."
         -
+          uuid: 1c506ff69e7b4564a6d95fd35b1a11fd
           name: 'Etcd: Proposals pending'
           type: DEPENDENT
           key: etcd.proposals.pending
@@ -758,11 +795,13 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{min(5m)}>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
+              uuid: 5feefc4dd5d14fe2b56dd63029b57026
+              expression: 'min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
               name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
               priority: WARNING
               description: '"Rising pending proposals suggests there is a high client load or the member cannot commit proposals."'
         -
+          uuid: bd7398507c274bfab53339380df16761
           name: 'Etcd: PUT per second'
           type: DEPENDENT
           key: etcd.put.rate
@@ -788,6 +827,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: b744c07f3290467b96b21ea38ad5d497
           name: 'Etcd: Range per second'
           type: DEPENDENT
           key: etcd.range.rate
@@ -813,6 +853,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 88c91b36eca94fd2b357a67d171dc621
           name: 'Etcd: Reads per second'
           type: DEPENDENT
           key: etcd.reads.rate
@@ -846,6 +887,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 4b881e32094e4f478c5d0849cb5d07a7
           name: 'Etcd: Resident memory'
           type: DEPENDENT
           key: etcd.res.bytes
@@ -867,6 +909,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: dee9ed8897cf4d3582957707ea09cdf8
           name: 'Etcd: Server version'
           type: DEPENDENT
           key: etcd.server.version
@@ -892,12 +935,14 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: cfb2fc467b224ef694d59b5c081ed965
+              expression: '(last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2))=1 and length(last(/Etcd by HTTP/etcd.server.version))>0'
               name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: b14c787c716146e990bc388d277a2803
           name: 'Etcd: Transaction per second'
           type: DEPENDENT
           key: etcd.txn.rate
@@ -923,6 +968,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 98ec9085d621446aa462efc86cf93905
           name: 'Etcd: Uptime'
           type: DEPENDENT
           key: etcd.uptime
@@ -951,12 +997,14 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: 6843369969f5410a840494104d71fe1f
+              expression: 'last(/Etcd by HTTP/etcd.uptime)<10m'
               name: 'Etcd: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: c35810b8b7bc4a62970b5293fb2d8fb2
           name: 'Etcd: Virtual memory'
           type: DEPENDENT
           key: etcd.virtual.bytes
@@ -978,6 +1026,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: 16c041fc189248bfaaa5826ffaf38459
           name: 'Etcd: Writes per second'
           type: DEPENDENT
           key: etcd.writes.rate
@@ -1010,6 +1059,7 @@ zabbix_export:
               tag: Application
               value: Etcd
         -
+          uuid: a0f94f429b99432e86d15ffa74d6eada
           name: 'Etcd: Service''s TCP port state'
           type: SIMPLE
           key: 'net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]'
@@ -1027,12 +1077,14 @@ zabbix_export:
               value: Etcd
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 74164f0783ae4227ba44f3e865fee3bd
+              expression: 'last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0'
               name: 'Etcd: Service is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 5e6121383e5d4f3eb1150a2068a4633b
           name: 'gRPC codes discovery'
           type: DEPENDENT
           key: etcd.grpc_code.discovery
@@ -1051,6 +1103,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 7d316cbec2ce4718ac133d90b7a89585
               name: 'Etcd: RPCs completed with code {#GRPC.CODE}'
               type: DEPENDENT
               key: 'etcd.grpc.handled.rate[{#GRPC.CODE}]'
@@ -1084,7 +1137,8 @@ zabbix_export:
                   value: Etcd
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ETCD.GRPC.ERRORS.MAX.WARN}'
+                  uuid: 459b6ee5735047d597a6a4ab41b76e21
+                  expression: 'min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}'
                   name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)'
                   priority: WARNING
           master_item:
@@ -1131,12 +1185,14 @@ zabbix_export:
                   status: ENABLED
                   discover: DISCOVER
         -
+          uuid: b7b527ee30b84a569afcd1f85b705810
           name: 'Peers discovery'
           type: DEPENDENT
           key: etcd.peer.discovery
           delay: '0'
           item_prototypes:
             -
+              uuid: 4129aa7b8acf4ca3b5476461fe5275c9
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Bytes received'
               type: DEPENDENT
               key: 'etcd.bytes.received.rate[{#ETCD.PEER}]'
@@ -1164,6 +1220,7 @@ zabbix_export:
                   tag: Application
                   value: 'Etcd peer {#ETCD.PEER}'
             -
+              uuid: 8f5fecbabe474baaab40df46879401af
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Bytes sent'
               type: DEPENDENT
               key: 'etcd.bytes.sent.rate[{#ETCD.PEER}]'
@@ -1191,6 +1248,7 @@ zabbix_export:
                   tag: Application
                   value: 'Etcd peer {#ETCD.PEER}'
             -
+              uuid: 2521ccfc16fc43069001883b85aa0243
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures'
               type: DEPENDENT
               key: 'etcd.received.fail.rate[{#ETCD.PEER}]'
@@ -1218,6 +1276,7 @@ zabbix_export:
                   tag: Application
                   value: 'Etcd peer {#ETCD.PEER}'
             -
+              uuid: 5756f1a16e5c42b79f6d6225c5382599
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Send failures'
               type: DEPENDENT
               key: 'etcd.sent.fail.rate[{#ETCD.PEER}]'
@@ -1306,6 +1365,7 @@ zabbix_export:
           macro: '{$ETCD.USER}'
       valuemaps:
         -
+          uuid: f25e21a70baa4e009bdbcb44acb1a22e
           name: 'Etcd healthcheck'
           mappings:
             -
@@ -1315,6 +1375,7 @@ zabbix_export:
               value: '1'
               newvalue: Ok
         -
+          uuid: 7bcaf8a520e24613a96d49e63a91a55b
           name: 'Etcd leader'
           mappings:
             -
@@ -1324,6 +1385,7 @@ zabbix_export:
               value: '1'
               newvalue: 'Yes'
         -
+          uuid: 1735a8d251b24c3fbab32e766064536b
           name: 'Service state'
           mappings:
             -
@@ -1334,7 +1396,8 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Etcd by HTTP:etcd.open.fds.min(5m)}/{Etcd by HTTP:etcd.max.fds.last()}*100>{$ETCD.OPEN.FDS.MAX.WARN}'
+      uuid: c45583928d204c04ad8884115e1e35c5
+      expression: 'min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}'
       name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: |
@@ -1342,6 +1405,7 @@ zabbix_export:
         If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."
   graphs:
     -
+      uuid: 18baccd03c0f4814a42d32b51334787d
       name: 'Etcd: File descriptors'
       graph_items:
         -
@@ -1358,6 +1422,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.max.fds
     -
+      uuid: eefd07cf30d84cc4b84f802468363200
       name: 'Etcd: gRPC client traffic'
       graph_items:
         -
@@ -1372,6 +1437,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.network.grpc.sent.rate
     -
+      uuid: c53ee0dba42d4a1f8afedbe0f6e42785
       name: 'Etcd: gRPC requests rate'
       graph_items:
         -
@@ -1392,6 +1458,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.grpc.started.rate
     -
+      uuid: 520ff92815d84e0f84e9296d249c04ae
       name: 'Etcd: HTTP requests rate'
       graph_items:
         -
@@ -1412,6 +1479,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.http.requests.rate
     -
+      uuid: 90af5b2f75b7402693bad7a8f371ab8e
       name: 'Etcd: Memory usage'
       graph_items:
         -
@@ -1428,6 +1496,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.virtual.bytes
     -
+      uuid: 59cd15292ad04ebd902a7d3080b53838
       name: 'Etcd: Proposals rate'
       graph_items:
         -
@@ -1456,6 +1525,7 @@ zabbix_export:
             host: 'Etcd by HTTP'
             key: etcd.proposals.pending
     -
+      uuid: b374fab55bcc452e9279214ddb2c8024
       name: 'Etcd: Read/Write rate'
       graph_items:
         -
