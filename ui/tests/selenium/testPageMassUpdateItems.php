@@ -75,22 +75,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 			],
 			[
 				'hostid' => self::HOSTID,
-				'name' => '5_Aggregate',
-				'key_' => 'grpavg["host group","key",avg,last]',
-				'type' => 8,
-				'value_type' => 0,
-				'delay' => '9m'
-			],
-			[
-				'hostid' => self::HOSTID,
-				'name' => '6_Aggregate',
-				'key_' => 'grpmin["host group","key",avg,min]',
-				'type' => 8,
-				'value_type' => 3,
-				'delay' => '30s'
-			],
-			[
-				'hostid' => self::HOSTID,
 				'name' => '7_IPMI',
 				'key_' => 'ipmi1',
 				'type' => 12,

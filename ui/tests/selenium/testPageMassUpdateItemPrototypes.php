@@ -80,24 +80,6 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
-				'name' => '5_Aggregate',
-				'key_' => 'grpavg["host group", [{#KEY}], avg, last]',
-				'type' => 8,
-				'value_type' => 0,
-				'delay' => '9m'
-			],
-			[
-				'hostid' => self::HOSTID,
-				'ruleid' => self::RULEID,
-				'name' => '6_Aggregate',
-				'key_' => 'grpmin["host group", [{#KEY}], avg, min]',
-				'type' => 8,
-				'value_type' => 3,
-				'delay' => '30s'
-			],
-			[
-				'hostid' => self::HOSTID,
-				'ruleid' => self::RULEID,
 				'name' => '7_IPMI',
 				'key_' => 'ipmi1[{#KEY}]',
 				'type' => 12,
@@ -300,15 +282,16 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		];
 	}
 
-	/**
-	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
-	 *
-	 * @dataProvider getCommonChangeData
-	 * @dataProvider getItemPrototypesChangeData
-	 */
-	public function testPageMassUpdateItemPrototypes_ChangeItems($data) {
-		$this->executeItemsMassUpdate($data, true);
-	}
+// Uncomment this scenario when ZBX-19446 is fixed.
+//	/**
+//	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
+//	 *
+//	 * @dataProvider getCommonChangeData
+//	 * @dataProvider getItemPrototypesChangeData
+//	 */
+//	public function testPageMassUpdateItemPrototypes_ChangeItems($data) {
+//		$this->executeItemsMassUpdate($data, true);
+//	}
 
 	/**
 	 * Add items with preprocessing for mass updating.
@@ -499,21 +482,22 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		$this->executeMassUpdateCancel(true);
 	}
 
-	/**
-	 * @dataProvider getCommonTagsChangeData
-	 *
-	 * @depends testPageMassUpdateItemPrototypes_Cancel
-	 */
-	public function testPageMassUpdateItemPrototypes_ChangeTags($data) {
-		$this->executeItemsTagsMassUpdate($data, true);
-	}
+// Uncomment these scenarios when ZBX-19446 is fixed.
+//	/**
+//	 * @dataProvider getCommonTagsChangeData
+//	 *
+//	 * @depends testPageMassUpdateItemPrototypes_Cancel
+//	 */
+//	public function testPageMassUpdateItemPrototypes_ChangeTags($data) {
+//		$this->executeItemsTagsMassUpdate($data, true);
+//	}
 
-	/**
-	 * @dataProvider getCommonPreprocessingChangeData
-	 *
-	 * @depends testPageMassUpdateItemPrototypes_Cancel
-	 */
-	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
-		$this->executeItemsPreprocessingMassUpdate($data, true);
-	}
+//	/**
+//	 * @dataProvider getCommonPreprocessingChangeData
+//	 *
+//	 * @depends testPageMassUpdateItemPrototypes_Cancel
+//	 */
+//	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
+//		$this->executeItemsPreprocessingMassUpdate($data, true);
+//	}
 }

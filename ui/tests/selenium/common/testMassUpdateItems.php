@@ -82,7 +82,7 @@ class testMassUpdateItems extends CWebTest{
 				'ip' => '127.0.5.5',
 				'main' => 0,
 				'port' => '10055',
-				'type'=> 2,
+				'type' => 2,
 				'useip' => 1,
 				'details' => [
 						'version' => 3,
@@ -102,10 +102,10 @@ class testMassUpdateItems extends CWebTest{
 	 */
 	public function getCommonChangeData() {
 		return [
-			[
+				[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'7_IPMI',
 						'8_IPMI'
 					],
@@ -118,21 +118,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix aggregate']
-					],
-					'details' => 'Key "1agent" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)",'.
-							' "Item key", "<last|min|max|avg|sum|count>", "parameter"].'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'13_DB_Monitor',
 						'14_DB_Monitor'
 					],
@@ -145,7 +131,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -159,7 +145,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -174,7 +160,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -191,7 +177,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -208,7 +194,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -225,7 +211,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -243,7 +229,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -261,7 +247,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -279,7 +265,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -297,7 +283,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -315,7 +301,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -333,7 +319,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -351,7 +337,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -369,7 +355,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -383,7 +369,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -397,7 +383,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -412,7 +398,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -427,7 +413,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -450,7 +436,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -473,7 +459,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -495,14 +481,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Headers' => [
 							[
 								'action' => USER_ACTION_UPDATE,
@@ -520,14 +506,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Headers' => [
 							[
 								'action' => USER_ACTION_UPDATE,
@@ -544,14 +530,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
 					],
@@ -561,14 +547,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
 					],
@@ -578,14 +564,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
@@ -595,14 +581,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => ''],
+						'URL' => ['id' => 'url', 'value' => ''],
 					],
 					'details' => 'Invalid parameter "/url": cannot be empty.'
 				]
@@ -610,14 +596,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'JMX agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
-						'JMX endpoint'=> ['id' => 'jmx_endpoint', 'value' => '']
+						'JMX endpoint' => ['id' => 'jmx_endpoint', 'value' => '']
 					],
 					'details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
 				]
@@ -625,14 +611,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'JMX agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
-						'JMX endpoint'=> [
+						'JMX endpoint' => [
 							'id' => 'jmx_endpoint',
 							'value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 						],
@@ -645,14 +631,14 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'JMX agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
-						'JMX endpoint'=> [
+						'JMX endpoint' => [
 							'id' => 'jmx_endpoint',
 							'value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 						],
@@ -665,7 +651,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -679,7 +665,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -692,7 +678,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'17_Script',
 						'18_Script'
 					],
@@ -705,7 +691,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'17_Script',
 						'18_Script'
 					],
@@ -718,7 +704,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'17_Script',
 						'18_Script'
 					],
@@ -730,7 +716,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'17_Script',
 						'18_Script'
 					],
@@ -741,14 +727,14 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent (active)'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
-						'Units'=> ['id' => 'units', 'value' => '$'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Units' => ['id' => 'units', 'value' => '$'],
 						'Update interval' => [
 							'Delay' => '99s',
 							'Custom intervals' => [
@@ -779,7 +765,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -799,7 +785,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -819,7 +805,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -839,7 +825,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -859,7 +845,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -879,13 +865,13 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Simple check'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Log'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Log'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.2:10052'],
 						'User name' => ['id' => 'username', 'value' => 'test_username'],
 						'Password' => ['id' => 'password', 'value' => 'test_password'],
@@ -895,13 +881,13 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix internal'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Text'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Text'],
 						'Update interval' => [
 							'Delay' => '1d',
 							'Custom intervals' => [
@@ -923,20 +909,20 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (unsigned)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (unsigned)'],
 						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '127.0.0.1']
 					]
 				]
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -948,7 +934,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -963,21 +949,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
-						'5_Aggregate',
-						'6_Aggregate'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix aggregate'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
-						'Units' => ['id' => 'units', 'value' => 'kB'],
-						'Update interval' => ['Delay' => '86400']
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -990,14 +962,14 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '{"request": "active checks", "host": "host"}'],
 						'Headers' => [
@@ -1012,20 +984,23 @@ class testMassUpdateItems extends CWebTest{
 								'value' => 'header value 2'
 							]
 						],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Units' => ['id' => 'units', 'value' => 'kB'],
+						'Update interval' => ['Delay' => '86400'],
 						'Enable trapping' => ['id' => 'allow_traps', 'value' => 'Yes']
 					]
 				]
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'JMX agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
-						'JMX endpoint'=> [
+						'JMX endpoint' => [
 							'id' => 'jmx_endpoint',
 							'value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
 						]
@@ -1034,7 +1009,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -1046,13 +1021,13 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'7_IPMI',
 						'8_IPMI'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'IPMI agent'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Units' => ['id' => 'units', 'value' => 'kB'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.3:10053']
 					]
@@ -1060,13 +1035,13 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'3_SNMP_trap',
 						'4_SNMP_trap'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP trap'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055'],
 						'History storage period' => [
 							'radio' => ['id' => 'history_mode', 'value' => 'Do not keep history']
@@ -1080,20 +1055,20 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'9_SNMP_Agent',
 						'10_SNMP_Agent'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Character'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Character'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					]
 				]
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'11_SSH_Agent',
 						'12_SSH_Agent'
 					],
@@ -1108,7 +1083,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'11_SSH_Agent',
 						'12_SSH_Agent'
 					],
@@ -1122,7 +1097,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'13_DB_Monitor',
 						'14_DB_Monitor'
 					],
@@ -1152,7 +1127,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -1165,41 +1140,41 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Calculated'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
 					]
 				]
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'15_Calculated',
 						'16_Calculated'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item'=> ['id' => 'master_item', 'value' => '7_IPMI'],
+						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI'],
 					],
 					'expected_tags' => [
 						'15_Calculated' => [
 							[
-								'tag'=> 'Item_tag_name',
-								'value'=> 'Item_tag_value'
+								'tag' => 'Item_tag_name',
+								'value' => 'Item_tag_value'
 							]
 						],
 						'16_Calculated' =>[
 							[
-								'tag'=> 'Item_tag_name_1',
-								'value'=> 'Item_tag_value_1'
+								'tag' => 'Item_tag_name_1',
+								'value' => 'Item_tag_value_1'
 							],
 							[
-								'tag'=> 'Item_tag_name_2',
-								'value'=> 'Item_tag_value_2'
+								'tag' => 'Item_tag_name_2',
+								'value' => 'Item_tag_value_2'
 							]
 						]
 					]
@@ -1445,7 +1420,7 @@ class testMassUpdateItems extends CWebTest{
 				'key_' => '1agent.preproc',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
 				'preprocessing' => [
 					[
@@ -1468,7 +1443,7 @@ class testMassUpdateItems extends CWebTest{
 				'key_' => '2agent.preproc',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
 				'preprocessing' => [
 					[
@@ -1491,7 +1466,7 @@ class testMassUpdateItems extends CWebTest{
 				'key_' => '1agent.no.preproc',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m'
 			],
 			[
@@ -1500,7 +1475,7 @@ class testMassUpdateItems extends CWebTest{
 				'key_' => '2agent.no.preproc',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
 			]
 		]);
@@ -1511,7 +1486,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1524,7 +1499,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1538,7 +1513,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1551,7 +1526,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1564,7 +1539,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1578,7 +1553,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1591,7 +1566,7 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'2_Item_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -1608,7 +1583,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'2_Item_Tags_Preprocessing'
 					],
@@ -1617,7 +1592,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
@@ -1651,7 +1626,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'2_Item_Tags_Preprocessing'
 					],
@@ -1723,38 +1698,38 @@ class testMassUpdateItems extends CWebTest{
 
 	public function getCommonTagsChangeData() {
 		return [
-			// TODO: Uncomment this case when ZBXNEXT-2976(76) is merged.
-			/*
 			// Empty tag name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'1_Item_No_Tags_Preprocessing'
 					],
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'value' => 'value1'
+					'Tags' => [
+						'action' => 'Add',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'value' => 'value1'
+							]
 						]
 					],
 					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
-			 */
 			// TODO: Uncomment this case when ZBX-19263 is fixed.
 			// Equal tags.
 			/*
 			[
 				[
 					'expected' => TEST_BAD,
-					'names'=> [
+					'names' => [
 						'2_Item_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
-					'tags' => [
+					'Tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -1772,7 +1747,7 @@ class testMassUpdateItems extends CWebTest{
 			*/
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'2_Item_Tags_Preprocessing'
 					],
@@ -1783,18 +1758,18 @@ class testMassUpdateItems extends CWebTest{
 					'expected_tags' => [
 						'1_Item_Tags_Preprocessing' => [
 							[
-								'tag'=> 'old_tag_1',
-								'value'=> 'old_value_1'
+								'tag' => 'old_tag_1',
+								'value' => 'old_value_1'
 							]
 						],
 						'2_Item_Tags_Preprocessing' => [
 							[
-								'tag'=> 'old_tag_2',
-								'value'=> 'old_value_2'
+								'tag' => 'old_tag_2',
+								'value' => 'old_value_2'
 							],
 							[
-								'tag'=> 'old_tag_3',
-								'value'=> 'old_value_3'
+								'tag' => 'old_tag_3',
+								'value' => 'old_value_3'
 							]
 						]
 					]
@@ -1802,7 +1777,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'2_Item_Tags_Preprocessing'
 					],
@@ -1812,34 +1787,34 @@ class testMassUpdateItems extends CWebTest{
 							[
 								'action' => USER_ACTION_UPDATE,
 								'index' => 0,
-								'tag'=> 'added_tag_1',
-								'value'=> 'added_value_1'
+								'tag' => 'added_tag_1',
+								'value' => 'added_value_1'
 							]
 						]
 					],
 					'expected_tags' => [
 						'1_Item_Tags_Preprocessing' => [
 							[
-								'tag'=> 'added_tag_1',
-								'value'=> 'added_value_1'
+								'tag' => 'added_tag_1',
+								'value' => 'added_value_1'
 							],
 							[
-								'tag'=> 'old_tag_1',
-								'value'=> 'old_value_1'
+								'tag' => 'old_tag_1',
+								'value' => 'old_value_1'
 							]
 						],
 						'2_Item_Tags_Preprocessing' => [
 							[
-								'tag'=> 'added_tag_1',
-								'value'=> 'added_value_1'
+								'tag' => 'added_tag_1',
+								'value' => 'added_value_1'
 							],
 							[
-								'tag'=> 'old_tag_2',
-								'value'=> 'old_value_2'
+								'tag' => 'old_tag_2',
+								'value' => 'old_value_2'
 							],
 							[
-								'tag'=> 'old_tag_3',
-								'value'=> 'old_value_3'
+								'tag' => 'old_tag_3',
+								'value' => 'old_value_3'
 							]
 						]
 					]
@@ -1847,7 +1822,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_replace',
 						'2_Item_Tags_replace'
 					],
@@ -1858,14 +1833,14 @@ class testMassUpdateItems extends CWebTest{
 					'expected_tags' => [
 						'1_Item_Tags_replace' => [
 							[
-								'tag'=> '',
-								'value'=> ''
+								'tag' => '',
+								'value' => ''
 							]
 						],
 						'2_Item_Tags_replace' => [
 							[
-								'tag'=> '',
-								'value'=> ''
+								'tag' => '',
+								'value' => ''
 							]
 						]
 					]
@@ -1873,7 +1848,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_replace',
 						'2_Item_Tags_replace'
 					],
@@ -1883,22 +1858,22 @@ class testMassUpdateItems extends CWebTest{
 							[
 								'action' => USER_ACTION_UPDATE,
 								'index' => 0,
-								'tag'=> 'replaced_tag',
-								'value'=> 'replaced_value'
+								'tag' => 'replaced_tag',
+								'value' => 'replaced_value'
 							]
 						]
 					],
 					'expected_tags' => [
 						'1_Item_Tags_replace' => [
 							[
-								'tag'=> 'replaced_tag',
-								'value'=> 'replaced_value'
+								'tag' => 'replaced_tag',
+								'value' => 'replaced_value'
 							]
 						],
 						'2_Item_Tags_replace' => [
 							[
-								'tag'=> 'replaced_tag',
-								'value'=> 'replaced_value'
+								'tag' => 'replaced_tag',
+								'value' => 'replaced_value'
 							]
 						]
 					]
@@ -1906,7 +1881,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_remove',
 						'2_Item_Tags_remove'
 					],
@@ -1914,26 +1889,26 @@ class testMassUpdateItems extends CWebTest{
 						'action' => 'Remove',
 						'tags' => [
 							[
-								'tag'=> '',
-								'value'=> ''
+								'tag' => '',
+								'value' => ''
 							]
 						]
 					],
 					'expected_tags' => [
 						'1_Item_Tags_remove' => [
 							[
-								'tag'=> 'remove_tag_1',
-								'value'=> 'remove_value_1'
+								'tag' => 'remove_tag_1',
+								'value' => 'remove_value_1'
 							],
 							[
-								'tag'=> 'remove_tag_2',
-								'value'=> 'remove_value_2'
+								'tag' => 'remove_tag_2',
+								'value' => 'remove_value_2'
 							]
 						],
 						'2_Item_Tags_remove' => [
 							[
-								'tag'=> 'remove_tag_2',
-								'value'=> 'remove_value_2'
+								'tag' => 'remove_tag_2',
+								'value' => 'remove_value_2'
 							]
 						]
 					]
@@ -1941,7 +1916,7 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_Tags_remove',
 						'2_Item_Tags_remove',
 						'3_Item_Tags_remove'
@@ -1952,28 +1927,28 @@ class testMassUpdateItems extends CWebTest{
 							[
 								'action' => USER_ACTION_UPDATE,
 								'index' => 0,
-								'tag'=> 'remove_tag_2',
-								'value'=> 'remove_value_2'
+								'tag' => 'remove_tag_2',
+								'value' => 'remove_value_2'
 							]
 						]
 					],
 					'expected_tags' => [
 						'1_Item_Tags_remove' => [
 							[
-								'tag'=> 'remove_tag_1',
-								'value'=> 'remove_value_1'
+								'tag' => 'remove_tag_1',
+								'value' => 'remove_value_1'
 							]
 						],
 						'2_Item_Tags_remove' => [
 							[
-								'tag'=> '',
-								'value'=> ''
+								'tag' => '',
+								'value' => ''
 							]
 						],
 						'3_Item_Tags_remove' => [
 							[
-								'tag'=> 'remove_tag_3',
-								'value'=> 'remove_value_3'
+								'tag' => 'remove_tag_3',
+								'value' => 'remove_value_3'
 							]
 						]
 					]
@@ -1982,7 +1957,7 @@ class testMassUpdateItems extends CWebTest{
 			// Different symbols in tag names and values.
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_No_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -1999,10 +1974,9 @@ class testMassUpdateItems extends CWebTest{
 								'tag' => 'tag1',
 								'value' => 'value1'
 							],
-							// TODO: Uncomment this line when ZBXNEXT-2976(76) is merged.
-//							[
-//								'tag' => 'tag2'
-//							],
+							[
+								'tag' => 'tag2'
+							],
 							[
 								'tag' => '{$MACRO:A}',
 								'value' => '{$MACRO:A}'
@@ -2022,7 +1996,7 @@ class testMassUpdateItems extends CWebTest{
 			// Two tags with equal tag names.
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_No_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -2046,7 +2020,7 @@ class testMassUpdateItems extends CWebTest{
 			// Two tags with equal tag values.
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_No_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -2072,7 +2046,7 @@ class testMassUpdateItems extends CWebTest{
 			/*
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_No_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -2094,7 +2068,7 @@ class testMassUpdateItems extends CWebTest{
 			// Tag with long name and value.
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item_No_Tags_Preprocessing',
 						'2_Item_No_Tags_Preprocessing'
 					],
@@ -2123,7 +2097,9 @@ class testMassUpdateItems extends CWebTest{
 	 * @param    boolean    $prototypes   true if item prototype, false if item
 	 */
 	public function executeItemsTagsMassUpdate($data, $prototypes = false) {
-		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+		}
 
 		$dialog = $this->openMassUpdateForm($prototypes, $data['names']);
 		$form = $dialog->asForm();
