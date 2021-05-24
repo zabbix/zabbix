@@ -40,7 +40,10 @@ No specific Zabbix configuration is required.
 |{$AMI.RESPONSE_TIME.MAX.WARN} |<p>The Asterisk Manager API page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$AMI.SECRET} |<p>The Asterisk Manager secret.</p> |`zabbix` |
 |{$AMI.TIMEZONE} |<p>The Asterisk server timezone.</p> |`+0` |
-|{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN} |<p>The maximum number of busy channels for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN} |<p>The maximum number of busy channels of a trunk for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} |<p>The total maximum number of busy channels of IAX trunks for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} |<p>The total maximum number of busy channels of PJSIP trunks for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} |<p>The total maximum number of busy channels of SIP trunks for trigger expression.</p> |`28` |
 |{$AMI.TRUNK_REGEXP} |<p>The regexp for the identification of trunk peers.</p> |`trunk` |
 |{$AMI.URL} |<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p> |`http://asterisk:8088/asterisk/rawman` |
 |{$AMI.USERNAME} |<p>The Asterisk Manager name.</p> |`zabbix` |
@@ -108,6 +111,9 @@ There are no template links in this template.
 |Asterisk: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Asterisk: Failed to fetch AMI page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:asterisk.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
 |Asterisk: has been reloaded (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime_reload.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m) |<p>The SIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}` |WARNING | |
+|Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m) |<p>The IAX trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.iax.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}` |WARNING | |
+|Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m) |<p>The PJSIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.pjsip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}` |WARNING | |
 |SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |
 |SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The SIP trunk may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.active_channels[{#OBJECTNAME}].min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
 |IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |

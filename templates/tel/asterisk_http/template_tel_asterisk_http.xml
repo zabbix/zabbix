@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-24T12:04:27Z</date>
+   <date>2021-05-24T12:54:54Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -482,6 +482,14 @@ return JSON.stringify(asterisk);
                <master_item>
                   <key>asterisk.get_stats</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}</expression>
+                     <name>Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>The IAX trunks may not be able to process new calls.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Asterisk: IAX offline peers</name>
@@ -597,6 +605,14 @@ return JSON.stringify(asterisk);
                <master_item>
                   <key>asterisk.get_stats</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}</expression>
+                     <name>Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>The PJSIP trunks may not be able to process new calls.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Asterisk: PJSIP available endpoints</name>
@@ -689,6 +705,14 @@ return JSON.stringify(asterisk);
                <master_item>
                   <key>asterisk.get_stats</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}</expression>
+                     <name>Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>The SIP trunks may not be able to process new calls.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Asterisk: SIP monitored offline</name>
@@ -1436,9 +1460,24 @@ OK</description>
                <description>The Asterisk server timezone.</description>
             </macro>
             <macro>
+               <macro>{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}</macro>
+               <value>28</value>
+               <description>The total maximum number of busy channels of IAX trunks for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}</macro>
+               <value>28</value>
+               <description>The total maximum number of busy channels of PJSIP trunks for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}</macro>
+               <value>28</value>
+               <description>The total maximum number of busy channels of SIP trunks for trigger expression.</description>
+            </macro>
+            <macro>
                <macro>{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN}</macro>
                <value>28</value>
-               <description>The maximum number of busy channels for trigger expression.</description>
+               <description>The maximum number of busy channels of a trunk for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$AMI.TRUNK_REGEXP}</macro>
