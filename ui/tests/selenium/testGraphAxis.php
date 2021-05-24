@@ -170,7 +170,7 @@ class testGraphAxis extends CWebTest {
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
-
+		sleep(1);
 		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}
 
