@@ -58,6 +58,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;
+extern char		*CONFIG_EXPORT_DIR;
 
 #define ZBX_IDS_SIZE	9
 
@@ -1553,12 +1554,17 @@ static void	DCsync_trends(void)
  *                                                                            *
  * Parameters: history           - [IN] array of history data                 *
  *             history_num       - [IN] number of history structures          *
+ *             history_itemids   - [IN] the item identifiers                  *
+ *                                      (used for item lookup)                *
+ *             history_items     - [IN] the items                             *
+ *             history_errcodes  - [IN] item error codes                      *
  *             timer_triggerids  - [IN] the timer triggerids to process       *
  *             ts                - [IN] timer trigger timestamp               *
  *             trigger_diff      - [OUT] trigger updates                      *
  *                                                                            *
  ******************************************************************************/
 static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
+		const zbx_vector_uint64_t *history_itemids, const DC_ITEM *history_items, const int *history_errcodes,
 		const zbx_vector_uint64_t *timer_triggerids, zbx_timespec_t *ts, zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, item_num = 0;
@@ -1609,7 +1615,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		zbx_dc_get_timer_triggers_by_triggerids(&trigger_info, &trigger_order, timer_triggerids, ts);
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	evaluate_expressions(&trigger_order);
+	evaluate_expressions(&trigger_order, history_itemids, history_items, history_errcodes);
 	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
@@ -1921,9 +1927,11 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
  ******************************************************************************/
 static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_HISTORY *h)
 {
-	zbx_uint64_t	flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK;
+	zbx_uint64_t	flags;
 	const char	*item_error = NULL;
 	zbx_item_diff_t	*diff;
+
+	flags = item->host.proxy_hostid == 0 ? ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK : 0;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
 	{
@@ -1972,6 +1980,9 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 	if (NULL != item_error)
 		flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+
+	if (0 == flags)
+		return NULL;
 
 	diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 	diff->itemid = item->itemid;
@@ -2024,7 +2035,10 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (i != item_diff->values_num)
-			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff);
+		{
+			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
+					ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
+		}
 
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
@@ -2054,7 +2068,6 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	size_t			sql_offset = 0;
 	int			i;
 	zbx_vector_ptr_t	item_diff;
 	zbx_item_diff_t		*diffs;
@@ -2066,8 +2079,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	/* preallocate zbx_item_diff_t structures for item_diff vector */
 	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2086,30 +2097,26 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		zbx_vector_ptr_append(&item_diff, diff);
-
-		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
-			continue;
-
-		if (0 == (ZBX_DC_FLAG_META & history[i].flags))
-			continue;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update item_rtdata"
-				" set lastlogsize=" ZBX_FS_UI64
-					",mtime=%d"
-				" where itemid=" ZBX_FS_UI64 ";\n",
-				history[i].lastlogsize, history[i].mtime, history[i].itemid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
 	if (0 != item_diff.values_num)
+	{
+		size_t	sql_offset = 0;
+
+		zbx_vector_ptr_sort(&item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diff,
+				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
 		DCconfig_items_apply_changes(&item_diff);
+	}
 
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_free(diffs);
@@ -2568,8 +2575,9 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 
 		normalize_item_value(item, h);
 
-		diff = calculate_item_update(item, h);
-		zbx_vector_ptr_append(item_diff, diff);
+		if (NULL != (diff = calculate_item_update(item, h)))
+			zbx_vector_ptr_append(item_diff, diff);
+
 		DCinventory_value_add(inventory_values, item, h);
 
 		if (0 != item->host.proxy_hostid && FAIL == is_item_processed_by_server(item->type, item->key_orig))
@@ -2867,11 +2875,14 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
+	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
+
+	item_retrieve_mode = NULL == CONFIG_EXPORT_DIR ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -2930,6 +2941,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		ZBX_DC_TREND		*trends = NULL;
 		zbx_timespec_t		ts;
 
+		zbx_vector_uint64_create(&itemids);
+
 		*more = ZBX_SYNC_DONE;
 
 		LOCK_CACHE;
@@ -2958,7 +2971,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
 			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
-			zbx_vector_uint64_create(&itemids);
 			zbx_vector_uint64_reserve(&itemids, history_num);
 
 			for (i = 0; i < history_num; i++)
@@ -2966,7 +2978,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
+			DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, history_num,
+					item_retrieve_mode);
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
 					&inventory_values, compression_age, &proxy_subscribtions);
@@ -3020,8 +3033,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				{
 					DBbegin();
 
-					recalculate_triggers(history, history_num, &timer_triggerids, &ts,
-							&trigger_diff);
+					recalculate_triggers(history, history_num, &itemids, items, errcodes,
+							&timer_triggerids, &ts, &trigger_diff);
 
 					/* process trigger events generated by recalculate_triggers() */
 					zbx_process_events(&trigger_diff, &triggerids);
@@ -3129,7 +3142,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		if (0 != history_num)
 		{
 			zbx_free(trends);
-			zbx_vector_uint64_destroy(&itemids);
 			DCconfig_clean_items(items, errcodes, history_num);
 			zbx_free(errcodes);
 			zbx_free(items);
@@ -3137,6 +3149,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			zbx_vector_ptr_clear(&history_items);
 			hc_free_item_values(history, history_num);
 		}
+
+		zbx_vector_uint64_destroy(&itemids);
 
 		/* Exit from sync loop if we have spent too much time here.       */
 		/* This is done to allow syncer process to update its statistics. */
@@ -4235,6 +4249,7 @@ int	hc_queue_get_size(void)
 
 int	hc_get_history_compression_age(void)
 {
+#if defined(HAVE_POSTGRESQL)
 	zbx_config_t	cfg;
 	int		compression_age = 0;
 
@@ -4250,6 +4265,9 @@ int	hc_get_history_compression_age(void)
 	zbx_config_clean(&cfg);
 
 	return compression_age;
+#else
+	return 0;
+#endif
 }
 
 /******************************************************************************

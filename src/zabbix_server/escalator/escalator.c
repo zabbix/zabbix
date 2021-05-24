@@ -1932,6 +1932,29 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
+static	int	postpone_escalation(const DB_ESCALATION *escalation)
+{
+	int		ret;
+	char		*sql;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
+			" and status in (0,3)", escalation->eventid, escalation->actionid);
+
+	result = DBselectN(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != (row = DBfetch(result)))
+		ret = ZBX_ESCALATION_SKIP;
+	else
+		ret = ZBX_ESCALATION_PROCESS;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_escalation                                                 *
@@ -1972,11 +1995,23 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
+
+		if (0 != escalation->r_eventid)
+		{
+			ret = postpone_escalation(escalation);
+			goto out;
+		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
+			if (0 != escalation->r_eventid)
+			{
+				ret = postpone_escalation(escalation);
+				goto out;
+			}
+
 			/* item disabled or deleted? */
 			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
 
@@ -2439,8 +2474,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		{
 			if (0 == escalation->esc_step)
 				escalation_execute(escalation, action, event);
-
-			escalation_recover(escalation, action, event, r_event);
+			else
+				escalation_recover(escalation, action, event, r_event);
 		}
 		else if (escalation->nextcheck <= now)
 		{

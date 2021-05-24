@@ -512,7 +512,8 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 				value->ts, value->state, value->error);
 	}
 	else
-		zbx_lld_process_agent_result(value->itemid, value->result_ptr->result, value->ts, value->error);
+		zbx_lld_process_agent_result(value->itemid, value->hostid, value->result_ptr->result, value->ts,
+				value->error);
 }
 
 /******************************************************************************
