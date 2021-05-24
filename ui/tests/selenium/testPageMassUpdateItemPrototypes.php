@@ -41,7 +41,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
 				'applications' => [5000, 5001],
 				'applicationPrototypes' => [['name' => 'Old Application proto']]
@@ -53,7 +53,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
 				'applications' => [5000, 5001],
 				'applicationPrototypes' => [['name' => 'Old Application proto']]
@@ -65,7 +65,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY1}]',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '3m',
 				'applications' => [5002, 5003],
 				'applicationPrototypes' => [['name' => 'App proto for replace']]
@@ -77,7 +77,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY2}]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '4m',
 				'applications' => [5002, 5003],
 				'applicationPrototypes' => [['name' => 'App proto for replace']]
@@ -89,7 +89,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'grpavg["host group", [{#KEY}], avg, last]',
 				'type' => 8,
 				'value_type' => 0,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '9m',
 				'applications' => [5004, 5005]
 			],
@@ -100,7 +100,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'grpmin["host group", [{#KEY}], avg, min]',
 				'type' => 8,
 				'value_type' => 3,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '30s',
 				'applications' => [5004, 5005],
 				'applicationPrototypes' => [['name' => 'App proto for remove']]
@@ -112,7 +112,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ipmi1[{#KEY}]',
 				'type' => 12,
 				'value_type' => 0,
-				'interfaceid'=> self::IPMI_INTERFACE_ID,
+				'interfaceid' => self::IPMI_INTERFACE_ID,
 				'delay' => '10m',
 				'ipmi_sensor' => 'temp',
 				'applications' => [5002, 5003],
@@ -125,7 +125,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ipmi2[{#KEY}]',
 				'type' => 12,
 				'value_type' => 3,
-				'interfaceid'=> self::IPMI_INTERFACE_ID,
+				'interfaceid' => self::IPMI_INTERFACE_ID,
 				'delay' => '11s',
 				'ipmi_sensor' => 'temp',
 				'applications' => [5002, 5003],
@@ -138,7 +138,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmp1[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '9m',
 				'snmp_oid' => '.1.3.6.1.2.1.1.1.0',
 				'applications' => [5004, 5005],
@@ -151,7 +151,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmp2[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
 				'delay' => '101s',
 				'snmp_oid' => '.1.3.8.1.2.1.1.1.0',
 				'applications' => [5004, 5005],
@@ -164,7 +164,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '22s',
 				'authtype' => 0,
 				'username' => 'username1',
@@ -177,7 +177,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '55s',
 				'authtype' => 0,
 				'username' => 'username2',
@@ -190,7 +190,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'db.odbc.select[{#KEY}]',
 				'type' => 11,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '10s',
 				'username' => 'test_username',
 				'password' => 'test_password',
@@ -211,7 +211,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'db.odbc.select[{#KEY}]',
 				'type' => 11,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '90s',
 				'params' => 'SELECT * FROM items',
 				'preprocessing' => [
@@ -230,7 +230,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'calculated1[{#KEY}]',
 				'type' => 15,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '50s',
 				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'
 			],
@@ -241,7 +241,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'calculated2[{#KEY}]',
 				'type' => 15,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '30s',
 				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)'
 			]
@@ -255,7 +255,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		return [
 			[
 				[
-					'names'=> [
+					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -282,7 +282,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'7_IPMI',
 						'8_IPMI'
 					],
@@ -305,7 +305,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'3_SNMP_trap',
 						'3_SNMP_trap'
 					],
@@ -330,7 +330,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			],
 			[
 				[
-					'names'=> [
+					'names' => [
 						'9_SNMP_Agent',
 						'10_SNMP_Agent'
 					],
@@ -377,7 +377,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
 				'preprocessing' => [
 					[
@@ -401,7 +401,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
 				'applications' => [5000, 5001],
 				'preprocessing' => [
@@ -426,7 +426,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '1agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '1m'
 			],
 			[
@@ -436,7 +436,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => '2agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'interfaceid' => self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
 			]
 		]);
