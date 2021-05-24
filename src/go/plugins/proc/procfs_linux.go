@@ -139,9 +139,10 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 			return nil, err
 		}
 
-		if !entries[0].IsDir() {
+		if len(entries) < 1 || !entries[0].IsDir() {
 			continue
 		}
+
 		var pid int64
 		var tmperr error
 		if pid, tmperr = strconv.ParseInt(entries[0].Name(), 10, 64); tmperr != nil {

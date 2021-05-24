@@ -749,7 +749,6 @@ typedef struct
 	zbx_uint64_t	lastlogsize;
 	unsigned char	state;
 	int		mtime;
-	int		lastclock;
 	const char	*error;
 
 	zbx_uint64_t	flags;
@@ -758,11 +757,9 @@ typedef struct
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		__UINT64_C(0x0002)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		__UINT64_C(0x0004)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		__UINT64_C(0x0008)
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		__UINT64_C(0x1000)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_DB			\
 	(ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR |\
 	ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE)
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE	(ZBX_FLAGS_ITEM_DIFF_UPDATE_DB | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK)
 }
 zbx_item_diff_t;
 
@@ -804,7 +801,8 @@ zbx_proxy_diff_t;
 
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
+		zbx_uint64_t mask);
 
 /* mock field to estimate how much data can be stored in characters, bytes or both, */
 /* depending on database backend                                                    */

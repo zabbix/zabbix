@@ -85,7 +85,6 @@ typedef struct
 	const char		*delay;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
-	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
 	int			history_sec;

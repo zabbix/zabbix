@@ -2834,9 +2834,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				item_hk_local.hostid = item->hostid;
 				item_hk_local.key = item->key;
-				item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-				if (item == item_hk->item_ptr)
+				if (NULL == (item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk,
+						&item_hk_local)))
+				{
+					/* item keys should be unique for items within a host, otherwise items with  */
+					/* same key share index and removal of last added item already cleared index */
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+				else if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
 					zbx_hashset_remove_direct(&config->items_hk, item_hk);
@@ -2883,7 +2889,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->triggers = NULL;
 			item->update_triggers = 0;
 			item->nextcheck = 0;
-			item->lastclock = 0;
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
 			item->mtime = atoi(row[21]);
@@ -3521,9 +3526,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		item_hk_local.hostid = item->hostid;
 		item_hk_local.key = item->key;
-		item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (item == item_hk->item_ptr)
+		if (NULL == (item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local)))
+		{
+			/* item keys should be unique for items within a host, otherwise items with  */
+			/* same key share index and removal of last added item already cleared index */
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+		else if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove_direct(&config->items_hk, item_hk);
@@ -7025,71 +7035,85 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 	return SUCCEED;
 }
 
-static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
+static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
 {
 	const ZBX_DC_IPMIHOST		*ipmihost;
 	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
-	strscpy(dst_host->host, src_host->host);
-	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
-	dst_host->maintenance_status = src_host->maintenance_status;
-	dst_host->maintenance_type = src_host->maintenance_type;
-	dst_host->maintenance_from = src_host->maintenance_from;
-	dst_host->errors_from = src_host->errors_from;
-	dst_host->available = src_host->available;
-	dst_host->disable_until = src_host->disable_until;
-	dst_host->snmp_errors_from = src_host->snmp_errors_from;
-	dst_host->snmp_available = src_host->snmp_available;
-	dst_host->snmp_disable_until = src_host->snmp_disable_until;
-	dst_host->ipmi_errors_from = src_host->ipmi_errors_from;
-	dst_host->ipmi_available = src_host->ipmi_available;
-	dst_host->ipmi_disable_until = src_host->ipmi_disable_until;
-	dst_host->jmx_errors_from = src_host->jmx_errors_from;
-	dst_host->jmx_available = src_host->jmx_available;
-	dst_host->jmx_disable_until = src_host->jmx_disable_until;
 	dst_host->status = src_host->status;
-	strscpy(dst_host->error, src_host->error);
-	strscpy(dst_host->snmp_error, src_host->snmp_error);
-	strscpy(dst_host->ipmi_error, src_host->ipmi_error);
-	strscpy(dst_host->jmx_error, src_host->jmx_error);
-	dst_host->tls_connect = src_host->tls_connect;
-	dst_host->tls_accept = src_host->tls_accept;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
-	strscpy(dst_host->tls_subject, src_host->tls_subject);
 
-	if (NULL == src_host->tls_dc_psk)
+	strscpy(dst_host->host, src_host->host);
+
+	if (ZBX_ITEM_GET_HOSTNAME & mode)
+		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
+
+	if (ZBX_ITEM_GET_MAINTENANCE & mode)
 	{
-		*dst_host->tls_psk_identity = '\0';
-		*dst_host->tls_psk = '\0';
-	}
-	else
-	{
-		strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
-		strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
-	}
-#endif
-	if (NULL != (ipmihost = (ZBX_DC_IPMIHOST *)zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
-	{
-		dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
-		dst_host->ipmi_privilege = ipmihost->ipmi_privilege;
-		strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
-		strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
-	}
-	else
-	{
-		dst_host->ipmi_authtype = ZBX_IPMI_DEFAULT_AUTHTYPE;
-		dst_host->ipmi_privilege = ZBX_IPMI_DEFAULT_PRIVILEGE;
-		*dst_host->ipmi_username = '\0';
-		*dst_host->ipmi_password = '\0';
+		dst_host->maintenance_status = src_host->maintenance_status;
+		dst_host->maintenance_type = src_host->maintenance_type;
+		dst_host->maintenance_from = src_host->maintenance_from;
 	}
 
-	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &src_host->hostid)))
-		dst_host->inventory_mode = (char)host_inventory->inventory_mode;
-	else
-		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
+	if (ZBX_ITEM_GET_HOSTINFO & mode)
+	{
+		dst_host->errors_from = src_host->errors_from;
+		dst_host->available = src_host->available;
+		dst_host->disable_until = src_host->disable_until;
+		dst_host->snmp_errors_from = src_host->snmp_errors_from;
+		dst_host->snmp_available = src_host->snmp_available;
+		dst_host->snmp_disable_until = src_host->snmp_disable_until;
+		dst_host->ipmi_errors_from = src_host->ipmi_errors_from;
+		dst_host->ipmi_available = src_host->ipmi_available;
+		dst_host->ipmi_disable_until = src_host->ipmi_disable_until;
+		dst_host->jmx_errors_from = src_host->jmx_errors_from;
+		dst_host->jmx_available = src_host->jmx_available;
+		dst_host->jmx_disable_until = src_host->jmx_disable_until;
+		strscpy(dst_host->error, src_host->error);
+		strscpy(dst_host->snmp_error, src_host->snmp_error);
+		strscpy(dst_host->ipmi_error, src_host->ipmi_error);
+		strscpy(dst_host->jmx_error, src_host->jmx_error);
+		dst_host->tls_connect = src_host->tls_connect;
+		dst_host->tls_accept = src_host->tls_accept;
+	#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		strscpy(dst_host->tls_issuer, src_host->tls_issuer);
+		strscpy(dst_host->tls_subject, src_host->tls_subject);
+
+		if (NULL == src_host->tls_dc_psk)
+		{
+			*dst_host->tls_psk_identity = '\0';
+			*dst_host->tls_psk = '\0';
+		}
+		else
+		{
+			strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
+			strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
+		}
+	#endif
+		if (NULL != (ipmihost = (ZBX_DC_IPMIHOST *)zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
+		{
+			dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
+			dst_host->ipmi_privilege = ipmihost->ipmi_privilege;
+			strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
+			strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
+		}
+		else
+		{
+			dst_host->ipmi_authtype = ZBX_IPMI_DEFAULT_AUTHTYPE;
+			dst_host->ipmi_privilege = ZBX_IPMI_DEFAULT_PRIVILEGE;
+			*dst_host->ipmi_username = '\0';
+			*dst_host->ipmi_password = '\0';
+		}
+	}
+
+	if (ZBX_ITEM_GET_INVENTORY & mode)
+	{
+		if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &src_host->hostid)))
+			dst_host->inventory_mode = (char)host_inventory->inventory_mode;
+		else
+			dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
+	}
 }
 
 /******************************************************************************
@@ -7115,7 +7139,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 	{
-		DCget_host(host, dc_host);
+		DCget_host(host, dc_host, ZBX_ITEM_GET_ALL);
 		ret = SUCCEED;
 	}
 
@@ -7387,7 +7411,7 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 	dst_interface->port = 0;
 }
 
-static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
+static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
 {
 	const ZBX_DC_NUMITEM		*numitem;
 	const ZBX_DC_LOGITEM		*logitem;
@@ -7405,43 +7429,74 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_HTTPITEM		*httpitem;
 	const ZBX_DC_SCRIPTITEM		*scriptitem;
 
-	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
-	strscpy(dst_item->key_orig, src_item->key);
-	dst_item->key = NULL;
-	dst_item->delay = zbx_strdup(NULL, src_item->delay);
-	dst_item->nextcheck = src_item->nextcheck;
+
 	dst_item->state = src_item->state;
-	dst_item->lastclock = src_item->lastclock;
-	dst_item->flags = src_item->flags;
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
+
 	dst_item->history = src_item->history;
+
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
-	dst_item->history_sec = src_item->history_sec;
 
-	dst_item->error = zbx_strdup(NULL, src_item->error);
+	dst_item->history_sec = src_item->history_sec;
+	strscpy(dst_item->key_orig, src_item->key);
+
+	if (ZBX_ITEM_GET_MISC & mode)
+	{
+		dst_item->itemid = src_item->itemid;			/* set after lock */
+		dst_item->flags = src_item->flags;
+		dst_item->key = NULL;					/* set during initialization */
+	}
+
+	if (ZBX_ITEM_GET_DELAY & mode)
+		dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
+
+	if ((ZBX_ITEM_GET_EMPTY_ERROR & mode) || '\0' != *src_item->error)		/* allocate after lock */
+		dst_item->error = zbx_strdup(NULL, src_item->error);
 
 	switch (src_item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
+			if (0 != (ZBX_ITEM_GET_NUM & mode))
+			{
+				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
 
-			dst_item->trends = numitem->trends;
-			dst_item->trends_sec = numitem->trends_sec;
-			dst_item->units = zbx_strdup(NULL, numitem->units);
+				dst_item->trends = numitem->trends;
+				dst_item->trends_sec = numitem->trends_sec;
+
+				/* allocate after lock */
+				if (0 != (ZBX_ITEM_GET_EMPTY_UNITS & mode) || '\0' != *numitem->units)
+					dst_item->units = zbx_strdup(NULL, numitem->units);
+			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &src_item->itemid)))
-				strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-			else
-				*dst_item->logtimefmt = '\0';
+			if (ZBX_ITEM_GET_LOGTIMEFMT & mode)
+			{
+				if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
+						&src_item->itemid)))
+				{
+					strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+				}
+				else
+					*dst_item->logtimefmt = '\0';
+			}
 			break;
 	}
+
+	if (ZBX_ITEM_GET_INTERFACE & mode)	/* not used by history syncer */
+	{
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+		DCget_interface(&dst_item->interface, dc_interface);
+	}
+
+	if (0 == (ZBX_ITEM_GET_POLLINFO & mode))	/* not used by history syncer */
+		return;
 
 	switch (src_item->type)
 	{
@@ -7684,10 +7739,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		default:
 			/* nothing to do */;
 	}
-
-	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
-
-	DCget_interface(&dst_item->interface, dc_interface);
 }
 
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
@@ -7857,8 +7908,8 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 			continue;
 		}
 
-		DCget_host(&items[i].host, dc_host);
-		DCget_item(&items[i], dc_item);
+		DCget_host(&items[i].host, dc_host, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_ALL);
 		errcodes[i] = SUCCEED;
 	}
 
@@ -7916,12 +7967,66 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 			continue;
 		}
 
-		DCget_host(&items[i].host, dc_host);
-		DCget_item(&items[i], dc_item);
+		DCget_host(&items[i].host, dc_host, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[i], dc_item, ZBX_ITEM_GET_ALL);
 		errcodes[i] = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
+}
+
+void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
+		unsigned int mode)
+{
+	size_t			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host = NULL;
+
+	memset(items, 0, sizeof(DC_ITEM) * (size_t)num);
+	memset(errcodes, 0, sizeof(int) * (size_t)num);
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			{
+				errcodes[i] = FAIL;
+				continue;
+			}
+		}
+
+		DCget_host(&items[i].host, dc_host, mode);
+		DCget_item(&items[i], dc_item, mode);
+	}
+
+	UNLOCK_CACHE;
+
+	/* avoid unnecessary allocations inside lock if there are no error or units */
+	for (i = 0; i < num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		items[i].itemid = itemids[i];
+
+		if (NULL == items[i].error)
+			items[i].error = zbx_strdup(NULL, "");
+
+		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+		{
+			if (NULL == items[i].units)
+				items[i].units = zbx_strdup(NULL, "");
+		}
+	}
 }
 
 /******************************************************************************
@@ -8091,7 +8196,7 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 			continue;
 		}
 
-		DCget_host(&hosts[i], dc_host);
+		DCget_host(&hosts[i], dc_host, ZBX_ITEM_GET_ALL);
 		errcodes[i] = SUCCEED;
 	}
 
@@ -8326,7 +8431,8 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 	int		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
 
-	WRLOCK_CACHE;
+	/* no other process can modify already locked triggers without write lock */
+	RDLOCK_CACHE;
 
 	for (i = 0; i < triggerids->values_num; i++)
 	{
@@ -8542,14 +8648,30 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
  ******************************************************************************/
 void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit)
 {
-	zbx_trigger_timer_t	*first_timer = NULL;
+	zbx_trigger_timer_t	*first_timer = NULL, *timer;
+	int			found = 0;
+	zbx_binary_heap_elem_t	*elem;
+
+	RDLOCK_CACHE;
+
+	if (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue))
+	{
+		elem = zbx_binary_heap_find_min(&config->trigger_queue);
+		timer = (zbx_trigger_timer_t *)elem->data;
+
+		if (timer->exec_ts.sec <= now)
+			found = 1;
+	}
+
+	UNLOCK_CACHE;
+
+	if (0 == found)
+		return;
 
 	WRLOCK_CACHE;
 
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
-		zbx_binary_heap_elem_t	*elem;
-		zbx_trigger_timer_t	*timer;
 		ZBX_DC_TRIGGER		*dc_trigger;
 		ZBX_DC_FUNCTION		*dc_function;
 
@@ -9166,8 +9288,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&(*items)[num].host, dc_host);
-		DCget_item(&(*items)[num], dc_item);
+		DCget_host(&(*items)[num].host, dc_host, ZBX_ITEM_GET_ALL);
+		DCget_item(&(*items)[num], dc_item, ZBX_ITEM_GET_ALL);
 		num++;
 	}
 
@@ -9252,8 +9374,8 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		}
 
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&items[num].host, dc_host);
-		DCget_item(&items[num], dc_item);
+		DCget_host(&items[num].host, dc_host, ZBX_ITEM_GET_ALL);
+		DCget_item(&items[num], dc_item, ZBX_ITEM_GET_ALL);
 		num++;
 	}
 
@@ -9362,8 +9484,8 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 			*items = (DC_ITEM *)zbx_realloc(*items, items_alloc * sizeof(DC_ITEM));
 		}
 
-		DCget_host(&(*items)[items_num].host, dc_host);
-		DCget_item(&(*items)[items_num], dc_item);
+		DCget_host(&(*items)[items_num].host, dc_host, ZBX_ITEM_GET_ALL);
+		DCget_item(&(*items)[items_num], dc_item, ZBX_ITEM_GET_ALL);
 		items_num++;
 	}
 unlock:
@@ -11760,7 +11882,7 @@ static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int fun
 		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		DCget_host(&host, dc_host);
+		DCget_host(&host, dc_host, ZBX_ITEM_GET_ALL);
 		zbx_hashset_insert(hosts, &host, sizeof(host));
 	}
 }
@@ -12770,11 +12892,15 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 
-	WRLOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < values_num; i++)
 	{
 		if (FAIL == errcodes[i])
+			continue;
+
+		/* update nextcheck for items that are counted in queue for monitoring purposes */
+		if (FAIL == zbx_is_counted_in_item_queue(items[i].type, items[i].key_orig))
 			continue;
 
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &items[i].itemid)))
@@ -12792,10 +12918,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 		if (ZBX_LOC_NOWHERE != dc_item->location)
 			continue;
 
-		/* update nextcheck for items that are counted in queue for monitoring purposes */
-		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, ZBX_ITEM_COLLECTED, values[i].ts.sec,
-					NULL);
+		DCitem_nextcheck_update(dc_item, dc_host, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
 	}
 
 	UNLOCK_CACHE;
@@ -12917,9 +13040,6 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
 			dc_item->state = diff->state;
-
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK & diff->flags))
-			dc_item->lastclock = diff->lastclock;
 	}
 
 	UNLOCK_CACHE;

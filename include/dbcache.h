@@ -173,8 +173,6 @@ typedef struct
 	char			*delay;
 	int			history_sec;
 	int			trends_sec;
-	int			nextcheck;
-	int			lastclock;
 	int			mtime;
 	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
@@ -657,6 +655,26 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_UPDATE	1
 #define ZBX_SYNC_SECRETS	2
 
+#define ZBX_ITEM_GET_MISC		0x001
+#define ZBX_ITEM_GET_DELAY		0x002
+#define ZBX_ITEM_GET_EMPTY_ERROR	0x004
+#define ZBX_ITEM_GET_NUM		0x008
+#define ZBX_ITEM_GET_EMPTY_UNITS	0x010
+#define ZBX_ITEM_GET_LOGTIMEFMT		0x020
+#define ZBX_ITEM_GET_POLLINFO		0x040
+#define ZBX_ITEM_GET_INTERFACE		0x080
+#define ZBX_ITEM_GET_HOSTNAME		0x100
+#define ZBX_ITEM_GET_HOSTINFO		0x200
+#define ZBX_ITEM_GET_MAINTENANCE	0x400
+#define ZBX_ITEM_GET_INVENTORY		0x800
+
+#define ZBX_ITEM_GET_ALL		(~(unsigned int)0)
+
+#define ZBX_ITEM_GET_SYNC		(ZBX_ITEM_GET_INVENTORY|ZBX_ITEM_GET_NUM)
+#define ZBX_ITEM_GET_SYNC_EXPORT	(ZBX_ITEM_GET_INVENTORY|ZBX_ITEM_GET_NUM|ZBX_ITEM_GET_HOSTNAME)
+
+#define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
+
 void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -669,6 +687,8 @@ int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
+		unsigned int mode);
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
