@@ -48,3 +48,8 @@ const (
 type msgIfDiscovery struct {
 	Ifname string `json:"{#IFNAME}"`
 }
+
+type msgIfDiscoveryWin struct {
+	Ifname string `json:"{#IFNAME}"`
+	Ifguid string `json:"{#IFGUID}"`
+}

@@ -34,6 +34,7 @@ import (
 const (
 	errorEmptyIpTable = "Empty IP address table returned."
 	errorCannotFindIf = "Cannot obtain network interface information."
+	guidStringLen     = 38
 )
 
 func (p *Plugin) nToIP(addr uint32) net.IP {
@@ -85,6 +86,10 @@ func (p *Plugin) getIfRowByIP(ipaddr string, ifs []win32.MIB_IF_ROW2) (row *win3
 	return
 }
 
+func (p *Plugin) getGuidString(winGuid win32.GUID) string {
+	return fmt.Sprintf("{%08x-%04x-%04x-%02x-%02x}", winGuid.Data1, winGuid.Data2, winGuid.Data3, winGuid.Data4[:2], winGuid.Data4[2:])
+}
+
 func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
 	var ifTable *win32.MIB_IF_TABLE2
 	if ifTable, err = win32.GetIfTable2(); err != nil {
@@ -96,7 +101,9 @@ func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (re
 
 	var row *win32.MIB_IF_ROW2
 	for i := range ifs {
-		if networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
+		if len(networkIf) == guidStringLen && networkIf[0] == '{' && networkIf[guidStringLen-1] == '}' &&
+			networkIf == p.getGuidString(ifs[i].InterfaceGuid) ||
+			networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
 			row = &ifs[i]
 			break
 		}
@@ -144,17 +151,17 @@ func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (re
 	return value, nil
 }
 
-func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
+func (p *Plugin) getDevDiscovery() (devices []msgIfDiscoveryWin, err error) {
 	var table *win32.MIB_IF_TABLE2
 	if table, err = win32.GetIfTable2(); err != nil {
 		return
 	}
 	defer win32.FreeMibTable(table)
 
-	devices = make([]msgIfDiscovery, 0, table.NumEntries)
+	devices = make([]msgIfDiscoveryWin, 0, table.NumEntries)
 	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
 	for i := range rows {
-		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:])})
+		devices = append(devices, msgIfDiscoveryWin{windows.UTF16ToString(rows[i].Description[:]), p.getGuidString(rows[i].InterfaceGuid)})
 	}
 	return
 }
@@ -237,7 +244,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) > 0 {
 			return nil, errors.New(errorParametersNotAllowed)
 		}
-		var devices []msgIfDiscovery
+		var devices []msgIfDiscoveryWin
 		if devices, err = p.getDevDiscovery(); err != nil {
 			return
 		}
