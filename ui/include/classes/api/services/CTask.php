@@ -463,11 +463,27 @@ class CTask extends CApiService {
 				'status' => HOST_STATUS_MONITORED
 			],
 			'templated_hosts' => true,
+			'preservekeys' => true,
 			'nopermissions' => true
 		]);
 
 		if (count($hosts) != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('host is not monitored')));
+			$hosts_not_monitored = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => array_keys(array_diff_key($hostids, $hosts)),
+				'templated_hosts' => true,
+				'nopermissions' => true
+			]);
+
+			$hosts_not_monitored = array_map(function ($host) {
+				return '"'.$host['name'].'"';
+			}, $hosts_not_monitored);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.',
+				_n('host %1$s is not monitored', 'hosts %1$s are not monitored',
+					implode(', ', $hosts_not_monitored), count($hosts_not_monitored)
+				)
+			));
 		}
 	}
 
