@@ -522,9 +522,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -537,9 +537,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -552,9 +552,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -569,9 +569,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -585,9 +585,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -601,9 +601,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'*.create',
+						'dashboard.create',
 						'dashboard.*',
-						'dashboard.create'
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -988,8 +988,9 @@ class testFormUserRoles extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			if (array_key_exists('api_methods', $data)) {
-				$multiselect_field = $this->query('class:multiselect-control')->asMultiselect()->one();
-				$this->assertEquals($data['api_methods'], $multiselect_field->getValue());
+				$api_methods = $this->query('class:multiselect-control')->asMultiselect()->one()->getValue();
+				rsort($api_methods);
+				$this->assertEquals($data['api_methods'], $api_methods);
 			}
 		}
 	}
