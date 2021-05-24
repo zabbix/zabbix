@@ -522,9 +522,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -537,9 +537,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -552,9 +552,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -569,9 +569,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -585,9 +585,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -601,9 +601,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-						'dashboard.create',
+						'*.create',
 						'dashboard.*',
-						'*.create'
+						'dashboard.create'
 					],
 					'message_header' => 'User role created'
 				]
