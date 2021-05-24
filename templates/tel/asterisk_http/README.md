@@ -19,9 +19,11 @@ This template was tested on:
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and
- create Asterisk Manager user with system and command write permissions within your Asterisk instance.  
+ create Asterisk Manager user with system and command write permissions within your Asterisk instance. Disable the PJSIP driver
+ if you do not use PJSIP or do not have PJSIP endpoints.  
 Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status.
 Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.  
+Do not forget to check {$AMI.TIMEZONE} macro and, if it needs, change its value to show right Uptime values.  
 If there are errors, increase the logging to debug level and see the Zabbix server log.
 
 
@@ -37,6 +39,7 @@ No specific Zabbix configuration is required.
 |{$AMI.QUEUE_CALLERS.MAX.WARN} |<p>The maximum number of callers in a queue for trigger expression.</p> |`10` |
 |{$AMI.RESPONSE_TIME.MAX.WARN} |<p>The Asterisk Manager API page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$AMI.SECRET} |<p>The Asterisk Manager secret.</p> |`zabbix` |
+|{$AMI.TIMEZONE} |<p>The Asterisk server timezone.</p> |`+0` |
 |{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN} |<p>The maximum number of busy channels for trigger expression.</p> |`28` |
 |{$AMI.TRUNK_REGEXP} |<p>The regexp for the identification of trunk peers.</p> |`trunk` |
 |{$AMI.URL} |<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p> |`http://asterisk:8088/asterisk/rawman` |
