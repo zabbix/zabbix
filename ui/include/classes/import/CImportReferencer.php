@@ -28,248 +28,447 @@ class CImportReferencer {
 	/**
 	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
 	 */
-	public $interfacesCache = [];
+	public $interfaces_cache = [];
+
 	protected $groups = [];
 	protected $templates = [];
 	protected $hosts = [];
 	protected $items = [];
-	protected $valueMaps = [];
+	protected $valuemaps = [];
 	protected $triggers = [];
 	protected $graphs = [];
-	protected $iconMaps = [];
+	protected $iconmaps = [];
+	protected $images = [];
 	protected $maps = [];
-	protected $templateDashboards = [];
+	protected $template_dashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
-	protected $hostPrototypes = [];
+	protected $host_prototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
-	protected $groupsRefs;
-	protected $templatesRefs;
-	protected $hostsRefs;
-	protected $itemsRefs;
-	protected $valueMapsRefs;
-	protected $triggersRefs;
-	protected $graphsRefs;
-	protected $iconMapsRefs;
-	protected $mapsRefs;
-	protected $templateDashboardsRefs;
-	protected $macrosRefs;
-	protected $proxiesRefs;
-	protected $hostPrototypesRefs;
-	protected $httptestsRefs;
-	protected $httpstepsRefs;
+
+	protected $db_groups;
+	protected $db_templates;
+	protected $db_hosts;
+	protected $db_items;
+	protected $db_valuemaps;
+	protected $db_triggers;
+	protected $db_graphs;
+	protected $db_iconmaps;
+	protected $db_images;
+	protected $db_maps;
+	protected $db_template_dashboards;
+	protected $db_macros;
+	protected $db_proxies;
+	protected $db_host_prototypes;
+	protected $db_httptests;
+	protected $db_httpsteps;
+
+	/**
+	 * Get group ID by group UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findGroupidByUuid(string $uuid): ?string {
+		if ($this->db_groups === null) {
+			$this->selectGroups();
+		}
+
+		foreach ($this->db_groups as $groupid => $group) {
+			if ($group['uuid'] === $uuid) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get group ID by group name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findGroupidByName(string $name): ?string {
+		if ($this->db_groups === null) {
+			$this->selectGroups();
+		}
+
+		foreach ($this->db_groups as $groupid => $group) {
+			if ($group['name'] === $name) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get template ID by group UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateidByUuid(string $uuid): ?string {
+		if ($this->db_templates === null) {
+			$this->selectTemplates();
+		}
+
+		foreach ($this->db_templates as $templateid => $template) {
+			if ($template['uuid'] === $uuid) {
+				return $templateid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get template ID by template host.
+	 *
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateidByHost(string $host): ?string {
+		if ($this->db_templates === null) {
+			$this->selectTemplates();
+		}
+
+		foreach ($this->db_templates as $templateid => $template) {
+			if ($template['host'] === $host) {
+				return $templateid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get host ID by host.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function findHostidByHost(string $name): ?string {
+		if ($this->db_hosts === null) {
+			$this->selectHosts();
+		}
+
+		foreach ($this->db_hosts as $hostid => $host) {
+			if ($host['host'] === $name) {
+				return $hostid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get host ID or template ID by host.
+	 *
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateidOrHostidByHost(string $host): ?string {
+		$templateid = $this->findTemplateidByHost($host);
+
+		if ($templateid !== null) {
+			return $templateid;
+		}
+
+		return $this->findHostidByHost($host);
+	}
+
+	/**
+	 * Get interface ID by host ID and interface reference.
+	 *
+	 * @param string $hostid
+	 * @param string $interface_ref
+	 *
+	 * @return string|null
+	 */
+	public function findInterfaceidByRef(string $hostid, string $interface_ref): ?string {
+		if (array_key_exists($hostid, $this->interfaces_cache)
+				&& array_key_exists($interface_ref, $this->interfaces_cache[$hostid])) {
+			return $this->interfaces_cache[$hostid][$interface_ref];
+		}
+
+		return null;
+	}
 
 	/**
 	 * Initializes references for items.
 	 */
-	public function initItemsReferences() {
-		if ($this->itemsRefs === null) {
+	public function initItemsReferences(): void {
+		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 	}
 
 	/**
-	 * Get group id by name.
+	 * Get item ID by uuid.
 	 *
-	 * @param string $name
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveGroup($name) {
-		if ($this->groupsRefs === null) {
-			$this->selectGroups();
+	public function findItemidByUuid(string $uuid): ?string {
+		if ($this->db_items === null) {
+			$this->selectItems();
 		}
 
-		return isset($this->groupsRefs[$name]) ? $this->groupsRefs[$name] : false;
+		foreach ($this->db_items as $itemid => $item) {
+			if ($item['uuid'] === $uuid) {
+				return $itemid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get host id by host.
-	 *
-	 * @param string $host
-	 *
-	 * @return string|bool
-	 */
-	public function resolveHost($host) {
-		if ($this->hostsRefs === null) {
-			$this->selectHosts();
-		}
-
-		return isset($this->hostsRefs[$host]) ? $this->hostsRefs[$host] : false;
-	}
-
-	/**
-	 * Get interface ID by host ID and interface reference name.
-	 *
-	 * @param string $hostid  Host ID.
-	 * @param string $name    Interface reference name.
-	 *
-	 * @return string|bool
-	 */
-	public function resolveInterface($hostid, $name) {
-		return (array_key_exists($hostid, $this->interfacesCache)
-				&& array_key_exists($name, $this->interfacesCache[$hostid]))
-			? $this->interfacesCache[$hostid][$name]
-			: false;
-	}
-
-	/**
-	 * Get template id by template name.
-	 *
-	 * @param string $host
-	 *
-	 * @return string|bool
-	 */
-	public function resolveTemplate($name) {
-		if ($this->templatesRefs === null) {
-			$this->selectTemplates();
-		}
-
-		return isset($this->templatesRefs[$name]) ? $this->templatesRefs[$name] : false;
-	}
-
-	/**
-	 * Get host or template id by host.
-	 *
-	 * @param string $host
-	 *
-	 * @return string|bool
-	 */
-	public function resolveHostOrTemplate($host) {
-		if ($this->templatesRefs === null) {
-			$this->selectTemplates();
-		}
-		if ($this->hostsRefs === null) {
-			$this->selectHosts();
-		}
-
-		if (isset($this->templatesRefs[$host])) {
-			return $this->templatesRefs[$host];
-		}
-		elseif (isset($this->hostsRefs[$host])) {
-			return $this->hostsRefs[$host];
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Get item id by host id and item key_.
+	 * Get item ID by host ID and item key_.
 	 *
 	 * @param string $hostid
 	 * @param string $key
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveItem($hostid, $key) {
-		if ($this->itemsRefs === null) {
+	public function findItemidByKey(string $hostid, string $key): ?string {
+		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
-		return isset($this->itemsRefs[$hostid][$key]) ? $this->itemsRefs[$hostid][$key] : false;
+		foreach ($this->db_items as $itemid => $item) {
+			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
+				return $itemid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get value map id by vale map name.
+	 * Get valuemap ID by valuemap name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveValueMap($hostid, $name) {
-		if ($this->valueMapsRefs === null) {
-			$this->selectValueMaps();
+	public function findValuemapidByName(string $hostid, string $name): ?string {
+		if ($this->db_valuemaps === null) {
+			$this->selectValuemaps();
 		}
 
-		return isset($this->valueMapsRefs[$hostid][$name]) ? $this->valueMapsRefs[$hostid][$name] : false;
+		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
+			if ($valuemap['hostid'] === $hostid && $valuemap['name'] === $name) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get trigger ID by trigger name and expression.
+	 * Get image ID by image name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findImageidByName(string $name): ?string {
+		if ($this->db_images === null) {
+			$this->selectImages();
+		}
+
+		foreach ($this->db_images as $imageid => $image) {
+			if ($image['name'] === $name) {
+				return $imageid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get trigger by trigger ID.
+	 *
+	 * @param string $triggerid
+	 *
+	 * @return array|null
+	 */
+	public function findTriggerById(string $triggerid): ?array {
+		if ($this->db_triggers === null) {
+			$this->selectTriggers();
+		}
+
+		if (array_key_exists($triggerid, $this->db_triggers)) {
+			return $this->db_triggers[$triggerid];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get trigger ID by trigger UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findTriggeridByUuid(string $uuid): ?string {
+		if ($this->db_triggers === null) {
+			$this->selectTriggers();
+		}
+
+		foreach ($this->db_triggers as $triggerid => $trigger) {
+			if ($trigger['uuid'] === $uuid) {
+				return $triggerid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get trigger ID by trigger name and expressions.
 	 *
 	 * @param string $name
 	 * @param string $expression
 	 * @param string $recovery_expression
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveTrigger($name, $expression, $recovery_expression) {
-		if ($this->triggersRefs === null) {
+	public function findTriggeridByName(string $name, string $expression, string $recovery_expression): ?string {
+		if ($this->db_triggers === null) {
 			$this->selectTriggers();
 		}
 
-		return array_key_exists($name, $this->triggersRefs)
-				&& array_key_exists($expression, $this->triggersRefs[$name])
-				&& array_key_exists($recovery_expression, $this->triggersRefs[$name][$expression])
-			? $this->triggersRefs[$name][$expression][$recovery_expression]
-			: false;
+		foreach ($this->db_triggers as $triggerid => $trigger) {
+			if ($trigger['description'] === $name
+					&& $trigger['expression'] === $expression
+					&& $trigger['recovery_expression'] === $recovery_expression) {
+				return $triggerid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get graph ID by UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findGraphidByUuid(string $uuid): ?string {
+		if ($this->db_graphs === null) {
+			$this->selectGraphs();
+		}
+
+		foreach ($this->db_graphs as $graphid => $graph) {
+			if ($graph['uuid'] === $uuid) {
+				return $graphid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
 	 * Get graph ID by host ID and graph name.
 	 *
-	 * @param string $hostId
+	 * @param string $hostid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveGraph($hostId, $name) {
-		if ($this->graphsRefs === null) {
+	public function findGraphidByName(string $hostid, string $name): ?string {
+		if ($this->db_graphs === null) {
 			$this->selectGraphs();
 		}
 
-		return isset($this->graphsRefs[$hostId][$name]) ? $this->graphsRefs[$hostId][$name] : false;
-	}
-
-	/**
-	 * Get icon map id by name.
-	 *
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveIconMap($name) {
-		if ($this->iconMapsRefs === null) {
-			$this->selectIconMaps();
+		foreach ($this->db_graphs as $graphid => $graph) {
+			if ($graph['name'] === $name && in_array($hostid, $graph['hosts'])) {
+				return $graphid;
+			}
 		}
 
-		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;
+		return null;
 	}
 
 	/**
-	 * Get map id by name.
+	 * Get iconmap ID by name.
 	 *
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveMap($name) {
-		if ($this->mapsRefs === null) {
+	public function findIconmapidByName(string $name): ?string {
+		if ($this->db_iconmaps === null) {
+			$this->selectIconmaps();
+		}
+
+		foreach ($this->db_iconmaps as $iconmapid => $iconmap) {
+			if ($iconmap['name'] === $name) {
+				return $iconmapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get map ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findMapidByName(string $name): ?string {
+		if ($this->db_maps === null) {
 			$this->selectMaps();
 		}
 
-		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
+		foreach ($this->db_maps as $mapid => $map) {
+			if ($map['name'] === $name) {
+				return $mapid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get template dashboard ID by template ID and dashboard name.
+	 * Get template dashboard ID by dashboard UUID.
 	 *
-	 * @param string $templateid
-	 * @param string $name
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
+	 *
+	 * @throws APIException
 	 */
-	public function resolveTemplateDashboards($templateid, $name) {
-		if ($this->templateDashboardsRefs === null) {
+	public function findTemplateDashboardidByUuid(string $uuid): ?string {
+		if ($this->db_template_dashboards === null) {
 			$this->selectTemplateDashboards();
 		}
 
-		return isset($this->templateDashboardsRefs[$templateid][$name])
-			? $this->templateDashboardsRefs[$templateid][$name]
-			: false;
+		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
+			if ($dashboard['uuid'] === $uuid) {
+				return $dashboardid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -278,485 +477,495 @@ class CImportReferencer {
 	 * @param string $hostid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveMacro($hostid, $name) {
-		if ($this->macrosRefs === null) {
+	public function findMacroid(string $hostid, string $name): ?string {
+		if ($this->db_macros === null) {
 			$this->selectMacros();
 		}
 
-		return isset($this->macrosRefs[$hostid][$name]) ? $this->macrosRefs[$hostid][$name] : false;
+		foreach ($this->db_macros as $hostmacroid => $macro) {
+			if ($macro['hostid'] === $hostid && $macro['macro'] === $name) {
+				return $hostmacroid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get proxy id by name.
+	 * Get proxy ID by name.
 	 *
-	 * @param string $name
+	 * @param string $host
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveProxy($name) {
-		if ($this->proxiesRefs === null) {
+	public function findProxyidByHost(string $host): ?string {
+		if ($this->db_proxies === null) {
 			$this->selectProxies();
 		}
 
-		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
+		foreach ($this->db_proxies as $proxyid => $proxy) {
+			if ($proxy['host'] === $host) {
+				return $proxyid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get proxy id by name.
+	 * Get host prototype ID by UUID.
 	 *
-	 * @param string $hostId
-	 * @param string $discoveryRuleId
-	 * @param string $hostPrototype
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveHostPrototype($hostId, $discoveryRuleId, $hostPrototype) {
-		if ($this->hostPrototypesRefs === null) {
+	public function findHostPrototypeidByUuid(string $uuid): ?string {
+		if ($this->db_host_prototypes === null) {
 			$this->selectHostPrototypes();
 		}
 
-		if (isset($this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype])) {
-			return $this->hostPrototypesRefs[$hostId][$discoveryRuleId][$hostPrototype];
+		foreach ($this->db_host_prototypes as $host_prototypeid => $host_prototype) {
+			if ($host_prototype['uuid'] === $uuid) {
+				return $host_prototypeid;
+			}
 		}
-		else {
-			return false;
-		}
+
+		return null;
 	}
 
 	/**
-	 * Get httptestid by hostid and web scenario name.
+	 * Get host prototype ID by host.
+	 *
+	 * @param string $parent_hostid
+	 * @param string $discovery_ruleid
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
+	public function findHostPrototypeidByHost(string $parent_hostid, string $discovery_ruleid, string $host): ?string {
+		if ($this->db_host_prototypes === null) {
+			$this->selectHostPrototypes();
+		}
+
+		foreach ($this->db_host_prototypes as $host_prototypeid => $host_prototype) {
+			if ($host_prototype['parent_hostid'] === $parent_hostid
+					&& $host_prototype['discovery_ruleid'] === $discovery_ruleid
+					&& $host_prototype['host'] === $host) {
+				return $host_prototypeid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get httptest ID by web scenario UUID.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findHttpTestidByUuid(string $uuid): ?string {
+		if ($this->db_httptests === null) {
+			$this->selectHttpTests();
+		}
+
+		foreach ($this->db_httptests as $httptestid => $httptest) {
+			if ($httptest['uuid'] === $uuid) {
+				return $httptestid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get httptest ID by hostid and web scenario name.
 	 *
 	 * @param string $hostid
 	 * @param string $name
 	 *
 	 * @return string|bool
 	 */
-	public function resolveHttpTest($hostid, $name) {
-		if ($this->httptestsRefs === null) {
+	public function findHttpTestidByName(string $hostid, string $name): ?string {
+		if ($this->db_httptests === null) {
 			$this->selectHttpTests();
 		}
 
-		return array_key_exists($hostid, $this->httptestsRefs) && array_key_exists($name, $this->httptestsRefs[$hostid])
-			? $this->httptestsRefs[$hostid][$name]
-			: false;
+		foreach ($this->db_httptests as $httptestid => $httptest) {
+			if ($httptest['hostid'] === $hostid && $httptest['name'] === $name) {
+				return $httptestid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
-	 * Get httpstepid by hostid, httptestid and web scenario step name.
+	 * Get httpstep ID by hostid, httptestid and web scenario step name.
 	 *
 	 * @param string $hostid
 	 * @param string $httptestid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveHttpStep($hostid, $httptestid, $name) {
-		if ($this->httpstepsRefs === null) {
+	public function findHttpStepidByName(string $hostid, string $httptestid, string $name): ?string {
+		if ($this->db_httpsteps === null) {
 			$this->selectHttpSteps();
 		}
 
-		if (!array_key_exists($hostid, $this->httpstepsRefs)) {
-			return false;
+		foreach ($this->db_httpsteps as $httpstepid => $httpstep) {
+			if ($httpstep['hostid'] === $hostid && $httpstep['name'] === $name
+					&& $httpstep['httptestid'] === $httptestid) {
+				return $httpstepid;
+			}
 		}
 
-		if (!array_key_exists($httptestid, $this->httpstepsRefs[$hostid])) {
-			return false;
-		}
-
-		if (!array_key_exists($name, $this->httpstepsRefs[$hostid][$httptestid])) {
-			return false;
-		}
-
-		return $this->httpstepsRefs[$hostid][$httptestid][$name];
+		return null;
 	}
 
 	/**
-	 * Add group names that need association with a database group id.
+	 * Add group names that need association with a database group ID.
 	 *
 	 * @param array $groups
 	 */
-	public function addGroups(array $groups) {
-		$this->groups = array_unique(array_merge($this->groups, $groups));
+	public function addGroups(array $groups): void {
+		$this->groups = $groups;
 	}
 
 	/**
-	 * Add group name association with group id.
+	 * Add group name association with group ID.
 	 *
-	 * @param string $name
-	 * @param string $id
+	 * @param string $groupid
+	 * @param array  $group
 	 */
-	public function addGroupRef($name, $id) {
-		$this->groupsRefs[$name] = $id;
+	public function setDbGroup(string $groupid, array $group): void {
+		$this->db_groups[$groupid] = [
+			'uuid' => $group['uuid'],
+			'name' => $group['name']
+		];
 	}
 
 	/**
-	 * Add templates names that need association with a database template id.
+	 * Add templates names that need association with a database template ID.
 	 *
 	 * @param array $templates
 	 */
-	public function addTemplates(array $templates) {
-		$this->templates = array_unique(array_merge($this->templates, $templates));
+	public function addTemplates(array $templates): void {
+		$this->templates = $templates;
 	}
 
 	/**
-	 * Add template name association with template id.
+	 * Add template name association with template ID.
 	 *
-	 * @param string $name
-	 * @param string $id
+	 * @param string $templateid
+	 * @param array  $template
 	 */
-	public function addTemplateRef($name, $id) {
-		$this->templatesRefs[$name] = $id;
+	public function setDbTemplate(string $templateid, array $template): void {
+		$this->db_templates[$templateid] = [
+			'uuid' => $template['uuid'],
+			'host' => $template['host']
+		];
 	}
 
 	/**
-	 * Add hosts names that need association with a database host id.
+	 * Add hosts names that need association with a database host ID.
 	 *
 	 * @param array $hosts
 	 */
-	public function addHosts(array $hosts) {
-		$this->hosts = array_unique(array_merge($this->hosts, $hosts));
+	public function addHosts(array $hosts): void {
+		$this->hosts = $hosts;
 	}
 
 	/**
-	 * Add host name association with host id.
+	 * Add host name association with host ID.
 	 *
-	 * @param string $host
-	 * @param string $id
+	 * @param string $hostid
+	 * @param array  $host
 	 */
-	public function addHostRef($host, $id) {
-		$this->hostsRefs[$host] = $id;
+	public function setDbHost(string $hostid, array $host): void {
+		$this->db_hosts[$hostid] = [
+			'host' => $host['host']
+		];
 	}
 
 	/**
-	 * Add item keys that need association with a database item id.
-	 * Input array has format:
-	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
+	 * Add item keys that need association with a database item ID.
 	 *
 	 * @param array $items
 	 */
-	public function addItems(array $items) {
-		foreach ($items as $host => $keys) {
-			if (!isset($this->items[$host])) {
-				$this->items[$host] = [];
-			}
-			$this->items[$host] = array_unique(array_merge($this->items[$host], $keys));
-		}
+	public function addItems(array $items): void {
+		$this->items = $items;
 	}
 
 	/**
-	 * Add item key association with item id.
+	 * Add item key association with item ID.
 	 *
-	 * @param string $hostId
-	 * @param string $key
-	 * @param string $itemId
+	 * @param string $itemid
+	 * @param array  $item
 	 */
-	public function addItemRef($hostId, $key, $itemId) {
-		$this->itemsRefs[$hostId][$key] = $itemId;
+	public function setDbItem(string $itemid, array $item): void {
+		$this->db_items[$itemid] = [
+			'hostid' => $item['hostid'],
+			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
+			'key_' => $item['key_']
+		];
 	}
 
 	/**
 	 * Add value map names that need association with a database value map ID.
 	 *
-	 * @param array $valueMaps
+	 * @param array $valuemaps
 	 */
-	public function addValueMaps(array $valueMaps) {
-		foreach ($valueMaps as $host => $valuemap_names) {
-			if (!array_key_exists($host, $this->valueMaps)) {
-				$this->valueMaps[$host] = [];
-			}
-			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
-		}
+	public function addValuemaps(array $valuemaps): void {
+		$this->valuemaps = $valuemaps;
 	}
 
 	/**
-	 * Add trigger description/expression/recovery_expression that need association with a database trigger id.
+	 * Add trigger description/expression/recovery_expression that need association with a database trigger ID.
 	 *
 	 * @param array $triggers
-	 * @param array $triggers[<description>]
-	 * @param array $triggers[<description>][<expression>]
-	 * @param bool  $triggers[<description>][<expression>][<recovery_expression>]
 	 */
-	public function addTriggers(array $triggers) {
-		foreach ($triggers as $description => $expressions) {
-			if (!array_key_exists($description, $this->triggers)) {
-				$this->triggers[$description] = [];
-			}
-
-			foreach ($expressions as $expression => $recovery_expressions) {
-				if (!array_key_exists($expression, $this->triggers[$description])) {
-					$this->triggers[$description][$expression] = [];
-				}
-
-				foreach ($recovery_expressions as $recovery_expression => $foo) {
-					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
-						$this->triggers[$description][$expression][$recovery_expression] = true;
-					}
-				}
-			}
-		}
+	public function addTriggers(array $triggers): void {
+		$this->triggers = $triggers;
 	}
 
 	/**
 	 * Add graph names that need association with a database graph ID.
-	 * Input array has format:
-	 * array('hostname1' => array('graphname1', 'graphname2'), 'hostname2' => array('graphname1'), ...)
 	 *
 	 * @param array $graphs
 	 */
-	public function addGraphs(array $graphs) {
-		foreach ($graphs as $host => $hostGraphs) {
-			if (!isset($this->graphs[$host])) {
-				$this->graphs[$host] = [];
-			}
-			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
-		}
+	public function addGraphs(array $graphs): void {
+		$this->graphs = $graphs;
 	}
 
 	/**
-	 * Add trigger name/expression association with trigger id.
+	 * Add trigger name/expression association with trigger ID.
 	 *
-	 * @param string $name
-	 * @param string $expression
-	 * @param string $recovery_expression
 	 * @param string $triggerid
+	 * @param array  $trigger
 	 */
-	public function addTriggerRef($name, $expression, $recovery_expression, $triggerid) {
-		$this->triggersRefs[$name][$expression][$recovery_expression] = $triggerid;
+	public function setDbTrigger(string $triggerid, array $trigger): void {
+		$this->db_triggers[$triggerid] = [
+			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
+			'description' => $trigger['description'],
+			'expression' => $trigger['expression'],
+			'recovery_expression' => $trigger['recovery_expression']
+		];
 	}
 
 	/**
-	 * Add icon map names that need association with a database icon map id.
+	 * Add icon map names that need association with a database icon map ID.
 	 *
-	 * @param array $iconMaps
+	 * @param array $iconmaps
 	 */
-	public function addIconMaps(array $iconMaps) {
-		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
+	public function addIconmaps(array $iconmaps): void {
+		$this->iconmaps = $iconmaps;
 	}
 
 	/**
-	 * Add map names that need association with a database map id.
+	 * Add icon map names that need association with a database icon map ID.
+	 *
+	 * @param array $images
+	 */
+	public function addImages(array $images): void {
+		$this->images = $images;
+	}
+
+	/**
+	 * Add image name association with image ID.
+	 *
+	 * @param string $imageid
+	 * @param array  $image
+	 */
+	public function setDbImage(string $imageid, array $image): void {
+		$this->db_images[$imageid] = [
+			'name' => $image['name']
+		];
+	}
+
+	/**
+	 * Add map names that need association with a database map ID.
 	 *
 	 * @param array $maps
 	 */
 	public function addMaps(array $maps) {
-		$this->maps = array_unique(array_merge($this->maps, $maps));
+//		$this->maps = array_unique(array_merge($this->maps, $maps));
+		$this->maps = $maps;
 	}
 
 	/**
-	 * Add map name association with map id.
+	 * Add map name association with map ID.
 	 *
-	 * @param string $name
-	 * @param string $mapId
+	 * @param string $mapid
+	 * @param array  $map
 	 */
-	public function addMapRef($name, $mapId) {
-		$this->mapsRefs[$name] = $mapId;
+	public function setDbMap(string $mapid, array $map): void {
+		$this->db_maps[$mapid] =[
+			'name' => $map['name']
+		];
 	}
 
 	/**
-	 * Add templated dashboard names that need association with a database dashboard id.
+	 * Add templated dashboard names that need association with a database dashboard ID.
 	 *
 	 * @param array $dashboards
 	 */
-	public function addTemplateDashboards(array $dashboards) {
-		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
+	public function addTemplateDashboards(array $dashboards): void {
+		$this->template_dashboards = $dashboards;
 	}
 
 	/**
-	 * Add template dashboard name association with template dashboard ID.
-	 *
-	 * @param string $name
-	 * @param string $template_dashboardid
-	 */
-	public function addTemplateDashboardsRef($name, $template_dashboardid) {
-		$this->templateDashboardsRefs[$name] = $template_dashboardid;
-	}
-
-	/**
-	 * Add macros names that need association with a database macro id.
+	 * Add macros names that need association with a database macro ID.
 	 *
 	 * @param array $macros
 	 */
-	public function addMacros(array $macros) {
-		foreach ($macros as $host => $ms) {
-			if (!isset($this->macros[$host])) {
-				$this->macros[$host] = [];
-			}
-			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
-		}
+	public function addMacros(array $macros): void {
+		$this->macros = $macros;
 	}
 
 	/**
-	 * Add macro name association with macro id.
-	 *
-	 * @param string $hostId
-	 * @param string $macro
-	 * @param string $macroId
-	 */
-	public function addMacroRef($hostId, $macro, $macroId) {
-		$this->macrosRefs[$hostId][$macro] = $macroId;
-	}
-
-	/**
-	 * Add proxy names that need association with a database proxy id.
+	 * Add proxy names that need association with a database proxy ID.
 	 *
 	 * @param array $proxies
 	 */
-	public function addProxies(array $proxies) {
-		$this->proxies = array_unique(array_merge($this->proxies, $proxies));
+	public function addProxies(array $proxies): void {
+		$this->proxies = $proxies;
 	}
 
 	/**
-	 * Add proxy name association with proxy id.
-	 *
-	 * @param string $name
-	 * @param string $proxyId
-	 */
-	public function addProxyRef($name, $proxyId) {
-		$this->proxiesRefs[$name] = $proxyId;
-	}
-
-	/**
-	 * Add host prototypes that need association with a database host prototype id.
+	 * Add host prototypes that need association with a database host prototype ID.
 	 *
 	 * @param array $hostPrototypes
 	 */
-	public function addHostPrototypes(array $hostPrototypes) {
-		foreach ($hostPrototypes as $host => $discoveryRule) {
-			if (!isset($this->hostPrototypes[$host])) {
-				$this->hostPrototypes[$host] = [];
-			}
-			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
-					$this->hostPrototypes[$host][$discoveryRuleKey] = [];
-				}
-				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
-					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
-				);
-			}
-		}
+	public function addHostPrototypes(array $hostPrototypes): void {
+		$this->host_prototypes = $hostPrototypes;
 	}
 
 	/**
-	 * Add web scenario names that need association with a database httptestid.
+	 * Add web scenario names that need association with a database httptest ID.
 	 *
 	 * @param array  $httptests
-	 * @param string $httptests[<host>][]	web scenario name
 	 */
-	public function addHttpTests(array $httptests) {
-		foreach ($httptests as $host => $names) {
-			if (!array_key_exists($host, $this->httptests)) {
-				$this->httptests[$host] = [];
-			}
-
-			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
-		}
+	public function addHttpTests(array $httptests): void {
+		$this->httptests = $httptests;
 	}
 
 	/**
-	 * Add web scenario step names that need association with a database httpstepid.
+	 * Add web scenario step names that need association with a database httpstep ID.
 	 *
 	 * @param array  $httpsteps
-	 * @param string $httpsteps[<host>][<httptest_name>][]	web scenario step name
 	 */
-	public function addHttpSteps(array $httpsteps) {
-		foreach ($httpsteps as $host => $httptests) {
-			if (!array_key_exists($host, $this->httpsteps)) {
-				$this->httpsteps[$host] = [];
-			}
-
-			foreach ($httptests as $httptest_name => $httpstep_names) {
-				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
-					$this->httpsteps[$host][$httptest_name] = [];
-				}
-
-				$this->httpsteps[$host][$httptest_name] =
-					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
-			}
-		}
+	public function addHttpSteps(array $httpsteps): void {
+		$this->httpsteps = $httpsteps;
 	}
 
 	/**
 	 * Select group ids for previously added group names.
 	 */
-	protected function selectGroups() {
-		if (!empty($this->groups)) {
-			$this->groupsRefs = [];
-			$dbGroups = API::HostGroup()->get([
-				'filter' => ['name' => $this->groups],
-				'output' => ['groupid', 'name'],
-				'preservekeys' => true
-			]);
-			foreach ($dbGroups as $group) {
-				$this->groupsRefs[$group['name']] = $group['groupid'];
-			}
+	protected function selectGroups(): void {
+		$this->db_groups = [];
 
-			$this->groups = [];
+		if (!$this->groups) {
+			return;
 		}
+
+		$this->db_groups = API::HostGroup()->get([
+			'output' => ['name', 'uuid'],
+			'filter' => [
+				'uuid' => array_column($this->groups, 'uuid'),
+				'name' => array_keys($this->groups)
+			],
+			'searchByAny' => true,
+			'preservekeys' => true
+		]);
+
+		$this->groups = [];
 	}
 
 	/**
 	 * Select template ids for previously added template names.
 	 */
-	protected function selectTemplates() {
-		if (!empty($this->templates)) {
-			$this->templatesRefs = [];
-			$dbTemplates = API::Template()->get([
-				'output' => ['host', 'templateid'],
-				'preservekeys' => true,
-				'editable' => true,
-				'filter' => ['host' => $this->templates]
-			]);
-			foreach ($dbTemplates as $template) {
-				$this->templatesRefs[$template['host']] = $template['templateid'];
-			}
+	protected function selectTemplates(): void {
+		$this->db_templates = [];
 
-			$this->templates = [];
+		if (!$this->templates) {
+			return;
 		}
+
+		$this->db_templates = API::Template()->get([
+			'output' => ['host', 'uuid'],
+			'filter' => [
+				'uuid' => array_column($this->templates, 'uuid'),
+				'host' => array_keys($this->templates)
+			],
+			'searchByAny' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$this->templates = [];
 	}
 
 	/**
 	 * Select host ids for previously added host names.
 	 */
-	protected function selectHosts() {
-		if (!empty($this->hosts)) {
-			$this->hostsRefs = [];
-			// fetch only normal hosts, discovered hosts must not be imported
-			$dbHosts = API::Host()->get([
-				'output' => ['hostid', 'host'],
-				'filter' => ['host' => $this->hosts],
-				'preservekeys' => true,
-				'templated_hosts' => true
-			]);
-			foreach ($dbHosts as $host) {
-				$this->hostsRefs[$host['host']] = $host['hostid'];
-			}
+	protected function selectHosts(): void {
+		$this->db_hosts = [];
 
-			$this->hosts = [];
+		if (!$this->hosts) {
+			return;
 		}
+
+		// Fetch only normal hosts, discovered hosts must not be imported.
+		$this->db_hosts = API::Host()->get([
+			'output' => ['host'],
+			'filter' => ['host' => array_keys($this->hosts)],
+			'templated_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		$this->hosts = [];
 	}
 
 	/**
 	 * Select item ids for previously added item keys.
 	 */
-	protected function selectItems() {
-		if (!empty($this->items)) {
-			$this->itemsRefs = [];
+	protected function selectItems(): void {
+		$this->db_items = [];
 
-			$sqlWhere = [];
-			foreach ($this->items as $host => $keys) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
-				}
+		if (!$this->items) {
+			return;
+		}
+
+		$sql_where = [];
+
+		foreach ($this->items as $host => $items) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(i.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('i.key_', array_keys($items))
+						.' OR '.dbConditionString('i.uuid', array_column($items, 'uuid'))
+					.'))';
 			}
+		}
 
-			if ($sqlWhere) {
-				$dbItems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbItem = DBfetch($dbItems)) {
-					$this->itemsRefs[$dbItem['hostid']][$dbItem['key_']] = $dbItem['itemid'];
-				}
+		if ($sql_where) {
+			$db_items = DBselect(
+				'SELECT i.itemid,i.hostid,i.key_,i.uuid FROM items i WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_item = DBfetch($db_items)) {
+				$this->db_items[$db_item['itemid']] = [
+					'uuid' => $db_item['uuid'],
+					'key_' => $db_item['key_'],
+					'hostid' => $db_item['hostid']
+				];
 			}
 		}
 	}
@@ -764,106 +973,112 @@ class CImportReferencer {
 	/**
 	 * Unset item refs to make referencer select them from db again.
 	 */
-	public function refreshItems() {
-		$this->itemsRefs = null;
+	public function refreshItems(): void {
+		$this->db_items = null;
 	}
 
 	/**
 	 * Select value map IDs for previously added value map names.
 	 */
-	protected function selectValueMaps() {
-		if ($this->valueMaps) {
-			$this->valueMapsRefs = [];
-			$sql_where = [];
+	protected function selectValuemaps(): void {
+		$this->db_valuemaps = [];
 
-			foreach ($this->valueMaps as $host => $valuemap_names) {
-				$hostid = $this->resolveHostOrTemplate($host);
-				if ($hostid) {
-					$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-						dbConditionString('vm.name', $valuemap_names).')';
-				}
-			}
-
-			if ($sql_where) {
-				$db_valuemaps = DBselect(
-					'SELECT vm.valuemapid,vm.hostid,vm.name'.
-					' FROM valuemap vm'.
-					' WHERE '.implode(' OR ', $sql_where)
-				);
-				while ($valuemap = DBfetch($db_valuemaps)) {
-					$this->valueMapsRefs[$valuemap['hostid']][$valuemap['name']] = $valuemap['valuemapid'];
-				}
-			}
-
-			$this->valueMaps = [];
+		if (!$this->valuemaps) {
+			return;
 		}
+
+		$sql_where = [];
+
+		foreach ($this->valuemaps as $host => $valuemap_names) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+					dbConditionString('vm.name', array_keys($valuemap_names)).')';
+			}
+		}
+
+		if ($sql_where) {
+			$db_valuemaps = DBselect(
+				'SELECT vm.valuemapid,vm.hostid,vm.name'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($valuemap = DBfetch($db_valuemaps)) {
+				$this->db_valuemaps[$valuemap['valuemapid']] = [
+					'name' => $valuemap['name'],
+					'hostid' => $valuemap['hostid']
+				];
+			}
+		}
+
+		$this->valuemaps = [];
 	}
 
 	/**
 	 * Select trigger ids for previously added trigger names/expressions.
 	 */
-	protected function selectTriggers() {
-		if ($this->triggers) {
-			$this->triggersRefs = [];
+	protected function selectTriggers(): void {
+		$this->db_triggers = [];
 
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid', 'expression', 'description', 'recovery_expression'],
-				'filter' => [
-					'description' => array_keys($this->triggers),
-					'flags' => [
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					]
-				]
-			]);
+		if (!$this->triggers) {
+			return;
+		}
 
-			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers,
-				['sources' => ['expression', 'recovery_expression']]
-			);
+		$uuids = [];
 
-			foreach ($dbTriggers as $dbTrigger) {
-				$description = $dbTrigger['description'];
-				$expression = $dbTrigger['expression'];
-				$recovery_expression = $dbTrigger['recovery_expression'];
-
-				if (array_key_exists($description, $this->triggers)
-						&& array_key_exists($expression, $this->triggers[$description])
-						&& array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
-					$this->triggersRefs[$description][$expression][$recovery_expression] = $dbTrigger['triggerid'];
-				}
+		foreach ($this->triggers as $trigger) {
+			foreach ($trigger as $expression) {
+				$uuids += array_flip(array_column($expression, 'uuid'));
 			}
 		}
-	}
 
-	/**
-	 * Select graph IDs for previously added graph names.
-	 */
-	protected function selectGraphs() {
-		if ($this->graphs) {
-			$this->graphsRefs = [];
-
-			$graphNames = [];
-
-			foreach ($this->graphs as $graphs) {
-				foreach ($graphs as $graph) {
-					$graphNames[$graph] = $graph;
-				}
-			}
-
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'selectHosts' => ['hostid'],
-				'filter' => [
-					'name' => $graphNames,
-					'flags' => null
+		$db_triggers = API::Trigger()->get([
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'filter' => [
+				'uuid' => array_keys($uuids),
+				'flags' => [
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE,
+					ZBX_FLAG_DISCOVERY_CREATED
 				]
-			]);
+			],
+			'preservekeys' => true
+		]);
 
-			foreach ($dbGraphs as $dbGraph) {
-				foreach ($dbGraph['hosts'] as $host) {
-					$this->graphsRefs[$host['hostid']][$dbGraph['name']] = $dbGraph['graphid'];
-				}
+		$db_triggers += API::Trigger()->get([
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'filter' => [
+				'description' => array_keys($this->triggers),
+				'flags' => [
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE,
+					ZBX_FLAG_DISCOVERY_CREATED
+				]
+			],
+			'preservekeys' => true
+		]);
+
+		if (!$db_triggers) {
+			return;
+		}
+
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		foreach ($db_triggers as $db_trigger) {
+			$uuid = $db_trigger['uuid'];
+			$description = $db_trigger['description'];
+			$expression = $db_trigger['expression'];
+			$recovery_expression = $db_trigger['recovery_expression'];
+
+			if (array_key_exists($uuid, $uuids)
+				|| (array_key_exists($description, $this->triggers)
+					&& array_key_exists($expression, $this->triggers[$description])
+					&& array_key_exists($recovery_expression, $this->triggers[$description][$expression]))) {
+				$this->db_triggers[$db_trigger['triggerid']] = $db_trigger;
 			}
 		}
 	}
@@ -871,147 +1086,265 @@ class CImportReferencer {
 	/**
 	 * Unset trigger refs to make referencer select them from db again.
 	 */
-	public function refreshTriggers() {
-		$this->triggersRefs = null;
+	public function refreshTriggers(): void {
+		$this->db_triggers = null;
+	}
+
+	/**
+	 * Select graph IDs for previously added graph names.
+	 */
+	protected function selectGraphs(): void {
+		$this->db_graphs = [];
+
+		if (!$this->graphs) {
+			return;
+		}
+
+		$graph_uuids = [];
+		$graph_names = [];
+
+		foreach ($this->graphs as $graph) {
+			$graph_uuids += array_flip(array_column($graph, 'uuid'));
+			$graph_names += array_flip(array_keys($graph));
+		}
+
+		$db_graphs =  API::Graph()->get([
+			'output' => ['uuid', 'name'],
+			'selectHosts' => ['hostid'],
+			'filter' => [
+				'uuid' => array_keys($graph_uuids),
+				'flags' => null
+			],
+			'preservekeys' => true
+		]);
+
+		$db_graphs += API::Graph()->get([
+			'output' => ['uuid', 'name'],
+			'selectHosts' => ['hostid'],
+			'filter' => [
+				'name' => array_keys($graph_names),
+				'flags' => null
+			],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_graphs as $graph) {
+			$graph['hosts'] = array_column($graph['hosts'], 'hostid');
+			$this->db_graphs[$graph['graphid']] = $graph;
+		}
 	}
 
 	/**
 	 * Unset graph refs to make referencer select them from DB again.
 	 */
-	public function refreshGraphs() {
-		$this->graphsRefs = null;
+	public function refreshGraphs(): void {
+		$this->db_graphs = null;
 	}
 
 	/**
 	 * Select icon map ids for previously added icon maps names.
 	 */
-	protected function selectIconMaps() {
-		if (!empty($this->iconMaps)) {
-			$this->iconMapsRefs = [];
-			$dbIconMaps = API::IconMap()->get([
-				'filter' => ['name' => $this->iconMaps],
-				'output' => ['iconmapid', 'name'],
-				'preservekeys' => true
-			]);
-			foreach ($dbIconMaps as $iconMap) {
-				$this->iconMapsRefs[$iconMap['name']] = $iconMap['iconmapid'];
-			}
+	protected function selectIconmaps(): void {
+		$this->db_iconmaps = [];
 
-			$this->iconMaps = [];
+		if (!$this->iconmaps) {
+			return;
 		}
+
+		$db_iconmaps = API::IconMap()->get([
+			'filter' => ['name' => array_keys($this->iconmaps)],
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_iconmaps as $iconmapid => $iconmap) {
+			$this->db_iconmaps[$iconmapid] = $iconmap;
+		}
+
+		$this->iconmaps = [];
+	}
+
+	/**
+	 * Select icon map ids for previously added icon maps names.
+	 */
+	protected function selectImages(): void {
+		$this->db_images = [];
+
+		if (!$this->images) {
+			return;
+		}
+
+		$db_images = API::Image()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->images)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_images as $imageid => $image) {
+			$this->db_images[$imageid] = $image;
+		}
+
+		$this->images = [];
 	}
 
 	/**
 	 * Select map ids for previously added maps names.
 	 */
-	protected function selectMaps() {
-		if (!empty($this->maps)) {
-			$this->mapsRefs = [];
-			$dbMaps = API::Map()->get([
-				'filter' => ['name' => $this->maps],
-				'output' => ['sysmapid', 'name'],
-				'preservekeys' => true
-			]);
-			foreach ($dbMaps as $dbMap) {
-				$this->mapsRefs[$dbMap['name']] = $dbMap['sysmapid'];
-			}
+	protected function selectMaps(): void {
+		$this->db_maps = [];
 
-			$this->maps = [];
+		if (!$this->maps) {
+			return;
 		}
+
+		$db_maps = API::Map()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->maps)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_maps as $mapid => $map) {
+			$this->db_maps[$mapid] = $map;
+		}
+
+		$this->maps = [];
 	}
 
 	/**
 	 * Select template dashboard IDs for previously added dashboard names and template IDs.
+	 *
+	 * @throws APIException
 	 */
-	protected function selectTemplateDashboards() {
-		if ($this->templateDashboards) {
-			$this->templateDashboardsRefs = [];
+	protected function selectTemplateDashboards(): void {
+		$this->db_template_dashboards = [];
 
-			$db_template_dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
-				'filter' => ['name' => $this->templateDashboards]
-			]);
-			foreach ($db_template_dashboards as $dashboard) {
-				$this->templateDashboardsRefs[$dashboard['templateid']][$dashboard['name']] = $dashboard['dashboardid'];
-			}
-
-			$this->templateDashboards = [];
+		if (!$this->template_dashboards) {
+			return;
 		}
+
+		$db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_keys($this->template_dashboards)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_template_dashboards as $dashboardid => $dashboard) {
+			$this->db_template_dashboards[$dashboardid] = [
+				'uuid' => $dashboard['uuid']
+			];
+		}
+
+		$this->template_dashboards = [];
 	}
 
 	/**
 	 * Select macro ids for previously added macro names.
 	 */
-	protected function selectMacros() {
-		if (!empty($this->macros)) {
-			$this->macrosRefs = [];
-			$sqlWhere = [];
-			foreach ($this->macros as $host => $macros) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(hm.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('hm.macro', $macros).')';
-				}
-			}
+	protected function selectMacros(): void {
+		$this->db_macros = [];
 
-			if ($sqlWhere) {
-				$dbMacros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbMacro = DBfetch($dbMacros)) {
-					$this->macrosRefs[$dbMacro['hostid']][$dbMacro['macro']] = $dbMacro['hostmacroid'];
-				}
-			}
-
-			$this->macros = [];
+		if (!$this->macros) {
+			return;
 		}
+
+		$sql_where = [];
+
+		foreach ($this->macros as $host => $macros) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+			if ($hostid) {
+				$sql_where[] = '(hm.hostid='.zbx_dbstr($hostid).' AND '
+					.dbConditionString('hm.macro', array_keys($macros)).')';
+			}
+		}
+
+		if ($sql_where) {
+			$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
+				.' WHERE '.implode(' OR ', $sql_where));
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$this->db_macros[$db_macro['hostmacroid']] = [
+					'hostid' => $db_macro['hostid'],
+					'macro' => $db_macro['macro']
+				];
+			}
+		}
+
+		$this->macros = [];
 	}
 
 	/**
 	 * Select proxy ids for previously added proxy names.
 	 */
-	protected function selectProxies() {
-		if (!empty($this->proxies)) {
-			$this->proxiesRefs = [];
-			$dbProxy = API::Proxy()->get([
-				'filter' => ['host' => $this->proxies],
-				'output' => ['hostid', 'host'],
-				'preservekeys' => true
-			]);
-			foreach ($dbProxy as $proxy) {
-				$this->proxiesRefs[$proxy['host']] = $proxy['proxyid'];
-			}
+	protected function selectProxies(): void {
+		$this->db_proxies = [];
 
-			$this->proxies = [];
+		if (!$this->proxies) {
+			return;
 		}
+
+		$this->db_proxies = API::Proxy()->get([
+			'output' => ['host'],
+			'search' => ['host' => array_keys($this->proxies)],
+			'preservekeys' => true
+		]);
+
+		$this->proxies = [];
 	}
 
 	/**
 	 * Select host prototype ids for previously added host prototypes names.
 	 */
-	protected function selectHostPrototypes() {
-		if (!empty($this->hostPrototypes)) {
-			$this->hostPrototypesRefs = [];
-			$sqlWhere = [];
-			foreach ($this->hostPrototypes as $host => $discoveryRule) {
-				$hostId = $this->resolveHostOrTemplate($host);
+	protected function selectHostPrototypes(): void {
+		$this->db_host_prototypes = [];
 
-				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-					$discoveryRuleId = $this->resolveItem($hostId, $discoveryRuleKey);
-					if ($hostId) {
-						$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.host', $hostPrototypes).')';
+		if (!$this->host_prototypes) {
+			return;
+		}
+
+		$sql_where = [];
+
+		foreach ($this->host_prototypes as $host => $discovery_rule) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				continue;
+			}
+
+			foreach ($discovery_rule as $discovery_rule_key => $host_prototypes) {
+				if (array_key_exists('uuid', $host_prototypes)) {
+					$discovery_ruleid = $this->findItemidByUuid($host_prototypes[0]['discovery_rule_uuid']);
+
+					if ($discovery_ruleid !== null) {
+						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
+							.dbConditionString('h.uuid', array_column($host_prototypes, 'uuid')).')';
+					}
+				}
+				else {
+					$discovery_ruleid = $this->findItemidByKey($hostid, $discovery_rule_key);
+
+					if ($discovery_ruleid !== null) {
+						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
+							.dbConditionString('h.host', array_keys($host_prototypes)).')';
 					}
 				}
 			}
+		}
 
-			if ($sqlWhere) {
-				$query = DBselect(
-					'SELECT h.host,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
-					' FROM hosts h,host_discovery hd,items i'.
-					' WHERE h.hostid=hd.hostid'.
-						' AND hd.parent_itemid=i.itemid'.
-						' AND ('.implode(' OR ', $sqlWhere).')'
-				);
-				while ($data = DBfetch($query)) {
-					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
-				}
+		if ($sql_where) {
+			$query = DBselect(
+				'SELECT h.host,h.uuid,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
+				' FROM hosts h,host_discovery hd,items i'.
+				' WHERE h.hostid=hd.hostid'.
+					' AND hd.parent_itemid=i.itemid'.
+					' AND ('.implode(' OR ', $sql_where).')'
+			);
+			while ($host_prototype = DBfetch($query)) {
+				$this->db_host_prototypes[$host_prototype['hostid']] = [
+					'uuid' => $host_prototype['uuid'],
+					'host' => $host_prototype['host'],
+					'parent_hostid' => $host_prototype['parent_hostid'],
+					'discovery_ruleid' => $host_prototype['parent_itemid']
+				];
 			}
 		}
 	}
@@ -1019,29 +1352,38 @@ class CImportReferencer {
 	/**
 	 * Select httptestids for previously added web scenario names.
 	 */
-	protected function selectHttpTests() {
-		if ($this->httptests) {
-			$this->httptestsRefs = [];
+	protected function selectHttpTests(): void {
+		$this->db_httptests = [];
 
-			$sql_where = [];
+		if (!$this->httptests) {
+			return;
+		}
 
-			foreach ($this->httptests as $host => $names) {
-				$hostid = $this->resolveHostOrTemplate($host);
+		$sql_where = [];
 
-				if ($hostid !== false) {
-					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid).' AND '.dbConditionString('ht.name', $names).')';
-				}
+		foreach ($this->httptests as $host => $httptests) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== false) {
+				$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('ht.name', array_keys($httptests))
+						.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))
+					.'))';
 			}
+		}
 
-			if ($sql_where) {
-				$db_httptests = DBselect(
-					'SELECT ht.hostid,ht.name,ht.httptestid'.
-					' FROM httptest ht'.
-					' WHERE '.implode(' OR ', $sql_where)
-				);
-				while ($db_httptest = DBfetch($db_httptests)) {
-					$this->httptestsRefs[$db_httptest['hostid']][$db_httptest['name']] = $db_httptest['httptestid'];
-				}
+		if ($sql_where) {
+			$db_httptests = DBselect(
+				'SELECT ht.hostid,ht.name,ht.httptestid,ht.uuid FROM httptest ht WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_httptest = DBfetch($db_httptests)) {
+				$this->db_httptests[$db_httptest['httptestid']] = [
+					'uuid' => $db_httptest['uuid'],
+					'name' => $db_httptest['name'],
+					'hostid' => $db_httptest['hostid']
+				];
 			}
 		}
 	}
@@ -1049,45 +1391,46 @@ class CImportReferencer {
 	/**
 	 * Unset web scenario refs to make referencer select them from db again.
 	 */
-	public function refreshHttpTests() {
-		$this->httptestsRefs = null;
+	public function refreshHttpTests(): void {
+		$this->db_httptests = null;
 	}
 
 	/**
 	 * Select httpstepids for previously added web scenario step names.
 	 */
-	protected function selectHttpSteps() {
-		if ($this->httpsteps) {
-			$this->httpstepsRefs = [];
+	protected function selectHttpSteps(): void {
+		$this->db_httpsteps = [];
 
-			$sql_where = [];
+		if (!$this->httpsteps) {
+			return;
+		}
 
-			foreach ($this->httpsteps as $host => $httptests) {
-				$hostid = $this->resolveHostOrTemplate($host);
+		$sql_where = [];
 
-				if ($hostid !== false) {
-					foreach ($httptests as $httptest_name => $httpstep_names) {
-						$httptestid = $this->resolveHttpTest($hostid, $httptest_name);
+		foreach ($this->httpsteps as $host => $httptests) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
 
-						if ($httptestid !== false) {
-							$sql_where[] = '(hs.httptestid='.zbx_dbstr($httptestid).
-								' AND '.dbConditionString('hs.name', $httpstep_names).')';
-						}
-					}
+			if ($hostid !== null) {
+				foreach ($httptests as $httpstep_names) {
+					$sql_where[] = dbConditionString('hs.name', array_keys($httpstep_names));
 				}
 			}
+		}
 
-			if ($sql_where) {
-				$db_httpsteps = DBselect(
-					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
-					' FROM httptest ht,httpstep hs'.
-					' WHERE ht.httptestid=hs.httptestid'.
-						' AND ('.implode(' OR ', $sql_where).')'
-				);
-				while ($db_httpstep = DBfetch($db_httpsteps)) {
-					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =
-						$db_httpstep['httpstepid'];
-				}
+		if ($sql_where) {
+			$db_httpsteps = DBselect(
+				'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
+				' FROM httptest ht,httpstep hs'.
+				' WHERE ht.httptestid=hs.httptestid'.
+					' AND ('.implode(' OR ', $sql_where).')'
+			);
+
+			while ($db_httpstep = DBfetch($db_httpsteps)) {
+				$this->db_httpsteps[$db_httpstep['httpstepid']] = [
+					'name' => $db_httpstep['name'],
+					'hostid' => $db_httpstep['hostid'],
+					'httptestid' => $db_httpstep['httptestid']
+				];
 			}
 		}
 	}

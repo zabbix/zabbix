@@ -397,6 +397,7 @@ class CHttpTestManager {
 				}
 
 				$newHttpTest = $httpTest;
+				$newHttpTest['uuid'] = '';
 				$newHttpTest['hostid'] = $hostId;
 				$newHttpTest['templateid'] = $httpTestId;
 				if ($exHttpTest) {
@@ -443,7 +444,10 @@ class CHttpTestManager {
 	 */
 	protected function createLinkageBetweenHttpTests($parentId, $childId) {
 		DB::update('httptest', [
-			'values' => ['templateid' => $parentId],
+			'values' => [
+				'templateid' => $parentId,
+				'uuid' => ''
+			],
 			'where' => ['httptestid' => $childId]
 		]);
 

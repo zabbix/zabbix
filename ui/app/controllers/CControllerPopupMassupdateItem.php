@@ -191,8 +191,6 @@ class CControllerPopupMassupdateItem extends CController {
 		];
 		$this->getInputs($input, array_keys($input));
 
-		//'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-
 		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
 			$input['trends'] = ITEM_NO_STORAGE_VALUE;
 		}
@@ -205,7 +203,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 		if (array_key_exists('tags', $input)) {
 			$input['tags'] = array_filter($input['tags'], function ($tag) {
-				return ($tag['tag'] !== '' && $tag['value'] !== '');
+				return ($tag['tag'] !== '' || $tag['value'] !== '');
 			});
 		}
 
@@ -251,7 +249,6 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			$hosts = $this->getHostsOrTemplates();
-			$host = array_shift($hosts);
 
 			if ($prototype && $hosts) {
 				throw new Exception();

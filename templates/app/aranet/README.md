@@ -3,11 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Refer to the vendor documentation.
 

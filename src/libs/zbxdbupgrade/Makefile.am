@@ -25,4 +25,7 @@ libzbxdbupgrade_a_SOURCES = \
 	dbupgrade_5010.c \
 	dbupgrade_5020.c \
 	dbupgrade_5030.c \
+	dbupgrade_5040.c \
+	dbupgrade_macros.c \
+	dbupgrade_macros.h \
 	dbupgrade.h

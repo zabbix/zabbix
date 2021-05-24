@@ -927,6 +927,21 @@ class CUserGroup extends CApiService {
 			);
 		}
 
+		// Check if user groups are used in scheduled reports.
+		$db_reports = DBselect(
+			'SELECT r.name,rug.usrgrpid'.
+			' FROM report r,report_usrgrp rug'.
+			' WHERE r.reportid=rug.reportid'.
+				' AND '.dbConditionInt('rug.usrgrpid', $usrgrpids),
+			1
+		);
+
+		if ($db_report = DBfetch($db_reports)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is report "%2$s" recipient.',
+				$db_usrgrps[$db_report['usrgrpid']]['name'], $db_report['name']
+			));
+		}
+
 		$this->checkUsersWithoutGroups($usrgrps);
 	}
 

@@ -44,8 +44,6 @@ $output = [
 	'navtree_data' => $item->getScriptData()
 ];
 
-//var_dump($output);
-
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

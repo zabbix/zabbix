@@ -1,0 +1,1613 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T08:05:26Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 2bf5827343f0420792ad953f290baa05
+      template: 'WildFly Server by JMX'
+      name: 'WildFly Server by JMX'
+      description: |
+        Official JMX Template for WildFly.
+        The metrics are collected by JMX. This template works with standalone and domain instances.
+        You can set {$WILDFLY.USER} and {$WILDFLY.PASSWORD} macros in the template for using on the host level.
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 9b9fce7f4b4945fea45feaa5b213c186
+          name: 'WildFly: Uptime'
+          type: JMX
+          key: 'jmx["java.lang:type=Runtime","Uptime"]'
+          history: 7d
+          units: s
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'WildFly server uptime.'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+          triggers:
+            -
+              uuid: 8a4fab49eb1e4ebbb1459d9b0f848771
+              expression: 'nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1'
+              name: 'WildFly: Failed to fetch info data (or no data for 15m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 15 minutes'
+            -
+              uuid: 71db189440ec4355aa06262e3200d47e
+              expression: 'last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
+              name: 'WildFly: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          uuid: daf104c5cafe4879b79fb30fca99c838
+          name: 'WildFly: Launch type'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","launchType"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: b3c30ba00ac54677a944cda7ec8536af
+          name: 'WildFly: Name'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","name"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: |
+            For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().
+            For domain mode: The name given to this domain
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 98dd8a8de5f240998bebaf28c8d1bbe2
+          name: 'WildFly: Process type'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","processType"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The type of process represented by this root resource.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 0238c33ca0f045a7b1376cd5b3048bf0
+          name: 'WildFly: Version'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","productVersion"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The version of the WildFly Core based product release'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+          triggers:
+            -
+              uuid: 2923ab6f81d64579b6ba778bc0467042
+              expression: '(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2))=1 and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
+              name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'WildFly version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 855c96cf1b3d4ef691f7693ba5f8357f
+          name: 'WildFly: Runtime configuration state'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","runtimeConfigurationState"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The current persistent configuration state, one of starting, ok, reload-required, restart-required, stopping or stopped.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+          triggers:
+            -
+              uuid: c5702304641748e4bb04be89f3a38326
+              expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
+              name: 'WildFly: Server needs to restart for configuration change.'
+              priority: WARNING
+        -
+          uuid: cd57068c6e18440a8e14c0b4fc5c6c78
+          name: 'WildFly: Server controller state'
+          type: JMX
+          key: 'jmx["jboss.as:management-root=server","serverState"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The current state of the server controller; either STARTING, RUNNING, RESTART_REQUIRED, RELOAD_REQUIRED or STOPPING.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+          triggers:
+            -
+              uuid: 81de7058e3b64f73a14e03728dcf1c9b
+              expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","serverState"],,"like","running")=0'
+              name: 'WildFly: Server controller is not in RUNNING state'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'WildFly: Server needs to restart for configuration change.'
+                  expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
+        -
+          uuid: 2986d57975334b0bbf6bd687df457c26
+          name: 'WildFly: Transactions: Aborted, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfAbortedTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of aborted (i.e. rolledback) transactions per second.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 035752468405481a9e0c4c60e662eadc
+          name: 'WildFly: Transactions: Application rollbacks, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfApplicationRollbacks"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions that have been rolled back by application request. This includes those that timeout, since the timeout behavior is considered an attribute of the application configuration.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 2c157932072e416baed45a2350a3bd66
+          name: 'WildFly: Transactions: Committed, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfCommittedTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of committed transactions'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 82958fc3169c42d2bb0c9dc29e341b8f
+          name: 'WildFly: Transactions: Heuristics, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfHeuristics"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions which have terminated with heuristic outcomes.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 50ba79375dbf48c8b86c3d8654576186
+          name: 'WildFly: Transactions: Current'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfInflightTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions that have begun but not yet terminated.'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 6ca1501ec2904b7b875d2f9bfa127e10
+          name: 'WildFly: Transactions: Nested, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfNestedTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The total number of nested (sub) transactions created.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: b1f782b6d71b4cc698a3f0d3b9d03a8d
+          name: 'WildFly: Transactions: ResourceRollbacks, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfResourceRollbacks"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions that rolled back due to resource (participant) failure.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 6ca6b59da5da4d7cb6fbacd2bdd37996
+          name: 'WildFly: Transactions: System rollbacks, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfSystemRollbacks"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions that have been rolled back due to internal system errors.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: 90f1a21c335b42928455d31635bfd11d
+          name: 'WildFly: Transactions: Timed out, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfTimedOutTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The number of transactions that have rolled back due to timeout.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+        -
+          uuid: a0c40292c62e4d51a96db3e07967b17c
+          name: 'WildFly: Transactions: Total, rate'
+          type: JMX
+          key: 'jmx["jboss.as:subsystem=transactions","numberOfTransactions"]'
+          history: 7d
+          value_type: FLOAT
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          description: 'The total number of transactions (top-level and nested) created per second.'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          tags:
+            -
+              tag: Application
+              value: WildFly
+      discovery_rules:
+        -
+          uuid: 9dbbe152925245f8a1f3bf5c32ae49c0
+          name: 'Deployments discovery'
+          type: JMX
+          key: 'jmx.get[beans,"jboss.as.expr:deployment=*"]'
+          delay: 1h
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DEPLOYMENT}'
+                value: '{$WILDFLY.DEPLOYMENT.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DEPLOYMENT}'
+                value: '{$WILDFLY.DEPLOYMENT.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery deployments metrics.'
+          item_prototypes:
+            -
+              uuid: 52d99e3f76b4464fbf47271243682d05
+              name: 'WildFly deployment [{#DEPLOYMENT}]: Enabled time'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",enabledTime]'
+              history: 7d
+              units: unixtime
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Indicates if the deployment is managed (aka uses the ContentRepository).'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+            -
+              uuid: 8942cf5bc803401cac2f4d9ea943f1fe
+              name: 'WildFly deployment [{#DEPLOYMENT}]: Enabled'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",enabled]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts.)'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+            -
+              uuid: f633e596ddcc4620a193243c80a6633b
+              name: 'WildFly deployment [{#DEPLOYMENT}]: Managed'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",managed]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Indicates if the deployment is managed (aka uses the ContentRepository).'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+            -
+              uuid: 498f0d31a5044b91b4aa8af621011919
+              name: 'WildFly deployment [{#DEPLOYMENT}]: Persistent'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",persistent]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Indicates if the deployment is managed (aka uses the ContentRepository).'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+            -
+              uuid: d5dd67dc20c54ef1921da9c9a068ad29
+              name: 'WildFly deployment [{#DEPLOYMENT}]: Status'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",status]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: |
+                The current runtime status of a deployment. 
+                Possible status modes are OK, FAILED, and STOPPED. 
+                FAILED indicates a dependency is missing or a service could not start. 
+                STOPPED indicates that the deployment was not enabled or was manually stopped.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly deployment [{#DEPLOYMENT}]'
+              trigger_prototypes:
+                -
+                  uuid: 6b432b25debe4277a971bc8a906e07b1
+                  expression: '(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2))=1 and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0'
+                  name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'Deployment status has changed. Ack to close.'
+                  manual_close: 'YES'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          lld_macro_paths:
+            -
+              lld_macro: '{#DEPLOYMENT}'
+              path: $.properties.deployment
+            -
+              lld_macro: '{#JMXOBJ}'
+              path: $.object
+        -
+          uuid: 8e3d5fe1a5a348169c15217bd083abf5
+          name: 'JDBC metrics discovery'
+          type: JMX
+          key: 'jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=jdbc"]'
+          delay: 1h
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          item_prototypes:
+            -
+              uuid: 6c0c0f94300148eda82224da1bc73bd1
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache access, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheAccessCount]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of times that the statement cache was accessed  per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 0857fb4d2d2447a0b0dede21bb4b4bd5
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache add, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheAddCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of statements added to the statement cache per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: bf368224ed444311ae1af4098c4bdb1f
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache current size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheCurrentSize]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of prepared and callable statements currently cached in the statement cache.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 9c08f05299774a538a52be2c11e62cda
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache delete, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheDeleteCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of statements discarded from the cache per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: dbe7bc3d9a8a46c6a84b956f0a9e33be
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache hit, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheHitCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of times that statements from the cache were used per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 0e81a30b802941c4bc0e34a10a8d0573
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache miss, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PreparedStatementCacheMissCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of times that a statement request could not be satisfied with a statement from the cache per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 81dbce02ad4d492ebebd1a205bea1b43
+              name: 'WildFly {#JMX_DATA_SOURCE}: Statistics enabled'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",statisticsEnabled]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Define whether runtime statistics are enabled or not.'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+          graph_prototypes:
+            -
+              uuid: 322b26787ab444db90a1be3da2717dd2
+              name: 'WildFly {#JMX_DATA_SOURCE}: Cache operations'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",PreparedStatementCacheAddCount]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",PreparedStatementCacheAccessCount]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",PreparedStatementCacheDeleteCount]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",PreparedStatementCacheHitCount]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",PreparedStatementCacheMissCount]'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          lld_macro_paths:
+            -
+              lld_macro: '{#JMXOBJ}'
+              path: $.object
+            -
+              lld_macro: '{#JMX_DATA_SOURCE}'
+              path: '$.properties.["data-source"]'
+        -
+          uuid: f8fd6899dafb4247853bd3ed3fbabd48
+          name: 'Pools metrics discovery'
+          type: JMX
+          key: 'jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=pool"]'
+          delay: 1h
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          item_prototypes:
+            -
+              uuid: 06d61e390b0e403e81b1eaa77815cde2
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Active'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",ActiveCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of open connections.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+              trigger_prototypes:
+                -
+                  uuid: ea551068ebd04d349eba3f45a72f2610
+                  expression: 'max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m'
+                  priority: WARNING
+            -
+              uuid: 64565b71c26b463d8ea83ee5ee18284f
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Available'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AvailableCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The available count.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: adf534b46aba4f28acea58ea46197edd
+              name: 'WildFly {#JMX_DATA_SOURCE}: Blocking time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AverageBlockingTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Average Blocking Time for pool.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 788691ba487e422a913d408361f99e4d
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Creating time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AverageCreationTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time spent creating a physical connection.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 52320ebbe70244e3ad52b0766cd03d8d
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Get time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AverageGetTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time spent obtaining a physical connection.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: c3a313b3d1c34e6b99ae73d5195e7fac
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Pool time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AveragePoolTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a physical connection spent in the pool.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: a76602ba784a4d40a3672a80487c878a
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Usage time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AverageUsageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time spent using a physical connection'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: ba111d0ad76848c39c54ffc37d04e561
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Blocking failure, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",BlockingFailureCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of failures trying to obtain a physical connection per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: c01eb89708224899a9ac8e90ee79bcca
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Created, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CreatedCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The created per second'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 606ed51ce8e549c7af20d7c1c5f78e6e
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Destroyed, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",DestroyedCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The destroyed count.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: a02eb0060fbb4f598d654d93c286c543
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Idle'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",IdleCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of physical connections currently idle.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: a5eed78c02274f6180eb667091087ce0
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: In use'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",InUseCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of physical connections currently in use.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 2f3e82a1c2f2472f95e4a85e3b182739
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Used, max'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MaxUsedCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The maximum number of connections used.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: fb9a55168c8a4082a19f846ca10adc85
+              name: 'WildFly {#JMX_DATA_SOURCE}: Statistics enabled'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",statisticsEnabled]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Define whether runtime statistics are enabled or not.'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+              trigger_prototypes:
+                -
+                  uuid: 2996a48892a640d69154de332c673755
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled'
+                  priority: INFO
+                -
+                  uuid: 4ea71ba3572647b29a60077bc511052a
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled'
+                  priority: INFO
+                  description: 'Zabbix has not received data for items for the last 15 minutes'
+            -
+              uuid: 727ff33cec8e4223bc5054c53d0de88b
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Timed out, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TimedOut]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The timed out connections per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+              trigger_prototypes:
+                -
+                  uuid: d70d1703fdc64926abe602324814ea4c
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: There are timeout  connections'
+                  priority: WARNING
+            -
+              uuid: 4832c8d39e0d4329af6876c594a3d741
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Wait'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",WaitCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of requests that had to wait to obtain a physical connection.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+              trigger_prototypes:
+                -
+                  uuid: 2e38504216d84f3b9fe43b0bea86e388
+                  expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m)'
+                  priority: WARNING
+            -
+              uuid: c22389aa983a4cdca504e3cc41126f03
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XACommitAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource commit invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 2510b507e62c4574af32bb0a283995e8
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XACommitCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource commit invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 6f15c885d49e4c1a89bd52b0b4ff0035
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: End time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAEndAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource end invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: c51dd8821ace4724ae965d7ca6f3ebdd
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: End, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAEndCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource end invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: b5028a44fa2b4347abe11177d61567e2
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Forget time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAForgetAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource forget invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 685173455b424a5aa5463670c1718314
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Forget, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAForgetCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource forget invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 4513aff93c8a404389aaf58b28aab5b1
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Prepare time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAPrepareAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource prepare invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 96c723883cfa416b9e030e5d42836de3
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Prepare, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAPrepareCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource prepare invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 30f0474a666547c39e0d793decd0be57
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Recover time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XARecoverAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource recover invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: d7a3de25f6a74c75b65bc9c83decc1ac
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XARecoverCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource recover invocationsper second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: bd64f91e953249e993c3c388f3382ff4
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Rollback time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XARollbackAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource rollback invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: 0c0749b041124e1ebb11396344517c01
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Rollback, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XARollbackCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource rollback invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: ab9c32db31d84a46967c1f601f11f610
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Start time, avg'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAStartAverageTime]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The average time for a XAResource start invocation.'
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+            -
+              uuid: ef5b00e1dcab4addbc72a0c191e3728b
+              name: 'WildFly {#JMX_DATA_SOURCE}: XA: Start rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",XAStartCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of XAResource start invocations per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly datasource [{#JMX_DATA_SOURCE}]'
+          trigger_prototypes:
+            -
+              uuid: 6a40b3e94cc0441abc95fe3bc94397bf
+              expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}'
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m)'
+              priority: HIGH
+          graph_prototypes:
+            -
+              uuid: 65db851d241b4fe4b6a5d9796d475e55
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connections'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",ActiveCount]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",AvailableCount]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",InUseCount]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",MaxUsedCount]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",TimedOut]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",WaitCount]'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          lld_macro_paths:
+            -
+              lld_macro: '{#JMXOBJ}'
+              path: $.object
+            -
+              lld_macro: '{#JMX_DATA_SOURCE}'
+              path: '$.properties.["data-source"]'
+        -
+          uuid: 0a566b1e160649cdb5fda18d3b157733
+          name: 'Undertow metrics discovery'
+          type: JMX
+          key: 'jmx.get[beans,"jboss.as:subsystem=undertow,server=*,http-listener=*"]'
+          delay: 1h
+          username: '{$WILDFLY.USER}'
+          password: '{$WILDFLY.PASSWORD}'
+          item_prototypes:
+            -
+              uuid: dde94dd2df61495582234d709552fe17
+              name: 'WildFly listener {#HTTP_LISTENER}: Bytes received, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",bytesReceived]'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of bytes that have been received by this listener per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+            -
+              uuid: 36451d29d7074b8ebdb3f366eeaa84df
+              name: 'WildFly listener {#HTTP_LISTENER}: Bytes sent, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",bytesSent]'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of bytes that have been sent out on this listener per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+            -
+              uuid: a34cb42c703a4996ab9a4c7a08e71eeb
+              name: 'WildFly listener {#HTTP_LISTENER}: Errors, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",errorCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of 500 responses that have been sent by this listener per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+              trigger_prototypes:
+                -
+                  uuid: 504b88b04a204335a10f56cc3d852ba5
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",errorCount])>0'
+                  name: 'WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener.'
+                  priority: WARNING
+            -
+              uuid: 2e7a581b104a4d4a8a0d9235b899635a
+              name: 'WildFly listener {#HTTP_LISTENER}: Requests, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",requestCount]'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'The number of requests this listener has served per second.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: Application
+                  value: 'WildFly listener [{#SERVER}.{#HTTP_LISTENER}]'
+          graph_prototypes:
+            -
+              uuid: 980c07db8fc5450db560a94df1250bf5
+              name: 'WildFly listener {#HTTP_LISTENER}: Requests'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",requestCount]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",errorCount]'
+            -
+              uuid: 7d982b6efde6432f9d3f96a4300eae00
+              name: 'WildFly listener {#HTTP_LISTENER}: Throughput'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",bytesReceived]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'WildFly Server by JMX'
+                    key: 'jmx["{#JMXOBJ}",bytesSent]'
+          jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+          lld_macro_paths:
+            -
+              lld_macro: '{#HTTP_LISTENER}'
+              path: '$.properties.["http-listener"]'
+            -
+              lld_macro: '{#JMXOBJ}'
+              path: $.object
+            -
+              lld_macro: '{#SERVER}'
+              path: '$.properties.["server"]'
+      macros:
+        -
+          macro: '{$WILDFLY.CONN.USAGE.WARN.MAX}'
+          value: '80'
+          description: 'The maximum connection usage percent for trigger expression.'
+        -
+          macro: '{$WILDFLY.CONN.WAIT.MAX.WARN}'
+          value: '300'
+          description: 'The maximum number of waiting connections for trigger expression.'
+        -
+          macro: '{$WILDFLY.DEPLOYMENT.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable deployments'
+        -
+          macro: '{$WILDFLY.DEPLOYMENT.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered deployments'
+        -
+          macro: '{$WILDFLY.JMX.PROTOCOL}'
+          value: remote+http
+        -
+          macro: '{$WILDFLY.PASSWORD}'
+          value: zabbix
+        -
+          macro: '{$WILDFLY.USER}'
+          value: zabbix
+      valuemaps:
+        -
+          uuid: 4004b5f2501f44a69dc86afce3daa4d1
+          name: 'WildFly flag'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+  graphs:
+    -
+      uuid: 69e213dfd33d49a8b057068a89e4cef1
+      name: 'WildFly: Transactions'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfTimedOutTransactions"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfSystemRollbacks"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfResourceRollbacks"]'
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfNestedTransactions"]'
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfHeuristics"]'
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfCommittedTransactions"]'
+        -
+          sortorder: '6'
+          color: AC8C14
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfApplicationRollbacks"]'
+        -
+          sortorder: '7'
+          color: 611F27
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfAbortedTransactions"]'
+        -
+          sortorder: '8'
+          color: F230E0
+          item:
+            host: 'WildFly Server by JMX'
+            key: 'jmx["jboss.as:subsystem=transactions","numberOfTransactions"]'

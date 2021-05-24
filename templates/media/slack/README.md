@@ -47,7 +47,7 @@ The **Send to** field can contain several variants of values:
 
 6\. You must add your bot to the target channel
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.4/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
 
 ## Supported Versions
 

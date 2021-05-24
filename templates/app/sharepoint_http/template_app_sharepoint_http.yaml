@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-18T09:22:26Z'
+  date: '2021-05-11T08:05:23Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 8d5fe5b4ebb64255a2429b34c7dd3681
       template: 'Microsoft SharePoint by HTTP'
       name: 'Microsoft SharePoint by HTTP'
       description: |
@@ -18,15 +20,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Sharepoint
-        -
-          name: 'Sharepoint front page'
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: 71e23c666b84414490589a509b60c488
           name: 'Sharepoint: Get directory structure'
           type: SCRIPT
           key: sharepoint.get_dir
@@ -133,9 +129,6 @@ zabbix_export:
             result.time = new Date().getTime() - js_start;
             return JSON.stringify(result);
           description: 'Used to get directory structure information'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -156,16 +149,18 @@ zabbix_export:
             -
               name: user
               value: '{$SHAREPOINT.USER}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: cd47c3d00ce545b0a557e0e68c89d53e
           name: 'Sharepoint: Get directory structure: Status'
           type: DEPENDENT
           key: sharepoint.get_dir.status
           delay: '0'
           history: 7d
           description: 'HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.'
-          applications:
-            -
-              name: Sharepoint
           valuemap:
             name: 'HTTP response status code'
           preprocessing:
@@ -181,13 +176,19 @@ zabbix_export:
                 - 3h
           master_item:
             key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
-              expression: '{last()}<>200'
+              uuid: ed1d66a1410e4af79af462e749ce979b
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200'
               name: 'Sharepoint: Error getting directory structure.'
               priority: WARNING
               description: 'Error getting directory structure. Check the Zabbix server log for more details.'
         -
+          uuid: b2daa471665541168b2a394b9b226d73
           name: 'Sharepoint: Get directory structure: Exec time'
           type: DEPENDENT
           key: sharepoint.get_dir.time
@@ -195,9 +196,6 @@ zabbix_export:
           history: 7d
           units: '!ms'
           description: 'The time taken to execute the script for obtaining the data structure (in ms). Less is better.'
-          applications:
-            -
-              name: Sharepoint
           preprocessing:
             -
               type: JSONPATH
@@ -211,12 +209,18 @@ zabbix_export:
                 - 3h
           master_item:
             key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
-              expression: '{last()}>2000'
+              uuid: 9e5bcc08d5f040de86afa38f5a653dd7
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000'
               name: 'Sharepoint: Server responds slowly to API request'
               priority: WARNING
         -
+          uuid: 7b59d767712f49b3bbc17947999ca944
           name: 'Sharepoint: Health score'
           type: HTTP_AGENT
           key: sharepoint.health_score
@@ -225,9 +229,6 @@ zabbix_export:
           username: '{$SHAREPOINT.USER}'
           password: '{$SHAREPOINT.PASSWORD}'
           description: 'This item specifies a value between 0 and 10, where 0 represents a low load and a high ability to process requests and 10 represents a high load and that the server is throttling requests to maintain adequate throughput.'
-          applications:
-            -
-              name: Sharepoint
           preprocessing:
             -
               type: REGEX
@@ -247,13 +248,19 @@ zabbix_export:
           url: '{$SHAREPOINT.URL}'
           retrieve_mode: HEADERS
           request_method: HEAD
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
           triggers:
             -
-              expression: '{last()}>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
+              uuid: 3a0451e3edda4a73aded57aa254fd813
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
               name: 'Sharepoint: Bad health score'
               priority: AVERAGE
       discovery_rules:
         -
+          uuid: 0fe7e8e5480a42b7903cb7ac9bf931cc
           name: 'Directory discovery'
           type: SCRIPT
           key: sharepoint.directory.discovery
@@ -361,6 +368,7 @@ zabbix_export:
                 formulaid: F
           item_prototypes:
             -
+              uuid: 337493ed37424be98abd4c0550279a0b
               name: 'Sharepoint: Created ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]'
@@ -370,9 +378,6 @@ zabbix_export:
               description: |
                 Date of creation:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -385,7 +390,12 @@ zabbix_export:
                     - 3h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
             -
+              uuid: b230bfba317e4d2eb2c6a816bd357d71
               name: 'Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]'
@@ -395,9 +405,6 @@ zabbix_export:
               description: |
                 Date of change:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -410,15 +417,21 @@ zabbix_export:
                     - 3h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  uuid: d1683e2fcdda45969ff451e43ae696c2
+                  expression: '(last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2))=1'
                   name: 'Sharepoint: Sharepoint object is changed'
                   opdata: '{#SHAREPOINT.LLD.FULL_PATH}'
                   priority: INFO
                   description: 'Updated date of modification of folder / file'
                   manual_close: 'YES'
             -
+              uuid: 68c3d2d2b33a494ab85ca6b883398fbb
               name: 'Sharepoint: Size ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]'
@@ -428,9 +441,6 @@ zabbix_export:
               description: |
                 Size of:
                 {#SHAREPOINT.LLD.FULL_PATH}
-              application_prototypes:
-                -
-                  name: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -443,6 +453,10 @@ zabbix_export:
                     - 24h
               master_item:
                 key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
           parameters:
             -
               name: password
@@ -461,20 +475,6 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-      httptests:
-        -
-          name: 'Sharepoint: Front page'
-          application:
-            name: 'Sharepoint front page'
-          delay: 10m
-          authentication: NTLM
-          http_user: '{$SHAREPOINT.USER}'
-          http_password: '{$SHAREPOINT.PASSWORD}'
-          steps:
-            -
-              name: Login
-              url: '{$SHAREPOINT.URL}'
-              status_codes: '200'
       macros:
         -
           macro: '{$SHAREPOINT.GET_INTERVAL}'
@@ -523,6 +523,7 @@ zabbix_export:
           macro: '{$SHAREPOINT.USER}'
       valuemaps:
         -
+          uuid: 70add725d6a84f6f9ed0917107dfffc9
           name: 'HTTP response status code'
           mappings:
             -

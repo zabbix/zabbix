@@ -24,6 +24,6 @@
  */
 abstract class CConverter {
 
-	abstract function convert($value);
+	abstract public function convert(array $data);
 
 }

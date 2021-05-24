@@ -47,18 +47,18 @@ class testFormValueMappings extends CWebTest {
 	const EXISTING_VALUEMAPS = [
 		[
 			'Name' => 'Valuemap for delete',
-			'Value' => "four ⇒ 4\noneoneoneoneoneoneoneoneoneoneone ⇒ 11111111111\nthreethreethreethreethreethree".
-					"threethreethreethree ⇒ 3333333333\n…",
+			'Value' => "=oneoneoneoneoneoneoneoneoneoneone\n⇒\n11111111111\n=two\n⇒\n2\n=threethreethreethreethreethree".
+					"threethreethreethree\n⇒\n3333333333\n…",
 			'Action' => 'Remove'
 		],
 		[
 			'Name' => 'Valuemap for update 1',
-			'Value' => '⇒ reference newvalue',
+			'Value' => "=\n⇒\nreference newvalue",
 			'Action' => 'Remove'
 		],
 		[
 			'Name' => 'Valuemap for update 2',
-			'Value' => "⇒ no data\n1 ⇒ one\n2 ⇒ two\n…",
+			'Value' => "=\n⇒\nno data\n=1\n⇒\none\n=2\n⇒\ntwo\n…",
 			'Action' => 'Remove'
 		]
 	];
@@ -89,7 +89,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check mappings table layout.
 		$mappings_table = $mapping_form->query('id:mappings_table')->asTable()->one();
-		$this->assertEquals(['Value', '', 'Mapped to', 'Action'], $mappings_table->getHeadersText());
+		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', 'Action', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
 			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//input')->one();
@@ -387,11 +387,6 @@ class testFormValueMappings extends CWebTest {
 		}
 		unset($mapping);
 
-		// Sort reference mappings array by field "Value".
-		usort($mappings, function($a, $b) {
-			return $a['value'] <=> $b['value'];
-		});
-
 		$mappings_table->checkValue($mappings);
 	}
 
@@ -420,7 +415,7 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (host or template) for which the scenario is executed.
 	 */
 	public function checkSimpleUpdate($source) {
-		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
+		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid ORDER BY v.name, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open configuration of a value mapping and save it without making any changes.
@@ -522,7 +517,7 @@ class testFormValueMappings extends CWebTest {
 		$reference_valuemaps = [
 			[
 				'Name' => $valuemap['name'],
-				'Value' => $valuemap['mappings']['value'].' ⇒ '.$valuemap['mappings']['newvalue'],
+				'Value' => "=".$valuemap['mappings']['value']."\n⇒\n".$valuemap['mappings']['newvalue'],
 				'Action' => 'Remove'
 			]
 		];

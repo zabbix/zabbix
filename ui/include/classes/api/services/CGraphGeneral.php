@@ -484,20 +484,25 @@ abstract class CGraphGeneral extends CApiService {
 	 * Check if new items are from same templated host, validate Y axis items and values and hosts and templates.
 	 *
 	 * @param array $graphs
+	 *
+	 * @throws APIException
 	 */
-	protected function validateCreate(array $graphs) {
+	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
+					'uuid' =>		['type' => API_UUID]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
+					'uuid' =>		['type' => API_UUID],
+					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 
@@ -506,8 +511,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$read_only_fields = ['templateid', 'flags'];
+		$templated_graph_indexes = [];
 
-		foreach ($graphs as $key => $graph) {
+		foreach ($graphs as $key => &$graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
 			$data = array_intersect_key($graph, $api_input_rules['fields']);
@@ -529,8 +535,9 @@ abstract class CGraphGeneral extends CApiService {
 
 				// check - items from one template. at least one item belongs to template
 				foreach ($graphHosts as $host) {
-					if (HOST_STATUS_TEMPLATE == $host['status']) {
+					if ($host['status'] == HOST_STATUS_TEMPLATE) {
 						$templatedGraph = $host['hostid'];
+						$templated_graph_indexes[$key] = true;
 						break;
 					}
 				}
@@ -558,8 +565,47 @@ abstract class CGraphGeneral extends CApiService {
 			// check graph type and ymin/ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 		}
+		unset($graph);
 
 		$this->validateHostsAndTemplates($graphs);
+		$this->checkAndAddUuid($graphs, $templated_graph_indexes);
+	}
+
+	/**
+	 * Check that only graphs on templates have UUID. Add UUID to all graphs on templates, if it does not exists.
+	 *
+	 * @param array $graphs_to_create
+	 * @param array $templated_graph_indexes
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$graphs_to_create, array $templated_graph_indexes): void {
+		foreach ($graphs_to_create as $index => &$graph) {
+			if (!array_key_exists($index, $templated_graph_indexes) && array_key_exists('uuid', $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
+						_s('unexpected parameter "%1$s"', 'uuid')
+					)
+				);
+			}
+
+			if (array_key_exists($index, $templated_graph_indexes) && !array_key_exists('uuid', $graph)) {
+				$graph['uuid'] = generateUuidV4();
+			}
+		}
+		unset($graph);
+
+		$db_uuid = DB::select('graphs', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($graphs_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -656,6 +702,12 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			if (array_key_exists('uuid', $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
 			}
 
 			$templatedGraph = false;

@@ -47,7 +47,7 @@ class CControllerPopupGeneric extends CController {
 	 * @var array
 	 */
 	const ALLOWED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_AGGREGATE, ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
+		ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
 	];
 
 	/**
@@ -378,6 +378,18 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name'),
 					_('Mapping')
+				]
+			],
+			'dashboard' => [
+				'title' => _('Dashboards'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'dashboardid,name',
+				'form' => [
+					'name' => 'dashboardform',
+					'id' => 'dashboards'
+				],
+				'table_columns' => [
+					_('Name')
 				]
 			]
 		];
@@ -1103,7 +1115,7 @@ class CControllerPopupGeneric extends CController {
 			case 'item_prototypes':
 				$options += [
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['name', 'host'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 
@@ -1287,7 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
 				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
-				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
 				 *          this parameter is not set;
 				 */
 				$records = [];
@@ -1336,7 +1348,7 @@ class CControllerPopupGeneric extends CController {
 
 				$db_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
-					'selectMappings' => ['value', 'newvalue'],
+					'selectMappings' => ['type', 'value', 'newvalue'],
 					'hostids' => $hostids,
 					'limit' => $limit
 				]);
@@ -1344,7 +1356,6 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
-					order_result($db_valuemap['mappings'], 'value');
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
 						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
@@ -1358,6 +1369,17 @@ class CControllerPopupGeneric extends CController {
 
 				$records = array_column($records, null, 'id');
 				CArrayHelper::sort($records, ['name', 'hostname']);
+				break;
+
+			case 'dashboard':
+				$options += [
+					'output' => ['dashboardid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Dashboard()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
 				break;
 		}
 

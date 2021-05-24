@@ -386,7 +386,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_ops_issuelink}'
       event_menu_name: 'Opsgenie: {EVENT.TAGS.__zbx_ops_issuekey}'
       description: |
-        Please refer to https://docs.opsgenie.com/docs/alert-api and https://www.zabbix.com/documentation/5.4/manual/config/notifications/media/webhook#example_scripts.
+        Please refer to https://docs.opsgenie.com/docs/alert-api and https://www.zabbix.com/documentation/6.0/manual/config/notifications/media/webhook#example_scripts.
           
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add dedicated user with media type "Opsgenie".

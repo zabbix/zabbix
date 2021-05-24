@@ -34,12 +34,12 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$this->setType(WIDGET_SVG_GRAPH);
 		$this->setValidationRules([
 			'name' => 'string',
-			'dashboardid' => 'db dashboard.dashboardid',
-			'initial_load' => 'in 0,1',
 			'edit_mode' => 'in 0,1',
 			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
+			'from_ts' => 'string',
+			'to_ts' => 'string',
 			'fields' => 'json'
 		]);
 	}
@@ -50,7 +50,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
-		$initial_load = $this->getInput('initial_load', 1);
 
 		$parser = new CNumberParser(['with_suffix' => true]);
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
@@ -99,16 +98,11 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'overrides' => array_values($fields['or'])
 		];
 
-		// Use dashboard time from user profile.
+		// Use dashboard time.
 		if ($graph_data['dashboard_time'] && !$preview) {
-			$timeline = getTimeSelectorPeriod([
-				'profileIdx' => 'web.dashboard.filter',
-				'profileIdx2' => $this->getInput('dashboardid', 0)
-			]);
-
 			$graph_data['time_period'] = [
-				'time_from' => $timeline['from_ts'],
-				'time_to' => $timeline['to_ts']
+				'time_from' => $this->getInput('from_ts', 0),
+				'time_to' => $this->getInput('to_ts', 0)
 			];
 		}
 		// Otherwise, set graph time period options.
@@ -140,7 +134,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultName()),
 			'svg' => $svg_options['svg'].$svg_options['legend'],
 			'svg_options' => $svg_options,
-			'initial_load' => $initial_load,
 			'preview' => $preview,
 			'info' => $edit_mode ? null : self::makeWidgetInfo($fields),
 			'user' => [

@@ -2581,3 +2581,22 @@ function secondsToPeriod(int $seconds): string {
 
 	return $period;
 }
+
+/**
+ * Generates UUID version 4.
+ *
+ * @param string $seed   String to be hashed as md5 and used as UUID body.
+ *
+ * @return string
+ */
+function generateUuidV4($seed = '') {
+	$data = ($seed === '') ? random_bytes(16) : hex2bin(md5($seed));
+
+	// Set head of 7th byte to 0100 (0100xxxx)
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+
+	// Set head of 9th byte to 10 (10xxxxxx)
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+	return bin2hex($data);
+}

@@ -1,0 +1,296 @@
+---
+test case: exact match
+in:
+  value: 0
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Value 0 (0)"
+---
+test case: exact match with conversion
+in:
+  value: 0.1024
+  type: 0 # ITEM_VALUE_TYPE_FLOAT
+  valuemaps:
+  - type: 0
+    value: "1e-4K"
+    newvalue: "Value 0.1K"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Value 0.1K (0.1024)"
+---
+test case: exact match string
+in:
+  value: "String 0"
+  type: 1 # ITEM_VALUE_TYPE_STR
+  valuemaps:
+  - type: 0
+    value: "String 0"
+    newvalue: "Value 0"
+  - type: 0
+    value: "String 1"
+    newvalue: "Value 1"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Value 0 (String 0)"
+---
+test case: regexp ignored
+in:
+  value: 1
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Value <= 3 (1)"
+---
+test case: regexp
+in:
+  value: 1
+  type: 1 # ITEM_VALUE_TYPE_STR
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Regex 1 (1)"
+---
+test case: range <= 3
+in:
+  value: 2
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+out:
+  return: SUCCEED
+  value: "Value <= 3 (2)"
+---
+test case: range 5-7
+in:
+  value: 6
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+  - type: 3
+    value: "5-7"
+    newvalue: "Value 5-7"
+out:
+  return: SUCCEED
+  value: "Value 5-7 (6)"
+---
+test case: range 5-7 ignored
+in:
+  value: 6
+  type: 1 # ITEM_VALUE_TYPE_STR
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "3"
+    newvalue: "Value <= 3"
+  - type: 3
+    value: "5-7"
+    newvalue: "Value 5-7"
+out:
+  return: FAIL
+  value: 6
+---
+test case: range > 10
+in:
+  value: 15
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: 3
+    newvalue: "Value <= 3"
+  - type: 3
+    value: "5-7"
+    newvalue: "Value 5-7"
+  - type: 1
+    value: 10
+    newvalue: "Value >= 10"
+out:
+  return: SUCCEED
+  value: "Value >= 10 (15)"
+---
+test case: default
+in:
+  value: 4
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: 3
+    newvalue: "Value <= 3"
+  - type: 3
+    value: "5-7"
+    newvalue: "Value 5-7"
+  - type: 1
+    value: 10
+    newvalue: "Value >= 10"
+  - type: 5
+    value: ""
+    newvalue: "Default"
+out:
+  return: SUCCEED
+  value: "Default (4)"
+---
+test case: no mapping
+in:
+  value: 4
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: 3
+    newvalue: "Value <= 3"
+  - type: 3
+    value: "5-7"
+    newvalue: "Value 5-7"
+  - type: 1
+    value: 10
+    newvalue: "Value >= 10"
+out:
+  return: FAIL
+  value: 4
+---
+test case: order
+in:
+  value: 1
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 2
+    value: 3
+    newvalue: "Value <= 3"
+  - type: 0
+    value: 1
+    newvalue: "Value 1"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+out:
+  return: SUCCEED
+  value: "Value <= 3 (1)"
+---
+test case: scientific ranges
+in:
+  value: -0.22
+  type: 0 # ITEM_VALUE_TYPE_FLOAT
+  valuemaps:
+  - type: 3
+    value: "-3.05E-1--1.1e-2, 1e+4 - 1.002e+5"
+    newvalue: "Scientific Range"
+out:
+  return: SUCCEED
+  value: "Scientific Range (-0.22)"
+---
+test case: complex range
+in:
+  value: 4
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-5,32,44,4- 6, 10.5 -12.5, 133.1, 8"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (4)"
+---
+test case: complex range 2
+in:
+  value: 4
+  type: 3 # ITEM_VALUE_TYPE_UINT64
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-1,32,44,9.0e-1- 6.0e0, 10.5 -12.5, 133.1, 8"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (4)"
+---
+test case: range with suffix
+in:
+  value: -400
+  type: 0 # ITEM_VALUE_TYPE_FLOAT
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-1,32,44,9.0e-1- 6.0e0, -5e-1K - -3e2"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (-400)"
+...
+

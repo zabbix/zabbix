@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:26Z'
+  date: '2021-05-11T08:05:04Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: de96d02bd5f242bfa31308ae2131d03f
       template: 'Brocade FC SNMP'
       name: 'Brocade FC SNMP'
       description: |
@@ -31,6 +33,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: b17a06635cb2400f9c6d0f848fd38868
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.26.1.0
@@ -47,12 +50,14 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              uuid: 68a50684095941cb90f22fbc8d632e7a
+              expression: 'min(/Brocade FC SNMP/system.cpu.util[swCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: c6e2d4c076b14ed19fbcb08caa32e5be
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.6.0
@@ -73,13 +78,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 9c5ae10dbafb45658f25f0279a8a1934
+              expression: '(last(/Brocade FC SNMP/system.hw.firmware,#1)<>last(/Brocade FC SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade FC SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 3c68a1be050d4c1287e63eb7b3b81f8f
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.10.0
@@ -101,12 +108,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 9939f98da99c435a9b5505e55e8abb5f
+              expression: '(last(/Brocade FC SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC SNMP/system.hw.serialnumber,#2))=1 and length(last(/Brocade FC SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 29f1dda8042d4fd18d7da9eb95fea76c
           name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.7.0
@@ -129,13 +138,15 @@ zabbix_export:
               value: Status
           triggers:
             -
-              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              uuid: b91af8b94e2047538376be9911beadee
+              expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
             -
-              expression: '{count(#1,{$HEALTH_WARN_STATUS:"offline"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"testing"},eq)}=1'
+              uuid: b17d4a2bae804c968984b763fa4562fc
+              expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"offline\"}")=1 or count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"testing\"}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -143,8 +154,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System status is in critical state'
-                  expression: '{Brocade FC SNMP:system.status[swOperStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
         -
+          uuid: 9a8441cae4fb4c698502a20d5ce23ddf
           name: 'Memory utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.26.6.0
@@ -161,12 +173,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              uuid: 1991ae08b008488380db02160b15160e
+              expression: 'min(/Brocade FC SNMP/vm.memory.util[swMemUsage.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
         -
+          uuid: 721801e236e34b02b5430d115b23817e
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]'
@@ -180,6 +194,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 4f37f76d0b3241598e69b091f1835ef5
               name: '{#SENSOR_INFO}: Fan speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}'
@@ -195,6 +210,7 @@ zabbix_export:
                   tag: Application
                   value: Fans
             -
+              uuid: ee2569161ad146b392bb8f331a7f7d19
               name: '{#SENSOR_INFO}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}'
@@ -211,13 +227,15 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: 75003433a8304644a20d11b82dcbae14
+                  expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  uuid: 83e8182fd7034edca8317fa91776b6d2
+                  expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -225,8 +243,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: '{Brocade FC SNMP:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
+          uuid: 32c9720e348e4d4ebb9e70c2b247de29
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]'
@@ -240,6 +259,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 7a8f32cbb43f4ce789097e8cb26b0456
               name: '{#SENSOR_INFO}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}'
@@ -256,13 +276,15 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: 649e7344411242738d9824f861b3c49a
+                  expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  uuid: bfe2f4085f6840da9e8d30f37bb29fdb
+                  expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -270,8 +292,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
-                      expression: '{Brocade FC SNMP:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
+          uuid: efaa3e2dfb5b405d99998bd6f8a08697
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]'
@@ -285,6 +308,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: f95f92a4151d4039ab3ce73ca231f079
               name: '{#SENSOR_INFO}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}'
@@ -302,6 +326,7 @@ zabbix_export:
                   tag: Application
                   value: Temperature
             -
+              uuid: ee48ef951f124c569327670a2a0f2152
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}'
@@ -318,28 +343,31 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: 5ee4c1931e244d638b58f945f8a7565c
+                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: fc68b3a0ea6643f988c26e3e735d7491
+                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
           trigger_prototypes:
             -
+              uuid: 726afdedb08848bd86ab4161cef29f42
               expression: |
-                {Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
+                avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
                 or
-                {Brocade FC SNMP:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                last(/Brocade FC SNMP/sensor.temp.status[swSensorStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
+              recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
               name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -347,8 +375,8 @@ zabbix_export:
               dependencies:
                 -
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                  expression: '{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                  recovery_expression: '{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -391,6 +419,7 @@ zabbix_export:
           value: '5'
       valuemaps:
         -
+          uuid: 54427fdf694547c598e3662df09a980a
           name: 'SW-MIB::swOperStatus'
           mappings:
             -
@@ -406,6 +435,7 @@ zabbix_export:
               value: '4'
               newvalue: faulty
         -
+          uuid: 73618556ee4b4e8f9ec9acf0893e13ea
           name: 'SW-MIB::swSensorStatus'
           mappings:
             -
@@ -428,6 +458,7 @@ zabbix_export:
               newvalue: absent
   graphs:
     -
+      uuid: 8d1edf299fde462bbca5ceaf1b439223
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -439,6 +470,7 @@ zabbix_export:
             host: 'Brocade FC SNMP'
             key: 'system.cpu.util[swCpuUsage.0]'
     -
+      uuid: d1e06bb17c2f458699664bfa61c12496
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

@@ -203,12 +203,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Simple form test host',
-					'type' => 'Zabbix aggregate'
-				]
-			],
-			[
-				[
-					'host' => 'Simple form test host',
 					'type' => 'External check'
 				]
 			],
@@ -418,12 +412,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'type' => 'Zabbix aggregate'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
 					'type' => 'External check'
 				]
 			],
@@ -594,7 +582,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'SNMP trap',
 				'Zabbix internal',
 				'Zabbix trapper',
-				'Zabbix aggregate',
 				'External check',
 				'Database monitor',
 				'IPMI agent',
@@ -820,7 +807,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case 'Simple check':
 			case 'SNMP agent':
 			case 'Zabbix internal':
-			case 'Zabbix aggregate':
 			case 'External check':
 			case 'Database monitor':
 			case 'IPMI agent':
@@ -852,7 +838,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'Text'
 			]);
 
-			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
+			if ($type == 'Calculated') {
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
@@ -945,8 +931,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 				while ($row = DBfetch($valuemap_result)) {
 					$db_valuemap[] = $row['name'];
 				}
-				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
-						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid']);
+				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.sortorder, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
+						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid'].
+						' ORDER BY vm.name, m.sortorder');
 
 				$valuemap_field->edit();
 				$valuemap_overlay = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -965,22 +952,22 @@ class testFormItemPrototype extends CLegacyWebTest {
 						$mappings = [];
 						$i = 0;
 						foreach ($db_mappings as $db_mapping) {
-							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
-
 							if ($db_mapping['name'] === $valuemap_name) {
-								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
-								$i++;
-								// Only the first three mappings are displayed in the form for each value mapping
-								if ($i < 4) {
-									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								if ($i < 3) {
+									$mappings[] = '='.$db_mapping['value'].' ⇒ '.$db_mapping['newvalue'];
+									$i++;
 								}
 								else {
-									$this->assertTrue(str_contains($mappings_text, '…'));
+									$mappings[] = '…';
 
 									break;
 								}
 							}
 						}
+						// Transform newlines in value map table text.
+						$source = $value_mapping->getColumn('Mapping')->getText();
+						$text = rtrim(preg_replace("/(.*)\n⇒\n(.*)\n?/", "\\1 ⇒ \\2\n", $source), "\n");
+						$this->assertEquals(implode("\n", $mappings), $text);
 					}
 				}
 				else {
@@ -1824,28 +1811,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'allowed_hosts' => '{$MACRO},127.0.0.1',
 					'dbCheck' => true,
 					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'item-zabbix-aggregate',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Key "item-zabbix-aggregate" does not match'
-					]
 				]
 			],
 			[
