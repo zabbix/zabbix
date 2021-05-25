@@ -2611,13 +2611,19 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$items = [];
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
-				$items = API::ItemPrototype()->get([
-					'output' => $options['selectItems'],
-					'itemids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$items = API::ItemPrototype()->get([
+						'output' => $options['selectItems'],
+						'itemids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
@@ -2638,6 +2644,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,f.triggerid'.
@@ -2650,11 +2657,16 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
 				}
 
-				$triggers = API::TriggerPrototype()->get([
-					'output' => $options['selectTriggers'],
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$triggers = API::TriggerPrototype()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
@@ -2676,6 +2688,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,gi.graphid'.
@@ -2688,11 +2701,16 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
 				}
 
-				$graphs = API::GraphPrototype()->get([
-					'output' => $options['selectGraphs'],
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::GraphPrototype()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
@@ -2714,13 +2732,19 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding hosts
 		if ($options['selectHostPrototypes'] !== null) {
 			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
+				$hostPrototypes = [];
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
-				$hostPrototypes = API::HostPrototype()->get([
-					'output' => $options['selectHostPrototypes'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hostPrototypes = API::HostPrototype()->get([
+						'output' => $options['selectHostPrototypes'],
+						'hostids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
 			}
 			else {
@@ -2755,11 +2779,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('item_condition', [
+				$conditions = DB::select('item_condition', [
 					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
 					'filter' => ['itemid' => $itemIds],
 					'preservekeys' => true,
-					'sortfield' => 'item_conditionid'
+					'sortfield' => ['item_conditionid']
 				]);
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
@@ -2849,11 +2873,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'preservekeys' => true
 			]);
 
-			if ($filter_requested) {
-				$conditions = API::getApiService()->select('lld_override_condition', [
+			if ($filter_requested && $overrides) {
+				$conditions = DB::select('lld_override_condition', [
 					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
 					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => 'lld_override_conditionid',
+					'sortfield' => ['lld_override_conditionid'],
 					'preservekeys' => true
 				]);
 
