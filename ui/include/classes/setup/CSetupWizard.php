@@ -20,7 +20,7 @@
 
 
 /**
- * Setup wizzard form.
+ * Setup wizard form.
  */
 class CSetupWizard extends CForm {
 
