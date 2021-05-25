@@ -271,7 +271,7 @@ static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
  * Parameters:                                                                *
  *     pIfRow      - [IN] pointer to initialized zbx_ifrow_t variable         *
  *                                                                            *
- * Comments: returns pointer do dynamically-allocated memory, caller must     *
+ * Comments: returns pointer to dynamically-allocated memory, caller must     *
  *           free it                                                          *
  *                                                                            *
  ******************************************************************************/
@@ -313,7 +313,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
  * Parameters:                                                                *
  *     pIfRow      - [IN] pointer to initialized zbx_ifrow_t variable         *
  *                                                                            *
- * Comments: returns pointer do dynamically-allocated memory, caller must     *
+ * Comments: returns pointer to dynamically-allocated memory, caller must     *
  *           free it                                                          *
  *                                                                            *
  ******************************************************************************/
