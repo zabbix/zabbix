@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-13 16:28+0300\n"
+"POT-Creation-Date: 2021-05-21 19:55+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9507,7 +9507,7 @@ msgstr "Điều kiện hoạt động không hợp lệ: %1$s."
 msgid "Invalid condition: %1$s."
 msgstr ""
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:220
+#: app/controllers/CControllerTimeSelectorUpdate.php:219
 msgid "Invalid date."
 msgstr "Ngày kiểm kê."
 
@@ -11151,7 +11151,7 @@ msgstr "Số lượng tệp mở tối đa được hỗ trợ bởi HĐH. Trả
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Số lượng tiến trình tối thiểu được hỗ trợ bởi HĐH. Trả về kiểu integer"
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:250
+#: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
 #: include/validate.inc.php:477
@@ -11386,7 +11386,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr "Sự quan trọng tối thiểu"
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:245
+#: app/controllers/CControllerTimeSelectorUpdate.php:244
 #: include/classes/mvc/CController.php:252
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
 #: include/validate.inc.php:470
@@ -14386,7 +14386,7 @@ msgstr "Lệnh từ xa"
 #: app/partials/hostmacros.inherited.list.html.php:118
 #: app/partials/hostmacros.list.html.php:56
 #: app/partials/js/common.filter.trigger.js.php:34
-#: app/partials/js/configuration.valuemap.js.php:98
+#: app/partials/js/configuration.valuemap.js.php:106
 #: app/partials/js/scheduledreport.subscription.js.php:201
 #: app/partials/massupdate.macros.tab.php:60
 #: app/partials/massupdate.macros.tab.php:126
@@ -20079,7 +20079,7 @@ msgid "days"
 msgstr "Ngày"
 
 #: app/controllers/CControllerMapView.php:123
-#: app/partials/js/configuration.valuemap.js.php:148
+#: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
 #: include/classes/setup/CSetupWizard.php:496
 #: include/classes/widgets/CWidgetHelper.php:69

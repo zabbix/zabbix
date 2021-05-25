@@ -72,7 +72,7 @@ class CExpressionMacroParser extends CParser {
 				$this->error = $this->expression_parser->getError();
 				return CParser::PARSE_FAIL;
 		}
-		$p += $this->expression_parser->getLength();;
+		$p += $this->expression_parser->getLength();
 
 		while (isset($source[$p]) && strpos(CExpressionParser::WHITESPACES, $source[$p]) !== false) {
 			$p++;

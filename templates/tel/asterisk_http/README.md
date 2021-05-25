@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and
  create Asterisk Manager user with system and command write permissions within your Asterisk instance.  
