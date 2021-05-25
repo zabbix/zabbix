@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-24T12:54:54Z</date>
+   <date>2021-05-25T13:03:53Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -21,8 +21,6 @@ should have an Agent interface with the AMI address to check Asterisk service&#1
 status.&#13;
 Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in&#13;
 the template for using on the host level.&#13;
-Do not forget to check {$AMI.TIMEZONE} macro and, if it needs, to change its&#13;
-value to show right Uptime values.&#13;
 If there are errors, increase the logging to debug level and see the Zabbix server log.&#13;
 &#13;
 &#13;
@@ -191,14 +189,15 @@ Template tooling version used: 0.38</description>
 
         var match = response.match('Response: (.+)');
         if (match !== null &amp;&amp; match[1] !== 'Success' &amp;&amp; match[1] !== 'Goodbye' &amp;&amp; match[1] !== 'Follows') {
-            var message = 'Request failed with message ' + match[1];
+            var responseText = match[1],
+                message = 'Request failed with message ' + match[1];
 
             match = response.match('Message: (.+)');
             if (match !== null &amp;&amp; match[1]) {
+                var responseMessage = match[1];
                 message += ': ' + match[1];
             }
-
-            if (message !== 'Request failed with message Error: No endpoints found') {
+            if (responseText !== 'Error' || responseMessage !== 'No endpoints found') {
                 throw message + '. Check debug log for more information.';
             }
         }
@@ -248,12 +247,16 @@ var asterisk = {
 };
 
 function block2Object(text) {
-    var fields = [],
+    var parts = [],
         dict = {};
 
-    text.split('\r\n').forEach(function (line) {
-        fields = line.split(': ');
-        dict[fields[0]] = fields[1];
+    text = text.replace(/^Output: /gm, '');
+
+    text.split('\n').forEach(function (line) {
+        parts = line.split(':');
+        if (parts.length &gt; 1) {
+            dict[parts.shift().trim()] = parts.join(':').trim();
+        }
     })
 
     return dict;
@@ -371,13 +374,38 @@ function escapeChars(str) {
     return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&amp;');
 }
 
+function getUptimeSeconds(text) {
+    var date = {
+        years: 0,
+        weeks: 0,
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+    };
+
+    var fields = {
+        years: 'years?',
+        weeks: 'weeks?',
+        days: 'days?',
+        hours: 'hours?',
+        minutes: 'minutes?',
+        seconds: 'seconds?'
+    };
+
+    Object.keys(fields).forEach(function (field) {
+        var match = text.match('(\\d+) ' + fields[field]);
+        if (match !== null &amp;&amp; typeof match[1] !== 'undefined') {
+            date[field] = parseInt(match[1]);
+        }
+    });
+    return date.years * 220752000 + date.weeks * 604800 + date.days * 86400 +
+        date.hours * 3600 + date.minutes * 60 + date.seconds;
+}
+
 var cookie = value.match(/mansession_id="([0-9A-z]+)"/);
 if (cookie == null) {
     throw 'Cannot find mansession_id with cookie in response.';
-}
-
-if (Ami.params.timezone.match(/^([+-]([\d]|10|11|12)(:[0-5][\d])?)$/) == null) {
-    throw 'Timezone should be between -12 to +12.';
 }
 
 var url = Ami.params.url.split('?')[0] + '?action=';
@@ -390,15 +418,13 @@ if (typeof coreSettings.AsteriskVersion !== 'undefined') {
     asterisk.version = coreSettings.AsteriskVersion;
 }
 
-response = Ami.request(url, 'CoreStatus');
-var coreStatus = block2Object(response.body);
-if (typeof coreStatus.CoreStartupDate !== 'undefined') {
-    asterisk.uptime = (Date.now() - Date.parse(coreStatus.CoreStartupDate + " " + coreStatus.CoreStartupTime +
-        Ami.params.timezone)) / 1000;
+response = Ami.request(url, 'command&amp;command=core%20show%20uptime');
+var uptime = block2Object(response.body);
+if (typeof uptime["System uptime"] !== 'undefined') {
+    asterisk.uptime = getUptimeSeconds(uptime["System uptime"]);
 }
-if (typeof coreStatus.CoreReloadDate !== 'undefined') {
-    asterisk.uptime_reload = (Date.now() - Date.parse(coreStatus.CoreReloadDate + " " + coreStatus.CoreReloadTime +
-        Ami.params.timezone)) / 1000;
+if (typeof uptime["Last reload"] !== 'undefined') {
+    asterisk.uptime_reload = getUptimeSeconds(uptime["Last reload"]);
 }
 
 response = Ami.request(url, 'command&amp;command=core%20show%20channels%20count');
@@ -437,7 +463,7 @@ if (list.includes('QueueSummary')) {
 try {
     response = Ami.request(url, 'Logoff');
 }
-catch (e) { }
+catch (e) {}
 
 return JSON.stringify(asterisk);
 </params>
@@ -1453,11 +1479,6 @@ OK</description>
                <macro>{$AMI.SECRET}</macro>
                <value>zabbix</value>
                <description>The Asterisk Manager secret.</description>
-            </macro>
-            <macro>
-               <macro>{$AMI.TIMEZONE}</macro>
-               <value>+0</value>
-               <description>The Asterisk server timezone.</description>
             </macro>
             <macro>
                <macro>{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}</macro>
