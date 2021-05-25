@@ -405,6 +405,8 @@ func hasMeta(path string) bool {
 }
 
 func loadInclude(root *Node, path string) (err error) {
+	path = filepath.Clean(path)
+
 	absPath, err := filepath.Abs(path)
 	if err != nil {
 		return newIncludeError(root, &path, err.Error())
