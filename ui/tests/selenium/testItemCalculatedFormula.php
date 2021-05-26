@@ -146,7 +146,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'count(/host/trap,"{#MACRO}:now-5h","eq")'
+					'formula' => 'count(/host/trap,"{#LLD}:now-5h","eq")'
 				]
 			],
 			[
@@ -701,6 +701,14 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => "bitand(last(/host/key,#5:now-#5),123)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(/host/key,#5:now-#5),123)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => "bitand(last(//key,:now-24h),123)",
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(//key,:now-24h),123)".'
@@ -1102,6 +1110,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'logsource(/*/trap)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logsource".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'logsource(/Trapper/trap[4],#3:now-#3,"^error")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],#3:now-#3,"^error")".'
 				]
 			],
 			[
@@ -1984,6 +2000,14 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => "varpop(//trap,#1:now-#1)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "varpop(//trap,#1:now-#1)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => "varsamp(//trap,{TEST})",
 					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"varsamp(//trap,{TEST})\"."
@@ -2459,8 +2483,8 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift".
-							"(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)"
+					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],{\$USERMACRO}))+avg(count_foreach(/*/trap?[tag=\"tag1\"],\"{\$USERMACRO}h\"))-bitrshift".
+							"(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,\"{\$USERMACRO}:now/h\")"
 				]
 			],
 			[
