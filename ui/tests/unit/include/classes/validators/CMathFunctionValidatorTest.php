@@ -21,7 +21,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CMastFunctionValidatorTest extends TestCase {
+class CMathFunctionValidatorTest extends TestCase {
 
 	/**
 	 * An array of math functions, options and the expected results.
