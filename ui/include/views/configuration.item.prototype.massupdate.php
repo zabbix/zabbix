@@ -393,7 +393,7 @@ $item_form_list
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()
-			))->setAttribute('target', '_blank')
+			))->setTarget('_blank')
 		]))->setId('valuemap')
 	)
 	->addRow(
