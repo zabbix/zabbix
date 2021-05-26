@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 5.4 and higher  
 https://service-provider.zyxel.com/global/en/products/msansdslams/central-msans/chassis-msans/ies-5000-series
 
 This template was tested on:

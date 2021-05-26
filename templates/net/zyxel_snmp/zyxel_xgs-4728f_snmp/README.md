@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 5.4 and higher  
 https://www.zyxel.com/products_services/xgs_4728f.shtml
 
 This template was tested on:

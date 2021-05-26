@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 5.4 and higher  
 http://origin-eu.zyxel.com/products_services/ies_1248_51v.shtml?t=p
 
 This template was tested on:
