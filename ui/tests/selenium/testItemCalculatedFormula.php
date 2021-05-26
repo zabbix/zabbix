@@ -85,6 +85,16 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
+					'formula' => 'avg(/host/trap,"{$TEST}h")'
+				]
+			],
+			[
+				[
+					'formula' => 'avg(/host/trap,{$TEST})'
+				]
+			],
+			[
+				[
 					'formula' => "avg(//trap,19)"
 				]
 			],
@@ -142,6 +152,11 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'count(/host/trap,1m,,"0")'
+				]
+			],
+			[
+				[
+					'formula' => 'count(/host/trap,"{$TEST}m",,"0")'
 				]
 			],
 			[
@@ -328,7 +343,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// fuzzytime() function.
 			[
 				[
-					'formula' => 'fuzzytime(/host/trap,60)'
+					'formula' => 'fuzzytime(/host/trap,"{$TEST}s")'
 				]
 			],
 			// last() function.
@@ -407,19 +422,19 @@ class testItemCalculatedFormula extends CWebTest {
 			// min() function.
 			[
 				[
-					'formula' => "min(//trap,#4:now-1m)"
+					'formula' => "min(//trap,\"#4:now-{\$TEST}m\")"
 				]
 			],
 			// mod() function.
 			[
 				[
-					'formula' => "mod(last(//trap),2)"
+					'formula' => "mod(last(//trap),2s)"
 				]
 			],
 			// nodata() function.
 			[
 				[
-					'formula' => 'nodata(/host/trap,30)'
+					'formula' => 'nodata(/host/trap,30d)'
 				]
 			],
 			// now() function.
@@ -669,6 +684,14 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => "bitand(last(//key,:now-24h),123)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(//key,:now-24h),123)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'bitand(/*/key,1h:now/h,123)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitand".'
@@ -690,6 +713,22 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'count(/host/trap,999999999999999)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(/host/trap,:now/d)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now/d)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(/host/trap,:now-5h,"eq")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now-5h,"eq")".'
 				]
 			],
 			[
@@ -759,6 +798,22 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'forecast(/host/trap,#77)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "forecast".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'forecast(/host/trap,:now/d,25h,"logarithmic","min")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "forecast(/host/trap,:now/d,25h,"logarithmic","min")".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'forecast(/host/trap,":now/d",25h,"logarithmic","min")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
 				]
 			],
 			[
@@ -1152,6 +1207,22 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => 'sum(/host/trap,":now/d")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "sum".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'sum(/host/trap,:now/d)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,:now/d)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,,)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "sum".'
@@ -1251,6 +1322,22 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => 'trendavg(/host/key,:now-3600)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendavg(/host/key,:now-3600)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendavg(/host/key,":now-3600")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,30m:now-30m)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
@@ -1338,6 +1425,15 @@ class testItemCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendmax(/host/item,:now/w)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmax(/host/item,:now/w)".'
+				]
+			],
+
 			[
 				[
 					'expected' => TEST_BAD,
