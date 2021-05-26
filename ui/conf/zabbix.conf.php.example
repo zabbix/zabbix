@@ -50,3 +50,4 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO['SP_CERT']			= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 //$SSO['SETTINGS']		= [];
+//$SSO['ProxyVars']      = false; //Change to true if you are using zabbix behind reverse proxy (or kubernetes ingress)

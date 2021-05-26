@@ -53,7 +53,6 @@ require_once __DIR__.'/vendor/xmlseclibs/xmlseclibs.php';
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
 
-$baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
 
 $sp_key = '';
@@ -61,6 +60,15 @@ $sp_cert = '';
 $idp_cert = '';
 
 global $SSO;
+
+if (is_array($SSO) && array_key_exists('ProxyVars', $SSO)) {
+	if (is_bool($SSO['ProxyVars'])) {
+		Utils::setProxyVars($SSO['ProxyVars']);
+	}
+}
+
+$baseurl = Utils::getSelfURLNoQuery();
+
 
 if (is_array($SSO) && array_key_exists('SP_KEY', $SSO)) {
 	if (file_exists($SSO['SP_KEY'])) {
