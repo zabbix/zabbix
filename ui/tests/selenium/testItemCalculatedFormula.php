@@ -2341,6 +2341,16 @@ class testItemCalculatedFormula extends CWebTest {
 							"(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)"
 				]
 			],
+			[
+				[
+					'formula' => 'avg(avg(sum(max(min(trendmax(/host/item,1h:now-1h),2),3),12d)))'
+				]
+			],
+			[
+				[
+					'formula' => 'truncate(bitxor(bytelength(cbrt(cosh(bytelength(cos(count(/host/key,1s)))))),1), 2)'
+				]
+			],
 			// Complex calculations validation.
 			[
 				[
