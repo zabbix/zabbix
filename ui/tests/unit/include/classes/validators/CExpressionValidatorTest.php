@@ -58,6 +58,19 @@ class CExpressionValidatorTest extends TestCase {
 			['min(sum_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(sum_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
+			// User macros.
+			['find(/host/key, {$PERIOD}:{$TIMESHIFT})', [], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, {$OP})', [], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, "{$OP}")', [], ['rc' => true, 'error' => null]],
+
+			// LLD macros.
+			['find(/host/key, {#PERIOD}:{#TIMESHIFT})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, {#PERIOD}:{#TIMESHIFT})', [], ['rc' => false, 'error' => 'invalid second parameter in function "find"']],
+			['find(/host/key, 1d, {#OP})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, {#OP})', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+			['find(/host/key, 1d, "{#OP}")', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, "{#OP}")', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+
 			// Unknown function in trigger expression.
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
