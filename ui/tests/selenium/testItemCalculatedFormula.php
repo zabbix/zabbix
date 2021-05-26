@@ -85,12 +85,12 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'avg(/host/trap,"{$TEST}h")'
+					'formula' => 'avg(/host/trap,"{$USERMACRO}h")'
 				]
 			],
 			[
 				[
-					'formula' => 'avg(/host/trap,{$TEST})'
+					'formula' => 'avg(/host/trap,{$USERMACRO})'
 				]
 			],
 			[
@@ -112,19 +112,19 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'bitand(last(/host/key,"{$TEST}:now-24h"),123)'
+					'formula' => 'bitand(last(/host/key,"{$USERMACRO}:now-24h"),123)'
 				]
 			],
 			// cbrt() function.
 			[
 				[
-					'formula' => "cbrt(last(//trap, {\$TEST}))"
+					'formula' => "cbrt(last(//trap, {\$USERMACRO}))"
 				]
 			],
 			// ceil() function.
 			[
 				[
-					'formula' => "ceil(last(//trap,{\$TEST}))"
+					'formula' => "ceil(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// change() function.
@@ -156,7 +156,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'count(/host/trap,"{$TEST}m",,"0")'
+					'formula' => 'count(/host/trap,"{$USERMACRO}m",,"0")'
 				]
 			],
 			[
@@ -172,7 +172,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// cos() function.
 			[
 				[
-					'formula' => "cos(last(//trap,{\$TEST}))"
+					'formula' => "cos(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// cosh() function.
@@ -229,7 +229,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// expm1() function.
 			[
 				[
-					'formula' => "expm1(last(//trap,{\$TEST}))"
+					'formula' => "expm1(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// find() function.
@@ -286,7 +286,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// floor() function.
 			[
 				[
-					'formula' => "floor(last(//trap,{\$TEST}))"
+					'formula' => "floor(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// forecast() function.
@@ -312,7 +312,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'forecast(/host/trap,"{$TEST}:now/d",25h,"logarithmic","min")'
+					'formula' => 'forecast(/host/trap,"{$USERMACRO}:now/d",25h,"logarithmic","min")'
 				]
 			],
 			[
@@ -343,7 +343,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// fuzzytime() function.
 			[
 				[
-					'formula' => 'fuzzytime(/host/trap,"{$TEST}s")'
+					'formula' => 'fuzzytime(/host/trap,"{$USERMACRO}s")'
 				]
 			],
 			// last() function.
@@ -359,7 +359,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'last(/host/trap,{$TEST})'
+					'formula' => 'last(/host/trap,{$USERMACRO})'
 				]
 			],
 			// log() function.
@@ -371,7 +371,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// log10() function.
 			[
 				[
-					'formula' => "log10(last(//trap,{\$TEST}))"
+					'formula' => "log10(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// length() function
@@ -405,7 +405,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'logsource(/Trapper/trap[4],"{$TEST}:now-1h","^error")'
+					'formula' => 'logsource(/Trapper/trap[4],"{$USERMACRO}:now-1h","^error")'
 				]
 			],
 			[
@@ -422,7 +422,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// min() function.
 			[
 				[
-					'formula' => "min(//trap,\"#4:now-{\$TEST}m\")"
+					'formula' => "min(//trap,\"#4:now-{\$USERMACRO}m\")"
 				]
 			],
 			// mod() function.
@@ -487,7 +487,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'sum(/host/trap,"5:{$TEST}")'
+					'formula' => 'sum(/host/trap,"5:{$USERMACRO}")'
 				]
 			],
 			[
@@ -497,13 +497,13 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'sum(/host/trap,"5:now/{$TEST}")'
+					'formula' => 'sum(/host/trap,"5:now/{$USERMACRO}")'
 				]
 			],
 			// signum()function.
 			[
 				[
-					'formula' => "signum(last(//trap,{\$TEST}))"
+					'formula' => "signum(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// sin()function.
@@ -521,7 +521,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// sqrt()function.
 			[
 				[
-					'formula' => "sqrt(last(//trap,{\$TEST}))"
+					'formula' => "sqrt(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			[
@@ -532,7 +532,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// tan()function.
 			[
 				[
-					'formula' => "tan(last(//trap,{\$TEST}))"
+					'formula' => "tan(last(//trap,{\$USERMACRO}))"
 				]
 			],
 			// timeleft() function.
@@ -543,7 +543,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'timeleft(/host/trap,"#6:now-{$TEST}",20G,"exponential")'
+					'formula' => 'timeleft(/host/trap,"#6:now-{$USERMACRO}",20G,"exponential")'
 				]
 			],
 			[
@@ -553,7 +553,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'timeleft(/host/trap,"{$TEST}:now-6h",20G,"power")'
+					'formula' => 'timeleft(/host/trap,"{$USERMACRO}:now-6h",20G,"power")'
 				]
 			],
 			// truncate() function
@@ -565,7 +565,7 @@ class testItemCalculatedFormula extends CWebTest {
 			// trendavg() function.
 			[
 				[
-					'formula' => 'trendavg(/host/item,"1M:now/M-{$TEST}")'
+					'formula' => 'trendavg(/host/item,"1M:now/M-{$USERMACRO}")'
 				]
 			],
 			[
@@ -618,7 +618,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'trendmin(/host/key,"3600:{$TEST}-3600")'
+					'formula' => 'trendmin(/host/key,"3600:{$USERMACRO}-3600")'
 				]
 			],
 			// trendsum() function.
@@ -634,7 +634,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'trendsum(/host/key,"3600:{$TEST}")'
+					'formula' => 'trendsum(/host/key,"3600:{$USERMACRO}")'
 				]
 			],
 			// Functions validation.
@@ -645,6 +645,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'abs',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "abs".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "Abs(change(/Trapper/trap[1]))",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Abs(change(/Trapper/trap[1]))".'
 				]
 			],
 			[
@@ -661,6 +669,15 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "abs(change(//trap[1]),1h:now/h)",
 					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"abs(change(//trap[1]),1h:now/h)\"."
+				]
+			],
+			// acos() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "Acos(last(//trap))",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Acos(last(//trap))".'
 				]
 			],
 			// avg() function validation.
@@ -739,6 +756,23 @@ class testItemCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "count".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "coT(last(//trap))",
+					'title' => 'Cannot add item',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"coT(last(//trap))\"."
+				]
+			],
+			// degrees() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "Degrees(last(//trap))",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Degrees(last(//trap))".'
+				]
+			],
 			// date() function validation.
 			[
 				[
@@ -773,6 +807,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'find(/host/trap,1M)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "find".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'FIND(/host/trap,#10,"le","5")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "FIND(/host/trap,#10,"le","5")".'
 				]
 			],
 			[
@@ -1098,9 +1140,9 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'max(/host/trap,#3d:now-{$TEST})',
+					'formula' => 'max(/host/trap,#3d:now-{$USERMACRO})',
 					'title' => 'Cannot add item',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$TEST})".'
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$USERMACRO})".'
 				]
 			],
 			// min() function validation.
@@ -1261,6 +1303,22 @@ class testItemCalculatedFormula extends CWebTest {
 				]
 			],
 			// time() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'Date()',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Date()".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'Dayofweek()',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Dayofweek()".'
+				]
+			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1674,7 +1732,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'min(avg_foreach(/host/key[*,param],{$TEST}))'
+					'formula' => 'min(avg_foreach(/host/key[*,param],{$USERMACRO}))'
 				]
 			],
 			[
@@ -1715,6 +1773,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'avg_foreach(/host/key[*,param],19)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "avg_foreach".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'min(Avg_foreach(/host/key[*,param],{$USERMACRO}))',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "min(Avg_foreach(/host/key[*,param],{$USERMACRO}))".'
 				]
 			],
 			[
@@ -1795,12 +1861,12 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "stddevpop(//trap,{\$TEST})"
+					'formula' => "stddevpop(//trap,{\$USERMACRO})"
 				]
 			],
 			[
 				[
-					'formula' => "stddevsamp(//trap,{\$TEST})"
+					'formula' => "stddevsamp(//trap,{\$USERMACRO})"
 				]
 			],
 			[
@@ -1815,7 +1881,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "varsamp(//trap,{\$TEST})"
+					'formula' => "varsamp(//trap,{\$USERMACRO})"
 				]
 			],
 			// Aggregated math functions validation.
@@ -1854,6 +1920,14 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => "Kurtosis(//trap,60d)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Kurtosis(//trap,60d)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'kurtosis(/*/trap,60s)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "kurtosis".'
@@ -1865,6 +1939,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'mad()',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "mad".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "Mad(//trap,60w)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Mad(//trap,60w)".'
 				]
 			],
 			[
@@ -2028,6 +2110,14 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => "ASCII(//trap_text)",
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "ASCII(//trap_text)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => "bitlength(//trap_text)",
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitlength".'
@@ -2087,6 +2177,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "insert(last(//trap_text),,,\"test\")=\"Zabbix\"",
 					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"insert(last(//trap_text),,,\"test\")=\"Zabbix\"\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"",
+					'title' => 'Cannot add item',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"\"."
 				]
 			],
 			[
@@ -2204,12 +2302,12 @@ class testItemCalculatedFormula extends CWebTest {
 			// Operator functions.
 			[
 				[
-					'formula' => 'between(5,(last(/host/trap)),{$TEST})'
+					'formula' => 'between(5,(last(/host/trap)),{$USERMACRO})'
 				]
 			],
 			[
 				[
-					'formula' => 'in(5,(last(/host/trap)),{$TEST},5,10)'
+					'formula' => 'in(5,(last(/host/trap)),{$USERMACRO},5,10)'
 				]
 			],
 			[
@@ -2250,6 +2348,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "in(5,(last(/host/trap)),,6,10)".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'In(5,(last(/host/trap)),{$USERMACRO},5,10)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "In(5,(last(/host/trap)),{$USERMACRO},5,10)".'
+				]
+			],
 			// Bitwise functions.
 			[
 				[
@@ -2273,7 +2379,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'bitrshift(last(/host/trap),{$MACRO})'
+					'formula' => 'bitrshift(last(/host/trap),{$USERMACRO})'
 				]
 			],
 			// Bitwise functions validation.
@@ -2283,6 +2389,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "bitor(last(//trap))",
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitor".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'BITOR(last(/host/trap),7)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "BITOR(last(/host/trap),7)".'
 				]
 			],
 			[
@@ -2299,6 +2413,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "bitnot(last(//trap),1)",
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitnot".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'Bitnot(last(/host/trap))',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Bitnot(last(/host/trap))".'
 				]
 			],
 			[
