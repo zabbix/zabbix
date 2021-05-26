@@ -100,6 +100,11 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "bitand(last(//key,#5:now-24h),123)"
 				]
 			],
+			[
+				[
+					'formula' => 'bitand(last(/host/key,"{$TEST}:now-24h"),123)'
+				]
+			],
 			// cbrt() function.
 			[
 				[
@@ -127,6 +132,11 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'count(/host/trap,#4:now-5h,"eq")'
+				]
+			],
+			[
+				[
+					'formula' => 'count(/host/trap,"{#MACRO}:now-5h","eq")'
 				]
 			],
 			[
@@ -287,7 +297,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'forecast(/host/trap,5:now/d,25h,"logarithmic","min")'
+					'formula' => 'forecast(/host/trap,"{$TEST}:now/d",25h,"logarithmic","min")'
 				]
 			],
 			[
@@ -332,6 +342,11 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'last(/host/trap,#3)'
 				]
 			],
+			[
+				[
+					'formula' => 'last(/host/trap,{$TEST})'
+				]
+			],
 			// log() function.
 			[
 				[
@@ -371,6 +386,16 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'logsource(/Trapper/trap[4],#3:now-1h,"^error")'
+				]
+			],
+			[
+				[
+					'formula' => 'logsource(/Trapper/trap[4],"{$TEST}:now-1h","^error")'
+				]
+			],
+			[
+				[
+					'formula' => 'logsource(/Trapper/trap[4],"{#LLD}:now-1h","^error")'
 				]
 			],
 			// max() function.
@@ -445,6 +470,21 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'sum(/host/trap,5:now/d)'
 				]
 			],
+			[
+				[
+					'formula' => 'sum(/host/trap,"5:{$TEST}")'
+				]
+			],
+			[
+				[
+					'formula' => 'sum(/host/trap,"{#LLD}:now/d")'
+				]
+			],
+			[
+				[
+					'formula' => 'sum(/host/trap,"5:now/{$TEST}")'
+				]
+			],
 			// signum()function.
 			[
 				[
@@ -469,6 +509,11 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => "sqrt(last(//trap,{\$TEST}))"
 				]
 			],
+			[
+				[
+					'formula' => "sqrt(last(//trap,\"{#LLD}\"))"
+				]
+			],
 			// tan()function.
 			[
 				[
@@ -483,7 +528,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'timeleft(/host/trap,#6:now-6h,20G,"exponential")'
+					'formula' => 'timeleft(/host/trap,"#6:now-{$TEST}",20G,"exponential")'
 				]
 			],
 			[
@@ -493,7 +538,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'timeleft(/host/trap,#6:now-6h,20G,"power")'
+					'formula' => 'timeleft(/host/trap,"{$TEST}:now-6h",20G,"power")'
 				]
 			],
 			// truncate() function
@@ -505,12 +550,17 @@ class testItemCalculatedFormula extends CWebTest {
 			// trendavg() function.
 			[
 				[
-					'formula' => 'trendavg(/host/item,1M:now/M-1y)'
+					'formula' => 'trendavg(/host/item,"1M:now/M-{$TEST}")'
 				]
 			],
 			[
 				[
 					'formula' => 'trendavg(/host/key,3600:now-3600)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendavg(/host/key,"3600:{#LLD}-3600")'
 				]
 			],
 			// trendcount() function.
@@ -522,6 +572,11 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'trendcount(/host/key,3600:now-3600)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendcount(/host/key,"3600:now-{#LLD}")'
 				]
 			],
 			// trendmax() function.
@@ -546,6 +601,11 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'trendmin(/host/key,3600:now-3600)'
 				]
 			],
+			[
+				[
+					'formula' => 'trendmin(/host/key,"3600:{$TEST}-3600")'
+				]
+			],
 			// trendsum() function.
 			[
 				[
@@ -555,6 +615,11 @@ class testItemCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'trendsum(/host/key,3600:now-3600)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendsum(/host/key,"3600:{$TEST}")'
 				]
 			],
 			// Functions validation.
@@ -973,6 +1038,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'max(/host/trap,#3d:now-d)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-d)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'max(/host/trap,#3d:now-{$TEST})',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$TEST})".'
 				]
 			],
 			// min() function validation.
@@ -1505,7 +1578,7 @@ class testItemCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'min(avg_foreach(/host/key[*,param],19))'
+					'formula' => 'min(avg_foreach(/host/key[*,param],{$TEST}))'
 				]
 			],
 			[
@@ -1578,6 +1651,14 @@ class testItemCalculatedFormula extends CWebTest {
 					'formula' => 'last_foreach(/host/key,{$PERIOD}:now-1d)',
 					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last_foreach".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'last_foreach(/host/key,"{$PERIOD}:now-1d")',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last_foreach".'
 				]
 			],
 			// Aggregated math functions.
@@ -2027,17 +2108,17 @@ class testItemCalculatedFormula extends CWebTest {
 			// Operator functions.
 			[
 				[
-					'formula' => "between(5,(last(//trap)),10)"
+					'formula' => 'between(5,(last(/host/trap)),{$TEST})'
 				]
 			],
 			[
 				[
-					'formula' => "in(5,(last(//trap)),2,5,10)"
+					'formula' => 'in(5,(last(/host/trap)),{$TEST},5,10)'
 				]
 			],
 			[
 				[
-					'formula' => "in(5,(last(//trap)),2,5,10)"
+					'formula' => 'in(5,(last(/host/trap)),"{#LLD}",6,10)'
 				]
 			],
 			// Operator functions validation.
@@ -2065,30 +2146,38 @@ class testItemCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "in".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'in(5,(last(/host/trap)),,6,10)',
+					'title' => 'Cannot add item',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "in(5,(last(/host/trap)),,6,10)".'
+				]
+			],
 			// Bitwise functions.
 			[
 				[
-					'formula' => "bitor(last(//trap),7)"
+					'formula' => 'bitor(last(/host/trap),7)'
 				]
 			],
 			[
 				[
-					'formula' => "bitxor(last(//trap),7)"
+					'formula' => 'bitxor(last(/host/trap),7)'
 				]
 			],
 			[
 				[
-					'formula' => "bitnot(last(//trap))"
+					'formula' => 'bitnot(last(/host/trap))'
 				]
 			],
 			[
 				[
-					'formula' => "bitlshift(last(//trap),7)"
+					'formula' => 'bitlshift(last(/host/trap),"{#LLD}")'
 				]
 			],
 			[
 				[
-					'formula' => "bitrshift(last(//trap),7)"
+					'formula' => 'bitrshift(last(/host/trap),{$MACRO})'
 				]
 			],
 			// Bitwise functions validation.
