@@ -2065,3 +2065,6 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
+
+// Allows to set "rel" tag value "noreferer" when setting target="_blank".
+define('ZBX_NOREFERER', true);
