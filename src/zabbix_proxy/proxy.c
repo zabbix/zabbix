@@ -1167,6 +1167,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
+	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t	thread_args;
