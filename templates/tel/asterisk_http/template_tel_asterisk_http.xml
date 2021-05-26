@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-25T13:03:53Z</date>
+   <date>2021-05-26T07:57:35Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -159,8 +159,7 @@ Template tooling version used: 0.38</description>
                      <params>var Ami = {
     params: {
         url: '{$AMI.URL}',
-        trunk: '{$AMI.TRUNK_REGEXP}',
-        timezone: '{$AMI.TIMEZONE}'
+        trunk: '{$AMI.TRUNK_REGEXP}'
     },
     api_request: new CurlHttpRequest(),
 
