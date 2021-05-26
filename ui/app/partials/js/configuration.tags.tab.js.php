@@ -52,6 +52,17 @@
 
 				tags_initialized = true;
 			}
+
+			if (tags_initialized) {
+				$('#tags-table').on('click', 'button.element-table-disable', function() {
+					var num = $(this).attr('id').split('_')[1],
+						$type = $('#tags_' + num + '_type');
+
+					if ($type.val() & <?= ZBX_PROPERTY_OWN ?>) {
+						$type.val($type.val() & (~<?= ZBX_PROPERTY_OWN ?>));
+					}
+				});
+			}
 		});
 	});
 </script>
