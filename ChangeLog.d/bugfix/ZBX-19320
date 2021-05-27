@@ -1,1 +1,1 @@
-..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option (agriscenko)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
