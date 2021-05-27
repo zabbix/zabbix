@@ -255,10 +255,17 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			if (array_key_exists('headers', $input) && $input['headers']) {
-				$headers = (count($input['headers']['name']) == count($input['headers']['value']))
-					? array_combine($input['headers']['name'], $input['headers']['value'])
+				$headers = [];
+				foreach ($input['headers']['name'] as $i => $header_name) {
+					if (array_key_exists($i, $input['headers']['value'])) {
+						$headers[$header_name] = $input['headers']['value'][$i];
+					}
+				}
+
+				// Ignore single row if it is empty.
+				$input['headers'] = ($headers !== ['' => ''])
+					? $headers
 					: [];
-				$input['headers'] = array_filter($headers, 'strlen');
 			}
 
 			if (array_key_exists('preprocessing', $input) && $input['preprocessing']) {
