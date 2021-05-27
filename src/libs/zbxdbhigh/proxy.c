@@ -3622,6 +3622,9 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *             nodata_win - [OUT] counter of delayed values                   *
  *             info       - [OUT] address of a pointer to the info            *
  *                                     string (should be freed by the caller) *
+ *             mode       - [IN]  item retrieve mode is used to retrieve only *
+ *                                necessary data to reduce time spent holding *
+ *                                read lock                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -3632,7 +3635,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
 		void *validator_args, struct zbx_json_parse *jp_data, zbx_data_session_t *session,
-		zbx_proxy_suppress_t *nodata_win, char **info, int mode)
+		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode)
 {
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;

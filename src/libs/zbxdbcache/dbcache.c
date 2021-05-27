@@ -1558,9 +1558,12 @@ static void	DCsync_trends(void)
  *                                                                            *
  * Parameters: history           - [IN] array of history data                 *
  *             history_num       - [IN] number of history structures          *
+ *             history_itemids   - [IN] the item identifiers                  *
+ *                                      (used for item lookup)                *
+ *             history_items     - [IN] the items                             *
+ *             history_errcodes  - [IN] item error codes                      *
  *             timers            - [IN] the trigger timers                    *
  *             trigger_diff      - [OUT] trigger updates                      *
- *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
 static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
@@ -1935,11 +1938,9 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
  ******************************************************************************/
 static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_HISTORY *h)
 {
-	zbx_uint64_t	flags;
+	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
 	zbx_item_diff_t	*diff;
-
-	flags = item->host.proxy_hostid == 0 ? ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK : 0;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
 	{
@@ -1994,7 +1995,6 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 	diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 	diff->itemid = item->itemid;
-	diff->lastclock = h->ts.sec;
 	diff->flags = flags;
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & flags))
@@ -2094,8 +2094,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		diff->itemid = history[i].itemid;
 		diff->state = history[i].state;
-		diff->lastclock = history[i].ts.sec;
-		diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK;
+		diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
 
 		if (0 != (ZBX_DC_FLAG_META & history[i].flags))
 		{
@@ -2948,12 +2947,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
+	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
-	int				item_retrieve_mode;
 
 	item_retrieve_mode = NULL == CONFIG_EXPORT_DIR ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
@@ -4128,17 +4127,40 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		item_value = &values[i];
 
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		/* a record with metadata and no value can be dropped if  */
+		/* the metadata update is copied to the last queued value */
+		if (NULL != (item = hc_get_item(item_value->itemid)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
-			UNLOCK_CACHE;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-			sleep(1);
-
-			LOCK_CACHE;
+			/* skip metadata updates when only one value is queued, */
+			/* because the item might be already being processed    */
+			if (item->head != item->tail)
+			{
+				item->head->lastlogsize = item_value->lastlogsize;
+				item->head->mtime = item_value->mtime;
+				item->head->flags |= ZBX_DC_FLAG_META;
+				continue;
+			}
 		}
 
-		if (NULL == (item = hc_get_item(item_value->itemid)))
+		if (SUCCEED != hc_clone_history_data(&data, item_value))
+		{
+			do
+			{
+				UNLOCK_CACHE;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+				sleep(1);
+
+				LOCK_CACHE;
+			}
+			while (SUCCEED != hc_clone_history_data(&data, item_value));
+
+			item = hc_get_item(item_value->itemid);
+		}
+
+		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
