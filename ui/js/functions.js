@@ -831,7 +831,7 @@ function downloadSvgImage($dom_node, file_name) {
 	image.onload = function() {
 		context2d.drawImage(image, 0, 0);
 		a.href = canvas.toDataURL('image/png');
-		a.rel = 'noopener';
+		a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 		a.download = file_name;
 		a.target = '_blank';
 		a.click();
@@ -862,7 +862,7 @@ function downloadPngImage($dom_node, file_name) {
 	var a = document.createElement('a');
 
 	a.href = $dom_node.attr('src');
-	a.rel = 'noopener';
+	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';
 	a.click();
