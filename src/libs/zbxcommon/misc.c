@@ -86,7 +86,7 @@ const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
-double	ZBX_DOUBLE_EPSILON = 0.000001;
+double	ZBX_DOUBLE_EPSILON = 2.22e-16;
 
 #ifdef _WINDOWS
 
