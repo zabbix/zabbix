@@ -109,6 +109,27 @@ class CHistFunctionValidator extends CValidator {
 				continue;
 			}
 
+			switch ($param['type']) {
+				case CHistFunctionParser::PARAM_TYPE_PERIOD:
+					if (self::hasMacros($param['data']['sec_num'], $this->options)
+							&& $param['data']['time_shift'] === '') {
+						continue 2;
+					}
+					break;
+
+				case CHistFunctionParser::PARAM_TYPE_QUOTED:
+					if (self::hasMacros(CHistFunctionParser::unquoteParam($param['match']), $this->options)) {
+						continue 2;
+					}
+					break;
+
+				case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+					if (self::hasMacros($param['match'], $this->options)) {
+						continue 2;
+					}
+					break;
+			}
+
 			if (array_key_exists('rules', $param_spec)) {
 				$is_valid = self::validateRules($param, $param_spec['rules'], $this->options);
 
@@ -194,10 +215,6 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
-					if (self::hasMacros($param['data']['sec_num'], $options) && $param['data']['time_shift'] === '') {
-						return true;
-					}
-
 					if (!self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $rule['mode'],
 							$options)) {
 						return false;
@@ -206,10 +223,6 @@ class CHistFunctionValidator extends CValidator {
 					break;
 
 				case 'number':
-					if (self::hasMacros($param_match_unquoted, $options)) {
-						return true;
-					}
-
 					$with_suffix = array_key_exists('with_suffix', $rule) && $rule['with_suffix'];
 
 					$parser = new CNumberParser(['with_minus' => true, 'with_suffix' => $with_suffix]);
@@ -228,18 +241,13 @@ class CHistFunctionValidator extends CValidator {
 					break;
 
 				case 'regexp':
-					if (!self::hasMacros($param_match_unquoted, $options)
-							&& preg_match($rule['pattern'], $param_match_unquoted) != 1) {
+					if (preg_match($rule['pattern'], $param_match_unquoted) != 1) {
 						return false;
 					}
 
 					break;
 
 				case 'time':
-					if (self::hasMacros($param_match_unquoted, $options)) {
-						return true;
-					}
-
 					$with_year = array_key_exists('with_year', $rule) && $rule['with_year'];
 					$min = array_key_exists('min', $rule) ? $rule['min'] : ZBX_MIN_INT32;
 					$max = array_key_exists('max', $rule) ? $rule['max'] : ZBX_MAX_INT32;
