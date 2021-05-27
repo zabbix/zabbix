@@ -150,11 +150,11 @@ class CWidgetForm {
 		foreach ($sortkeys as $key => $sub_keys) {
 			foreach (array_keys($sub_keys) as $sub_key) {
 				foreach (array_keys($result[$key]) as $i) {
-					ksort($result[$key][$i][$sub_key]);
+					ksort($result[$key][$i][$sub_key], SORT_NUMERIC);
 				}
 			}
 
-			ksort($result[$key]);
+			ksort($result[$key], SORT_NUMERIC);
 		}
 
 		return $result;
