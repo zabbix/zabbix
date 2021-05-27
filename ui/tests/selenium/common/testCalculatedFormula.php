@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
-/**
- * @backup items
- */
-class testItemCalculatedFormula extends CWebTest {
+class testCalculatedFormula extends CWebTest {
+
+	public $url;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -36,13 +36,12 @@ class testItemCalculatedFormula extends CWebTest {
 		];
 	}
 
-	public function getValidationData() {
+	public function getCommonValidationData() {
 		return [
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => '',
-					'title' => 'Page received incorrect data',
 					'error' => 'Incorrect value for field "Formula": cannot be empty.'
 				]
 			],
@@ -50,7 +49,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'something',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "something".'
 				]
 			],
@@ -643,7 +641,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'abs',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "abs".'
 				]
 			],
@@ -651,7 +648,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Abs(change(/Trapper/trap[1]))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Abs(change(/Trapper/trap[1]))".'
 				]
 			],
@@ -659,7 +655,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'abs(/test/key)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "abs".'
 				]
 			],
@@ -667,7 +662,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "abs(change(//trap[1]),1h:now/h)",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"abs(change(//trap[1]),1h:now/h)\"."
 				]
 			],
@@ -676,7 +670,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Acos(last(//trap))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Acos(last(//trap))".'
 				]
 			],
@@ -685,7 +678,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "avg".'
 				]
 			],
@@ -694,7 +686,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(last(/*/key,1h:now/h))',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitand".'
 				]
 			],
@@ -702,7 +693,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitand(last(/host/key,#5:now-#5),123)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(/host/key,#5:now-#5),123)".'
 				]
 			],
@@ -710,7 +700,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitand(last(//key,:now-24h),123)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bitand(last(//key,:now-24h),123)".'
 				]
 			],
@@ -718,7 +707,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(/*/key,1h:now/h,123)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitand".'
 				]
 			],
@@ -727,7 +715,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'change(/Trapper/trap[1],,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "change".'
 				]
 			],
@@ -736,7 +723,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,999999999999999)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
 				]
 			],
@@ -744,7 +730,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,:now/d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now/d)".'
 				]
 			],
@@ -752,7 +737,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,:now-5h,"eq")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now-5h,"eq")".'
 				]
 			],
@@ -760,7 +744,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,#4:now-5h,"1","eq")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "count".'
 				]
 			],
@@ -768,7 +751,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "coT(last(//trap))",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"coT(last(//trap))\"."
 				]
 			],
@@ -777,7 +759,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Degrees(last(//trap))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Degrees(last(//trap))".'
 				]
 			],
@@ -786,7 +767,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'date(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "date".'
 				]
 			],
@@ -795,7 +775,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'dayofmonth(1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "dayofmonth".'
 				]
 			],
@@ -804,7 +783,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'dayofweek',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "dayofweek".'
 				]
 			],
@@ -813,7 +791,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,1M)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "find".'
 				]
 			],
@@ -821,7 +798,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'FIND(/host/trap,#10,"le","5")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "FIND(/host/trap,#10,"le","5")".'
 				]
 			],
@@ -829,7 +805,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,#4:now-5h,eq,1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "find(/host/trap,#4:now-5h,eq,1)".'
 				]
 			],
@@ -837,7 +812,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'find(/host/trap,#4:now-5h,"test",1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "find".'
 				]
 			],
@@ -846,7 +820,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#77)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "forecast".'
 				]
 			],
@@ -854,7 +827,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,:now/d,25h,"logarithmic","min")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "forecast(/host/trap,:now/d,25h,"logarithmic","min")".'
 				]
 			],
@@ -862,7 +834,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,":now/d",25h,"logarithmic","min")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
 				]
 			],
@@ -870,7 +841,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#7,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "forecast".'
 				]
 			],
@@ -878,7 +848,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
 				]
 			],
@@ -886,7 +855,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#1,"test")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "forecast".'
 				]
 			],
@@ -894,7 +862,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "forecast".'
 				]
 			],
@@ -902,7 +869,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial7")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "forecast".'
 				]
 			],
@@ -910,7 +876,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial1","test")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "forecast".'
 				]
 			],
@@ -918,7 +883,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/host/trap,#5,25h,"polynomial1","")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "forecast".'
 				]
 			],
@@ -926,7 +890,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'forecast(/*/trap,#1,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "forecast".'
 				]
 			],
@@ -935,7 +898,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "fuzzytime".'
 				]
 			],
@@ -943,7 +905,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/host/trap,test)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "fuzzytime(/host/trap,test)".'
 				]
 			],
@@ -951,7 +912,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/*/trap,65w)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "fuzzytime".'
 				]
 			],
@@ -960,7 +920,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last".'
 				]
 			],
@@ -968,7 +927,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,7)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			],
@@ -976,7 +934,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,7s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			],
@@ -984,7 +941,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/*/trap,#3:now-1d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
 				]
 			],
@@ -992,7 +948,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "last".'
 				]
 			],
@@ -1000,7 +955,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/*/trap,#3:now-1d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
 				]
 			],
@@ -1009,7 +963,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "length".'
 				]
 			],
@@ -1017,7 +970,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(/host/trap,7d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "length".'
 				]
 			],
@@ -1025,7 +977,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'length(last(/host/trap,7s))',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			],
@@ -1034,7 +985,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/Trapper/trap[4],^error)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logeventid(/Trapper/trap[4],^error)".'
 				]
 			],
@@ -1042,7 +992,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/Trapper/trap[4],1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logeventid".'
 				]
 			],
@@ -1050,7 +999,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logeventid(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logeventid".'
 				]
 			],
@@ -1059,7 +1007,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/host/key,123)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
 				]
 			],
@@ -1067,7 +1014,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],^error)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logseverity(/Trapper/trap[4],^error)".'
 				]
 			],
@@ -1075,7 +1021,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],,"^error")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "logseverity".'
 				]
 			],
@@ -1083,7 +1028,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
 				]
 			],
@@ -1091,7 +1035,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/*/key)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logseverity".'
 				]
 			],
@@ -1099,7 +1042,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logseverity(/Trapper/trap[4],"High")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "logseverity".'
 				]
 			],
@@ -1108,7 +1050,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "logsource".'
 				]
 			],
@@ -1116,7 +1057,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],#3:now-#3,"^error")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],#3:now-#3,"^error")".'
 				]
 			],
@@ -1124,7 +1064,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],^error)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],^error)".'
 				]
 			],
@@ -1132,7 +1071,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'logsource(/Trapper/trap[4],#2,^error)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "logsource(/Trapper/trap[4],#2,^error)".'
 				]
 			],
@@ -1141,7 +1079,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "max".'
 				]
 			],
@@ -1149,7 +1086,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-d)".'
 				]
 			],
@@ -1157,7 +1093,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-{$USERMACRO})',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$USERMACRO})".'
 				]
 			],
@@ -1166,7 +1101,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(/host/trap,1M)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "min".'
 				]
 			],
@@ -1174,7 +1108,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(/*/trap,#4:now-1m)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "min".'
 				]
 			],
@@ -1183,7 +1116,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "nodata".'
 				]
 			],
@@ -1191,7 +1123,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "nodata".'
 				]
 			],
@@ -1199,7 +1130,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata(/host/trap,0s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "nodata".'
 				]
 			],
@@ -1207,7 +1137,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'nodata(/*/trap,30)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "nodata".'
 				]
 			],
@@ -1216,7 +1145,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'now',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "now".'
 				]
 			],
@@ -1224,7 +1152,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'now(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "now".'
 				]
 			],
@@ -1233,7 +1160,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/host/trap,,5)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "percentile".'
 				]
 			],
@@ -1241,7 +1167,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/host/trap,test,test)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "percentile(/host/trap,test,test)".'
 				]
 			],
@@ -1249,7 +1174,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'percentile(/*/trap,#5,100)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "percentile".'
 				]
 			],
@@ -1258,7 +1182,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "sum".'
 				]
 			],
@@ -1266,7 +1189,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,":now/d")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "sum".'
 				]
 			],
@@ -1274,7 +1196,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,:now/d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,:now/d)".'
 				]
 			],
@@ -1282,7 +1203,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "sum".'
 				]
 			],
@@ -1290,7 +1210,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,#3d:now-d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,#3d:now-d)".'
 				]
 			],
@@ -1298,7 +1217,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,60:now/60)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,60:now/60)".'
 				]
 			],
@@ -1306,7 +1224,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,a)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,a)".'
 				]
 			],
@@ -1314,7 +1231,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum(/host/trap,1Y)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "sum(/host/trap,1Y)".'
 				]
 			],
@@ -1323,7 +1239,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Date()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Date()".'
 				]
 			],
@@ -1331,7 +1246,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Dayofweek()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Dayofweek()".'
 				]
 			],
@@ -1339,7 +1253,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'time(/host/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "time".'
 				]
 			],
@@ -1348,7 +1261,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5,,"logarithmic")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "timeleft".'
 				]
 			],
@@ -1356,7 +1268,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,,20G,"power")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "timeleft".'
 				]
 			],
@@ -1364,7 +1275,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5M,"20G","power")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "timeleft".'
 				]
 			],
@@ -1372,7 +1282,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/host/trap,5,20G,"test")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "timeleft".'
 				]
 			],
@@ -1380,7 +1289,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'timeleft(/*/trap,#100,1M)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "timeleft".'
 				]
 			],
@@ -1389,7 +1297,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendavg".'
 				]
 			],
@@ -1397,7 +1304,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,:now-3600)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendavg(/host/key,:now-3600)".'
 				]
 			],
@@ -1405,7 +1311,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,":now-3600")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
 				]
 			],
@@ -1413,7 +1318,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/key,30m:now-30m)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
 				]
 			],
@@ -1421,7 +1325,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendavg".'
 				]
 			],
@@ -1429,7 +1332,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendavg".'
 				]
 			],
@@ -1437,7 +1339,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendavg(/host/item,-1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendavg(/host/item,-1h)".'
 				]
 			],
@@ -1446,7 +1347,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendcount".'
 				]
 			],
@@ -1454,7 +1354,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/key,30:now-30)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
 				]
 			],
@@ -1462,7 +1361,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/key,0:now-0h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
 				]
 			],
@@ -1470,7 +1368,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendcount".'
 				]
 			],
@@ -1478,7 +1375,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendcount(/host/item,-1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendcount(/host/item,-1h)".'
 				]
 			],
@@ -1487,7 +1383,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
 				]
 			],
@@ -1495,7 +1390,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/key,30s:now-30s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
 				]
 			],
@@ -1503,7 +1397,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,:now/w)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmax(/host/item,:now/w)".'
 				]
 			],
@@ -1512,7 +1405,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,0d:now/d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
 				]
 			],
@@ -1520,7 +1412,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmax(/host/item,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmax".'
 				]
 			],
@@ -1529,7 +1420,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendmin".'
 				]
 			],
@@ -1537,7 +1427,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/key,59m:now-59m)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
 				]
 			],
@@ -1545,7 +1434,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/key,now/d-2d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmin(/host/key,now/d-2d)".'
 				]
 			],
@@ -1553,7 +1441,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendmin".'
 				]
 			],
@@ -1561,7 +1448,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
 				]
 			],
@@ -1569,7 +1455,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,0)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendmin".'
 				]
 			],
@@ -1577,7 +1462,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendmin(/host/item,-1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmin(/host/item,-1h)".'
 				]
 			],
@@ -1586,7 +1470,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendsum".'
 				]
 			],
@@ -1594,7 +1477,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/key,59:now-59)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendsum".'
 				]
 			],
@@ -1602,7 +1484,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/key,:now/d-2d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendsum(/host/key,:now/d-2d)".'
 				]
 			],
@@ -1610,7 +1491,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item,,)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trendsum".'
 				]
 			],
@@ -1618,7 +1498,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item,1h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendsum".'
 				]
 			],
@@ -1627,7 +1506,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "abschange(//trap)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "abschange".'
 				]
 			],
@@ -1635,7 +1513,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap,"test")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
 				]
 			],
@@ -1643,7 +1520,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
 				]
 			],
@@ -1651,7 +1527,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'iregexp(/*/trap,"test")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "iregexp".'
 				]
 			],
@@ -1659,7 +1534,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'iregexp(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "iregexp".'
 				]
 			],
@@ -1667,7 +1541,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'prev(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "prev".'
 				]
 			],
@@ -1675,7 +1548,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
 				]
 			],
@@ -1683,7 +1555,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'regexp(/*/trap,"pattern",50s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "regexp".'
 				]
 			],
@@ -1691,7 +1562,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'str(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "str".'
 				]
 			],
@@ -1699,7 +1569,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'str(/*/trap,"pattern",50s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "str".'
 				]
 			],
@@ -1707,7 +1576,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'strlen(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "strlen".'
 				]
 			],
@@ -1715,7 +1583,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'strlen(/*/trap,"pattern",#5)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "strlen(/*/trap,"pattern",#5)".'
 				]
 			],
@@ -1723,7 +1590,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trenddelta(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": unknown function "trenddelta".'
 				]
 			],
@@ -1731,7 +1597,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'trenddelta(/*/trap,1h,now/h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trenddelta(/*/trap,1h,now/h)".'
 				]
 			],
@@ -1771,7 +1636,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/*/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last_foreach".'
 				]
 			],
@@ -1779,7 +1643,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'sum_foreach(/*/trap,20s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "sum_foreach".'
 				]
 			],
@@ -1787,7 +1650,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'avg_foreach(/host/key[*,param],19)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "avg_foreach".'
 				]
 			],
@@ -1795,7 +1657,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min(Avg_foreach(/host/key[*,param],{$USERMACRO}))',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "min(Avg_foreach(/host/key[*,param],{$USERMACRO}))".'
 				]
 			],
@@ -1803,7 +1664,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count_foreach(/*/trap?[tag="tag1"],99h)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count_foreach".'
 				]
 			],
@@ -1811,7 +1671,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'min_foreach(/*/trap?[group="Servers"],6)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "min_foreach".'
 				]
 			],
@@ -1819,7 +1678,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'max_foreach(/*/trap,20s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "max_foreach".'
 				]
 			],
@@ -1827,7 +1685,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/host/key,{$PERIOD}:now-1d)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last_foreach".'
 				]
 			],
@@ -1835,7 +1692,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last_foreach(/host/key,"{$PERIOD}:now-1d")',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "last_foreach".'
 				]
 			],
@@ -1905,7 +1761,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "countunique(//trap)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "countunique".'
 				]
 			],
@@ -1913,7 +1768,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'countunique(/host/trap,60s,"test",1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "countunique".'
 				]
 			],
@@ -1921,7 +1775,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'countunique(/host/trap,60s,like,1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "countunique(/host/trap,60s,like,1)".'
 				]
 			],
@@ -1929,7 +1782,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "first(//trap,60s,)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "first".'
 				]
 			],
@@ -1937,7 +1789,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Kurtosis(//trap,60d)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Kurtosis(//trap,60d)".'
 				]
 			],
@@ -1945,7 +1796,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'kurtosis(/*/trap,60s)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "kurtosis".'
 				]
 			],
@@ -1953,7 +1803,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'mad()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "mad".'
 				]
 			],
@@ -1961,7 +1810,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Mad(//trap,60w)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Mad(//trap,60w)".'
 				]
 			],
@@ -1969,7 +1817,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'skewness(/trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "skewness(/trap)".'
 				]
 			],
@@ -1977,7 +1824,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'stddevpop(trap)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "stddevpop(trap)".'
 				]
 			],
@@ -1985,7 +1831,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "sumofsquares(//trap,{TEST})",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"sumofsquares(//trap,{TEST})\"."
 				]
 			],
@@ -1993,7 +1838,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "varpop(//trap,1M:now/M-1y)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "varpop".'
 				]
 			],
@@ -2001,7 +1845,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "varpop(//trap,#1:now-#1)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "varpop(//trap,#1:now-#1)".'
 				]
 			],
@@ -2009,7 +1852,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "varsamp(//trap,{TEST})",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"varsamp(//trap,{TEST})\"."
 				]
 			],
@@ -2017,7 +1859,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "varsamp(//trap)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "varsamp".'
 				]
 			],
@@ -2127,7 +1968,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "ascii(//trap_text)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "ascii".'
 				]
 			],
@@ -2135,7 +1975,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "ASCII(//trap_text)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "ASCII(//trap_text)".'
 				]
 			],
@@ -2143,7 +1982,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitlength(//trap_text)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitlength".'
 				]
 			],
@@ -2151,7 +1989,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "char(//trap)=\"d\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "char".'
 				]
 			],
@@ -2159,7 +1996,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "concat(last(//trap_text))=\"testtest\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "concat".'
 				]
 			],
@@ -2167,7 +2003,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "concat(last(//trap_text),#1)=\"testtest\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"concat(last(//trap_text),#1)=\"testtest\"\"."
 				]
 			],
@@ -2175,7 +2010,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "insert(last(//trap_text),2)=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "insert".'
 				]
 			],
@@ -2183,7 +2017,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "insert(last(//trap_text),2,1)=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "insert".'
 				]
 			],
@@ -2191,7 +2024,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "insert(last(//trap_text),2,1,test)=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"insert(last(//trap_text),2,1,test)=\"Zabbix\"\"."
 				]
 			],
@@ -2199,7 +2031,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "insert(last(//trap_text),,,\"test\")=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"insert(last(//trap_text),,,\"test\")=\"Zabbix\"\"."
 				]
 			],
@@ -2207,7 +2038,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"Insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\"\"."
 				]
 			],
@@ -2215,7 +2045,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "left(last(//trap_text))=\"Zab\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "left".'
 				]
 			],
@@ -2223,7 +2052,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "left(last(//trap_text),test)=\"Zab\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"left(last(//trap_text),test)=\"Zab\"\"."
 				]
 			],
@@ -2231,7 +2059,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "left(last(//trap_text),#1)=\"Zab\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"left(last(//trap_text),#1)=\"Zab\"\"."
 				]
 			],
@@ -2239,7 +2066,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "ltrim(last(//trap_text),test)=\"Zabbix\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"ltrim(last(//trap_text),test)=\"Zabbix\"\"."
 				]
 			],
@@ -2247,7 +2073,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bytelength(//trap_text)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bytelength".'
 				]
 			],
@@ -2255,7 +2080,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "repeat(last(//trap_text))=\"ZabbixZabbix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "repeat".'
 				]
 			],
@@ -2263,7 +2087,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "replace(last(//trap_text))=\"Zabbaaah\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "replace".'
 				]
 			],
@@ -2271,7 +2094,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "replace(last(//trap_text),\"Zab\")=\"Zabbaaah\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "replace".'
 				]
 			],
@@ -2279,7 +2101,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "replace(last(//trap_text),,\"Zab\")=\"Zabbaaah\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"replace(last(//trap_text),,\"Zab\")=\"Zabbaaah\"\"."
 				]
 			],
@@ -2287,7 +2108,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "right(last(//trap_text))=\"bix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "right".'
 				]
 			],
@@ -2295,7 +2115,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "rtrim(//trap_text)=\"bix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "rtrim".'
 				]
 			],
@@ -2303,7 +2122,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "mid(last(//trap_text),\"1\",\"2\",\"3\")=\"bix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "mid".'
 				]
 			],
@@ -2311,7 +2129,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "mid(last(//trap_text),,)=\"bix\"",
-					'title' => 'Cannot add item',
 					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"mid(last(//trap_text),,)=\"bix\"\"."
 				]
 			],
@@ -2319,7 +2136,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "trim(last(//trap_text),\"1\",\"2\")=\"bix\"",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "trim".'
 				]
 			],
@@ -2344,7 +2160,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "between(5,(last(//trap)),10,1)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "between".'
 				]
 			],
@@ -2352,7 +2167,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "between(5,(last(//trap)))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "between".'
 				]
 			],
@@ -2360,7 +2174,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "in(last(//trap))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "in".'
 				]
 			],
@@ -2368,7 +2181,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'in(5,(last(/host/trap)),,6,10)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "in(5,(last(/host/trap)),,6,10)".'
 				]
 			],
@@ -2376,7 +2188,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'In(5,(last(/host/trap)),{$USERMACRO},5,10)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "In(5,(last(/host/trap)),{$USERMACRO},5,10)".'
 				]
 			],
@@ -2411,7 +2222,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitor(last(//trap))",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitor".'
 				]
 			],
@@ -2419,7 +2229,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'BITOR(last(/host/trap),7)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "BITOR(last(/host/trap),7)".'
 				]
 			],
@@ -2427,7 +2236,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitxor(last(//trap),7,9)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitxor".'
 				]
 			],
@@ -2435,7 +2243,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "bitnot(last(//trap),1)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitnot".'
 				]
 			],
@@ -2443,7 +2250,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'Bitnot(last(/host/trap))',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "Bitnot(last(/host/trap))".'
 				]
 			],
@@ -2451,7 +2257,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitlshift()',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "bitlshift".'
 				]
 			],
@@ -2459,7 +2264,6 @@ class testItemCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'bitrshift(last(/*/trap),1)',
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
 				]
 			],
@@ -2503,7 +2307,6 @@ class testItemCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-".
 							"bitrshift(last(/*/trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "last".'
 				]
 			],
@@ -2512,7 +2315,6 @@ class testItemCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => "min_foreach(/*/trap?[group=\"Servers\"],6)+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift(last(//trap),1)".
 							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,60m:now/h)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "min_foreach".'
 				]
 			],
@@ -2521,7 +2323,6 @@ class testItemCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],6))+avg(count_foreach(/*/trap?[tag=\"tag1\"],99h))-bitrshift(last(//trap),1)".
 							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)=>trendsum(/host/item,60m:now/h)",
-					'title' => 'Cannot add item',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from ">trendsum(/host/item,60m:now/h)".'
 				]
 			]
@@ -2529,14 +2330,17 @@ class testItemCalculatedFormula extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getValidationData
+	 * Function for testing formula field in calculated item or item prototype.
+	 *
+	 * @param    array    $data       data provider
+	 * @param    boolean  $prototype  false if item, true if item prototype
 	 */
-	public function testItemCalculatedFormula_Validation($data) {
+	public function executeValidation($data, $prototype = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
 		}
 
-		$this->page->login()->open('items.php?form=create&hostid=40001&context=host')->waitUntilReady();
+		$this->page->login()->open($this->url)->waitUntilReady();
 		$form = $this->query('name:itemForm')->asForm()->waitUntilVisible()->one();
 		$key = 'calc'.microtime(true);
 
@@ -2550,12 +2354,16 @@ class testItemCalculatedFormula extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['title'], $data['error']);
+			$title = (CTestArrayHelper::get($data, 'formula') === '')
+				? 'Page received incorrect data'
+				: (($prototype) ? 'Cannot add item prototype' : 'Cannot add item');
+
+			$this->assertMessage(TEST_BAD, $title, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, 'Item added');
+			$this->assertMessage(TEST_GOOD, (($prototype) ? 'Item prototype added' : 'Item added'));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 		}
 	}
