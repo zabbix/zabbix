@@ -1646,7 +1646,8 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}", (unsigned int)dsname->hvdisks.values_num);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
+				(unsigned int)dsname->hvdisks.values_num);
 
 		zbx_json_close(&json_data);
 	}

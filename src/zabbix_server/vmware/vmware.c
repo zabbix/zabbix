@@ -3321,7 +3321,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 	zbx_vector_str_t	scsi_luns;
 	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
-	int			i, ret = FAIL;
+	int			i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
 
@@ -3347,10 +3347,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
-		goto out;
-
-	ret = SUCCEED;
+	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
 out:
 	zbx_free(tmp);
 	zbx_vector_str_destroy(&scsi_luns);
@@ -3621,8 +3618,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 			if (SUCCEED != zbx_xml_read_doc_num(multipath_data, tmp, &hvdisk.multipath_total) ||
 					0 == hvdisk.multipath_total)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): for diskextent: %s not found for lun: %s",
-						__func__, diskextent->diskname, lun);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): for diskextent: %s and lun: %s"
+						" multipath data is not found", __func__, diskextent->diskname, lun);
 				zbx_free(lun);
 				continue;
 			}
