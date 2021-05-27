@@ -54,42 +54,52 @@ require_once __DIR__.'/vendor/xmlseclibs/xmlseclibs.php';
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
 
-$baseurl = Utils::getSelfURLNoQuery();
-$relay_state = null;
+global $SSO;
 
 $sp_key = '';
 $sp_cert = '';
 $idp_cert = '';
 
-global $SSO;
-
 if (is_array($SSO) && array_key_exists('SP_KEY', $SSO)) {
-	if (file_exists($SSO['SP_KEY'])) {
+	if (is_readable($SSO['SP_KEY'])) {
 		$sp_key = file_get_contents($SSO['SP_KEY']);
 	}
 }
-elseif (file_exists('conf/certs/sp.key')) {
+elseif (is_readable('conf/certs/sp.key')) {
 	$sp_key = file_get_contents('conf/certs/sp.key');
 }
 
 if (is_array($SSO) && array_key_exists('SP_CERT', $SSO)) {
-	if (file_exists($SSO['SP_CERT'])) {
+	if (is_readable($SSO['SP_CERT'])) {
 		$sp_cert = file_get_contents($SSO['SP_CERT']);
 	}
 }
-elseif (file_exists('conf/certs/sp.crt')) {
+elseif (is_readable('conf/certs/sp.crt')) {
 	$sp_cert = file_get_contents('conf/certs/sp.crt');
 }
 
 if (is_array($SSO) && array_key_exists('IDP_CERT', $SSO)) {
-	if (file_exists($SSO['IDP_CERT'])) {
+	if (is_readable($SSO['IDP_CERT'])) {
 		$idp_cert = file_get_contents($SSO['IDP_CERT']);
 	}
 }
-elseif (file_exists('conf/certs/idp.crt')) {
+elseif (is_readable('conf/certs/idp.crt')) {
 	$idp_cert = file_get_contents('conf/certs/idp.crt');
 }
 
+if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
+	if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
+			&& $SSO['SETTINGS']['baseurl'] !== '') {
+		Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
+	}
+
+	if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
+		Utils::setProxyVars(true);
+	}
+}
+
+$baseurl = Utils::getSelfURLNoQuery();
+$relay_state = null;
 $settings = [
 	'sp' => [
 		'entityId' => $config['saml_sp_entityid'],
