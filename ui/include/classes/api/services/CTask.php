@@ -404,7 +404,8 @@ class CTask extends CApiService {
 
 		// Check permissions.
 		$items = API::Item()->get([
-			'output' => ['type', 'hostid', 'status', 'flags'],
+			'output' => ['name', 'type', 'status', 'flags'],
+			'selectHosts' => ['name', 'status'],
 			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -414,7 +415,8 @@ class CTask extends CApiService {
 
 		if (count($items) != $itemids_cnt) {
 			$items += API::DiscoveryRule()->get([
-				'output' => ['type', 'hostid', 'status', 'flags'],
+				'output' => ['name', 'type', 'status', 'flags'],
+				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => true,
 				'preservekeys' => true
@@ -427,8 +429,7 @@ class CTask extends CApiService {
 			}
 		}
 
-		// Validate item and LLD rule types and statuses, and collect host IDs for later.
-		$hostids = [];
+		// Validate item and LLD rule type and status.
 		$allowed_types = checkNowAllowedTypes();
 
 		foreach ($items as $item) {
@@ -442,32 +443,13 @@ class CTask extends CApiService {
 				);
 			}
 
-			if ($item['status'] != ITEM_STATUS_ACTIVE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot send request: %1$s.',
-						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
-							? _('discovery rule is disabled')
-							: _('item is disabled')
-					)
-				);
+			if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
+				$host_name = $item['hosts'][0]['name'];
+				$problem = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+					? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
+					: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', $problem));
 			}
-
-			$hostids[$item['hostid']] = true;
-		}
-
-		// Check if those are actually monitored hosts because given hostids could actually be templateids.
-		$hosts = API::Host()->get([
-			'output' => [],
-			'hostids' => array_keys($hostids),
-			'filter' => [
-				'status' => HOST_STATUS_MONITORED
-			],
-			'templated_hosts' => true,
-			'nopermissions' => true
-		]);
-
-		if (count($hosts) != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('host is not monitored')));
 		}
 	}
 
