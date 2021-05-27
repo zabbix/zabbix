@@ -290,7 +290,7 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'forecast(/host/trap,#5,25h,"linear")'
+					'formula' => 'forecast(/host/trap,#5,"25h","linear")'
 				]
 			],
 			[
@@ -337,6 +337,16 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'fuzzytime(/host/trap,"{$USERMACRO}s")'
+				]
+			],
+			[
+				[
+					'formula' => 'fuzzytime(/host/trap,"5h")'
+				]
+			],
+			[
+				[
+					'formula' => 'fuzzytime(/host/trap,5h)'
 				]
 			],
 			// last() function.
@@ -423,6 +433,11 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'nodata(/host/trap,30d)'
+				]
+			],
+			[
+				[
+					'formula' => 'nodata(/host/trap,"30d")'
 				]
 			],
 			// now() function.
@@ -658,6 +673,20 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "avg(/host/trap,{#LLD}h)".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'avg(/host/trap,"30")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'avg(/host/trap,"30s")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
+				]
+			],
 			// bitand() function validation.
 			[
 				[
@@ -706,6 +735,20 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => 'count(/host/trap,"99m")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(/host/key,"3600:now-3600")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "count".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,:now/d)',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(/host/trap,:now/d)".'
 				]
@@ -724,6 +767,7 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "count".'
 				]
 			],
+			// cot() function validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -870,6 +914,20 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "forecast".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'forecast(/host/trap,"#4:now-5h",25h)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'forecast(/host/trap,"5:now/d","25h")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "forecast".'
+				]
+			],
 			// fuzzytime() function validation.
 			[
 				[
@@ -911,6 +969,13 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'last(/host/trap,7s)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'last(/host/trap,"#3")',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			],
