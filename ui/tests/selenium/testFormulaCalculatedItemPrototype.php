@@ -51,12 +51,17 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 			],
 			[
 				[
-					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)'
+					'formula' => 'count(/host/trap,"{#LLD}m",,"0")'
 				]
 			],
 			[
 				[
-					'formula' => 'count(/host/trap,"{#LLD}m",,"0")'
+					'formula' => 'count(/host/trap,"{#LLD}:now-5h","eq")'
+				]
+			],
+			[
+				[
+					'formula' => 'logsource(/Trapper/trap[4],"{#LLD}:now-1h","^error")'
 				]
 			],
 			[
@@ -76,6 +81,11 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 			],
 			[
 				[
+					'formula' => 'sum(/host/trap,"{#LLD}:now/d")'
+				]
+			],
+			[
+				[
 					'formula' => 'timeleft(/host/trap,"{#LLD}:now-6h",20G,"power")'
 				]
 			],
@@ -86,12 +96,32 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 			],
 			[
 				[
+					'formula' => 'trendavg(/host/item,1M:now/M-{#LLD})'
+				]
+			],
+			[
+				[
 					'formula' => 'trendmin(/host/key,"3600:{#LLD}-3600")'
 				]
 			],
 			[
 				[
+					'formula' => 'trendcount(/host/key,"3600:now-{#LLD}")'
+				]
+			],
+			[
+				[
+					'formula' => 'trendcount(/host/key,3600:now-{#LLD})'
+				]
+			],
+			[
+				[
 					'formula' => "stddevsamp(//trap,{#LLD})"
+				]
+			],
+			[
+				[
+					'formula' => "sqrt(last(//trap,\"{#LLD}\"))"
 				]
 			],
 			[
@@ -118,22 +148,8 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'max(/host/trap,#3d:now-{#LLD})',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{#LLD})".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'avg(/host/trap,{#LLD}h)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "something".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'trendavg(/host/item,1M:now/M-{#LLD})',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "something".'
+					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
 				]
 			]
 		];

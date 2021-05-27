@@ -144,11 +144,6 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'count(/host/trap,"{#LLD}:now-5h","eq")'
-				]
-			],
-			[
-				[
 					'formula' => 'count(/host/trap,1m,,"0")'
 				]
 			],
@@ -406,11 +401,6 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'logsource(/Trapper/trap[4],"{$USERMACRO}:now-1h","^error")'
 				]
 			],
-			[
-				[
-					'formula' => 'logsource(/Trapper/trap[4],"{#LLD}:now-1h","^error")'
-				]
-			],
 			// max() function.
 			[
 				[
@@ -490,11 +480,6 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'sum(/host/trap,"{#LLD}:now/d")'
-				]
-			],
-			[
-				[
 					'formula' => 'sum(/host/trap,"5:now/{$USERMACRO}")'
 				]
 			],
@@ -520,11 +505,6 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => "sqrt(last(//trap,{\$USERMACRO}))"
-				]
-			],
-			[
-				[
-					'formula' => "sqrt(last(//trap,\"{#LLD}\"))"
 				]
 			],
 			// tan()function.
@@ -571,11 +551,6 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'trendavg(/host/key,3600:now-3600)'
 				]
 			],
-			[
-				[
-					'formula' => 'trendavg(/host/key,"3600:{#LLD}-3600")'
-				]
-			],
 			// trendcount() function.
 			[
 				[
@@ -585,11 +560,6 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'trendcount(/host/key,3600:now-3600)'
-				]
-			],
-			[
-				[
-					'formula' => 'trendcount(/host/key,"3600:now-{#LLD}")'
 				]
 			],
 			// trendmax() function.
@@ -679,6 +649,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'avg()',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "avg".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'avg(/host/trap,{#LLD}h)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "avg(/host/trap,{#LLD}h)".'
 				]
 			],
 			// bitand() function validation.
@@ -1094,6 +1071,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'max(/host/trap,#3d:now-{$USERMACRO})',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{$USERMACRO})".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'max(/host/trap,#3d:now-{#LLD})',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(/host/trap,#3d:now-{#LLD})".'
 				]
 			],
 			// min() function validation.
@@ -2150,11 +2134,6 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'in(5,(last(/host/trap)),{$USERMACRO},5,10)'
 				]
 			],
-			[
-				[
-					'formula' => 'in(5,(last(/host/trap)),"{#LLD}",6,10)'
-				]
-			],
 			// Operator functions validation.
 			[
 				[
@@ -2205,11 +2184,6 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'bitnot(last(/host/trap))'
-				]
-			],
-			[
-				[
-					'formula' => 'bitlshift(last(/host/trap),"{#LLD}")'
 				]
 			],
 			[
