@@ -28,16 +28,17 @@
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
-#define ZBX_IPC_PREPROCESSOR_WORKER		1
-#define ZBX_IPC_PREPROCESSOR_REQUEST		2
-#define ZBX_IPC_PREPROCESSOR_RESULT		3
-#define ZBX_IPC_PREPROCESSOR_QUEUE		4
-#define ZBX_IPC_PREPROCESSOR_TEST_REQUEST	5
-#define ZBX_IPC_PREPROCESSOR_TEST_RESULT	6
-#define ZBX_IPC_PREPROCESSOR_DIAG_STATS		7
-#define ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT	8
-#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS		9
-#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT	10
+#define ZBX_IPC_PREPROCESSOR_WORKER			1
+#define ZBX_IPC_PREPROCESSOR_REQUEST			2
+#define ZBX_IPC_PREPROCESSOR_RESULT			3
+#define ZBX_IPC_PREPROCESSOR_QUEUE			4
+#define ZBX_IPC_PREPROCESSOR_TEST_REQUEST		5
+#define ZBX_IPC_PREPROCESSOR_TEST_RESULT		6
+#define ZBX_IPC_PREPROCESSOR_DIAG_STATS			7
+#define ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT		8
+#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS			9
+#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT		10
+#define ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS	11
 
 typedef struct {
 	AGENT_RESULT	*result;
@@ -80,9 +81,11 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 void	zbx_preprocessor_unpack_test_result(zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
 		char **error, const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int values_num, int values_preproc_num);
+zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
+		int pending);
 
-void	zbx_preprocessor_unpack_diag_stats(int *values_num, int *values_preproc_num, const unsigned char *data);
+void	zbx_preprocessor_unpack_diag_stats(int *total, int *queued, int *processing, int *done,
+		int *pending, const unsigned char *data);
 
 zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit);
 
