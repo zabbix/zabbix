@@ -22,8 +22,6 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
-use  \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
-
 /**
  * Multifield table element.
  */
@@ -328,7 +326,7 @@ class CMultifieldTableElement extends CTableElement {
 				try {
 					$controls[$name]->fill($value);
 				}
-				catch (UnrecognizedExceptionException $e1) {
+				catch (Exception $e1) {
 					try {
 						$controls = $this->getRowControls($this->getRow($index));
 						$controls[$name]->fill($value);

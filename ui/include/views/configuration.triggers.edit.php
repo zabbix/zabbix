@@ -583,7 +583,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 	$dependenciesTable->addRow(
 		(new CRow([
 			(new CLink($dep_trigger_description, 'triggers.php?form=update&triggerid='.$dependency['triggerid']))
-				->setAttribute('target', '_blank'),
+				->setTarget('_blank'),
 			(new CCol(
 				$discovered_trigger
 					? null

@@ -33,7 +33,7 @@ INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'AP
 INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,900,'API discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
+INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (9000,900,40067);
 
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (399,'API value map for update');

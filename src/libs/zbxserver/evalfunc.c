@@ -336,7 +336,7 @@ static int	evaluate_LOGSOURCE(char **value, DC_ITEM *item, const char *parameter
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		switch (regexp_match_ex(&regexps, ZBX_NULL2EMPTY_STR(vc_value.value.log->source), arg1, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				*value = zbx_strdup(*value, "1");
