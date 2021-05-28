@@ -26,6 +26,7 @@
 #include "zbxserver.h"
 #include "export.h"
 #include "zbxservice.h"
+#include "service_protocol.h"
 
 /* event recovery data */
 typedef struct
@@ -1931,16 +1932,29 @@ void	zbx_events_update_itservices(void)
 		if (TRIGGER_VALUE_PROBLEM != event->value || 0 == event->tags.values_num)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event);
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->severity, event->clock,
+				&event->tags);
 	}
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
 	{
+		int	values_num;
+
 		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
 			continue;
 
-		/* zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->r_event); */
+		/* if (0 == recovery->r_event->tags.values_num)
+			continue; */
+
+		values_num = recovery->r_event->tags.values_num;
+
+		recovery->r_event->tags.values_num = 0;	/* don't send tags for recovery event */
+
+		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->severity,
+				recovery->r_event->clock, &recovery->r_event->tags);
+
+		recovery->r_event->tags.values_num = values_num;
 	}
 
 	if (NULL == data)

@@ -24,7 +24,8 @@
 #include "db.h"
 #include "zbxalgo.h"
 
-void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, const DB_EVENT *event);
+void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
+		int severity, int clock, const zbx_vector_ptr_t *tags);
 /*void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_availability_ptr_t  *interface_availabilities);*/
 #endif
