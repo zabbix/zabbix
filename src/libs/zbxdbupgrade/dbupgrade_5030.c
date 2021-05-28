@@ -3097,6 +3097,20 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		scr_item->application = zbx_strdup(NULL, row[14]);
 		scr_item->dynamic = atoi(row[15]);
 
+		if (0 == scr_item->colspan)
+		{
+			scr_item->colspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: colspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (0 == scr_item->rowspan)
+		{
+			scr_item->rowspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
 		DBpatch_trace_screen_item(scr_item);
 
 		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
