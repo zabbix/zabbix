@@ -136,6 +136,12 @@ class testDiscoveryRule extends CAPITest {
 					];
 					break;
 
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
 				case ITEM_TYPE_TELNET:
 				case ITEM_TYPE_SSH:
 					$params = [
@@ -146,7 +152,8 @@ class testDiscoveryRule extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151'
+						'master_itemid' => '150151',
+						'delay' => '0'
 					];
 					break;
 
@@ -174,15 +181,18 @@ class testDiscoveryRule extends CAPITest {
 					break;
 			}
 
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
 			$item_type_tests['Test valid LLD rule with item type '.$type] = [
-				'discoveryrule' => [
+				'discoveryrule' => $params + [
 					'name' => 'API LLD rule of type '.$type,
 					'key_' => 'api_lld_rule_of_type_'.$type,
 					'hostid' => '50009',
 					'type' => (string) $type,
-					'interfaceid' => $interfaceid,
 					'delay' => '30s'
-				] + $params,
+				],
 				'expected_error' => null
 			];
 		}

@@ -55,6 +55,12 @@ class testItemPrototype extends CAPITest {
 					];
 					break;
 
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
 				case ITEM_TYPE_TELNET:
 				case ITEM_TYPE_SSH:
 					$params = [
@@ -65,7 +71,8 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151'
+						'master_itemid' => '150151',
+						'delay' => '0'
 					];
 					break;
 
@@ -101,17 +108,20 @@ class testItemPrototype extends CAPITest {
 					break;
 			}
 
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
 			$item_type_tests[] = [
-				'request_data' => [
+				'request_data' => $params + [
 					'hostid' => '50009',
 					'ruleid' => '40066',
 					'name' => 'Test item prototype of type '.$type,
 					'key_' => 'test_item_prototype_of_type_'.$type,
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => (string) $type,
-					'interfaceid' => $interfaceid,
 					'delay' => '30s'
-				] + $params,
+				],
 				'expected_error' => null
 			];
 		}

@@ -45,7 +45,7 @@ class testItem extends CAPITest {
 			ITEM_TYPE_CALCULATED => null,
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
-			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
 			ITEM_TYPE_SNMP => '50029',
 			ITEM_TYPE_SCRIPT => '50022'
 		];
@@ -59,6 +59,12 @@ class testItem extends CAPITest {
 					];
 					break;
 
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
 				case ITEM_TYPE_TELNET:
 				case ITEM_TYPE_SSH:
 					$params = [
@@ -69,7 +75,8 @@ class testItem extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151'
+						'master_itemid' => '150151',
+						'delay' => '0'
 					];
 					break;
 
@@ -105,16 +112,19 @@ class testItem extends CAPITest {
 					break;
 			}
 
-			$item_type_tests[] = [
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
+			$item_type_tests[] = $params + [
 				'request_data' => [
 					'name' => 'Item of type '.$type,
 					'key_' => 'item_of_type_'.$type,
 					'hostid' => '50009',
 					'type' => (string) $type,
-					'interfaceid' => $interfaceid,
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'delay' => '30s'
-				] + $params,
+				],
 				'expected_error' => null
 			];
 		}
