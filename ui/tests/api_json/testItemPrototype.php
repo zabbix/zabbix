@@ -26,8 +26,57 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testItemPrototype extends CAPITest {
 
-		public static function getItemPrototypeCreateData() {
+	public static function getItemPrototypeCreateData() {
+		$valid_item_types = [
+			ITEM_TYPE_ZABBIX => '50022',
+			ITEM_TYPE_TRAPPER => null,
+			ITEM_TYPE_SIMPLE => '50022',
+			ITEM_TYPE_INTERNAL => null,
+			ITEM_TYPE_ZABBIX_ACTIVE => null,
+			ITEM_TYPE_EXTERNAL => '50022',
+			ITEM_TYPE_DB_MONITOR => null,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_CALCULATED => null,
+			ITEM_TYPE_JMX => '50030',
+			ITEM_TYPE_DEPENDENT => null,
+			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_SNMP => '50029',
+			ITEM_TYPE_SCRIPT => null
+		];
+
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			$item_type_tests[] = [
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '40066',
+					'name' => 'Test item prototype of type '.$type,
+					'key_' => 'test_item_prototype_of_type_'.$type,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => (string) $type,
+					'interfaceid' => $interfaceid,
+					'delay' => '30s'
+				],
+				'expected_error' => null
+			];
+		}
+
 		return [
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '40066',
+					'name' => 'Item prototype with invalid item type',
+					'key_' => 'item_prototype_with_invalid_item_type',
+					'interfaceid' => '50022',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => '100',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 2, 3, 5, 7, 10, 11, 12, 13, 14, 16, 15, 17, 18, 19, 20, 21.'
+			],
 			// Test update interval for mqtt key of the Agent item type.
 			[
 				'request_data' => [
@@ -105,7 +154,7 @@ class testItemPrototype extends CAPITest {
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 			]
-		];
+		] + $item_type_tests;
 	}
 
 	/**
