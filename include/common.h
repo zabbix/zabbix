@@ -148,7 +148,8 @@ zbx_timezone_t;
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
-#define ZBX_DOUBLE_EPSILON	0.000001
+extern double	ZBX_DOUBLE_EPSILON;
+
 int	zbx_double_compare(double a, double b);
 
 /* item types */
