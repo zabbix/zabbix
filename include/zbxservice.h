@@ -28,6 +28,5 @@
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
 
 void	zbx_service_flush(unsigned char *data, zbx_uint32_t size);
-void	zbx_services_flush(const zbx_vector_ptr_t *problems);
 
 #endif /* ZABBIX_AVAILABILITY_H */

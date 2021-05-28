@@ -3180,6 +3180,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 				}
 				while (ZBX_DB_DOWN == txn_error);
+
+				if (ZBX_DB_OK == txn_error)
+					zbx_events_update_itservices();
 			}
 		}
 

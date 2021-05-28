@@ -45,18 +45,3 @@ void	zbx_service_flush(unsigned char *data, zbx_uint32_t size)
 	}
 }
 
-void	zbx_services_flush(const zbx_vector_ptr_t *problems)
-{
-	unsigned char	*data = NULL;
-	size_t		data_alloc = 0, data_offset = 0;
-	int		i;
-
-	for (i = 0; i < problems->values_num; i++)
-	{
-		/* zbx_availability_serialize(&data, &data_alloc, &data_offset, */
-		/* interface_availabilities->values[i]); */
-	}
-
-	zbx_availability_flush(data, data_offset);
-	zbx_free(data);
-}

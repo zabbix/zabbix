@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_PROTOCOL_H
-#define ZABBIX_AVAIL_PROTOCOL_H
+#ifndef ZABBIX_SERVICE_PROTOCOL_H
+#define ZABBIX_SERVICE_PROTOCOL_H
 
 #include "common.h"
 #include "db.h"
 #include "zbxalgo.h"
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *interface_availability);
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_availability_ptr_t  *interface_availabilities);
+void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, const DB_EVENT *event);
+/*void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_availability_ptr_t  *interface_availabilities);*/
 #endif

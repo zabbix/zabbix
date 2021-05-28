@@ -20,12 +20,12 @@
 #include "common.h"
 #include "zbxserialize.h"
 #include "db.h"
-#include "avail_protocol.h"
+#include "service_protocol.h"
 #include "dbcache.h"
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *interface_availability)
+void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, const DB_EVENT *event)
 {
+	/*
 	zbx_uint32_t	data_len = 0;
 	size_t		error_len;
 	unsigned char	*ptr;
@@ -54,9 +54,9 @@ void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.available);
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.errors_from);
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.disable_until);
-	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);
+	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);*/
 }
-
+/*
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_availability_ptr_t  *interface_availabilities)
 {
@@ -82,5 +82,5 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		data += zbx_deserialize_value(data, &interface_availability->agent.disable_until);
 		data += zbx_deserialize_str(data, &interface_availability->agent.error, deserialize_error_len);
 	}
-}
+}*/
 

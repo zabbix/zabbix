@@ -1913,6 +1913,29 @@ exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	zbx_events_update_itservices(void)
+{
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
+	int		i;
+
+	for (i = 0; i < events.values_num; i++)
+	{
+		DB_EVENT	*event = events.values[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != event->value)
+			continue;
+
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event);
+	}
+
+	zbx_service_flush(data, data_offset);
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_event_suppress_data                                          *
@@ -2061,11 +2084,7 @@ static int	flush_events(void)
 	zbx_event_recovery_t		*recovery;
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
-	zbx_vector_ptr_t		problems;
 
-	zbx_vector_ptr_create(&problems);
-
-	zbx_services_flush(&problems);
 	ret = save_events();
 	save_problems();
 	save_event_recovery();
@@ -2085,7 +2104,6 @@ static int	flush_events(void)
 
 	process_actions(&events, &closed_events);
 	zbx_vector_uint64_pair_destroy(&closed_events);
-	zbx_vector_ptr_destroy(&problems);
 
 	return ret;
 }

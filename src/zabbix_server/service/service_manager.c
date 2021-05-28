@@ -115,7 +115,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		if (NULL != message)
 		{
 //			zbx_availability_deserialize(message->data, message->size, &interface_availabilities);
-//			zbx_ipc_message_free(message);
+			zbx_ipc_message_free(message);
 		}
 //
 		if (NULL != client)
