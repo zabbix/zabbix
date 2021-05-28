@@ -263,6 +263,7 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
 ........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
 .........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
@@ -271,6 +272,15 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+.......PS. [ZBX-19114] fixed slow detection of vmware hv multipath values for medium and huge vc instances (MVekslers)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+........S. [ZBX-19291] fixed memory error when linking host prototypes (asestakovs)
 .......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
 .......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
 ...G...... [ZBX-19208] fixed imprecise ns on windows (dgoloscapov)
