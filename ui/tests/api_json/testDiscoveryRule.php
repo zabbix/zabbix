@@ -166,8 +166,7 @@ class testDiscoveryRule extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0',
-						'params' => ''
+						'url' => 'http://0.0.0.0'
 					];
 					break;
 

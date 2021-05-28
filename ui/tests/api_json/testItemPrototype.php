@@ -85,8 +85,7 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0',
-						'params' => ''
+						'url' => 'http://0.0.0.0'
 					];
 					break;
 
@@ -98,7 +97,6 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
-						'params' => '',
 						'timeout' => '30s',
 						'parameters' => [],
 						'delay' => '0'
