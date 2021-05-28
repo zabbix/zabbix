@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -51,8 +51,21 @@ class CLink extends CTag {
 		return $this;
 	}
 
-	public function setTarget($value = null) {
-		$this->attributes['target'] = $value;
+	/**
+	 * Set URL target. If target is "_blank", add "rel" tag and tag values "noopener" and "noreferrer". The "noreferrer"
+	 * depends if it is set to true in defines.inc.php.
+	 *
+	 * @param string $value  URL target value.
+	 *
+	 * @return CLink
+	 */
+	public function setTarget(?string $value = null): self {
+		$this->setAttribute('target', $value);
+
+		if ($value === '_blank') {
+			$this->setAttribute('rel', 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''));
+		}
+
 		return $this;
 	}
 

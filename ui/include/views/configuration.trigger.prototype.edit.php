@@ -579,7 +579,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('triggerid', $dependency['triggerid'])
 				->setArgument('context', $data['context'])
-		))->setAttribute('target', '_blank');
+		))->setTarget('_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($depTriggerDescription,
@@ -587,7 +587,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 				->setArgument('form', 'update')
 				->setArgument('triggerid', $dependency['triggerid'])
 				->setArgument('context', $data['context'])
-		))->setAttribute('target', '_blank');
+		))->setTarget('_blank');
 	}
 
 	$row = new CRow([$description,
