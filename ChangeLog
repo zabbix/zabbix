@@ -9,6 +9,9 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+.......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
+...G...... [ZBX-19208] fixed imprecise ns on windows (dgoloscapov)
 ...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
 ....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
 ........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
@@ -511,6 +514,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.12
+
+5.0.12rc1 was released as 5.0.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.12rc1
@@ -2578,6 +2593,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.32rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.31
+
+4.0.31rc1 was released as 4.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.31rc1
