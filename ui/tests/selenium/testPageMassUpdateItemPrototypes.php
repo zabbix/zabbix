@@ -282,16 +282,15 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		];
 	}
 
-// Uncomment this scenario when ZBX-19446 is fixed.
-//	/**
-//	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
-//	 *
-//	 * @dataProvider getCommonChangeData
-//	 * @dataProvider getItemPrototypesChangeData
-//	 */
-//	public function testPageMassUpdateItemPrototypes_ChangeItems($data) {
-//		$this->executeItemsMassUpdate($data, true);
-//	}
+	/**
+	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
+	 *
+	 * @dataProvider getCommonChangeData
+	 * @dataProvider getItemPrototypesChangeData
+	 */
+	public function testPageMassUpdateItemPrototypes_ChangeItems($data) {
+		$this->executeItemsMassUpdate($data, true);
+	}
 
 	/**
 	 * Add items with preprocessing for mass updating.
@@ -482,22 +481,21 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 		$this->executeMassUpdateCancel(true);
 	}
 
-// Uncomment these scenarios when ZBX-19446 is fixed.
-//	/**
-//	 * @dataProvider getCommonTagsChangeData
-//	 *
-//	 * @depends testPageMassUpdateItemPrototypes_Cancel
-//	 */
-//	public function testPageMassUpdateItemPrototypes_ChangeTags($data) {
-//		$this->executeItemsTagsMassUpdate($data, true);
-//	}
+	/**
+	 * @dataProvider getCommonTagsChangeData
+	 *
+	 * @depends testPageMassUpdateItemPrototypes_Cancel
+	 */
+	public function testPageMassUpdateItemPrototypes_ChangeTags($data) {
+		$this->executeItemsTagsMassUpdate($data, true);
+	}
 
-//	/**
-//	 * @dataProvider getCommonPreprocessingChangeData
-//	 *
-//	 * @depends testPageMassUpdateItemPrototypes_Cancel
-//	 */
-//	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
-//		$this->executeItemsPreprocessingMassUpdate($data, true);
-//	}
+	/**
+	 * @dataProvider getCommonPreprocessingChangeData
+	 *
+	 * @depends testPageMassUpdateItemPrototypes_Cancel
+	 */
+	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
+		$this->executeItemsPreprocessingMassUpdate($data, true);
+	}
 }
