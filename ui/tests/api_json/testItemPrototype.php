@@ -48,6 +48,56 @@ class testItemPrototype extends CAPITest {
 
 		$item_type_tests = [];
 		foreach ($valid_item_types as $type => $interfaceid) {
+			switch ($type) {
+				case ITEM_TYPE_IPMI:
+					$params = [
+						'ipmi_sensor' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_TELNET:
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => 0
+					];
+					break;
+				case ITEM_TYPE_JMX:
+					$params = [
+						'username' => 'username',
+						'password' => 'password'
+					];
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$params = [
+						'url' => 'http://0.0.0.0'
+					];
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_SCRIPT:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				default:
+					$params = [];
+					break;
+			}
+
 			$item_type_tests[] = [
 				'request_data' => [
 					'hostid' => '50009',
@@ -58,7 +108,7 @@ class testItemPrototype extends CAPITest {
 					'type' => (string) $type,
 					'interfaceid' => $interfaceid,
 					'delay' => '30s'
-				],
+				] + $params,
 				'expected_error' => null
 			];
 		}
