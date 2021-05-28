@@ -294,18 +294,24 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
-#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
-		"count(/*/*/*/*/*/*/*[local-name()='val']/*[local-name()='lun']"			\
-		"/*[local-name()='path'][*[local-name()='state'][text()='active'] and "			\
-		"../*[local-name()='id']=../../../../*[local-name()='propSet']/*[local-name()='val']"	\
-		"/*[local-name()='ScsiLun']/*[local-name()='uuid'][../*[local-name()='canonicalName']"	\
-		"[text()='%s']]])"
+#define ZBX_XPATH_HV_SCSI_TOPOLOGY									\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"				\
+		"[text()='config.storageDevice.scsiTopology']][1]"					\
+		"/*[local-name()='val']/*[local-name()='adapter']/*[local-name()='target']"		\
+		"/*[local-name()='lun']/*[local-name()='scsiLun']"
 
-#define ZBX_XPATH_HV_MULTIPATH_PATHS()									\
-		"count(/*/*/*/*/*/*/*[local-name()='val']/*[local-name()='lun']"			\
-		"/*[local-name()='path'][../*[local-name()='id']=../../../../*[local-name()='propSet']"	\
-		"/*[local-name()='val']/*[local-name()='ScsiLun']/*[local-name()='uuid']"		\
-		"[../*[local-name()='canonicalName'][text()='%s']]])"
+#define ZBX_XPATH_HV_LUN()										\
+		"substring-before(substring-after(/*/*/*/*/*/*[local-name()='propSet']"			\
+		"[*[local-name()='val'][text()='%s']][1]/*[local-name()='name'],'\"'),'\"')"
+
+#define ZBX_XPATH_HV_MULTIPATH(state)									\
+		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
+		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"				\
+		"/*[local-name()='path']" state ")"
+
+#define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
+#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
+		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
 
 #define ZBX_XPATH_DS_INFO_EXTENT()									\
 		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
@@ -543,6 +549,7 @@ ZBX_HTTPPAGE;
 static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
 static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
 		char **error);
+static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num);
 static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath);
 
@@ -2873,10 +2880,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 		goto out;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		xmlXPathFreeObject(xpathObj);
 		goto out;
-	}
 
 	nodeset = xpathObj->nodesetval;
 
@@ -2902,9 +2906,13 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 		zbx_vector_vmware_diskextent_append(diskextents, diskextent);
 	}
 
+	zbx_vector_vmware_diskextent_sort(diskextents, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 	ret = SUCCEED;
-	xmlXPathFreeObject(xpathObj);
 out:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
 	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
@@ -3070,8 +3078,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
-					"<ns0:pathSet>config.storageDevice.scsiLun</ns0:pathSet>"	\
-					"<ns0:pathSet>config.storageDevice.multipathInfo</ns0:pathSet>"	\
+					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"	\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:propSet>"								\
@@ -3125,6 +3132,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef	ZBX_POST_HV_DETAILS
 }
 
 /******************************************************************************
@@ -3262,6 +3271,92 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef	ZBX_POST_HV_DATACENTER_NAME
+#	undef	ZBX_POST_SOAP_FOLDER
+#	undef	ZBX_POST_SOAP_CUSTER
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_hv_get_multipath_data                             *
+ *                                                                            *
+ * Purpose: gets the vmware hypervisor data about ds multipath                *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             hv_data      - [IN] the hv data with scsi topology info        *
+ *             hvid         - [IN] the vmware hypervisor id                   *
+ *             xdoc         - [OUT] a reference to output xml document        *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *service, CURL *easyhandle,
+		xmlDoc *hv_data, const char *hvid, xmlDoc **xdoc, char **error)
+{
+#	define ZBX_POST_HV_MP_DETAILS									\
+		ZBX_POST_VSPHERE_HEADER									\
+		"<ns0:RetrievePropertiesEx>"								\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
+			"<ns0:specSet>"									\
+				"<ns0:propSet>"								\
+					"<ns0:type>HostSystem</ns0:type>"				\
+					"<ns0:pathSet>config.storageDevice.multipathInfo</ns0:pathSet>"	\
+					"%s"								\
+				"</ns0:propSet>"							\
+				"<ns0:objectSet>"							\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
+					"<ns0:skip>false</ns0:skip>"					\
+				"</ns0:objectSet>"							\
+			"</ns0:specSet>"								\
+			"<ns0:options/>"								\
+		"</ns0:RetrievePropertiesEx>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_POST_SCSI_INFO									\
+		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"
+
+	zbx_vector_str_t	scsi_luns;
+	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
+	int			i, ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
+
+	zbx_vector_str_create(&scsi_luns);
+	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() count of scsiLun:%d", __func__, scsi_luns.values_num);
+
+	if (0 == scsi_luns.values_num)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	for (i = 0; i < scsi_luns.values_num; i++)
+	{
+		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
+	}
+
+	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
+	hvid_esc = xml_escape_dyn(hvid);
+	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
+			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
+	zbx_free(hvid_esc);
+	zbx_free(scsi_req);
+
+	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+out:
+	zbx_free(tmp);
+	zbx_vector_str_destroy(&scsi_luns);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+#	undef	ZBX_POST_SCSI_INFO
+#	undef	ZBX_POST_HV_MP_DETAILS
 }
 
 /******************************************************************************
@@ -3395,44 +3490,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_get_multipath_count                                       *
- *                                                                            *
- * Purpose: retrieves multipath count                                         *
- *                                                                            *
- * Parameters: xdoc           - [IN] xml document                             *
- *             xpath          - [IN] xpath                                    *
- *             multipath_num  - [OUT] count                                   *
- *                                                                            *
- * Return value: SUCCEED - the count was retrieved successfully               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_get_multipath_count(xmlDoc *xdoc, const char *xpath, int *multipath_num)
-{
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	int		ret = FAIL;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
-		goto out;
-
-	if (XPATH_NUMBER == xpathObj->type)
-	{
-		*multipath_num = (int)xpathObj->floatval;
-		ret = SUCCEED;
-	}
-
-	xmlXPathFreeObject(xpathObj);
-out:
-	xmlXPathFreeContext(xpathCtx);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_dsname_compare                                            *
  *                                                                            *
  * Purpose: sorting function to sort Datastore names vector by name           *
@@ -3467,7 +3524,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
 {
 	char			*value;
-	xmlDoc			*details = NULL;
+	xmlDoc			*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t	datastores, vms;
 	int			i, j, ret = FAIL;
 
@@ -3510,6 +3567,11 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 	zbx_vector_vmware_dsname_reserve(&hv->dsnames, datastores.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastores are connected to hypervisor \"%s\"", __func__,
+			datastores.values_num, hv->id);
+
+	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, details, id, &multipath_data, error))
+		goto out;
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -3533,25 +3595,43 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		dsname = (zbx_vmware_dsname_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dsname_t));
 		dsname->name = zbx_strdup(NULL, ds->name);
 		zbx_vector_vmware_hvdisk_create(&dsname->hvdisks);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): for %d diskextents check multipath at ds:\"%s\"", __func__,
+				ds->diskextents.values_num, ds->name);
 
-		for (j = 0; j < ds->diskextents.values_num; j++)
+		for (j = 0; NULL != multipath_data && j < ds->diskextents.values_num; j++)
 		{
 			zbx_vmware_diskextent_t	*diskextent = ds->diskextents.values[j];
 			zbx_vmware_hvdisk_t	hvdisk;
-			char			tmp[MAX_STRING_LEN];
+			char			tmp[MAX_STRING_LEN], *lun;
 
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), diskextent->diskname);
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_LUN(), diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(details, tmp, &hvdisk.multipath_total))
+			if (NULL == (lun = zbx_xml_read_doc_value(multipath_data, tmp)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): not found diskextent: %s",
+						__func__, diskextent->diskname);
 				continue;
+			}
 
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), diskextent->diskname);
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), lun);
 
-			if (SUCCEED != vmware_get_multipath_count(details, tmp, &hvdisk.multipath_active))
+			if (SUCCEED != zbx_xml_read_doc_num(multipath_data, tmp, &hvdisk.multipath_total) ||
+					0 == hvdisk.multipath_total)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): for diskextent: %s and lun: %s"
+						" multipath data is not found", __func__, diskextent->diskname, lun);
+				zbx_free(lun);
+				continue;
+			}
+
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), lun);
+
+			if (SUCCEED != zbx_xml_read_doc_num(multipath_data, tmp, &hvdisk.multipath_active))
 				hvdisk.multipath_active = 0;
 
 			hvdisk.partitionid = diskextent->partitionid;
 			zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, hvdisk);
+			zbx_free(lun);
 		}
 
 		zbx_vector_vmware_hvdisk_sort(&dsname->hvdisks, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3580,6 +3660,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	ret = SUCCEED;
 out:
+	zbx_xml_free_doc(multipath_data);
 	zbx_xml_free_doc(details);
 
 	zbx_vector_str_clear_ext(&vms, zbx_str_free);
@@ -5185,11 +5266,21 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
-		zbx_vmware_hv_t	hv_local;
+		zbx_vmware_hv_t	hv_local, *hv;
 
 		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores, &hv_local,
 				&data->error))
 		{
+			if (NULL != (hv = zbx_hashset_search(&data->hvs, &hv_local)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Duplicate uuid of new hv id:%s name:%s uuid:%s and"
+					" discovered hv with id:%s name:%s", hv_local.id,
+					ZBX_NULL2EMPTY_STR(hv_local.props[ZBX_VMWARE_HVPROP_NAME]), hv_local.uuid,
+					hv->id, ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]));
+				vmware_hv_clean(&hv_local);
+				continue;
+			}
+
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 		}
 		else if (NULL != data->error)
@@ -6554,6 +6645,12 @@ static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpa
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto clean;
 
+	if (XPATH_STRING == xpathObj->type)
+	{
+		value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+		goto clean;
+	}
+
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
@@ -6596,6 +6693,44 @@ static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_xml_read_doc_num                                             *
+ *                                                                            *
+ * Purpose: retrieves numeric xpath value                                     *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] xml document                                      *
+ *             xpath - [IN] xpath                                             *
+ *             num   - [OUT] numeric value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the count was retrieved successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_xml_read_doc_num(xmlDoc *xdoc, const char *xpath, int *num)
+{
+	int		ret = FAIL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto out;
+
+	if (XPATH_NUMBER == xpathObj->type)
+	{
+		*num = (int)xpathObj->floatval;
+		ret = SUCCEED;
+	}
+
+	xmlXPathFreeObject(xpathObj);
+out:
+	xmlXPathFreeContext(xpathCtx);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_xml_read_values                                              *
  *                                                                            *
  * Purpose: populate array of values from a xml data                          *
@@ -6621,7 +6756,7 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
