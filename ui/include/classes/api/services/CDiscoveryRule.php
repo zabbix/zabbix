@@ -3004,7 +3004,9 @@ class CDiscoveryRule extends CItemGeneral {
 							'output' => ['lld_override_operationid', 'tag', 'value'],
 							'filter' => ['lld_override_operationid' => array_keys(
 								$trigger_prototype_objectids + $host_prototype_objectids + $item_prototype_objectids
-							)]
+							)],
+							'sortfield' => ['lld_override_optagid'],
+							'sortorder' => [ZBX_SORT_UP]
 						]);
 					}
 
