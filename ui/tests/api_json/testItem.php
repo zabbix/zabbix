@@ -59,6 +59,7 @@ class testItem extends CAPITest {
 					'hostid' => '50009',
 					'type' => (string) $type,
 					'interfaceid' => $interfaceid,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'delay' => '30s'
 				],
 				'expected_error' => null
@@ -406,23 +407,23 @@ class testItem extends CAPITest {
 
 	public static function itemCreateData() {
 		$valid_item_types = [
-			ITEM_TYPE_ZABBIX => 50022,
+			ITEM_TYPE_ZABBIX => '50022',
 			ITEM_TYPE_TRAPPER => null,
-			ITEM_TYPE_SIMPLE => 50022,
+			ITEM_TYPE_SIMPLE => '50022',
 			ITEM_TYPE_INTERNAL => null,
 			ITEM_TYPE_ZABBIX_ACTIVE => null,
-			ITEM_TYPE_AGGREGATE => null,
-			ITEM_TYPE_EXTERNAL => 50022,
+			ITEM_TYPE_EXTERNAL => '50022',
 			ITEM_TYPE_DB_MONITOR => null,
-			ITEM_TYPE_IPMI => 50031,
-			ITEM_TYPE_SSH => 50022,
-			ITEM_TYPE_TELNET => 50022,
-			ITEM_TYPE_JMX => 50030,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_CALCULATED => null,
-			ITEM_TYPE_SNMPTRAP => 50029,
+			ITEM_TYPE_SNMPTRAP => '50029',
 			ITEM_TYPE_DEPENDENT => null,
 			ITEM_TYPE_HTTPAGENT => null,
-			ITEM_TYPE_SNMP => 50029
+			ITEM_TYPE_SNMP => '50029',
+			ITEM_TYPE_SCRIPT => null
 		];
 
 		$item_type_tests = [];
@@ -432,7 +433,7 @@ class testItem extends CAPITest {
 					'name' => 'Item of type '.$type,
 					'key_' => 'item_of_type_'.$type,
 					'hostid' => '50009',
-					'type' => $type,
+					'type' => (string) $type,
 					'interfaceid' => $interfaceid,
 					'delay' => '30s'
 				],
