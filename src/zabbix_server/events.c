@@ -1940,7 +1940,7 @@ void	zbx_events_update_itservices(void)
 		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
 			continue;
 
-		//zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->r_event);
+		/* zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->r_event); */
 	}
 
 	if (NULL == data)
