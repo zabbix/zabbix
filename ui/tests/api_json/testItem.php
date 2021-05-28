@@ -101,7 +101,7 @@ class testItem extends CAPITest {
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
-						'params' => '',
+						'params' => 'script',
 						'timeout' => '30s',
 						'parameters' => [],
 						'delay' => '0'
