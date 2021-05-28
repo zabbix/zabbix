@@ -61,6 +61,17 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '30s'
 				],
 				'expected_error' => 'Item with key "apilldrule4" already exists on "API Host".'
+			],
+			'Test  LLD rule with unsupported item type' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule with unsupported item type',
+					'key_' => 'api_lld_rule_with_unsupported_item_type',
+					'hostid' => '50009',
+					'type' => '100',
+					'interfaceid' => '50022',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Incorrect value "100" for "type" field.'
 			]
 		];
 
@@ -68,19 +79,39 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public static function discoveryrule_create_data_valid() {
-		return [
-			'Test valid LLD rule with default properties' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule default',
-					'key_' => 'apilldruledefault',
-					'hostid' => '50009',
-					'type' => '0',
-					'interfaceid' => '50022',
-					'delay' => '30s'
-				],
-				'expected_error' => null
-			]
+		$valid_item_types = [
+			ITEM_TYPE_ZABBIX => '50022',
+			ITEM_TYPE_TRAPPER => null,
+			ITEM_TYPE_SIMPLE => '50022',
+			ITEM_TYPE_INTERNAL => null,
+			ITEM_TYPE_ZABBIX_ACTIVE => null,
+			ITEM_TYPE_EXTERNAL => '50022',
+			ITEM_TYPE_DB_MONITOR => null,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_JMX => '50030',
+			ITEM_TYPE_DEPENDENT => null,
+			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_SNMP => '50029'
 		];
+
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			$item_type_tests['Test valid LLD rule with item type '.$type] = [
+				'discoveryrule' => array_filter([
+					'name' => 'API LLD rule of type '.$type,
+					'key_' => 'api_lld_rule_of_type_'.$type,
+					'hostid' => '50009',
+					'type' => $type,
+					'interfaceid' => $interfaceid,
+					'delay' => '30s'
+				]),
+				'expected_error' => null
+			];
+		}
+
+		return $item_type_tests;
 
 		// TODO: add other properties, multiple rules, duplicates etc.
 	}
