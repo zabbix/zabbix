@@ -8,6 +8,8 @@ This is a template for monitoring HPE ProLiant BL920 servers with HP iLO version
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+
 Refer to the vendor documentation.
 
 ## Zabbix configuration
