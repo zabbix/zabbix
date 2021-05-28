@@ -123,7 +123,7 @@ class testDiscoveryRule extends CAPITest {
 			ITEM_TYPE_TELNET => '50022',
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
-			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
 			ITEM_TYPE_SNMP => '50029'
 		];
 
@@ -166,7 +166,8 @@ class testDiscoveryRule extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'params' => ''
 					];
 					break;
 

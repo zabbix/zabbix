@@ -41,7 +41,7 @@ class testItemPrototype extends CAPITest {
 			ITEM_TYPE_CALCULATED => null,
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
-			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
 			ITEM_TYPE_SNMP => '50029',
 			ITEM_TYPE_SCRIPT => '50022'
 		];
@@ -85,7 +85,8 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'params' => ''
 					];
 					break;
 

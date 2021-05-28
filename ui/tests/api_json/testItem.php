@@ -89,7 +89,8 @@ class testItem extends CAPITest {
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'params' => ''
 					];
 					break;
 
