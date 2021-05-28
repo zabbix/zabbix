@@ -53,8 +53,8 @@ void	zbx_services_flush(const zbx_vector_ptr_t *problems)
 
 	for (i = 0; i < problems->values_num; i++)
 	{
-//		zbx_availability_serialize(&data, &data_alloc, &data_offset,
-//				interface_availabilities->values[i]);
+		/* zbx_availability_serialize(&data, &data_alloc, &data_offset, */
+		/* interface_availabilities->values[i]); */
 	}
 
 	zbx_availability_flush(data, data_offset);
