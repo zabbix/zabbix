@@ -1,11 +1,264 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:27Z'
+  date: '2021-05-26T13:47:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
+    -
+      uuid: 56079badd056419383cc26e6a4fcc7e0
+      template: VMware
+      name: VMware
+      description: |
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'VMware macros'
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 5ce209f4d94f460488a74a92a52d92b1
+          name: 'VMware: Event log'
+          type: SIMPLE
+          key: 'vmware.eventlog[{$VMWARE.URL},skip]'
+          history: 7d
+          trends: '0'
+          value_type: LOG
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          tags:
+            -
+              tag: Application
+              value: VMware
+        -
+          uuid: ee2edadb8ce943ef81d25dbbba8667a4
+          name: 'VMware: Full name'
+          type: SIMPLE
+          key: 'vmware.fullname[{$VMWARE.URL}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware service full name.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
+        -
+          uuid: a0ec9145f2234fbea79a28c57ebdb44d
+          name: 'VMware: Version'
+          type: SIMPLE
+          key: 'vmware.version[{$VMWARE.URL}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware service version.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: VMware
+      discovery_rules:
+        -
+          uuid: 16ffc933cce74cf28a6edf306aa99782
+          name: 'Discover VMware clusters'
+          type: SIMPLE
+          key: 'vmware.cluster.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of clusters'
+          item_prototypes:
+            -
+              uuid: 46111f91dd564a459dbc1d396e2e6c76
+              name: 'VMware: Status of "{#CLUSTER.NAME}" cluster'
+              type: SIMPLE
+              key: 'vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware cluster status.'
+              valuemap:
+                name: 'VMware status'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+        -
+          uuid: 8fb6a45cbe074b0cb6df53758e2c6623
+          name: 'Discover VMware datastores'
+          type: SIMPLE
+          key: 'vmware.datastore.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          item_prototypes:
+            -
+              uuid: 4b61838ba4c34e709b25081ae5b059b5
+              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Amount of time for a read operation from the datastore (milliseconds).'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+            -
+              uuid: 5355c401dc244bc588ccd18767577c93
+              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
+              type: SIMPLE
+              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in percentage from total.'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+            -
+              uuid: 84f13c4fde2d4a17baaf0c8c1eb4f2c0
+              name: 'VMware: Total size of datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]'
+              delay: 5m
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in bytes.'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+            -
+              uuid: 540cd0fbc56c4b8ea19f2ff5839ce00d
+              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Amount of time for a write operation to the datastore (milliseconds).'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+        -
+          uuid: a5bc075e89f248e7b411d8f960897a08
+          name: 'Discover VMware hypervisors'
+          type: SIMPLE
+          key: 'vmware.hv.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of hypervisors.'
+          host_prototypes:
+            -
+              uuid: 051a1469d4d045cbbf818fcc843a352e
+              host: '{#HV.UUID}'
+              name: '{#HV.NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: '{#CLUSTER.NAME}'
+                -
+                  name: '{#DATACENTER.NAME}'
+              templates:
+                -
+                  name: 'VMware Hypervisor'
+              macros:
+                -
+                  macro: '{$VMWARE.HV.UUID}'
+                  value: '{#HV.UUID}'
+                  description: 'UUID of hypervisor.'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#HV.IP}'
+        -
+          uuid: 9fd559f4e88c4677a1b874634dd686f5
+          name: 'Discover VMware VMs'
+          type: SIMPLE
+          key: 'vmware.vm.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of guest virtual machines.'
+          host_prototypes:
+            -
+              uuid: 23b9ae9d6f33414880db1cb107115810
+              host: '{#VM.UUID}'
+              name: '{#VM.NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: '{#CLUSTER.NAME} (vm)'
+                -
+                  name: '{#DATACENTER.NAME} (vm)'
+                -
+                  name: '{#HV.NAME}'
+              templates:
+                -
+                  name: 'VMware Guest'
+              macros:
+                -
+                  macro: '{$VMWARE.VM.UUID}'
+                  value: '{#VM.UUID}'
+                  description: 'UUID of guest virtual machine.'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#VM.IP}'
+      valuemaps:
+        -
+          uuid: 3c59c22905054d42ac4ee8b72fe5f270
+          name: 'VMware status'
+          mappings:
+            -
+              value: '0'
+              newvalue: gray
+            -
+              value: '1'
+              newvalue: green
+            -
+              value: '2'
+              newvalue: yellow
+            -
+              value: '3'
+              newvalue: red
     -
       uuid: 7942fb93ae3b47cf9ca0ea4beb0675ce
       template: 'VMware Guest'

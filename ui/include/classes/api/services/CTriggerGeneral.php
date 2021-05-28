@@ -153,7 +153,8 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$new_trigger = $tpl_trigger;
-			unset($new_trigger['triggerid'], $new_trigger['templateid'], $new_trigger['uuid']);
+			$new_trigger['uuid'] = '';
+			unset($new_trigger['triggerid'], $new_trigger['templateid']);
 
 			if (array_key_exists($tpl_hostid, $hosts_by_tpl_hostid)) {
 				foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
@@ -1021,12 +1022,16 @@ abstract class CTriggerGeneral extends CApiService {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$db_trigger_tags = API::getApiService()->select('trigger_tag', [
-			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
-			'filter' => ['triggerid' => array_keys($_db_triggers)],
-			'preservekeys' => true
-		]);
-		$_db_triggers = $this->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
+		$db_trigger_tags = $_db_triggers
+			? DB::select('trigger_tag', [
+				'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+				'filter' => ['triggerid' => array_keys($_db_triggers)],
+				'preservekeys' => true
+			])
+			: [];
+
+		$_db_triggers = $this
+			->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $db_trigger_tags, 'tags');
 
 		$read_only_fields = ['description', 'expression', 'recovery_mode', 'recovery_expression', 'correlation_mode',
@@ -1275,6 +1280,9 @@ abstract class CTriggerGeneral extends CApiService {
 				$upd_trigger['values']['recovery_expression'] = $trigger['recovery_expression'];
 			}
 
+			if (array_key_exists('uuid', $trigger)) {
+				$upd_trigger['values']['uuid'] = $trigger['uuid'];
+			}
 			if ($trigger['description'] !== $db_trigger['description']) {
 				$upd_trigger['values']['description'] = $trigger['description'];
 			}

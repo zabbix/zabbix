@@ -1034,7 +1034,7 @@ abstract class CItemGeneral extends CApiService {
 
 				// copying item
 				$new_item = $tpl_item;
-				unset($new_item['uuid']);
+				$new_item['uuid'] = '';
 
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];

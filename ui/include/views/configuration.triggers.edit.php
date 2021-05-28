@@ -603,7 +603,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('form', 'update')
 					->setArgument('triggerid', $dependency['triggerid'])
 					->setArgument('context', $data['context'])
-			))->setAttribute('target', '_blank'),
+			))->setTarget('_blank'),
 			(new CCol(
 				$discovered_trigger
 					? null

@@ -63,6 +63,7 @@ zbx_function_trim_optype_t;
 static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
 	char	suffix;
+	double	result;
 
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
@@ -70,7 +71,12 @@ static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
 	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
 		return FAIL;
 
-	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(suffix));
+	result = atof(value_num->data.str) * suffix2factor(suffix);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+		return FAIL;
+
+	zbx_variant_set_dbl(value, result);
 
 	return SUCCEED;
 }
@@ -1589,7 +1595,7 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 
 	p = zbx_strshift_utf8(arg->data.str, start->data.ui64 - 1);
 
-	if (srclen > start->data.ui64 + len->data.ui64)
+	if (srclen >= start->data.ui64 + len->data.ui64)
 	{
 		sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
 		strval = zbx_malloc(NULL, sz);
@@ -1778,7 +1784,7 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (src_len < start->data.ui64 + len->data.ui64)
+	if (src_len < start->data.ui64 - 1 + len->data.ui64)
 	{
 		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
 				ctx->expression + token->loc.l);

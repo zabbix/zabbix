@@ -850,7 +850,7 @@ function downloadSvgImage(svg, file_name) {
 	image.onload = function() {
 		context2d.drawImage(image, 0, 0);
 		a.href = canvas.toDataURL('image/png');
-		a.rel = 'noopener';
+		a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 		a.download = file_name;
 		a.target = '_blank';
 		a.click();
@@ -881,7 +881,7 @@ function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
 	a.href = img.src;
-	a.rel = 'noopener';
+	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';
 	a.click();

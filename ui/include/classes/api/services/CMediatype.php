@@ -1213,28 +1213,40 @@ class CMediatype extends CApiService {
 
 		// adding message templates
 		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+			$message_templates = [];
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
 				'media_type_message'
 			);
-			$message_templates = API::getApiService()->select('media_type_message', [
-				'output' => $options['selectMessageTemplates'],
-				'filter' => ['mediatype_messageid' => $relation_map->getRelatedIds()],
-				'preservekeys' => true
-			]);
-			$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
-				[]
-			);
+			$related_ids = $relation_map->getRelatedIds();
+
+			if ($related_ids) {
+				$message_templates = API::getApiService()->select('media_type_message', [
+					'output' => $options['selectMessageTemplates'],
+					'mediatype_messageids' => $related_ids,
+					'preservekeys' => true
+				]);
+				$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
+					[]
+				);
+			}
+
 			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
 		}
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$users = [];
 			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$users = API::User()->get([
-				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$users = API::User()->get([
+					'output' => $options['selectUsers'],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 

@@ -65,7 +65,7 @@ class CMathFunctionValidator extends CValidator {
 				&& ($num_required_parameters[1] === null || $num_parameters <= $num_required_parameters[1]);
 		}
 		else {
-			$is_valid = $num_parameters == $num_required_parameters;
+			$is_valid = ($num_parameters == $num_required_parameters);
 		}
 
 		if (!$is_valid) {

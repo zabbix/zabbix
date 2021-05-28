@@ -61,27 +61,29 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	int		mib[4], i;
 	size_t		sz;
 	static char	*args = NULL;
-	static int	args_alloc = 128;
-
-	if (NULL == args)
-		args = zbx_malloc(args, args_alloc);
+	static int	args_alloc = 0;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
 	mib[2] = KERN_PROC_ARGS;
 	mib[3] = proc->ZBX_PROC_PID;
-retry:
-	sz = (size_t)args_alloc;
-	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
-	{
-		if (errno == ENOMEM)
-		{
-			args_alloc *= 2;
-			args = zbx_realloc(args, args_alloc);
-			goto retry;
-		}
+
+	if (-1 == sysctl(mib, 4, NULL, &sz, NULL, 0))
 		return NULL;
+
+	if (NULL == args)
+	{
+		args = zbx_malloc(args, sz);
+		args_alloc = sz;
 	}
+	else if (sz > args_alloc)
+	{
+		args = zbx_realloc(args, sz);
+		args_alloc = sz;
+	}
+
+	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
+		return NULL;
 
 	for (i = 0; i < (int)(sz - 1); i++)
 		if (args[i] == '\0')

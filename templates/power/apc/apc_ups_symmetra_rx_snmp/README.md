@@ -11,7 +11,7 @@ Note: please, use the latest version of the firmware for your NMC in order for t
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for APC UPS Symmetra RX management IP as SNMPv2 interface.
 

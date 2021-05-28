@@ -31,7 +31,24 @@ class C52AggregateItemKeyConverter extends CConverter {
 	 */
 	protected $item_key_parser;
 
-	public function __construct() {
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => false  Enable low-level discovery macros usage in time periods.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'lldmacros' => false
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+
 		$this->item_key_parser = new CItemKey();
 	}
 
@@ -43,8 +60,6 @@ class C52AggregateItemKeyConverter extends CConverter {
 	 * @return string  Converted item key.
 	 */
 	public function convert($value) {
-		$this->item_key = '';
-
 		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {
 			return $value;
 		}
@@ -57,34 +72,61 @@ class C52AggregateItemKeyConverter extends CConverter {
 		}
 
 		$params = $params['parameters'];
-		$this->item_key = trim($this->item_key_parser->getParam(1));
-		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
-		$item_key = '/*/'.$this->item_key;
-		$host_groups = [$params[0]['raw']];
-
-		if ($params[0]['type'] == CItemKey::PARAM_ARRAY) {
-			$host_groups = array_column($params[0]['parameters'], 'raw');
-		}
+		$host_groups = ($params[0]['type'] == CItemKey::PARAM_ARRAY) ? $params[0]['parameters'] : [$params[0]];
 
 		foreach ($host_groups as &$host_group) {
-			if ($host_group[0] === '"') {
-				$host_group = substr($host_group, 1, -1);
-			}
+			$host_group = ($host_group['type'] == CItemKey::PARAM_QUOTED)
+				? CItemKey::unquoteParam($host_group['raw'])
+				: $host_group['raw'];
+			$host_group = CFilterParser::quoteString($host_group);
 		}
+		unset($host_group);
 
-		$host_groups = array_filter($host_groups, 'strlen');
-
-		if ($host_groups) {
-			$item_key .= '?[group="'.implode('" or group="', $host_groups).'"]';
-		}
-
+		$item_key = '/*/'.trim($this->item_key_parser->getParam(1)).'?[group='.implode(' or group=', $host_groups).']';
+		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
 		$timeperiod = $this->item_key_parser->getParam(3);
 		$new_value = substr($this->item_key_parser->getKey(), 3).'('.$func_foreach.'('.$item_key;
 
 		if ($timeperiod !== null) {
-			$new_value .= ','.trim($timeperiod);
+			$timeperiod = trim($timeperiod);
+
+			if ($this->isQuotableTimeperiod($timeperiod)) {
+				$timeperiod = CHistFunctionParser::quoteParam($timeperiod);
+			}
+
+			$new_value .= ','.$timeperiod;
 		}
 
 		return $new_value.'))';
+	}
+
+	private function isQuotableTimeperiod(string $timeperiod): bool {
+		$number_parser = new CNumberParser(['with_minus' => false, 'with_suffix' => true]);
+
+		if ($number_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($user_macro_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+			return false;
+		}
+
+		if ($this->options['lldmacros']) {
+			$lld_macro_parser = new CLLDMacroParser();
+
+			if ($lld_macro_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+				return false;
+			}
+
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+
+			if ($lld_macro_function_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

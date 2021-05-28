@@ -101,6 +101,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to Fluid form element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFluidFormElement
+	 */
+	public function asFluidForm($options = []) {
+		return $this->cast(CFluidFormElement::class, $options);
+	}
+
+	/**
 	 * Cast object to CheckboxForm element.
 	 *
 	 * @param array $options    additional casting options
