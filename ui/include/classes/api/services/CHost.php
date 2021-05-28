@@ -842,6 +842,11 @@ class CHost extends CHostGeneral {
 	 */
 	public function update($hosts) {
 		$hosts = zbx_toArray($hosts);
+
+		if (!$hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$db_hosts = $this->get([
@@ -1947,6 +1952,10 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $hosts) {
+		if (!$hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$host_name_parser = new CHostNameParser();
 
 		$host_db_fields = ['host' => null];
