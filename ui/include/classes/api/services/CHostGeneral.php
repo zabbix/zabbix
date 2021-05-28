@@ -149,7 +149,11 @@ abstract class CHostGeneral extends CHostBase {
 			$this->unlink(zbx_toArray($data['templateids_clear']), $allHostIds, true);
 		}
 
-		if (isset($data['macros'])) {
+		if (array_key_exists('macros', $data)) {
+			if (!$data['macros']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
+
 			$hostMacros = API::UserMacro()->get([
 				'output' => ['hostmacroid'],
 				'hostids' => $allHostIds,
@@ -158,7 +162,9 @@ abstract class CHostGeneral extends CHostBase {
 				]
 			]);
 			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
+			if ($hostMacroIds) {
+				API::UserMacro()->delete($hostMacroIds);
+			}
 		}
 
 		if (isset($data['groupids'])) {
@@ -670,15 +676,21 @@ abstract class CHostGeneral extends CHostBase {
 		// adding templates
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectParentTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectParentTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($templates, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $templates, 'parentTemplates', $options['limitSelects']);
 			}
 			else {
@@ -767,6 +779,8 @@ abstract class CHostGeneral extends CHostBase {
 		// adding triggers
 		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
+				$relationMap = new CRelationMap();
 				// discovered items
 				$res = DBselect(
 					'SELECT i.hostid,f.triggerid'.
@@ -774,19 +788,23 @@ abstract class CHostGeneral extends CHostBase {
 						' WHERE '.dbConditionInt('i.hostid', $hostids).
 						' AND i.itemid=f.itemid'
 				);
-				$relationMap = new CRelationMap();
 				while ($relation = DBfetch($res)) {
 					$relationMap->addRelation($relation['hostid'], $relation['triggerid']);
 				}
 
-				$triggers = API::Trigger()->get([
-					'output' => $options['selectTriggers'],
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'description');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$triggers = API::Trigger()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($triggers, 'description');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
@@ -808,6 +826,8 @@ abstract class CHostGeneral extends CHostBase {
 		// adding graphs
 		if ($options['selectGraphs'] !== null) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
+				$relationMap = new CRelationMap();
 				// discovered items
 				$res = DBselect(
 					'SELECT i.hostid,gi.graphid'.
@@ -815,19 +835,23 @@ abstract class CHostGeneral extends CHostBase {
 						' WHERE '.dbConditionInt('i.hostid', $hostids).
 						' AND i.itemid=gi.itemid'
 				);
-				$relationMap = new CRelationMap();
 				while ($relation = DBfetch($res)) {
 					$relationMap->addRelation($relation['hostid'], $relation['graphid']);
 				}
 
-				$graphs = API::Graph()->get([
-					'output' => $options['selectGraphs'],
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($graphs, 'name');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::Graph()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($graphs, 'name');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
