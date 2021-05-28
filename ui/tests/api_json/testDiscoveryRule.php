@@ -137,7 +137,7 @@ class testDiscoveryRule extends CAPITest {
 					'type' => (string) $type,
 					'interfaceid' => $interfaceid,
 					'delay' => '30s'
-				] + $params,
+				],
 				'expected_error' => null
 			];
 		}

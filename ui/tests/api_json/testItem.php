@@ -42,13 +42,41 @@ class testItem extends CAPITest {
 			ITEM_TYPE_IPMI => '50031',
 			ITEM_TYPE_SSH => '50022',
 			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_CALCULATED => null,
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
 			ITEM_TYPE_HTTPAGENT => null,
-			ITEM_TYPE_SNMP => '50029'
+			ITEM_TYPE_SNMP => '50029',
+			ITEM_TYPE_SCRIPT => null
 		];
 
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			$item_type_tests[] = [
+				'discoveryrule' => [
+					'name' => 'Item of type '.$type,
+					'key_' => 'item_of_type_'.$type,
+					'hostid' => '50009',
+					'type' => (string) $type,
+					'interfaceid' => $interfaceid,
+					'delay' => '30s'
+				],
+				'expected_error' => null
+			];
+		}
+
 		return [
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'Item with invalid item type',
+					'key_' => 'item_with_invalid_item_type',
+					'interfaceid' => '50022',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => '100'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 2, 3, 5, 7, 10, 11, 12, 13, 14, 16, 15, 17, 18, 19, 20, 21.'
+			],
 			// Test update interval for mqtt key of the Agent item type.
 			[
 				'request_data' => [
@@ -163,7 +191,7 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
 			]
-		];
+		] + $item_type_tests;
 	}
 
 	/**
