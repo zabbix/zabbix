@@ -2096,6 +2096,7 @@ AC_OUTPUT([
 	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/preprocessor/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/service/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile

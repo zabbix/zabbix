@@ -75,6 +75,7 @@ PROXY_SUBDIRS = \
 	zabbix_server/scripts \
 	zabbix_server/preprocessor \
 	zabbix_server/availability \
+	zabbix_server/service \
 	zabbix_proxy \
 	zabbix_js
 	

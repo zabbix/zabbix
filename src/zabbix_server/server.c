@@ -62,6 +62,7 @@
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
 #include "availability/avail_manager.h"
+#include "service/service_manager.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
 #include "reporter/report_manager.h"
@@ -204,6 +205,7 @@ int	CONFIG_HISTORYPOLLER_FORKS	= 5;
 int	CONFIG_AVAILMAN_FORKS		= 1;
 int	CONFIG_REPORTMANAGER_FORKS	= 0;
 int	CONFIG_REPORTWRITER_FORKS	= 0;
+int	CONFIG_SERVICEMAN_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -492,6 +494,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_REPORTWRITER;
 		*local_process_num = local_server_num - server_count + CONFIG_REPORTWRITER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SERVICEMAN_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SERVICEMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_SERVICEMAN_FORKS;
 	}
 	else
 		return FAIL;
@@ -1291,7 +1298,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
 			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
 			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
-			+ CONFIG_REPORTWRITER_FORKS;
+			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
@@ -1437,7 +1444,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
@@ -1445,6 +1451,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_SERVICEMAN:
+				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
