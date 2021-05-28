@@ -99,7 +99,6 @@ class testItemPrototype extends CAPITest {
 					$params = [
 						'params' => 'script',
 						'timeout' => '30s',
-						'parameters' => [],
 						'delay' => '0'
 					];
 					break;
