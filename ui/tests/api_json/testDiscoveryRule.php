@@ -130,14 +130,14 @@ class testDiscoveryRule extends CAPITest {
 		$item_type_tests = [];
 		foreach ($valid_item_types as $type => $interfaceid) {
 			$item_type_tests['Test valid LLD rule with item type '.$type] = [
-				'discoveryrule' => array_filter([
+				'discoveryrule' => [
 					'name' => 'API LLD rule of type '.$type,
 					'key_' => 'api_lld_rule_of_type_'.$type,
 					'hostid' => '50009',
-					'type' => $type,
+					'type' => (string) $type,
 					'interfaceid' => $interfaceid,
 					'delay' => '30s'
-				]),
+				] + $params,
 				'expected_error' => null
 			];
 		}
