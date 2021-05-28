@@ -90,7 +90,7 @@ class testItem extends CAPITest {
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
 						'url' => 'http://0.0.0.0',
-						'params' => []
+						'params' => ''
 					];
 					break;
 
@@ -102,7 +102,7 @@ class testItem extends CAPITest {
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
-						'params' => 'params',
+						'params' => '',
 						'timeout' => '30s',
 						'parameters' => [],
 						'delay' => '0'
@@ -118,8 +118,8 @@ class testItem extends CAPITest {
 				$params['interfaceid'] = $interfaceid;
 			}
 
-			$item_type_tests[] = $params + [
-				'request_data' => [
+			$item_type_tests[] = [
+				'request_data' => $params + [
 					'name' => 'Item of type '.$type,
 					'key_' => 'item_of_type_'.$type,
 					'hostid' => '50009',
