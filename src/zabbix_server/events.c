@@ -1915,9 +1915,11 @@ exit:
 
 void	zbx_events_update_itservices(void)
 {
-	unsigned char	*data = NULL;
-	size_t		data_alloc = 0, data_offset = 0;
-	int		i;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_event_recovery_t	*recovery;
 
 	for (i = 0; i < events.values_num; i++)
 	{
@@ -1926,11 +1928,23 @@ void	zbx_events_update_itservices(void)
 		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
 
-		if (TRIGGER_VALUE_PROBLEM != event->value)
+		if (TRIGGER_VALUE_PROBLEM != event->value || 0 == event->tags.values_num)
 			continue;
 
 		zbx_service_serialize(&data, &data_alloc, &data_offset, event);
 	}
+
+	zbx_hashset_iter_reset(&event_recovery, &iter);
+	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
+			continue;
+
+		//zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->r_event);
+	}
+
+	if (NULL == data)
+		return;
 
 	zbx_service_flush(data, data_offset);
 	zbx_free(data);

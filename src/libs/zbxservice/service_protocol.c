@@ -25,18 +25,26 @@
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, const DB_EVENT *event)
 {
-	/*
-	zbx_uint32_t	data_len = 0;
-	size_t		error_len;
+	zbx_uint32_t	data_len = 0, *len = NULL;
+	int		i;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, interface_availability->interfaceid);
+	zbx_serialize_prepare_value(data_len, event->eventid);
+	zbx_serialize_prepare_value(data_len, event->severity);
+	zbx_serialize_prepare_value(data_len, event->clock);
+	zbx_serialize_prepare_value(data_len, event->tags.values_num);
 
-	zbx_serialize_prepare_value(data_len, interface_availability->agent.flags);
-	zbx_serialize_prepare_value(data_len, interface_availability->agent.available);
-	zbx_serialize_prepare_value(data_len, interface_availability->agent.errors_from);
-	zbx_serialize_prepare_value(data_len, interface_availability->agent.disable_until);
-	zbx_serialize_prepare_str_len(data_len, interface_availability->agent.error, error_len);
+	if (0 != event->tags.values_num)
+	{
+		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * event->tags.values_num);
+		for (i = 0; i < event->tags.values_num; i++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+			zbx_serialize_prepare_str_len(data_len, tag->tag, len[i * 2]);
+			zbx_serialize_prepare_str_len(data_len, tag->value, len[i * 2 + 1]);
+		}
+	}
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
@@ -49,12 +57,20 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	ptr += zbx_serialize_value(ptr, interface_availability->interfaceid);
-	ptr += zbx_serialize_value(ptr, interface_availability->agent.flags);
-	ptr += zbx_serialize_value(ptr, interface_availability->agent.available);
-	ptr += zbx_serialize_value(ptr, interface_availability->agent.errors_from);
-	ptr += zbx_serialize_value(ptr, interface_availability->agent.disable_until);
-	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);*/
+	ptr += zbx_serialize_value(ptr, event->eventid);
+	ptr += zbx_serialize_value(ptr, event->severity);
+	ptr += zbx_serialize_value(ptr, event->clock);
+	ptr += zbx_serialize_value(ptr, event->tags.values_num);
+
+	for (i = 0; i < event->tags.values_num; i++)
+	{
+		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+		ptr += zbx_serialize_str(ptr, tag->tag, len[i * 2]);
+		ptr += zbx_serialize_str(ptr, tag->value, len[i * 2 + 1]);
+	}
+
+	zbx_free(len);
 }
 /*
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
