@@ -43,7 +43,7 @@ class testItemPrototype extends CAPITest {
 			ITEM_TYPE_DEPENDENT => null,
 			ITEM_TYPE_HTTPAGENT => null,
 			ITEM_TYPE_SNMP => '50029',
-			ITEM_TYPE_SCRIPT => null
+			ITEM_TYPE_SCRIPT => '50022'
 		];
 
 		$item_type_tests = [];
@@ -65,9 +65,10 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => 0
+						'master_itemid' => '150151'
 					];
 					break;
+
 				case ITEM_TYPE_JMX:
 					$params = [
 						'username' => 'username',
@@ -89,7 +90,9 @@ class testItemPrototype extends CAPITest {
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
-						'snmp_oid' => '1.2.3'
+						'params' => 'params',
+						'timeout' => '30s',
+						'parameters' => []
 					];
 					break;
 
