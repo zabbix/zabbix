@@ -1026,47 +1026,57 @@ class CItemPrototype extends CItemGeneral {
 
 		// adding applications
 		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
+			$applications = [];
 			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get([
-				'output' => $options['selectApplications'],
-				'applicationids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$applications = API::Application()->get([
+					'output' => $options['selectApplications'],
+					'applicationids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $applications, 'applications');
 		}
 
 		// adding application prototypes
 		if ($options['selectApplicationPrototypes'] !== null
 				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
-			$pkFieldId = $this->pk('application_prototype');
-			$outputFields = [
-				$pkFieldId => $this->fieldId($pkFieldId, 'ap')
-			];
-
-			if (is_array($options['selectApplicationPrototypes'])) {
-				foreach ($options['selectApplicationPrototypes'] as $field) {
-					if ($this->hasField($field, 'application_prototype')) {
-						$outputFields[$field] = $this->fieldId($field, 'ap');
-					}
-				}
-
-				$outputFields = implode(',', $outputFields);
-			}
-			else {
-				$outputFields = 'ap.*';
-			}
-
+			$application_prototypes = [];
 			$relationMap = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
 				'item_application_prototype'
 			);
+			$related_ids = $relationMap->getRelatedIds();
 
-			$application_prototypes = DBfetchArray(DBselect(
-				'SELECT '.$outputFields.
-				' FROM application_prototype ap'.
-				' WHERE '.dbConditionInt('ap.application_prototypeid', $relationMap->getRelatedIds())
-			));
+			if ($related_ids) {
+				$pkFieldId = $this->pk('application_prototype');
+				$outputFields = [
+					$pkFieldId => $this->fieldId($pkFieldId, 'ap')
+				];
 
-			$application_prototypes = zbx_toHash($application_prototypes, 'application_prototypeid');
+				if (is_array($options['selectApplicationPrototypes'])) {
+					foreach ($options['selectApplicationPrototypes'] as $field) {
+						if ($this->hasField($field, 'application_prototype')) {
+							$outputFields[$field] = $this->fieldId($field, 'ap');
+						}
+					}
+
+					$outputFields = implode(',', $outputFields);
+				}
+				else {
+					$outputFields = 'ap.*';
+				}
+
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT '.$outputFields.
+					' FROM application_prototype ap'.
+					' WHERE '.dbConditionInt('ap.application_prototypeid', $related_ids)
+				));
+
+				$application_prototypes = zbx_toHash($application_prototypes, 'application_prototypeid');
+			}
 
 			$result = $relationMap->mapMany($result, $application_prototypes, 'applicationPrototypes');
 		}
@@ -1074,16 +1084,22 @@ class CItemPrototype extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
 				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
-				$triggers = API::TriggerPrototype()->get([
-					'output' => $options['selectTriggers'],
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
 
-				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'description');
+				if ($related_ids) {
+					$triggers = API::TriggerPrototype()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+
+					if (!is_null($options['limitSelects'])) {
+						order_result($triggers, 'description');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
@@ -1105,16 +1121,22 @@ class CItemPrototype extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
 				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
-				$graphs = API::GraphPrototype()->get([
-					'output' => $options['selectGraphs'],
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
 
-				if (!is_null($options['limitSelects'])) {
-					order_result($graphs, 'name');
+				if ($related_ids) {
+					$graphs = API::GraphPrototype()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+
+					if (!is_null($options['limitSelects'])) {
+						order_result($graphs, 'name');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
