@@ -1270,7 +1270,8 @@ class CScript extends CApiService {
 			$parameters = DB::select('script_param', [
 				'output' => ['scriptid', 'name', 'value'],
 				'filter' => ['scriptid' => array_keys($result)],
-				'sortfield' => ['script_paramid']
+				'sortfield' => ['name'],
+				'sortorder' => [ZBX_SORT_UP]
 			]);
 
 			foreach ($parameters as $parameter) {
