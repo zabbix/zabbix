@@ -71,7 +71,7 @@ class testDiscoveryRule extends CAPITest {
 					'interfaceid' => '50022',
 					'delay' => '30s'
 				],
-				'expected_error' => 'Incorrect value "100" for "type" field.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 2, 3, 5, 7, 10, 11, 12, 13, 14, 16, 18, 19, 20.'
 			]
 		];
 
@@ -92,19 +92,74 @@ class testDiscoveryRule extends CAPITest {
 			ITEM_TYPE_TELNET => '50022',
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
-			ITEM_TYPE_HTTPAGENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
 			ITEM_TYPE_SNMP => '50029'
 		];
 
 		$item_type_tests = [];
 		foreach ($valid_item_types as $type => $interfaceid) {
+			switch ($type) {
+				case ITEM_TYPE_IPMI:
+					$params = [
+						'ipmi_sensor' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_TELNET:
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => '150151',
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_JMX:
+					$params = [
+						'username' => 'username',
+						'password' => 'password'
+					];
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$params = [
+						'url' => 'http://0.0.0.0'
+					];
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				default:
+					$params = [];
+					break;
+			}
+
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
 			$item_type_tests['Test valid LLD rule with item type '.$type] = [
-				'discoveryrule' => [
+				'discoveryrule' => $params + [
 					'name' => 'API LLD rule of type '.$type,
 					'key_' => 'api_lld_rule_of_type_'.$type,
 					'hostid' => '50009',
 					'type' => (string) $type,
-					'interfaceid' => $interfaceid,
 					'delay' => '30s'
 				],
 				'expected_error' => null
