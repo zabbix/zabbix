@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-13T07:53:07Z</date>
+   <date>2021-05-28T06:27:36Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Server HPE ProLiant DL360 SNMP</template>
-         <name>Template Server HPE ProLiant DL360 SNMP</name>
-         <description>Template for HPE ProLiant DL360 servers with HP iLO version 4 and later.&#13;
+         <template>Template Server HPE ProLiant BL460 SNMP</template>
+         <name>Template Server HPE ProLiant BL460 SNMP</name>
+         <description>Template for HPE ProLiant BL460 servers with HP iLO version 4 and later.&#13;
 &#13;
 MIBs used:&#13;
 CPQHLTH-MIB&#13;
@@ -120,7 +120,7 @@ networking software.</description>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: CPQSINFO-MIB&#13;
-The machine product name.The name of the machine used in this system.</description>
+The machine product name. The name of the machine used in this system.</description>
                <inventory_link>MODEL</inventory_link>
                <applications>
                   <application>
@@ -321,7 +321,7 @@ The overall condition. This object represents the overall status of the server i
                      <dependencies>
                         <dependency>
                            <name>System status is in critical state</name>
-                           <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.status[cpqHeMibCondition].last()}={$HEALTH.STATUS.CRIT}</expression>
+                           <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.status[cpqHeMibCondition].last()}={$HEALTH.STATUS.CRIT}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -467,7 +467,7 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                            <description>Please check the device for faults.</description>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{count(#1,{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"},eq)}=1</expression>
+                           <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}</expression>
                            <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
@@ -475,7 +475,7 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or {Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or {Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -551,7 +551,7 @@ Read Cache Could Not Be Mapped (9)&#13;
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -564,11 +564,11 @@ Read Cache Could Not Be Mapped (9)&#13;
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}</expression>
                               </dependency>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or {Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or {Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or {Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or {Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -626,7 +626,7 @@ Array Controller Model. The type of controller card.</description>
                      <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 This value represents the overall condition of this controller,&#13;
-and any associated logical drives,physical drives, and array accelerators.</description>
+and any associated logical drives, physical drives, and array accelerators.</description>
                      <applications>
                         <application>
                            <name>Disk arrays</name>
@@ -658,7 +658,7 @@ and any associated logical drives,physical drives, and array accelerators.</desc
                            <dependencies>
                               <dependency>
                                  <name>{#CNTLR_LOCATION}: Disk array controller is in critical state</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].last()}={$DISK.ARRAY.STATUS.CRIT}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].last()}={$DISK.ARRAY.STATUS.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -727,7 +727,7 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                            <dependencies>
                               <dependency>
                                  <name>Fan {#SNMPINDEX}: Fan is in critical state</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].last()}={$FAN.STATUS.CRIT}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].last()}={$FAN.STATUS.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -798,7 +798,7 @@ linkFailure(4)&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}].last()}=3</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}].last()}=3</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -830,7 +830,7 @@ linkFailure(4)&#13;
                      <trends>0d</trends>
                      <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
-Drive Array Physical Drive Media Type.The following values are defined:&#13;
+Drive Array Physical Drive Media Type. The following values are defined:&#13;
 other(1)  The instrument agent is unable to determine the physical drive’s media type.&#13;
 rotatingPlatters(2)  The physical drive media is composed of rotating platters.&#13;
 solidState(3)  The physical drive media is composed of solid state electronics.</description>
@@ -859,7 +859,7 @@ solidState(3)  The physical drive media is composed of solid state electronics.<
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CPQIDA-MIB&#13;
-Physical Drive Model.This is a text description of the physical drive.&#13;
+Physical Drive Model. This is a text description of the physical drive.&#13;
 The text that appears depends upon who manufactured the drive and the drive type.&#13;
 If a drive fails, note the model to identify the type of drive necessary for replacement.&#13;
 If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.</description>
@@ -952,7 +952,7 @@ or if the controller does not support SCSI drives.</description>
                      <trends>0d</trends>
                      <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
-Physical Drive S.M.A.R.T Status.The following values are defined:&#13;
+Physical Drive S.M.A.R.T Status. The following values are defined:&#13;
 other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.&#13;
 ok(2)  Indicates the drive is functioning properly.&#13;
 replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.</description>
@@ -980,7 +980,7 @@ replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  er
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_LOCATION}: Physical disk failed</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].last()}={$DISK.STATUS.FAIL}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].last()}={$DISK.STATUS.FAIL}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1032,7 +1032,7 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_LOCATION}: Physical disk failed</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].last()}={$DISK.STATUS.FAIL}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].last()}={$DISK.STATUS.FAIL}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1100,7 +1100,7 @@ failed(4)  A power supply component detects a condition that could  permanently 
                            <dependencies>
                               <dependency>
                                  <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].last()}={$PSU.STATUS.CRIT}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].last()}={$PSU.STATUS.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1995,7 +1995,7 @@ differ from the advertised size of a drive.</description>
                            <dependencies>
                               <dependency>
                                  <name>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</name>
-                                 <expression>{Template Server HPE ProLiant DL360 SNMP:hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].last()}={$VDISK.STATUS.CRIT}</expression>
+                                 <expression>{Template Server HPE ProLiant BL460 SNMP:hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].last()}={$VDISK.STATUS.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
