@@ -25,6 +25,7 @@
 #include "events.h"
 #include "zbxserver.h"
 #include "export.h"
+#include "zbxservice.h"
 
 /* event recovery data */
 typedef struct
@@ -2060,7 +2061,11 @@ static int	flush_events(void)
 	zbx_event_recovery_t		*recovery;
 	zbx_vector_uint64_pair_t	closed_events;
 	zbx_hashset_iter_t		iter;
+	zbx_vector_ptr_t		problems;
 
+	zbx_vector_ptr_create(&problems);
+
+	zbx_services_flush(&problems);
 	ret = save_events();
 	save_problems();
 	save_event_recovery();
@@ -2080,6 +2085,7 @@ static int	flush_events(void)
 
 	process_actions(&events, &closed_events);
 	zbx_vector_uint64_pair_destroy(&closed_events);
+	zbx_vector_ptr_destroy(&problems);
 
 	return ret;
 }
