@@ -267,6 +267,24 @@ if (getRequest('itemid', false)) {
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 	$host = reset($item['hosts']);
+
+	foreach ($item['overrides'] as &$override) {
+		if (!array_key_exists('operations', $override)) {
+			continue;
+		}
+
+		foreach ($override['operations'] as &$operation) {
+			if (array_key_exists('optag', $operation)) {
+				CArrayHelper::sort($operation['optag'], [
+					['field' => 'tag', 'order' => ZBX_SORT_UP],
+					['field' => 'value', 'order' => ZBX_SORT_UP]
+				]);
+				$operation['optag'] = array_values($operation['optag']);
+			}
+		}
+		unset($operation);
+	}
+	unset($override);
 }
 elseif ($hostid) {
 	$hosts = API::Host()->get([
