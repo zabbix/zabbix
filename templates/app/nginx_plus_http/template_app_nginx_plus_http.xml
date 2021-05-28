@@ -1,0 +1,3592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-05-02T20:38:10Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Nginx Plus by HTTP</template>
+         <name>Template App Nginx Plus by HTTP</name>
+         <description>Get Nginx Plus metrics by HTTP agent.&#13;
+Metrics are collected by requests to Nginx Plus API.&#13;
+Don't forget to change macros {$NGINX.API.ENDPOINT}.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Nginx</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Nginx: Get connections</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.connections</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns statistics of client connections.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/connections/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Connections accepted, rate</name>
+               <type>DEPENDENT</type>
+               <key>nginx.connections.accepted.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of accepted client connections per second.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.accepted</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.connections</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Connections active</name>
+               <type>DEPENDENT</type>
+               <key>nginx.connections.active</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The current number of active client connections.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.active</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.connections</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Connections dropped</name>
+               <type>DEPENDENT</type>
+               <key>nginx.connections.dropped</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of dropped client connections.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.dropped</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.connections</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)} &gt; {$NGINX.DROP_RATE.MAX.WARN}</expression>
+                     <name>Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Nginx: Connections idle</name>
+               <type>DEPENDENT</type>
+               <key>nginx.connections.idle</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The current number of idle client connections.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.idle</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.connections</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Get HTTP location zones</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.http.location_zones</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status information for each HTTP location zone.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/http/location_zones/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Get HTTP zones</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.http.server_zones</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status information for each HTTP server zone.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/http/server_zones/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Get HTTP upstreams</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.http.upstreams</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status of each HTTP upstream server group and its servers.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/http/upstreams/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Get info</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.info</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Return status of nginx running instance.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/nginx/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Address</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.address</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The address of the server that accepted status request.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.address</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Get info error</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.error</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>Nginx error description.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.error.text</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{strlen()}&gt;0</expression>
+                     <name>Nginx: Server response error (text: {ITEM.VALUE})</name>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Nginx: Generation</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.generation</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of configuration reloads.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.generation</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <units>uptime</units>
+               <description>Server uptime.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.load_timestamp</params>
+                     <error_handler>DISCARD_VALUE</error_handler>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return Math.floor((Date.now() - new Date(value)) / 1000);</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Nginx: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>Nginx: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for metrics for the last 30 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Nginx: Version</name>
+               <type>DEPENDENT</type>
+               <key>nginx.info.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>Version of nginx.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.version</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.info</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Nginx: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Nginx version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Nginx: Get requests</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.requests</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status of client HTTP requests.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/http/requests/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Requests current</name>
+               <type>DEPENDENT</type>
+               <key>nginx.requests.current</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The current number of client requests.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.current</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.requests</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Requests total, rate</name>
+               <type>DEPENDENT</type>
+               <key>nginx.requests.total.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of client requests per second.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.total</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.requests</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Get resolvers</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.resolvers</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status information for each resolver zone.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/resolvers/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Get SSL</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.ssl</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns SSL statistics.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/ssl/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: SSL handshakes failed, rate</name>
+               <type>DEPENDENT</type>
+               <key>nginx.ssl.handshakes_failed.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of failed SSL handshakes per second.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.handshakes_failed</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.ssl</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: SSL handshakes, rate</name>
+               <type>DEPENDENT</type>
+               <key>nginx.ssl.handshakes.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of successful SSL handshakes per second.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.handshakes</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.ssl</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: SSL session reuses, rate</name>
+               <type>DEPENDENT</type>
+               <key>nginx.ssl.session_reuses.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The total number of session reuses during SSL handshake per second.</description>
+               <applications>
+                  <application>
+                     <name>Nginx</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.session_reuses</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>nginx.ssl</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Nginx: Get Stream server zones</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.stream.server_zones</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status information for each stream server zone.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/stream/server_zones/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+            <item>
+               <name>Nginx: Get Stream upstreams</name>
+               <type>HTTP_AGENT</type>
+               <key>nginx.stream.upstreams</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns status of each stream upstream server group and its servers.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$NGINX.API.ENDPOINT}/6/stream/upstreams/</url>
+               <status_codes>200,404</status_codes>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>HTTP location zones discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.http.location_zones.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Discarded, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.discarded.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests completed without sending a response per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].discarded</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Received, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.received.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes received from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].received</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Requests, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.requests.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of client requests received from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].requests</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses 1xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.1xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “1xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.1xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses 2xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.2xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “2xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.2xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses 3xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.3xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “3xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.3xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses 4xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.4xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “4xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.4xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses 5xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.5xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “5xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.5xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses total, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.responses.total.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of responses sent to clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.total</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Sent, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.location_zones.sent.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes sent to clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP location zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sent</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.location_zones</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Requests</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.requests.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Nginx: HTTP location zone [{#NAME}]: Responses</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.responses.2xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.responses.1xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.responses.3xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.responses.4xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.location_zones.responses.5xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.http.location_zones</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>HTTP server zones discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.http.server_zones.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Discarded, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.discarded.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests completed without sending a response per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].discarded</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Processing</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.processing[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of client requests that are currently being processed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].processing</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Received, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.received.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes received from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].received</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Requests, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.requests.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of client requests received from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].requests</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses 1xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.1xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “1xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.1xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses 2xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.2xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “2xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.2xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses 3xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.3xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “3xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.3xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses 4xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.4xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “4xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.4xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses 5xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.5xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “5xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.5xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses total, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.responses.total.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of responses sent to clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.total</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Sent, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.server_zones.sent.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes sent to clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sent</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Requests</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.requests.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Nginx: HTTP server zone [{#NAME}]: Responses</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.responses.2xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.responses.1xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.responses.3xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.responses.4xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.server_zones.responses.5xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.http.server_zones</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>HTTP upstream peers discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.http.upstream.peers.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#UPSTREAM}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UPSTREAM}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Active</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.active[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The current number of active connections.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].active.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of unsuccessful attempts to communicate with the server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].fails.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Header time</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.header_time.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!ms</units>
+                     <description>The average time to get the response header from the server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].header_time.first()</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of health check requests made.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.checks.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of failed health checks.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.fails.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>How many times the server became unhealthy (state “unhealthy”).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.unhealthy.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes received from this server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].received.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Requests, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.requests.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of client requests forwarded to this server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].requests.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Response time</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!ms</units>
+                     <description>The average time to get the full response from the server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].response_time.first()</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 1xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “1xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.1xx.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 2xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “2xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.2xx.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 3xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “3xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.3xx.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 4xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “4xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.4xx.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 5xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of responses with “5xx” status codes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.5xx.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses total, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of responses obtained from this server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].responses.total.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes sent to this server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].sent.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: State</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str(up)}=0 and {str(down)}=0</expression>
+                           <name>Nginx: HTTP upstream server is not in UP or DOWN state.</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].unavail.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}].sum(5m)} &gt; ({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))</expression>
+                     <name>Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)</name>
+                     <priority>WARNING</priority>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}].sum(5m)} &gt; ({Template App Nginx Plus by HTTP:nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}].sum(5m)}*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))</expression>
+                     <name>Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)</name>
+                     <priority>HIGH</priority>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.http.upstreams</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var input = JSON.parse(value),
+    output = [];
+
+Object.keys(input).forEach(function (upstream) {
+    input[upstream].peers.forEach(function (peer) {
+        output.push({ '{#UPSTREAM}': upstream, '{#PEER}': peer.server })
+    });
+});
+
+return JSON.stringify(output);
+
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>HTTP upstreams discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.http.upstreams.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#NAME}]: Keepalive</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstreams.keepalive[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The current number of idle keepalive connections.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].keepalive</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#NAME}]: Zombies</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstreams.zombies[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The current number of servers removed from the group but still processing active client requests.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].zombies</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: HTTP upstream [{#NAME}]: Zone</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.http.upstreams.zone[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The name of the shared memory zone that keeps the group’s configuration and run-time state.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: HTTP upstream [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].zone</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.http.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>nginx.http.upstreams</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Resolvers discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.resolvers.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.RESOLVER.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Requests addr, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.requests.addr.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests to resolve addresses to names per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].requests.addr</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Requests name, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.requests.name.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests to resolve names to addresses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].requests.name</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Requests srv, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.requests.srv.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests to resolve SRV records per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].requests.srv</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses formerr, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.formerr.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of FORMERR (Format error) responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.formerr</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses noerror, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.noerror.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of successful responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.noerror</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses notimp, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.notimp.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of NOTIMP (Unimplemented) responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.notimp</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses nxdomain, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.nxdomain.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of NXDOMAIN (Host not found) responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.nxdomain</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses refused, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.refused.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of REFUSED (Operation refused) responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.refused</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses servfail, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.servfail.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of SERVFAIL (Server failure) responses per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.servfail</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses timedout, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.timedout.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of timed out requests per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.timedout</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses unknown, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.resolvers.responses.unknown.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of requests completed with an unknown error per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Resolver [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].responses.unknown</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.resolvers</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Requests</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.requests.name.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.requests.srv.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.requests.addr.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Nginx: Resolver [{#NAME}]: Responses</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.noerror.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.formerr.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.servfail.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.nxdomain.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.notimp.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>5</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>6C59DC</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.refused.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>6</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>AC8C14</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.timedout.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>7</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>611F27</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.resolvers.responses.unknown.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.resolvers</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Stream server zones discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.stream.server_zones.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Connections, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.connections.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of connections accepted from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].connections</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Discarded, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.discarded.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of connections completed without creating a session per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].discarded</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Processing</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.processing[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of client connections that are currently being processed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].processing</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Received, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.received.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes received from clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].received</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sent, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.sent.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes sent to clients per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sent</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sessions 2xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of sessions completed with status codes “2xx” per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sessions.2xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sessions 4xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of sessions completed with status codes “4xx” per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sessions.4xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sessions 5xx, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of sessions completed with status codes “5xx” per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sessions.5xx</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sessions total, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.server_zones.sessions.total.rate[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of completed client sessions per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream zone [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].sessions.total</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.server_zones</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: Stream server zone [{#NAME}]: Sessions</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.stream.server_zones</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Stream upstream peers discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.stream.upstream.peers.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#UPSTREAM}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UPSTREAM}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Active</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.active[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The current number of connections.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].active.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connect time</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.connect_time.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!ms</units>
+                     <description>The average time to connect to the upstream server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].connect_time.first()</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connections</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.connections.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of client connections forwarded to this server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].connections.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of unsuccessful attempts to communicate with the server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].fails.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: First byte time</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.first_byte_time.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!ms</units>
+                     <description>The average time to receive the first byte of data.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].first_byte_time.first()</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of health check requests made.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.checks.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of failed health checks.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.fails.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>How many times the server became unhealthy (state “unhealthy”).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].health_checks.unhealthy.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes received from this server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].received.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Response time</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!ms</units>
+                     <description>The average time to receive the last byte of data.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].response_time.first()</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The total number of bytes sent to this server per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].sent.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: State</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str(up)}=0 and {str(down)}=0</expression>
+                           <name>Nginx: Stream upstream server is not in UP or DOWN state.</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].unavail.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Nginx Plus by HTTP</host>
+                              <key>nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>nginx.stream.upstreams</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var input = JSON.parse(value),
+    output = [];
+
+Object.keys(input).forEach(function (upstream) {
+    input[upstream].peers.forEach(function (peer) {
+        output.push({ '{#UPSTREAM}': upstream, '{#PEER}': peer.server })
+    });
+});
+
+return JSON.stringify(output);
+
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Stream upstreams discovery</name>
+               <type>DEPENDENT</type>
+               <key>nginx.stream.upstreams.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#NAME}</macro>
+                        <value>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#NAME}]: Zombies</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstreams.zombies[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].zombies</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Nginx: Stream upstream [{#NAME}]: Zone</name>
+                     <type>DEPENDENT</type>
+                     <key>nginx.stream.upstreams.zone[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Nginx: Stream upstream [{#NAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#NAME}'].zone</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>nginx.stream.upstreams</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>nginx.stream.upstreams</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var output = [];
+
+Object.keys(JSON.parse(value)).forEach(function (v) {
+    output.push({ '{#NAME}': v })
+});
+
+return JSON.stringify(output);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>30m</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$NGINX.API.ENDPOINT}</macro>
+               <description>NGINX Plus API URL in the format `&lt;scheme&gt;://&lt;host&gt;:&lt;port&gt;/&lt;location&gt;/`</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.DROP_RATE.MAX.WARN}</macro>
+               <value>1</value>
+               <description>The critical rate of the dropped connections for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}</macro>
+               <value>5</value>
+               <description>Maximum percentage of errors with status code 4xx (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}</macro>
+               <value>5</value>
+               <description>Maximum percentage of errors with status code 4xx (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable HTTP location zones</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered HTTP location zones</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable HTTP upstreams</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered HTTP upstreams</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable HTTP server zones</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered HTTP server zones</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.RESOLVER.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable Resolvers</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered Resolvers</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable Stream upstreams</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered Stream upstreams</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable Stream server zones</description>
+            </macro>
+            <macro>
+               <macro>{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered Stream server zones</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Nginx: Connections</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.connections.accepted.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.connections.dropped</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.connections.active</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>A54F10</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.connections.idle</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Nginx: Requests</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.requests.total.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Nginx: SSL</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.ssl.handshakes.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.ssl.handshakes_failed.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.ssl.session_reuses.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Nginx: Uptime</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Nginx Plus by HTTP</host>
+                  <key>nginx.info.uptime</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+</zabbix_export>

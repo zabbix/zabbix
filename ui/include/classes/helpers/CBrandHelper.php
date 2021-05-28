@@ -122,7 +122,7 @@ class CBrandHelper {
 				(new CLink('Zabbix SIA', 'https://www.zabbix.com/'))
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('target', '_blank')
+					->setTarget('_blank')
 			]
 		);
 

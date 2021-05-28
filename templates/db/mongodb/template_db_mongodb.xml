@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-01T09:52:19Z</date>
+   <date>2021-05-11T13:53:07Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2818,6 +2818,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                         <step>
                            <type>JSONPATH</type>
                            <params>$.metrics.repl.preload.docs.totalMillis</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2846,6 +2847,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                         <step>
                            <type>JSONPATH</type>
                            <params>$.metrics.repl.preload.docs.num</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2875,6 +2877,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                         <step>
                            <type>JSONPATH</type>
                            <params>$.metrics.repl.preload.indexes.totalMillis</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2903,6 +2906,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                         <step>
                            <type>JSONPATH</type>
                            <params>$.metrics.repl.preload.indexes.num</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2944,7 +2948,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{change()}=1</expression>
+                           <expression>{diff()}=1</expression>
                            <recovery_mode>NONE</recovery_mode>
                            <name>MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})</name>
                            <priority>WARNING</priority>
