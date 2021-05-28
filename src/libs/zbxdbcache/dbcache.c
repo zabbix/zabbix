@@ -4176,17 +4176,40 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		item_value = &values[i];
 
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		/* a record with metadata and no value can be dropped if  */
+		/* the metadata update is copied to the last queued value */
+		if (NULL != (item = hc_get_item(item_value->itemid)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
-			UNLOCK_CACHE;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-			sleep(1);
-
-			LOCK_CACHE;
+			/* skip metadata updates when only one value is queued, */
+			/* because the item might be already being processed    */
+			if (item->head != item->tail)
+			{
+				item->head->lastlogsize = item_value->lastlogsize;
+				item->head->mtime = item_value->mtime;
+				item->head->flags |= ZBX_DC_FLAG_META;
+				continue;
+			}
 		}
 
-		if (NULL == (item = hc_get_item(item_value->itemid)))
+		if (SUCCEED != hc_clone_history_data(&data, item_value))
+		{
+			do
+			{
+				UNLOCK_CACHE;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+				sleep(1);
+
+				LOCK_CACHE;
+			}
+			while (SUCCEED != hc_clone_history_data(&data, item_value));
+
+			item = hc_get_item(item_value->itemid);
+		}
+
+		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);

@@ -24,6 +24,11 @@ define('ZABBIX_EXPORT_VERSION',	'5.4');
 
 define('ZABBIX_DB_VERSION',		5040000);
 
+define('DB_VERSION_SUPPORTED',				0);
+define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
+define('DB_VERSION_HIGHER_THAN_MAXIMUM',	2);
+define('DB_VERSION_FAILED_TO_RETRIEVE',		3);
+
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
 
@@ -2060,3 +2065,6 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
+
+// Allows to set "rel" tag value "noreferer" when setting target="_blank".
+define('ZBX_NOREFERER', true);

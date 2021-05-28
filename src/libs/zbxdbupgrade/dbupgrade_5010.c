@@ -1310,6 +1310,20 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		scr_item->url = zbx_strdup(NULL, row[12]);
 		scr_item->max_columns = atoi(row[13]);
 
+		if (0 == scr_item->colspan)
+		{
+			scr_item->colspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: colspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (0 == scr_item->rowspan)
+		{
+			scr_item->rowspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
 		DBpatch_trace_screen_item(scr_item);
 
 		if (0 == DBpatch_is_convertible_screen_item(scr_item->resourcetype))
