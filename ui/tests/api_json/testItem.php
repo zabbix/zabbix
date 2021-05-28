@@ -61,7 +61,7 @@ class testItem extends CAPITest {
 					'interfaceid' => $interfaceid,
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'delay' => '30s'
-				],
+				] + $parameters,
 				'expected_error' => null
 			];
 		}
@@ -401,85 +401,6 @@ class testItem extends CAPITest {
 					$dbResult = 'SELECT * FROM trigger_discovery WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
-			}
-		}
-	}
-
-	public static function itemCreateData() {
-		$valid_item_types = [
-			ITEM_TYPE_ZABBIX => '50022',
-			ITEM_TYPE_TRAPPER => null,
-			ITEM_TYPE_SIMPLE => '50022',
-			ITEM_TYPE_INTERNAL => null,
-			ITEM_TYPE_ZABBIX_ACTIVE => null,
-			ITEM_TYPE_EXTERNAL => '50022',
-			ITEM_TYPE_DB_MONITOR => null,
-			ITEM_TYPE_IPMI => '50031',
-			ITEM_TYPE_SSH => '50022',
-			ITEM_TYPE_TELNET => '50022',
-			ITEM_TYPE_JMX => '50030',
-			ITEM_TYPE_CALCULATED => null,
-			ITEM_TYPE_SNMPTRAP => '50029',
-			ITEM_TYPE_DEPENDENT => null,
-			ITEM_TYPE_HTTPAGENT => null,
-			ITEM_TYPE_SNMP => '50029',
-			ITEM_TYPE_SCRIPT => null
-		];
-
-		$item_type_tests = [];
-		foreach ($valid_item_types as $type => $interfaceid) {
-			$item_type_tests['Test valid item creation of type '.$type] = [
-				'item' => [
-					'name' => 'Item of type '.$type,
-					'key_' => 'item_of_type_'.$type,
-					'hostid' => '50009',
-					'type' => (string) $type,
-					'interfaceid' => $interfaceid,
-					'delay' => '30s'
-				],
-				'expected_error' => null
-			];
-		}
-
-		$item_type_tests['Test unsupported item type'] = [
-			'item' => [
-				'name' => 'Item of unsupported item type',
-				'key_' => 'item_of_unsupported_item_type',
-				'hostid' => '50009',
-				'type' => '100',
-				'interfaceid' => '50029',
-				'delay' => '30s'
-			],
-			'expected_error' => null
-		];
-
-		return $item_type_tests;
-	}
-
-	/**
-	 * @dataProvider itemCreateData
-	 */
-	public function testItemCreate(array $item, $expected_error) {
-		$result = $this->call('item.create', $item, $expected_error);
-
-		// Accept single and multiple item just like API method. Work with multi-dimensional array in result.
-		if (!array_key_exists(0, $item)) {
-			$item = zbx_toArray($item);
-		}
-
-		if ($expected_error === null) {
-			foreach ($result['result']['itemids'] as $num => $id) {
-				$db_item = CDBHelper::getRow(
-					'SELECT i.hostid,i.name,i.key_,i.type,i.delay'.
-					' FROM items i'.
-					' WHERE i.itemid='.zbx_dbstr($id)
-				);
-
-				$this->assertSame($db_item['hostid'], $item[$num]['hostid']);
-				$this->assertSame($db_item['name'], $item[$num]['name']);
-				$this->assertSame($db_item['key_'], $item[$num]['key_']);
-				$this->assertSame($db_item['type'], $item[$num]['type']);
-				$this->assertSame($db_item['delay'], $item[$num]['delay']);
 			}
 		}
 	}
