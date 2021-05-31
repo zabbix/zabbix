@@ -1150,6 +1150,7 @@ class testUserRolesPermissions extends CWebTest {
 				if (array_key_exists('user_roles', $data)) {
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($data['remove_ui']);
+					$this->page->logout();
 					$this->page->userLogin('user_for_role', 'zabbix');
 				}
 				else {
@@ -1162,9 +1163,11 @@ class testUserRolesPermissions extends CWebTest {
 					$this->checkLinks($data['link']);
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($user_roles);
+					$this->page->logout();
 				}
 				else {
 					$this->checkLinks($data['link']);
+					$this->page->logout();
 				}
 			}
 		}
@@ -1253,6 +1256,7 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
 				$this->changeAction($enabled_ui);
+				$this->page->logout();
 			}
 		}
 	}
