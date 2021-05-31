@@ -1300,6 +1300,7 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	private function changeAction($action) {
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid);
+		$this->page->waitUntilReady();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$form->fill($action);
 		$form->submit();
