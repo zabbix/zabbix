@@ -29,7 +29,6 @@ class testGraphAxis extends CWebTest {
 		return [
 			[
 				[
-					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-10-25 00:00:00',
 					'end_period' => '2020-10-25 08:00:00',
 					'name' => 'Riga, Winter, big zoom'
@@ -37,7 +36,6 @@ class testGraphAxis extends CWebTest {
 			],
 			[
 				[
-					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-03-29 00:00:00',
 					'end_period' => '2020-03-29 08:00:00',
 					'name' => 'Riga, Summer, big zoom'
@@ -45,7 +43,6 @@ class testGraphAxis extends CWebTest {
 			],
 			[
 				[
-					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-10-25 03:00:00',
 					'end_period' => '2020-10-25 05:00:00',
 					'name' => 'Riga, Winter, small zoom'
@@ -53,7 +50,6 @@ class testGraphAxis extends CWebTest {
 			],
 			[
 				[
-					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-03-29 02:00:00',
 					'end_period' => '2020-03-29 04:00:00',
 					'name' => 'Riga, Summer, small zoom'
@@ -77,7 +73,15 @@ class testGraphAxis extends CWebTest {
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
-		$this->assertScreenshot($this->query('xpath://div/img')->one(), $data['name']);
+
+		try {
+			$this->query('xpath://div[contains(@class,"is-loading")]/img')->waitUntilPresent();
+		}
+		catch (\Exception $ex) {
+			// Code is not missing here.
+		}
+
+		$this->assertScreenshot($this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()
+				->one(), $data['name']);
 	}
 }

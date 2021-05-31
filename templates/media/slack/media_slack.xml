@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-11T00:00:00Z</date>
+    <date>2021-04-06T06:29:40Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>
@@ -22,6 +22,10 @@
                 <parameter>
                     <name>channel</name>
                     <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>channel_id</name>
+                    <value>{EVENT.TAGS.__channel_id}</value>
                 </parameter>
                 <parameter>
                     <name>discovery_host_dns</name>
@@ -96,6 +100,10 @@
                     <value>{HOST.HOST}</value>
                 </parameter>
                 <parameter>
+                    <name>message_ts</name>
+                    <value>{EVENT.TAGS.__message_ts}</value>
+                </parameter>
+                <parameter>
                     <name>slack_as_user</name>
                     <value>true</value>
                 </parameter>
@@ -161,19 +169,21 @@ function isEventResolve(params) {&#13;
 function getPermalink(channelId, messageTimestamp) {&#13;
     var req = new CurlHttpRequest();&#13;
 &#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        req.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
+&#13;
     req.AddHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');&#13;
+    req.AddHeader('Authorization: Bearer ' + params.bot_token);&#13;
 &#13;
-    var resp = JSON.parse(req.Get(&#13;
-        '{0}?token={1}&amp;channel={2}&amp;message_ts={3}'.format(&#13;
+    var query = '{0}?channel={1}&amp;message_ts={2}'.format(&#13;
             Slack.getPermalink,&#13;
-            params.bot_token,&#13;
-            channelId,&#13;
-            messageTimestamp&#13;
-        )&#13;
-    ));&#13;
+            encodeURIComponent(channelId),&#13;
+            encodeURIComponent(messageTimestamp)),&#13;
+        resp = JSON.parse(req.Get(query));&#13;
 &#13;
-    if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
-        throw resp.error;&#13;
+    if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
+        throw 'message was created, but getting message link was failed with reason &quot;' + resp.error + '&quot;';&#13;
     }&#13;
 &#13;
     return resp.permalink;&#13;
@@ -196,21 +206,6 @@ function createProblemURL(zabbix_url, triggerid, eventid, event_source) {&#13;
     return problem_url;&#13;
 }&#13;
 &#13;
-function getTagValue(event_tags, key) {&#13;
-    var pattern = new RegExp('(' + key + ':.+)');&#13;
-    var tag_value = event_tags&#13;
-        .split(',')&#13;
-        .filter(function (v) {&#13;
-            return v.match(pattern);&#13;
-        })&#13;
-        .map(function (v) {&#13;
-            return v.split(':')[1];&#13;
-        })[0]&#13;
-        || 0;&#13;
-&#13;
-    return tag_value;&#13;
-}&#13;
-&#13;
 function handlerAlarm(params) {&#13;
     var fields = {&#13;
         channel: params.channel,&#13;
@@ -229,7 +224,7 @@ function handlerAlarm(params) {&#13;
 &#13;
         var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -239,7 +234,7 @@ function handlerAlarm(params) {&#13;
         result.tags.__message_link = getPermalink(resp.channel, resp.ts);&#13;
     }&#13;
     else if (isEventUpdate(params)) {&#13;
-        fields.thread_ts = getTagValue(params.event_tags, 'message_ts');&#13;
+        fields.thread_ts = params.message_ts;&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
@@ -251,15 +246,15 @@ function handlerAlarm(params) {&#13;
         ];&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
     }&#13;
     else if (isEventResolve(params)) {&#13;
-        fields.channel = getTagValue(params.event_tags, 'channel_id');&#13;
+        fields.channel = params.channel_id;&#13;
         fields.text = '';&#13;
-        fields.ts = getTagValue(params.event_tags, 'message_ts');&#13;
+        fields.ts = params.message_ts;&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
                 RESOLVE_COLOR,&#13;
@@ -270,7 +265,7 @@ function handlerAlarm(params) {&#13;
         ];&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.chatUpdate, JSON.stringify(fields)));&#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
     }&#13;
@@ -294,7 +289,7 @@ function handlerEvent(params) {&#13;
 &#13;
         var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -315,7 +310,7 @@ function handlerEvent(params) {&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -332,7 +327,7 @@ function handlerEvent(params) {&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
     }&#13;

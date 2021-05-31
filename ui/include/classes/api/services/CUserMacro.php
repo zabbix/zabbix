@@ -475,6 +475,10 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $hostmacros) {
+		if (!$hostmacros) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		// Check the data required for authorization first.
 		foreach ($hostmacros as $hostmacro) {
 			$this->checkHostId($hostmacro);
@@ -518,6 +522,10 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $hostmacros) {
+		if (!$hostmacros) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$required_fields = ['hostmacroid'];
 
 		foreach ($hostmacros as $hostmacro) {
@@ -533,7 +541,7 @@ class CUserMacro extends CApiService {
 		// Make sure we have all the data we need.
 		$hostmacros = $this->extendObjects($this->tableName(), $hostmacros, ['macro', 'hostid']);
 
-		$db_hostmacros = API::getApiService()->select($this->tableName(), [
+		$db_hostmacros = DB::select($this->tableName(), [
 			'output' => ['hostmacroid', 'hostid', 'macro'],
 			'hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')
 		]);

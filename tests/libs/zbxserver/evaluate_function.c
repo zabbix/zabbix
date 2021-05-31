@@ -89,6 +89,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
 		printf("evaluate_function returned error: %s\n", error);
+	zbx_vc_flush_stats();
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);

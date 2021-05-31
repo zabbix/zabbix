@@ -475,6 +475,8 @@ static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_fu
 		zbx_history_record_vector_destroy(&values, items[i].value_type);
 	}
 
+	zbx_vc_flush_stats();
+
 	if (0 == group_values.values_num)
 	{
 		char	*tmp = NULL;

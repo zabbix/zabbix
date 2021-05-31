@@ -29,10 +29,10 @@ abstract class CApiClient {
 	 *
 	 * @param string 	$api
 	 * @param string 	$method
-	 * @param mixed 	$params
+	 * @param array 	$params
 	 * @param string	$auth
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract public function callMethod($api, $method, $params, $auth);
+	abstract public function callMethod($api, $method, array $params, $auth);
 }

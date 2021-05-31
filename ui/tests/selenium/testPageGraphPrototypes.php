@@ -30,7 +30,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 	/**
 	 * Discovery rule "testFormDiscoveryRule" id used in test.
 	 */
-	const DISCOVERY_RULE_ID = 33800;
+	const DISCOVERY_RULE_ID = 133800;
 
 	/**
 	 * Item prototype "testFormItemReuse" id used in test belong to discovery rule "testFormDiscoveryRule".

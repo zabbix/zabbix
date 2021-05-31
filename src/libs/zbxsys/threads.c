@@ -188,8 +188,15 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	status = dwstatus;
 
 #else	/* not _WINDOWS */
+	pid_t	pid;
 
-	if (0 >= waitpid(thread, &status, 0))
+	do
+	{
+		pid = waitpid(thread, &status, 0);
+	}
+	while (pid == -1 && EINTR == errno);
+
+	if (0 >= pid)
 	{
 		zbx_error("Error waiting for process with PID %d: %s", (int)thread, zbx_strerror(errno));
 		return ZBX_THREAD_ERROR;

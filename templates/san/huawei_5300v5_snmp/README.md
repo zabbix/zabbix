@@ -61,7 +61,7 @@ No specific Zabbix configuration is required.
 |FANs discovery |<p>Discovery of FANs</p> |SNMP |huawei.5300.fan.discovery |
 |BBU discovery |<p>Discovery of BBU</p> |SNMP |huawei.5300.bbu.discovery |
 |Disks discovery |<p>Discovery of disks</p> |SNMP |huawei.5300.disks.discovery |
-|Nodes performance discovery |<p>Discovery of nodes perfomance counters</p> |SNMP |huawei.5300.nodes.discovery |
+|Nodes performance discovery |<p>Discovery of nodes performance counters</p> |SNMP |huawei.5300.nodes.discovery |
 |LUNs discovery |<p>Discovery of LUNs</p> |SNMP |huawei.5300.lun.discovery |
 |Storage pools discovery |<p>Discovery of storage pools</p> |SNMP |huawei.5300.pool.discovery |
 

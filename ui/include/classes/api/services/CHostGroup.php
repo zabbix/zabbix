@@ -397,23 +397,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {
@@ -450,23 +467,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {
@@ -1365,15 +1399,21 @@ class CHostGroup extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
@@ -1394,15 +1434,21 @@ class CHostGroup extends CApiService {
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
 			}
 			else {

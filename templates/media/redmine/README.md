@@ -33,7 +33,8 @@ This guide describes how to integrate your Zabbix 5.0 installation with Redmine 
 
 - **redmine_access_key** to the your **API key**
 - **redmine_url** to the **frontend URL** of your **Redmine** installation
-- **redmine_project** to your Project ID or its name. Important: if you specify a project name, each time an additional API call will be made to get its identifier.
+- **redmine_project** to your numeric Project ID or its name. Important: if you specify a project name, each time an additional API call will be made to get its identifier.<br>
+You can find Project ID on *http://&lt;YOR_REDMINE_URL&gt;/projects.xml*
 - **redmine_tracker_id** to your Tracker ID
 
 [![](images/thumb.05.png?raw=true)](images/05.png)

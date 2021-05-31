@@ -27,8 +27,8 @@ class testFormTagsTriggerPrototype extends testFormTags {
 
 	public $update_name = 'Trigger prototype with tags for updating';
 	public $clone_name = 'Trigger prototype with tags for cloning';
-	public $link = 'trigger_prototypes.php?parent_discoveryid=33800';
-	public $saved_link = 'trigger_prototypes.php?form=update&parent_discoveryid=33800&triggerid=';
+	public $link = 'trigger_prototypes.php?parent_discoveryid=133800';
+	public $saved_link = 'trigger_prototypes.php?form=update&parent_discoveryid=133800&triggerid=';
 
 	/**
 	 * Test creating of Trigger prototype with tags.

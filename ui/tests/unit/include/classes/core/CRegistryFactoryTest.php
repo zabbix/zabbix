@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,14 +19,16 @@
 **/
 
 
-class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CRegistryFactoryTest extends TestCase {
 
 	/**
 	 * @var CRegistryFactory
 	 */
 	protected $factory;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->factory = new CRegistryFactory([
 			'string' => 'DateTime',
 			'closure' => function() {

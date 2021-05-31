@@ -464,8 +464,15 @@ static int	am_db_compare_tags(const void *d1, const void *d2)
 	return strcmp(tag1->value, tag2->value);
 }
 
-ZBX_VECTOR_DECL(tags, zbx_tag_t*)
-ZBX_VECTOR_IMPL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+
+static void	tag_free(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
+}
 
 typedef struct
 {
@@ -475,25 +482,24 @@ typedef struct
 }
 zbx_event_tags_t;
 
-ZBX_VECTOR_DECL(events_tags, zbx_event_tags_t*)
-ZBX_VECTOR_IMPL(events_tags, zbx_event_tags_t*)
+ZBX_PTR_VECTOR_DECL(events_tags, zbx_event_tags_t*)
+ZBX_PTR_VECTOR_IMPL(events_tags, zbx_event_tags_t*)
 
 static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 {
-	const zbx_event_tags_t	*event_tags_1 = (const zbx_event_tags_t *)d1;
-	const zbx_event_tags_t	*event_tags_2 = (const zbx_event_tags_t *)d2;
+	const zbx_event_tags_t	*event_tags_1 = *(const zbx_event_tags_t **)d1;
+	const zbx_event_tags_t	*event_tags_2 = *(const zbx_event_tags_t **)d2;
 
-	return event_tags_1->eventid > event_tags_2->eventid;
+	ZBX_RETURN_IF_NOT_EQUAL(event_tags_1->eventid, event_tags_2->eventid);
+
+	return 0;
 }
 
-static void	clean_events_tags(zbx_vector_events_tags_t *events_tags)
+static void	event_tags_free(zbx_event_tags_t *event_tags)
 {
-	int	i;
-
-	for (i = 0; i < events_tags->values_num; i++)
-		zbx_vector_tags_destroy(&((events_tags->values[i])->tags));
-
-	zbx_vector_events_tags_destroy(events_tags);
+	zbx_vector_tags_clear_ext(&event_tags->tags, tag_free);
+	zbx_vector_tags_destroy(&event_tags->tags);
+	zbx_free(event_tags);
 }
 
 /******************************************************************************
@@ -759,7 +765,8 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			zbx_db_insert_execute(&db_problem);
 			zbx_db_insert_clean(&db_problem);
 
-			clean_events_tags(&update_events_tags);
+			zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
+			zbx_vector_events_tags_destroy(&update_events_tags);
 		}
 		while (ZBX_DB_DOWN == DBcommit());
 

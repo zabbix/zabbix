@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
-class function_formatFloat extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public static function testProvider() {
+class function_formatFloatTest extends TestCase {
+
+	public static function dataProvider() {
 		return [
 			[0,						15,	null,	false,	'0'],
 			[1,						15,	null,	false,	'1'],
@@ -59,7 +61,7 @@ class function_formatFloat extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int $precision

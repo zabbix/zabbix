@@ -19,7 +19,6 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

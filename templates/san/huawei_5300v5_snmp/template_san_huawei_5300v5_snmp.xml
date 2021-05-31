@@ -959,7 +959,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                     <snmp_oid>discovery[{#NODE},1.3.6.1.4.1.34774.4.1.21.3.1.1]</snmp_oid>
                     <key>huawei.5300.nodes.discovery</key>
                     <delay>1h</delay>
-                    <description>Discovery of nodes perfomance counters</description>
+                    <description>Discovery of nodes performance counters</description>
                     <item_prototypes>
                         <item_prototype>
                             <name>Node {#NODE}: CPU utilization</name>

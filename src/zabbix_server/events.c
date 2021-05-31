@@ -1785,6 +1785,7 @@ void	zbx_export_events(void)
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_VALUE, event->value);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, event->eventid);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, event->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_SEVERITY, event->severity);
 
 		get_hosts_by_expression(&hosts, event->trigger.expression,
 				event->trigger.recovery_expression);

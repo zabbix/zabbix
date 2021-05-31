@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ func Test_setDiskFields(t *testing.T) {
 	}
 
 	type args struct {
-		deviceJsons map[string]string
+		deviceJsons map[string]jsonDevice
 	}
 
 	tests := []struct {
@@ -43,9 +43,9 @@ func Test_setDiskFields(t *testing.T) {
 		want    []interface{}
 		wantErr bool
 	}{
-		{"+one_drive", args{map[string]string{"/dev/sda": jsonSdaStr}}, []interface{}{sdaOutStr}, false},
-		{"-failed_json", args{map[string]string{"/dev/sda": `{"device":}`}}, nil, true},
-		{"-failed_device_data_json", args{map[string]string{"/dev/sda": `{"device": foo,"rotation_rate": 0}`}}, nil, true},
+		{"+one_drive", args{map[string]jsonDevice{"/dev/sda": {jsonData: jsonSdaStr}}}, []interface{}{sdaOutStr}, false},
+		{"-failed_json", args{map[string]jsonDevice{"/dev/sda": {jsonData: `{"device":}`}}}, nil, true},
+		{"-failed_device_data_json", args{map[string]jsonDevice{"/dev/sda": {jsonData: `{"device": foo,"rotation_rate": 0}`}}}, nil, true},
 	}
 
 	for _, tt := range tests {

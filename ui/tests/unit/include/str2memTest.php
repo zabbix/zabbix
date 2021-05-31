@@ -19,9 +19,11 @@
 **/
 
 
-class Cstr2memTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public static function testProvider() {
+class str2memTest extends TestCase {
+
+	public static function dataProvider() {
 		return [
 			['1', 1],
 			['1024', 1024],
@@ -42,7 +44,7 @@ class Cstr2memTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param string $expected

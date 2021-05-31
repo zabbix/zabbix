@@ -189,7 +189,7 @@ class testZBX6663 extends CLegacyWebTest {
 		if (isset($zbx_data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestOpen('templates.php?page=2');
+			$this->zbxTestOpen('templates.php?page=3');
 			$this->zbxTestClickLinkText($zbx_data['template']);
 		}
 

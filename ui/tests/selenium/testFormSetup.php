@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,8 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 
 		global $DB;
-		$this->assertScreenshot($this->query('xpath://form')->one(), 'Prerequisites_'.$DB['TYPE']);
+		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
 	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {

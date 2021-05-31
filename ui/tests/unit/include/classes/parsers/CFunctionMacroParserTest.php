@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,13 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CFunctionMacroParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new CFunctionMacroParser();
 	}
 
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['{host:item.func()}', 0, CParser::PARSE_SUCCESS, '{host:item.func()}'],
 			['{host:item.func(0)}', 0, CParser::PARSE_SUCCESS, '{host:item.func(0)}'],
@@ -51,7 +53,7 @@ class CFunctionMacroParserTest extends CParserTest {
 		];
 	}
 
-	public function testParseExpressionProvider() {
+	public function dataProviderParseExpression() {
 		return [
 			[
 				'{host:item[0, param1, "param2"].func(0, param1, "param2")}', 0,
@@ -87,7 +89,7 @@ class CFunctionMacroParserTest extends CParserTest {
 	}
 
 	/**
-	 * @dataProvider testParseExpressionProvider()
+	 * @dataProvider dataProviderParseExpression()
 	 *
 	 * @param string    $source
 	 * @param array     $expected
@@ -108,7 +110,7 @@ class CFunctionMacroParserTest extends CParserTest {
 		]);
 	}
 
-	public function testParseExpression18Provider() {
+	public function dataProviderParseExpression18() {
 		return [
 			[
 				'{host:ssh,21.last(0)}=0', 0,
@@ -134,7 +136,7 @@ class CFunctionMacroParserTest extends CParserTest {
 	}
 
 	/**
-	 * @dataProvider testParseExpression18Provider()
+	 * @dataProvider dataProviderParseExpression18()
 	 *
 	 * @param string    $source
 	 * @param array     $expected

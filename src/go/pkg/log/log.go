@@ -51,10 +51,11 @@ var logLevel int
 var logger *log.Logger
 
 type LogStat struct {
-	logType  int
-	filename string
-	filesize int64
-	f        *os.File
+	logType     int
+	filename    string
+	filesize    int64
+	f           *os.File
+	currentSize int64
 }
 
 var logStat LogStat
@@ -182,41 +183,55 @@ func procLog(format string, args []interface{}, level int) {
 }
 
 func rotateLog() {
-	if logStat.logType == File && logStat.filesize != 0 {
-		var printError string
-
+	if logStat.logType == File {
 		fstat, err := os.Stat(logStat.filename)
-		if err != nil {
-			return
-		}
+		if err != nil || fstat.Size() == 0 || logStat.currentSize > fstat.Size() {
 
-		if fstat.Size() > logStat.filesize {
-			filenameOld := logStat.filename + ".old"
 			logStat.f.Close()
-			os.Remove(filenameOld)
 
-			err = os.Rename(logStat.filename, filenameOld)
-			if err != nil {
-				printError = err.Error()
-			}
-
-			logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				errmsg := "Cannot open log file"
-				if printError != "" {
-					errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
-				}
+			if logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
 				logStat.logType = Undefined
-				panic(errmsg)
+				log.Fatal(fmt.Sprintf("Cannot open log file %s", logStat.filename))
 			}
 
 			logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
-			if printError != "" {
-				logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
-					logStat.filename, filenameOld, printError)
-				logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
-					" moving it to \"%s\" failed. The logfile was truncated.",
-					logStat.filename, filenameOld)
+			logStat.currentSize = 0
+			return
+		}
+
+		if logStat.filesize != 0 {
+			var printError string
+
+			logStat.currentSize = fstat.Size()
+
+			if logStat.currentSize > logStat.filesize {
+				filenameOld := logStat.filename + ".old"
+				logStat.f.Close()
+				os.Remove(filenameOld)
+
+				err = os.Rename(logStat.filename, filenameOld)
+				if err != nil {
+					printError = err.Error()
+				}
+
+				logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
+				if err != nil {
+					errmsg := fmt.Sprintf("Cannot open log file %s", logStat.filename)
+					if printError != "" {
+						errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
+					}
+					logStat.logType = Undefined
+					log.Fatal(errmsg)
+				}
+
+				logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+				if printError != "" {
+					logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
+						logStat.filename, filenameOld, printError)
+					logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
+						" moving it to \"%s\" failed. The logfile was truncated.",
+						logStat.filename, filenameOld)
+				}
 			}
 		}
 	}

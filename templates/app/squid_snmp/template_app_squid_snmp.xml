@@ -1098,7 +1098,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$SQUID.FILE.DESC.WARN.MIN}</macro>
                <value>100</value>
-               <description>The threshold for minimum number of avaliable file descriptors</description>
+               <description>The threshold for minimum number of available file descriptors</description>
             </macro>
             <macro>
                <macro>{$SQUID.HTTP.PORT}</macro>
@@ -1108,7 +1108,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$SQUID.PAGE.FAULT.WARN}</macro>
                <value>90</value>
-               <description>The threshold for sys page faults rate in percent of recieved HTTP requests</description>
+               <description>The threshold for sys page faults rate in percent of received HTTP requests</description>
             </macro>
             <macro>
                <macro>{$SQUID.SNMP.COMMUNITY}</macro>
@@ -1126,7 +1126,7 @@ Template tooling version used: 0.38</description>
    <triggers>
       <trigger>
          <expression>{Template App Squid SNMP:squid[cacheSysPageFaults].avg(5m)}&gt;{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}</expression>
-         <name>Squid: High sys page faults rate (&gt;{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests)</name>
+         <name>Squid: High sys page faults rate (&gt;{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>

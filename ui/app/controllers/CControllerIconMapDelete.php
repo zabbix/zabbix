@@ -21,10 +21,6 @@
 
 class CControllerIconMapDelete extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'iconmapid' => 'required | db icon_map.iconmapid'

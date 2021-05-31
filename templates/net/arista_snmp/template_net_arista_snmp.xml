@@ -818,7 +818,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
             <macro>
                <macro>{$MEMORY.NAME.NOT_MATCHES}</macro>
                <value>(Buffer|Cache)</value>
-               <description>Filter is overriden to ignore RAM(Cache) and RAM(Buffers) memory objects.</description>
+               <description>Filter is overridden to ignore RAM(Cache) and RAM(Buffers) memory objects.</description>
             </macro>
             <macro>
                <macro>{$PSU_CRIT_STATUS}</macro>

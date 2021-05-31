@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,15 +19,17 @@
 **/
 
 
-class function_relativeDateToTextTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class function_relativeDateToTextTest extends TestCase {
 	protected $tz;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->tz = date_default_timezone_get();
 		date_default_timezone_set('Europe/Riga');
 	}
 
-	public function tearDown() {
+	protected function tearDown(): void {
 		date_default_timezone_set($this->tz);
 	}
 

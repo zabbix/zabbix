@@ -21,10 +21,6 @@
 
 class CControllerImageDelete extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'imageid'   => 'required | db images.imageid',

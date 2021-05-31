@@ -175,7 +175,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with 0 in Attempts field.
@@ -189,7 +189,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with too much Attempts.
@@ -201,9 +201,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Too much Attempts'
 					],
 					'options' => [
-						'Attempts' => '11'
+						'Attempts' => '101'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Attempt to add a webhook with empty Attempt interval field.
@@ -231,9 +231,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					],
 					'options' => [
 						'Attempts' => '5',
-						'Attempt interval' => '61'
+						'Attempt interval' => '3601'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Attempt to add a webhook with custom concurrent sessions number out of range.
@@ -247,23 +247,6 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '5',
 						'Attempt interval' => '5'
-					],
-					'concurrent_sessions' => [
-						'Custom' => '101'
-					],
-					'error_message' => 'Incorrect value for field "maxsessions": must be between "0" and "100".'
-				]
-			],
-			// Attempt to set concurrent sessions field to custom and set the value out of range.
-			[
-				[
-					'fields' => [
-						'Name' => 'Custom concurrent sessions out of range',
-						'Type' => 'Webhook',
-						'Script' => 'Custom concurrent sessions out of range'
-					],
-					'options' => [
-						'Attempts' => '5'
 					],
 					'concurrent_sessions' => [
 						'Custom' => '101'
@@ -374,7 +357,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field to 0.
@@ -388,7 +371,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field too high.
@@ -400,9 +383,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Too much Attempts'
 					],
 					'options' => [
-						'Attempts' => '100'
+						'Attempts' => '101'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Set the value of Attempts field to some string.
@@ -416,7 +399,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => 'five'
 					],
-					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error_message' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			// Remove the value of the attempt interval field.
@@ -444,9 +427,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					],
 					'options' => [
 						'Attempts' => '5',
-						'Attempt interval' => '61'
+						'Attempt interval' => '3601'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Set a string value in the attempt interval field.
@@ -461,7 +444,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '10seconds'
 					],
-					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error_message' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// Removing the name of a webhook media type.
@@ -550,11 +533,30 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Webhook with specified "Menu entry name" and "Menu entry URL" fields'
 					],
 					'options' => [
-						'Attempts' => '10',
-						'Attempt interval' => '1m'
+						'Attempts' => '100',
+						'Attempt interval' => '1h'
 					],
 					'concurrent_sessions' => [
-						'Custom' => '5'
+						'Custom' => '100'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Webhook with 60m Attempt interval',
+						'Type' => 'Webhook',
+						'Include event menu entry' => true,
+						'Menu entry name' => '{EVENT.TAGS.Name}',
+						'Menu entry URL' => '{EVENT.TAGS.Url}',
+						'Script' => 'Webhook with specified "Menu entry name" and "Menu entry URL" fields'
+					],
+					'options' => [
+						'Attempts' => '1',
+						'Attempt interval' => '60m'
+					],
+					'concurrent_sessions' => [
+						'Custom' => '100'
 					]
 				]
 			],
@@ -574,8 +576,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Enabled' => false
 					],
 					'options' => [
-						'Attempts' => '5',
-						'Attempt interval' => '20s'
+						'Attempts' => '50',
+						'Attempt interval' => '3600s'
 					],
 					'concurrent_sessions' => 'Unlimited',
 					'parameters' => [

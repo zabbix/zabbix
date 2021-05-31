@@ -528,7 +528,7 @@ SELECT queries performance can significate degrade, so clickhouse try delay inse
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround merges, mutations and fetches).&#13;
+               <description>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).&#13;
  Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."</description>
                <applications>
                   <application>
@@ -546,14 +546,14 @@ SELECT queries performance can significate degrade, so clickhouse try delay inse
                </master_item>
             </item>
             <item>
-               <name>ClickHouse: Memory used for backround moves</name>
+               <name>ClickHouse: Memory used for background moves</name>
                <type>DEPENDENT</type>
                <key>clickhouse.memory.tracking.background.moves</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.&#13;
+               <description>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.&#13;
  This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."</description>
                <applications>
                   <application>
@@ -1386,7 +1386,7 @@ or due to startup without ZooKeeper configured."</description>
                </master_item>
             </item>
             <item>
-               <name>ClickHouse: ZooKeeper exeptions per second</name>
+               <name>ClickHouse: ZooKeeper exceptions per second</name>
                <type>DEPENDENT</type>
                <key>clickhouse.zookeper.exeptions.rate</key>
                <delay>0</delay>
@@ -1415,7 +1415,7 @@ or due to startup without ZooKeeper configured."</description>
                </master_item>
             </item>
             <item>
-               <name>ClickHouse: ZooKeeper hardware exeptions per second</name>
+               <name>ClickHouse: ZooKeeper hardware exceptions per second</name>
                <type>DEPENDENT</type>
                <key>clickhouse.zookeper.hw_exeptions.rate</key>
                <delay>0</delay>
@@ -1497,7 +1497,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                </triggers>
             </item>
             <item>
-               <name>ClickHouse: ZooKeeper user exeptions per second</name>
+               <name>ClickHouse: ZooKeeper user exceptions per second</name>
                <type>DEPENDENT</type>
                <key>clickhouse.zookeper.user_exeptions.rate</key>
                <delay>0</delay>
@@ -2642,7 +2642,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
          </graph_items>
       </graph>
       <graph>
-         <name>ClickHouse: Zookeeper exeptions rate</name>
+         <name>ClickHouse: Zookeeper exceptions rate</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

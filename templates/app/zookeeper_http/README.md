@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).  
 By default AdminServer is enabled and listens on port 8080.  
-You can еnable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
+You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
 Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
 
 
@@ -32,7 +32,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ZOOKEEPER.COMMAND_URL} |<p>The URL for listing and issuing commands relative to the root URL (admin.commandURL).</p> |`commands` |
-|{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN} |<p>Maximum percentage of file descriptors usage alert treshold (for trigger expression).</p> |`85` |
+|{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN} |<p>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</p> |`85` |
 |{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN} |<p>Maximum number of outstanding requests (for trigger expression).</p> |`10` |
 |{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN} |<p>Maximum number of pending syncs from the followers (for trigger expression).</p> |`10` |
 |{$ZOOKEEPER.PORT} |<p>The port the embedded Jetty server listens on (admin.serverPort).</p> |`8080` |

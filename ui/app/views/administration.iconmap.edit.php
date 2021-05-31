@@ -138,7 +138,8 @@ if ($data['iconmapid'] != 0) {
 			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
-					->setArgument('iconmapid', $data['iconmapid']),
+					->setArgument('iconmapid', $data['iconmapid'])
+					->setArgumentSID(),
 				_('Delete icon map?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

@@ -27,7 +27,29 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	const HOST_ID = 40001;
-	const UPDATED_ID = 33800;
+	const UPDATED_ID = 133800;
+
+	const INTERVAL_MAPPING = [
+		'Type' => [
+			'name' => 'type',
+			'class' => 'CSegmentedRadioElement',
+			'selector' => 'xpath:./ul[contains(@class, "radio-list-control")]'.
+					'|./ul/li/ul[contains(@class, "radio-list-control")]|./div/ul[contains(@class, "radio-list-control")]'
+		],
+		'Interval' => [
+			'name' => 'delay',
+			'class' => 'CElement',
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
+		],
+		'Period' => [
+			'name' => 'period',
+			'class' => 'CElement',
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
+		]
+	];
+
 
 	public static $created_id;
 	public static $old_hash;
@@ -293,7 +315,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_ADD,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '',
 												'period' => '1-5,01:01-13:05'
 											]
@@ -324,7 +346,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_ADD,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '20s',
 												'period' => ''
 											]
@@ -355,7 +377,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_ADD,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '20s',
 												'period' => '1-2'
 											]
@@ -386,7 +408,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_ADD,
-												'Type' => 'Scheduling',
+												'type' => 'Scheduling',
 												'delay' => 'wd1-9'
 											]
 										]
@@ -504,8 +526,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
-											['Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
+											['type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
+											['type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
 										]
 									]
 								],
@@ -1279,7 +1301,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 0,
-												'Type' => 'Scheduling',
+												'type' => 'Scheduling',
 												'delay' => 'wd1-3h10-17'
 											],
 											[
@@ -1398,8 +1420,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 //						'Update interval' => [
 //							'Delay' => '1m',
 //							'Custom intervals' => [
-//								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
-//								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+//								['type' => 'Flexible', 'delay' => '50s', 'period' => '1-7,00:00-24:00'],
+//								['type' => 'Scheduling', 'delay' => 'wd1-5h9-18']
 //							]
 //						],
 						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
@@ -1673,7 +1695,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							}
 							if (array_key_exists('Custom intervals', $operation['Update interval'])) {
 								$this->query('xpath:.//table[@id="lld_overrides_custom_intervals"]')
-										->asMultifieldTable()->one()
+										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()
 										->fill($operation['Update interval']['Custom intervals']);
 							}
 						}
