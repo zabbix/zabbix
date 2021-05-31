@@ -27,7 +27,8 @@
 #include "sighandler.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
-//#include "avail_protocol.h"
+#include "zbxalgo.h"
+#include "service_protocol.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -54,6 +55,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_message_t	*message;
 	int			ret, processed_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush, sec;
+	zbx_vector_ptr_t	events;
 
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -85,6 +87,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //
 //	zbx_vector_availability_ptr_create(&interface_availabilities);
 //
+	zbx_vector_ptr_create(&events);
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 //
 	while (ZBX_IS_RUNNING())
@@ -114,8 +117,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //
 		if (NULL != message)
 		{
-//			zbx_availability_deserialize(message->data, message->size, &interface_availabilities);
+			zbx_service_deserialize(message->data, message->size, &events);
 			zbx_ipc_message_free(message);
+
+			zbx_vector_ptr_clear(&events);
 		}
 //
 		if (NULL != client)
@@ -139,6 +144,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //		}
 	}
 
+	zbx_vector_ptr_destroy(&events);
 	DBclose();
 
 	exit(EXIT_SUCCESS);

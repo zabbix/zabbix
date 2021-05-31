@@ -1929,11 +1929,11 @@ void	zbx_events_update_itservices(void)
 		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
 
-		if (TRIGGER_VALUE_PROBLEM != event->value || 0 == event->tags.values_num)
+		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->severity, event->clock,
-				&event->tags);
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->value,
+				event->severity, &event->tags);
 	}
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
@@ -1944,15 +1944,11 @@ void	zbx_events_update_itservices(void)
 		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
 			continue;
 
-		/* if (0 == recovery->r_event->tags.values_num)
-			continue; */
-
 		values_num = recovery->r_event->tags.values_num;
+		recovery->r_event->tags.values_num = 0;
 
-		recovery->r_event->tags.values_num = 0;	/* don't send tags for recovery event */
-
-		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->severity,
-				recovery->r_event->clock, &recovery->r_event->tags);
+		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
+				recovery->r_event->value, recovery->r_event->severity, &recovery->r_event->tags);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -2910,13 +2906,16 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		update_trigger_changes(&trigger_diff);
 		zbx_db_save_trigger_changes(&trigger_diff);
 
-		DBcommit();
+		if (ZBX_DB_OK == DBcommit())
+		{
+			DCconfig_triggers_apply_changes(&trigger_diff);
+			DBupdate_itservices(&trigger_diff);
 
-		DCconfig_triggers_apply_changes(&trigger_diff);
-		DBupdate_itservices(&trigger_diff);
+			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+				zbx_export_events();
 
-		if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-			zbx_export_events();
+			zbx_events_update_itservices();
+		}
 
 		zbx_clean_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);

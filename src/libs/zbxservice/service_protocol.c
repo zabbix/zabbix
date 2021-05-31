@@ -24,15 +24,16 @@
 #include "dbcache.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int severity, int clock, const zbx_vector_ptr_t *tags)
+		int clock, int value, int severity, const zbx_vector_ptr_t *tags)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, eventid);
-	zbx_serialize_prepare_value(data_len, severity);
 	zbx_serialize_prepare_value(data_len, clock);
+	zbx_serialize_prepare_value(data_len, value);
+	zbx_serialize_prepare_value(data_len, severity);
 	zbx_serialize_prepare_value(data_len, tags->values_num);
 
 	if (0 != tags->values_num)
@@ -59,8 +60,9 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 	*data_offset += data_len;
 
 	ptr += zbx_serialize_value(ptr, eventid);
-	ptr += zbx_serialize_value(ptr, severity);
 	ptr += zbx_serialize_value(ptr, clock);
+	ptr += zbx_serialize_value(ptr, value);
+	ptr += zbx_serialize_value(ptr, severity);
 	ptr += zbx_serialize_value(ptr, tags->values_num);
 
 	for (i = 0; i < tags->values_num; i++)
@@ -74,31 +76,42 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 	zbx_free(len);
 }
 
-/*
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_availability_ptr_t  *interface_availabilities)
+
+void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events)
 {
 	const unsigned char	*end = data + size;
 
 	while (data < end)
 	{
-		zbx_interface_availability_t	*interface_availability;
-		zbx_uint32_t			deserialize_error_len;
+		zbx_event_t	*event;
+		int		values_num, i;
 
+		event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
+		zbx_vector_ptr_create(&event->tags);
+		zbx_vector_ptr_append(events, event);
 
-		interface_availability = (zbx_interface_availability_t *)zbx_malloc(NULL,
-				sizeof(zbx_interface_availability_t));
+		data += zbx_deserialize_value(data, &event->eventid);
+		data += zbx_deserialize_value(data, &event->clock);
+		data += zbx_deserialize_value(data, &event->value);
+		data += zbx_deserialize_value(data, &event->severity);
+		data += zbx_deserialize_value(data, &values_num);
 
-		zbx_vector_availability_ptr_append(interface_availabilities, interface_availability);
+		if (0 != values_num)
+		{
+			zbx_vector_ptr_reserve(&event->tags, values_num);
 
-		interface_availability->id = interface_availabilities->values_num;
+			for (i = 0; i < values_num; i++)
+			{
+				zbx_tag_t	*tag;
+				zbx_uint32_t	len;
 
-		data += zbx_deserialize_value(data, &interface_availability->interfaceid);
-		data += zbx_deserialize_value(data, &interface_availability->agent.flags);
-		data += zbx_deserialize_value(data, &interface_availability->agent.available);
-		data += zbx_deserialize_value(data, &interface_availability->agent.errors_from);
-		data += zbx_deserialize_value(data, &interface_availability->agent.disable_until);
-		data += zbx_deserialize_str(data, &interface_availability->agent.error, deserialize_error_len);
+				tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+				data += zbx_deserialize_str(data, &tag->tag, len);
+				data += zbx_deserialize_str(data, &tag->value, len);
+
+				zbx_vector_ptr_append(&event->tags, tag);
+			}
+		}
 	}
-}*/
+}
 
