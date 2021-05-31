@@ -28,6 +28,7 @@ class CExpressionValidator extends CValidator {
 	 * An options array.
 	 *
 	 * Supported options:
+	 *   'usermacros' => false   Enable user macros usage in function parameters.
 	 *   'lldmacros' => false   Enable low-level discovery macros usage in function parameters.
 	 *   'calculated' => false  Validate expression as part of calculated item formula.
 	 *   'partial' => false     Validate partial expression (relaxed requirements).
@@ -35,6 +36,7 @@ class CExpressionValidator extends CValidator {
 	 * @var array
 	 */
 	private $options = [
+		'usermacros' => false,
 		'lldmacros' => false,
 		'calculated' => false,
 		'partial' => false
@@ -151,7 +153,7 @@ class CExpressionValidator extends CValidator {
 
 					$options = [
 						'parameters' => $this->hist_function_parameters,
-						'usermacros' => true,
+						'usermacros' => $this->options['usermacros'],
 						'lldmacros' => $this->options['lldmacros'],
 						'calculated' => $this->options['calculated']
 					];

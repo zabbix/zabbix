@@ -59,9 +59,9 @@ class CExpressionValidatorTest extends TestCase {
 			['sum(sum_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
 			// User macros.
-			['find(/host/key, {$PERIOD}:{$TIMESHIFT})', [], ['rc' => true, 'error' => null]],
-			['find(/host/key, 1d, {$OP})', [], ['rc' => true, 'error' => null]],
-			['find(/host/key, 1d, "{$OP}")', [], ['rc' => true, 'error' => null]],
+			['find(/host/key, {$PERIOD}:{$TIMESHIFT})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, {$OP})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, "{$OP}")', ['usermacros' => true], ['rc' => true, 'error' => null]],
 
 			// LLD macros.
 			['find(/host/key, {#PERIOD}:{#TIMESHIFT})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
