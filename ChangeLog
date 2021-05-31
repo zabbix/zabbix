@@ -332,6 +332,7 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
 ..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 .......PS. [ZBX-19114] fixed slow detection of vmware hv multipath values for medium and huge vc instances (MVekslers)
