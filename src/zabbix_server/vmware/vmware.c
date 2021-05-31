@@ -2818,12 +2818,12 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 		zbx_free(id_esc);
 		id = zbx_xml_read_doc_value(xdoc , tmp);
 
-		if (NULL == folder)	/* We always resolve the first 'Folder' name */
+		if (NULL == folder)	/* we always resolve the first 'Folder' name */
 		{
 			folder = fl;
 			fl = NULL;
 		}
-		else if (NULL != id)	/* We do not include the last default 'Folder' */
+		else if (NULL != id)	/* we do not include the last default 'Folder' */
 			folder = zbx_dsprintf(folder, "%s/%s", fl, folder);
 
 		zbx_free(fl);
