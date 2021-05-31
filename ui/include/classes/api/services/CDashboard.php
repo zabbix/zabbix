@@ -1259,12 +1259,17 @@ class CDashboard extends CApiService {
 		// Adding user shares.
 		if ($options['selectUsers'] !== null) {
 			$relation_map = $this->createRelationMap($result, 'dashboardid', 'userid', 'dashboard_user');
-			// Get all allowed users.
-			$db_users = API::User()->get([
-				'output' => [],
-				'userids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
+			$db_users = [];
+
+			if ($related_ids) {
+				// Get all allowed users.
+				$db_users = API::User()->get([
+					'output' => [],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
 
 			if ($db_users) {
 				$db_dashboard_users = API::getApiService()->select('dashboard_user', [
@@ -1295,12 +1300,17 @@ class CDashboard extends CApiService {
 		// Adding user group shares.
 		if ($options['selectUserGroups'] !== null) {
 			$relation_map = $this->createRelationMap($result, 'dashboardid', 'usrgrpid', 'dashboard_usrgrp');
-			// Get all allowed groups.
-			$db_usrgrps = API::UserGroup()->get([
-				'output' => [],
-				'usrgrpids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relation_map->getRelatedIds();
+			$db_usrgrps = [];
+
+			if ($related_ids) {
+				// Get all allowed groups.
+				$db_usrgrps = API::UserGroup()->get([
+					'output' => [],
+					'usrgrpids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
 
 			if ($db_usrgrps) {
 				$db_dashboard_usrgrps = API::getApiService()->select('dashboard_usrgrp', [

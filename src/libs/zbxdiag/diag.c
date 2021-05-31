@@ -413,19 +413,29 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
-			int	values_num, values_preproc_num;
+			int	total, queued, processing, done, pending;
 
 			time1 = zbx_time();
-			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&values_num, &values_preproc_num, error)))
+			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&total, &queued, &processing, &done,
+					&pending, error)))
+			{
 				goto out;
+			}
 
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES))
-				zbx_json_addint64(json, "values", values_num);
+			{
+				zbx_json_addint64(json, "values", total);
+				zbx_json_addint64(json, "done", done);
+			}
 			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES_PREPROC))
-				zbx_json_addint64(json, "preproc.values", values_preproc_num);
+			{
+				zbx_json_addint64(json, "queued", queued);
+				zbx_json_addint64(json, "processing", processing);
+				zbx_json_addint64(json, "pending", pending);
+			}
 		}
 
 		if (0 != tops.values_num)
@@ -438,13 +448,19 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 			{
 				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
 
-				if (0 == strcmp(map->name, "values"))
+				if (0 == strcmp(map->name, "values") || 0 == strcmp(map->name, "oldest.preproc.values"))
 				{
 					zbx_vector_ptr_t	items;
 
 					zbx_vector_ptr_create(&items);
 					time1 = zbx_time();
-					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->value, &items, error)))
+					if (0 == strcmp(map->name, "values"))
+						ret = zbx_preprocessor_get_top_items(map->value, &items, error);
+					else
+						ret = zbx_preprocessor_get_top_oldest_preproc_items(map->value, &items,
+								error);
+
+					if (FAIL == ret)
 					{
 						zbx_vector_ptr_destroy(&items);
 						goto out;
@@ -621,7 +637,7 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 		diag_add_section_request(j, ZBX_DIAG_VALUECACHE, "values", "request.values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_PREPROCESSING)))
-		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "values", NULL);
+		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "values", "oldest.preproc.values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_LLD)))
 		diag_add_section_request(j, ZBX_DIAG_LLD, "values", NULL);
@@ -828,6 +844,7 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp)
 	zbx_free(msg);
 
 	diag_log_top_view(jp, "top.values", "$.top.values");
+	diag_log_top_view(jp, "top.oldest.preproc.values", "$.top['oldest.preproc.values']");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
 }
@@ -896,6 +913,7 @@ void	zbx_diag_log_info(unsigned int flags)
 	zbx_json_init(&j, 1024);
 
 	diag_prepare_default_request(&j, flags);
+
 	if (FAIL == zbx_json_open(j.buffer, &jp))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;

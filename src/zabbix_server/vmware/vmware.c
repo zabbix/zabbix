@@ -4845,11 +4845,21 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
-		zbx_vmware_hv_t	hv_local;
+		zbx_vmware_hv_t	hv_local, *hv;
 
 		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores, &hv_local,
 				&data->error))
 		{
+			if (NULL != (hv = zbx_hashset_search(&data->hvs, &hv_local)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Duplicate uuid of new hv id:%s name:%s uuid:%s and"
+					" discovered hv with id:%s name:%s", hv_local.id,
+					ZBX_NULL2EMPTY_STR(hv_local.props[ZBX_VMWARE_HVPROP_NAME]), hv_local.uuid,
+					hv->id, ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]));
+				vmware_hv_clean(&hv_local);
+				continue;
+			}
+
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 		}
 		else if (NULL != data->error)

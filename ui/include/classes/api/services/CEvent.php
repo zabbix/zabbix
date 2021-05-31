@@ -955,6 +955,9 @@ class CEvent extends CApiService {
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = [];
+			$relationMap = new CRelationMap();
+
 			// trigger events
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$query = DBselect(
@@ -979,17 +982,21 @@ class CEvent extends CApiService {
 				);
 			}
 
-			$relationMap = new CRelationMap();
 			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
 			}
 
-			$hosts = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
@@ -1031,16 +1038,22 @@ class CEvent extends CApiService {
 
 		// adding alerts
 		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
+			$alerts = [];
 			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$alerts = API::Alert()->get([
-				'output' => $options['select_alerts'],
-				'selectMediatypes' => API_OUTPUT_EXTEND,
-				'alertids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$alerts = API::Alert()->get([
+					'output' => $options['select_alerts'],
+					'selectMediatypes' => API_OUTPUT_EXTEND,
+					'alertids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true,
+					'sortfield' => 'clock',
+					'sortorder' => ZBX_SORT_DOWN
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $alerts, 'alerts');
 		}
 

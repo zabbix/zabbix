@@ -11,17 +11,17 @@
         <template>
             <template>Cisco Catalyst 3750V2-24FS SNMP</template>
             <name>Cisco Catalyst 3750V2-24FS SNMP</name>
-            <description>Template Cisco Catalyst 3750V2-24FS
-
-MIBs used:
-CISCO-MEMORY-POOL-MIB
-IF-MIB
-EtherLike-MIB
-SNMPv2-MIB
-CISCO-PROCESS-MIB
-CISCO-ENVMON-MIB
-ENTITY-MIB
-
+            <description>Template Cisco Catalyst 3750V2-24FS&#13;
+&#13;
+MIBs used:&#13;
+CISCO-MEMORY-POOL-MIB&#13;
+IF-MIB&#13;
+EtherLike-MIB&#13;
+SNMPv2-MIB&#13;
+CISCO-PROCESS-MIB&#13;
+CISCO-ENVMON-MIB&#13;
+ENTITY-MIB&#13;
+&#13;
 Template tooling version used: 0.38</description>
             <groups>
                 <group>
