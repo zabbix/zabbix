@@ -341,6 +341,7 @@ class CApiInputValidator {
 		}
 
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
 			'calculated' => true,
 			'host_macro' => true,
@@ -2063,6 +2064,7 @@ class CApiInputValidator {
 		}
 
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 

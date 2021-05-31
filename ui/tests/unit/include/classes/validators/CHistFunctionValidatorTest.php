@@ -704,6 +704,7 @@ class CHistFunctionValidatorTest extends TestCase {
 	 */
 	public function testHistFunctionValidator(string $source, array $options, array $expected) {
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => true
 		] + $options);
 		$hist_function_validator = new CHistFunctionValidator([

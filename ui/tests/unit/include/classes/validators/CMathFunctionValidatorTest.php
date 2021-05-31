@@ -302,7 +302,7 @@ class CMathFunctionValidatorTest extends TestCase {
 	 * @dataProvider dataProvider
 	 */
 	public function testMathFunctionValidator(string $source, array $expected) {
-		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_parser = new CExpressionParser();
 		$math_function_validator = new CMathFunctionValidator([
 			'parameters' => (new CMathFunctionData())->getParameters()
 		]);

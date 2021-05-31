@@ -132,6 +132,7 @@ class CExpressionValidatorTest extends TestCase {
 	 */
 	public function testExpressionValidator(string $source, array $options, array $expected) {
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => true
 		] + $options);
 		$expression_validator = new CExpressionValidator($options);
