@@ -2147,7 +2147,6 @@ class CExpressionParserTest extends TestCase {
 			// collapsed trigger expressions
 			['func(/host/key)', null, CParser::PARSE_FAIL, ['collapsed_expression' => true]],
 			['{123}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true]],
-
 			['{123} = {$MACRO}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true, 'usermacros' => true]],
 			['{123} = {$MACRO}', null, CParser::PARSE_SUCCESS_CONT, ['collapsed_expression' => true]],
 			['{123} = {#MACRO}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true, 'lldmacros' => true]],
