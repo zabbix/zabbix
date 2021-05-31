@@ -55,6 +55,7 @@ New features:
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+..F....... [ZBX-19487] fixed PHP runtime errors in the Monitoring->Problems view (Sasha)
 ..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
 .........T [ZBX-19462] fixed VMWare template (tuskov)
 ....I...S. [ZBX-19468] fixed escaped symbols in screen name during conversion to dashboard (akozlovs)
