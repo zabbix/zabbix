@@ -1320,7 +1320,7 @@ class testMassUpdateItems extends CWebTest{
 
 						case 'History storage period':
 						case 'Trend storage period':
-							if (CTestArrayHelper::get($value, 'input.value', 'null') === '0' ) {
+							if (CTestArrayHelper::get($value, 'input.value', 'null') === '0') {
 								$this->assertEquals('Do not keep '.$value['input']['id'], $form->query('id',
 										$value['radio']['id'])->one()->asSegmentedRadio()->getValue());
 							}
