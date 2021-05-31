@@ -148,7 +148,7 @@ class testFormValueMappings extends CWebTest {
 
 	public function getValuemapData() {
 		return [
-			// Successful creation/update of value mapping with multiple mappings.
+			// Successful creation/update of value mapping with multiple mappings and type equals.
 			[
 				[
 					'name' => 'ABC!@#$%^&*()_+=[].абвгдеёжзāīōēūšķļ€‡Œ™£¥©µ¾ÆÖÕæƩƴƵɷʁΔβφψϾֆ۝ܫज',
@@ -156,26 +156,149 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
+							'type' => 'equals',
 							'value' => '   ',
 							'newvalue' => 'jaunā vērtība'
 						],
 						[
+							'type' => 'equals',
 							'value' => '   2 два   ',
 							'newvalue' => 'один + один'
 						],
 						[
+							'type' => 'equals',
 							'value' => 'duplicate newvalue',
 							'newvalue' => 'один + один'
 						],
 						[
+							'type' => 'equals',
 							'value' => '1_WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
 							'newvalue' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'
 						],
 						[
+							'type' => 'equals',
 							'value' => 'mapping not shown',
 							'newvalue' => '  not shown on screenshot   '
 						]
 
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - is greater than or equals.
+			[
+				[
+					'name' => 'greater than or equals',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is greater than or equals',
+							'value' => '10',
+							'newvalue' => 'greater or equals 10'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'type' => 'is greater than or equals',
+							'value' => '25.25',
+							'newvalue' => 'greater or equals 25.25'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'type' => 'is greater than or equals',
+							'value' => '0.1',
+							'newvalue' => 'greater or equals 0.1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 3,
+							'type' => 'is greater than or equals',
+							'value' => '.55',
+							'newvalue' => 'greater or equals .55'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 4,
+							'type' => 'is greater than or equals',
+							'value' => '0',
+							'newvalue' => 'greater or equals 0'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 5,
+							'type' => 'is greater than or equals',
+							'value' => '-25',
+							'newvalue' => 'greater or equals -25'
+						],
+						[
+							'type' => 'is greater than or equals',
+							'value' => '-30.30',
+							'newvalue' => 'greater or equals -30.30'
+						],
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - is less than or equals.
+			[
+				[
+					'name' => 'less than or equals',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is less than or equals',
+							'value' => '10',
+							'newvalue' => 'less or equals 10'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'type' => 'is less than or equals',
+							'value' => '25.25',
+							'newvalue' => 'less or equals 25.25'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'type' => 'is less than or equals',
+							'value' => '0.1',
+							'newvalue' => 'less or equals 0.1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 3,
+							'type' => 'is less than or equals',
+							'value' => '.55',
+							'newvalue' => 'less or equals .55'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 4,
+							'type' => 'is less than or equals',
+							'value' => '0',
+							'newvalue' => 'less or equals 0'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 5,
+							'type' => 'is less than or equals',
+							'value' => '-25',
+							'newvalue' => 'less or equals -25'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 6,
+							'type' => 'is less than or equals',
+							'value' => '-30.30',
+							'newvalue' => 'less or equals -30.30'
+						],
 					],
 					'trim' => true,
 					'update valuemap' => self::UPDATE_VALUEMAP1,
@@ -347,7 +470,7 @@ class testFormValueMappings extends CWebTest {
 		// Add a new value mapping or open the value mapping to be updated.
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
-			: 'link:'.CTestArrayHelper::get($data, 'update valuemap', self::UPDATE_VALUEMAP2)
+			: 'link:'.CTestArrayHelper::get($data, 'update valuemap', 'Valuemap for update 1')
 		)->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
@@ -375,11 +498,15 @@ class testFormValueMappings extends CWebTest {
 
 			// Check the screenshot of the whole value mappings tab.
 			$this->openValueMappingTab($source, false);
-			$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot id']);
+//			$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot id']);
 
 			// Check all mappings that belong to the created value mapping.
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
+			$dialog->query('xpath:.//input[@id="name"]')->one()->fill('Valuemap for update 1');
+			$dialog->submit();
+			COverlayDialogElement::ensureNotPresent();
+			$this->query('button:Update')->waitUntilClickable()->one()->click();
 		}
 	}
 
