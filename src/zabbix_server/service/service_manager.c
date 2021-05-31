@@ -32,20 +32,78 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-//static sigset_t		orig_mask;
-//
-//#define ZBX_AVAILABILITY_MANAGER_DELAY			1
+
+//#define ZBX_AVAILABILITY_MANAGER_DELAY		1
 //#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
-//
-//static int	interface_availability_compare(const void *d1, const void *d2)
-//{
-//	const zbx_interface_availability_t	*ia1 = *(const zbx_interface_availability_t **)d1;
-//	const zbx_interface_availability_t	*ia2 = *(const zbx_interface_availability_t **)d2;
-//
-//	ZBX_RETURN_IF_NOT_EQUAL(ia1->interfaceid, ia2->interfaceid);
-//
-//	return ia1->id - ia2->id;
-//}
+
+static void	event_clean(zbx_event_t *event)
+{
+	zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+	zbx_vector_ptr_destroy(&event->tags);
+	zbx_free(event);
+}
+
+static void	event_ptr_clean(zbx_event_t **event)
+{
+	event_clean(*event);
+}
+
+static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
+{
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(*(const zbx_uint64_t **)d);
+}
+
+static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recovery_events, zbx_vector_ptr_t *events)
+{
+	int	i;
+
+	for (i = 0; i < events->values_num; i++)
+	{
+		zbx_event_t	*event, **ptr;
+
+		event = events->values[i];
+
+		switch (event->value)
+		{
+			case TRIGGER_VALUE_OK:
+				if (NULL == (ptr = zbx_hashset_search(problem_events, &event)))
+				{
+					/* handle possible race condition when recovery is received before problem */
+					zbx_hashset_insert(recovery_events, &event, sizeof(zbx_event_t **));
+					continue;
+				}
+
+				event_clean(event);
+				zbx_hashset_remove_direct(problem_events, ptr);
+				break;
+			case TRIGGER_VALUE_PROBLEM:
+				if (NULL != (ptr = zbx_hashset_search(problem_events, &event)))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\": event"
+							" already processed", event->eventid);
+					THIS_SHOULD_NEVER_HAPPEN;
+					event_clean(event);
+					continue;
+				}
+
+				if (NULL != (ptr = zbx_hashset_search(recovery_events, &event)))
+				{
+					/* handle possible race condition when recovery is received before problem */
+					zbx_hashset_remove_direct(recovery_events, ptr);
+					event_clean(event);
+					continue;
+				}
+
+				zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t **));
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\" unexpected value:%d",
+						event->eventid, event->value);
+				THIS_SHOULD_NEVER_HAPPEN;
+				event_clean(event);
+		}
+	}
+}
 
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
@@ -56,7 +114,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	int			ret, processed_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush, sec;
 	zbx_vector_ptr_t	events;
-
+	zbx_hashset_t		problem_events, recovery_events;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -80,14 +138,20 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-//
-//	/* initialize statistics */
+
+	/* initialize statistics */
 	time_stat = zbx_time();
 	time_flush = time_stat;
-//
-//	zbx_vector_availability_ptr_create(&interface_availabilities);
-//
+
 	zbx_vector_ptr_create(&events);
+	zbx_hashset_create_ext(&problem_events, 1000, default_uint64_ptr_hash_func,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&recovery_events, 1, default_uint64_ptr_hash_func,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 //
 	while (ZBX_IS_RUNNING())
@@ -119,7 +183,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			zbx_service_deserialize(message->data, message->size, &events);
 			zbx_ipc_message_free(message);
-
+			process_events(&problem_events, &recovery_events, &events);
 			zbx_vector_ptr_clear(&events);
 		}
 //
@@ -144,6 +208,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //		}
 	}
 
+	zbx_hashset_destroy(&problem_events);
+	zbx_hashset_destroy(&recovery_events);
 	zbx_vector_ptr_destroy(&events);
 	DBclose();
 
