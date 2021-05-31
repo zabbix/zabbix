@@ -76,7 +76,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function prepareUserData() {
 		$response = CDataHelper::call('user.create', [
 			[
-				'alias' => 'user_for_role',
+				'username' => 'user_for_role',
 				'passwd' => 'zabbix',
 				'roleid' => self::$super_roleid,
 				'usrgrps' => [
@@ -350,8 +350,8 @@ class testUserRolesPermissions extends CWebTest {
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
 			$this->page->waitUntilReady();
-			$widget_row = $this->query('xpath:(//table[@class="list-table"])[10]')->asTable()->one()->findRow('Time', '2020-10-23 18:23:48');
-			$this->assertTrue($widget_row->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
+			$table = $this->query('xpath:(//table[@class="list-table"])[10]')->waitUntilVisible()->asTable()->one();
+			$this->assertTrue($table->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
 
 			// Event details page.
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
@@ -1232,6 +1232,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_Dashboard($data) {
 		$enabled_ui = [
 			'Monitoring' => [
+				'Dashboard',
 				'Problems',
 				'Hosts',
 				'Overview',
