@@ -159,7 +159,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)
 				->addRow(_('Value'),
-					(new CTextBox('filter', getRequest('filter', '')))
+					(new CTextBox('filter', $data['filter']))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 						->removeId()
 				);
@@ -202,6 +202,8 @@ if ($data['itemids']) {
 		'pageFile' => (new CUrl('history.php'))
 			->setArgument('action', $data['action'])
 			->setArgument('itemids', $data['itemids'])
+			->setArgument('filter', $data['filter'])
+			->setArgument('filter_task', $data['filter_task'])
 			->getUrl(),
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
