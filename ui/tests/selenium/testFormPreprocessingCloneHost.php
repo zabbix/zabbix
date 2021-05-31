@@ -27,7 +27,7 @@ class testFormPreprocessingCloneHost extends testFormPreprocessingClone {
 
 	public $hostid = 40001;				// Simple form test host.
 	public $itemid = 99102;				// StestFormItem.
-	public $lldid = 33800;				// testFormDiscoveryRule.
+	public $lldid = 133800;				// testFormDiscoveryRule.
 	public $item_prototypeid = 23800;	// testFormItemPrototype1.
 
 	/**

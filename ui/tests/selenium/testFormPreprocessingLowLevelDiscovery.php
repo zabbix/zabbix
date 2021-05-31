@@ -36,7 +36,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
 	const INHERITANCE_LLDID			= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
-	const CLONE_LLDID				= 33800;	// 'Simple form test host' -> 'testFormDiscoveryRule1'
+	const CLONE_LLDID				= 133800;	// 'Simple form test host' -> 'testFormDiscoveryRule1'
 	const CLONE_PREPROCESSING = [
 		[
 			'type' => '5',
