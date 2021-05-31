@@ -1148,8 +1148,6 @@ class testUserRolesPermissions extends CWebTest {
 			$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
 			if ($action_status === true) {
 				if (array_key_exists('user_roles', $data)) {
-					$this->page->logout();
-					$this->page->waitUntilReady();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($data['remove_ui']);
 					$this->page->logout();
@@ -1165,7 +1163,6 @@ class testUserRolesPermissions extends CWebTest {
 					$this->checkLinks($data['link']);
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($user_roles);
-					$this->page->logout();
 				}
 				else {
 					$this->checkLinks($data['link']);
