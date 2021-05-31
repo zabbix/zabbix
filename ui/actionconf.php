@@ -613,6 +613,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
+	order_result($data['actions'], $sortField, $sortOrder);
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
 
 	// render view
