@@ -71,7 +71,11 @@ class testDiscoveryRule extends CAPITest {
 					'interfaceid' => '50022',
 					'delay' => '30s'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 2, 3, 5, 7, 10, 11, 12, 13, 14, 16, 18, 19, 20.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
+					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+				]).'.'
 			]
 		];
 
