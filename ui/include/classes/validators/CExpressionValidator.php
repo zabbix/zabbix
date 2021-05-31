@@ -28,7 +28,7 @@ class CExpressionValidator extends CValidator {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false   Enable user macros usage in function parameters.
+	 *   'usermacros' => false  Enable user macros usage in function parameters.
 	 *   'lldmacros' => false   Enable low-level discovery macros usage in function parameters.
 	 *   'calculated' => false  Validate expression as part of calculated item formula.
 	 *   'partial' => false     Validate partial expression (relaxed requirements).
