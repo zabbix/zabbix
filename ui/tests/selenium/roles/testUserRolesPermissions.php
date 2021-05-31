@@ -1153,7 +1153,6 @@ class testUserRolesPermissions extends CWebTest {
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($data['remove_ui']);
 					$this->page->logout();
-					$this->page->waitUntilReady();
 					$this->page->userLogin('user_for_role', 'zabbix');
 				}
 				else {
