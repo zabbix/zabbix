@@ -1134,7 +1134,6 @@ class testUserRolesPermissions extends CWebTest {
 				'Scripts'
 			]
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link', $data['section']);
@@ -1242,7 +1241,6 @@ class testUserRolesPermissions extends CWebTest {
 				'Services'
 			]
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link:Monitoring');
