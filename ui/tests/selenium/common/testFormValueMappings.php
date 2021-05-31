@@ -98,6 +98,25 @@ class testFormValueMappings extends CWebTest {
 		$this->assertEquals(1, $row->query('xpath:.//td[text()="⇒"]')->all()->count());
 		$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
+		// Check types.
+		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
+		$dropdown = $mappings_table->query('name:mappings[1][type]')->one()->asZDropdown();
+		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
+		$dropdown_values = $dropdown->getOptions()->asText();
+		$this->assertEquals($types, $dropdown_values);
+		foreach ($types as $type) {
+			$dropdown->select($type);
+			if ($type === 'default') {
+				$this->assertEquals('visibility-hidden', $value_column->getAttribute('class'));
+			}
+			elseif ($type === 'regexp') {
+				$this->assertEquals('regexp', $value_column->getAttribute('placeholder'));
+			}
+			else {
+				$this->assertEquals('value', $value_column->getAttribute('placeholder'));
+			}
+		}
+
 		// Check that both overlay control buttons are clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
