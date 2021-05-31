@@ -107,12 +107,10 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 
 static void	db_get_events(zbx_vector_ptr_t *events)
 {
-	DB_ROW				row;
-	DB_RESULT			result;
-	zbx_event_t			*event;
-	DB_ROW				row;
-	zbx_uint64_t			eventid;
-	zbx_event_suppress_query_t	*query = NULL;
+	DB_RESULT	result;
+	zbx_event_t	*event;
+	DB_ROW		row;
+	zbx_uint64_t	eventid;
 
 	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value"
 			" from problem p"
@@ -130,7 +128,7 @@ static void	db_get_events(zbx_vector_ptr_t *events)
 
 		if (NULL == event || eventid != event->eventid)
 		{
-			query = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
+			event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
 
 			event->eventid = eventid;
 			event->clock = atoi(row[1]);
