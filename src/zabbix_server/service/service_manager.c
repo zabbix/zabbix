@@ -33,8 +33,8 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-//#define ZBX_AVAILABILITY_MANAGER_DELAY		1
-//#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
+/*#define ZBX_AVAILABILITY_MANAGER_DELAY		1
+#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5*/
 
 static void	event_clean(zbx_event_t *event)
 {
@@ -103,6 +103,54 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 				event_clean(event);
 		}
 	}
+}
+
+static void	db_get_events(zbx_vector_ptr_t *events)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_event_t			*event;
+	DB_ROW				row;
+	zbx_uint64_t			eventid;
+	zbx_event_suppress_query_t	*query = NULL;
+
+	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value"
+			" from problem p"
+			" left join problem_tag t"
+				" on p.eventid=t.eventid"
+			" where p.source=%d"
+				" and p.object=%d"
+				" and r_eventid is null"
+			" order by p.eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		if (NULL == event || eventid != event->eventid)
+		{
+			query = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
+
+			event->eventid = eventid;
+			event->clock = atoi(row[1]);
+			event->value = TRIGGER_VALUE_PROBLEM;
+			event->severity = atoi(row[2]);
+			zbx_vector_ptr_create(&event->tags);
+			zbx_vector_ptr_append(events, event);
+		}
+
+		if (FAIL == DBis_null(row[3]))
+		{
+			zbx_tag_t	*tag;
+
+			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, row[3]);
+			tag->value = zbx_strdup(NULL, row[4]);
+			zbx_vector_ptr_append(&event->tags, tag);
+		}
+	}
+	DBfree_result(result);
 }
 
 ZBX_THREAD_ENTRY(service_manager_thread, args)
@@ -175,10 +223,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
-//
+
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
-//
+
 		if (NULL != message)
 		{
 			zbx_service_deserialize(message->data, message->size, &events);
@@ -186,7 +234,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			process_events(&problem_events, &recovery_events, &events);
 			zbx_vector_ptr_clear(&events);
 		}
-//
+
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 //
