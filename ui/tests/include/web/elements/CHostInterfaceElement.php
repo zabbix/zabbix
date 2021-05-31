@@ -150,7 +150,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 	 *
 	 * @return array
 	 */
-	protected function getRowControls($row, $headers = null) {
+	public function getRowControls($row, $headers = null) {
 		$controls = parent::getRowControls($row, $headers);
 
 		$xpath = 'xpath:.//div['.CXPathHelper::fromClass('list-accordion-item-body').']';
