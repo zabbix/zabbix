@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-31T06:53:44Z</date>
+   <date>2021-06-01T09:18:39Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -64,7 +64,7 @@ Template tooling version used: 0.38</description>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
-The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
+The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</description>
                <inventory_link>CONTACT</inventory_link>
                <applications>
                   <application>
@@ -206,7 +206,7 @@ This attribute defines the service tag of the system.</description>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
-The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
+The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.</description>
                <inventory_link>LOCATION</inventory_link>
                <applications>
                   <application>
@@ -231,7 +231,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
-An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</description>
+An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</description>
                <inventory_link>NAME</inventory_link>
                <applications>
                   <application>
@@ -265,7 +265,7 @@ An administratively-assigned name for this managed node.By convention, this is t
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
-The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
+The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -361,7 +361,7 @@ This attribute defines the name of the operating system that the host is running
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <name>Dell R820: Operating system description has changed</name>
                      <priority>INFO</priority>
-                     <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
+                     <description>Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -406,7 +406,7 @@ The time (in hundredths of a second) since the network management portion of the
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>LOG</value_type>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -672,11 +672,11 @@ Possible values:&#13;
                      <status>ENABLED</status>
                      <units>rpm</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
-0700.0012.0001.0006 This attribute defines the reading for a cooling device&#13;
-of subtype other than coolingDeviceSubTypeIsDiscrete.  When the value&#13;
+This attribute defines the reading for a cooling device&#13;
+of subtype other than coolingDeviceSubTypeIsDiscrete. When the value&#13;
 for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the&#13;
 value returned for this attribute is the speed in RPM or the OFF/ON value&#13;
-of the cooling device.  When the value for coolingDeviceSubType is&#13;
+of the cooling device. When the value for coolingDeviceSubType is&#13;
 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</description>
                      <applications>
                         <application>
@@ -693,7 +693,7 @@ coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</des
                      <trends>0d</trends>
                      <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
-0700.0012.0001.0005 This attribute defines the probe status of the cooling device.</description>
+This attribute defines the probe status of the cooling device.</description>
                      <applications>
                         <application>
                            <name>Fans</name>
@@ -1043,17 +1043,17 @@ Possible values:&#13;
                      <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
-0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.&#13;
+This attribute defines the probe status of the temperature probe.&#13;
 Possible values:&#13;
 other(1),               -- probe status is not one of the following:&#13;
 unknown(2),             -- probe status is unknown (not known or monitored)&#13;
 ok(3),                  -- probe is reporting a value within the thresholds&#13;
-nonCriticalUpper(4),    -- probe has crossed upper noncritical threshold&#13;
-criticalUpper(5),       -- probe has crossed upper critical threshold&#13;
-nonRecoverableUpper(6), -- probe has crossed upper non-recoverable threshold&#13;
-nonCriticalLower(7),    -- probe has crossed lower noncritical threshold&#13;
-criticalLower(8),       -- probe has crossed lower critical threshold&#13;
-nonRecoverableLower(9), -- probe has crossed lower non-recoverable threshold&#13;
+nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold&#13;
+criticalUpper(5),       -- probe has crossed the upper critical threshold&#13;
+nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold&#13;
+nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold&#13;
+criticalLower(8),       -- probe has crossed the lower critical threshold&#13;
+nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold&#13;
 failed(10)              -- probe is not functional</description>
                      <applications>
                         <application>
@@ -1120,7 +1120,7 @@ failed(10)              -- probe is not functional</description>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
-0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</description>
+This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</description>
                      <applications>
                         <application>
                            <name>Temperature</name>
@@ -1276,7 +1276,7 @@ The current state of this virtual disk (which includes any member physical disks
 Possible states:&#13;
 1: The current state could not be determined.&#13;
 2: The virtual disk is operating normally or optimally.&#13;
-3: The virtual disk has encountered a failure. The data on disk is lost or is about to be lost.&#13;
+3: The virtual disk has encountered a failure. Data on the disk is lost or is about to be lost.&#13;
 4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.&#13;
 The data on the virtual disk might no longer be fault tolerant.</description>
                      <applications>
@@ -1299,14 +1299,14 @@ The data on the virtual disk might no longer be fault tolerant.</description>
                            <name>Dell R820: {#DISK_NAME} failed</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
-                           <description>Please check virtual disk for warnings or errors.</description>
+                           <description>Please check the virtual disk for warnings or errors.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}={$VDISK.STATUS.WARN:"degraded"}</expression>
                            <name>Dell R820: {#DISK_NAME} is in warning state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
-                           <description>Please check virtual disk for warnings or errors.</description>
+                           <description>Please check the virtual disk for warnings or errors.</description>
                            <dependencies>
                               <dependency>
                                  <name>Dell R820: {#DISK_NAME} failed</name>
