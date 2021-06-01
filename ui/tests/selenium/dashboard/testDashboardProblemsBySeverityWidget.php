@@ -1316,7 +1316,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	}
 
 	/**
-	 * @on-before-once prepareUpdateData
+	 * @onBeforeOnce prepareUpdateData
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Update($data) {
