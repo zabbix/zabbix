@@ -1308,7 +1308,7 @@ class testUserRolesPermissions extends CWebTest {
 		$form->fill($action);
 		$form->submit();
 	}
-	
+
 	private function clickSignout() {
 		$this->query('xpath://a[@class="icon-signout"]')->waitUntilPresent()->one()->click();
 		$this->query('button:Sign in')->waitUntilVisible()->one();
