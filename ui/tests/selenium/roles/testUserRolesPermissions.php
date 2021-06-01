@@ -1134,7 +1134,6 @@ class testUserRolesPermissions extends CWebTest {
 				'Scripts'
 			]
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link', $data['section']);
@@ -1149,8 +1148,10 @@ class testUserRolesPermissions extends CWebTest {
 			$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
 			if ($action_status === true) {
 				if (array_key_exists('user_roles', $data)) {
+					$this->clickSignout();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($data['remove_ui']);
+					$this->clickSignout();
 					$this->page->userLogin('user_for_role', 'zabbix');
 				}
 				else {
@@ -1163,9 +1164,11 @@ class testUserRolesPermissions extends CWebTest {
 					$this->checkLinks($data['link']);
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($user_roles);
+					$this->clickSignout();
 				}
 				else {
 					$this->checkLinks($data['link']);
+					$this->clickSignout();
 				}
 			}
 		}
@@ -1304,5 +1307,10 @@ class testUserRolesPermissions extends CWebTest {
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$form->fill($action);
 		$form->submit();
+	}
+	
+	private function clickSignout() {
+		$this->query('xpath://a[@class="icon-signout"]')->waitUntilPresent()->one()->click();
+		$this->query('button:Sign in')->waitUntilVisible()->one();
 	}
 }
