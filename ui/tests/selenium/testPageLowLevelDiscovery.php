@@ -281,7 +281,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Server hardware'
 					],
 					'context' => 'template',
-					'rows' => 40
+					'rows' => 100
 				]
 			],
 			[
@@ -393,13 +393,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Key' => 'array.cache.discovery'
+						'Key' => 'ucs.array.cache.discovery'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery'
+						'Array controller cache discovery'
 					]
 				]
 			],

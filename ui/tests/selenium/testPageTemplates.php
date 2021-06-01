@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Linux by Zabbix agent';
+	public $templateName = 'IIS by Zabbix agent';
 
 	use FilterTrait;
 	use TableTrait;
