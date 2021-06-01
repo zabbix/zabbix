@@ -292,7 +292,7 @@ class C52ImportConverter extends CConverter {
 			?string $discovery_rule_key = null, ?string $short_template_name = null): array {
 		$result = [];
 		$calculated_item_converter = new C52CalculatedItemConverter();
-		$aggregate_item_key_converter = new C52AggregateItemKeyConverter();
+		$aggregate_item_key_converter = new C52AggregateItemKeyConverter(['lldmacros' => true]);
 
 		foreach ($item_prototypes as $item_prototype) {
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {

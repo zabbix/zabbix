@@ -62,70 +62,36 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 			return $item;
 		}
 
-		$extra_expressions = [];
 		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
 		$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-		$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
-		$this->wrap_subexpressions = ($parts['type'] === 'operator');
-		$this->convertExpressionParts($expression, [$parts], $extra_expressions);
-		$extra_expressions = array_filter($extra_expressions);
-
-		if ($extra_expressions) {
-			$extra_expressions = array_keys(array_flip($extra_expressions));
-			$item['params'] = '('.$expression.')';
-			$extra_expressions = array_reverse($extra_expressions);
-			$item['params'] .= ' or '.implode(' or ', $extra_expressions);
-		}
-		else {
-			$item['params'] = $expression;
-		}
-
-		return $item;
-	}
-
-	/**
-	 * Convert expression part.
-	 *
-	 * @param string $expression         Expression string.
-	 * @param array $expression_element  Expression part to convert.
-	 * @param array $extra_expr          Unused parameter to match parent class function signature.
-	 */
-	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
-		if (($this->parser->parse($expression_element['expression'])) === false) {
-			return;
-		}
-
-		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
 
 		for ($i = count($functions) - 1; $i >= 0; $i--) {
-			$fn = $functions[$i]['data'] + ['host' => '', 'item' => '', 'function' => $functions[$i]['value']];
-			$key_param = $fn['functionParams'][0];
-			$host_delimiter_pos = strpos($key_param, ':');
-			$key_param_pos = strpos($key_param, '[');
-			$host_name = '';
+			$fn = $functions[$i]['data'] + ['host' => '', 'item' => ''];
 
-			if ($host_delimiter_pos !== false && ($key_param_pos === false || $host_delimiter_pos < $key_param_pos)) {
-				list($host_name, $key_param) = explode(':', $key_param, 2);
+			$query = $fn['functionParams'][0];
+			$colon_pos = strpos($query, ':');
+			$bracket_pos = strpos($query, '[');
+
+			if ($colon_pos !== false && ($bracket_pos === false || $colon_pos < $bracket_pos)) {
+				list($host_name, $item_key) = explode(':', $query, 2);
+			}
+			else {
+				$host_name = '';
+				$item_key = $query;
 			}
 
-			if ($this->item_key_parser->parse($key_param) === CParser::PARSE_SUCCESS) {
+			if ($this->item_key_parser->parse($item_key) === CParser::PARSE_SUCCESS) {
 				array_shift($fn['functionParams']);
 				array_shift($fn['functionParamsRaw']['parameters']);
-				[$new_expression] = $this->convertFunction($fn, $host_name, $key_param);
+				[$new_expr] = $this->convertFunction($fn, $host_name, $item_key);
 
-				$expression_element['expression'] = substr_replace($expression_element['expression'], $new_expression,
-					$functions[$i]['pos'], $functions[$i]['length']
-				);
+				$expression = substr_replace($expression, $new_expr, $functions[$i]['pos'], $functions[$i]['length']);
 			}
 		}
 
-		if ($this->wrap_subexpressions && count($functions) > 1) {
-			$expression_element['expression'] = '('.$expression_element['expression'].')';
-		}
+		$item['params'] = $expression;
 
-		$expression = substr_replace($expression, $expression_element['expression'],
-			$expression_element['pos'], $expression_element['length']
-		);
+		return $item;
 	}
 
 	/**

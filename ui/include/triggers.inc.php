@@ -1819,9 +1819,9 @@ function get_item_function_info(string $expr) {
 
 	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
+		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'countunique' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
-		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'first' => $rules['numeric'] + $rules['string'],
 		'forecast' => $rules['numeric_as_float'],
@@ -1839,16 +1839,16 @@ function get_item_function_info(string $expr) {
 		'skewness' => $rules['numeric_as_float'],
 		'stddevpop' => $rules['numeric_as_float'],
 		'stddevsamp' => $rules['numeric_as_float'],
-		'sumofsquares' => $rules['numeric_as_float'],
-		'varpop' => $rules['numeric_as_float'],
-		'varsamp' => $rules['numeric_as_float'],
 		'sum' => $rules['numeric'],
+		'sumofsquares' => $rules['numeric_as_float'],
 		'timeleft' => $rules['numeric_as_float'],
 		'trendavg' => $rules['numeric'],
 		'trendcount' => $rules['numeric'],
 		'trendmax' => $rules['numeric'],
 		'trendmin' => $rules['numeric'],
-		'trendsum' => $rules['numeric']
+		'trendsum' => $rules['numeric'],
+		'varpop' => $rules['numeric_as_float'],
+		'varsamp' => $rules['numeric_as_float']
 	];
 
 	$math_functions = [
@@ -1910,9 +1910,9 @@ function get_item_function_info(string $expr) {
 		'right' => ['any' => $rule_str],
 		'round' => ['any' => $rule_float],
 		'rtrim' => ['any' => $rule_str],
+		'signum' => ['any' => $rule_int],
 		'sin' => ['any' => $rule_float],
 		'sinh' => ['any' => $rule_float],
-		'signum' => ['any' => $rule_int],
 		'sqrt' => ['any' => $rule_float],
 		'sum' => ['any' => $rule_float],
 		'tan' => ['any' => $rule_float],

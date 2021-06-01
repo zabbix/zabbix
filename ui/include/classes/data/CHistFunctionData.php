@@ -44,15 +44,10 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
-		'count' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
-			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
-				'required' => false
-			],
-			['required' => false]
+		'change' => [
+			['rules' => [['type' => 'query']]]
 		],
-		'countunique' => [
+		'count' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
 			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
@@ -64,8 +59,13 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
-		'change' => [
-			['rules' => [['type' => 'query']]]
+		'countunique' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
+				'required' => false
+			],
+			['required' => false]
 		],
 		'find' => [
 			['rules' => [['type' => 'query']]],
@@ -155,24 +155,11 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
-
 		'stddevpop' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'stddevsamp' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'sumofsquares' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'varpop' => [
-			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
-		],
-		'varsamp' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
@@ -183,6 +170,10 @@ final class CHistFunctionData {
 		'sum_foreach' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+		],
+		'sumofsquares' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		],
 		'timeleft' => [
 			['rules' => [['type' => 'query']]],
@@ -211,12 +202,18 @@ final class CHistFunctionData {
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
+		],
+		'varpop' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
+		],
+		'varsamp' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
 		]
 	];
 
-	private const ITEM_VALUE_TYPES_INT = [ITEM_VALUE_TYPE_UINT64];
 	private const ITEM_VALUE_TYPES_NUM = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
-	private const ITEM_VALUE_TYPES_STR = [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG];
 	private const ITEM_VALUE_TYPES_LOG = [ITEM_VALUE_TYPE_LOG];
 	private const ITEM_VALUE_TYPES_ALL = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR,
 		ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG
@@ -230,10 +227,10 @@ final class CHistFunctionData {
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
-		'count' => self::ITEM_VALUE_TYPES_ALL,
-		'countunique' => self::ITEM_VALUE_TYPES_ALL,
-		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'count' => self::ITEM_VALUE_TYPES_ALL,
+		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
+		'countunique' => self::ITEM_VALUE_TYPES_ALL,
 		'find' => self::ITEM_VALUE_TYPES_ALL,
 		'first' => self::ITEM_VALUE_TYPES_ALL,
 		'forecast' => self::ITEM_VALUE_TYPES_NUM,
@@ -254,17 +251,17 @@ final class CHistFunctionData {
 		'skewness' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevpop' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevsamp' => self::ITEM_VALUE_TYPES_NUM,
-		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
-		'varpop' => self::ITEM_VALUE_TYPES_NUM,
-		'varsamp' => self::ITEM_VALUE_TYPES_NUM,
 		'sum' => self::ITEM_VALUE_TYPES_NUM,
 		'sum_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
-		'trendsum' => self::ITEM_VALUE_TYPES_NUM
+		'trendsum' => self::ITEM_VALUE_TYPES_NUM,
+		'varpop' => self::ITEM_VALUE_TYPES_NUM,
+		'varsamp' => self::ITEM_VALUE_TYPES_NUM
 	];
 
 	/**

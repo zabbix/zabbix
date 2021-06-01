@@ -78,6 +78,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const SESSION_KEY = 'session_key';
 	public const URL = 'url';
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
+	public const DBVERSION_STATUS = 'dbversion_status';
 
 	/**
 	 * Settings API object parameters array.

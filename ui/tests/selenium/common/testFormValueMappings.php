@@ -415,7 +415,7 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (host or template) for which the scenario is executed.
 	 */
 	public function checkSimpleUpdate($source) {
-		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid ORDER BY vm.value';
+		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid ORDER BY v.name, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open configuration of a value mapping and save it without making any changes.
