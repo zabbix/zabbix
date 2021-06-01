@@ -22,6 +22,8 @@ libzbxdbhigh_a_SOURCES = \
 	template_item.c \
 	template.h \
 	trigger.c \
+	trigger_linking.c \
+	trigger_linking.h \
 	tag.c \
 	lld_override.c \
 	mediatype.c
