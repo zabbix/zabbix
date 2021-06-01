@@ -146,6 +146,23 @@ class testFormValueMappings extends CWebTest {
 
 	public function getValuemapData() {
 		return [
+			// Mapping type - default.
+			[
+				[
+					'name' => 'default',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'default',
+							'newvalue' => 'default value'
+						]
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
 			// Successful creation/update of value mapping with multiple mappings and type equals.
 			[
 				[
@@ -188,46 +205,30 @@ class testFormValueMappings extends CWebTest {
 			// Mapping type - is greater than or equals.
 			[
 				[
+					'update_remove' => true,
 					'name' => 'greater than or equals',
 					'mappings' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'type' => 'is greater than or equals',
 							'value' => '10',
 							'newvalue' => 'greater or equals 10'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
 							'type' => 'is greater than or equals',
 							'value' => '25.25',
 							'newvalue' => 'greater or equals 25.25'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'type' => 'is greater than or equals',
-							'value' => '0.1',
-							'newvalue' => 'greater or equals 0.1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
 							'type' => 'is greater than or equals',
 							'value' => '.55',
 							'newvalue' => 'greater or equals .55'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
 							'type' => 'is greater than or equals',
 							'value' => '0',
 							'newvalue' => 'greater or equals 0'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 5,
 							'type' => 'is greater than or equals',
 							'value' => '-25',
 							'newvalue' => 'greater or equals -25'
@@ -236,7 +237,7 @@ class testFormValueMappings extends CWebTest {
 							'type' => 'is greater than or equals',
 							'value' => '-30.30',
 							'newvalue' => 'greater or equals -30.30'
-						],
+						]
 					],
 					'trim' => true,
 					'update valuemap' => self::UPDATE_VALUEMAP1,
@@ -246,57 +247,176 @@ class testFormValueMappings extends CWebTest {
 			// Mapping type - is less than or equals.
 			[
 				[
+					'update_remove' => true,
 					'name' => 'less than or equals',
 					'mappings' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'type' => 'is less than or equals',
 							'value' => '10',
 							'newvalue' => 'less or equals 10'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
 							'type' => 'is less than or equals',
 							'value' => '25.25',
 							'newvalue' => 'less or equals 25.25'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'type' => 'is less than or equals',
-							'value' => '0.1',
-							'newvalue' => 'less or equals 0.1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
 							'type' => 'is less than or equals',
 							'value' => '.55',
 							'newvalue' => 'less or equals .55'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
 							'type' => 'is less than or equals',
 							'value' => '0',
 							'newvalue' => 'less or equals 0'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 5,
 							'type' => 'is less than or equals',
 							'value' => '-25',
 							'newvalue' => 'less or equals -25'
 						],
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 6,
 							'type' => 'is less than or equals',
 							'value' => '-30.30',
 							'newvalue' => 'less or equals -30.30'
+						]
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - in range.
+			[
+				[
+					'update_remove' => true,
+					'name' => 'in range',
+					'mappings' => [
+						[
+							'type' => 'in range',
+							'value' => '1-10',
+							'newvalue' => 'from 1 to 10'
 						],
+						[
+							'type' => 'in range',
+							'value' => '-10-10',
+							'newvalue' => 'from -10 to 10'
+						],
+						[
+							'type' => 'in range',
+							'value' => '-20--10',
+							'newvalue' => 'from -20 to -10'
+						],
+						[
+							'type' => 'in range',
+							'value' => '20-20',
+							'newvalue' => 'from 20 to 20'
+						],
+						[
+							'type' => 'in range',
+							'value' => '123.456-789.1011',
+							'newvalue' => 'from 123.456 to 789.1011'
+						],
+						[
+							'type' => 'in range',
+							'value' => '-789.1011--123.456',
+							'newvalue' => 'from -789.1011 to -123.456'
+						],
+						[
+							'type' => 'in range',
+							'value' => '.00001-.00002',
+							'newvalue' => 'from .00001 to .00002'
+						]
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - regex.
+			[
+				[
+					'update_remove' => true,
+					'name' => 'regex',
+					'mappings' => [
+						[
+							'type' => 'regexp',
+							'value' => '^&^%&%&%^',
+							'newvalue' => 'symbols'
+						],
+						[
+							'type' => 'regexp',
+							'value' => '^\d+(\.\d+)?',
+							'newvalue' => 'true regex'
+						],
+						[
+							'type' => 'regexp',
+							'value' => '42',
+							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
+						]
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - equals with range.
+			[
+				[
+					'update_remove' => true,
+					'name' => 'equals and inrange',
+					'mappings' => [
+						[
+							'type' => 'in range',
+							'value' => '1-10',
+							'newvalue' => 'same mapping'
+						],
+						[
+							'type' => 'equals',
+							'value' => '1-10',
+							'newvalue' => 'same mapping'
+						]
+					],
+					'trim' => true,
+					'update valuemap' => self::UPDATE_VALUEMAP1,
+					'screenshot id' => 'ValuemapScreenshot1'
+				]
+			],
+			// Mapping type - all available types.
+			[
+				[
+					'update_remove' => true,
+					'name' => 'all types together',
+					'mappings' => [
+						[
+							'type' => 'equals',
+							'value' => '10',
+							'newvalue' => 'default value'
+						],
+						[
+							'type' => 'is greater than or equals',
+							'value' => '11',
+							'newvalue' => 'greater or equals 11'
+						],
+												[
+							'type' => 'is less than or equals',
+							'value' => '12',
+							'newvalue' => 'less or equals 12'
+						],
+						[
+							'type' => 'in range',
+							'value' => '13-16',
+							'newvalue' => 'from 13 to 16'
+						],
+						[
+							'type' => 'regexp',
+							'value' => '42',
+							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
+						],
+						[
+							'type' => 'default',
+							'newvalue' => 'default value'
+						]
 					],
 					'trim' => true,
 					'update valuemap' => self::UPDATE_VALUEMAP1,
@@ -441,7 +561,76 @@ class testFormValueMappings extends CWebTest {
 					],
 					'error_details' => 'Incorrect value for field "Value": value (one) already exists.'
 				]
+			],
+			// Text in value field with type - is greater than or equals.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for greater than or equals',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is greater than or equals',
+							'value' => 'text here',
+							'newvalue' => 'this is text'
+						]
+					],
+					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.'
+				]
+			],
+			// Text in value field with type - is less than or equals.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for less than or equals',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is less than or equals',
+							'value' => 'text here',
+							'newvalue' => 'this is text'
+						]
+					],
+					'error_details' => 'Incorrect value for field "Value": a floating point value is expected.'
+				]
+			],
+			// Incorrect value for - in range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for incorrect in range',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'in range',
+							'value' => '5---10',
+							'newvalue' => 'several symbols'
+						]
+					],
+					'error_details' => 'Incorrect value for field "Value": invalid range expression.'
+				]
 			]
+			// TODO: Uncomment after ZBX-19497 fix
+//			// Incorrect value for - regexp.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'name' => 'error message empty regexp value field',
+//					'mappings' => [
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'type' => 'regexp',
+//							'value' => '',
+//							'newvalue' => 'empty value'
+//						]
+//					],
+//					'error_details' => 'Incorrect value for field "Value": cannot be empty.'
+//				]
+//			]
 		];
 	}
 
@@ -480,6 +669,9 @@ class testFormValueMappings extends CWebTest {
 			$mapping_table->clear();
 		}
 		else {
+			if ($action === 'update' && CTestArrayHelper::get($data, 'update_remove')) {
+				$mapping_table->clear();
+			}
 			$mapping_table->fill($data['mappings']);
 		}
 		$dialog->submit();
@@ -501,10 +693,12 @@ class testFormValueMappings extends CWebTest {
 			// Check all mappings that belong to the created value mapping.
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
-			$dialog->query('xpath:.//input[@id="name"]')->one()->fill('Valuemap for update 1');
-			$dialog->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$this->query('button:Update')->waitUntilClickable()->one()->click();
+			if ($action === 'update') {
+				$dialog->query('xpath:.//input[@id="name"]')->one()->fill('Valuemap for update 1');
+				$dialog->submit();
+				COverlayDialogElement::ensureNotPresent();
+				$this->query('button:Update')->waitUntilClickable()->one()->click();
+			}
 		}
 	}
 
