@@ -101,7 +101,7 @@ class testPageScreens extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allScreens
-	 * @backup-once screens
+	 * @backupOnce screens
 	 */
 	public function testPageScreens_MassDelete($screen) {
 		$this->zbxTestLogin('screenconf.php');
