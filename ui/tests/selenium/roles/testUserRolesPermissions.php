@@ -1162,6 +1162,7 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				if (array_key_exists('user_roles', $data)) {
 					$this->checkLinks($data['link']);
+					$this->clickSignout();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeAction($user_roles);
 					$this->clickSignout();
