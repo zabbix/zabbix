@@ -1,1 +1,1 @@
-....I..... [ZBX-19431] changed defaults for Zabbix server health dashboard (jfreibergs)
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
