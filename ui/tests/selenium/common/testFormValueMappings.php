@@ -109,11 +109,9 @@ class testFormValueMappings extends CWebTest {
 			if ($type === 'default') {
 				$this->assertEquals('visibility-hidden', $value_column->getAttribute('class'));
 			}
-			elseif ($type === 'regexp') {
-				$this->assertEquals('regexp', $value_column->getAttribute('placeholder'));
-			}
 			else {
-				$this->assertEquals('value', $value_column->getAttribute('placeholder'));
+				$placeholder = ($type === 'regexp') ? 'regexp' : 'value';
+				$this->assertEquals($placeholder, $value_column->getAttribute('placeholder'));
 			}
 		}
 
