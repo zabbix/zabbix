@@ -32,9 +32,30 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)
 
-/*#define ZBX_AVAILABILITY_MANAGER_DELAY		1
-#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5*/
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	zbx_uint64_t		current_eventid;
+	int			status;
+	int			algorithm;
+	zbx_vector_ptr_t	service_problems;
+	zbx_vector_ptr_t	service_problem_tags;
+	zbx_vector_ptr_t	children;
+	zbx_vector_ptr_t	parents;
+}
+zbx_service_t;
+
+/* preprocessing manager data */
+typedef struct
+{
+	zbx_hashset_t		services;	/* item value history cache */
+}
+zbx_service_manager_t;
+
+/*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
+#define ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC		5
 
 static void	event_clean(zbx_event_t *event)
 {
@@ -105,10 +126,10 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 	}
 }
 
-static void	db_get_events(zbx_vector_ptr_t *events)
+static void	db_get_events(zbx_hashset_t *problem_events)
 {
 	DB_RESULT	result;
-	zbx_event_t	*event;
+	zbx_event_t	*event = NULL;
 	DB_ROW		row;
 	zbx_uint64_t	eventid;
 
@@ -135,7 +156,7 @@ static void	db_get_events(zbx_vector_ptr_t *events)
 			event->value = TRIGGER_VALUE_PROBLEM;
 			event->severity = atoi(row[2]);
 			zbx_vector_ptr_create(&event->tags);
-			zbx_vector_ptr_append(events, event);
+			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t **));
 		}
 
 		if (FAIL == DBis_null(row[3]))
@@ -151,6 +172,46 @@ static void	db_get_events(zbx_vector_ptr_t *events)
 	DBfree_result(result);
 }
 
+static void	sync_services(zbx_hashset_t *services)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_service_t	service, *pservice;
+
+	result = DBselect("select serviceid,status,algorithm from services");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(service.serviceid, row[0]);
+		service.status = atoi(row[1]);
+		service.algorithm = atoi(row[2]);
+
+		if (NULL == (pservice = zbx_hashset_search(services, &service)))
+		{
+			service.current_eventid = 0;
+			zbx_vector_ptr_create(&service.children);
+			zbx_vector_ptr_create(&service.parents);
+			zbx_vector_ptr_create(&service.service_problem_tags);
+			zbx_vector_ptr_create(&service.service_problems);
+
+			zbx_hashset_insert(services, &service, sizeof(service));
+			continue;
+		}
+
+		pservice->status = service.status;		/* status can only be changed by service manager */
+		pservice->algorithm = service.algorithm;	/* TODO: recalculate services with changed algorithm */
+	}
+	DBfree_result(result);
+}
+
+static void	service_clean(zbx_service_t *service)
+{
+	zbx_vector_ptr_create(&service->children);
+	zbx_vector_ptr_create(&service->parents);
+	zbx_vector_ptr_create(&service->service_problem_tags);
+	zbx_vector_ptr_create(&service->service_problems);
+}
+
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
 	zbx_ipc_service_t	service;
@@ -161,6 +222,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	double			time_stat, time_idle = 0, time_now, time_flush, sec;
 	zbx_vector_ptr_t	events;
 	zbx_hashset_t		problem_events, recovery_events;
+	zbx_service_manager_t	service_manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -198,8 +260,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	zbx_hashset_create_ext(&service_manager.services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	db_get_events(&problem_events);	/* TODO: housekeeping*/
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
-//
+
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
@@ -235,10 +303,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
-//
-//		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
-//		{
-//			time_flush = time_now;
+
+		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush)
+		{
+			sync_services(&service_manager.services);
+			time_flush = time_now;
 //
 //			if (0 == interface_availabilities.values_num)
 //				continue;
@@ -251,9 +320,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //			processed_num = interface_availabilities.values_num;
 //			zbx_vector_availability_ptr_clear_ext(&interface_availabilities,
 //					zbx_interface_availability_free);
-//		}
+		}
 	}
 
+	zbx_hashset_destroy(&service_manager.services);
 	zbx_hashset_destroy(&problem_events);
 	zbx_hashset_destroy(&recovery_events);
 	zbx_vector_ptr_destroy(&events);
