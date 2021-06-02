@@ -26,7 +26,13 @@ define('PHPUNIT_CONFIG_DIR', '{CONFIG_DIR}');
 define('PHPUNIT_COMPONENT_DIR', '{COMPONENT_DIR}');
 define('PHPUNIT_PORT_PREFIX', '{PORT_PREFIX}');
 
-define('PHPUNIT_DATA_DIR', '{PHPUNIT_DATA_DIR}');
+/*
+ * Defines directory with write permissions that will be used to store cached data source data.
+ * This one is optional (can be omitted) and is used only for cases when multiple test execution
+ * without DB recreation is required.
+ *
+ * define('PHPUNIT_DATA_DIR', '{PHPUNIT_DATA_DIR}');
+ */
 define('PHPUNIT_DATA_SOURCES_DIR', '{PHPUNIT_DATA_SOURCES_DIR}');
 
 // SAML settings.
