@@ -39,8 +39,8 @@ class testPageDashboard extends CLegacyWebTest {
 	public $mapTestId = 3;
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 */
 	public function testPageDashboard_CheckLayoutForDifferentUsers() {
 		$users = ['super-admin', 'admin', 'user', 'guest'];
