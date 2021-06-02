@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
 ..F....... [ZBX-19487] fixed PHP runtime errors in the Monitoring->Problems view (Sasha)
 ..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
 ....I...S. [ZBX-19468] fixed escaped symbols in screen name during conversion to dashboard (akozlovs)
