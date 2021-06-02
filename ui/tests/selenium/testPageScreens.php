@@ -46,7 +46,7 @@ class testPageScreens extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allScreens
-	 * @ignore-browser-errors
+	 * @ignoreBrowserErrors
 	 */
 	public function testPageScreens_SimpleEdit($screen) {
 		$this->zbxTestLogin('screenconf.php');
@@ -60,7 +60,7 @@ class testPageScreens extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allScreens
-	 * @ignore-browser-errors
+	 * @ignoreBrowserErrors
 	 */
 	public function testPageScreens_SimpleUpdate($screen) {
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
