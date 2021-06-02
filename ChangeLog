@@ -859,6 +859,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.13rc1
 
 New features:
+A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 .........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
 .........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
 .........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
