@@ -41,7 +41,7 @@ static int	DBpatch_6000001(void)
 				{
 					{"service_problem_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
@@ -108,6 +108,9 @@ static int	DBpatch_6000008(void)
 
 static void	DBpatch_trim_tag_value(char *tag_value)
 {
+	if (NULL == tag_value)
+		return;
+
 	if (strlen(tag_value) > ZBX_TAGVALUE_MAX_LEN)
 	{
 		int	i;
