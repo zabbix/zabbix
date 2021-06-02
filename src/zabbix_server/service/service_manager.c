@@ -212,17 +212,17 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 {
 	int			i, j;
 	zbx_hashset_iter_t	iter;
-
+/*
 	for (i = 0; i < event->tags.values_num; i++)
 	{
-//		zbx_service_problem_tag_t	*pservice_problem_tag;
-//
-//		zbx_hashset_iter_reset(service_problem_tags, &iter);
-//		while (NULL != (pservice_problem_tag = (zbx_service_problem_tag_t *)zbx_hashset_iter_next(&iter)))
-//		{
-//			//if (strcmp(pservice_problem_tag->tag, )
-//		}
-	}
+		zbx_service_problem_tag_t	*pservice_problem_tag;
+
+		zbx_hashset_iter_reset(service_problem_tags, &iter);
+		while (NULL != (pservice_problem_tag = (zbx_service_problem_tag_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (strcmp(pservice_problem_tag->tag, )
+		}
+	}*/
 }
 
 static void	sync_services(zbx_hashset_t *services)
