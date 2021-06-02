@@ -58,11 +58,20 @@ typedef struct
 }
 zbx_service_problem_tag_t;
 
+typedef struct
+{
+	zbx_uint64_t	linkid;
+	zbx_service_t	*parent;
+	zbx_service_t	*child;
+}
+zbx_services_link_t;
+
 /* preprocessing manager data */
 typedef struct
 {
 	zbx_hashset_t	services;
 	zbx_hashset_t	service_problem_tags;
+	zbx_hashset_t	services_links;
 }
 zbx_service_manager_t;
 
@@ -277,6 +286,47 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager)
 	DBfree_result(result);
 }
 
+static void	sync_services_links(zbx_service_manager_t *service_manager)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select linkid,serviceupid,servicedownid from services_links");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t		serviceupid, servicedownid;
+		zbx_services_link_t	services_link, *pservices_link;
+
+		ZBX_STR2UINT64(services_link.linkid, row[0]);
+		ZBX_STR2UINT64(serviceupid, row[1]);
+		ZBX_STR2UINT64(servicedownid, row[2]);
+
+		if (NULL == (pservices_link = zbx_hashset_search(&service_manager->services_links, &services_link)))
+		{
+			services_link.parent = zbx_hashset_search(&service_manager->services, &serviceupid);
+			services_link.child = zbx_hashset_search(&service_manager->services, &servicedownid);
+
+			if (NULL == services_link.parent || NULL == services_link.child)
+			{
+				/* it is not possible for link to exist without corresponding service */
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			zbx_vector_ptr_append(&services_link.parent->children, services_link.child);
+			zbx_vector_ptr_append(&services_link.child->parents, services_link.parent);
+			zbx_hashset_insert(&service_manager->services_links, &services_link, sizeof(services_link));
+			continue;
+		}
+
+		/* links cannot be changed */
+
+		/* TODO: handle deleted links by removing child and parent from services vector */
+	}
+	DBfree_result(result);
+}
+
 static void	service_clean(zbx_service_t *service)
 {
 	zbx_vector_ptr_create(&service->children);
@@ -342,9 +392,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_hashset_create_ext(&service_manager.services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	zbx_hashset_create_ext(&service_manager.service_problem_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_problem_tag_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager.services_links, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_events(&problem_events);	/* TODO: housekeeping*/
 
@@ -371,6 +426,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			DBbegin();
 			sync_services(&service_manager.services);
 			sync_service_problem_tags(&service_manager);
+			sync_services_links(&service_manager);
 			DBcommit();
 			time_flush = time_now;
 			time_now = zbx_time();
@@ -397,6 +453,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			zbx_ipc_client_release(client);
 	}
 
+	zbx_hashset_destroy(&service_manager.services_links);
+	zbx_hashset_destroy(&service_manager.service_problem_tags);
 	zbx_hashset_destroy(&service_manager.services);
 	zbx_hashset_destroy(&problem_events);
 	zbx_hashset_destroy(&recovery_events);
