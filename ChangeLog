@@ -1,6 +1,7 @@
 Changes for 5.4.1rc2
 
 Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.1rc1
