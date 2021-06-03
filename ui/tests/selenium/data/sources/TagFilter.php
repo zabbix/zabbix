@@ -21,7 +21,7 @@
 class TagFilter {
 
 	/**
-	 * Create data for testFormTags tests.
+	 * Create data for tag filtering tests.
 	 *
 	 * @return array
 	 */

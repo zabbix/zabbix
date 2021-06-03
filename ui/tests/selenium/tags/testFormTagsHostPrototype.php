@@ -34,15 +34,6 @@ class testFormTagsHostPrototype extends testFormTags {
 	public $template = 'Template for tags testing';
 
 	/**
-	 * Get ids and prepare data for test.
-	 */
-	public function prepareData() {
-		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
-	}
-
-	/**
 	 * Test creating of Host prototype with tags.
 	 *
 	 * @dataProvider getCreateData
@@ -116,7 +107,7 @@ class testFormTagsHostPrototype extends testFormTags {
 		// Check created element tags.
 		$this->page->open($host_link);
 		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
-		$table->findRow('Name', $this->template, true)->getColumn('Hosts')->click();
+		$table->findRow('Name', $this->template, true)->getColumn('Hosts')->children()->one()->click();
 		$this->query('link', $data['name'].' {#KEY}')->waitUntilPresent()->one()->click();
 		$form->selectTab('Tags');
 		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
