@@ -106,31 +106,13 @@ static int	DBpatch_5050008(void)
 
 #define ZBX_TAGVALUE_MAX_LEN	32
 
-static void DBpatch_trim_tag_value(char *text)
+static void DBpatch_trim_tag_value(char *value)
 {
-	int	i = 0, j = 0, charcount = 0;
+	size_t	len;
 
-	while ('\0' != text[i] && ZBX_TAGVALUE_MAX_LEN - 3 > charcount)
-	{
-		size_t charlen = zbx_utf8_char_len(text + i);
+	len = zbx_strlen_utf8_nchars(value, ZBX_TAGVALUE_MAX_LEN - ZBX_CONST_STRLEN("..."));
 
-		if (0 == charlen)
-			charlen = 1;
-
-		if (SUCCEED == zbx_db_is_escape_sequence(text[i]))
-			charcount++;
-
-		i += charlen;
-		charcount++;
-	}
-
-	while (j < 3)
-	{
-		*(text + i + j) = '.';
-		j++;
-	}
-
-	*(text + i + j) = '\0';
+	memcpy(value + len, "...", ZBX_CONST_STRLEN("...") + 1);
 }
 
 static int	DBpatch_5050009(void)
