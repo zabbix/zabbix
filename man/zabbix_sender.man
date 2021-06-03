@@ -403,7 +403,7 @@ When used together with \fB\-\-config\fR, overrides the port entries of \fBServe
 Specify source IP address.
 When used together with \fB\-\-config\fR, overrides \fBSourceIP\fR parameter specified in agentd configuration file.
 .IP "\fB\-t\fR, \fB\-\-timeout\fR \fIseconds\fR"
-Specify timeout.
+Specify timeout. Valid range: 1\-300 seconds (default: 60)
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\fR"
 Specify host name the item belongs to (as registered in Zabbix frontend).
 Host IP address and DNS name will not work.

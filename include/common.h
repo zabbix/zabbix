@@ -856,6 +856,7 @@ zbx_script_t;
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 
 #define	GET_SENDER_TIMEOUT	60
+#define	GET_SENDER_TIMEOUT_STR	"60"
 
 #ifndef MAX
 #	define MAX(a, b) ((a) > (b) ? (a) : (b))

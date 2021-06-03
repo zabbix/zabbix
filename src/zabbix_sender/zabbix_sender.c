@@ -132,6 +132,13 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
+static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
+
+#define CONFIG_SENDER_TIMEOUT_MIN	1
+#define CONFIG_SENDER_TIMEOUT_MAX	300
+#define CONFIG_SENDER_TIMEOUT_MIN_STR	"1"
+#define CONFIG_SENDER_TIMEOUT_MAX_STR	"300"
+
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
@@ -153,7 +160,9 @@ const char	*help_message[] = {
 	"                             together with --config, overrides \"SourceIP\"",
 	"                             parameter specified in agentd configuration file",
 	"",
-	"  -t --timeout seconds       Specify timeout",
+	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_SENDER_TIMEOUT_MIN_STR "-"
+			CONFIG_SENDER_TIMEOUT_MAX_STR " seconds",
+	"                             (default: " GET_SENDER_TIMEOUT_STR " seconds)",
 	"",
 	"  -s --host host             Specify host name the item belongs to (as",
 	"                             registered in Zabbix frontend). Host IP address",
@@ -336,10 +345,6 @@ static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
 static char	*ZABBIX_KEY = NULL;
 static char	*ZABBIX_KEY_VALUE = NULL;
-static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
-
-#define CONFIG_SENDER_TIMEOUT_MIN	1
-#define CONFIG_SENDER_TIMEOUT_MAX	300
 
 typedef struct
 {

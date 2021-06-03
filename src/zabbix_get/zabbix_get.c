@@ -63,6 +63,13 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_GET;
 
+#define CONFIG_GET_TIMEOUT_MIN		1
+#define CONFIG_GET_TIMEOUT_MAX		30
+#define CONFIG_GET_TIMEOUT_MIN_STR	"1"
+#define CONFIG_GET_TIMEOUT_MAX_STR	"30"
+
+static int	CONFIG_GET_TIMEOUT = CONFIG_GET_TIMEOUT_MAX;
+
 const char	*help_message[] = {
 	"Get data from Zabbix agent.",
 	"",
@@ -72,7 +79,9 @@ const char	*help_message[] = {
 	"                             (default: " ZBX_DEFAULT_AGENT_PORT_STR ")",
 	"  -I --source-address IP-address   Specify source IP address",
 	"",
-	"  -t --timeout seconds       Specify timeout",
+	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_GET_TIMEOUT_MIN_STR "-"
+			CONFIG_GET_TIMEOUT_MAX_STR " seconds",
+	"                             (default: " CONFIG_GET_TIMEOUT_MAX_STR " seconds)",
 	"",
 	"  -k --key item-key          Specify key of the item to retrieve value for",
 	"",
@@ -205,11 +214,6 @@ struct zbx_option	longopts[] =
 static char	shortopts[] = "s:p:k:I:t:hV";
 
 /* end of COMMAND LINE OPTIONS */
-
-static int	CONFIG_GET_TIMEOUT = GET_SENDER_TIMEOUT;
-
-#define CONFIG_GET_TIMEOUT_MIN	1
-#define CONFIG_GET_TIMEOUT_MAX	30
 
 #if !defined(_WINDOWS)
 
