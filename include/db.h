@@ -723,7 +723,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 int	zbx_db_get_database_type(void);
-int	zbx_db_is_escape_sequence(char c);
 
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct

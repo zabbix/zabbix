@@ -2194,7 +2194,7 @@ static ub4	OCI_DBserver_status(void)
 }
 #endif	/* HAVE_ORACLE */
 
-int	zbx_db_is_escape_sequence(char c)
+static int	zbx_db_is_escape_sequence(char c)
 {
 #if defined(HAVE_MYSQL)
 	if ('\'' == c || '\\' == c)
