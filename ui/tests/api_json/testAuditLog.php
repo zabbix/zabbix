@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @on-before enableUserGroup
- * @on-after disableUserGroup
+ * @onBefore enableUserGroup
+ * @onAfter disableUserGroup
  */
 class testAuditLog extends CAPITest {
 

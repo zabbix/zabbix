@@ -133,7 +133,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
 	 * @dataProvider getAuditReportData
-	 * @backup-once config
+	 * @backupOnce config
 	 *
 	 * Check record on Audit report page, after updating autoregistration.
 	 */
@@ -266,7 +266,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 	/**
 	 * @dataProvider getAutoregistrationValidationData
-	 * @backup-once config
+	 * @backupOnce config
 	 *
 	 * Check autoregistration validation on first update.
 	 */
@@ -436,7 +436,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	/**
 	 * @dataProvider getAutoregistrationValidationData
 	 * @depends testFormAdministrationGeneralAutoregistration_AddPskEncryption
-	 * @backup-once config
+	 * @backupOnce config
 	 *
 	 * Check autoregistration validation, when change PSK values.
 	 */

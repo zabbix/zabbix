@@ -133,7 +133,7 @@ class testFormAdministrationScripts extends CWebTest {
 
 	/**
 	 * @dataProvider getScriptsData
-	 * @backup-once scripts
+	 * @backupOnce scripts
 	 */
 	public function testFormAdministrationScripts_Create($data) {
 		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
