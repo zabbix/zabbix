@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
- * @on-before prepareUpdateData
+ * @onBefore prepareUpdateData
  */
 class testItem extends CAPITest {
 

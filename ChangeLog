@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
 ..F....... [ZBX-19487] fixed PHP runtime errors in the Monitoring->Problems view (Sasha)
 ..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
 ....I...S. [ZBX-19468] fixed escaped symbols in screen name during conversion to dashboard (akozlovs)
@@ -42,6 +43,12 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 .......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
 ........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.1rc2
+
+Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.1rc1
@@ -854,6 +861,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.13rc1
 
 New features:
+A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 .........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
 .........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
 .........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
