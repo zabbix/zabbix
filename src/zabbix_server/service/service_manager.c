@@ -529,6 +529,15 @@ typedef struct
 }
 zbx_status_update_t;
 
+/* status update queue items */
+typedef struct
+{
+	zbx_uint64_t	serviceid;
+	int		old_status;
+	int		status;
+}
+zbx_service_update_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: its_updates_append                                               *
@@ -554,6 +563,30 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 	zbx_vector_ptr_append(updates, update);
 }
 
+static void	update_service(zbx_hashset_t *service_updates, zbx_uint64_t serviceid, int old_status, int status)
+{
+	zbx_service_update_t	update = {.serviceid = serviceid, .old_status = old_status, .status = status}, *pupdate;
+
+	if (NULL == (pupdate = (zbx_service_update_t *)zbx_hashset_search(service_updates, &update)))
+		pupdate = (zbx_service_update_t *)zbx_hashset_insert(service_updates, &update, sizeof(update));
+
+	pupdate->status = status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: its_updates_compare                                              *
+ *                                                                            *
+ * Purpose: used to sort service updates by source id                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: its_write_status_and_alarms                                      *
@@ -568,7 +601,8 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr_t *alarms)
+static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr_t *alarms,
+		zbx_hashset_t *service_updates)
 {
 	int			i, ret = FAIL;
 	zbx_vector_ptr_t	updates;
@@ -576,25 +610,24 @@ static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		alarmid;
 	zbx_hashset_iter_t	iter;
-	zbx_service_t		*itservice;
+	zbx_service_update_t	*itservice;
 
 	/* get a list of service status updates that must be written to database */
-	/*zbx_vector_ptr_create(&updates);
-	zbx_hashset_iter_reset(&itservices->itservices, &iter);
+	zbx_vector_ptr_create(&updates);
+	zbx_hashset_iter_reset(service_updates, &iter);
 
-	while (NULL != (itservice = (zbx_itservice_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (itservice = (zbx_service_update_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (itservice->old_status != itservice->status)
 			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
-	}*/
+	}
 
 	/* write service status changes into database */
-	/*DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != updates.values_num)
 	{
 		zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
-		zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
 
 		for (i = 0; i < updates.values_num; i++)
 		{
@@ -620,7 +653,7 @@ static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr
 	}
 
 	ret = SUCCEED;
-*/
+
 	/* write generated service alarms into database */
 	if (0 != alarms->values_num)
 	{
@@ -646,8 +679,8 @@ static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr
 out:
 	zbx_free(sql);
 
-	/*zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&updates);*/
+	zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
 }
@@ -668,7 +701,8 @@ out:
  *           (up until the root service) are updated too.                     *
  *                                                                            *
  ******************************************************************************/
-static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx_vector_ptr_t *alarms)
+static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx_vector_ptr_t *alarms,
+		zbx_hashset_t *service_updates)
 {
 	int	status, i;
 
@@ -704,13 +738,14 @@ static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx
 
 	if (itservice->status != status)
 	{
+		update_service(service_updates, itservice->serviceid, itservice->status, status);
 		itservice->status = status;
 
 		its_updates_append(alarms, itservice->serviceid, status, clock);
 
 		/* update parent services */
 		for (i = 0; i < itservice->parents.values_num; i++)
-			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms);
+			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms, service_updates);
 	}
 out:
 	;
@@ -721,8 +756,10 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 	zbx_hashset_iter_t	iter;
 	zbx_services_diff_t	*pservices_diff;
 	zbx_vector_ptr_t	alarms;
+	zbx_hashset_t		service_updates;
 
 	zbx_vector_ptr_create(&alarms);
+	zbx_hashset_create(&service_updates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_iter_reset(services_diff, &iter);
 	while (NULL != (pservices_diff = (zbx_services_diff_t *)zbx_hashset_iter_next(&iter)))
@@ -767,22 +804,24 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "pservice->status:%d status:%d", pservice->status, status);
 		if (pservice->status == status || SERVICE_ALGORITHM_NONE == pservice->algorithm)
 			continue;
 
+		update_service(&service_updates, pservice->serviceid, pservice->status, status);
 		pservice->status = status;
 
 		its_updates_append(&alarms, pservice->serviceid, pservice->status, clock);
 
 		/* update parent services */
 		for (i = 0; i < pservice->parents.values_num; i++)
-			its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms);
+			its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms, &service_updates);
 	}
 
-	its_write_status_and_alarms(NULL, &alarms);
+	its_write_status_and_alarms(NULL, &alarms, &service_updates);
 
 	/* iterate over services_diff and insert service_problem */
+
+	zbx_hashset_destroy(&service_updates);
 	zbx_vector_ptr_clear_ext(&alarms, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&alarms);
 }
