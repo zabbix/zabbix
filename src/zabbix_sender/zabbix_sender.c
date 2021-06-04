@@ -136,8 +136,8 @@ static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 
 #define CONFIG_SENDER_TIMEOUT_MIN	1
 #define CONFIG_SENDER_TIMEOUT_MAX	300
-#define CONFIG_SENDER_TIMEOUT_MIN_STR	"1"
-#define CONFIG_SENDER_TIMEOUT_MAX_STR	"300"
+#define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
+#define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
@@ -162,7 +162,7 @@ const char	*help_message[] = {
 	"",
 	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_SENDER_TIMEOUT_MIN_STR "-"
 			CONFIG_SENDER_TIMEOUT_MAX_STR " seconds",
-	"                             (default: " GET_SENDER_TIMEOUT_STR " seconds)",
+	"                             (default: " ZBX_STR(GET_SENDER_TIMEOUT) " seconds)",
 	"",
 	"  -s --host host             Specify host name the item belongs to (as",
 	"                             registered in Zabbix frontend). Host IP address",
