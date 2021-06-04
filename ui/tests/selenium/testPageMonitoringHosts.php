@@ -75,7 +75,7 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 
 		// Check tags on the specific host.
-		$tags = $table->findRow('Name', 'Host with tags for cloning')->getColumn('Tags')->query('class:tag')->all();
+		$tags = $table->findRow('Name', 'Host for tags filtering - clone')->getColumn('Tags')->query('class:tag')->all();
 		$this->assertEquals(['action: clone', 'tag: host'], $tags->asText());
 
 		foreach ($tags as $tag) {
