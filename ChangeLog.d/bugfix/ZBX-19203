@@ -1,1 +1,1 @@
-..F....... [ZBX-19203] fixed filter value to be unset when switching between pages and resetting filter in latest data history screen (miks)
+..F....... [ZBX-19203] fixed filter values to be unset when switching between pages and resetting filter in latest data history screen (miks)

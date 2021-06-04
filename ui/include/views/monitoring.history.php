@@ -70,7 +70,7 @@ if (hasRequest('filter')) {
 	$header['right']->addVar('filter', $data['filter']);
 }
 if (hasRequest('mark_color')) {
-	$header['right']->addVar('mark_color', getRequest('mark_color'));
+	$header['right']->addVar('mark_color', $data['mark_color']);
 }
 
 $actions = [
@@ -204,6 +204,7 @@ if ($data['itemids']) {
 			->setArgument('itemids', $data['itemids'])
 			->setArgument('filter', $data['filter'])
 			->setArgument('filter_task', $data['filter_task'])
+			->setArgument('mark_color', $data['mark_color'])
 			->getUrl(),
 		'profileIdx' => $data['profileIdx'],
 		'profileIdx2' => $data['profileIdx2'],
@@ -212,7 +213,7 @@ if ($data['itemids']) {
 		'page' => $data['page'],
 		'filter' => $data['filter'],
 		'filter_task' => $data['filter_task'],
-		'mark_color' => getRequest('mark_color'),
+		'mark_color' => $data['mark_color'],
 		'plaintext' => $data['plaintext'],
 		'graphtype' => $data['graphtype']
 	]);
