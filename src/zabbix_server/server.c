@@ -1453,6 +1453,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
+				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
 				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
 				break;
 		}
