@@ -3170,10 +3170,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
-					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
-						DBupdate_itservices(&trigger_diff);
-					}
 					else
 						zbx_clean_events();
 

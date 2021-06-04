@@ -290,7 +290,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 				pservices_diff = zbx_hashset_insert(services_diffs, &services_diff, sizeof(services_diff));
 			}
 
-			zbx_vector_ptr_append(&services_diff.events, event);
+			zbx_vector_ptr_append(&pservices_diff->events, event);
 		}
 	}
 
@@ -517,16 +517,218 @@ static void	tag_services_clean(void *data)
 	zbx_free(d->tag);
 }
 
+/* status update queue items */
+typedef struct
+{
+	/* the update source id */
+	zbx_uint64_t	sourceid;
+	/* the new status */
+	int		status;
+	/* timestamp */
+	int		clock;
+}
+zbx_status_update_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: its_updates_append                                               *
+ *                                                                            *
+ * Purpose: adds an update to the queue                                       *
+ *                                                                            *
+ * Parameters: updates   - [OUT] the update queue                             *
+ *             sourceid  - [IN] the update source id                          *
+ *             status    - [IN] the update status                             *
+ *             clock     - [IN] the update timestamp                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid, int status, int clock)
+{
+	zbx_status_update_t	*update;
+
+	update = (zbx_status_update_t *)zbx_malloc(NULL, sizeof(zbx_status_update_t));
+
+	update->sourceid = sourceid;
+	update->status = status;
+	update->clock = clock;
+
+	zbx_vector_ptr_append(updates, update);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: its_write_status_and_alarms                                      *
+ *                                                                            *
+ * Purpose: writes service status changes and generated service alarms into   *
+ *          database                                                          *
+ *                                                                            *
+ * Parameters: itservices - [IN] the services data                            *
+ *             alarms     - [IN] the service alarms update queue              *
+ *                                                                            *
+ * Return value: SUCCEED - the data was written successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	its_write_status_and_alarms(zbx_service_t *itservices, zbx_vector_ptr_t *alarms)
+{
+	int			i, ret = FAIL;
+	zbx_vector_ptr_t	updates;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		alarmid;
+	zbx_hashset_iter_t	iter;
+	zbx_service_t		*itservice;
+
+	/* get a list of service status updates that must be written to database */
+	/*zbx_vector_ptr_create(&updates);
+	zbx_hashset_iter_reset(&itservices->itservices, &iter);
+
+	while (NULL != (itservice = (zbx_itservice_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (itservice->old_status != itservice->status)
+			its_updates_append(&updates, itservice->serviceid, itservice->status, 0);
+	}*/
+
+	/* write service status changes into database */
+	/*DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (0 != updates.values_num)
+	{
+		zbx_vector_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_ptr_uniq(&updates, (zbx_compare_func_t)its_updates_compare);
+
+		for (i = 0; i < updates.values_num; i++)
+		{
+			zbx_status_update_t	*update = (zbx_status_update_t *)updates.values[i];
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update services"
+					" set status=%d"
+					" where serviceid=" ZBX_FS_UI64 ";\n",
+					update->status, update->sourceid);
+
+			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto out;
+		}
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+*/
+	/* write generated service alarms into database */
+	if (0 != alarms->values_num)
+	{
+		zbx_db_insert_t	db_insert;
+
+		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
+
+		zbx_db_insert_prepare(&db_insert, "service_alarms", "servicealarmid", "serviceid", "value", "clock",
+				NULL);
+
+		for (i = 0; i < alarms->values_num; i++)
+		{
+			zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
+
+			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
+					update->clock);
+		}
+
+		ret = zbx_db_insert_execute(&db_insert);
+
+		zbx_db_insert_clean(&db_insert);
+	}
+out:
+	zbx_free(sql);
+
+	/*zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&updates);*/
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: its_itservice_update_status                                      *
+ *                                                                            *
+ * Purpose: updates service and its parents statuses                          *
+ *                                                                            *
+ * Parameters: service    - [IN] the service to update                        *
+ *             clock      - [IN] the update timestamp                         *
+ *             alarms     - [OUT] the alarms update queue                     *
+ *                                                                            *
+ * Comments: This function recalculates service status according to the       *
+ *           algorithm and status of the children services. If the status     *
+ *           has been changed, an alarm is generated and parent services      *
+ *           (up until the root service) are updated too.                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx_vector_ptr_t *alarms)
+{
+	int	status, i;
+
+	switch (itservice->algorithm)
+	{
+		case SERVICE_ALGORITHM_MIN:
+			status = TRIGGER_SEVERITY_COUNT;
+			for (i = 0; i < itservice->children.values_num; i++)
+			{
+				zbx_service_t	*child = (zbx_service_t *)itservice->children.values[i];
+
+				if (child->status < status)
+					status = child->status;
+			}
+			break;
+		case SERVICE_ALGORITHM_MAX:
+			status = 0;
+			for (i = 0; i < itservice->children.values_num; i++)
+			{
+				zbx_service_t	*child = (zbx_service_t *)itservice->children.values[i];
+
+				if (child->status > status)
+					status = child->status;
+			}
+			break;
+		case SERVICE_ALGORITHM_NONE:
+			goto out;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
+					itservice->algorithm);
+			goto out;
+	}
+
+	if (itservice->status != status)
+	{
+		itservice->status = status;
+
+		its_updates_append(alarms, itservice->serviceid, status, clock);
+
+		/* update parent services */
+		for (i = 0; i < itservice->parents.values_num; i++)
+			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms);
+	}
+out:
+	;
+}
+
 static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_diff)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_services_diff_t	*pservices_diff;
+	zbx_vector_ptr_t	alarms;
+
+	zbx_vector_ptr_create(&alarms);
 
 	zbx_hashset_iter_reset(services_diff, &iter);
 	while (NULL != (pservices_diff = (zbx_services_diff_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_service_t	service = {.serviceid = pservices_diff->serviceid}, *pservice;
-		int		status = TRIGGER_SEVERITY_NOT_CLASSIFIED, i;
+		int		status = TRIGGER_SEVERITY_NOT_CLASSIFIED, i, clock;
 
 		pservice = zbx_hashset_search(services, &service);
 
@@ -538,23 +740,26 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 
 		for (i = 0; i < pservices_diff->events.values_num; i++)
 		{
-			zbx_event_t	*event = pservices_diff->events.values[i];
+			zbx_event_t	*event = (zbx_event_t *)pservices_diff->events.values[i];
 
 			/* obtain highest possible sverity */
 			/* delete old service_problems and insert new on status change*/
 			if (event->severity > status)
+			{
 				status = event->severity;
+				clock = event->clock;
+			}
 		}
 
 		for (i = 0; i < pservice->service_problems.values_num; i++)
 		{
-			zbx_service_problem_t	*service_problem = pservice->service_problems.values[i];
+			zbx_service_problem_t	*service_problem = (zbx_service_problem_t *)pservice->service_problems.values[i];
 			int			index;
 
 			if (FAIL == (index = zbx_vector_ptr_search(&pservices_diff->events, &service_problem->eventid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				/* service_problem is no longer linked to service and must be deleted */
+				/* service_problem is no longer linked to service and must be deleted from cache and db */
 			}
 			else
 			{	/* service_problem already linked to service */
@@ -562,12 +767,24 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 			}
 		}
 
-		if (pservice->status == status)
+		zabbix_log(LOG_LEVEL_INFORMATION, "pservice->status:%d status:%d", pservice->status, status);
+		if (pservice->status == status || SERVICE_ALGORITHM_NONE == pservice->algorithm)
 			continue;
 
 		pservice->status = status;
-		/* recalculate parents for service, update status and generate alarms */
+
+		its_updates_append(&alarms, pservice->serviceid, pservice->status, clock);
+
+		/* update parent services */
+		for (i = 0; i < pservice->parents.values_num; i++)
+			its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms);
 	}
+
+	its_write_status_and_alarms(NULL, &alarms);
+
+	/* iterate over services_diff and insert service_problem */
+	zbx_vector_ptr_clear_ext(&alarms, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&alarms);
 }
 
 ZBX_THREAD_ENTRY(service_manager_thread, args)
@@ -668,14 +885,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			if (0 == time_flush)
 			{
 				zbx_hashset_iter_t	iter;
-				zbx_event_t		*event;
-				zbx_service_t		*service;
+				zbx_event_t		**event;
+				/*zbx_service_t		*service;*/
 				zbx_services_diff_t	services_diff, *pservices_diff;
 
 				zbx_hashset_iter_reset(&problem_events, &iter);
-				while (NULL != (event = (zbx_event_t *)zbx_hashset_iter_next(&iter)))
+				while (NULL != (event = (zbx_event_t **)zbx_hashset_iter_next(&iter)))
 				{
-					match_event_to_service_problem_tags(event,
+					match_event_to_service_problem_tags(*event,
 							&service_manager.service_problem_tags_index,
 							&service_manager.services_diff);
 				}
@@ -691,6 +908,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 					}
 				}*/
+
+				db_update_services(&service_manager.services, &service_manager.services_diff);
 
 			}
 
