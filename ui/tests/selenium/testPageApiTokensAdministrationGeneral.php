@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @backup token
  * @backup profiles
  *
- * @on-before prepareTokenData
+ * @onBefore prepareTokenData
  */
 class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 
@@ -541,7 +541,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 	 * @dataProvider getSortData
 	 */
 	public function testPageApiTokensAdministrationGeneral_Sort($data) {
-		// Place $timestamp variable value in data provider as the data providers are formed before execution of on-before.
+		// Place $timestamp variable value in data provider as the data providers are formed before execution of onBefore.
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
 				if ($value === 'change_to_timestamp') {

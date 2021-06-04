@@ -52,7 +52,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 9287a40d9e51446aa35413b5515cd927
+              uuid: 20963ffd33864196ab909b60d7acdc0a
               expression: 'avg(/Zabbix Server/zabbix[process,alerter,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,alerter,avg,busy],10m)<65'
@@ -73,7 +73,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: acff86c6532f4d23a1bcf8a92bfbb9f8
+              uuid: c7f8ac54e4d3409788b8a456046ee461
               expression: 'avg(/Zabbix Server/zabbix[process,alert manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,alert manager,avg,busy],10m)<65'
@@ -94,7 +94,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 2017a4737a8142ee870a570279e387bf
+              uuid: e2a487335f2748a6b26d867290c9cfe4
               expression: 'avg(/Zabbix Server/zabbix[process,alert syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,alert syncer,avg,busy],10m)<65'
@@ -115,7 +115,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 1813de0ff11a4a1c8104d3c2f4823eb1
+              uuid: 048c947b3b0a440b80ad6ebfc1a43f10
               expression: 'avg(/Zabbix Server/zabbix[process,availability manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,availability manager,avg,busy],10m)<65'
@@ -136,7 +136,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 7efe60da3ccd48379d6d4a4aeb052632
+              uuid: 63d681dba0b94487886a1d9b3360d1d1
               expression: 'avg(/Zabbix Server/zabbix[process,configuration syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,configuration syncer,avg,busy],10m)<65'
@@ -157,7 +157,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 2dfca4b382dc4c10a82f962a82b56986
+              uuid: 5c470ddbda674fe0a789447dd120c36d
               expression: 'avg(/Zabbix Server/zabbix[process,discoverer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,discoverer,avg,busy],10m)<65'
@@ -178,7 +178,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 394d0cf845834b208cf67cdf3aa3ee89
+              uuid: 9895b4318f50487d9c7f25abd48bb1a1
               expression: 'avg(/Zabbix Server/zabbix[process,escalator,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,escalator,avg,busy],10m)<65'
@@ -199,7 +199,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 8272505b19eb4c3ebcb0f7e2a87b0046
+              uuid: 9a76cde4aaea4e8eb48f725e9653037b
               expression: 'avg(/Zabbix Server/zabbix[process,history poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,history poller,avg,busy],10m)<65'
@@ -220,7 +220,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 9a9db6cf9a814e3cb5527f55601dbdcb
+              uuid: a99ffd43a05e40f7abee83aa8c6c3ce5
               expression: 'avg(/Zabbix Server/zabbix[process,history syncer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,history syncer,avg,busy],10m)<65'
@@ -241,7 +241,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 8afa38d80cec498ab09102559ccaf410
+              uuid: faa349f84dc043658fe51294ad87f766
               expression: 'avg(/Zabbix Server/zabbix[process,housekeeper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,housekeeper,avg,busy],10m)<65'
@@ -262,7 +262,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 48473ac0d1334f34a478c812b6c4c2d1
+              uuid: c296c1ecdba44bd5b826ab4a86bbc300
               expression: 'avg(/Zabbix Server/zabbix[process,http poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,http poller,avg,busy],10m)<65'
@@ -283,7 +283,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 127e01bc49174374ae4fce4e39e7d48b
+              uuid: d5c6ea5711594a9587ab8d7094f1f481
               expression: 'avg(/Zabbix Server/zabbix[process,icmp pinger,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,icmp pinger,avg,busy],10m)<65'
@@ -304,7 +304,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: b2a6da852c1940e6b1fcc51055de3969
+              uuid: 9ce0c874e5924b308827e8be5a9bf0eb
               expression: 'avg(/Zabbix Server/zabbix[process,ipmi manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,ipmi manager,avg,busy],10m)<65'
@@ -325,7 +325,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: dc391f94e72a4ea7b559635f3a14146a
+              uuid: 5a4f841292fd4bb5bec2e28340c9e4c2
               expression: 'avg(/Zabbix Server/zabbix[process,ipmi poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,ipmi poller,avg,busy],10m)<65'
@@ -346,7 +346,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 65b21acc26664a8383b12bf4864e338c
+              uuid: d7705ba9c3f74554ac21c59c9a0dcc11
               expression: 'avg(/Zabbix Server/zabbix[process,java poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,java poller,avg,busy],10m)<65'
@@ -367,7 +367,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 77d0ffb259544727adddf67588b7e878
+              uuid: 39109dabd9454844996864834292c0c4
               expression: 'avg(/Zabbix Server/zabbix[process,lld manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,lld manager,avg,busy],10m)<65'
@@ -388,7 +388,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 06374c1c8bd34ac5987b83a195eb086f
+              uuid: 8eca01d6e0e64f5795d3a5b5e4aa593d
               expression: 'avg(/Zabbix Server/zabbix[process,lld worker,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,lld worker,avg,busy],10m)<65'
@@ -409,7 +409,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: d832e4e1bebf4e1b94b6a2b0ccd2ccdc
+              uuid: bb50da4052134ef1a478bface291b50a
               expression: 'avg(/Zabbix Server/zabbix[process,poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,poller,avg,busy],10m)<65'
@@ -430,7 +430,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: e1498a7ed1e242fcafb58561d31baeec
+              uuid: 6e7a117afa7e41e2a783f8afc42434fa
               expression: 'avg(/Zabbix Server/zabbix[process,preprocessing manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,preprocessing manager,avg,busy],10m)<65'
@@ -451,7 +451,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 5fa3db9503124da18ed49479f265955f
+              uuid: e2cbdcc8b4844943a67d1f51587e599c
               expression: 'avg(/Zabbix Server/zabbix[process,preprocessing worker,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,preprocessing worker,avg,busy],10m)<65'
@@ -472,7 +472,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 0f39bbf5d3fd4abaa2f1affa00c93635
+              uuid: 6a884c1fbf254637bb74b68571ee2ffa
               expression: 'avg(/Zabbix Server/zabbix[process,proxy poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,proxy poller,avg,busy],10m)<65'
@@ -493,7 +493,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 2b80c18a4eb04b05ab5f3d38d86fa278
+              uuid: 82f774b4a47247f49db1ab0480a69eae
               expression: 'avg(/Zabbix Server/zabbix[process,report manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,report manager,avg,busy],10m)<65'
@@ -514,7 +514,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: aa5784748441444b971b6cccefe17567
+              uuid: 03158d902b854b3495aa76042f361bea
               expression: 'avg(/Zabbix Server/zabbix[process,report writer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,report writer,avg,busy],10m)<65'
@@ -535,7 +535,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 20d9e4962ad94925a8f5d7c9cdd2e78f
+              uuid: bf730ed3313f45248f483289c704f5e9
               expression: 'avg(/Zabbix Server/zabbix[process,self-monitoring,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,self-monitoring,avg,busy],10m)<65'
@@ -556,7 +556,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: dda67eb7e1dd4a0faf7faa5c80e2aeaa
+              uuid: 821611786e5e49bf941cbca370d6ed6b
               expression: 'avg(/Zabbix Server/zabbix[process,snmp trapper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,snmp trapper,avg,busy],10m)<65'
@@ -577,7 +577,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 38e9c70dcf9d47ff8288f36008b6267e
+              uuid: 37c1c6ec07474a8a95b06c3c28e4bf96
               expression: 'avg(/Zabbix Server/zabbix[process,task manager,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,task manager,avg,busy],10m)<65'
@@ -598,7 +598,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 1c5101bd3a5e4aca8ec434e813376bc3
+              uuid: 0c7715df608f4736a7077ff2f6098adc
               expression: 'avg(/Zabbix Server/zabbix[process,timer,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,timer,avg,busy],10m)<65'
@@ -619,7 +619,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: a54acdb8bcf847f8b95e01ae079148de
+              uuid: 197c04bbf5204ce7ac80630f2948b6b0
               expression: 'avg(/Zabbix Server/zabbix[process,trapper,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,trapper,avg,busy],10m)<65'
@@ -640,7 +640,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 7b0adb4b994a4b8989499f192bd38b44
+              uuid: b0168864ef6849f185deb6ef22a056fa
               expression: 'avg(/Zabbix Server/zabbix[process,unreachable poller,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,unreachable poller,avg,busy],10m)<65'
@@ -661,7 +661,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 808b5ec689a94e829af8229b5896dede
+              uuid: 7e0881bb1b384deba18439ae098a7fbd
               expression: 'avg(/Zabbix Server/zabbix[process,vmware collector,avg,busy],10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix Server/zabbix[process,vmware collector,avg,busy],10m)<65'
@@ -680,7 +680,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 1f4fd4a94ce845df91105d1334bbf158
+              uuid: 53883a57e663421ca5fa794067a267b4
               expression: 'min(/Zabbix Server/zabbix[queue,10m],10m)>100'
               name: 'Zabbix server: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
@@ -711,7 +711,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: b0c1a145b4134141b990ef3a91d4c04f
+              uuid: 088a0e0ac64442a29de4d86f11c87438
               expression: 'max(/Zabbix Server/zabbix[rcache,buffer,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the configuration cache'
               priority: AVERAGE
@@ -757,7 +757,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 892a231144cd4bffbcff4654931f8e52
+              uuid: cdca16919f6648ebbe6119e7c23a98c7
               expression: 'max(/Zabbix Server/zabbix[vcache,buffer,pused],10m)>95'
               name: 'Zabbix server: More than 95% used in the value cache'
               priority: AVERAGE
@@ -813,7 +813,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 049a703407164f999de22f3bf56e4da2
+              uuid: ee3db7e7bc104f1598ca36e735bce53f
               expression: 'last(/Zabbix Server/zabbix[vcache,cache,mode])=1'
               name: 'Zabbix server: Zabbix value cache working in low memory mode'
               priority: HIGH
@@ -859,7 +859,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: 95f7d06cdf7b4edf8450b1b1e239a9ce
+              uuid: 2df2ed6520c44ee880f35912f869583e
               expression: 'max(/Zabbix Server/zabbix[vmware,buffer,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the vmware cache'
               priority: AVERAGE
@@ -881,7 +881,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: a1708fb4832649b48d976a188cb7f9f9
+              uuid: 5d63483588964e49b1f870dfb770bf04
               expression: 'max(/Zabbix Server/zabbix[wcache,history,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the history cache'
               priority: AVERAGE
@@ -903,7 +903,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: a40bea6a2ef347a1b4ac23c42dbd66ca
+              uuid: 24245fbc55b743319162dd1edb37c5a0
               expression: 'max(/Zabbix Server/zabbix[wcache,index,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the history index cache'
               priority: AVERAGE
@@ -925,7 +925,7 @@ zabbix_export:
               value: 'Zabbix server'
           triggers:
             -
-              uuid: c14de69716864fb5a5176888393e169e
+              uuid: 34426156de6b4690918117a23ccc1138
               expression: 'max(/Zabbix Server/zabbix[wcache,trend,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the trends cache'
               priority: AVERAGE
@@ -1250,7 +1250,7 @@ zabbix_export:
               newvalue: 'Low memory'
   graphs:
     -
-      uuid: 62c7e17ab6da4d12a755172ec8102e63
+      uuid: a6eb4d7df7ec4388bc37f7d27cc26a9f
       name: 'Zabbix server: Data gathering processes'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -1464,7 +1464,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[tcache,cache,pitems]'
     -
-      uuid: 04283bd549e941558fde1fdb26456f7f
+      uuid: d2841f4fbb33411d9ab1b1b48e7e959f
       name: 'Zabbix server: Value cache effectiveness'
       type: STACKED
       graph_items:
@@ -1480,7 +1480,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[vcache,cache,hits]'
     -
-      uuid: 23603b0ad2a749aca8d65208a1612bf4
+      uuid: 0432df37a8f34cf7978531642037c1a1
       name: 'Zabbix server: Zabbix cache usage, % free'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -1521,7 +1521,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[vmware,buffer,pused]'
     -
-      uuid: 64ee4977d920436facb095db40e1846e
+      uuid: 99fbcd47f72148f486f3b5e7d49596b8
       name: 'Zabbix server: Zabbix data gathering process busy %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -1597,7 +1597,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[process,history poller,avg,busy]'
     -
-      uuid: 2e4259e5ffcd429fb81569baf7747c6d
+      uuid: 630f638ad0054d3380f941e72805ea1d
       name: 'Zabbix server: Zabbix internal process busy %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -1710,7 +1710,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[process,report writer,avg,busy]'
     -
-      uuid: 3f52299e605540b5a32e19e724a78073
+      uuid: b053dc416ee3422b94e46fb415ea87e6
       name: 'Zabbix server: Zabbix internal queues'
       graph_items:
         -
@@ -1725,7 +1725,7 @@ zabbix_export:
             host: 'Zabbix Server'
             key: 'zabbix[lld_queue]'
     -
-      uuid: 96fa92f0b0294eb9a47dbd9bf183b644
+      uuid: 3d256a358da74f469700eea05173343a
       name: 'Zabbix server: Zabbix server performance'
       graph_items:
         -

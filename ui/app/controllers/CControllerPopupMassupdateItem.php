@@ -97,26 +97,6 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	/**
-	 * Get array of updated items or item prototypes hosts or templates.
-	 *
-	 * @return array
-	 */
-	protected function getHostsOrTemplates(): array {
-		$options = ['itemids' => $this->getInput('ids')];
-
-		if ($this->getInput('context') === 'host') {
-			$options['output'] = ['hostid'];
-			$result = API::Host()->get($options);
-		}
-		else {
-			$options['output'] = ['templateid'];
-			$result = CArrayHelper::renameObjectsKeys(API::Template()->get($options), ['templateid' => 'hostid']);
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Get array of updated items or item prototypes.
 	 *
 	 * @return array
@@ -246,12 +226,6 @@ class CControllerPopupMassupdateItem extends CController {
 						$input['delay'] .= ';'.$interval['schedule'];
 					}
 				}
-			}
-
-			$hosts = $this->getHostsOrTemplates();
-
-			if ($prototype && $hosts) {
-				throw new Exception();
 			}
 
 			if (array_key_exists('headers', $input) && $input['headers']) {

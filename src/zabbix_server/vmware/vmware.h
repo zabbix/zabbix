@@ -97,8 +97,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char		*diskname;
 	zbx_uint64_t	partitionid;
+	char		*diskname;
 }
 zbx_vmware_diskextent_t;
 
