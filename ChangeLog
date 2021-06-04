@@ -539,6 +539,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 .......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
 ...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
