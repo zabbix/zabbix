@@ -8567,7 +8567,8 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'problem',
-				'ref_field' => 'eventid'
+				'ref_field' => 'eventid',
+			],
 			'serviceid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
