@@ -814,7 +814,7 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 	while (NULL != (pservices_diff = (zbx_services_diff_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_service_t	service = {.serviceid = pservices_diff->serviceid}, *pservice;
-		int		status = TRIGGER_SEVERITY_NOT_CLASSIFIED, i, clock;
+		int		status = TRIGGER_SEVERITY_NOT_CLASSIFIED, i, clock = 0;
 
 		pservice = zbx_hashset_search(services, &service);
 
