@@ -1087,6 +1087,9 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				zbx_hashset_iter_reset(&service_manager.services, &iter);
 				while (NULL != (pservice = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
 				{
+					if (0 != pservice->children.values_num)
+						continue;
+
 					services_diff.serviceid = pservice->serviceid;
 					pservices_diff = zbx_hashset_search(&service_manager.services_diff, &services_diff);
 
