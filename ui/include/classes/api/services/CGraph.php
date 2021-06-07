@@ -298,6 +298,11 @@ class CGraph extends CGraphGeneral {
 				}
 			}
 			else {
+				// Graphs share table with graph prototypes. Therefore remove graph unrelated fields.
+				if ($this->outputIsRequested('discover', $options['output'])) {
+					unset($graph['discover']);
+				}
+
 				$result[$graph['graphid']] = $graph;
 			}
 		}
