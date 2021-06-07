@@ -4045,6 +4045,8 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() parsed:%d", __func__, parsed_num);
 
 	return parsed_num;
+
+#	undef LAST_KEY
 }
 
 /******************************************************************************
@@ -4154,6 +4156,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
+
+#	undef ATTEMPTS_NUM
+#	undef EVENT_TAG
+#	undef RETURNVAL_TAG
+#	undef LAST_KEY
 }
 
 /******************************************************************************
