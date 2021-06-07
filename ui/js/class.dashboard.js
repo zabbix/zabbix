@@ -1445,6 +1445,7 @@ class CDashboard extends CBaseComponent {
 		if (name !== '') {
 			data.index = null;
 			tab_contents_name.textContent = name;
+			tab_contents_name.title = name;
 		}
 		else {
 			let max_index = this._dashboard_pages.size - 1;
@@ -1456,7 +1457,11 @@ class CDashboard extends CBaseComponent {
 			}
 
 			data.index = max_index + 1;
-			tab_contents_name.textContent = sprintf(t('Page %1$d'), data.index);
+
+			const name = sprintf(t('Page %1$d'), data.index);
+
+			tab_contents_name.textContent = name;
+			tab_contents_name.title = name;
 		}
 
 		if (this._getDashboardPageActionsContextMenu(dashboard_page).length > 0) {
@@ -1484,6 +1489,7 @@ class CDashboard extends CBaseComponent {
 
 		if (name !== '') {
 			tab_contents_name.textContent = name;
+			tab_contents_name.title = name;
 		}
 		else {
 			const tab_index = [...this._tabs.getList().children].indexOf(data.tab) + 1;
@@ -1504,7 +1510,11 @@ class CDashboard extends CBaseComponent {
 			}
 
 			data.index = is_tab_index_available ? tab_index : max_index + 1;
-			tab_contents_name.textContent = sprintf(t('Page %1$d'), data.index);
+
+			const name = sprintf(t('Page %1$d'), data.index);
+
+			tab_contents_name.textContent = name;
+			tab_contents_name.title = name;
 		}
 	}
 
