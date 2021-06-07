@@ -1,15 +1,27 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:25Z'
+  date: '2021-05-26T13:57:31Z'
   groups:
     -
+      uuid: 1d12408342854fd5a4436dd6d5d1bd4a
       name: Templates/Telephony
   templates:
     -
+      uuid: 30cc187a4e994c39b07f53d86b5cc6bc
       template: 'Asterisk by HTTP'
       name: 'Asterisk by HTTP'
       description: |
-        The template gets Asterisk metrics from AMI by HTTP agent. You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance. Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status. Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level. If there are errors, increase the logging to debug level and see the Zabbix server log.
+        The template gets Asterisk metrics from AMI by HTTP agent.
+        You should enable the mini-HTTP Server, add the option webenabled=yes
+        in the general section of the manager.conf file and create Asterisk Manager
+        user with system and command write permissions within your Asterisk instance.
+        Disable the PJSIP driver if you do not use PJSIP or do not have PJSIP endpoints.
+        Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host
+        should have an Agent interface with the AMI address to check Asterisk service
+        status.
+        Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in
+        the template for using on the host level.
+        If there are errors, increase the logging to debug level and see the Zabbix server log.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
         
@@ -19,6 +31,7 @@ zabbix_export:
           name: Templates/Telephony
       items:
         -
+          uuid: 72d074f6bb214ef9884d8cc4b1530ad3
           name: 'Asterisk: Active calls'
           type: DEPENDENT
           key: asterisk.active_calls
@@ -37,6 +50,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: bb9ac1ac188b43239456477e13ae555f
           name: 'Asterisk: Active channels'
           type: DEPENDENT
           key: asterisk.active_channels
@@ -55,6 +69,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: ccfc2a8a5880430196e2c874b66370ca
           name: 'Asterisk: Calls processed'
           type: DEPENDENT
           key: asterisk.calls_processed
@@ -73,6 +88,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 196af875a190438abd8de5a6803a550f
           name: 'Asterisk: Calls processed per second'
           type: DEPENDENT
           key: asterisk.calls_processed.rate
@@ -96,6 +112,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 7db3e9cdae3d4bffa7429617e351fce1
           name: 'Asterisk: Get stats'
           type: HTTP_AGENT
           key: asterisk.get_stats
@@ -138,16 +155,19 @@ zabbix_export:
                               throw message + ' Check debug log for more information.';
                           }
                   
-                          var match = response.match('Response: (.+)\r\n');
+                          var match = response.match('Response: (.+)');
                           if (match !== null && match[1] !== 'Success' && match[1] !== 'Goodbye' && match[1] !== 'Follows') {
-                              var message = 'Request failed with message ' + match[1];
+                              var responseText = match[1],
+                                  message = 'Request failed with message ' + match[1];
                   
-                              match = response.match('Message: (.+)\r\n');
+                              match = response.match('Message: (.+)');
                               if (match !== null && match[1]) {
+                                  var responseMessage = match[1];
                                   message += ': ' + match[1];
                               }
-                  
-                              throw message + '. Check debug log for more information.';
+                              if (responseText !== 'Error' || responseMessage !== 'No endpoints found') {
+                                  throw message + '. Check debug log for more information.';
+                              }
                           }
                   
                           return {
@@ -170,6 +190,7 @@ zabbix_export:
                           monitored_offline: 0,
                           unmonitored_online: 0,
                           unmonitored_offline: 0,
+                          active_channels: 0,
                           total: 0
                       },
                       iax: {
@@ -177,12 +198,14 @@ zabbix_export:
                           online: 0,
                           offline: 0,
                           unmonitored: 0,
+                          active_channels: 0,
                           total: 0
                       },
                       pjsip: {
                           trunks: [],
                           available: 0,
                           unavailable: 0,
+                          active_channels: 0,
                           total: 0
                       },
                       queue: {
@@ -192,12 +215,16 @@ zabbix_export:
                   };
                   
                   function block2Object(text) {
-                      var fields = [],
+                      var parts = [],
                           dict = {};
                   
-                      text.split('\r\n').forEach(function (line) {
-                          fields = line.split(': ');
-                          dict[fields[0]] = fields[1];
+                      text = text.replace(/^Output: /gm, '');
+                  
+                      text.split('\n').forEach(function (line) {
+                          parts = line.split(':');
+                          if (parts.length > 1) {
+                              dict[parts.shift().trim()] = parts.join(':').trim();
+                          }
                       })
                   
                       return dict;
@@ -248,8 +275,9 @@ zabbix_export:
                           }
                       });
                       asterisk.sip.trunks.forEach(function (trunk) {
-                          var active_channels = channels.match(new RegExp(' SIP/' + trunk.ObjectName.split('/')[0], 'g'));
+                          var active_channels = channels.match(new RegExp('[^!J]SIP/' + escapeChars(trunk.ObjectName), 'g'));
                           trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                          asterisk.sip.active_channels += trunk.active_channels;
                       });
                   }
                   
@@ -276,9 +304,10 @@ zabbix_export:
                       });
                       asterisk.iax.online = asterisk.iax.total - asterisk.iax.offline;
                       asterisk.iax.trunks.forEach(function (trunk) {
-                          var active_channels = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
-                              '| IAX2/' + trunk.ObjectUsername + ')', 'g'));
+                          var active_channels = channels.match(new RegExp('[^!](IAX2/' + escapeChars(trunk.ObjectName) +
+                              '|IAX2/' + escapeChars(trunk.ObjectUsername) + ')', 'g'));
                           trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                          asterisk.iax.active_channels += trunk.active_channels;
                       });
                   }
                   
@@ -297,8 +326,9 @@ zabbix_export:
                       });
                       asterisk.pjsip.available = asterisk.pjsip.total - asterisk.pjsip.unavailable;
                       asterisk.pjsip.trunks.forEach(function (trunk) {
-                          var active_channels = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
+                          var active_channels = channels.match(new RegExp('[^!]PJSIP/' + escapeChars(trunk.ObjectName), 'g'));
                           trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                          asterisk.pjsip.active_channels += trunk.active_channels;
                       });
                   }
                   
@@ -306,6 +336,39 @@ zabbix_export:
                       response = Ami.request(url, 'QueueSummary');
                       asterisk.queue.queues = text2Object(response.body);
                       asterisk.queue.total = asterisk.queue.queues.length;
+                  }
+                  
+                  function escapeChars(str) {
+                      return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+                  }
+                  
+                  function getUptimeSeconds(text) {
+                      var date = {
+                          years: 0,
+                          weeks: 0,
+                          days: 0,
+                          hours: 0,
+                          minutes: 0,
+                          seconds: 0
+                      };
+                  
+                      var fields = {
+                          years: 'years?',
+                          weeks: 'weeks?',
+                          days: 'days?',
+                          hours: 'hours?',
+                          minutes: 'minutes?',
+                          seconds: 'seconds?'
+                      };
+                  
+                      Object.keys(fields).forEach(function (field) {
+                          var match = text.match('(\\d+) ' + fields[field]);
+                          if (match !== null && typeof match[1] !== 'undefined') {
+                              date[field] = parseInt(match[1]);
+                          }
+                      });
+                      return date.years * 220752000 + date.weeks * 604800 + date.days * 86400 +
+                          date.hours * 3600 + date.minutes * 60 + date.seconds;
                   }
                   
                   var cookie = value.match(/mansession_id="([0-9A-z]+)"/);
@@ -323,16 +386,16 @@ zabbix_export:
                       asterisk.version = coreSettings.AsteriskVersion;
                   }
                   
-                  response = Ami.request(url, 'CoreStatus');
-                  var coreStatus = block2Object(response.body);
-                  if (typeof coreStatus.CoreStartupDate !== 'undefined') {
-                      asterisk.uptime = (Date.now() - Date.parse(coreStatus.CoreStartupDate + " " + coreStatus.CoreStartupTime)) / 1000;
+                  response = Ami.request(url, 'command&command=core%20show%20uptime');
+                  var uptime = block2Object(response.body);
+                  if (typeof uptime["System uptime"] !== 'undefined') {
+                      asterisk.uptime = getUptimeSeconds(uptime["System uptime"]);
                   }
-                  if (typeof coreStatus.CoreReloadDate !== 'undefined') {
-                      asterisk.uptime_reload = (Date.now() - Date.parse(coreStatus.CoreReloadDate + " " + coreStatus.CoreReloadTime)) / 1000;
+                  if (typeof uptime["Last reload"] !== 'undefined') {
+                      asterisk.uptime_reload = getUptimeSeconds(uptime["Last reload"]);
                   }
                   
-                  response = Ami.request(url, 'command&command=core%20show%20channels');
+                  response = Ami.request(url, 'command&command=core%20show%20channels%20count');
                   channels = response.body;
                   var fields = {
                       active_channels: 'active channels?',
@@ -346,6 +409,9 @@ zabbix_export:
                           asterisk[field] = parseInt(match[1]);
                       }
                   });
+                  
+                  response = Ami.request(url, 'command&command=core%20show%20channels%20concise');
+                  channels = response.body;
                   
                   response = Ami.request(url, 'ListCommands');
                   var list = response.body;
@@ -368,6 +434,7 @@ zabbix_export:
                   catch (e) {}
                   
                   return JSON.stringify(asterisk);
+                  
           url: '{$AMI.URL}'
           query_fields:
             -
@@ -385,6 +452,33 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: d9900a1f096a4b89a2aa4af89f30b2cc
+          name: 'Asterisk: IAX trunks active channels'
+          type: DEPENDENT
+          key: asterisk.iax.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of IAX trunks active channels.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.iax.active_channels
+          master_item:
+            key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
+          triggers:
+            -
+              uuid: 0ae0a5b6123a42dd9722219e5e5839df
+              expression: 'min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
+              name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
+              priority: WARNING
+              description: 'The IAX trunks may not be able to process new calls.'
+        -
+          uuid: 0798cf46d82041e6a7091698c7693ec5
           name: 'Asterisk: IAX offline peers'
           type: DEPENDENT
           key: asterisk.iax.offline
@@ -403,6 +497,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: bf741f5560734530be352341071c5984
           name: 'Asterisk: IAX online peers'
           type: DEPENDENT
           key: asterisk.iax.online
@@ -421,6 +516,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: ccb62e9b41da4f20b4ab19e4eecd598b
           name: 'Asterisk: IAX peers'
           type: DEPENDENT
           key: asterisk.iax.total
@@ -439,6 +535,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: cf5c07c1a09b4a10af21292b876fcb20
           name: 'Asterisk: IAX unmonitored peers'
           type: DEPENDENT
           key: asterisk.iax.unmonitored
@@ -457,6 +554,33 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 5ae6135a49764db7b496f5d2378ddd77
+          name: 'Asterisk: PJSIP trunks active channels'
+          type: DEPENDENT
+          key: asterisk.pjsip.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of PJSIP trunks active channels.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pjsip.active_channels
+          master_item:
+            key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
+          triggers:
+            -
+              uuid: 9b158fe0efb4416cb6ad5d53b38c3e38
+              expression: 'min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
+              name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
+              priority: WARNING
+              description: 'The PJSIP trunks may not be able to process new calls.'
+        -
+          uuid: cc07f186104842aabec3d26dcd4322d2
           name: 'Asterisk: PJSIP available endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.available
@@ -475,6 +599,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: fdc888cb355a4b738be8a77354a7ce76
           name: 'Asterisk: PJSIP endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.total
@@ -493,6 +618,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 5c10fe1a4bfb4628be20137d0f1ec725
           name: 'Asterisk: PJSIP unavailable endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.unavailable
@@ -511,6 +637,33 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 2df0dca89a744e86b4f5a2cec673d427
+          name: 'Asterisk: SIP trunks active channels'
+          type: DEPENDENT
+          key: asterisk.sip.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of SIP trunks active channels.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sip.active_channels
+          master_item:
+            key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
+          triggers:
+            -
+              uuid: d2fde5d26d284a129346a12ba0949b60
+              expression: 'min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
+              name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
+              priority: WARNING
+              description: 'The SIP trunks may not be able to process new calls.'
+        -
+          uuid: fb08ec8d143a41a097f8652c8261bad8
           name: 'Asterisk: SIP monitored offline'
           type: DEPENDENT
           key: asterisk.sip.monitored_offline
@@ -529,6 +682,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 23744b0a04b54637a7dbe1c7f8f5200f
           name: 'Asterisk: SIP monitored online'
           type: DEPENDENT
           key: asterisk.sip.monitored_online
@@ -547,6 +701,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: fb78998a342942ac942a7e1632b98208
           name: 'Asterisk: SIP peers'
           type: DEPENDENT
           key: asterisk.sip.total
@@ -565,6 +720,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: ae21f8c13063402d9eece400a18c6167
           name: 'Asterisk: SIP unmonitored offline'
           type: DEPENDENT
           key: asterisk.sip.unmonitored_offline
@@ -583,6 +739,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 1cd5fb5232ca4f4398f85d959ac11b2c
           name: 'Asterisk: SIP unmonitored online'
           type: DEPENDENT
           key: asterisk.sip.unmonitored_online
@@ -601,6 +758,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 9c64cb54c2c541c1862558dcf8c6e3a3
           name: 'Asterisk: Total queues'
           type: DEPENDENT
           key: asterisk.total_queues
@@ -619,6 +777,7 @@ zabbix_export:
               tag: Application
               value: Asterisk
         -
+          uuid: 8395ab5b70a7433eb508c513995988bb
           name: 'Asterisk: Uptime'
           type: DEPENDENT
           key: asterisk.uptime
@@ -640,7 +799,8 @@ zabbix_export:
               value: Asterisk
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: 35ca01e504a548db9d4db8be1390d6b9
+              expression: 'nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1'
               name: 'Asterisk: Failed to fetch AMI page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
@@ -648,14 +808,16 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Asterisk: Service is down'
-                  expression: '{Asterisk by HTTP:net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"].last()}=0'
+                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
             -
-              expression: '{last()}<10m'
+              uuid: 100d38b62c1d4ce298a9fadfbab19e4c
+              expression: 'last(/Asterisk by HTTP/asterisk.uptime)<10m'
               name: 'Asterisk: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 86e23b5b9fd64e6e840588d25921fcbf
           name: 'Asterisk: Uptime after reload'
           type: DEPENDENT
           key: asterisk.uptime_reload
@@ -677,12 +839,14 @@ zabbix_export:
               value: Asterisk
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: 4e99b65188264ba1aa80e24662f9b3cd
+              expression: 'last(/Asterisk by HTTP/asterisk.uptime_reload)<10m'
               name: 'Asterisk: has been reloaded (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 8ed124c5d61541c0ab1dcc3491fb05c6
           name: 'Asterisk: Version'
           type: DEPENDENT
           key: asterisk.version
@@ -704,12 +868,14 @@ zabbix_export:
               value: Asterisk
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: f1a260626ae6446d89e1e725e14c1098
+              expression: '(last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2))=1 and length(last(/Asterisk by HTTP/asterisk.version))>0'
               name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Asterisk version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 09102393dc6a4ac598f02d95801c6ca0
           name: 'Asterisk: Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]'
@@ -723,15 +889,17 @@ zabbix_export:
               value: Asterisk
           triggers:
             -
-              expression: '{min(5m)}>{$AMI.RESPONSE_TIME.MAX.WARN}'
+              uuid: dbc74502be01498194003dc1a3d90014
+              expression: 'min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
               name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Asterisk: Service is down'
-                  expression: '{Asterisk by HTTP:net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"].last()}=0'
+                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
         -
+          uuid: 58e18df6a5534395bf74d3babdb73170
           name: 'Asterisk: Service status'
           type: SIMPLE
           key: 'net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]'
@@ -750,18 +918,21 @@ zabbix_export:
               value: Asterisk
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 1fa3370fa93f4d07a2c470f993096554
+              expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
               name: 'Asterisk: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 3e7facc25a344cec8e384e8a9f8b372a
           name: 'IAX peers discovery'
           type: DEPENDENT
           key: asterisk.iax_peers.discovery
           delay: '0'
           item_prototypes:
             -
+              uuid: 72d71ec4fa2b4e88a03d25e3bbe8771a
               name: 'IAX trunk "{#OBJECTNAME}": Active channels'
               type: DEPENDENT
               key: 'asterisk.iax.trunk.active_channels[{#OBJECTNAME}]'
@@ -781,11 +952,13 @@ zabbix_export:
                   value: 'Asterisk IAX trunks'
               trigger_prototypes:
                 -
-                  expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  uuid: e2a6c7a9b6234e2aae20c9aa480f9ef1
+                  expression: 'min(/Asterisk by HTTP/asterisk.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
                   name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The IAX trunk may not be able to process new calls.'
             -
+              uuid: bbde7e898b4b4d34b27308d6ddaf86fc
               name: 'IAX trunk "{#OBJECTNAME}": Status'
               type: DEPENDENT
               key: 'asterisk.iax.trunk.status[{#OBJECTNAME}]'
@@ -816,7 +989,8 @@ zabbix_export:
                   value: 'Asterisk IAX trunks'
               trigger_prototypes:
                 -
-                  expression: '{last()}="UNKNOWN" or {last()}="UNREACHABLE"'
+                  uuid: db595245acef4ec9b771c266c14100d2
+                  expression: 'last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNREACHABLE"'
                   name: 'IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
@@ -836,12 +1010,14 @@ zabbix_export:
               parameters:
                 - 1h
         -
+          uuid: 1a123ca04c7544bfa823a39b8a9fe84c
           name: 'PJSIP endpoints discovery'
           type: DEPENDENT
           key: asterisk.pjsip_endpoints.discovery
           delay: '0'
           item_prototypes:
             -
+              uuid: ec8220a1aa814112908337a009f6fcac
               name: 'PJSIP trunk "{#OBJECTNAME}": Active channels'
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]'
@@ -861,11 +1037,13 @@ zabbix_export:
                   value: 'Asterisk PJSIP trunks'
               trigger_prototypes:
                 -
-                  expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  uuid: f192d555011c42c28c6a8f52c0388fe1
+                  expression: 'min(/Asterisk by HTTP/asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
                   name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The PJSIP trunk may not be able to process new calls.'
             -
+              uuid: c364b2ac50344372b155cbb98d9a7afe
               name: 'PJSIP trunk "{#OBJECTNAME}": Device state'
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]'
@@ -895,7 +1073,8 @@ zabbix_export:
                   value: 'Asterisk PJSIP trunks'
               trigger_prototypes:
                 -
-                  expression: '{last()}="Unavailable"'
+                  uuid: 6f31d886d6954b82874d38646b233689
+                  expression: 'last(/Asterisk by HTTP/asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}])="Unavailable"'
                   name: 'PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable'
                   priority: AVERAGE
                   description: 'The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
@@ -915,12 +1094,14 @@ zabbix_export:
               parameters:
                 - 1h
         -
+          uuid: 5a936a95d62f4b50a4f3db112a3e041f
           name: 'Queues discovery'
           type: DEPENDENT
           key: asterisk.queues.discovery
           delay: '0'
           item_prototypes:
             -
+              uuid: c16d9df72ba749369726d4cfcc8b4f40
               name: '"{#QUEUE}": Available'
               type: DEPENDENT
               key: 'asterisk.queue.available[{#QUEUE}]'
@@ -939,6 +1120,7 @@ zabbix_export:
                   tag: Application
                   value: 'Asterisk queue "{#QUEUE}"'
             -
+              uuid: c271c7d76b2e49dea386bb08d60307d0
               name: '"{#QUEUE}": Callers'
               type: DEPENDENT
               key: 'asterisk.queue.callers[{#QUEUE}]'
@@ -958,11 +1140,13 @@ zabbix_export:
                   value: 'Asterisk queue "{#QUEUE}"'
               trigger_prototypes:
                 -
-                  expression: '{min(10m)}>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
+                  uuid: 4f72c6a755be465287f36b8b12d3175b
+                  expression: 'min(/Asterisk by HTTP/asterisk.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
                   name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
                   priority: WARNING
                   description: 'There is a large number of calls in the queue.'
             -
+              uuid: 8319ec55cf6f4e8590f180f1a81f37ed
               name: '"{#QUEUE}": Logged in'
               type: DEPENDENT
               key: 'asterisk.queue.loggedin[{#QUEUE}]'
@@ -996,12 +1180,14 @@ zabbix_export:
               parameters:
                 - 1h
         -
+          uuid: 675fc5b11cb1482db0c539dfb9100e75
           name: 'SIP peers discovery'
           type: DEPENDENT
           key: asterisk.sip_peers.discovery
           delay: '0'
           item_prototypes:
             -
+              uuid: 9043578864494b13b249ee7bdf13820d
               name: 'SIP trunk "{#OBJECTNAME}": Active channels'
               type: DEPENDENT
               key: 'asterisk.sip.trunk.active_channels[{#OBJECTNAME}]'
@@ -1021,11 +1207,13 @@ zabbix_export:
                   value: 'Asterisk SIP trunks'
               trigger_prototypes:
                 -
-                  expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  uuid: 51820b1326f84f51ba0e561946275133
+                  expression: 'min(/Asterisk by HTTP/asterisk.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
                   name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The SIP trunk may not be able to process new calls.'
             -
+              uuid: df33da749e874f55be5f0c33cd201f62
               name: 'SIP trunk "{#OBJECTNAME}": Status'
               type: DEPENDENT
               key: 'asterisk.sip.trunk.status[{#OBJECTNAME}]'
@@ -1056,7 +1244,8 @@ zabbix_export:
                   value: 'Asterisk SIP trunks'
               trigger_prototypes:
                 -
-                  expression: '{last()}="UNKNOWN" or {last()}="UNREACHABLE"'
+                  uuid: 39cac88e9263470da6e4b1a08f806c58
+                  expression: 'last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNREACHABLE"'
                   name: 'SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
                   priority: AVERAGE
                   description: 'The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
@@ -1095,7 +1284,19 @@ zabbix_export:
         -
           macro: '{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN}'
           value: '28'
-          description: 'The maximum number of busy channels for trigger expression.'
+          description: 'The maximum number of busy channels of a trunk for trigger expression.'
+        -
+          macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of IAX trunks for trigger expression.'
+        -
+          macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of PJSIP trunks for trigger expression.'
+        -
+          macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of SIP trunks for trigger expression.'
         -
           macro: '{$AMI.TRUNK_REGEXP}'
           value: trunk
@@ -1110,6 +1311,7 @@ zabbix_export:
           description: 'The Asterisk Manager name.'
       valuemaps:
         -
+          uuid: d6e38832f2d44ec0bf6761e36fd7668f
           name: 'Service state'
           mappings:
             -
@@ -1120,6 +1322,7 @@ zabbix_export:
               newvalue: Up
   graphs:
     -
+      uuid: 92b561a0aee24da9a7d9875f2293316d
       name: 'Asterisk: Calls stats'
       graph_items:
         -
@@ -1141,62 +1344,83 @@ zabbix_export:
             host: 'Asterisk by HTTP'
             key: asterisk.calls_processed.rate
     -
+      uuid: 0e5d56155a1240108a4ffc2f3dc041be
       name: 'Asterisk: IAX peers'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.iax.online
+            key: asterisk.iax.active_channels
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.iax.offline
+            key: asterisk.iax.online
         -
           sortorder: '2'
           color: F63100
           item:
             host: 'Asterisk by HTTP'
+            key: asterisk.iax.offline
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Asterisk by HTTP'
             key: asterisk.iax.unmonitored
     -
+      uuid: fd5b051daaf64df89856bec400bbc3a0
       name: 'Asterisk: PJSIP peers'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.pjsip.available
+            key: asterisk.pjsip.active_channels
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Asterisk by HTTP'
+            key: asterisk.pjsip.available
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Asterisk by HTTP'
             key: asterisk.pjsip.unavailable
     -
+      uuid: 2781590218fe4cc9ade68446e5d11aa2
       name: 'Asterisk: SIP peers'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.sip.monitored_online
+            key: asterisk.sip.active_channels
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.sip.monitored_offline
+            key: asterisk.sip.monitored_online
         -
           sortorder: '2'
           color: F63100
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.sip.unmonitored_online
+            key: asterisk.sip.monitored_offline
         -
           sortorder: '3'
           color: A54F10
+          item:
+            host: 'Asterisk by HTTP'
+            key: asterisk.sip.unmonitored_online
+        -
+          sortorder: '4'
+          color: FC6EA3
           item:
             host: 'Asterisk by HTTP'
             key: asterisk.sip.unmonitored_offline

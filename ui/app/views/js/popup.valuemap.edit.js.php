@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,54 @@
  */
 ?>
 $(() => {
-	$('#mappings_table').dynamicRows({template: '#mapping-row-tmpl', rows: <?= json_encode($data['mappings']) ?>});
+	let VALUEMAP_MAPPING_TYPE_DEFAULT = <?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>;
+	let type_placeholder = <?= json_encode([
+		VALUEMAP_MAPPING_TYPE_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('value'),
+		VALUEMAP_MAPPING_TYPE_IN_RANGE => _('value'),
+		VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp')
+	]) ?>;
+	let table = document.querySelector('#mappings_table');
+	let observer = new MutationObserver(mutationHandler);
+
+	// Observe changes for form fields: type, value.
+	observer.observe(table, {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		attributeFilter: ['value']
+	});
+	updateOnTypeChange();
+
+	function updateOnTypeChange() {
+		let default_select = table.querySelector(`z-select[value="${VALUEMAP_MAPPING_TYPE_DEFAULT}"]`);
+
+		table.querySelectorAll('tr').forEach((row) => {
+			let zselect = row.querySelector('z-select[name$="[type]"]');
+			let input = row.querySelector('input[name$="[value]"]');
+
+			if (zselect) {
+				zselect.getOptionByValue(VALUEMAP_MAPPING_TYPE_DEFAULT).disabled = (default_select
+					&& zselect !== default_select
+				);
+				input.classList.toggle('visibility-hidden', (zselect === default_select));
+				input.disabled = (zselect === default_select);
+				input.setAttribute('placeholder', type_placeholder[zselect.value]||'');
+			}
+		});
+	}
+
+	function mutationHandler(mutation_records, observer) {
+		let update = mutation_records.filter((mutation) => {
+			return (mutation.target.tagName === 'INPUT' && mutation.target.getAttribute('name').substr(-6) === '[type]')
+				|| (mutation.target.tagName === 'TBODY' && mutation.removedNodes.length > 0);
+		});
+
+		if (update.length) {
+			updateOnTypeChange();
+		}
+	}
 });
 
 function submitValueMap(overlay) {

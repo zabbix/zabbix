@@ -202,7 +202,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct statvfs	*mntbuf;
 	struct zbx_json	j;
 
-	if (0 == (rc = getmntinfo(&mntbuf, MNT_WAIT)))
+	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
@@ -243,7 +243,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int			ret = SYSINFO_RET_FAIL;
 
 	/* check how many bytes to allocate for the mounted filesystems */
-	if (0 == (rc = getmntinfo(&mntbuf, MNT_WAIT)))
+	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
@@ -283,7 +283,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
 
-	if (0 == (rc = getmntinfo(&mntbuf, MNT_WAIT)))
+	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		goto out;

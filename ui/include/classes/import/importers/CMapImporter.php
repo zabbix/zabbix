@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -25,73 +25,78 @@ class CMapImporter extends CImporter {
 	 * Import maps.
 	 *
 	 * @param array $maps
+	 *
+	 * @throws Exception
 	 */
-	public function import(array $maps) {
+	public function import(array $maps): void {
 		$maps = zbx_toHash($maps, 'name');
-
 		$maps = $this->resolveMapElementReferences($maps);
+
+		$maps_to_create = [];
+		$maps_to_update = [];
 
 		/*
 		 * Get all importable maps with removed elements and links. First import maps and then update maps with
 		 * elements and links from import file. This way we make sure we are able to resolve any references
 		 * between maps and links that are imported.
 		 */
-		$mapsWithoutElements = $this->getMapsWithoutElements($maps);
+		foreach ($this->getMapsWithoutElements($maps) as $map_name => $map_without_elements) {
+			$mapid = $this->referencer->findMapidByName($map_without_elements['name']);
 
-		$mapsToProcess = ['createMissing' => [], 'updateExisting' => []];
-
-		foreach ($mapsWithoutElements as $mapName => $mapWithoutElements) {
-			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
-			if ($mapId) {
+			if ($mapid !== null) {
 				// Update sysmapid in source map too.
-				$mapWithoutElements['sysmapid'] = $mapId;
-				$maps[$mapName]['sysmapid'] = $mapId;
-
-				$mapsToProcess['updateExisting'][] = $mapWithoutElements;
+				$map_without_elements['sysmapid'] = $mapid;
+				$maps[$map_name]['sysmapid'] = $mapid;
+				$maps_to_update[] = $map_without_elements;
 			}
 			else {
-				$mapsToProcess['createMissing'][] = $mapWithoutElements;
+				$maps_to_create[] = $map_without_elements;
 			}
 		}
 
-		if ($this->options['maps']['createMissing'] && $mapsToProcess['createMissing']) {
-			$newMapIds = API::Map()->create($mapsToProcess['createMissing']);
-			foreach ($mapsToProcess['createMissing'] as $num => $map) {
-				$mapId = $newMapIds['sysmapids'][$num];
-				$this->referencer->addMapRef($map['name'], $mapId);
-
-				$maps[$map['name']]['sysmapid'] = $mapId;
-			}
+		if ($this->options['maps']['updateExisting'] && $maps_to_update) {
+			API::Map()->update($maps_to_update);
 		}
 
-		if ($this->options['maps']['updateExisting'] && $mapsToProcess['updateExisting']) {
-			API::Map()->update($mapsToProcess['updateExisting']);
+		if ($this->options['maps']['createMissing'] && $maps_to_create) {
+			$created_maps = API::Map()->create($maps_to_create);
+
+			foreach ($maps_to_create as $index => $map) {
+				$mapid = $created_maps['sysmapids'][$index];
+
+				$this->referencer->setDbMap($mapid, $map);
+
+				$maps[$map['name']]['sysmapid'] = $mapid;
+			}
 		}
 
 		// Form an array of maps that need to be updated with elements and links, respecting the create/update options.
-		$mapsToUpdate = [];
-		foreach ($mapsToProcess as $mapActionKey => $mapArray) {
-			if ($this->options['maps'][$mapActionKey] && $mapsToProcess[$mapActionKey]) {
-				foreach ($mapArray as $mapItem) {
-					$map = [
-						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
-						'name' => $mapItem['name'],
-						'shapes' => $maps[$mapItem['name']]['shapes'],
-						'lines' => $maps[$mapItem['name']]['lines'],
-						'selements' => $maps[$mapItem['name']]['selements'],
-						'links' => $maps[$mapItem['name']]['links']
-					];
-					$map = $this->resolveMapReferences($map);
+		$maps_to_process = [];
+
+		foreach (['createMissing' => $maps_to_create, 'updateExisting' => $maps_to_update]
+				as $action => $maps_without_elements) {
+			if ($this->options['maps'][$action]) {
+				foreach ($maps_without_elements as $map_without_element) {
+					$map = $maps[$map_without_element['name']];
+
+					$map = $this->resolveMapReferences([
+						'sysmapid' => $map['sysmapid'],
+						'name' => $map_without_element['name'],
+						'shapes' => $map['shapes'],
+						'lines' => $map['lines'],
+						'selements' => $map['selements'],
+						'links' => $map['links']
+					]);
 
 					// Remove the map name so API does not make an update query to the database.
 					unset($map['name']);
-					$mapsToUpdate[] = $map;
+					$maps_to_process[] = $map;
 				}
 			}
 		}
 
-		if ($mapsToUpdate) {
-			API::Map()->update($mapsToUpdate);
+		if ($maps_to_process) {
+			API::Map()->update($maps_to_process);
 		}
 	}
 
@@ -102,7 +107,7 @@ class CMapImporter extends CImporter {
 	 *
 	 * @return array
 	 */
-	protected function getMapsWithoutElements(array $maps) {
+	protected function getMapsWithoutElements(array $maps): array {
 		foreach ($maps as &$map) {
 			if (array_key_exists('selements', $map)) {
 				unset($map['selements']);
@@ -119,119 +124,117 @@ class CMapImporter extends CImporter {
 	/**
 	 * Change all references in map to database ids.
 	 *
-	 * @throws Exception
-	 *
 	 * @param array $map
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
-	protected function resolveMapReferences(array $map) {
-		if (isset($map['selements'])) {
-			foreach ($map['selements'] as &$selement) {
-				switch ($selement['elementtype']) {
-					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['elements'][0]['sysmapid'] = $this->referencer->resolveMap($selement['elements'][0]['name']);
-						if (!$selement['elements'][0]['sysmapid']) {
-							throw new Exception(_s('Cannot find map "%1$s" used in map "%2$s".',
-								$selement['elements'][0]['name'], $map['name']));
-						}
+	protected function resolveMapReferences(array $map): array {
+		foreach ($map['selements'] as &$selement) {
+			switch ($selement['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$mapid = $this->referencer->findMapidByName($selement['elements'][0]['name']);
 
-						unset($selement['elements'][0]['name']);
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['elements'][0]['groupid'] = $this->referencer->resolveGroup($selement['elements'][0]['name']);
-						if (!$selement['elements'][0]['groupid']) {
-							throw new Exception(_s('Cannot find group "%1$s" used in map "%2$s".',
-								$selement['elements'][0]['name'], $map['name']));
-						}
-
-						unset($selement['elements'][0]['name']);
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['elements'][0]['hostid'] = $this->referencer->resolveHost($selement['elements'][0]['host']);
-						if (!$selement['elements'][0]['hostid']) {
-							throw new Exception(_s('Cannot find host "%1$s" used in map "%2$s".',
-								$selement['elements'][0]['host'], $map['name']));
-						}
-
-						unset($selement['elements'][0]['host']);
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						foreach ($selement['elements'] as &$element) {
-							$element['triggerid'] = $this->referencer->resolveTrigger($element['description'],
-								$element['expression'], $element['recovery_expression']
-							);
-
-							if (!$element['triggerid']) {
-								throw new Exception(_s(
-									'Cannot find trigger "%1$s" used in map "%2$s".',
-									$element['description'],
-									$map['name']
-								));
-							}
-
-							unset($element['description'], $element['expression'], $element['recovery_expression']);
-						}
-						unset($element);
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_IMAGE:
-						unset($selement['elements']);
-						break;
-				}
-
-				$icons = [
-					'icon_off' => 'iconid_off',
-					'icon_on' => 'iconid_on',
-					'icon_disabled' => 'iconid_disabled',
-					'icon_maintenance' => 'iconid_maintenance'
-				];
-				foreach ($icons as $element => $field) {
-					if (array_key_exists($element, $selement)) {
-						if (array_key_exists('name', $selement[$element]) && $selement[$element]['name'] !== '') {
-							$image = getImageByIdent($selement[$element]);
-							if (!$image) {
-								throw new Exception(_s('Cannot find icon "%1$s" used in map "%2$s".',
-									$selement[$element]['name'], $map['name']));
-							}
-							$selement[$field] = $image['imageid'];
-						}
-					}
-				}
-			}
-			unset($selement);
-		}
-
-		if (isset($map['links'])) {
-			foreach ($map['links'] as &$link) {
-				if (!$link['linktriggers']) {
-					unset($link['linktriggers']);
-					continue;
-				}
-
-				foreach ($link['linktriggers'] as &$linkTrigger) {
-					$trigger = $linkTrigger['trigger'];
-					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
-						$trigger['recovery_expression']
-					);
-
-					if (!$triggerId) {
-						throw new Exception(_s(
-							'Cannot find trigger "%1$s" used in map "%2$s".',
-							$trigger['description'],
-							$map['name']
-						));
+					if ($mapid === null) {
+						throw new Exception(_s('Cannot find map "%1$s" used in map "%2$s".',
+							$selement['elements'][0]['name'], $map['name']));
 					}
 
-					$linkTrigger['triggerid'] = $triggerId;
-				}
-				unset($linkTrigger);
+					$selement['elements'][0]['sysmapid'] = $mapid;
+					unset($selement['elements'][0]['name']);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$groupid = $this->referencer->findGroupidByName($selement['elements'][0]['name']);
+
+					if ($groupid === null) {
+						throw new Exception(_s('Cannot find group "%1$s" used in map "%2$s".',
+							$selement['elements'][0]['name'], $map['name']));
+					}
+
+					$selement['elements'][0]['groupid'] = $groupid;
+					unset($selement['elements'][0]['name']);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$hostid = $this->referencer->findHostidByHost($selement['elements'][0]['host']);
+
+					if ($hostid === null) {
+						throw new Exception(_s('Cannot find host "%1$s" used in map "%2$s".',
+							$selement['elements'][0]['host'], $map['name']));
+					}
+
+					$selement['elements'][0]['hostid'] = $hostid;
+					unset($selement['elements'][0]['host']);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					foreach ($selement['elements'] as &$element) {
+						$triggerid = $this->referencer->findTriggeridByName($element['description'],
+							$element['expression'], $element['recovery_expression']
+						);
+
+						if ($triggerid === null) {
+							throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
+								$element['description'], $map['name']));
+						}
+
+						$element['triggerid'] = $triggerid;
+						unset($element['description'], $element['expression'], $element['recovery_expression']);
+					}
+					unset($element);
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
+					unset($selement['elements']);
+					break;
 			}
-			unset($link);
+
+			$icons = [
+				'icon_off' => 'iconid_off',
+				'icon_on' => 'iconid_on',
+				'icon_disabled' => 'iconid_disabled',
+				'icon_maintenance' => 'iconid_maintenance'
+			];
+
+			foreach ($icons as $name_field => $id_field) {
+				if (array_key_exists($name_field, $selement) && array_key_exists('name', $selement[$name_field])
+						&& $selement[$name_field]['name'] !== '') {
+					$imageid = $this->referencer->findImageidByName(trim($selement[$name_field]['name']));
+
+					if ($imageid === null) {
+						throw new Exception(_s('Cannot find icon "%1$s" used in map "%2$s".',
+							$selement[$name_field]['name'], $map['name']));
+					}
+					$selement[$id_field] = $imageid;
+				}
+			}
 		}
+		unset($selement);
+
+		foreach ($map['links'] as &$link) {
+			if (!$link['linktriggers']) {
+				unset($link['linktriggers']);
+				continue;
+			}
+
+			foreach ($link['linktriggers'] as &$linktrigger) {
+				$trigger = $linktrigger['trigger'];
+				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression']
+				);
+
+				if ($triggerid === null) {
+					throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
+						$trigger['description'], $map['name']));
+				}
+
+				$linktrigger['triggerid'] = $triggerid;
+			}
+			unset($linktrigger);
+		}
+		unset($link);
 
 		return $map;
 	}
@@ -245,31 +248,30 @@ class CMapImporter extends CImporter {
 	 *
 	 * @return array
 	 */
-	protected function resolveMapElementReferences(array $maps) {
+	protected function resolveMapElementReferences(array $maps): array {
 		foreach ($maps as &$map) {
-			if (array_key_exists('iconmap', $map)) {
-				if (array_key_exists('name', $map['iconmap']) && $map['iconmap']['name'] !== '') {
-					$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+			if (array_key_exists('iconmap', $map) && array_key_exists('name', $map['iconmap'])
+					&& $map['iconmap']['name'] !== '') {
+				$iconmapid = $this->referencer->findIconmapidByName($map['iconmap']['name']);
 
-					if (!$map['iconmapid']) {
-						throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
-							$map['iconmap']['name'], $map['name']
-						));
-					}
+				if ($iconmapid === null) {
+					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
+						$map['iconmap']['name'], $map['name']
+					));
 				}
+				$map['iconmapid'] = $iconmapid;
 			}
 
-			if (array_key_exists('background', $map)) {
-				if (array_key_exists('name', $map['background']) && $map['background']['name'] !== '') {
-					$image = getImageByIdent($map['background']);
+			if (array_key_exists('background', $map) && array_key_exists('name', $map['background'])
+					&& $map['background']['name'] !== '') {
+				$imageid = $this->referencer->findImageidByName(trim($map['background']['name']));
 
-					if (!$image) {
-						throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
-							$map['background']['name'], $map['name']
-						));
-					}
-					$map['backgroundid'] = $image['imageid'];
+				if ($imageid === null) {
+					throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
+						$map['background']['name'], $map['name']
+					));
 				}
+				$map['backgroundid'] = $imageid;
 			}
 		}
 		unset($map);

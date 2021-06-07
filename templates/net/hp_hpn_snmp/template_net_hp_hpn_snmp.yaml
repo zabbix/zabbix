@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:26Z'
+  date: '2021-05-11T08:05:04Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: cce20a5d149a48b7ac7f5383c3510883
       template: 'HP Enterprise Switch SNMP'
       name: 'HP Enterprise Switch SNMP'
       description: |
@@ -32,6 +34,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: 083172af308e401a99a662f615a5b450
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0
@@ -49,12 +52,14 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              uuid: 883e49e933bd4cfda0e7dde774604a0a
+              expression: 'min(/HP Enterprise Switch SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: dadf12eb4c0a42bf9504e15bc4fe6d7c
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.1.3.0
@@ -81,13 +86,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: a9dcdf4129d041eca8dadc8bfbc455ee
+              expression: '(last(/HP Enterprise Switch SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch SNMP/system.hw.firmware,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 12d7d4a915714166b2c0a48733235ac1
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.36.1.1.2.9.0
@@ -109,13 +116,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 6b9b9b0d1ff24074bb344d04efe53444
+              expression: '(last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 4d827ed3c2a6436d9ea453ef1568d47e
           name: 'Entity Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -129,6 +138,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 6bd9d8c8d9cd473fb7e562cbde4de097
               name: '{#ENT_NAME}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
@@ -148,6 +158,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: baffe9cf11744c2286592a35934fb5b0
               name: '{#ENT_NAME}: Hardware version(revision)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
@@ -167,6 +178,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
         -
+          uuid: ebc407e29b1f4575b50ca7bfb3a2abc8
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
@@ -186,6 +198,7 @@ zabbix_export:
           description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.2 - fans and are present'
           item_prototypes:
             -
+              uuid: 939c03f1532944b4bfb732eb52b4d566
               name: '{#ENT_DESCR}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
@@ -204,13 +217,15 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1'
+                  uuid: 4fba6383ed4c4cd89b349a5dfccb7909
+                  expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1'
+                  uuid: 6cf626561b33468cb1e2c9e590334c4b
+                  expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -218,8 +233,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ENT_DESCR}: Fan is in critical state'
-                      expression: '{HP Enterprise Switch SNMP:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1'
+                      expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
         -
+          uuid: e175ffc9f7db4714bc99450e86a3963f
           name: 'Memory Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.1]'
@@ -228,6 +244,7 @@ zabbix_export:
           description: 'Discovery of NETSWITCH-MIB::hpLocalMemTable, A table that contains information on all the local memory for each slot.'
           item_prototypes:
             -
+              uuid: 27c87eb48e2e49879960bbb14430e52b
               name: '#{#SNMPVALUE}: Available memory'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.6.{#SNMPINDEX}'
@@ -242,6 +259,7 @@ zabbix_export:
                   tag: Application
                   value: Memory
             -
+              uuid: 1b6f6b3a06d44ff088a5ac0336ad995b
               name: '#{#SNMPVALUE}: Total memory'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.5.{#SNMPINDEX}'
@@ -256,6 +274,7 @@ zabbix_export:
                   tag: Application
                   value: Memory
             -
+              uuid: a724e90409b746068c4765dbbcfaf70d
               name: '#{#SNMPVALUE}: Used memory'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.7.{#SNMPINDEX}'
@@ -270,13 +289,14 @@ zabbix_export:
                   tag: Application
                   value: Memory
             -
+              uuid: 7167b10eb27548b8b48b7dc2881b82dd
               name: '#{#SNMPVALUE}: Memory utilization'
               type: CALCULATED
               key: 'vm.memory.util[snmp.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last("vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]")/last("vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]")*100'
+              params: 'last(//vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}])/last(//vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}])*100'
               description: 'Memory utilization in %'
               tags:
                 -
@@ -284,12 +304,14 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  uuid: 4fe0382fdee141adac03788c8810e387
+                  expression: 'min(/HP Enterprise Switch SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: aebb1527b1264e319bce23354c4ff200
               name: '#{#SNMPVALUE}: Memory usage'
               ymin_type_1: FIXED
               graph_items:
@@ -307,6 +329,7 @@ zabbix_export:
                     host: 'HP Enterprise Switch SNMP'
                     key: 'vm.memory.available[hpLocalMemFreeBytes.{#SNMPINDEX}]'
             -
+              uuid: 87cafd79e372498a87bd6fa283482256
               name: '#{#SNMPVALUE}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -318,6 +341,7 @@ zabbix_export:
                     host: 'HP Enterprise Switch SNMP'
                     key: 'vm.memory.util[snmp.{#SNMPINDEX}]'
         -
+          uuid: 75ff389432a443dd89075f5a89bfbc1e
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
@@ -337,6 +361,7 @@ zabbix_export:
           description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.1 - power supplies and are present'
           item_prototypes:
             -
+              uuid: 221f46a720ee4b2dbb35ad055f784146
               name: '{#ENT_DESCR}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
@@ -355,13 +380,15 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1'
+                  uuid: 81553d4157ce4c938c25b9403c5e572a
+                  expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1'
+                  uuid: aeb31d4c3958433c9a0105f79156094a
+                  expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -369,8 +396,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ENT_DESCR}: Power supply is in critical state'
-                      expression: '{HP Enterprise Switch SNMP:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1'
+                      expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
         -
+          uuid: 5039f958791e40dbb19e16359dad0898
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]'
@@ -390,6 +418,7 @@ zabbix_export:
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
           item_prototypes:
             -
+              uuid: 0f33142de9874eb288d48337becae31a
               name: '{#SENSOR_INFO}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
@@ -408,17 +437,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: 5d0d743c7f5449f4a429845ab3894d19
+                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: b549cc5016884818bf416c415618171f
+                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -426,16 +457,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: a4294d3ad024438aaba4234811d65582
+                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
         -
+          uuid: 8e9738236f3a4f5eb29df85a46e82326
           name: 'Temp Status Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
@@ -455,6 +488,7 @@ zabbix_export:
           description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.3 - over temp status and are present'
           item_prototypes:
             -
+              uuid: e5dbc6e86d0e4272aab83171cd9115e7
               name: '{#ENT_DESCR}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
@@ -501,6 +535,7 @@ zabbix_export:
           value: '50'
       valuemaps:
         -
+          uuid: 3c0731bf0669419fa8ebfdf9f7ec14de
           name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
           mappings:
             -
@@ -520,6 +555,7 @@ zabbix_export:
               newvalue: notPresent
   graphs:
     -
+      uuid: d282b8d685c547a58645c1cc63b00571
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

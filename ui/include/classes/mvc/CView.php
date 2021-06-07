@@ -41,6 +41,13 @@ class CView {
 	private $layout_modes_enabled = false;
 
 	/**
+	 * Explicitly set layout mode.
+	 *
+	 * @var int
+	 */
+	private $layout_mode;
+
+	/**
 	 * View name.
 	 *
 	 * @var string
@@ -198,12 +205,25 @@ class CView {
 	}
 
 	/**
-	 * Get current layout mode if layout modes were enabled for this view, or ZBX_LAYOUT_NORMAL otherwise.
+	 * Set layout mode explicitly.
+	 *
+	 * @param int $layout_mode  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
+	 */
+	public function setLayoutMode(int $layout_mode): void {
+		$this->layout_mode = $layout_mode;
+	}
+
+	/**
+	 * Get current layout mode.
 	 *
 	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
 	public function getLayoutMode() {
-		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+		if ($this->layout_modes_enabled) {
+			return ($this->layout_mode !== null) ? $this->layout_mode : CViewHelper::loadLayoutMode();
+		}
+
+		return ZBX_LAYOUT_NORMAL;
 	}
 
 	/**

@@ -86,6 +86,8 @@ const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
+double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
 #ifdef _WINDOWS
 
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -3569,7 +3571,7 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
 	if (0 == strncmp(func, "trend", 5))
 		return ZBX_FUNCTION_TYPE_TRENDS;
 
-	if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ','))
+	if (0 == strcmp(func, "nodata"))
 		return ZBX_FUNCTION_TYPE_TIMER;
 
 	return ZBX_FUNCTION_TYPE_HISTORY;
@@ -3902,3 +3904,75 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_report_nextcheck                                         *
+ *                                                                            *
+ * Purpose: calculate report nextcheck                                        *
+ *                                                                            *
+ * Parameters: now        - [IN] the current timestamp                        *
+ *             cycle      - [IN] the report cycle                             *
+ *             weekdays   - [IN] the week days report should be prepared,     *
+ *                               bitmask (0x01 - Monday, 0x02 - Tuesday...)   *
+ *             start_time - [IN] the report start time in seconds after       *
+ *                               midnight                                     *
+ *             tz         - [IN] the report starting timezone                 *
+ *                                                                            *
+ * Return value: The timestamp when the report must be prepared or -1 if an   *
+ *               error occurred.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
+		const char *tz)
+{
+	struct tm	*tm;
+	time_t		yesterday = now - SEC_PER_DAY;
+	int		nextcheck, tm_hour, tm_min, tm_sec;
+
+	if (NULL == (tm = zbx_localtime(&yesterday, tz)))
+		return -1;
+
+	tm_sec = start_time % 60;
+	start_time /= 60;
+	tm_min = start_time % 60;
+	start_time /= 60;
+	tm_hour = start_time;
+
+	do
+	{
+		/* handle midnight startup times */
+		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
+			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+
+		switch (cycle)
+		{
+			case ZBX_REPORT_CYCLE_YEARLY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				break;
+			case ZBX_REPORT_CYCLE_MONTHLY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				break;
+			case ZBX_REPORT_CYCLE_WEEKLY:
+				if (0 == weekdays)
+					return -1;
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+
+				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
+					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+
+				break;
+			case ZBX_REPORT_CYCLE_DAILY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				break;
+		}
+
+		tm->tm_sec = tm_sec;
+		tm->tm_min = tm_min;
+		tm->tm_hour = tm_hour;
+
+		nextcheck = (int)mktime(tm);
+	}
+	while (-1 != nextcheck && nextcheck <= now);
+
+	return nextcheck;
+}

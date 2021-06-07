@@ -20,6 +20,9 @@
 #ifndef ZABBIX_ZBXHISTORY_H
 #define ZABBIX_ZBXHISTORY_H
 
+#include "zbxvariant.h"
+#include "zbxjson.h"
+
 /* the item history value */
 typedef struct
 {
@@ -40,6 +43,7 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type);
 char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type);
 void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *value, int value_type);
+void	zbx_history_value2variant(const history_value_t *value, unsigned char value_type, zbx_variant_t *var);
 
 /* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
 /* value vector filled by zbx_vc_get_value* functions. This define simply better          */
@@ -55,6 +59,6 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-
+void	zbx_history_check_version(struct zbx_json *json);
 
 #endif

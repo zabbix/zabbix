@@ -25,6 +25,7 @@
 #include "evalfunc.h"
 #include "zbxregexp.h"
 #include "zbxtrends.h"
+#include "../zbxalgo/vectorimpl.h"
 
 typedef enum
 {
@@ -39,6 +40,26 @@ typedef enum
 	ZBX_VALUE_NVALUES
 }
 zbx_value_type_t;
+
+#define ZBX_VALUEMAP_STRING_LEN	64
+
+#define ZBX_VALUEMAP_TYPE_MATCH			0
+#define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
+#define ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL		2
+#define ZBX_VALUEMAP_TYPE_RANGE			3
+#define ZBX_VALUEMAP_TYPE_REGEX			4
+#define ZBX_VALUEMAP_TYPE_DEFAULT		5
+
+typedef struct
+{
+	char	value[ZBX_VALUEMAP_STRING_LEN];
+	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
+	int	type;
+}
+zbx_valuemaps_t;
+
+ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
+ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
 static const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -337,7 +358,7 @@ static int	evaluate_LOGSOURCE(char **value, DC_ITEM *item, const char *parameter
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		switch (regexp_match_ex(&regexps, ZBX_NULL2EMPTY_STR(vc_value.value.log->source), arg1, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				*value = zbx_strdup(*value, "1");
@@ -424,7 +445,7 @@ out:
 #define OP_LIKE		6
 #define OP_REGEXP	7
 #define OP_IREGEXP	8
-#define OP_BAND		9
+#define OP_BITAND		9
 #define OP_MAX		10
 
 static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
@@ -455,7 +476,7 @@ static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t 
 			if (value <= pattern)
 				(*count)++;
 			break;
-		case OP_BAND:
+		case OP_BITAND:
 			if ((value & mask) == pattern)
 				(*count)++;
 	}
@@ -627,7 +648,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 	else if (0 == strcmp(arg3, "iregexp"))
 		op = OP_IREGEXP;
 	else if (0 == strcmp(arg3, "band"))
-		op = OP_BAND;
+		op = OP_BITAND;
 
 	if (OP_UNKNOWN == op)
 	{
@@ -652,14 +673,14 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 			goto out;
 		}
 
-		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		if (OP_BITAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
 					arg3);
 			goto out;
 		}
 
-		if (OP_BAND == op && NULL != (arg2_2 = strchr(arg2, '/')))
+		if (OP_BITAND == op && NULL != (arg2_2 = strchr(arg2, '/')))
 		{
 			*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
 			arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
@@ -669,7 +690,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 		{
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				if (OP_BAND != op)
+				if (OP_BITAND != op)
 				{
 					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
@@ -834,7 +855,7 @@ out:
 #undef OP_LIKE
 #undef OP_REGEXP
 #undef OP_IREGEXP
-#undef OP_BAND
+#undef OP_BITAND
 #undef OP_MAX
 
 /******************************************************************************
@@ -2697,6 +2718,167 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: trends_parse_range                                               *
+ *                                                                            *
+ * Purpose: parse trend function period arguments into time range using old   *
+ *          parameter format                                                  *
+ *                                                                            *
+ * Parameters: from         - [IN] the time the period shift is calculated    *
+ *                                 from                                       *
+ *             period       - [IN] the history period                         *
+ *             period_shift - [IN] the history period shift                   *
+ *             start        - [OUT] the period start time in seconds since    *
+ *                                  Epoch                                     *
+ *             end          - [OUT] the period end time in seconds since      *
+ *                                  Epoch                                     *
+ *             error        - [OUT] the error message if parsing failed       *
+ *                                                                            *
+ * Return value: SUCCEED - period was parsed successfully                     *
+ *               FAIL    - invalid time period was specified                  *
+ *                                                                            *
+ * Comments: Daylight saving changes are applied when parsing ranges with     *
+ *           day+ used as period base (now/?).                                *
+ *                                                                            *
+ *           Example period_shift values:                                     *
+ *             now/d                                                          *
+ *             now/d-1h                                                       *
+ *             now/d+1h                                                       *
+ *             now/d+1h/w                                                     *
+ *             now/d/w/h+1h+2h                                                *
+ *             now-1d/h                                                       *
+ *                                                                            *
+ *  Comments: This is temporary solution to keep calculated checks working    *
+ *            until they are updated.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
+		char **error)
+{
+	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	zbx_time_unit_t	period_unit;
+	size_t		len;
+	struct tm	tm_end, tm_start;
+	const char	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:%s shift:%s", __func__, period, period_shift);
+
+	/* parse period */
+
+	if (SUCCEED != zbx_tm_parse_period(period, &len, &period_num, &period_unit, error))
+		return FAIL;
+
+	if ('\0' != period[len])
+	{
+		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", period + len);
+		return FAIL;
+	}
+
+	if (period_hours[period_unit] * period_num > 24 * 366)
+	{
+		*error = zbx_strdup(*error, "period is too large");
+		return FAIL;
+	}
+
+	/* parse period shift */
+
+	p = period_shift;
+
+	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
+	{
+		*error = zbx_strdup(*error, "period shift must begin with \"now\"");
+		return FAIL;
+	}
+
+	p += ZBX_CONST_STRLEN("now");
+
+	localtime_r(&from, &tm_end);
+
+	while ('\0' != *p)
+	{
+		zbx_time_unit_t	unit;
+
+		if ('/' == *p)
+		{
+			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+			{
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
+
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			zbx_tm_round_down(&tm_end, unit);
+
+			/* unit is single character */
+			p++;
+		}
+		else if ('+' == *p || '-' == *p)
+		{
+			int	num;
+			char	op = *(p++);
+
+			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
+				return FAIL;
+
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			if ('+' == op)
+				zbx_tm_add(&tm_end, num, unit);
+			else
+				zbx_tm_sub(&tm_end, num, unit);
+
+			p += len;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+			return FAIL;
+		}
+	}
+
+	tm_start = tm_end;
+
+	/* trends clock refers to the beginning of the hourly interval - subtract */
+	/* one hour to get the trends clock for the last hourly interval          */
+	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
+
+	if (-1 == (*end = mktime(&tm_end)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period end time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (abs((int)from - *end) > SEC_PER_YEAR * 26)
+	{
+		*error = zbx_strdup(*error, "period shift is too large");
+		return FAIL;
+	}
+
+	zbx_tm_sub(&tm_start, period_num, period_unit);
+	if (-1 == (*start = mktime(&tm_start)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period start time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
+
+	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_TREND                                                   *
  *                                                                            *
  * Purpose: evaluate trend* functions for the item                            *
@@ -2735,7 +2917,7 @@ static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const c
 		goto out;
 	}
 
-	if (SUCCEED != zbx_trends_parse_range(ts->sec, period, period_shift, &start, &end, error))
+	if (SUCCEED != trends_parse_range(ts->sec, period, period_shift, &start, &end, error))
 		goto out;
 
 	switch (item->value_type)
@@ -3281,6 +3463,165 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 }
 
+static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
+{
+	zbx_free(valuemap);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_value_by_map                                            *
+ *                                                                            *
+ * Purpose: replace value by mapping value                                    *
+ *                                                                            *
+ * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
+ *             valuemaps - vector of values mapped                            *
+ *             value_type - type of input value                               *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, value contains new value   *
+ *               FAIL - evaluation failed, value contains old value           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
+		unsigned char value_type)
+{
+	char		*value_tmp;
+	int		i, ret = FAIL;
+	double		input_value;
+	zbx_valuemaps_t	*valuemap;
+
+	for (i = 0; i < valuemaps->values_num; i++)
+	{
+		char			*pattern;
+		int			match;
+		zbx_vector_ptr_t	regexps;
+
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+
+		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type)
+		{
+			if (ITEM_VALUE_TYPE_STR != value_type)
+			{
+				double	num1, num2;
+
+				if (ZBX_INFINITY != (num1 = evaluate_string_to_double(value)) &&
+						ZBX_INFINITY != (num2 = evaluate_string_to_double(valuemap->value)) &&
+						SUCCEED == zbx_double_compare(num1, num2))
+				{
+					goto map_value;
+				}
+			}
+			else if (0 == strcmp(valuemap->value, value))
+				goto map_value;
+		}
+
+		if (ITEM_VALUE_TYPE_STR == value_type && ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
+		{
+			zbx_vector_ptr_create(&regexps);
+
+			pattern = valuemap->value;
+
+			match = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+
+			zbx_regexp_clean_expressions(&regexps);
+			zbx_vector_ptr_destroy(&regexps);
+
+			if (ZBX_REGEXP_MATCH == match)
+				goto map_value;
+		}
+
+		if (ITEM_VALUE_TYPE_STR != value_type &&
+				ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
+		{
+			double	min, max;
+
+			if (ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL == valuemap->type &&
+					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
+			{
+				if (input_value <= max)
+					goto map_value;
+			}
+			else if (ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL == valuemap->type &&
+					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
+			{
+				if (input_value >= min)
+					goto map_value;
+			}
+			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
+			{
+				int	num, j;
+				char	*input_ptr;
+
+				input_ptr = valuemap->value;
+
+				zbx_trim_str_list(input_ptr, ',');
+				zbx_trim_str_list(input_ptr, '-');
+				num = num_param(input_ptr);
+
+				for (j = 0; j < num; j++)
+				{
+					int	found = 0;
+					char	*ptr, *range_str;
+
+					range_str = ptr = get_param_dyn(input_ptr, j + 1, NULL);
+
+					if (1 < strlen(ptr) && '-' == *ptr)
+						ptr++;
+
+					while (NULL != (ptr = strchr(ptr, '-')))
+					{
+						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
+							break;
+						ptr++;
+					}
+
+					if (NULL == ptr)
+					{
+						min = evaluate_string_to_double(range_str);
+						found = ZBX_INFINITY != min && SUCCEED == zbx_double_compare(input_value, min);
+					}
+					else
+					{
+						*ptr = '\0';
+						min = evaluate_string_to_double(range_str);
+						max = evaluate_string_to_double(ptr + 1);
+						if (ZBX_INFINITY != min && ZBX_INFINITY != max &&
+								input_value >= min && input_value <= max)
+						{
+							found = 1;
+						}
+					}
+
+					zbx_free(range_str);
+
+					if (0 != found)
+						goto map_value;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < valuemaps->values_num; i++)
+	{
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+
+		if (ZBX_VALUEMAP_TYPE_DEFAULT == valuemap->type)
+			goto map_value;
+	}
+map_value:
+	if (i < valuemaps->values_num)
+	{
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
+
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: replace_value_by_map                                             *
@@ -3288,44 +3629,53 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
  * Purpose: replace value by mapping value                                    *
  *                                                                            *
  * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
  *             valuemapid - index of value map                                *
+ *             value_type - type of input value                               *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  ******************************************************************************/
-static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
+static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid, unsigned char value_type)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*value_esc, *value_tmp;
-	int		ret = FAIL;
+	int				ret = FAIL;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_valuemaps_t			*valuemap;
+	zbx_vector_valuemaps_ptr_t	valuemaps;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
 
 	if (0 == valuemapid)
 		goto clean;
 
-	value_esc = DBdyn_escape_string(value);
+	zbx_vector_valuemaps_ptr_create(&valuemaps);
+
 	result = DBselect(
-			"select newvalue"
+			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
-				" and value" ZBX_SQL_STRCMP,
-			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
-	zbx_free(value_esc);
+			" order by sortorder asc",
+			valuemapid);
 
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	while (NULL != (row = DBfetch(result)))
 	{
-		del_zeros(row[0]);
+		del_zeros(row[1]);
 
-		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
-		zbx_strlcpy_utf8(value, value_tmp, max_len);
-		zbx_free(value_tmp);
-
-		ret = SUCCEED;
+		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
+		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
+		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
+		valuemap->type = atoi(row[2]);
+		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
+
 	DBfree_result(result);
+
+	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
+
+	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
+	zbx_vector_valuemaps_ptr_destroy(&valuemaps);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 
@@ -3352,13 +3702,13 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
-			replace_value_by_map(value, max_len, valuemapid);
+			replace_value_by_map(value, max_len, valuemapid, value_type);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeros(value);
 			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
+			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid, value_type))
 				add_value_suffix(value, max_len, units, value_type);
 			break;
 		default:
@@ -3409,8 +3759,12 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 			(resolved_params = zbx_dc_expand_user_macros_in_func_params(parameter, item.host.hostid)),
 			&ts, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate function \"%s:%s.%s(%s)\": %s", host, key, function,
-				parameter, (NULL == error ? "item does not exist" : error));
+		char	*msg;
+
+		msg = zbx_eval_format_function_error(function, host, key, parameter,
+				(NULL == error ? "item does not exist" : error));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+		zbx_free(msg);
 		ret = FAIL;
 	}
 	else
@@ -3487,22 +3841,17 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
  *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
  *                                                                            *
  ******************************************************************************/
-int	evaluatable_for_notsupported(const char *fn)
+int	zbx_evaluatable_for_notsupported(const char *fn)
 {
-	/* functions date(), dayofmonth(), dayofweek(), now(), time() and nodata() are exceptions, */
-	/* they should be evaluated for NOTSUPPORTED items, too */
+	/* function nodata() are exceptions,                   */
+	/* and should be evaluated for NOTSUPPORTED items, too */
 
-	if ('n' != *fn && 'd' != *fn && 't' != *fn)
-		return FAIL;
-
-	if (('n' == *fn) && (0 == strcmp(fn, "nodata") || 0 == strcmp(fn, "now")))
-		return SUCCEED;
-
-	if (('d' == *fn) && (0 == strcmp(fn, "dayofweek") || 0 == strcmp(fn, "dayofmonth") || 0 == strcmp(fn, "date")))
-		return SUCCEED;
-
-	if (0 == strcmp(fn, "time"))
+	if (0 == strcmp(fn, "nodata"))
 		return SUCCEED;
 
 	return FAIL;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxserver/valuemaps_test.c"
+#endif

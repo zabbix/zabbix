@@ -18,58 +18,58 @@
 --
 
 TABLE |dashboard
-FIELDS|dashboardid|name                        |userid|private|templateid|display_period|auto_start|
-ROW   |1          |Global view                 |1     |0      |NULL      |30            |1         |
-ROW   |2          |Zabbix server health        |1     |1      |NULL      |30            |1         |
-ROW   |3          |Apache performance          |NULL  |1      |10265     |30            |1         |
-ROW   |4          |Apache performance          |NULL  |1      |10264     |30            |1         |
-ROW   |5          |Docker overview             |NULL  |1      |10318     |30            |1         |
-ROW   |7          |Redis performance           |NULL  |1      |10310     |30            |1         |
-ROW   |8          |RabbitMQ overview           |NULL  |1      |10300     |30            |1         |
-ROW   |9          |RabbitMQ node status        |NULL  |1      |10301     |30            |1         |
-ROW   |10         |Network interfaces          |NULL  |1      |10285     |30            |1         |
-ROW   |11         |System performance          |NULL  |1      |10285     |30            |1         |
-ROW   |12         |RabbitMQ overview           |NULL  |1      |10302     |30            |1         |
-ROW   |13         |RabbitMQ node status        |NULL  |1      |10303     |30            |1         |
-ROW   |14         |Network interfaces          |NULL  |1      |10342     |30            |1         |
-ROW   |15         |System performance          |NULL  |1      |10343     |30            |1         |
-ROW   |16         |Network interfaces          |NULL  |1      |10276     |30            |1         |
-ROW   |17         |System performance          |NULL  |1      |10001     |30            |1         |
-ROW   |18         |PostgreSQL databases        |NULL  |1      |10329     |30            |1         |
-ROW   |19         |Netowrk interfaces          |NULL  |1      |10348     |30            |1         |
-ROW   |20         |System performance          |NULL  |1      |10351     |30            |1         |
-ROW   |21         |Netowrk interfaces          |NULL  |1      |10291     |30            |1         |
-ROW   |22         |System performance          |NULL  |1      |10081     |30            |1         |
-ROW   |23         |MySQL performance           |NULL  |1      |10316     |30            |1         |
-ROW   |24         |MySQL performance           |NULL  |1      |10320     |30            |1         |
-ROW   |26         |Network interfaces          |NULL  |1      |10192     |30            |1         |
-ROW   |27         |Network interfaces          |NULL  |1      |10190     |30            |1         |
-ROW   |28         |Nginx performance           |NULL  |1      |10266     |30            |1         |
-ROW   |29         |System performance          |NULL  |1      |10185     |30            |1         |
-ROW   |30         |Nginx performance           |NULL  |1      |10267     |30            |1         |
-ROW   |31         |System performance          |NULL  |1      |10079     |30            |1         |
-ROW   |32         |System performance          |NULL  |1      |10074     |30            |1         |
-ROW   |33         |System performance          |NULL  |1      |10078     |30            |1         |
-ROW   |36         |Zabbix server health        |NULL  |1      |10047     |30            |1         |
-ROW   |37         |Zabbix proxy health         |NULL  |1      |10048     |30            |1         |
-ROW   |38         |Zabbix server health        |NULL  |1      |10261     |30            |1         |
-ROW   |39         |Zabbix proxy health         |NULL  |1      |10262     |30            |1         |
-ROW   |40         |HAProxy Backend performance |NULL  |1      |10309     |30            |1         |
-ROW   |41         |HAProxy Frontend performance|NULL  |1      |10309     |30            |1         |
-ROW   |42         |HAProxy Server performance  |NULL  |1      |10309     |30            |1         |
-ROW   |43         |HAProxy Backend performance |NULL  |1      |10308     |30            |1         |
-ROW   |44         |HAProxy Frontend performance|NULL  |1      |10308     |30            |1         |
-ROW   |45         |HAProxy Server performance  |NULL  |1      |10308     |30            |1         |
-ROW   |48         |PostgreSQL databases        |NULL  |1      |10357     |30            |1         |
-ROW   |49         |PostgreSQL stat             |NULL  |1      |10357     |30            |1         |
-ROW   |50         |System performance          |NULL  |1      |10076     |30            |1         |
-ROW   |51         |System performance          |NULL  |1      |10075     |30            |1         |
-ROW   |52         |System performance          |NULL  |1      |10077     |30            |1         |
-ROW   |53         |MySQL performance           |NULL  |1      |10317     |30            |1         |
-ROW   |54         |Network interfaces          |NULL  |1      |10188     |30            |1         |
-ROW   |55         |System performance          |NULL  |1      |10248     |30            |1         |
-ROW   |56         |Redis overview              |NULL  |1      |10310     |30            |1         |
-ROW   |57         |Zabbix server               |1     |1      |NULL      |30            |1         |
+FIELDS|dashboardid|name                        |userid|private|templateid|uuid                            |display_period|auto_start|
+ROW   |1          |Global view                 |1     |0      |NULL      |                                |30            |1         |
+ROW   |2          |Zabbix server health        |1     |1      |NULL      |                                |30            |1         |
+ROW   |3          |Apache performance          |NULL  |1      |10265     |a328c9e713424465a8e1adec7322b0dc|30            |1         |
+ROW   |4          |Apache performance          |NULL  |1      |10264     |c27c68fb9c234a09b4023076b45affc1|30            |1         |
+ROW   |5          |Docker overview             |NULL  |1      |10318     |7eb6472d07ac4c379e6b730b59a12507|30            |1         |
+ROW   |7          |Redis performance           |NULL  |1      |10310     |ee4c29eb7a0f443fafb7e7d3b9df7b24|30            |1         |
+ROW   |8          |RabbitMQ overview           |NULL  |1      |10300     |a886a871a00d47e28b8648cadae3bc99|30            |1         |
+ROW   |9          |RabbitMQ node status        |NULL  |1      |10301     |ce0af043ed2c4e7c988674c9ecb787d6|30            |1         |
+ROW   |10         |Network interfaces          |NULL  |1      |10285     |19dac6b780aa49558bf4a3782ba4b3b6|30            |1         |
+ROW   |11         |System performance          |NULL  |1      |10285     |558606056f464970a7c544ba75d544f2|30            |1         |
+ROW   |12         |RabbitMQ overview           |NULL  |1      |10302     |1b64af348f284f74a1f7f03de1d55f7b|30            |1         |
+ROW   |13         |RabbitMQ node status        |NULL  |1      |10303     |5e70f5ff6706442abc83ec1b206d9fe4|30            |1         |
+ROW   |14         |Network interfaces          |NULL  |1      |10342     |4c72409900b84a29bfcfd02648535a2b|30            |1         |
+ROW   |15         |System performance          |NULL  |1      |10343     |3e6ceed431734cc29836019e93b5f89e|30            |1         |
+ROW   |16         |Network interfaces          |NULL  |1      |10276     |1cbc445224b14af1b72f1580d7444ba5|30            |1         |
+ROW   |17         |System performance          |NULL  |1      |10001     |e9ca2f8e715f428b8edc0129aa0c79de|30            |1         |
+ROW   |18         |PostgreSQL databases        |NULL  |1      |10329     |e3ae726b06cc4663a3eef5a73909f796|30            |1         |
+ROW   |19         |Netowrk interfaces          |NULL  |1      |10348     |1f4737b4a5364b35a8358dccedf6a492|30            |1         |
+ROW   |20         |System performance          |NULL  |1      |10351     |234161507ccb4d83b111cb31e0db8ae5|30            |1         |
+ROW   |21         |Netowrk interfaces          |NULL  |1      |10291     |9ddc1ce7e9ea4d7dba8e282366084f3b|30            |1         |
+ROW   |22         |System performance          |NULL  |1      |10081     |5f494fac9dc94bf3827b67ea212240f2|30            |1         |
+ROW   |23         |MySQL performance           |NULL  |1      |10316     |ce2f9d7bb18e469f97e692baee02841d|30            |1         |
+ROW   |24         |MySQL performance           |NULL  |1      |10320     |ca5006123e0f4eb8bc0155027e663d2c|30            |1         |
+ROW   |26         |Network interfaces          |NULL  |1      |10192     |8283a27e39a9451283ce74aca085ffaa|30            |1         |
+ROW   |27         |Network interfaces          |NULL  |1      |10190     |b06fc59c5e744962b1ac5314e7e12cec|30            |1         |
+ROW   |28         |Nginx performance           |NULL  |1      |10266     |9d071e3a148c405e85c53ef25d54efaf|30            |1         |
+ROW   |29         |System performance          |NULL  |1      |10185     |623ea1bf76fc4e509e2b33b0642fb208|30            |1         |
+ROW   |30         |Nginx performance           |NULL  |1      |10267     |7d0bf76f09204bb7ba9ee995bf161d46|30            |1         |
+ROW   |31         |System performance          |NULL  |1      |10079     |d66f39e86e2047289acea0bc9a218807|30            |1         |
+ROW   |32         |System performance          |NULL  |1      |10074     |b4606920366049bd98e2e6d31c602d67|30            |1         |
+ROW   |33         |System performance          |NULL  |1      |10078     |774e5b14c75c49b4a3a4196ce1ccdaf7|30            |1         |
+ROW   |36         |Zabbix server health        |NULL  |1      |10047     |6815a90fb9b745fd8f1b1f47697893d6|30            |1         |
+ROW   |37         |Zabbix proxy health         |NULL  |1      |10048     |c12bdb602db645a292d0cbba39d58e9f|30            |1         |
+ROW   |38         |Zabbix server health        |NULL  |1      |10261     |acf492c7fb70451ba2afc6938e745a3a|30            |1         |
+ROW   |39         |Zabbix proxy health         |NULL  |1      |10262     |73c77a8555bc4a7d814d2cf54164f15f|30            |1         |
+ROW   |40         |HAProxy Backend performance |NULL  |1      |10309     |7910c0c96e014d68966c5ac989e9ebb7|30            |1         |
+ROW   |41         |HAProxy Frontend performance|NULL  |1      |10309     |d6ba5079de1c49bb9e0e5c47112b3ff9|30            |1         |
+ROW   |42         |HAProxy Server performance  |NULL  |1      |10309     |f41c3a3976dc483d98a386273ab5678f|30            |1         |
+ROW   |43         |HAProxy Backend performance |NULL  |1      |10308     |6d515de988274ac6b31938eebd175973|30            |1         |
+ROW   |44         |HAProxy Frontend performance|NULL  |1      |10308     |7c4decb2fefc4cfe9c4a3f8717d710ca|30            |1         |
+ROW   |45         |HAProxy Server performance  |NULL  |1      |10308     |ebc5a517fa544fada42550059c014c5b|30            |1         |
+ROW   |48         |PostgreSQL databases        |NULL  |1      |10357     |d95f29826778497a9ed265e0c335fd0f|30            |1         |
+ROW   |49         |PostgreSQL stat             |NULL  |1      |10357     |f2ceabf59fd64ca9828ea55e9b9668bd|30            |1         |
+ROW   |50         |System performance          |NULL  |1      |10076     |873e38e16ef94f2b9b743a3251db0fbb|30            |1         |
+ROW   |51         |System performance          |NULL  |1      |10075     |618c8fc9d4b640999b3389960f5bead4|30            |1         |
+ROW   |52         |System performance          |NULL  |1      |10077     |cbac7a8959574b308d1c1e23cf3760ee|30            |1         |
+ROW   |53         |MySQL performance           |NULL  |1      |10317     |d56c53704c264552a09cf3e59a1835f3|30            |1         |
+ROW   |54         |Network interfaces          |NULL  |1      |10188     |2e6a063b22c6428db5f47ac6805fd263|30            |1         |
+ROW   |55         |System performance          |NULL  |1      |10248     |59f09fada3ab43d1bdb70091f92e77f1|30            |1         |
+ROW   |56         |Redis overview              |NULL  |1      |10310     |7c5bdd7bc74648c4891abc6649d105d0|30            |1         |
+ROW   |57         |Zabbix server               |1     |1      |NULL      |                                |30            |1         |
 
 TABLE |dashboard_usrgrp
 FIELDS|dashboard_usrgrpid|dashboardid|usrgrpid|permission|

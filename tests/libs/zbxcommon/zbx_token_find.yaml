@@ -543,7 +543,7 @@ in:
 out:
   token: '{?{HOST.HOST}'
   token_type: ZBX_TOKEN_EXPRESSION_MACRO
-  expression: '{HOST.HOST'
+  expression: '{HOST.HOST}'
   return: SUCCEED
 ---
 test case: 'Success: {?{$MACRO}}'

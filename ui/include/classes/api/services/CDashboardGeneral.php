@@ -77,6 +77,21 @@ abstract class CDashboardGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		// Check if dashboards are used in scheduled reports.
+		if ($this instanceof CDashboard) {
+			$db_reports = DB::select('report', [
+				'output' => ['name', 'dashboardid'],
+				'filter' => ['dashboardid' => $dashboardids],
+				'limit' => 1
+			]);
+
+			if ($db_reports) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" is used in report "%2$s".',
+					$db_dashboards[$db_reports[0]['dashboardid']]['name'], $db_reports[0]['name']
+				));
+			}
+		}
+
 		$db_dashboard_pages = DB::select('dashboard_page', [
 			'output' => [],
 			'filter' => ['dashboardid' => $dashboardids],

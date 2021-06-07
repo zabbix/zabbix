@@ -319,7 +319,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	}
 
 	/**
-	 * @ignore-browser-errors
+	 * @ignoreBrowserErrors
 	 * @backup config
 	 * @dataProvider getAuthenticationDetails
 	 */

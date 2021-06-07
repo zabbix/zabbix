@@ -333,6 +333,21 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 
+		if (ITEM_TYPE_CALCULATED == item.type)
+		{
+			zbx_eval_context_t	ctx;
+			char			*error = NULL;
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
+			{
+				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
+				zbx_free(error);
+			}
+
+			zbx_eval_serialize(&ctx, NULL, &item.formula_bin);
+			zbx_eval_clear(&ctx);
+		}
+
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER);
 
 		switch (errcode)
@@ -385,6 +400,7 @@ out:
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
 	zbx_free(item.script_params);
+	zbx_free(item.formula_bin);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

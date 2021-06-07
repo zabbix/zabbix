@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @on-before enableUserGroup
- * @on-after disableUserGroup
+ * @onBefore enableUserGroup
+ * @onAfter disableUserGroup
  */
 class testAuditLog extends CAPITest {
 
@@ -790,7 +790,7 @@ class testAuditLog extends CAPITest {
 					AUDIT_RESOURCE_CORRELATION, AUDIT_RESOURCE_GRAPH_PROTOTYPE, AUDIT_RESOURCE_ITEM_PROTOTYPE,
 					AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_AUTOREGISTRATION, AUDIT_RESOURCE_MODULE,
 					AUDIT_RESOURCE_SETTINGS, AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION,
-					AUDIT_RESOURCE_TEMPLATE_DASHBOARD, AUDIT_RESOURCE_AUTH_TOKEN
+					AUDIT_RESOURCE_TEMPLATE_DASHBOARD, AUDIT_RESOURCE_AUTH_TOKEN, AUDIT_RESOURCE_SCHEDULED_REPORT
 				]).'.'
 			],
 			// Filter validation - ip.

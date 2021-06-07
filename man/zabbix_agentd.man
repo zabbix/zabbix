@@ -162,6 +162,7 @@ Documentation
 .BR zabbix_sender (1),
 .BR zabbix_server (8),
 .BR zabbix_js (1),
-.BR zabbix_agent2 (8)
+.BR zabbix_agent2 (8),
+.BR zabbix_web_service (8)
 .SH AUTHOR
 Alexei Vladishev <alex@zabbix.com>

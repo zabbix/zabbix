@@ -88,6 +88,12 @@ class CLLDMacroFunctionParserTest extends CParserTest {
 				0,
 				CParser::PARSE_FAIL,
 				''
+			],
+			[
+				'{{#M}.somefunc(/host/key["a", "b"])}',
+				0,
+				CParser::PARSE_FAIL,
+				''
 			]
 		];
 	}

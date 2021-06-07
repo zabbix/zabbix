@@ -564,7 +564,13 @@ jQuery(function($) {
 					switch (e.which) {
 						case KEY_TAB:
 						case KEY_ESCAPE:
-							hideAvailable($obj);
+							var $available = ms.values.available_div;
+
+							if ($available.parent().is(document.body)) {
+								hideAvailable($obj);
+								e.stopPropagation();
+							}
+
 							cleanSearchInput($obj);
 							break;
 

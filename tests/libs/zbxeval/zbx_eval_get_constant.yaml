@@ -1,0 +1,162 @@
+---
+test case: 'extract token 1'
+in:
+  expression: '("ccc")="ccca"'
+  index: 1
+out:
+  return: 'ccc'
+---
+test case: 'extract token 2'
+in:
+  expression: '("ccc")="ccca"'
+  index: 2
+out:
+  return: 'ccca'
+---
+test case: 'extract token 3'
+in:
+  expression: '("ccc")="ccca"'
+  index: 3
+out:
+  return: ''
+---
+test case: 'extract token 1, int in the middle'
+in:
+  expression: '("90")<>(2/"1")'
+  index: 1
+out:
+  return: '90'
+---
+test case: 'extract token 2, int in the middle'
+in:
+  expression: '("90")<>(2/"1")'
+  index: 2
+out:
+  return: '2'
+---
+test case: 'extract token 3, int in the middle'
+in:
+  expression: '("90")<>(2/"1")'
+  index: 3
+out:
+  return: '1'
+---
+test case: 'extract token 1, str in the middle'
+in:
+  expression: '(66)<>("-2"/1)'
+  index: 1
+out:
+  return: '66'
+---
+test case: 'extract token 2, str in the middle'
+in:
+  expression: '(66)<>("-2"/1)'
+  index: 2
+out:
+  return: '-2'
+---
+test case: 'extract token 3, str in the middle'
+in:
+  expression: '(66)<>("-2"/1)'
+  index: 3
+out:
+  return: '1'
+---
+test case: 'escape function'
+in:
+  expression: '{0286} + (0)<>("-2"/1 - {2370897})'
+  index: 1
+out:
+  return: '0'
+---
+test case: 'macro'
+in:
+  expression: '{19928}<>"{HOST.HOST}"'
+  index: 1
+out:
+  return: '{HOST.HOST}'
+---
+test case: 'escaping 1'
+in:
+  expression: '"\\"<>"a"'
+  index: 1
+out:
+  return: '\'
+---
+test case: 'escaping 2'
+in:
+  expression: '"\""<>"a"'
+  index: 1
+out:
+  return: '"'
+---
+test case: 'escaping 3'
+in:
+  expression: '"\"\"\""<>"a"'
+  index: 1
+out:
+  return: '"""'
+---
+test case: 'user macro'
+in:
+  expression: '{19928}<>{$MACRO}'
+  index: 1
+out:
+  return: '{$MACRO}'
+---
+test case: 'negative constant'
+in:
+  expression: '{19928}=-1'
+  index: 1
+out:
+  return: '-1'
+---
+test case: 'user macro with context'
+in:
+  expression: '{19928}<>{$MACRO:"x:\"1\""}'
+  index: 1
+out:
+  return: '{$MACRO:"x:\"1\""}'
+---
+test case: 'fraction'
+in:
+  expression: '{19928}<>.5'
+  index: 1
+out:
+  return: '.5'
+---
+test case: 'negative fraction'
+in:
+  expression: '{19928}<>-.5'
+  index: 1
+out:
+  return: '-.5'
+---
+test case: 'constant after macro'
+in:
+  expression: '{TRIGGER.VALUE}=1 and {19928}<>10'
+  index: 2
+out:
+  return: '10'
+---
+test case: 'constant 1e5'
+in:
+  expression: '{19928}=1e5'
+  index: 1
+out:
+  return: '1e5'
+---
+test case: 'constant 1e-5'
+in:
+  expression: '{19928}=1e-5'
+  index: 1
+out:
+  return: '1e-5'
+---
+test case: 'string constant -10e-10'
+in:
+  expression: '{TRIGGER.VALUE}=1 and {19928}<>"-10e-10"'
+  index: 2
+out:
+  return: '-10e-10'
+...

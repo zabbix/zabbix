@@ -102,7 +102,7 @@
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
 		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
-			<a href="#{url}" target="_blank">#{name}</a>
+			<a href="#{url}" target="_blank" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<?= (new CButton('remove', _('Remove')))

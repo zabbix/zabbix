@@ -12,7 +12,7 @@ Refer to the vendor documentation.
 
 ## Zabbix configuration
 
-The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/5.4/manual/config/macros/user_macros_context for more detailed info on user context macros.
+The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/6.0/manual/config/macros/user_macros_context for more detailed info on user context macros.
 
 ### Macros used
 

@@ -37,7 +37,7 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormTagsTriggerPrototype_Create($data) {
-		$expression = '{Simple form test host:item-prototype-form1.last()}=0';
+		$expression = 'last(/Simple form test host/item-prototype-form1)=0';
 		$this->checkTagsCreate($data, 'trigger prototype', $expression);
 	}
 

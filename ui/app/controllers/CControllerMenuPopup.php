@@ -261,7 +261,12 @@ class CControllerMenuPopup extends CController {
 					}
 
 					foreach ($db_trigger['functions'] as $function) {
-						if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
+						$parameters = array_map(function ($param) {
+							return trim($param, ' "');
+						}, explode(',', $function['parameter']));
+
+						if ($function['function'] !== 'find' || !array_key_exists(2, $parameters)
+								|| !in_array($parameters[2], ['regexp', 'iregexp'])) {
 							continue 2;
 						}
 					}
@@ -615,7 +620,8 @@ class CControllerMenuPopup extends CController {
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
-							'target' => '_blank'
+							'target' => '_blank',
+							'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 						];
 					}
 				}
@@ -627,7 +633,7 @@ class CControllerMenuPopup extends CController {
 						$url['url'] = 'javascript: alert(\''.
 							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
 						'\');';
-						unset($url['target']);
+						unset($url['target'], $url['rel']);
 					}
 				}
 				unset($url);

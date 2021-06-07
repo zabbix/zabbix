@@ -60,7 +60,6 @@ class CControllerQueueOverview extends CController {
 				ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMP,
 				ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_AGGREGATE,
 				ITEM_TYPE_EXTERNAL,
 				ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_HTTPAGENT,

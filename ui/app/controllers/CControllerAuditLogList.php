@@ -217,7 +217,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping'),
 			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
 			AUDIT_RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
-			AUDIT_RESOURCE_AUTH_TOKEN => _('API token')
+			AUDIT_RESOURCE_AUTH_TOKEN => _('API token'),
+			AUDIT_RESOURCE_SCHEDULED_REPORT => _('Scheduled report')
 		];
 	}
 

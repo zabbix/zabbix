@@ -37,7 +37,7 @@ class testFormTagsTrigger extends testFormTags {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormTagsTrigger_Create($data) {
-		$expression = '{Simple form test host:test-item-reuse.last()}=0';
+		$expression = 'last(/Simple form test host/test-item-reuse)=0';
 		$this->checkTagsCreate($data, 'trigger', $expression);
 	}
 

@@ -358,6 +358,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($chdHosts as $chdHost) {
 			$tmpGraph = $graph;
+			$tmpGraph['uuid'] = '';
 			$tmpGraph['templateid'] = $graph['graphid'];
 
 			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
@@ -636,7 +637,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 */
-	protected function validateCreate(array $graphs) {
+	protected function validateCreate(array &$graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
 
 		$allowedItems = API::Item()->get([

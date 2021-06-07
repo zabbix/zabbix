@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:31Z'
+  date: '2021-05-11T08:05:09Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 57aeccd43b744942b9555269b79a96ad
       template: 'HP Comware HH3C SNMP'
       name: 'HP Comware HH3C SNMP'
       description: |
@@ -34,6 +36,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       discovery_rules:
         -
+          uuid: ab903dd9cb4b49daba7a1bb0c2c65a1f
           name: 'Entity Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -47,6 +50,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 88a392e093444292b3c58c5f9d5305a5
               name: '{#ENT_NAME}: Firmware version'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.9.{#SNMPINDEX}'
@@ -67,13 +71,15 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 17e0f72418f4432d852b5c39ddf675bd
+                  expression: '(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: cc241e313bde48e1bd23f3eefb667439
               name: '{#ENT_NAME}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
@@ -93,6 +99,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: 9ebc80e149fc4db7a4fb7df2322aad86
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
@@ -113,12 +120,14 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: d3633f4584344570a1c0570f0b082590
+                  expression: '(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: a63db3df3939447397df5bf9a58edde1
               name: '{#ENT_NAME}: Hardware version(revision)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
@@ -138,6 +147,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: a54f57e58f494300b99161b1fb8f2edf
               name: '{#ENT_NAME}: Operating system'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}'
@@ -158,12 +168,14 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 9e6cccf7daec4405ac3bb1a27670fcee
+                  expression: '(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
                   manual_close: 'YES'
         -
+          uuid: fdd2fcda49ab4f00861f1a2dcee1dcad
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_DESCR},1.3.6.1.2.1.47.1.1.1.1.2]'
@@ -178,6 +190,7 @@ zabbix_export:
           description: 'Discovering all entities of PhysicalClass - 7: fan(7)'
           item_prototypes:
             -
+              uuid: 9cacbc1e037a4c0abdf0862014484a3c
               name: '{#ENT_NAME}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.19.{#SNMPINDEX}'
@@ -197,12 +210,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS:"fanError"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
+                  uuid: b0821c8e75e14e53906c3a3f209a2785
+                  expression: 'count(/HP Comware HH3C SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"fanError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"hardwareFaulty\"}")=1'
                   name: '{#ENT_NAME}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: 268421e66ba94cecac8fdeac7dfbffbb
           name: 'Module Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.2,{#MODULE_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -222,6 +237,7 @@ zabbix_export:
           description: 'Filter limits results to ''Module level1'' or Fabric Modules'
           item_prototypes:
             -
+              uuid: edbaa4c5e6e744b3bd4d7ab85b42c1ca
               name: '{#MODULE_NAME}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.6.{#SNMPINDEX}'
@@ -240,12 +256,14 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  uuid: 37a4a248c89240fe82c5fd6622123aa0
+                  expression: 'min(/HP Comware HH3C SNMP/system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#MODULE_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
             -
+              uuid: 3021126f556f4c62b335c8108ba1cff1
               name: '{#MODULE_NAME}: Memory utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.8.{#SNMPINDEX}'
@@ -263,12 +281,14 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  uuid: e8d3cb45afea4cbd935c9ea668746260
+                  expression: 'min(/HP Comware HH3C SNMP/vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MODULE_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: 2f7801aa39bd486bb9d2ff751c98559b
               name: '{#MODULE_NAME}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -280,6 +300,7 @@ zabbix_export:
                     host: 'HP Comware HH3C SNMP'
                     key: 'system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]'
             -
+              uuid: ff71369f73174bc0baf98f6da6f82d97
               name: '{#MODULE_NAME}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -291,6 +312,7 @@ zabbix_export:
                     host: 'HP Comware HH3C SNMP'
                     key: 'vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}]'
         -
+          uuid: 75f751bae6e64b9892c9283cefa8db80
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_DESCR},1.3.6.1.2.1.47.1.1.1.1.2]'
@@ -305,6 +327,7 @@ zabbix_export:
           description: 'Discovering all entities of PhysicalClass - 6: powerSupply(6)'
           item_prototypes:
             -
+              uuid: 1ed2aa667cc94e6f9fb3abb9cb8de9b2
               name: '{#ENT_NAME}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.19.{#SNMPINDEX}'
@@ -325,12 +348,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS:"psuError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"rpsError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
+                  uuid: 0c3cb88352e2417fb2b80bb78448fb35
+                  expression: 'count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"psuError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"rpsError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"hardwareFaulty\"}")=1'
                   name: '{#ENT_NAME}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
         -
+          uuid: 14606d314fc24002a0a4cda2fa009d45
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.2,{#MODULE_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -354,6 +379,7 @@ zabbix_export:
           description: 'Discovering modules temperature (same filter as in Module Discovery) plus and temperature sensors'
           item_prototypes:
             -
+              uuid: 4b18458608f74e0ca48af5cb674e324d
               name: '{#SNMPVALUE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.12.{#SNMPINDEX}'
@@ -370,17 +396,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: bbad03018e8e408c952cca2615b4eab3
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: cda6a4e305fe41239462d2f85acc5590
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -388,12 +416,13 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: 340a9c397bff4ac5a37a2ada9d0c1e69
+                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -430,6 +459,7 @@ zabbix_export:
           value: '50'
       valuemaps:
         -
+          uuid: d7832aa00dd743bb8451cabff4e90e60
           name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
           mappings:
             -

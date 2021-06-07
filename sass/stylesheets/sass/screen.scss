@@ -28,11 +28,13 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/dashboard";
+@import "components/diff";
 @import "components/form-search";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/tabfilter";
+@import "components/toc";
 @import "components/z-select";
 
 .link-action {
@@ -1337,6 +1339,21 @@ form {
 		@extend tfoot;
 	}
 
+	td {
+		position: relative;
+
+		&.td-drag-icon {
+			padding: 0 11px 0 0;
+			vertical-align: middle;
+		}
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			margin-right: 5px;
+		}
+	}
+
 	.table-forms-td-left {
 		display: table-cell;
 		padding: 5px 0;
@@ -1368,14 +1385,7 @@ form {
 			position: relative;
 
 			&.td-drag-icon {
-				padding: 0 11px 0 0;
-				vertical-align: middle;
-			}
-
-			.drag-icon {
-				position: absolute;
-				top: 5px;
-				margin-right: 5px;
+				padding-right: 11px;
 			}
 
 			&.center {
@@ -1511,6 +1521,7 @@ form {
 }
 
 .radio-list-control {
+	display: inline-block;
 	white-space: nowrap;
 
 	li {
@@ -1603,6 +1614,10 @@ form {
 			transition: none;
 			@extend %form-disabled;
 		}
+	}
+
+	+ .icon-info {
+		margin-left: 5px;
 	}
 }
 
@@ -3047,8 +3062,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
-			padding: 0 10px;
+			margin: 0 -10px 8px;
+			padding: 2px 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3134,6 +3149,11 @@ $form-icon-btn: (
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
+
+		&.modal-popup-fullscreen {
+			width: calc(100vw - 40px);
+			max-width: calc(100vw - 40px);
+		}
 	}
 
 	.hintbox-wrap {
@@ -3183,7 +3203,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 6px;
+		margin: -10px -10px 4px;
 	}
 
 	.maps-container {
@@ -4994,6 +5014,10 @@ svg {
 	display: none;
 }
 
+.visibility-hidden {
+	visibility: hidden;
+}
+
 .checkbox-list {
 	li {
 		overflow: hidden;
@@ -5490,7 +5514,9 @@ svg {
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
 .icon-actions-number-red,
-.icon-description {
+.icon-description,
+.icon-user,
+.icon-user-group {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -5622,6 +5648,30 @@ svg {
 
 	&::before {
 		background-position: -474px -245px;
+	}
+}
+
+.icon-user,
+.icon-user-group {
+	height: 16px;
+	width: 16px;
+	vertical-align: top;
+
+	&::before {
+		height: inherit;
+		width: inherit;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -339px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -339px -8px;
 	}
 }
 
@@ -6446,6 +6496,21 @@ z-select,
 	}
 }
 
+.mappings-table {
+	display: grid;
+	grid-template-columns: auto auto minmax(auto, 100%);
+
+	& > div {
+		text-align: left;
+	}
+
+	// For every 3th starting from 2nd child.
+	& > div:nth-child(3n + 2) {
+		text-align: center;
+		padding: 0 10px;
+	}
+}
+
 .valuemap-checkbox {
 	margin-top: 10px;
 }
@@ -6455,5 +6520,30 @@ z-select,
 		td {
 			vertical-align: top;
 		}
+	}
+}
+
+.subscriptions-table {
+
+	th {
+		color: $font-alt-color;
+	}
+}
+
+.import-compare {
+	display: flex;
+	max-height: calc(100vh - 190px);
+
+	.toc {
+		flex: 20%;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.diff {
+		flex: 80%;
+		margin-left: 5px;
+		overflow: auto;
+		border: 1px dashed $form-border-color;
 	}
 }

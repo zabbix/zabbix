@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -22,9 +22,9 @@
 class CTemplateImporter extends CImporter {
 
 	/**
-	 * @var array		a list of template IDs which were created or updated
+	 * @var array  A list of template IDs which were created or updated.
 	 */
-	protected $processedTemplateIds = [];
+	protected $processed_templateids = [];
 
 	/**
 	 * Import templates.
@@ -46,15 +46,15 @@ class CTemplateImporter extends CImporter {
 		}
 
 		do {
-			$independentTemplates = $this->getIndependentTemplates($templates);
+			$independent_templates = $this->getIndependentTemplates($templates);
 
-			$templatesToCreate = [];
-			$templatesToUpdate = [];
+			$templates_to_create = [];
+			$templates_to_update = [];
 			$valuemaps = [];
-			$templateLinkage = [];
-			$tmpls_to_clear = [];
+			$template_linkage = [];
+			$templates_to_clear = [];
 
-			foreach ($independentTemplates as $name) {
+			foreach ($independent_templates as $name) {
 				$template = $templates[$name];
 				unset($templates[$name]);
 
@@ -65,69 +65,36 @@ class CTemplateImporter extends CImporter {
 				 *  - save linkages to add in case if 'create new' linkages is checked;
 				 *  - calculate missing linkages in case if 'delete missing' is checked.
 				 */
-				if (!empty($template['templates'])) {
-					$templateLinkage[$template['host']] = $template['templates'];
+				if (array_key_exists('templates', $template)) {
+					$template_linkage[$template['host']] = $template['templates'];
 				}
 				unset($template['templates']);
 
-				if (array_key_exists('templateid', $template) && ($this->options['templates']['updateExisting']
-						|| $this->options['process_templates'])) {
-					$templatesToUpdate[] = $template;
+				if (array_key_exists('templateid', $template)
+						&& ($this->options['templates']['updateExisting'] || $this->options['process_templates'])) {
+					$templates_to_update[] = $template;
 				}
-				else if ($this->options['templates']['createMissing']) {
+				elseif ($this->options['templates']['createMissing']) {
 					if (array_key_exists('templateid', $template)) {
-						throw new Exception(_s('Template "%1$s" already exists.', $name));
+						throw new Exception(_s('Template "%1$s" already exists.', $template['host']));
 					}
 
-					$templatesToCreate[] = $template;
+					$templates_to_create[] = $template;
 				}
 
-				if ($template['valuemaps']) {
+				if (array_key_exists('valuemaps', $template)) {
 					$valuemaps[$template['host']] = $template['valuemaps'];
 				}
 			}
 
-			if ($this->options['templates']['createMissing'] && $templatesToCreate) {
-				$newTemplateIds = API::Template()->create($templatesToCreate);
-
-				foreach ($templatesToCreate as $num => $createdTemplate) {
-					$templateId = $newTemplateIds['templateids'][$num];
-
-					$this->referencer->addTemplateRef($createdTemplate['host'], $templateId);
-					$this->processedTemplateIds[$templateId] = $templateId;
-
-					if ($this->options['templateLinkage']['createMissing']
-							&& !empty($templateLinkage[$createdTemplate['host']])) {
-						API::Template()->massAdd([
-							'templates' => ['templateid' => $templateId],
-							'templates_link' => $templateLinkage[$createdTemplate['host']]
-						]);
-					}
-
-					if ($this->options['valueMaps']['createMissing']
-							&& array_key_exists($createdTemplate['host'], $valuemaps)) {
-						$ins_valuemaps = [];
-						foreach ($valuemaps[$createdTemplate['host']] as $valuemap) {
-							$valuemap['hostid'] = $templateId;
-							$ins_valuemaps[] = $valuemap;
-						}
-
-						if ($ins_valuemaps) {
-							API::ValueMap()->create($ins_valuemaps);
-						}
-					}
-				}
-			}
-
-			if ($templatesToUpdate) {
-
+			if ($templates_to_update) {
 				// Get template linkages to unlink and clear.
 				if ($this->options['templateLinkage']['deleteMissing']) {
 					// Get already linked templates.
 					$db_template_links = API::Template()->get([
 						'output' => ['templateid'],
 						'selectParentTemplates' => ['templateid'],
-						'templateids' => array_column($templatesToUpdate, 'templateid'),
+						'templateids' => array_column($templates_to_update, 'templateid'),
 						'preservekeys' => true
 					]);
 
@@ -136,114 +103,156 @@ class CTemplateImporter extends CImporter {
 					}
 					unset($db_template_link);
 
-					foreach ($templatesToUpdate as $tmpl) {
-						if (array_key_exists($tmpl['host'], $templateLinkage)) {
-							$tmpls_to_clear[$tmpl['templateid']] = array_diff($db_template_links[$tmpl['templateid']],
-								array_column($templateLinkage[$tmpl['host']], 'templateid')
+					foreach ($templates_to_update as $template) {
+						if (array_key_exists($template['host'], $template_linkage)) {
+							$templates_to_clear[$template['templateid']] = array_diff(
+								$db_template_links[$template['templateid']],
+								array_column($template_linkage[$template['host']], 'templateid')
 							);
 						}
 						else {
-							$tmpls_to_clear[$tmpl['templateid']] = $db_template_links[$tmpl['templateid']];
+							$templates_to_clear[$template['templateid']] = $db_template_links[$template['templateid']];
 						}
 					}
 				}
 
 				if ($this->options['templates']['updateExisting']) {
-					API::Template()->update($templatesToUpdate);
+					API::Template()->update(array_map(function($template) {
+						unset($template['uuid']);
+						return $template;
+					}, $templates_to_update));
 				}
 
-				foreach ($templatesToUpdate as $updatedTemplate) {
-					$this->processedTemplateIds[$updatedTemplate['templateid']] = $updatedTemplate['templateid'];
+				foreach ($templates_to_update as $template) {
+					$this->referencer->setDbTemplate($template['templateid'], $template);
+					$this->processed_templateids[$template['templateid']] = $template['templateid'];
 
 					// Drop existing template linkages if 'delete missing' is selected.
-					if (array_key_exists($updatedTemplate['templateid'], $tmpls_to_clear)
-							&& $tmpls_to_clear[$updatedTemplate['templateid']]) {
+					if (array_key_exists($template['templateid'], $templates_to_clear)
+							&& $templates_to_clear[$template['templateid']]) {
 						API::Template()->massRemove([
-							'templateids' => [$updatedTemplate['templateid']],
-							'templateids_clear' => $tmpls_to_clear[$updatedTemplate['templateid']]
+							'templateids' => [$template['templateid']],
+							'templateids_clear' => $templates_to_clear[$template['templateid']]
 						]);
 					}
 
 					// Make new template linkages.
 					if ($this->options['templateLinkage']['createMissing']
-							&& !empty($templateLinkage[$updatedTemplate['host']])) {
+							&& array_key_exists($template['host'], $template_linkage)) {
 						API::Template()->massAdd([
-							'templates' => $updatedTemplate,
-							'templates_link' => $templateLinkage[$updatedTemplate['host']]
+							'templates' => $template,
+							'templates_link' => $template_linkage[$template['host']]
 						]);
 					}
 
 					$db_valuemaps = API::ValueMap()->get([
-						'output' => ['valuemapid', 'name'],
-						'hostids' => [$updatedTemplate['templateid']]
+						'output' => ['valuemapid', 'uuid'],
+						'hostids' => [$template['templateid']]
 					]);
 
 					if ($this->options['valueMaps']['createMissing']
-							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
-						$ins_valuemaps = [];
-						$valuemap_names = array_column($db_valuemaps, 'name');
-						foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
-							if (!in_array($valuemap['name'], $valuemap_names)) {
-								$valuemap['hostid'] = $updatedTemplate['templateid'];
-								$ins_valuemaps[] = $valuemap;
+							&& array_key_exists($template['host'], $valuemaps)) {
+						$valuemaps_to_create = [];
+						$valuemap_uuids = array_column($db_valuemaps, 'uuid');
+
+						foreach ($valuemaps[$template['host']] as $valuemap) {
+							if (!in_array($valuemap['uuid'], $valuemap_uuids)) {
+								$valuemaps_to_create[] = $valuemap  + ['hostid' => $template['templateid']];
 							}
 						}
 
-						if ($ins_valuemaps) {
-							API::ValueMap()->create($ins_valuemaps);
+						if ($valuemaps_to_create) {
+							API::ValueMap()->create($valuemaps_to_create);
 						}
 					}
 
 					if ($this->options['valueMaps']['updateExisting']
-							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
-						$upd_valuemaps = [];
+							&& array_key_exists($template['host'], $valuemaps)) {
+						$valuemaps_to_update = [];
+
 						foreach ($db_valuemaps as $db_valuemap) {
-							foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
-								if ($db_valuemap['name'] === $valuemap['name']) {
-									$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
-									$upd_valuemaps[] = $valuemap;
+							foreach ($valuemaps[$template['host']] as $valuemap) {
+								if ($db_valuemap['uuid'] === $valuemap['uuid']) {
+									unset($valuemap['uuid']);
+									$valuemaps_to_update[] = $valuemap + ['valuemapid' => $db_valuemap['valuemapid']];
 								}
 							}
 						}
 
-						if ($upd_valuemaps) {
-							API::ValueMap()->update($upd_valuemaps);
+						if ($valuemaps_to_update) {
+							API::ValueMap()->update($valuemaps_to_update);
 						}
 					}
 
 					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
-						$del_valuemapids = [];
-						if (array_key_exists($updatedTemplate['host'], $valuemaps)) {
-							$valuemap_names = array_column($valuemaps[$updatedTemplate['host']], 'name');
+						$valuemapids_to_delete = [];
+
+						if (array_key_exists($template['host'], $valuemaps)) {
+							$valuemap_uuids = array_column($valuemaps[$template['host']], 'uuid');
+
 							foreach ($db_valuemaps as $db_valuemap) {
-								if (!in_array($db_valuemap['name'], $valuemap_names)) {
-									$del_valuemapids[] = $db_valuemap['valuemapid'];
+								if (!in_array($db_valuemap['uuid'], $valuemap_uuids)) {
+									$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
 								}
 							}
 						}
 						else {
-							$del_valuemapids = array_column($db_valuemaps, 'valuemapid');
+							$valuemapids_to_delete = array_column($db_valuemaps, 'valuemapid');
 						}
 
-						if ($del_valuemapids) {
-							API::ValueMap()->delete($del_valuemapids);
+						if ($valuemapids_to_delete) {
+							API::ValueMap()->delete($valuemapids_to_delete);
 						}
 					}
 				}
 			}
-		} while (!empty($independentTemplates));
+
+			if ($this->options['templates']['createMissing'] && $templates_to_create) {
+				$created_templates = API::Template()->create($templates_to_create);
+
+				foreach ($templates_to_create as $index => $template) {
+					$templateid = $created_templates['templateids'][$index];
+
+					$this->referencer->setDbTemplate($templateid, $template);
+					$this->processed_templateids[$templateid] = $templateid;
+
+					if ($this->options['templateLinkage']['createMissing']
+						&& array_key_exists($template['host'], $template_linkage)) {
+						API::Template()->massAdd([
+							'templates' => ['templateid' => $templateid],
+							'templates_link' => $template_linkage[$template['host']]
+						]);
+					}
+
+					if ($this->options['valueMaps']['createMissing']
+						&& array_key_exists($template['host'], $valuemaps)) {
+						$valuemaps_to_create = [];
+
+						foreach ($valuemaps[$template['host']] as $valuemap) {
+							$valuemap['hostid'] = $templateid;
+							$valuemaps_to_create[] = $valuemap;
+						}
+
+						if ($valuemaps_to_create) {
+							API::ValueMap()->create($valuemaps_to_create);
+						}
+					}
+				}
+			}
+		} while ($independent_templates);
 
 		// if there are templates left in $templates, then they have unresolved references
 		foreach ($templates as $template) {
-			$unresolvedReferences = [];
-			foreach ($template['templates'] as $linkedTemplate) {
-				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
-					$unresolvedReferences[] = $linkedTemplate['name'];
+			$unresolved_references = [];
+
+			foreach ($template['templates'] as $linked_template) {
+				if (!$this->referencer->findTemplateidByHost($linked_template['name'])) {
+					$unresolved_references[] = $linked_template['name'];
 				}
 			}
 			throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
 				'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
-				$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
+				$template['host'], implode(', ', $unresolved_references), count($unresolved_references)));
 		}
 	}
 
@@ -252,28 +261,32 @@ class CTemplateImporter extends CImporter {
 	 *
 	 * @return array
 	 */
-	public function getProcessedTemplateIds() {
-		return $this->processedTemplateIds;
+	public function getProcessedTemplateids(): array {
+		return $this->processed_templateids;
 	}
 
 	/**
 	 * Check if templates have circular references.
 	 *
-	 * @throws Exception
 	 * @see checkCircularRecursive
 	 *
 	 * @param array $templates
+	 *
+	 * @throws Exception
 	 */
-	protected function checkCircularTemplateReferences(array $templates) {
+	protected function checkCircularTemplateReferences(array $templates): void {
 		foreach ($templates as $name => $template) {
 			if (empty($template['templates'])) {
 				continue;
 			}
 
-			foreach ($template['templates'] as $linkedTemplate) {
+			foreach ($template['templates'] as $linked_template) {
 				$checked = [$name];
-				if ($circTemplates = $this->checkCircularRecursive($linkedTemplate, $templates, $checked)) {
-					throw new Exception(_s('Circular reference in templates: %1$s.', implode(' - ', $circTemplates)));
+
+				if ($circular_templates = $this->checkCircularRecursive($linked_template, $templates, $checked)) {
+					throw new Exception(
+						_s('Circular reference in templates: %1$s.', implode(' - ', $circular_templates))
+					);
 				}
 			}
 		}
@@ -283,58 +296,61 @@ class CTemplateImporter extends CImporter {
 	 * Recursive function for searching for circular template references.
 	 * If circular reference exist it return array with template names with circular reference.
 	 *
-	 * @param array $linkedTemplate template element to inspect on current recursive loop
-	 * @param array $templates      all templates where circular references should be searched
-	 * @param array $checked        template names that already were processed,
-	 *                              should contain unique values if no circular references exist
+	 * @param array $linked_template  Template element to inspect on current recursive loop.
+	 * @param array $templates        All templates where circular references should be searched.
+	 * @param array $checked          Template names that already were processed,
+	 *                                should contain unique values if no circular references exist.
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	protected function checkCircularRecursive(array $linkedTemplate, array $templates, array $checked) {
-		$linkedTemplateName = $linkedTemplate['name'];
+	protected function checkCircularRecursive(array $linked_template, array $templates, array $checked): array {
+		$linked_template_name = $linked_template['name'];
 
-		// if current element map name is already in list of checked map names,
-		// circular reference exists
-		if (in_array($linkedTemplateName, $checked)) {
-			// to have nice result containing only maps that have circular reference,
-			// remove everything that was added before repeated map name
-			$checked = array_slice($checked, array_search($linkedTemplateName, $checked));
-			// add repeated name to have nice loop like m1->m2->m3->m1
-			$checked[] = $linkedTemplateName;
-			return $checked;
+		// If current template name is already in list of checked template names, circular reference exists.
+		if (!in_array($linked_template_name, $checked)) {
+			$checked[] = $linked_template_name;
 		}
 		else {
-			$checked[] = $linkedTemplateName;
+			// To have nice result containing only templates that have circular reference,
+			// remove everything that was added before repeated template name.
+			$checked = array_slice($checked, array_search($linked_template_name, $checked));
+			// Add repeated name to have nice loop like m1->m2->m3->m1.
+			$checked[] = $linked_template_name;
+			return $checked;
 		}
 
-		// we need to find map that current element reference to
-		// and if it has selements check all them recursively
-		if (!empty($templates[$linkedTemplateName]['templates'])) {
-			foreach ($templates[$linkedTemplateName]['templates'] as $tpl) {
-				return $this->checkCircularRecursive($tpl, $templates, $checked);
+		// We need to find template that current element reference to and if it has linked templates
+		// check all them recursively.
+		if (array_key_exists($linked_template_name, $templates)) {
+			foreach ($templates[$linked_template_name]['templates'] as $template) {
+				$circular_templates = $this->checkCircularRecursive($template, $templates, $checked);
+
+				if ($circular_templates) {
+					return $circular_templates;
+				}
 			}
 		}
 
-		return false;
+		return [];
 	}
 
 	/**
-	 * Get templates that don't have not existing linked templates i.e. all templates that must be linked to these templates exist.
-	 * Returns array with template names (host).
+	 * Get templates that don't have not existing linked templates i.e. all templates that must be linked to these
+	 * templates exist. Returns array with template names (host).
 	 *
 	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function getIndependentTemplates(array $templates) {
-		foreach ($templates as $num => $template) {
-			if (empty($template['templates'])) {
+	protected function getIndependentTemplates(array $templates): array {
+		foreach ($templates as $index => $template) {
+			if (!array_key_exists('templates', $template)) {
 				continue;
 			}
 
-			foreach ($template['templates'] as $linkedTpl) {
-				if (!$this->referencer->resolveTemplate($linkedTpl['name'])) {
-					unset($templates[$num]);
+			foreach ($template['templates'] as $linked_template) {
+				if ($this->referencer->findTemplateidByHost($linked_template['name']) === null) {
+					unset($templates[$index]);
 					continue 2;
 				}
 			}
@@ -344,40 +360,54 @@ class CTemplateImporter extends CImporter {
 	}
 
 	/**
-	 * Change all references in template to database ids.
-	 *
-	 * @throws Exception
+	 * Change all references in template to database IDs.
 	 *
 	 * @param array $template
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
-	protected function resolveTemplateReferences(array $template) {
-		if ($templateId = $this->referencer->resolveTemplate($template['host'])) {
-			$template['templateid'] = $templateId;
+	protected function resolveTemplateReferences(array $template): array {
+		$templateid = $this->referencer->findTemplateidByUuid($template['uuid']);
 
-			// if we update template, existing macros should have hostmacroid
+		if ($templateid !== null) {
+			$template['templateid'] = $templateid;
+
+			// If we update template, existing macros should have hostmacroid.
 			if (array_key_exists('macros', $template)) {
 				foreach ($template['macros'] as &$macro) {
-					if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
-						$macro['hostmacroid'] = $hostMacroId;
+					$hostmacroid = $this->referencer->findMacroid($templateid, $macro['macro']);
+
+					if ($hostmacroid !== null) {
+						$macro['hostmacroid'] = $hostmacroid;
 					}
 				}
 				unset($macro);
 			}
 		}
 
-		foreach ($template['groups'] as $gnum => $group) {
-			if (!$this->referencer->resolveGroup($group['name'])) {
+		foreach ($template['groups'] as $index => $group) {
+			$groupid = $this->referencer->findGroupidByName($group['name']);
+
+			if ($groupid === null) {
 				throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
 			}
-			$template['groups'][$gnum] = ['groupid' => $this->referencer->resolveGroup($group['name'])];
+
+			$template['groups'][$index] = ['groupid' => $groupid];
 		}
 
-		if (isset($template['templates'])) {
-			foreach ($template['templates'] as $tnum => $parentTemplate) {
-				$template['templates'][$tnum] = [
-					'templateid' => $this->referencer->resolveTemplate($parentTemplate['name'])
+		if (array_key_exists('templates', $template)) {
+			foreach ($template['templates'] as $index => $parent_template) {
+				$parent_templateid = $this->referencer->findTemplateidByHost($parent_template['name']);
+
+				if ($parent_templateid === null) {
+					throw new Exception(_s('Cannot import template "%1$s", linked template "%2$s" does not exist.',
+						$template['host'], $parent_template['name']));
+				}
+
+				$template['templates'][$index] = [
+					'templateid' => $parent_templateid
 				];
 			}
 		}

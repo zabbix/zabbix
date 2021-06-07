@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:57Z'
+  date: '2021-05-11T08:05:44Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
+      uuid: d670c32f007d438c9dcd32db57d2b691
       template: 'Oracle by Zabbix Agent 2'
       name: 'Oracle by Zabbix Agent 2'
       description: 'Template tooling version used: 0.38'
@@ -14,6 +16,7 @@ zabbix_export:
           name: Templates/Databases
       items:
         -
+          uuid: 9d24ae0f86d54b73a35d9c15d4e082cb
           name: 'Oracle: Active parallel sessions'
           type: DEPENDENT
           key: oracle.active_parallel_sessions
@@ -33,6 +36,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 7e4eb79b9b674c5ba57e790fae0fb410
           name: 'Oracle: Active serial sessions'
           type: DEPENDENT
           key: oracle.active_serial_sessions
@@ -52,6 +56,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 9763dd0b223540e4820fd3b8f3281ec3
           name: 'Oracle: Average active sessions'
           type: DEPENDENT
           key: oracle.active_sessions
@@ -71,6 +76,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1ad93880e4314d68b9e1aa4e00f03b6e
           name: 'Oracle: Get archive log info'
           key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 5m
@@ -82,6 +88,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: a5533a1c354a4c8dbfec39c9b0637ba2
           name: 'Oracle: Archiver state'
           type: DEPENDENT
           key: oracle.archiver_state
@@ -102,6 +109,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: a5f5251364a44a90a66bb2096f53a48a
           name: 'Oracle: Buffer cache hit ratio'
           type: DEPENDENT
           key: oracle.buffer_cache_hit_ratio
@@ -122,6 +130,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1483e7a312154438a9b09d0b696568f0
           name: 'Oracle: Global cache blocks corrupted'
           type: DEPENDENT
           key: oracle.cache_blocks_corrupt
@@ -140,6 +149,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 3589d4b2b9114f9cabb027f85f5349ab
           name: 'Oracle: Global cache blocks lost'
           type: DEPENDENT
           key: oracle.cache_blocks_lost
@@ -158,6 +168,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1bad65e85d8b482d9cd83b1d202f8d8c
           name: 'Oracle: Get CDB and No-CDB info'
           key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -169,6 +180,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: fd1ea13484984d0baffc45ea02a33a7c
           name: 'Oracle: Cursor cache hit ratio'
           type: DEPENDENT
           key: oracle.cursor_cache_hit_ratio
@@ -189,6 +201,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 9fd6475d1b824c74b2b3dad1db4f494a
           name: 'Oracle: Database CPU time ratio'
           type: DEPENDENT
           key: oracle.database_cpu_time_ratio
@@ -209,6 +222,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 9fc7f2e986cd4c97ad8778f06dd04822
           name: 'Oracle: Database wait time ratio'
           type: DEPENDENT
           key: oracle.database_wait_time_ratio
@@ -229,6 +243,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 12efa23a53eb468ea7b0713b8f610542
           name: 'Oracle: Datafiles count'
           key: 'oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: 7d
@@ -243,6 +258,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: cdd3d4f1baea4f2ea122e058704d43e9
           name: 'Oracle: Datafiles limit'
           type: DEPENDENT
           key: oracle.db_files_limit
@@ -261,6 +277,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: cb703b07fc514ce5aedc561896bcd53f
           name: 'Oracle: Get ASM stats'
           key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -272,6 +289,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 9692f4f771844438a3f9224455c504b6
           name: 'Oracle: Disk sort per second'
           type: DEPENDENT
           key: oracle.disk_sorts
@@ -292,6 +310,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 7dc5745f2a124119b058d23195ba5058
           name: 'Oracle: Enqueue timeouts per second'
           type: DEPENDENT
           key: oracle.enqueue_timeouts_rate
@@ -312,6 +331,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1aa391bbd2484793a31dc9f0dce51b46
           name: 'Oracle: Get FRA stats'
           key: 'oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -323,6 +343,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 5e09413cb3a14a3a87e2ead6b838ce1f
           name: 'Oracle: FRA, Number of files'
           type: DEPENDENT
           key: oracle.fra_number_of_files
@@ -341,6 +362,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 68f50e7513d642f789a27dfce03ca1b8
           name: 'Oracle: FRA, Number of restore points'
           type: DEPENDENT
           key: oracle.fra_restore_point
@@ -359,6 +381,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: f7f16828d46a4054a30a22e955542d6a
           name: 'Oracle: FRA, Space limit'
           type: DEPENDENT
           key: oracle.fra_space_limit
@@ -378,6 +401,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 92d7abac10dc47a7bec1bd420a41c78c
           name: 'Oracle: FRA, Space reclaimable'
           type: DEPENDENT
           key: oracle.fra_space_reclaimable
@@ -397,6 +421,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1e02a10018124f4db85ef9822a605b61
           name: 'Oracle: FRA, Used space'
           type: DEPENDENT
           key: oracle.fra_space_used
@@ -416,6 +441,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 887c56e1b9f1415db5def1e1f502a6ae
           name: 'Oracle: FRA, Usable space in %'
           type: DEPENDENT
           key: oracle.fra_usable_pct
@@ -435,6 +461,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: e8725c1d79e34fbc8331677fe3d4459e
           name: 'Oracle: GC CR block received per second'
           type: DEPENDENT
           key: oracle.gc_cr_block_received_rate
@@ -455,6 +482,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 2c7dd0c162b742d08a2432c8bdde4ce2
           name: 'Oracle: Get instance state'
           key: 'oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -466,6 +494,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 021a98326c8f402693e4fba9fb3c25de
           name: 'Oracle: Instance role'
           type: DEPENDENT
           key: oracle.instance.role
@@ -486,6 +515,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: cd0e2c8f164443588ad19647506c0eea
           name: 'Oracle: Instance hostname'
           type: DEPENDENT
           key: oracle.instance_hostname
@@ -507,12 +537,14 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 346ef7cacf534988892970d699ef4028
+              expression: '(last(/Oracle by Zabbix Agent 2/oracle.instance_hostname,#1)<>last(/Oracle by Zabbix Agent 2/oracle.instance_hostname,#2))=1 and length(last(/Oracle by Zabbix Agent 2/oracle.instance_hostname))>0'
               name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance hostname has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 0cc90c2554a7412eafe42c33dd1e9ede
           name: 'Oracle: Instance name'
           type: DEPENDENT
           key: oracle.instance_name
@@ -534,12 +566,14 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: ed394860378642d5b9f220327ead6766
+              expression: '(last(/Oracle by Zabbix Agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix Agent 2/oracle.instance_name,#2))=1 and length(last(/Oracle by Zabbix Agent 2/oracle.instance_name))>0'
               name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance name has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: f51053d243ef41089b5e635fd1abb5f3
           name: 'Oracle: Instance status'
           type: DEPENDENT
           key: oracle.instance_status
@@ -560,6 +594,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: b2551269bf4541dfae378b9e48d1f5da
           name: 'Oracle: Library cache hit ratio'
           type: DEPENDENT
           key: oracle.library_cache_hit_ratio
@@ -580,6 +615,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 13a938f495ee464a8ed3f2575cd191b9
           name: 'Oracle: Logons per second'
           type: DEPENDENT
           key: oracle.logons_rate
@@ -600,6 +636,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 440f42943ebc436fb75bd5d8397fe876
           name: 'Oracle: Long table scans per second'
           type: DEPENDENT
           key: oracle.long_table_scans_rate
@@ -620,6 +657,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 4769432ae04641758daabd5b27deaa01
           name: 'Oracle: Memory sorts ratio'
           type: DEPENDENT
           key: oracle.memory_sorts_ratio
@@ -640,6 +678,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: ca4452418d2641bd87fa75e946c2bf98
           name: 'Oracle: Get PDB info'
           key: 'oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -651,6 +690,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 4926809f2c244b33b1a0650510a30fa4
           name: 'Oracle: Get PGA stats'
           key: 'oracle.pga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -662,6 +702,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 749a1281ba84475193897a3362f6f873
           name: 'Oracle: PGA, Global memory bound'
           type: DEPENDENT
           key: oracle.pga_global_bound
@@ -681,6 +722,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 2b5797f046434125b65daf31121fdd81
           name: 'Oracle: PGA, Aggregate target parameter'
           type: DEPENDENT
           key: oracle.pga_target
@@ -700,6 +742,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: e96ff6a018dc4553b9ad7f2dc87f4d99
           name: 'Oracle: Physical reads per second'
           type: DEPENDENT
           key: oracle.physical_reads_rate
@@ -720,6 +763,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 92bf88b7b07048b785ca37d9b97cd78b
           name: 'Oracle: Physical reads bytes per second'
           type: DEPENDENT
           key: oracle.physical_read_bytes_rate
@@ -740,6 +784,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: b71df51181c1464486ced05c95bdc938
           name: 'Oracle: Physical writes per second'
           type: DEPENDENT
           key: oracle.physical_writes_rate
@@ -760,6 +805,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: e34abb4139fe43ae8b27edbe6ad12c8d
           name: 'Oracle: Physical writes bytes per second'
           type: DEPENDENT
           key: oracle.physical_write_bytes_rate
@@ -780,6 +826,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 7f4d8ea4912944ec8bf32edff9e3b5ae
           name: 'Oracle: Ping'
           key: 'oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 30s
@@ -798,11 +845,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: df6b0f5dd50848cc8c2e67947df0a5e1
+              expression: 'last(/Oracle by Zabbix Agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0'
               name: 'Oracle: Connection to database is unavailable'
               priority: DISASTER
               description: 'Connection to Oracle Database is currently unavailable.'
         -
+          uuid: ce9dabcce58d408d8188fe7caa71e666
           name: 'Oracle: Number of processes'
           key: 'oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: 7d
@@ -816,6 +865,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: cdb59700d4a24fb3bea9d2b63d5d7938
           name: 'Oracle: Processes limit'
           type: DEPENDENT
           key: oracle.processes_limit
@@ -834,6 +884,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 898a5325c2a2469dabb6a2356107dd66
           name: 'Oracle: Redo logs available to switch'
           key: 'oracle.redolog.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: 7d
@@ -849,11 +900,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{max(5m)} < {$ORACLE.REDO.MIN.WARN}'
+              uuid: 18dba6067a254bdd99a363c3d7b9bdb2
+              expression: 'max(/Oracle by Zabbix Agent 2/oracle.redolog.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) < {$ORACLE.REDO.MIN.WARN}'
               name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of available for log switching inactive/unused REDOs is low (Database down risk)'
         -
+          uuid: e8aca0dfd1d74d3b9b042d3ed3070e42
           name: 'Oracle: Rows per sort'
           type: DEPENDENT
           key: oracle.rows_per_sort
@@ -873,6 +926,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 0458d6dd9bde4f2aa51319e3c23f5eae
           name: 'Oracle: SQL service response time'
           type: DEPENDENT
           key: oracle.service_response_time
@@ -897,6 +951,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 41d61d167bf044fe9f0d9815b4fd27e6
           name: 'Oracle: Get sessions stats'
           key: 'oracle.sessions.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{$ORACLE.SESSION.LOCK.MAX.TIME}"]'
           history: '0'
@@ -908,6 +963,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 89811a05632c478d97165f629dadd5b9
           name: 'Oracle: Active background sessions'
           type: DEPENDENT
           key: oracle.session_active_background
@@ -929,6 +985,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: a7ef5969fff545968d7c133bc67baaac
           name: 'Oracle: Active user sessions'
           type: DEPENDENT
           key: oracle.session_active_user
@@ -950,6 +1007,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: d91119f30b95418bab67f929737e6bf8
           name: 'Oracle: Sessions concurrency'
           type: DEPENDENT
           key: oracle.session_concurrency_rate
@@ -971,11 +1029,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{min(5m)} > {$ORACLE.CONCURRENCY.MAX.WARN}'
+              uuid: ff16c7bbeaa5439f98ffe12ce7deff71
+              expression: 'min(/Oracle by Zabbix Agent 2/oracle.session_concurrency_rate,5m) > {$ORACLE.CONCURRENCY.MAX.WARN}'
               name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
         -
+          uuid: cfd7559ac25e4c0a837048e675f4d995
           name: 'Oracle: Session count'
           type: DEPENDENT
           key: oracle.session_count
@@ -995,6 +1055,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 2222705798fd464492c6f692dd9a0392
           name: 'Oracle: Inactive user sessions'
           type: DEPENDENT
           key: oracle.session_inactive_user
@@ -1016,6 +1077,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 381c97858785442389cd6ab74d0ee285
           name: 'Oracle: Sessions limit'
           type: DEPENDENT
           key: oracle.session_limit
@@ -1034,6 +1096,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: c1717acc82784151b5afc6ad08ce3145
           name: 'Oracle: Sessions lock rate'
           type: DEPENDENT
           key: oracle.session_lock_rate
@@ -1055,11 +1118,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{min(5m)} > {$ORACLE.SESSIONS.LOCK.MAX.WARN}'
+              uuid: 504e5d964de645679ce448165dadd027
+              expression: 'min(/Oracle by Zabbix Agent 2/oracle.session_lock_rate,5m) > {$ORACLE.SESSIONS.LOCK.MAX.WARN}'
               name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
         -
+          uuid: c279df21264642369d65a6c72a11698d
           name: 'Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s'
           type: DEPENDENT
           key: oracle.session_long_time_locked
@@ -1080,11 +1145,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{min(5m)} > {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
+              uuid: 5abc07cd48514a0dac90ce946ce6bc3a
+              expression: 'min(/Oracle by Zabbix Agent 2/oracle.session_long_time_locked,5m) > {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
               name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.'
         -
+          uuid: 1bafc80a94fb454785362593b8a73be3
           name: 'Oracle: Get SGA stats'
           key: 'oracle.sga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -1096,6 +1163,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 7ad06a6ccb834c5c95f30c319a48446c
           name: 'Oracle: SGA, buffer cache'
           type: DEPENDENT
           key: oracle.sga_buffer_cache
@@ -1115,6 +1183,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 39dc67c29cce4742acf832949dc57760
           name: 'Oracle: SGA, fixed'
           type: DEPENDENT
           key: oracle.sga_fixed
@@ -1134,6 +1203,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 562c02f282974020add8f98e9865fb9d
           name: 'Oracle: SGA, java pool'
           type: DEPENDENT
           key: oracle.sga_java_pool
@@ -1153,6 +1223,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 35e3346e273a46339e7b5d3721584d3a
           name: 'Oracle: SGA, large pool'
           type: DEPENDENT
           key: oracle.sga_large_pool
@@ -1172,6 +1243,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 77c17fc1056745c4949b3476c3b920d4
           name: 'Oracle: SGA, log buffer'
           type: DEPENDENT
           key: oracle.sga_log_buffer
@@ -1191,6 +1263,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: b64f3cad53814e989c576d3ce51bf42d
           name: 'Oracle: SGA, shared pool'
           type: DEPENDENT
           key: oracle.sga_shared_pool
@@ -1210,6 +1283,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 517c7b3bbf8d40988e6a8289319eaec9
           name: 'Oracle: Shared pool free %'
           type: DEPENDENT
           key: oracle.shared_pool_free
@@ -1231,11 +1305,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{max(5m)}<{$ORACLE.SHARED.FREE.MIN.WARN}'
+              uuid: 80dbf89c86764cf09d2c5ec834e8940c
+              expression: 'max(/Oracle by Zabbix Agent 2/oracle.shared_pool_free,5m)<{$ORACLE.SHARED.FREE.MIN.WARN}'
               name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.'
         -
+          uuid: 28c7030b02714d5ea402fe6f2a3d769a
           name: 'Oracle: Total sorts per user call'
           type: DEPENDENT
           key: oracle.sorts_per_user_call
@@ -1255,6 +1331,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: eccce1efc85d46199b3147ec586e1cd5
           name: 'Oracle: Get system metrics'
           key: 'oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 0;m0-59
@@ -1267,6 +1344,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: d59cca864e8044d89f9b4689ec712511
           name: 'Oracle: Get system parameters'
           key: 'oracle.sys.params["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -1278,6 +1356,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 48f54a0324a64e80aaf22d5cd26798cd
           name: 'Oracle: Temp space used'
           type: DEPENDENT
           key: oracle.temp_space_used
@@ -1298,6 +1377,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 1a4efb793cff4224b0ae02272be2fe85
           name: 'Oracle: PGA, Total allocated'
           type: DEPENDENT
           key: oracle.total_pga_allocated
@@ -1317,6 +1397,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 264b73d153694b52a47ac0219a8de66c
           name: 'Oracle: PGA, Total freeable'
           type: DEPENDENT
           key: oracle.total_pga_freeable
@@ -1336,6 +1417,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 3f3083748a4f42998b135b1b4f88d11a
           name: 'Oracle: PGA, Total inuse'
           type: DEPENDENT
           key: oracle.total_pga_used
@@ -1355,6 +1437,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 97ac4acedcde465b8d004a8ac476dd99
           name: 'Oracle: Get tablespaces stats'
           key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: '0'
@@ -1366,6 +1449,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 4f1a9efea8594486b226307a52e35474
           name: 'Oracle: Uptime'
           type: DEPENDENT
           key: oracle.uptime
@@ -1387,17 +1471,20 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: bcdaf519783f453e81d7064207f8bd30
+              expression: 'nodata(/Oracle by Zabbix Agent 2/oracle.uptime,30m)=1'
               name: 'Oracle: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting.'
             -
-              expression: '{last()}<10m'
+              uuid: 5eae478e85834eee91b94680d529dcdb
+              expression: 'last(/Oracle by Zabbix Agent 2/oracle.uptime)<10m'
               name: 'Oracle: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 73ff311f3d5c4e93b5919f5633fc09f9
           name: 'Oracle: User''s expire password'
           key: 'oracle.user.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: 7d
@@ -1415,11 +1502,13 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{last()}  < {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}'
+              uuid: 5eaa700c3bb74399ad2d26c382397415
+              expression: 'last(/Oracle by Zabbix Agent 2/oracle.user.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])  < {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}'
               name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
               priority: WARNING
               description: 'Password for zabbix user in the database will expire soon.'
         -
+          uuid: cec9a53d637e42c79e2a838588ceeaca
           name: 'Oracle: User rollbacks per second'
           type: DEPENDENT
           key: oracle.user_rollbacks_rate
@@ -1440,6 +1529,7 @@ zabbix_export:
               tag: Application
               value: Oracle
         -
+          uuid: 04c0b90a0a7c4d6a95f51d006a65a530
           name: 'Oracle: Version'
           type: DEPENDENT
           key: oracle.version
@@ -1465,19 +1555,22 @@ zabbix_export:
               value: Oracle
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 4a68bcb6149c4c839e263c949343add8
+              expression: '(last(/Oracle by Zabbix Agent 2/oracle.version,#1)<>last(/Oracle by Zabbix Agent 2/oracle.version,#2))=1 and length(last(/Oracle by Zabbix Agent 2/oracle.version))>0'
               name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB version has changed. Ack to close.'
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: e2f1ce8c037f4efa9bdb98166d344be6
           name: 'Archive log discovery'
           key: 'oracle.archive.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 1h
           description: 'Log archive destinations.'
           item_prototypes:
             -
+              uuid: 46ae0ac79493430a94ac50f79dc053ba
               name: 'Archivelog ''{#DEST_NAME}'': Error'
               type: DEPENDENT
               key: 'oracle.archivelog_error["{#DEST_NAME}"]'
@@ -1502,6 +1595,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle Archivelog'
             -
+              uuid: ce76a8ece06f4a17bfaf08b4351346d5
               name: 'Archivelog ''{#DEST_NAME}'': Last sequence'
               type: DEPENDENT
               key: 'oracle.archivelog_log_sequence["{#DEST_NAME}"]'
@@ -1524,6 +1618,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle Archivelog'
             -
+              uuid: a411a4e1c8ca4ea2a1ece92075cd0325
               name: 'Archivelog ''{#DEST_NAME}'': Status'
               type: DEPENDENT
               key: 'oracle.archivelog_log_status["{#DEST_NAME}"]'
@@ -1545,11 +1640,13 @@ zabbix_export:
                   value: 'Oracle Archivelog'
               trigger_prototypes:
                 -
-                  expression: '{last()}<2'
+                  uuid: e2d393c0ff2f420097e19890bcbe215c
+                  expression: 'last(/Oracle by Zabbix Agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2'
                   name: 'Archivelog ''{#DEST_NAME}'': Log Archive is not valid'
                   priority: HIGH
                   description: 'ARL destination not in 3 - Valid or 2 - Deferred.'
         -
+          uuid: 59840e68757644afbcf6ec49a6f5e95d
           name: 'Database discovery'
           key: 'oracle.db.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 1h
@@ -1568,6 +1665,7 @@ zabbix_export:
           description: 'Scanning databases in DBMS.'
           item_prototypes:
             -
+              uuid: d9d1575b767b46e0aefe65a270f2d01b
               name: 'Oracle Database ''{#DBNAME}'': Force logging'
               type: DEPENDENT
               key: 'oracle.db_force_logging["{#DBNAME}"]'
@@ -1592,6 +1690,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#TYPE}'
             -
+              uuid: a499423d6e8d44f2bc11beceb30c5fc1
               name: 'Oracle Database ''{#DBNAME}'': Log mode'
               type: DEPENDENT
               key: 'oracle.db_log_mode["{#DBNAME}"]'
@@ -1616,6 +1715,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#TYPE}'
             -
+              uuid: 0b0cfebb30aa4d21b8ff91f887fdffde
               name: 'Oracle Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
               key: 'oracle.db_open_mode["{#DBNAME}"]'
@@ -1641,7 +1741,8 @@ zabbix_export:
                   value: 'Oracle {#TYPE}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  uuid: fb642c2cfeb142409c67a7755d1047cc
+                  expression: '(last(/Oracle by Zabbix Agent 2/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix Agent 2/oracle.db_open_mode["{#DBNAME}"],#2))=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
@@ -1649,13 +1750,15 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
-                      expression: '{Oracle by Zabbix Agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1'
+                      expression: 'last(/Oracle by Zabbix Agent 2/oracle.db_open_mode["{#DBNAME}"])=1'
                 -
-                  expression: '{last()}=1'
+                  uuid: ef1c57d8f7d34c02bf0b7347d9fddf54
+                  expression: 'last(/Oracle by Zabbix Agent 2/oracle.db_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
                   description: 'The Oracle DB has a MOUNTED state.'
             -
+              uuid: 560b010dcdfc445cbd4e266b88b60e24
               name: 'Oracle Database ''{#DBNAME}'': Role'
               type: DEPENDENT
               key: 'oracle.db_role["{#DBNAME}"]'
@@ -1681,24 +1784,28 @@ zabbix_export:
                   value: 'Oracle {#TYPE}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  uuid: 24fef0b751fd4d089eced3c210954b4f
+                  expression: '(last(/Oracle by Zabbix Agent 2/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by Zabbix Agent 2/oracle.db_role["{#DBNAME}"],#2))=1'
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB role has changed. Ack to close.'
                   manual_close: 'YES'
           trigger_prototypes:
             -
-              expression: '{Oracle by Zabbix Agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1'
+              uuid: 049473f763d84700b62abf5c914390fe
+              expression: 'last(/Oracle by Zabbix Agent 2/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by Zabbix Agent 2/oracle.db_log_mode["{#DBNAME}"]) = 1'
               name: 'Oracle Database ''{#DBNAME}'': Force logging is deactivated for DB with active Archivelog'
               priority: WARNING
               description: 'Force Logging mode  - it is very important metric for Databases in ''ARCHIVELOG''. This feature allows to forcibly write all transactions to the REDO.'
         -
+          uuid: 8d31eea973a7408abf0eb25ca7ba70c6
           name: 'ASM disk groups discovery'
           key: 'oracle.diskgroups.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 1h
           description: 'ASM disk groups'
           item_prototypes:
             -
+              uuid: 8b4e5c9385d04a39b2187e093ffca213
               name: 'ASM ''{#DG_NAME}'': Free size'
               type: DEPENDENT
               key: 'oracle.asm_free_size["{#DG_NAME}"]'
@@ -1718,6 +1825,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle ASM'
             -
+              uuid: b80f69f44dd24eae82a301dbefb0c60f
               name: 'ASM ''{#DG_NAME}'': Total size'
               type: DEPENDENT
               key: 'oracle.asm_total_size["{#DG_NAME}"]'
@@ -1737,6 +1845,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle ASM'
             -
+              uuid: e2a0ac73040f401bb05ff88140f6665b
               name: 'ASM ''{#DG_NAME}'': Free size'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DG_NAME}"]'
@@ -1758,21 +1867,24 @@ zabbix_export:
                   value: 'Oracle ASM'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                  uuid: b8aa1b00e2574e35bf71554cabfffcfc
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
                   name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
                   description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
                 -
-                  expression: '{min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  uuid: af6ff1d099524209b2806b1257e9a8e3
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
                   name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
                   description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
                   dependencies:
                     -
                       name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
-                      expression: '{Oracle by Zabbix Agent 2:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                      expression: 'min(/Oracle by Zabbix Agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
           graph_prototypes:
             -
+              uuid: f42e49e6743f4b08b5bdc3ab284b26f3
               name: 'ASM ''{#DG_NAME}'': ASM disk group ''{#DG_NAME}'''
               graph_items:
                 -
@@ -1787,6 +1899,7 @@ zabbix_export:
                     host: 'Oracle by Zabbix Agent 2'
                     key: 'oracle.asm_total_size["{#DG_NAME}"]'
         -
+          uuid: 479a56fe538f46c094cc4b595d070776
           name: 'PDB discovery'
           key: 'oracle.pdb.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 1h
@@ -1805,6 +1918,7 @@ zabbix_export:
           description: 'Scanning PDB in DBMS.'
           item_prototypes:
             -
+              uuid: c52e96105cea45cea1b18201b325ba53
               name: 'Oracle Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
               key: 'oracle.pdb_open_mode["{#DBNAME}"]'
@@ -1830,17 +1944,20 @@ zabbix_export:
                   value: 'Oracle PDB'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  uuid: 61f48e1d858f4e95a603b32ee1c409dc
+                  expression: '(last(/Oracle by Zabbix Agent 2/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix Agent 2/oracle.pdb_open_mode["{#DBNAME}"],#2))=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()}=1'
+                  uuid: a6921cc3b42843dcb5624b3bb172f996
+                  expression: 'last(/Oracle by Zabbix Agent 2/oracle.pdb_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
                   description: 'The Oracle DB has a MOUNTED state.'
         -
+          uuid: 46ee5f42a15b43a58f7ef0ce5e3638d3
           name: 'Tablespace discovery'
           key: 'oracle.ts.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 1h
@@ -1859,6 +1976,7 @@ zabbix_export:
           description: 'Scanning tablespaces in DBMS.'
           item_prototypes:
             -
+              uuid: 14a26a84cfe947089843ed93cd7707c8
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_alloc_bytes["{#TABLESPACE}"]'
@@ -1878,6 +1996,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
             -
+              uuid: d7263b6da6c04c7798909a8448f526ab
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace free, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_free_bytes["{#TABLESPACE}"]'
@@ -1897,6 +2016,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
             -
+              uuid: d2d919d303b244829c797245e08c2fe5
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_max_bytes["{#TABLESPACE}"]'
@@ -1916,6 +2036,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
             -
+              uuid: de6892ac5ca4499db01dd02c0444aafc
               name: 'Oracle TBS ''{#TABLESPACE}'': Open status'
               type: DEPENDENT
               key: 'oracle.tbs_status["{#TABLESPACE}"]'
@@ -1937,7 +2058,8 @@ zabbix_export:
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1'
+                  uuid: 2e84836974b340b5b916eed08e1fcdf4
+                  expression: '(last(/Oracle by Zabbix Agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix Agent 2/oracle.tbs_status["{#TABLESPACE}"],#2))=1'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle tablespace status has changed. Ack to close.'
@@ -1945,13 +2067,15 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
-                      expression: '{Oracle by Zabbix Agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2'
+                      expression: 'last(/Oracle by Zabbix Agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
                 -
-                  expression: '{last()}=2'
+                  uuid: 832f908ca3b84a3c9a030b5d33b96016
+                  expression: 'last(/Oracle by Zabbix Agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
                   priority: WARNING
                   description: 'The tablespase is in the offline state.'
             -
+              uuid: ab56fee407e143db912dffcf24fb0106
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
@@ -1971,6 +2095,7 @@ zabbix_export:
                   tag: Application
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
             -
+              uuid: 358615a3e372462e9cec05df1df22743
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_file_pct["{#TABLESPACE}"]'
@@ -1992,18 +2117,21 @@ zabbix_export:
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                  uuid: bbc86236064348ee9150dfdd07623061
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
                 -
-                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  uuid: ba298d35aaaa4386b4f03914dcf1cb27
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
-                      expression: '{Oracle by Zabbix Agent 2:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                      expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
             -
+              uuid: 5d6293b33a46488c88a75dc898bf7059
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_pct["{#TABLESPACE}"]'
@@ -2025,19 +2153,22 @@ zabbix_export:
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  uuid: 2530cb03fb4e4e728396834f0db89466
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
-                      expression: '{Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                      expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                 -
-                  expression: '{min(5m)}>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                  uuid: 451108a2251848ea8719378d5c0abb42
+                  expression: 'min(/Oracle by Zabbix Agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
           graph_prototypes:
             -
+              uuid: 4b20cce21abb453f9aab0dbce75ff060
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace ''{#TABLESPACE}'''
               graph_items:
                 -
@@ -2159,6 +2290,7 @@ zabbix_export:
           description: 'Oracle username.'
       valuemaps:
         -
+          uuid: 5a90da8dd6124159a7f82a7a996f0a53
           name: 'Oracle Archivelog status'
           mappings:
             -
@@ -2174,6 +2306,7 @@ zabbix_export:
               value: '3'
               newvalue: Valid
         -
+          uuid: f39e64058fef423bb858ba45834a3455
           name: 'Oracle archiver state'
           mappings:
             -
@@ -2189,6 +2322,7 @@ zabbix_export:
               value: '3'
               newvalue: Failed
         -
+          uuid: 015a0c94ba2644c6aa343d3f792a4072
           name: 'Oracle DB open status'
           mappings:
             -
@@ -2207,6 +2341,7 @@ zabbix_export:
               value: '4'
               newvalue: 'Read Only with Apply'
         -
+          uuid: afade10cda4e453982355342ba9d8d9f
           name: 'Oracle DB role'
           mappings:
             -
@@ -2228,6 +2363,7 @@ zabbix_export:
               value: '5'
               newvalue: 'Far sync'
         -
+          uuid: 1d9f4a44f2f94a799768f147cb712331
           name: 'Oracle force log status'
           mappings:
             -
@@ -2237,6 +2373,7 @@ zabbix_export:
               value: '1'
               newvalue: 'Yes'
         -
+          uuid: 53d97b73db8449959420e03114d345c3
           name: 'Oracle instance role'
           mappings:
             -
@@ -2249,6 +2386,7 @@ zabbix_export:
               value: '2'
               newvalue: Secondary
         -
+          uuid: 4893318c780f47719e12e839c9a846c2
           name: 'Oracle instance status'
           mappings:
             -
@@ -2267,6 +2405,7 @@ zabbix_export:
               value: '4'
               newvalue: 'Open migrate'
         -
+          uuid: 910dd4a87f75434289fa2e345778d18d
           name: 'Oracle log mode'
           mappings:
             -
@@ -2279,6 +2418,7 @@ zabbix_export:
               value: '2'
               newvalue: MANUAL
         -
+          uuid: f14ed94cf12740a19e221ddaa4855c54
           name: 'Oracle tablespace status'
           mappings:
             -
@@ -2294,6 +2434,7 @@ zabbix_export:
               value: '3'
               newvalue: Read-Only
         -
+          uuid: 31c489581d8b4246942c663b88fbaf9f
           name: 'Service state'
           mappings:
             -
@@ -2304,27 +2445,32 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Oracle by Zabbix Agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.processes_limit.last()} > {$ORACLE.PROCESSES.MAX.WARN}'
+      uuid: 3f265c15b3d042d79b1aa598f7249738
+      expression: 'min(/Oracle by Zabbix Agent 2/oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) * 100 / last(/Oracle by Zabbix Agent 2/oracle.processes_limit) > {$ORACLE.PROCESSES.MAX.WARN}'
       name: 'Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.'
     -
-      expression: '{Oracle by Zabbix Agent 2:oracle.session_count.min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.session_limit.last()} > {$ORACLE.SESSIONS.MAX.WARN}'
+      uuid: d9977c48c6e7435eafde4cabc43bb5fc
+      expression: 'min(/Oracle by Zabbix Agent 2/oracle.session_count,5m) * 100 / last(/Oracle by Zabbix Agent 2/oracle.session_limit) > {$ORACLE.SESSIONS.MAX.WARN}'
       name: 'Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.'
     -
-      expression: '{Oracle by Zabbix Agent 2:oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.db_files_limit.last()} > {$ORACLE.DB.FILE.MAX.WARN}'
+      uuid: 362882973d0b45d1a09a687353734032
+      expression: 'min(/Oracle by Zabbix Agent 2/oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) * 100 / last(/Oracle by Zabbix Agent 2/oracle.db_files_limit) > {$ORACLE.DB.FILE.MAX.WARN}'
       name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.'
     -
-      expression: '{Oracle by Zabbix Agent 2:oracle.total_pga_used.min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.pga_target.last()} > {$ORACLE.PGA.USE.MAX.WARN}'
+      uuid: aecb78fc9a7549f2b8e68325530bcd99
+      expression: 'min(/Oracle by Zabbix Agent 2/oracle.total_pga_used,5m) * 100 / last(/Oracle by Zabbix Agent 2/oracle.pga_target) > {$ORACLE.PGA.USE.MAX.WARN}'
       name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
   graphs:
     -
+      uuid: 292f08d249d344db882a3447cc268ca6
       name: 'Oracle: Datafiles'
       graph_items:
         -
@@ -2339,6 +2485,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.db_files_limit
     -
+      uuid: 4b4d2430750c4885b4764c3b602dc091
       name: 'Oracle: PGA'
       graph_items:
         -
@@ -2359,6 +2506,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.total_pga_allocated
     -
+      uuid: 4e02f667b98042f6ac538692a074a982
       name: 'Oracle: Physical Read\Write Rate'
       graph_items:
         -
@@ -2373,6 +2521,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.physical_reads_rate
     -
+      uuid: 2bfd6cda93da4201a73c3d16caea8284
       name: 'Oracle: Physical Read\Write Rate, Bytes'
       graph_items:
         -
@@ -2387,6 +2536,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.physical_read_bytes_rate
     -
+      uuid: e51ad4ba7cca491faf7564a8d26bc1da
       name: 'Oracle: Processes'
       graph_items:
         -
@@ -2401,6 +2551,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.processes_limit
     -
+      uuid: 3323be96dd454a92ade913ab6c2b589c
       name: 'Oracle: Sessions'
       graph_items:
         -
@@ -2433,6 +2584,7 @@ zabbix_export:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.session_limit
     -
+      uuid: ad7c9a7b4c7a4b4885cb1e91e7e79d3d
       name: 'Oracle: SGA Memory Usage'
       type: STACKED
       graph_items:

@@ -309,7 +309,7 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -337,8 +337,8 @@ class CTemplate extends CHostGeneral {
 				$template['name'] = $template['host'];
 			}
 
-			$ins_templates[] = array_intersect_key($template, array_flip(['host', 'name', 'description'])) +
-				['status' => HOST_STATUS_TEMPLATE];
+			$ins_templates[] = array_intersect_key($template, array_flip(['uuid', 'host', 'name', 'description']))
+				+ ['status' => HOST_STATUS_TEMPLATE];
 		}
 		unset($template);
 
@@ -429,7 +429,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $templates) {
+	protected function validateCreate(array &$templates) {
 		$groupIds = [];
 
 		foreach ($templates as &$template) {
@@ -549,6 +549,36 @@ class CTemplate extends CHostGeneral {
 				$this->validateTags($template);
 			}
 		}
+
+		$this->checkAndAddUuid($templates);
+	}
+
+	/**
+	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
+	 *
+	 * @param array $templates_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$templates_to_create): void {
+		foreach ($templates_to_create as &$template) {
+			if (!array_key_exists('uuid', $template)) {
+				$template['uuid'] = generateUuidV4();
+			}
+		}
+		unset($template);
+
+		$db_uuid = DB::select('hosts', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($templates_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -615,9 +645,15 @@ class CTemplate extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
-		foreach ($templates as $template) {
+		foreach ($templates as $index => $template) {
 			if (!isset($dbTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+
+			if (array_key_exists('uuid', $template)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
 			}
 
 			// Property 'auto_compress' is not supported for templates.
@@ -1235,15 +1271,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($templates, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $templates, 'templates', $options['limitSelects']);
 			}
 			else {
@@ -1264,15 +1306,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {

@@ -159,7 +159,11 @@ abstract class CHostGeneral extends CHostBase {
 			$this->unlink(zbx_toArray($data['templateids_clear']), $allHostIds, true);
 		}
 
-		if (isset($data['macros'])) {
+		if (array_key_exists('macros', $data)) {
+			if (!$data['macros']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
+
 			$hostMacros = API::UserMacro()->get([
 				'output' => ['hostmacroid'],
 				'hostids' => $allHostIds,
@@ -168,7 +172,9 @@ abstract class CHostGeneral extends CHostBase {
 				]
 			]);
 			$hostMacroIds = zbx_objectValues($hostMacros, 'hostmacroid');
-			API::UserMacro()->delete($hostMacroIds);
+			if ($hostMacroIds) {
+				API::UserMacro()->delete($hostMacroIds);
+			}
 		}
 
 		if (isset($data['groupids'])) {
@@ -281,7 +287,10 @@ abstract class CHostGeneral extends CHostBase {
 			$templ_triggerids[] = $db_trigger['triggerid'];
 		}
 
-		$triggerids = [ZBX_FLAG_DISCOVERY_NORMAL => [], ZBX_FLAG_DISCOVERY_PROTOTYPE => []];
+		$upd_triggers = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
 
 		if ($templ_triggerids) {
 			$sql_distinct = ($targetids !== null) ? ' DISTINCT' : '';
@@ -301,31 +310,51 @@ abstract class CHostGeneral extends CHostBase {
 			);
 
 			while ($db_trigger = DBfetch($db_triggers)) {
-				$triggerids[$db_trigger['flags']][] = $db_trigger['triggerid'];
+				if ($clear) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
+				}
+				else {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['triggerid' => $db_trigger['triggerid']]
+					];
+				}
+			}
+
+			if (!$clear && ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+				$db_triggers = DBselect(
+					'SELECT DISTINCT t.triggerid,t.flags'.
+					' FROM triggers t,functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('t.triggerid', array_keys(
+							$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
+
+				while ($db_trigger = DBfetch($db_triggers)) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
+				}
 			}
 		}
 
-		if ($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]) {
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				CTriggerManager::delete($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
 			}
 			else {
-				DB::update('triggers', [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_NORMAL]]
-				]);
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 		}
 
-		if ($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				CTriggerPrototypeManager::delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			}
 			else {
-				DB::update('triggers', [
-					'values' => ['templateid' => 0],
-					'where' => ['triggerid' => $triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
-				]);
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 		}
 
@@ -346,6 +375,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($tpl_graphids) {
+			$upd_graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			];
+
 			$sql = ($targetids !== null)
 				? 'SELECT DISTINCT g.graphid,g.flags'.
 					' FROM graphs g,graphs_items gi,items i'.
@@ -359,41 +393,63 @@ abstract class CHostGeneral extends CHostBase {
 
 			$db_graphs = DBSelect($sql);
 
-			$graphs = [
-				ZBX_FLAG_DISCOVERY_NORMAL => [],
-				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-			];
 			while ($db_graph = DBfetch($db_graphs)) {
-				$graphs[$db_graph['flags']][] = $db_graph['graphid'];
-			}
-
-			if ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 				if ($clear) {
-					CGraphPrototypeManager::delete($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
 				}
 				else {
-					DB::update('graphs', [
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
 						'values' => ['templateid' => 0],
-						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
-					]);
+						'where' => ['graphid' => $db_graph['graphid']]
+					];
 				}
 			}
 
-			if ($graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if (!$clear && ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+				$db_graphs = DBselect(
+					'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i,hosts h'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('g.graphid', array_keys(
+							$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
+
+				while ($db_graph = DBfetch($db_graphs)) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 				if ($clear) {
-					CGraphManager::delete($graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 				}
 				else {
-					DB::update('graphs', [
-						'values' => ['templateid' => 0],
-						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_NORMAL]]
-					]);
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+				if ($clear) {
+					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
 				}
 			}
 		}
 		/* }}} GRAPHS */
 
 		/* ITEMS, DISCOVERY RULES {{{ */
+		$upd_items = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_RULE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
 		$sqlFrom = ' items i1,items i2,hosts h';
 		$sqlWhere = ' i2.itemid=i1.templateid'.
 			' AND '.dbConditionInt('i2.hostid', $templateids).
@@ -403,139 +459,139 @@ abstract class CHostGeneral extends CHostBase {
 		if (!is_null($targetids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid,h.name as host'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
+
 		$dbItems = DBSelect($sql);
-		$items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
+
 		while ($item = DBfetch($dbItems)) {
-			$items[$item['flags']][$item['itemid']] = [
-				'name' => $item['name'],
-				'host' => $item['host']
-			];
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else{
-				DB::update('items', [
-					'values' => ['templateid' => 0],
-					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_RULE])]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_RULE] as $discoveryRule) {
-					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
-				}
-			}
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])) {
-			if ($clear) {
-				CItemManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else{
-				DB::update('items', [
-					'values' => ['templateid' => 0, 'valuemapid' => 0],
-					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL])]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item) {
-					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $item['host']));
-				}
-			}
-		}
-
-		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-
-			if ($clear) {
-				// Deletes item prototypes and related entities.
-				CItemPrototypeManager::delete($item_prototypeids);
+				$upd_items[$item['flags']][$item['itemid']] = true;
 			}
 			else {
-				DB::update('items', [
-					'values' => ['templateid' => 0, 'valuemapid' => 0],
-					'where' => ['itemid' => $item_prototypeids]
-				]);
-
-				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
-					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
+				$upd_item = ['templateid' => 0];
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
+					$upd_item['uuid'] = generateUuidV4();
 				}
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$upd_item['valuemapid'] = 0;
+				}
+
+				$upd_items[$item['flags']][$item['itemid']] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			if ($clear) {
+				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */
 
 		// host prototypes
 		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
-		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY_RULE])) {
-			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_RULE]);
-
-			$hostPrototypes = DBfetchArrayAssoc(DBSelect(
-				'SELECT DISTINCT h.hostid,h.host,h3.host AS parent_host'.
+		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			$host_prototypes = DBSelect(
+				'SELECT DISTINCT h.hostid,h3.status as host_status'.
 				' FROM hosts h'.
 					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
 					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
 					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
 					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', $discoveryRuleIds)
-			), 'hostid');
-			if ($hostPrototypes) {
-				DB::update('hosts', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($hostPrototypes)]
-				]);
+				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
+			);
+
+			$upd_host_prototypes = [];
+
+			while ($host_prototype = DBfetch($host_prototypes)) {
+				$upd_host_prototype = ['templateid' => 0];
+				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_host_prototype['uuid'] = generateUuidV4();
+				}
+
+				$upd_host_prototypes[$host_prototype['hostid']] = [
+					'values' => $upd_host_prototype,
+					'where' => ['hostid' => $host_prototype['hostid']]
+				];
+			}
+
+			if ($upd_host_prototypes) {
+				DB::update('hosts', $upd_host_prototypes);
 				DB::update('group_prototype', [
 					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($hostPrototypes)]
+					'where' => ['hostid' => array_keys($upd_host_prototypes)]
 				]);
-				foreach ($hostPrototypes as $hostPrototype) {
-					info(_s('Unlinked: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parent_host']));
-				}
 			}
 		}
 
 		// http tests
+		$upd_httptests = [];
+
 		$sqlWhere = '';
 		if (!is_null($targetids)) {
 			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,ht1.name,h.name as host'.
-				' FROM httptest ht1'.
-				' INNER JOIN httptest ht2 ON ht2.httptestid=ht1.templateid'.
-				' INNER JOIN hosts h ON h.hostid=ht1.hostid'.
-				' WHERE '.dbConditionInt('ht2.hostid', $templateids).
+		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
+				' FROM httptest ht1,httptest ht2,hosts h'.
+				' WHERE ht1.templateid=ht2.httptestid'.
+					' AND ht1.hostid=h.hostid'.
+					' AND '.dbConditionInt('ht2.hostid', $templateids).
 				$sqlWhere;
-		$dbHttpTests = DBSelect($sql);
-		$httpTests = [];
-		while ($httpTest = DBfetch($dbHttpTests)) {
-			$httpTests[$httpTest['httptestid']] = [
-				'name' => $httpTest['name'],
-				'host' => $httpTest['host']
-			];
+
+		$httptests = DBSelect($sql);
+
+		while ($httptest = DBfetch($httptests)) {
+			if ($clear) {
+				$upd_httptests[$httptest['httptestid']] = true;
+			}
+			else {
+				$upd_httptest = ['templateid' => 0];
+				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_httptest['uuid'] = generateUuidV4();
+				}
+
+				$upd_httptests[$httptest['httptestid']] = [
+					'values' => $upd_httptest,
+					'where' => ['httptestid' => $httptest['httptestid']]
+				];
+			}
 		}
 
-		if (!empty($httpTests)) {
+		if ($upd_httptests) {
 			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($httpTests), true);
+				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
 				}
 			}
 			else {
-				DB::update('httptest', [
-					'values' => ['templateid' => 0],
-					'where' => ['httptestid' => array_keys($httpTests)]
-				]);
-				foreach ($httpTests as $httpTest) {
-					info(_s('Unlinked: Web scenario "%1$s" on "%2$s".', $httpTest['name'], $httpTest['host']));
-				}
+				DB::update('httptest', $upd_httptests);
 			}
 		}
 
@@ -561,15 +617,21 @@ abstract class CHostGeneral extends CHostBase {
 		// adding templates
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectParentTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectParentTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($templates, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $templates, 'parentTemplates', $options['limitSelects']);
 			}
 			else {
@@ -658,6 +720,8 @@ abstract class CHostGeneral extends CHostBase {
 		// adding triggers
 		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
+				$relationMap = new CRelationMap();
 				// discovered items
 				$res = DBselect(
 					'SELECT i.hostid,f.triggerid'.
@@ -665,19 +729,23 @@ abstract class CHostGeneral extends CHostBase {
 						' WHERE '.dbConditionInt('i.hostid', $hostids).
 						' AND i.itemid=f.itemid'
 				);
-				$relationMap = new CRelationMap();
 				while ($relation = DBfetch($res)) {
 					$relationMap->addRelation($relation['hostid'], $relation['triggerid']);
 				}
 
-				$triggers = API::Trigger()->get([
-					'output' => $options['selectTriggers'],
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($triggers, 'description');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$triggers = API::Trigger()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($triggers, 'description');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
@@ -699,6 +767,8 @@ abstract class CHostGeneral extends CHostBase {
 		// adding graphs
 		if ($options['selectGraphs'] !== null) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
+				$relationMap = new CRelationMap();
 				// discovered items
 				$res = DBselect(
 					'SELECT i.hostid,gi.graphid'.
@@ -706,19 +776,23 @@ abstract class CHostGeneral extends CHostBase {
 						' WHERE '.dbConditionInt('i.hostid', $hostids).
 						' AND i.itemid=gi.itemid'
 				);
-				$relationMap = new CRelationMap();
 				while ($relation = DBfetch($res)) {
 					$relationMap->addRelation($relation['hostid'], $relation['graphid']);
 				}
 
-				$graphs = API::Graph()->get([
-					'output' => $options['selectGraphs'],
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($graphs, 'name');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::Graph()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($graphs, 'name');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
@@ -831,13 +905,15 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
 				$params = [
-					'output' => ['valuemapid', 'value', 'newvalue'],
-					'filter' => ['valuemapid' => array_keys($valuemaps)]
+					'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)],
+					'sortfield' => ['sortorder']
 				];
 				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
 
 				while ($mapping = DBfetch($query)) {
 					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'type' => $mapping['type'],
 						'value' => $mapping['value'],
 						'newvalue' => $mapping['newvalue']
 					];

@@ -24,73 +24,118 @@
  */
 ?>
 
-function confirmSubmit(overlay) {
-	if (document.querySelectorAll('.deleteMissing:checked').length === 0) {
-		return submitPopup(overlay);
+function submitPopup(overlay) {
+	if (document.getElementById('rules_preset').value === "template") {
+		return openImportComparePopup(overlay);
 	}
 	else {
-		overlayDialogue({
-			'content': jQuery('<span>').text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
-			'buttons': [
-				{
-					'title': <?= json_encode(_('OK')) ?>,
-					'focused': true,
-					'action': function() {
-						return submitPopup(overlay);
-					}
-				},
-				{
-					'title': <?= json_encode(_('Cancel')) ?>,
-					'cancel': true,
-					'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-					'action': function() {
-						overlay.unsetLoading();
-						return true;
-					}
-				}
-			]
-		}, overlay);
+		if (isDeleteMissingChecked(overlay)) {
+			return confirmSubmit(overlay);
+		}
+
+		return submitImportPopup(overlay);
 	}
 }
 
-function submitPopup(overlay) {
-	const form = document.querySelector('#import-form');
-	const file = form.querySelector('#import_file');
-	const formData = new FormData();
+function isDeleteMissingChecked(import_overlay) {
+	return import_overlay.$dialogue.get(0).querySelectorAll('.deleteMissing:checked').length > 0;
+}
 
+function confirmSubmit(import_overlay, compare_overlay) {
+	overlayDialogue({
+		content: jQuery('<span>')
+					.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
+		buttons: [
+			{
+				title: <?= json_encode(_('OK')) ?>,
+				focused: true,
+				action: function() {
+					if (compare_overlay !== undefined) {
+						overlayDialogueDestroy(compare_overlay.dialogueid);
+					}
+					return submitImportPopup(import_overlay);
+				}
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				cancel: true,
+				class: '<?= ZBX_STYLE_BTN_ALT ?>',
+				action: function() {
+					(compare_overlay || import_overlay).unsetLoading();
+					return true;
+				}
+			}
+		]
+	}, (compare_overlay || import_overlay).$btn_submit);
+}
+
+function openImportComparePopup(overlay) {
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-	// Append import file.
-	formData.append('import_file', file.files.length ? file.files[0] : '');
+	const form = document.getElementById('import-form');
 
-	// Append all checkboxes to form.
-	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map(
-		(elem) => formData.append(elem.name, elem.value)
-	);
+	const url = new Curl('zabbix.php', false);
+	url.setArgument('action', 'popup.import.compare');
+	url.setArgument('import_overlayid', overlay.dialogueid);
 
-	url = new Curl('zabbix.php', false),
-	url.setArgument('action', 'popup.import');
-	url.setArgument('output', 'ajax');
+	overlay.setLoading();
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: formData
+		body: new FormData(form)
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			overlay.unsetLoading();
+			document.getElementById('import_file').value = '';
 			$(response.errors).insertBefore(form);
-			form.querySelector('#import_file').value = '';
 		}
 		else {
-			postMessageOk(response['title']);
+			overlayDialogue({
+				title: response.header,
+				class: `modal-popup${response.no_changes ? '' : ' modal-popup-fullscreen'}`,
+				content: response.body,
+				buttons: response.buttons,
+				script_inline: response.script_inline,
+				debug: response.debug
+			}, overlay.$btn_submit);
+		}
+
+		overlay.unsetLoading();
+	});
+}
+
+function submitImportPopup(overlay) {
+	// Remove error message.
+	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+	const form = document.getElementById('import-form');
+
+	const url = new Curl('zabbix.php', false);
+	url.setArgument('action', 'popup.import');
+	url.setArgument('output', 'ajax');
+
+	overlay.setLoading();
+
+	fetch(url.getUrl(), {
+		method: 'post',
+		body: new FormData(form)
+	})
+	.then((response) => response.json())
+	.then((response) => {
+		if ('errors' in response) {
+			document.getElementById('import_file').value = '';
+			overlay.unsetLoading();
+			$(response.errors).insertBefore(form);
+		}
+		else {
+			postMessageOk(response.title);
 			if ('messages' in response) {
 				postMessageDetails('success', response.messages);
 			}
 			overlayDialogueDestroy(overlay.dialogueid);
-			location.href = location.href;
+			location.href = location.href.split('#')[0];
 		}
 	});
 }
@@ -98,18 +143,18 @@ function submitPopup(overlay) {
 function updateWarning(obj, content) {
 	if (jQuery(obj).is(':checked')) {
 		overlayDialogue({
-			'content': jQuery('<span>').text(content),
-			'buttons': [
+			content: jQuery('<span>').text(content),
+			buttons: [
 				{
-					'title': <?= json_encode(_('OK')) ?>,
-					'focused': true,
-					'action': function() {}
+					title: <?= json_encode(_('OK')) ?>,
+					focused: true,
+					action: function() {}
 				},
 				{
-					'title': <?= json_encode(_('Cancel')) ?>,
-					'cancel': true,
-					'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-					'action': function() {
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: function() {
 						jQuery(obj).prop('checked', false);
 					}
 				}

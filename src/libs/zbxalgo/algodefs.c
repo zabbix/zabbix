@@ -409,3 +409,46 @@ unsigned int	zbx_isqrt32(unsigned int value)
 
 	return result;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_gen_uuid4                                                    *
+ *                                                                            *
+ * Purpose: calculate UUID version 4 as string of 32 symbols                  *
+ *                                                                            *
+ * Parameters: seed    - [IN] string for seed calculation                     *
+ *                                                                            *
+ * Return value: uuid string                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_gen_uuid4(const char *seed)
+{
+	size_t		i;
+	const char	*hex = "0123456789abcdef";
+	char		*ptr, *uuid;
+	md5_state_t	state;
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
+
+#define ZBX_UUID_VERSION	4
+#define ZBX_UUID_VARIANT	2
+
+	ptr = uuid = (char *)zbx_malloc(NULL, 2 * MD5_DIGEST_SIZE + 1);
+
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)seed, (int)strlen(seed));
+	zbx_md5_finish(&state, hash);
+
+	hash[6] = (md5_byte_t)((hash[6] & 0xf) | (ZBX_UUID_VERSION << 4));
+	hash[8] = (md5_byte_t)((hash[8] & 0x3f) | (ZBX_UUID_VARIANT << 6));
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*ptr++ = hex[(hash[i] >> 4) & 0xf];
+		*ptr++ = hex[hash[i] & 0xf];
+	}
+
+	*ptr = '\0';
+
+	return uuid;
+}
+

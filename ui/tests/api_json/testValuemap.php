@@ -252,7 +252,202 @@ class testValuemap extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(0) already exists.'
 			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value is required for type equal',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value is required for type greater or equal',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value is required for type less or equal',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value is required for type range',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_IN_RANGE,
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value is required for type greater or equal',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_REGEXP,
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1": the parameter "value" is missing.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API value should be empty for type default',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'value' => 'fail',
+								'newvalue' => 'fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/1/value": should be empty.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'type and value combination should be unique',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '10',
+								'newvalue' => '1 fail'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '10',
+								'newvalue' => '2 fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(10) already exists.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API only one type default is allowed',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'newvalue' => '1 fail'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'value' => '',
+								'newvalue' => '2 fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/2": value (type)=(5) already exists.'
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API float value with zero suffix check for geq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '7',
+								'newvalue' => '1 fail'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '7.00',
+								'newvalue' => '2 fail'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mappings/2": value (value)=(7) already exists.'
+			],
 			// Successfully create.
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API equal value uniqueness check as string for eq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '5',
+								'newvalue' => '5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '5.00',
+								'newvalue' => '5.00'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API float value uniqueness validation for geq mapping',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '5',
+								'newvalue' => '5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '5.001',
+								'newvalue' => '5.001'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
 			[
 				'valuemap' => [
 					[
@@ -326,6 +521,72 @@ class testValuemap extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API create value map with mapping types',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'newvalue' => 'default'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_REGEXP,
+								'value' => '/[0-9]{3,}/',
+								'newvalue' => 'regexp'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_IN_RANGE,
+								'value' => '10-20,-20--10,20,0.5-0.7,-0.7--0.5',
+								'newvalue' => 'range'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
+								'value' => '10',
+								'newvalue' => '<=10'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '10',
+								'newvalue' => '>=10'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '10',
+								'newvalue' => '10'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => 'A',
+								'newvalue' => 'A'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '0.5',
+								'newvalue' => '0.5'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'valuemap' => [
+					[
+						'hostid' => '50009',
+						'name' => 'API mapping type default value can be empty when defined',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'value' => '',
+								'newvalue' => 'default'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -343,6 +604,7 @@ class testValuemap extends CAPITest {
 				$this->assertEquals($dbRow['name'], $valuemap[$key]['name']);
 
 				foreach ($valuemap[$key]['mappings'] as $values) {
+					$values += ['value' => ''];
 					$this->assertEquals(1, CDBHelper::getCount('select * from valuemap_mapping where valuemapid='.zbx_dbstr($id).
 							' and value='.zbx_dbstr($values['value']).' and newvalue='.zbx_dbstr($values['newvalue']))
 					);
@@ -611,6 +873,56 @@ class testValuemap extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'valuemap' => [
+					[
+						'valuemapid' => '18',
+						'name' => 'API update valuemap one',
+						'mappings' => [
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_DEFAULT,
+								'newvalue' => 'default'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_REGEXP,
+								'value' => '/[0-9]{3,}/',
+								'newvalue' => 'regexp'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_IN_RANGE,
+								'value' => '10-20,-20--10,20,0.5-0.7,-0.7--0.5',
+								'newvalue' => 'range'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
+								'value' => '10.5',
+								'newvalue' => '<=10.5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+								'value' => '20.5',
+								'newvalue' => '>=20.5'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => 'A',
+								'newvalue' => 'A'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '10',
+								'newvalue' => '10'
+							],
+							[
+								'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+								'value' => '0.5',
+								'newvalue' => '0.5'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -628,11 +940,16 @@ class testValuemap extends CAPITest {
 				$this->assertEquals($dbRow['name'], $valuemaps[$key]['name']);
 
 				if (array_key_exists('mappings', $valuemaps[$key])){
-					foreach ($valuemaps[$key]['mappings'] as $values) {
-						$this->assertEquals(1, CDBHelper::getCount('select * from valuemap_mapping where valuemapid='.zbx_dbstr($id).
-								' and value='.zbx_dbstr($values['value']).' and newvalue='.
-								zbx_dbstr($values['newvalue']))
-						);
+					$db_mappings = CDBHelper::getAll(
+						'SELECT type,value,newvalue'.
+						' FROM valuemap_mapping'.
+						' WHERE valuemapid='.zbx_dbstr($id).
+						' ORDER BY sortorder ASC'
+					);
+
+					foreach ($valuemaps[$key]['mappings'] as $i => $mapping) {
+						$mapping = $mapping + ['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => ''];
+						$this->assertEquals($mapping, $db_mappings[$i]);
 					}
 				}
 			}

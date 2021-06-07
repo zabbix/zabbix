@@ -47,14 +47,17 @@ const Console = 3
 
 const MB = 1048576
 
+//DefaultLogger is the default Zabbix agent 2 and Zabbix web service logger.
+var DefaultLogger *log.Logger
+
 var logLevel int
-var logger *log.Logger
 
 type LogStat struct {
-	logType  int
-	filename string
-	filesize int64
-	f        *os.File
+	logType     int
+	filename    string
+	filesize    int64
+	f           *os.File
+	currentSize int64
 }
 
 var logStat LogStat
@@ -118,13 +121,13 @@ func Open(logType int, level int, filename string, filesize int) error {
 			return err
 		}
 	case Console:
-		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
+		DefaultLogger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
 	case File:
 		logStat.f, err = os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
-		logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+		DefaultLogger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
 	default:
 		return errors.New("invalid argument")
 	}
@@ -178,45 +181,59 @@ func procLog(format string, args []interface{}, level int) {
 	logAccess.Lock()
 	defer logAccess.Unlock()
 	rotateLog()
-	logger.Printf(format, args...)
+	DefaultLogger.Printf(format, args...)
 }
 
 func rotateLog() {
-	if logStat.logType == File && logStat.filesize != 0 {
-		var printError string
-
+	if logStat.logType == File {
 		fstat, err := os.Stat(logStat.filename)
-		if err != nil {
+		if err != nil || fstat.Size() == 0 || logStat.currentSize > fstat.Size() {
+
+			logStat.f.Close()
+
+			if logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+				logStat.logType = Undefined
+				log.Fatal(fmt.Sprintf("Cannot open log file %s", logStat.filename))
+			}
+
+			DefaultLogger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+			logStat.currentSize = 0
 			return
 		}
 
-		if fstat.Size() > logStat.filesize {
-			filenameOld := logStat.filename + ".old"
-			logStat.f.Close()
-			os.Remove(filenameOld)
+		if logStat.filesize != 0 {
+			var printError string
 
-			err = os.Rename(logStat.filename, filenameOld)
-			if err != nil {
-				printError = err.Error()
-			}
+			logStat.currentSize = fstat.Size()
 
-			logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				errmsg := "Cannot open log file"
-				if printError != "" {
-					errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
+			if logStat.currentSize > logStat.filesize {
+				filenameOld := logStat.filename + ".old"
+				logStat.f.Close()
+				os.Remove(filenameOld)
+
+				err = os.Rename(logStat.filename, filenameOld)
+				if err != nil {
+					printError = err.Error()
 				}
-				logStat.logType = Undefined
-				panic(errmsg)
-			}
 
-			logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
-			if printError != "" {
-				logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
-					logStat.filename, filenameOld, printError)
-				logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
-					" moving it to \"%s\" failed. The logfile was truncated.",
-					logStat.filename, filenameOld)
+				logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
+				if err != nil {
+					errmsg := fmt.Sprintf("Cannot open log file %s", logStat.filename)
+					if printError != "" {
+						errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
+					}
+					logStat.logType = Undefined
+					log.Fatal(errmsg)
+				}
+
+				DefaultLogger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+				if printError != "" {
+					DefaultLogger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
+						logStat.filename, filenameOld, printError)
+					DefaultLogger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
+						" moving it to \"%s\" failed. The logfile was truncated.",
+						logStat.filename, filenameOld)
+				}
 			}
 		}
 	}

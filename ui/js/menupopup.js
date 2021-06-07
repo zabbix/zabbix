@@ -455,64 +455,107 @@ function getMenuPopupMapElementImage(options) {
 }
 
 /**
- * Get menu popup trigger section data.
+ * Get menu popup dashboard actions data.
  *
  * @param {string} options['dashboardid']
  * @param {bool}   options['editable']
- * @param {object} trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ * @param {bool}   options['has_related_reports']
+ * @param {bool}   options['can_edit_dashboards']
+ * @param {bool}   options['can_view_reports']
+ * @param {bool}   options['can_create_reports']
+ * @param {object} trigger_elmnt                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
 function getMenuPopupDashboard(options, trigger_elmnt) {
-	var	url_create = new Curl('zabbix.php', false),
-		url_clone = new Curl('zabbix.php', false),
-		url_delete = new Curl('zabbix.php', false);
+	const sections = [];
+	const popup_options = {
+		dashboardid: options.dashboardid
+	};
 
-	url_create.setArgument('action', 'dashboard.view');
-	url_create.setArgument('new', '1');
+	// Dashboard actions.
+	if (options.can_edit_dashboards) {
+		const url_create = new Curl('zabbix.php', false);
+		url_create.setArgument('action', 'dashboard.view');
+		url_create.setArgument('new', '1');
 
-	url_clone.setArgument('action', 'dashboard.view');
-	url_clone.setArgument('source_dashboardid', options.dashboardid);
+		const url_clone = new Curl('zabbix.php', false);
+		url_clone.setArgument('action', 'dashboard.view');
+		url_clone.setArgument('source_dashboardid', options.dashboardid);
 
-	url_delete.setArgument('action', 'dashboard.delete');
-	url_delete.setArgument('dashboardids', [options.dashboardid]);
+		const url_delete = new Curl('zabbix.php', false);
+		url_delete.setArgument('action', 'dashboard.delete');
+		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
-	return [{
-		label: t('Actions'),
-		items: [
+		sections.push({
+			label: t('Actions'),
+			items: [
+				{
+					label: t('Sharing'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+					},
+					disabled: !options.editable
+				},
+				{
+					label: t('Create new'),
+					url: url_create.getUrl()
+				},
+				{
+					label: t('Clone'),
+					url: url_clone.getUrl()
+				},
+				{
+					label: t('Delete'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						if (!confirm(t('Delete dashboard?'))) {
+							return false;
+						}
+
+						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+					},
+					disabled: !options.editable
+				}
+			]
+		});
+	}
+
+	// Report actions.
+	if (options.can_view_reports) {
+		const report_actions = [
 			{
-				label: t('Sharing'),
+				label: t('View related reports'),
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					var popup_options = {'dashboardid': options.dashboardid};
-					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
 				},
-				disabled: !options.editable
-			},
-			{
-				label: t('Create new'),
-				url: url_create.getUrl()
-			},
-			{
-				label: t('Clone'),
-				url: url_clone.getUrl()
-			},
-			{
-				label: t('Delete'),
-				clickCallback: function () {
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					if (!confirm(t('Delete dashboard?'))) {
-						return false;
-					}
-
-					redirect(url_delete.getUrl(), 'post', 'sid', true, true);
-				},
-				disabled: !options.editable
+				disabled: !options.has_related_reports
 			}
-		]
-	}];
+		];
+
+		if (options.can_create_reports) {
+			report_actions.unshift({
+				label: t('Create new report'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
+				}
+			});
+		}
+
+		sections.push({
+			label: options.can_edit_dashboards ? null : t('Actions'),
+			items: report_actions
+		})
+	}
+
+	return sections;
 }
 
 /**
@@ -1393,6 +1436,10 @@ jQuery(function($) {
 
 				if ('target' in options) {
 					link.attr('target', options.target);
+				}
+
+				if ('rel' in options) {
+					link.attr('rel', options.rel);
 				}
 			}
 

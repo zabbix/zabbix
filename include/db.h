@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
+#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -208,7 +209,10 @@ struct	_DC_TRIGGER;
 
 #define EVENT_NAME_LEN			2048
 
+#define FUNCTION_NAME_LEN		12
 #define FUNCTION_PARAM_LEN		255
+
+#define REPORT_ERROR_LEN		2048
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
@@ -308,6 +312,11 @@ typedef struct
 }
 DB_DSERVICE;
 
+#define ZBX_DB_TRIGGER_EVAL_NONE			0x0000
+#define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001
+#define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002
+#define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -324,6 +333,9 @@ typedef struct
 	unsigned char	type;
 	unsigned char	recovery_mode;
 	unsigned char	correlation_mode;
+
+	/* temporary trigger cache for related data */
+	void		*cache;
 }
 DB_TRIGGER;
 
@@ -352,11 +364,10 @@ typedef struct
 }
 DB_EVENT;
 
-typedef struct
+typedef struct DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char			*description;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;
@@ -365,13 +376,24 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
+	char			*script;
+	char			*attempt_interval;
+	char			*timeout;
 	unsigned short		smtp_port;
 	unsigned char		smtp_security;
 	unsigned char		smtp_verify_peer;
 	unsigned char		smtp_verify_host;
 	unsigned char		smtp_authentication;
+	unsigned char		content_type;
+	int			maxsessions;
+	int			maxattempts;
 }
 DB_MEDIATYPE;
+
+void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
+		const DB_MEDIATYPE *mt);
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
 
 typedef struct
 {
@@ -504,7 +526,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBcheck_capabilities(void);
+zbx_uint32_t	DBextract_version(struct zbx_json *json);
+void		DBflush_version_requirements(const char *version);
+int		DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);
@@ -753,7 +777,6 @@ typedef struct
 	zbx_uint64_t	lastlogsize;
 	unsigned char	state;
 	int		mtime;
-	int		lastclock;
 	const char	*error;
 
 	zbx_uint64_t	flags;
@@ -762,11 +785,9 @@ typedef struct
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		__UINT64_C(0x0002)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		__UINT64_C(0x0004)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		__UINT64_C(0x0008)
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		__UINT64_C(0x1000)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_DB			\
 	(ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR |\
 	ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE)
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE	(ZBX_FLAGS_ITEM_DIFF_UPDATE_DB | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK)
 }
 zbx_item_diff_t;
 
@@ -775,7 +796,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-
+void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 typedef struct
@@ -808,7 +830,8 @@ zbx_proxy_diff_t;
 
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
+		zbx_uint64_t mask);
 
 /* mock field to estimate how much data can be stored in characters, bytes or both, */
 /* depending on database backend                                                    */
@@ -877,6 +900,13 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_ptr_t *ops);
 
+#define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
+void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 #endif

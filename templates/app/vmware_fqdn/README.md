@@ -6,7 +6,7 @@
 For Zabbix version: 5.4 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/5.4/manual/vm_monitoring
+For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
 
 
 ## Setup
@@ -47,7 +47,7 @@ No specific Zabbix configuration is required.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/5.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
+|VMware |VMware: Event log |<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p> |SIMPLE |vmware.eventlog[{$VMWARE.URL},skip] |
 |VMware |VMware: Full name |<p>VMware service full name.</p> |SIMPLE |vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Version |<p>VMware service version.</p> |SIMPLE |vmware.version[{$VMWARE.URL}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Status of "{#CLUSTER.NAME}" cluster |<p>VMware cluster status.</p> |SIMPLE |vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}] |

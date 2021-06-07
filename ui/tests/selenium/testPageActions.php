@@ -295,7 +295,7 @@ class testPageActions extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allActions
-	 * @backup-once actions
+	 * @backupOnce actions
 	 */
 	public function testPageActions_MassDelete($action) {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';

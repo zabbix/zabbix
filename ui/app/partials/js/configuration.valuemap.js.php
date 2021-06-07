@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,9 +80,17 @@ var AddValueMap = class {
 		link.innerHTML = this.data.name;
 		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
-		link.addEventListener('click',
-			(event) => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, event.target)
-		);
+		link.addEventListener('click', (e) => {
+			const valuemap_names = [];
+			const valuemap_table = e.target.closest('table');
+
+			valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => {
+				if (this.data.name !== element.value) {
+					valuemap_names.push(element.value);
+				}
+			});
+			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1}, null, e.target);
+		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
 		cell.appendChild(link);
@@ -105,23 +113,62 @@ var AddValueMap = class {
 
 	createMappingCell() {
 		let i = 0;
-		const cell = document.createElement('td');
-		const hellip = document.createElement('span');
-		hellip.innerHTML = '&hellip;';
+		let cell = document.createElement('td');
+		let hellip = document.createElement('span');
+		let arrow_cell = document.createElement('div');
+		let mappings_table = document.createElement('div');
+		let value_cell, newvalue_cell;
 
+		hellip.innerHTML = '&hellip;';
+		arrow_cell.textContent = '⇒';
+		mappings_table.classList.add('mappings-table');
 		cell.classList.add('wordwrap');
-		for (let value of this.data.mappings) {
-			if (i <= this.MAX_MAPPINGS) {
-				cell.append((i < this.MAX_MAPPINGS)
-					? `${value.value} ⇒ ${value.newvalue}`
-					: hellip,
-					document.createElement('br')
-				);
+
+		for (let mapping of this.data.mappings) {
+			mapping = {value: '', ...mapping};
+
+			cell.appendChild(this.createHiddenInput(`[mappings][${i}][type]`, mapping.type));
+			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, mapping.value));
+			cell.appendChild(this.createHiddenInput(`[mappings][${i}][newvalue]`, mapping.newvalue));
+			i++;
+		}
+
+		for (let mapping of this.data.mappings.slice(0, this.MAX_MAPPINGS)) {
+			value_cell = document.createElement('div');
+			newvalue_cell = document.createElement('div');
+			newvalue_cell.textContent = mapping.newvalue;
+
+			switch (parseInt(mapping.type, 10)) {
+				case <?= VALUEMAP_MAPPING_TYPE_EQUAL ?>:
+					value_cell.textContent = `=${mapping.value}`;
+					break;
+
+				case <?= VALUEMAP_MAPPING_TYPE_GREATER_EQUAL ?>:
+					value_cell.textContent = `>=${mapping.value}`;
+					break;
+
+				case <?= VALUEMAP_MAPPING_TYPE_LESS_EQUAL ?>:
+					value_cell.textContent = `<=${mapping.value}`;
+					break;
+
+				case <?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>:
+					value_cell = document.createElement('em');
+					value_cell.textContent = <?= json_encode(_('default')) ?>;
+					break;
+
+				default:
+					value_cell.textContent = mapping.value;
 			}
 
-			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, value.value));
-			cell.appendChild(this.createHiddenInput(`[mappings][${i}][newvalue]`, value.newvalue));
-			i++;
+			mappings_table.append(value_cell);
+			mappings_table.append(arrow_cell.cloneNode(true));
+			mappings_table.append(newvalue_cell);
+		}
+
+		cell.append(mappings_table);
+
+		if (this.data.mappings.length > this.MAX_MAPPINGS) {
+			cell.append(hellip);
 		}
 
 		return cell;

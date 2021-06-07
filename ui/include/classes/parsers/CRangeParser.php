@@ -46,7 +46,15 @@ class CRangeParser extends CParser {
 	private $lld_macro_function_parser;
 
 	/**
-	 * Range.
+	 * Number parser.
+	 *
+	 * @var CNumberParser
+	 */
+	private $number_parser;
+
+	/**
+	 * Array of range strings. Range value with suffix will be stored as string of calculated value, value "1K"
+	 * will be stored as "1024".
 	 *
 	 * @var array
 	 */
@@ -55,23 +63,32 @@ class CRangeParser extends CParser {
 	/**
 	 * Options to initialize other parsers.
 	 *
+	 * usermacros   Allow usermacros in ranges.
+	 * lldmacros    Allow lldmacros in ranges.
+	 * with_minus   Allow negative ranges.
+	 * with_float   Allow float number ranges.
+	 * with_suffix  Allow number ranges with suffix, supported suffixes see CNumberParser::$suffixes.
+	 *
 	 * @var array
 	 */
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'with_minus' => false,
+		'with_float' => false,
+		'with_suffix' => false
 	];
 
 	/**
 	 * @param array $options   An array of options to initialize other parsers.
 	 */
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
+		$this->number_parser = new CNumberParser([
+			'with_minus' => $this->options['with_minus'],
+			'with_float' => $this->options['with_float'],
+			'with_suffix' => $this->options['with_suffix']
+		]);
 
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
@@ -91,6 +108,8 @@ class CRangeParser extends CParser {
 	 *   {$M}-{$M}
 	 *   {#M}-{#M}
 	 *   {$M}-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}
+	 *   -200--10
+	 *   -2.5--1.35
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -196,21 +215,25 @@ class CRangeParser extends CParser {
 	 * @return bool|array     Returns false if non-numeric character found else returns array of position and match.
 	 */
 	private function parseDigits($source, &$pos) {
-		if (!preg_match('/^([0-9]+)/', substr($source, $pos), $matches)) {
+		if ($this->number_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		if ($matches[0] > ZBX_MAX_INT32) {
+		$value = $this->number_parser->calcValue();
+
+		if ($value > ZBX_MAX_INT32) {
 			return false;
 		}
 
 		// Second value must be greater than or equal to first one.
-		if ($this->range && ctype_digit($this->range[0]) && $this->range[0] > $matches[0]) {
+		if ($this->range && is_numeric($this->range[0]) && $this->range[0] > $value) {
 			return false;
 		}
 
-		$pos += strlen($matches[0]);
-		$this->range[] = $matches[0];
+		$pos += $this->number_parser->getLength();
+		$this->range[] = ($this->number_parser->getSuffix() === null)
+			? $this->number_parser->getMatch()
+			: strval($value);
 
 		return true;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class testFormSetup extends CWebTest {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
-		$this->assertEquals("Welcome to\nZabbix 5.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
@@ -62,7 +62,7 @@ class testFormSetup extends CWebTest {
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
 		$this->page->refresh()->waitUntilReady();
-		$this->assertEquals("Добро пожаловать в\nZabbix 5.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Добро пожаловать в\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
@@ -862,7 +862,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
 		$this->query('button:Back')->one()->click();
-		$this->assertEquals("Welcome to\nZabbix 5.4", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
+		$this->assertEquals("Welcome to\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 

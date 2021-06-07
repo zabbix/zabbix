@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:40Z'
+  date: '2021-05-11T08:05:21Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 86702e8bc514434e8c914d50c206cb94
       template: 'Apache by HTTP'
       name: 'Apache by HTTP'
       description: |
@@ -20,6 +22,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: b9fe6f0bbe174e9f81af84a3bc0b0e7c
           name: 'Apache: Total bytes'
           type: DEPENDENT
           key: apache.bytes
@@ -44,6 +47,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: b36010be10874cf188eeacc81f2c366f
           name: 'Apache: Bytes per second'
           type: DEPENDENT
           key: apache.bytes.rate
@@ -74,6 +78,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: e61be8ad92004100aca55fcedd2a3807
           name: 'Apache: Get status'
           type: HTTP_AGENT
           key: apache.get_status
@@ -137,7 +142,8 @@ zabbix_export:
               value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: db396445cc5042f89f31dc12cb99c32e
+              expression: 'nodata(/Apache by HTTP/apache.get_status,30m)=1'
               name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
@@ -145,8 +151,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Apache: Service is down'
-                  expression: '{Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
         -
+          uuid: 5fb5101de70a43fab50d55f418462255
           name: 'Apache: Total requests'
           type: DEPENDENT
           key: apache.requests
@@ -165,6 +172,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: ee15f4958040459da53251cc3561ed39
           name: 'Apache: Requests per second'
           type: DEPENDENT
           key: apache.requests.rate
@@ -190,6 +198,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 3dd8ba505d584b028c7ac08d8b959eb3
           name: 'Apache: Uptime'
           type: DEPENDENT
           key: apache.uptime
@@ -210,12 +219,14 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: 76cfa6ebf39f4c8fbd8fde9e0f36d3ed
+              expression: 'last(/Apache by HTTP/apache.uptime)<10m'
               name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: fe0de2eb1478482f99b38c13bd20564c
           name: 'Apache: Version'
           type: DEPENDENT
           key: apache.version
@@ -241,12 +252,14 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 5296d69af0704d0e8a07398f0b4c9685
+              expression: '(last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2))=1 and length(last(/Apache by HTTP/apache.version))>0'
               name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: f74ffb92e30e48958b5b82f7dfbe5147
           name: 'Apache: Workers idle cleanup'
           type: DEPENDENT
           key: apache.workers.cleanup
@@ -265,6 +278,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: d664bee9a330480bbaee7273b871a8d3
           name: 'Apache: Workers closing connection'
           type: DEPENDENT
           key: apache.workers.closing
@@ -283,6 +297,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: a6fb3444585749be998ec840cd8e4511
           name: 'Apache: Workers DNS lookup'
           type: DEPENDENT
           key: apache.workers.dnslookup
@@ -301,6 +316,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: fcf771f2a9b64a81a37db679f0494ed3
           name: 'Apache: Workers finishing'
           type: DEPENDENT
           key: apache.workers.finishing
@@ -319,6 +335,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: cb81a6a77395444283bc5e065fcbfc2e
           name: 'Apache: Workers keepalive (read)'
           type: DEPENDENT
           key: apache.workers.keepalive
@@ -337,6 +354,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 7fc0002a279b4541af569a03c1aca2ac
           name: 'Apache: Workers logging'
           type: DEPENDENT
           key: apache.workers.logging
@@ -355,6 +373,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 78b0bd7d8bec49549fc003d460af9177
           name: 'Apache: Workers reading request'
           type: DEPENDENT
           key: apache.workers.reading
@@ -373,6 +392,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 379ac66397b94463ad17b24fbd20c615
           name: 'Apache: Workers sending reply'
           type: DEPENDENT
           key: apache.workers.sending
@@ -391,6 +411,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 1c90055e02a244fc8d18e73b23daa0f1
           name: 'Apache: Workers slot with no current process'
           type: DEPENDENT
           key: apache.workers.slot
@@ -409,6 +430,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: ae21ea113e8840349aff81ab582d92b4
           name: 'Apache: Workers starting up'
           type: DEPENDENT
           key: apache.workers.starting
@@ -427,6 +449,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: be1a05a6eab84b64ac4d51c966ea91e8
           name: 'Apache: Workers waiting for connection'
           type: DEPENDENT
           key: apache.workers.waiting
@@ -445,6 +468,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 1752b9bcf7b34abbaf105f5261638271
           name: 'Apache: Total workers busy'
           type: DEPENDENT
           key: apache.workers_total.busy
@@ -463,6 +487,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: b1b1c86a12964ae2813c63481e464ec7
           name: 'Apache: Total workers idle'
           type: DEPENDENT
           key: apache.workers_total.idle
@@ -481,6 +506,7 @@ zabbix_export:
               tag: Application
               value: Apache
         -
+          uuid: 5039d11bc3964d6e9928a0a46dd0b402
           name: 'Apache: Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
@@ -493,15 +519,17 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}'
+              uuid: ffbb564032c7462eb0bb9b4c2f700559
+              expression: 'min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
               name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Apache: Service is down'
-                  expression: '{Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0'
+                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
         -
+          uuid: fb65918695094026838e2b9e4ca00402
           name: 'Apache: Service ping'
           type: SIMPLE
           key: 'net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
@@ -519,12 +547,14 @@ zabbix_export:
               value: Apache
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: afe2fde35d054333adc8369a0f9af778
+              expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
               name: 'Apache: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: eee8abd3174d426092e8bca9b3ba982e
           name: 'Event MPM discovery'
           type: DEPENDENT
           key: apache.mpm.event.discovery
@@ -534,6 +564,7 @@ zabbix_export:
             https://httpd.apache.org/docs/current/mod/event.html
           item_prototypes:
             -
+              uuid: f52700379f9a4ee8b378a2eb9caea070
               name: 'Apache: Bytes per request'
               type: DEPENDENT
               key: 'apache.bytes[per_request{#SINGLETON}]'
@@ -554,6 +585,7 @@ zabbix_export:
                   tag: Application
                   value: Apache
             -
+              uuid: 062d7c941f0c468d8b63fa76ae0610f6
               name: 'Apache: Connections async closing'
               type: DEPENDENT
               key: 'apache.connections[async_closing{#SINGLETON}]'
@@ -572,6 +604,7 @@ zabbix_export:
                   tag: Application
                   value: Apache
             -
+              uuid: 6cb8b255ad8343a48e622912bc298366
               name: 'Apache: Connections async keep alive'
               type: DEPENDENT
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
@@ -590,6 +623,7 @@ zabbix_export:
                   tag: Application
                   value: Apache
             -
+              uuid: 997b3452aac24ad6afbad775d649c727
               name: 'Apache: Connections async writing'
               type: DEPENDENT
               key: 'apache.connections[async_writing{#SINGLETON}]'
@@ -608,6 +642,7 @@ zabbix_export:
                   tag: Application
                   value: Apache
             -
+              uuid: 31cb044eed904ca19150921fe36f3285
               name: 'Apache: Connections total'
               type: DEPENDENT
               key: 'apache.connections[total{#SINGLETON}]'
@@ -626,6 +661,7 @@ zabbix_export:
                   tag: Application
                   value: Apache
             -
+              uuid: 34555340f3ad4b878504df188f54a9c9
               name: 'Apache: Number of async processes'
               type: DEPENDENT
               key: 'apache.process[num{#SINGLETON}]'
@@ -645,6 +681,7 @@ zabbix_export:
                   value: Apache
           graph_prototypes:
             -
+              uuid: 066b53ed2244414ca3090498eb035c27
               name: 'Apache: Current async connections{#SINGLETON}'
               graph_items:
                 -
@@ -672,6 +709,7 @@ zabbix_export:
                     host: 'Apache by HTTP'
                     key: 'apache.connections[total{#SINGLETON}]'
             -
+              uuid: dbaa0c2468cc40fca977fb382d19cb78
               name: 'Apache: Current async processes{#SINGLETON}'
               graph_items:
                 -
@@ -710,78 +748,82 @@ zabbix_export:
           description: 'Request scheme which may be http or https'
       dashboards:
         -
+          uuid: a328c9e713424465a8e1adec7322b0dc
           name: 'Apache performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Apache: Requests per second'
-                    host: 'Apache by HTTP'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Apache: Requests per second'
+                        host: 'Apache by HTTP'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Apache: Workers total'
-                    host: 'Apache by HTTP'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Apache: Workers total'
+                        host: 'Apache by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'Apache: Current async connections{#SINGLETON}'
-                    host: 'Apache by HTTP'
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Apache: Current async connections{#SINGLETON}'
+                        host: 'Apache by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'Apache: Current async processes{#SINGLETON}'
-                    host: 'Apache by HTTP'
-            -
-              type: GRAPH_CLASSIC
-              'y': '10'
-              width: '12'
-              height: '6'
-              fields:
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Apache: Current async processes{#SINGLETON}'
+                        host: 'Apache by HTTP'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Apache: Worker states'
-                    host: 'Apache by HTTP'
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Apache: Worker states'
+                        host: 'Apache by HTTP'
       valuemaps:
         -
+          uuid: a5d1f911fb264bd4bc087ea582626d7f
           name: 'Service state'
           mappings:
             -
@@ -792,6 +834,7 @@ zabbix_export:
               newvalue: Up
   graphs:
     -
+      uuid: a3998992f7504a12826e3c4d592836b5
       name: 'Apache: Requests per second'
       graph_items:
         -
@@ -801,6 +844,7 @@ zabbix_export:
             host: 'Apache by HTTP'
             key: apache.requests.rate
     -
+      uuid: 1629062b5cd74b67af9a60226a79f8f1
       name: 'Apache: Worker states'
       graph_items:
         -
@@ -869,6 +913,7 @@ zabbix_export:
             host: 'Apache by HTTP'
             key: apache.workers.waiting
     -
+      uuid: 78e59f1b5eb747019f92921ac5ef48b0
       name: 'Apache: Workers total'
       type: STACKED
       graph_items:

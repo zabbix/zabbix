@@ -326,10 +326,10 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action         Popup controller related action.
- * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid     (optional) id of overlay dialogue.
- * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action          Popup controller related action.
+ * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid      (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
@@ -343,7 +343,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec'
+				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype'
@@ -386,20 +386,24 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				if (action === 'popup.scriptexec') {
-					buttons.push({
-						'title': t('Ok'),
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
-				}
-				else {
-					buttons.push({
-						'title': t('Cancel'),
-						'class': 'btn-alt',
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
+				switch (action) {
+					case 'popup.scheduledreport.list':
+					case 'popup.scheduledreport.test':
+					case 'popup.scriptexec':
+						buttons.push({
+							'title': t('Ok'),
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
+						break;
+
+					default:
+						buttons.push({
+							'title': t('Cancel'),
+							'class': 'btn-alt',
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
 				}
 
 				overlay.setProperties({
@@ -488,11 +492,6 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
-		// Do not catch multiselect events.
-		if (jQuery(event.target).closest('.multiselect').data('multiSelect') !== undefined) {
-			return;
-		}
-
 		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {

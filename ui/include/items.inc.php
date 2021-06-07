@@ -90,7 +90,6 @@ function item_type2str($type = null) {
 		ITEM_TYPE_SNMPTRAP => _('SNMP trap'),
 		ITEM_TYPE_INTERNAL => _('Zabbix internal'),
 		ITEM_TYPE_TRAPPER => _('Zabbix trapper'),
-		ITEM_TYPE_AGGREGATE => _('Zabbix aggregate'),
 		ITEM_TYPE_EXTERNAL => _('External check'),
 		ITEM_TYPE_DB_MONITOR => _('Database monitor'),
 		ITEM_TYPE_HTTPAGENT => _('HTTP agent'),
@@ -1420,7 +1419,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 	// apply value mapping
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_STR:
-			$mapping = CValueMapHelper::getMappedValue($value, $item['valuemap']);
+			$mapping = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
 			// break; is not missing here
 
 		case ITEM_VALUE_TYPE_TEXT:
@@ -1436,7 +1435,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			break;
 
 		default:
-			$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
+			$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 	}
 
 	return $value;
@@ -2051,7 +2050,6 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_ZABBIX,
 		ITEM_TYPE_SIMPLE,
 		ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR,
 		ITEM_TYPE_IPMI,

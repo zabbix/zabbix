@@ -111,6 +111,11 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SYSTEM_INFO)
 				? (new CMenuItem(_('System information')))->setAction('report.status')
 				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
+				? (new CMenuItem(_('Scheduled reports')))
+					->setAction('scheduledreport.list')
+					->setAliases(['scheduledreport.edit'])
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
 				? (new CMenuItem(_('Availability report')))
 					->setUrl(new CUrl('report2.php'), 'report2.php')

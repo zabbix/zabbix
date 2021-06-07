@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:32Z'
+  date: '2021-05-11T08:05:12Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: e5ec7acc7efc4ac491b6fa552ab077ae
       template: 'Dell Force S-Series SNMP'
       name: 'Dell Force S-Series SNMP'
       description: |
@@ -27,6 +29,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       discovery_rules:
         -
+          uuid: f35cb754ebd748b7842c67461264f48d
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.4.1.1]'
@@ -34,6 +37,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: c916b4658e914e93af13b4fe7b58138e
               name: 'Fan {#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.4.1.2.{#SNMPINDEX}'
@@ -52,13 +56,15 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: aecc6fdd58404347b3074b0c1db63f09
+                  expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  uuid: a53271304dcf418aa5afdaa145436b70
+                  expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -66,8 +72,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#SNMPVALUE}: Fan is in critical state'
-                      expression: '{Dell Force S-Series SNMP:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
+          uuid: ff38ddf97a2a47c88ad93d590dedc22a
           name: 'CPU and Memory and Flash Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.9.1.1]'
@@ -75,6 +82,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: f2f0febdd3c14d77a47461c22b883bb5
               name: '#{#SNMPINDEX}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.9.1.3.{#SNMPINDEX}'
@@ -91,12 +99,14 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  uuid: 002c0f19cfe54fe08da2183654752470
+                  expression: 'min(/Dell Force S-Series SNMP/system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
             -
+              uuid: 3571d6508f07442983936fdcc2ba733f
               name: '#{#SNMPINDEX}: Memory utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.9.1.5.{#SNMPINDEX}'
@@ -113,12 +123,14 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  uuid: 41baaaa2eb6246b7982ac76928fbd0f8
+                  expression: 'min(/Dell Force S-Series SNMP/vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: d5ec0b9ce1f04b0abd0b4bfe6aa28f6b
               name: '#{#SNMPINDEX}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -130,6 +142,7 @@ zabbix_export:
                     host: 'Dell Force S-Series SNMP'
                     key: 'system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]'
             -
+              uuid: 69c63b7fb65347cc9301b02e1f9cd45e
               name: '#{#SNMPINDEX}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -141,6 +154,7 @@ zabbix_export:
                     host: 'Dell Force S-Series SNMP'
                     key: 'vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]'
         -
+          uuid: 21117a6eb71f4837971ccedfff7596f6
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.3.1.1]'
@@ -149,6 +163,7 @@ zabbix_export:
           description: 'A list of power supply residents in the S-series chassis.'
           item_prototypes:
             -
+              uuid: 7cc5081ad6114124845beedbe4725899
               name: 'PSU {#SNMPVALUE}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.3.1.2.{#SNMPINDEX}'
@@ -167,13 +182,15 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: 764f08ab7a29481fa73a63ae256ff154
+                  expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  uuid: a7d4ac882ec24cce9839c6012c7fa562
+                  expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -181,8 +198,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
-                      expression: '{Dell Force S-Series SNMP:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
+          uuid: a619474b839642f69e583a2c63e8b4ba
           name: 'Stack Unit Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.2.1.2]'
@@ -190,6 +208,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: 4eaf5b777b0c4efeb34140618e18aaa5
               name: 'Device {#SNMPVALUE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.14.{#SNMPINDEX}'
@@ -206,17 +225,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: dc1064de6a6b4533be812e590b96927b
+                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: f4d0a2c0b1a9468990e1f6dbfef1ab75
+                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: 'Device {#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -224,16 +245,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: f1bbf02af05041ef95ff80ff18fc02a7
+                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: 'Device {#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
             -
+              uuid: d6e3d7bb74b84e0c895a1b1b740f0e14
               name: '#{#SNMPVALUE}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.7.{#SNMPINDEX}'
@@ -255,6 +278,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: eb6853c30dd04581b2e362d7747b40b5
               name: '#{#SNMPVALUE}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.12.{#SNMPINDEX}'
@@ -277,12 +301,14 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 6f02e903dab24bf294015f43e0b52504
+                  expression: '(last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#2))=1 and length(last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}]))>0'
                   name: '#{#SNMPVALUE}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: bd68fcd8247744cb8c10e3dfc699bc7f
               name: '#{#SNMPVALUE}: Hardware version(revision)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.21.{#SNMPINDEX}'
@@ -304,6 +330,7 @@ zabbix_export:
                   tag: Application
                   value: Inventory
             -
+              uuid: 67cce945315e426f9b12456fe95a6c1a
               name: '#{#SNMPVALUE}: Operating system'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.10.{#SNMPINDEX}'
@@ -326,7 +353,8 @@ zabbix_export:
                   value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 66049aa1d7cb45ebac1fe5292c309ba2
+                  expression: '(last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#2))=1 and length(last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}]))>0'
                   name: '#{#SNMPVALUE}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -361,6 +389,7 @@ zabbix_export:
           value: '55'
       valuemaps:
         -
+          uuid: b389c759db0448ffbe28d4572fbfb3e9
           name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
           mappings:
             -
@@ -373,6 +402,7 @@ zabbix_export:
               value: '3'
               newvalue: absent
         -
+          uuid: 2532df482bd348ba8202c3eb2b76340b
           name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
           mappings:
             -

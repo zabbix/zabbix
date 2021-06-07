@@ -45,22 +45,22 @@ class CConfigurationExport {
 	 */
 	protected $dataFields;
 
+	protected $options;
+
 	/**
 	 * Constructor.
 	 *
 	 * @param array $options IDs of elements that should be exported.
 	 */
 	public function __construct(array $options) {
-		$this->options = [
+		$this->options = array_merge([
 			'hosts' => [],
 			'templates' => [],
 			'groups' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => []
-		];
-
-		$this->options = array_merge($this->options, $options);
+		], $options);
 
 		$this->data = [
 			'groups' => [],
@@ -82,7 +82,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps'
+				'verify_host', 'allow_traps', 'uuid'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
@@ -90,7 +90,7 @@ class CConfigurationExport {
 				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
 				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'parameters'
+				'verify_host', 'allow_traps', 'parameters', 'uuid'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
@@ -98,7 +98,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover'
+				'verify_host', 'allow_traps', 'discover', 'uuid'
 			]
 		];
 	}
@@ -207,12 +207,42 @@ class CConfigurationExport {
 		}
 
 		if ($options['maps']) {
-			$this->gatherMaps($options['maps']);
+			$options['images'] = array_merge($options['images'], $this->gatherMaps($options['maps']));
+			$options['images'] = array_keys(array_flip($options['images']));
+		}
+
+		if ($options['images']) {
+			$this->gatherImages($options['images']);
 		}
 
 		if ($options['mediaTypes']) {
 			$this->gatherMediaTypes($options['mediaTypes']);
 		}
+	}
+
+	/**
+	 * Gather image data for export.
+	 *
+	 * @param array $imageids
+	 */
+	protected function gatherImages(array $imageids): void {
+		$images = API::Image()->get([
+			'output' => ['imageid', 'name', 'imagetype'],
+			'imageids' => $imageids,
+			'select_image' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($images as &$image) {
+			$image = [
+				'name' => $image['name'],
+				'imagetype' => $image['imagetype'],
+				'encodedImage' => $image['image']
+			];
+		}
+		unset($image);
+
+		$this->data['images'] = $images;
 	}
 
 	/**
@@ -244,7 +274,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherGroups(array $groupIds) {
 		$this->data['groups'] = API::HostGroup()->get([
-			'output' => ['name'],
+			'output' => ['name', 'uuid'],
 			'groupids' => $groupIds,
 			'preservekeys' => true
 		]);
@@ -257,13 +287,13 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
-			'output' => ['host', 'name', 'description'],
-			'selectGroups' => ['groupid', 'name'],
+			'output' => ['host', 'name', 'description', 'uuid'],
+			'selectGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
-			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings', 'uuid'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -303,7 +333,7 @@ class CConfigurationExport {
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => ['groupid', 'name'],
+			'selectGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -340,7 +370,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplateDashboards(array $templates) {
 		$dashboards = API::TemplateDashboard()->get([
-			'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+			'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start', 'uuid'],
 			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 			'templateids' => array_keys($templates),
 			'preservekeys' => true
@@ -787,10 +817,11 @@ class CConfigurationExport {
 		$triggers = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name'
+				'discover', 'event_name', 'uuid'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
+			'selectHosts' => ['status'],
 			'selectItems' => ['itemid', 'flags', 'type'],
 			'selectTags' => ['tag', 'value'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
@@ -856,7 +887,7 @@ class CConfigurationExport {
 		$httptests = API::HttpTest()->get([
 			'output' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
 			],
 			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
 				'retrieve_mode', 'timeout', 'required', 'status_codes'
@@ -920,7 +951,7 @@ class CConfigurationExport {
 
 		$graph_items = API::Item()->get([
 			'output' => ['key_'],
-			'selectHosts' => ['host'],
+			'selectHosts' => ['host', 'status'],
 			'itemids' => $graphItemIds,
 			'webitems' => true,
 			'filter' => [
@@ -961,6 +992,12 @@ class CConfigurationExport {
 			foreach ($graph['gitems'] as $ginum => $gItem) {
 				if (array_key_exists($gItem['itemid'], $graph_items)) {
 					$item = $graph_items[$gItem['itemid']];
+
+					if ($item['hosts'][0]['status'] != HOST_STATUS_TEMPLATE) {
+						unset($graph['uuid']);
+					}
+					unset($item['hosts'][0]['status']);
+
 					$graphs[$gnum]['gitems'][$ginum]['itemid'] = [
 						'host' => $item['hosts'][0]['host'],
 						'key' => $item['key_']
@@ -988,11 +1025,12 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'event_name'
+				'event_name', 'uuid'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
+			'selectHosts' => ['status'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
@@ -1012,6 +1050,11 @@ class CConfigurationExport {
 	protected function prepareTriggers(array $triggers) {
 		// Unset triggers containing discovered items.
 		foreach ($triggers as $idx => &$trigger) {
+			if ($trigger['hosts'][0]['status'] != HOST_STATUS_TEMPLATE) {
+				unset($trigger['uuid']);
+			}
+			unset($trigger['hosts']);
+
 			foreach ($trigger['items'] as $item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);
@@ -1033,13 +1076,15 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get maps for export from database.
+	 * Get maps for export from database and collect image IDs used in maps for later usage.
 	 *
-	 * @param array $mapIds
+	 * @param array $mapids
+	 *
+	 * @return array
 	 */
-	protected function gatherMaps(array $mapIds) {
+	protected function gatherMaps(array $mapids): array {
 		$sysmaps = API::Map()->get([
-			'sysmapids' => $mapIds,
+			'sysmapids' => $mapids,
 			'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 				'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
 				'zindex'
@@ -1053,27 +1098,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		$this->prepareMapExport($sysmaps);
+		$imageids = $this->prepareMapExport($sysmaps);
 
 		$this->data['maps'] = $sysmaps;
 
-		$images = API::Image()->get([
-			'output' => ['imageid', 'name', 'imagetype'],
-			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
-			'select_image' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($images as &$image) {
-			$image = [
-				'name' => $image['name'],
-				'imagetype' => $image['imagetype'],
-				'encodedImage' => $image['image']
-			];
-		}
-		unset($image);
-
-		$this->data['images'] = $images;
+		return $imageids;
 	}
 
 	/**
@@ -1105,27 +1134,14 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get value maps for export builder from database.
-	 *
-	 * @param array $valuemapids
-	 *
-	 * return array
-	 */
-	protected function gatherValueMaps(array $valuemapids) {
-		$this->data['valueMaps'] = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'selectMappings' => ['value', 'newvalue'],
-			'valuemapids' => $valuemapids,
-			'preservekeys' => true
-		]);
-	}
-
-	/**
-	 * Change map elements real database selement id and icons ids to unique field references.
+	 * Change map elements real database selement id and icons ids to unique field references. Gather image IDs for
+	 * later usage.
 	 *
 	 * @param array $exportMaps
+	 *
+	 * @return array
 	 */
-	protected function prepareMapExport(array &$exportMaps) {
+	protected function prepareMapExport(array &$exportMaps): array {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
 
 		// gather element IDs that must be substituted
@@ -1235,6 +1251,8 @@ class CConfigurationExport {
 			unset($link);
 		}
 		unset($sysmap);
+
+		return $imageIds;
 	}
 
 	/**
@@ -1247,7 +1265,7 @@ class CConfigurationExport {
 	protected function getGroupsReferences(array $groupIds) {
 		$groups = API::HostGroup()->get([
 			'groupids' => $groupIds,
-			'output' => ['name'],
+			'output' => ['uuid', 'name'],
 			'preservekeys' => true
 		]);
 
@@ -1257,7 +1275,10 @@ class CConfigurationExport {
 		}
 
 		foreach ($groups as &$group) {
-			$group = ['name' => $group['name']];
+			$group = [
+				'uuid' => $group['uuid'],
+				'name' => $group['name']
+			];
 		}
 		unset($group);
 

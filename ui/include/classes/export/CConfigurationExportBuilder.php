@@ -246,6 +246,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($templates as $template) {
 			$result[] = [
+				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
@@ -440,16 +441,22 @@ class CConfigurationExportBuilder {
 	 * @param array $valuemaps
 	 */
 	protected function formatValueMaps(array $valuemaps) {
-		$result = [];
-
 		CArrayHelper::sort($valuemaps, ['name']);
 
-		foreach ($valuemaps as $valuemap) {
-			CArrayHelper::sort($valuemap['mappings'], ['value']);
-			$result[] = $valuemap;
+		foreach ($valuemaps as &$valuemap) {
+			foreach ($valuemap['mappings'] as &$mapping) {
+				if ($mapping['type'] == VALUEMAP_MAPPING_TYPE_EQUAL) {
+					unset($mapping['type']);
+				}
+				elseif ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {
+					unset($mapping['value']);
+				}
+			}
+			unset($mapping);
 		}
+		unset($valuemap);
 
-		return $result;
+		return $valuemaps;
 	}
 
 	/**
@@ -522,6 +529,7 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
+				'uuid' => $discoveryRule['uuid'],
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -639,6 +647,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($httptests as $httptest) {
 			$result[] = [
+				'uuid' => $httptest['uuid'],
 				'name' => $httptest['name'],
 				'delay' => $httptest['delay'],
 				'attempts' => $httptest['retries'],
@@ -740,6 +749,10 @@ class CConfigurationExportBuilder {
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			];
 
+			if (array_key_exists('uuid', $graph)) {
+				$data['uuid'] = $graph['uuid'];
+			}
+
 			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $graph['discover'];
 			}
@@ -764,6 +777,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($hostPrototypes as $hostPrototype) {
 			$result[] = [
+				'uuid' => $hostPrototype['uuid'],
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
@@ -877,6 +891,10 @@ class CConfigurationExportBuilder {
 				'tags' => $this->formatTags($trigger['tags'])
 			];
 
+			if (array_key_exists('uuid', $trigger)) {
+				$data['uuid'] = $trigger['uuid'];
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $trigger['discover'];
 			}
@@ -959,6 +977,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($groups as $group) {
 			$result[] = [
+				'uuid' => $group['uuid'],
 				'name' => $group['name']
 			];
 		}
@@ -976,12 +995,12 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatItems(array $items, array $simple_triggers) {
 		$result = [];
-		$expression_data = $simple_triggers ? new CTriggerExpression() : null;
 
 		CArrayHelper::sort($items, ['key_']);
 
 		foreach ($items as $item) {
 			$data = [
+				'uuid' => $item['uuid'],
 				'name' => $item['name'],
 				'type' => $item['type'],
 				'snmp_oid' => $item['snmp_oid'],
@@ -1065,32 +1084,8 @@ class CConfigurationExportBuilder {
 
 			if ($simple_triggers) {
 				$triggers = [];
-				$prefix_length = strlen($item['host'].':'.$item['key_'].'.');
-
 				foreach ($simple_triggers as $simple_trigger) {
 					if (bccomp($item['itemid'], $simple_trigger['items'][0]['itemid']) == 0) {
-						if ($expression_data->parse($simple_trigger['expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], '',
-										$expression['pos'] + 1, $prefix_length
-									);
-								}
-							}
-						}
-
-						if ($simple_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-								&& $expression_data->parse($simple_trigger['recovery_expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['recovery_expression'] = substr_replace(
-										$simple_trigger['recovery_expression'], '', $expression['pos'] + 1,
-										$prefix_length
-									);
-								}
-							}
-						}
-
 						$triggers[] = $simple_trigger;
 					}
 				}
@@ -1192,6 +1187,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
+				'uuid' => $dashboard['uuid'],
 				'name' => $dashboard['name'],
 				'display_period' => $dashboard['display_period'],
 				'auto_start' => $dashboard['auto_start'],

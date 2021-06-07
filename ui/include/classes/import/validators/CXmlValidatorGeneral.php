@@ -43,6 +43,13 @@ abstract class CXmlValidatorGeneral {
 	protected $strict = false;
 
 	/**
+	 * This validation is for importcompare, it should produce same output in import, as for export.
+	 *
+	 * @var bool
+	 */
+	protected $preview = false;
+
+	/**
 	 * @param string $format  Format of import source.
 	 */
 	public function __construct(string $format) {
@@ -67,6 +74,28 @@ abstract class CXmlValidatorGeneral {
 	 */
 	public function setStrict(bool $strict): self {
 		$this->strict = $strict;
+
+		return $this;
+	}
+
+	/**
+	 * On import preview validation should not change content.
+	 *
+	 * @return bool
+	 */
+	public function isPreview(): bool {
+		return $this->preview;
+	}
+
+	/**
+	 * On import preview validation should not change content.
+	 *
+	 * @param bool $preview
+	 *
+	 * @return self
+	 */
+	public function setPreview(bool $preview): self {
+		$this->preview = $preview;
 
 		return $this;
 	}
@@ -140,7 +169,7 @@ abstract class CXmlValidatorGeneral {
 
 			// validation of the values type
 			foreach ($rules['rules'] as $tag => $rule) {
-				if (array_key_exists('import', $rule)) {
+				if (array_key_exists('import', $rule) && !$this->preview) {
 					$data[$tag] = call_user_func($rule['import'], $data);
 				}
 

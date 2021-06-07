@@ -27,6 +27,7 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'url' =>							'db config.url',
 			'discovery_groupid' =>				'db config.discovery_groupid',
 			'default_inventory_mode' =>			'db config.default_inventory_mode',
 			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
@@ -42,7 +43,8 @@ class CControllerMiscConfigEdit extends CController {
 			'connect_timeout' =>				'db config.connect_timeout',
 			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
 			'script_timeout' =>					'db config.script_timeout',
-			'item_test_timeout' =>				'db config.item_test_timeout'
+			'item_test_timeout' =>				'db config.item_test_timeout',
+			'report_test_timeout' =>			'db config.report_test_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,6 +62,7 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function doAction() {
 		$data = [
+			'url' => $this->getInput('url', CSettingsHelper::get(CSettingsHelper::URL)),
 			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
 				CSettingsHelper::DISCOVERY_GROUPID
 			)),
@@ -105,6 +108,9 @@ class CControllerMiscConfigEdit extends CController {
 			)),
 			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::ITEM_TEST_TIMEOUT
+			)),
+			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
+				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
 			))
 		];
 

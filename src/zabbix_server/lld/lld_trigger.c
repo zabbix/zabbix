@@ -27,13 +27,13 @@ typedef struct
 {
 	zbx_uint64_t		triggerid;
 	char			*description;
-	char			*expression;
-	char			*recovery_expression;
 	char			*comments;
 	char			*url;
 	char			*correlation_tag;
 	char			*opdata;
 	char			*event_name;
+	char			*expression_orig;
+	char			*recovery_expression_orig;
 	unsigned char		status;
 	unsigned char		type;
 	unsigned char		priority;
@@ -44,6 +44,8 @@ typedef struct
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	tags;
+	zbx_eval_context_t	eval_ctx;
+	zbx_eval_context_t	eval_ctx_r;
 }
 zbx_lld_trigger_prototype_t;
 
@@ -242,6 +244,9 @@ static void	lld_function_free(zbx_lld_function_t *function)
 
 static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prototype)
 {
+	zbx_eval_clear(&trigger_prototype->eval_ctx);
+	zbx_eval_clear(&trigger_prototype->eval_ctx_r);
+
 	zbx_vector_ptr_clear_ext(&trigger_prototype->tags, (zbx_clean_func_t)lld_tag_free);
 	zbx_vector_ptr_destroy(&trigger_prototype->tags);
 	zbx_vector_ptr_clear_ext(&trigger_prototype->dependencies, zbx_ptr_free);
@@ -253,8 +258,8 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 	zbx_free(trigger_prototype->correlation_tag);
 	zbx_free(trigger_prototype->url);
 	zbx_free(trigger_prototype->comments);
-	zbx_free(trigger_prototype->recovery_expression);
-	zbx_free(trigger_prototype->expression);
+	zbx_free(trigger_prototype->recovery_expression_orig);
+	zbx_free(trigger_prototype->expression_orig);
 	zbx_free(trigger_prototype->description);
 	zbx_free(trigger_prototype);
 }
@@ -299,11 +304,12 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
  *             trigger_prototypes - [OUT] sorted list of trigger prototypes   *
  *                                                                            *
  ******************************************************************************/
-static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes)
+static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes, char **error)
 {
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
+	char				*errmsg = NULL;
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
@@ -323,8 +329,8 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 
 		ZBX_STR2UINT64(trigger_prototype->triggerid, row[0]);
 		trigger_prototype->description = zbx_strdup(NULL, row[1]);
-		trigger_prototype->expression = zbx_strdup(NULL, row[2]);
-		trigger_prototype->recovery_expression = zbx_strdup(NULL, row[8]);
+		trigger_prototype->expression_orig = zbx_strdup(NULL, row[2]);
+		trigger_prototype->recovery_expression_orig = zbx_strdup(NULL, row[8]);
 		ZBX_STR2UCHAR(trigger_prototype->status, row[3]);
 		ZBX_STR2UCHAR(trigger_prototype->type, row[4]);
 		ZBX_STR2UCHAR(trigger_prototype->priority, row[5]);
@@ -341,6 +347,30 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 		zbx_vector_ptr_create(&trigger_prototype->functions);
 		zbx_vector_ptr_create(&trigger_prototype->dependencies);
 		zbx_vector_ptr_create(&trigger_prototype->tags);
+
+		zbx_eval_init(&trigger_prototype->eval_ctx);
+		zbx_eval_init(&trigger_prototype->eval_ctx_r);
+
+		if (SUCCEED != zbx_eval_parse_expression(&trigger_prototype->eval_ctx,
+				trigger_prototype->expression_orig, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, &errmsg))
+		{
+			*error = zbx_strdcatf(*error, "Invalid trigger prototype \"%s\" expression: %s\n",
+					trigger_prototype->description, errmsg);
+			zbx_free(errmsg);
+			lld_trigger_prototype_free(trigger_prototype);
+			continue;
+		}
+
+		if ('\0' != *trigger_prototype->recovery_expression_orig &&
+				SUCCEED != zbx_eval_parse_expression(&trigger_prototype->eval_ctx_r,
+				trigger_prototype->recovery_expression_orig, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, &errmsg))
+		{
+			*error = zbx_strdcatf(*error, "Invalid trigger prototype \"%s\" recovery expression: %s\n",
+					trigger_prototype->description, errmsg);
+			zbx_free(errmsg);
+			lld_trigger_prototype_free(trigger_prototype);
+			continue;
+		}
 
 		zbx_vector_ptr_append(trigger_prototypes, trigger_prototype);
 	}
@@ -898,140 +928,242 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_has
 	return NULL;
 }
 
-static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functions, zbx_uint64_t *function_index)
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_eval_expression_index_functions                              *
+ *                                                                            *
+ * Purpose: set indexes for functionid tokens {<functionid>} from the         *
+ *          specified function vector                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vector_ptr_t *functions)
 {
-	size_t			l, r;
-	int			index;
+	int			i, index;
 	zbx_uint64_t		functionid;
 	zbx_lld_function_t	*function;
-	char			buffer[ZBX_MAX_UINT64_LEN];
 
-	for (l = 0; '\0' != (*expression)[l]; l++)
+	for (i = 0; i < ctx->stack.values_num; i++)
 	{
-		if ('{' != (*expression)[l])
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 			continue;
 
-		if ('$' == (*expression)[l + 1])
+		if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+				&functionid))
 		{
-			int	macro_r, context_l, context_r;
-
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
-				l += macro_r;
-			else
-				l++;
-
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-
-		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
-			;
-
-		if ('}' != (*expression)[r])
-			continue;
-
-		/* ... > 0 | {12345} + ... */
-		/*           l     r       */
-
-		if (SUCCEED != is_uint64_n(*expression + l + 1, r - l - 1, &functionid))
-			continue;
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(functions, &functionid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			function = (zbx_lld_function_t *)functions->values[index];
 
-			if (0 == function->index)
-				function->index = ++(*function_index);
-
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, function->index);
-
-			r--;
-			zbx_replace_string(expression, l + 1, &r, buffer);
-			r++;
+			function->index = index + 1;
+			zbx_variant_set_ui64(&token->value, function->index);
 		}
-
-		l = r;
 	}
 }
 
-static void	lld_expressions_simplify(char **expression, char **recovery_expression, zbx_vector_ptr_t *functions)
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_eval_expression_simplify                                     *
+ *                                                                            *
+ * Purpose: simplify parsed expression by replacing {<functionid>} with       *
+ *          {<function index>}                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **expression, zbx_vector_ptr_t *functions)
 {
-	zbx_uint64_t	function_index = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, (NULL != expression ? *expression : ""));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' recovery_expression:'%s'", __func__,
-			*expression, *recovery_expression);
-
-	lld_expression_simplify(expression, functions, &function_index);
-	lld_expression_simplify(recovery_expression, functions, &function_index);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s' recovery_expression:'%s'", __func__,
-			*expression, *recovery_expression);
-}
-
-static char	*lld_expression_expand(const char *expression, const zbx_vector_ptr_t *functions)
-{
-	size_t		l, r;
-	int		i;
-	zbx_uint64_t	index;
-	char		*buffer = NULL;
-	size_t		buffer_alloc = 64, buffer_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
-
-	buffer = (char *)zbx_malloc(buffer, buffer_alloc);
-
-	*buffer = '\0';
-
-	for (l = 0; '\0' != expression[l]; l++)
+	if (SUCCEED == zbx_eval_status(ctx))
 	{
-		zbx_chrcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, expression[l]);
+		lld_eval_expression_index_functions(ctx, functions);
 
-		if ('{' != expression[l])
-			continue;
-
-		if ('$' == expression[l + 1])
+		if (NULL != expression)
 		{
-			int	macro_r, context_l, context_r;
+			char	*new_expression = NULL;
 
-			if (SUCCEED == zbx_user_macro_parse(expression + l, &macro_r, &context_l, &context_r, NULL))
-				l += macro_r;
-			else
-				l++;
-
-			continue;
+			zbx_eval_compose_expression(ctx, &new_expression);
+			zbx_free(*expression);
+			*expression = new_expression;
 		}
-
-		for (r = l + 1; '\0' != expression[r] && '}' != expression[r]; r++)
-			;
-
-		if ('}' != expression[r])
-			continue;
-
-		/* ... > 0 | {1} + ... */
-		/*           l r       */
-
-		if (SUCCEED != is_uint64_n(expression + l + 1, r - l - 1, &index))
-			continue;
-
-		for (i = 0; i < functions->values_num; i++)
-		{
-			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[i];
-
-			if (function->index != index)
-				continue;
-
-			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, ZBX_FS_UI64 ":%s(%s)",
-					function->itemid, function->function, function->parameter);
-
-			break;
-		}
-
-		l = r - 1;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __func__, buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, (NULL != expression ? *expression : ""));
+}
 
-	return buffer;
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_expression_simplify                                  *
+ *                                                                            *
+ * Purpose: simplify trigger expression by replacing {<functionid>} with      *
+ *          {<function index>}                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, char **expression,
+		zbx_vector_ptr_t *functions)
+{
+	zbx_eval_context_t	ctx;
+	char			*errmsg = NULL;
+
+	if ('\0' == **expression)
+		return;
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *expression, ZBX_EVAL_TRIGGER_EXPRESSION_LLD,
+			&errmsg))
+	{
+		const char	*type;
+
+		type = (*expression == trigger->expression ? "" : " recovery");
+		zabbix_log(LOG_LEVEL_DEBUG, "Invalid trigger \"%s\"%s expression: %s", trigger->description, type,
+				errmsg);
+		zbx_free(errmsg);
+
+		/* set empty expression so it's replaced with discovered one */
+		*expression = zbx_strdup(*expression, "");
+		return;
+	}
+
+	lld_eval_expression_simplify(&ctx, expression, functions);
+	zbx_eval_clear(&ctx);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_eval_expression_expand                                       *
+ *                                                                            *
+ * Purpose: expand parsed expression function indexes with function strings   *
+ *          in format itemid:func(params)                                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vector_ptr_t *functions)
+{
+	int		i, j;
+	char		*expression = NULL;
+	zbx_uint64_t	index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, ctx->expression);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (ZBX_VARIANT_UI64 != token->value.type)
+		{
+			if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+					&index))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+		}
+		else
+			index = token->value.data.ui64;
+
+		for (j = 0; j < functions->values_num; j++)
+		{
+			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[j];
+
+			if (function->index == index)
+			{
+				char	*value;
+
+				value = zbx_dsprintf(NULL, ZBX_FS_UI64 ":%s(%s)", function->itemid,
+						function->function, function->parameter);
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_str(&token->value, value);
+				break;
+			}
+		}
+	}
+
+	zbx_eval_compose_expression(ctx, &expression);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, expression);
+
+	return expression;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_expression_expand                                    *
+ *                                                                            *
+ * Purpose: expand trigger expression function indexes with function strings  *
+ *          in format itemid:func(params)                                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, const char *expression,
+		const zbx_vector_ptr_t *functions)
+{
+	zbx_eval_context_t	ctx;
+	char			*errmsg = NULL, *new_expression;
+
+	if ('\0' == *expression)
+		return zbx_strdup(NULL, "");
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression,
+			ZBX_EVAL_TRIGGER_EXPRESSION_LLD & (~ZBX_EVAL_COMPOSE_FUNCTIONID), &errmsg))
+	{
+		const char	*type;
+
+		type = (expression == trigger->expression ? "" : " recovery");
+		zabbix_log(LOG_LEVEL_DEBUG, "Invalid trigger \"%s\"%s expression: %s", trigger->description, type,
+				errmsg);
+		zbx_free(errmsg);
+
+		return zbx_strdup(NULL, "");
+	}
+
+	new_expression = lld_eval_expression_expand(&ctx, functions);
+	zbx_eval_clear(&ctx);
+
+	return new_expression;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_expression_simplify_and_expand                       *
+ *                                                                            *
+ * Purpose: set function indexes and expand them to function strings in       *
+ *          format itemid:func(params)                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_expression_simplify_and_expand(const zbx_lld_trigger_t *trigger, char **expression,
+		zbx_vector_ptr_t *functions)
+{
+	zbx_eval_context_t	ctx;
+	char			*errmsg = NULL, *new_expression;
+
+	if ('\0' == **expression)
+		return;
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *expression,
+			ZBX_EVAL_TRIGGER_EXPRESSION_LLD & (~ZBX_EVAL_COMPOSE_FUNCTIONID), &errmsg))
+	{
+		const char	*type;
+
+		type = (*expression == trigger->expression ? "" : " recovery");
+		zabbix_log(LOG_LEVEL_DEBUG, "Invalid trigger \"%s\"%s expression: %s", trigger->description, type,
+				errmsg);
+		zbx_free(errmsg);
+
+		/* reset expression so it's replaced with discovered one */
+		*expression = zbx_strdup(*expression, "");
+		return;
+	}
+
+	lld_eval_expression_index_functions(&ctx, functions);
+	new_expression = lld_eval_expression_expand(&ctx, functions);
+	zbx_eval_clear(&ctx);
+	zbx_free(*expression);
+	*expression = new_expression;
 }
 
 static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_parse *jp_row,
@@ -1196,6 +1328,60 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_eval_get_expanded_expression                                 *
+ *                                                                            *
+ * Purpose: return copy of the expression with expanded LLD macros            *
+ *                                                                            *
+ ******************************************************************************/
+static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macros, char *err, size_t err_len)
+{
+	zbx_eval_context_t	ctx;
+	int			i;
+	char			*expression = NULL;
+
+	/* empty expression will not be parsed */
+	if (SUCCEED != zbx_eval_status(src))
+		return zbx_strdup(NULL, "");
+
+	zbx_eval_copy(&ctx, src, src->expression);
+
+	for (i = 0; i < ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx.stack.values[i];
+		char			*value;
+
+		switch(token->type)
+		{
+			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
+			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			case ZBX_EVAL_TOKEN_VAR_STR:
+				break;
+			default:
+				continue;
+		}
+
+		value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+
+		if (FAIL == substitute_lld_macros(&value, jp_row, lld_macros, ZBX_MACRO_ANY, err, err_len))
+		{
+			zbx_free(value);
+			goto out;
+		}
+
+		zbx_variant_clear(&token->value);
+		zbx_variant_set_str(&token->value, value);
+	}
+
+	zbx_eval_compose_expression(&ctx, &expression);
+out:
+	zbx_eval_clear(&ctx);
+
+	return expression;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_trigger_make                                                 *
  *                                                                            *
  * Purpose: create a trigger based on lld rule and add it to the list         *
@@ -1217,15 +1403,13 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links);
 	operation_msg = NULL != trigger ? "update" : "create";
 
-	expression = zbx_strdup(expression, trigger_prototype->expression);
-	recovery_expression = zbx_strdup(recovery_expression, trigger_prototype->recovery_expression);
-
-	if (SUCCEED != substitute_lld_macros(&expression, jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_TRIGGER,
-			err, sizeof(err)) ||
-			SUCCEED != substitute_lld_macros(&recovery_expression, jp_row, lld_macros,
-					ZBX_MACRO_ANY | ZBX_TOKEN_TRIGGER, err, sizeof(err)))
+	if (NULL == (expression = lld_eval_get_expanded_expression(&trigger_prototype->eval_ctx, jp_row, lld_macros,
+			err, sizeof(err))) ||
+			NULL == (recovery_expression = lld_eval_get_expanded_expression(&trigger_prototype->eval_ctx_r,
+					jp_row, lld_macros, err, sizeof(err))))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n", operation_msg, err);
+		*error = zbx_strdcatf(*error, "Cannot %s trigger: failed to expand LLD macros in %s expression: %s.\n",
+				operation_msg, (NULL == expression ? "" : " recovery"), err);
 		goto out;
 	}
 
@@ -1320,7 +1504,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		}
 
 		buffer = zbx_strdup(buffer, trigger_prototype->event_name);
-		substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_EXPRESSION_MACRO, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macros,
+				ZBX_MACRO_ANY | ZBX_TOKEN_EXPRESSION_MACRO | ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(trigger->event_name, buffer))
 		{
@@ -1950,34 +2135,28 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
  *               the triggers are identical; FAIL - otherwise                 *
  *                                                                            *
  ******************************************************************************/
-static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *trigger_b)
+static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *db_trigger)
 {
 	int	ret = FAIL;
+	char	*expression = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == strcmp(trigger->description, trigger_b->description))
-	{
-		char	*expression, *expression_b;
+	if (0 != strcmp(trigger->description, db_trigger->description))
+		goto out;
 
-		expression = lld_expression_expand(trigger->expression, &trigger->functions);
-		expression_b = lld_expression_expand(trigger_b->expression, &trigger_b->functions);
+	expression = lld_trigger_expression_expand(trigger, trigger->expression, &trigger->functions);
 
-		if (0 == strcmp(expression, expression_b))
-		{
-			zbx_free(expression);
-			zbx_free(expression_b);
+	if (0 != strcmp(expression, db_trigger->expression))
+		goto out;
 
-			expression = lld_expression_expand(trigger->recovery_expression, &trigger->functions);
-			expression_b = lld_expression_expand(trigger_b->recovery_expression, &trigger_b->functions);
+	zbx_free(expression);
+	expression = lld_trigger_expression_expand(trigger, trigger->recovery_expression, &trigger->functions);
 
-			if (0 == strcmp(expression, expression_b))
-				ret = SUCCEED;
-		}
-
-		zbx_free(expression);
-		zbx_free(expression_b);
-	}
+	if (0 == strcmp(expression, db_trigger->recovery_expression))
+		ret = SUCCEED;
+out:
+	zbx_free(expression);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2122,7 +2301,9 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		{
 			db_trigger = (zbx_lld_trigger_t *)db_triggers.values[i];
 
-			lld_expressions_simplify(&db_trigger->expression, &db_trigger->recovery_expression,
+			lld_trigger_expression_simplify_and_expand(db_trigger, &db_trigger->expression,
+					&db_trigger->functions);
+			lld_trigger_expression_simplify_and_expand(db_trigger, &db_trigger->recovery_expression,
 					&db_trigger->functions);
 
 			for (j = 0; j < triggers->values_num; j++)
@@ -2309,64 +2490,73 @@ static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
  *       internal function index                                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_expression_create(char **expression, const zbx_vector_ptr_t *functions)
+static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expression,
+		const zbx_vector_ptr_t *functions)
 {
-	size_t		l, r;
-	int		i;
-	zbx_uint64_t	function_index;
-	char		buffer[ZBX_MAX_UINT64_LEN];
+	int			i, j, ret = FAIL;
+	zbx_uint64_t		function_index;
+	zbx_eval_context_t	ctx;
+	char			*errmsg = NULL, *new_expression = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
 
-	for (l = 0; '\0' != (*expression)[l]; l++)
+	if ('\0' == **expression)
 	{
-		if ('{' != (*expression)[l])
-			continue;
-
-		if ('$' == (*expression)[l + 1])
-		{
-			int	macro_r, context_l, context_r;
-
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
-				l += macro_r;
-			else
-				l++;
-
-			continue;
-		}
-
-		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
-			;
-
-		if ('}' != (*expression)[r])
-			continue;
-
-		/* ... > 0 | {1} + ... */
-		/*           l r       */
-
-		if (SUCCEED != is_uint64_n(*expression + l + 1, r - l - 1, &function_index))
-			continue;
-
-		for (i = 0; i < functions->values_num; i++)
-		{
-			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[i];
-
-			if (function->index != function_index)
-				continue;
-
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, function->functionid);
-
-			r--;
-			zbx_replace_string(expression, l + 1, &r, buffer);
-			r++;
-
-			break;
-		}
-
-		l = r;
+		ret = SUCCEED;
+		goto out;
 	}
 
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *expression, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, &errmsg))
+	{
+		const char	*type;
+
+		type = (*expression == trigger->expression ? "" : " recovery");
+		zabbix_log(LOG_LEVEL_DEBUG, "Invalid trigger \"%s\"%s expression: %s", trigger->description, type,
+				errmsg);
+		zbx_free(errmsg);
+
+		THIS_SHOULD_NEVER_HAPPEN;
+
+		goto out;
+	}
+
+	for (i = 0; i < ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx.stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+				&function_index))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		for (j = 0; j < functions->values_num; j++)
+		{
+			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[j];
+
+			if (function->index == function_index)
+			{
+				zbx_variant_set_ui64(&token->value, function->functionid);
+				break;
+			}
+		}
+	}
+
+	zbx_eval_compose_expression(&ctx, &new_expression);
+	zbx_free(*expression);
+	*expression = new_expression;
+
+	zbx_eval_clear(&ctx);
+
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, *expression);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2583,10 +2773,26 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		}
 
 		if (0 == trigger->triggerid || 0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION))
-			lld_expression_create(&trigger->expression, &trigger->functions);
+		{
+			if (FAIL == lld_expression_create(trigger, &trigger->expression, &trigger->functions))
+			{
+				/* further updates will fail, so there is unnecessary overhead, */
+				/* but lld_expression_create() can fail only because of bugs,   */
+				/* so better to leave unoptimized handling of 'impossible'      */
+				/* errors than unnecessary complicate cod                       */
+				DBrollback();
+				ret = FAIL;
+			}
+		}
 
 		if (0 == trigger->triggerid || 0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
-			lld_expression_create(&trigger->recovery_expression, &trigger->functions);
+		{
+			if (FAIL == lld_expression_create(trigger, &trigger->recovery_expression, &trigger->functions))
+			{
+				DBrollback();
+				ret = FAIL;
+			}
+		}
 
 		if (0 == trigger->triggerid)
 		{
@@ -3552,7 +3758,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 	zbx_vector_ptr_create(&trigger_prototypes);
 
-	lld_trigger_prototypes_get(lld_ruleid, &trigger_prototypes);
+	lld_trigger_prototypes_get(lld_ruleid, &trigger_prototypes, error);
 
 	if (0 == trigger_prototypes.values_num)
 		goto out;
@@ -3573,15 +3779,16 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	{
 		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes.values[i];
 
-		lld_expressions_simplify(&trigger_prototype->expression, &trigger_prototype->recovery_expression,
-				&trigger_prototype->functions);
+		lld_eval_expression_simplify(&trigger_prototype->eval_ctx, NULL, &trigger_prototype->functions);
+		lld_eval_expression_simplify(&trigger_prototype->eval_ctx_r, NULL, &trigger_prototype->functions);
 	}
 
 	for (i = 0; i < triggers.values_num; i++)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers.values[i];
 
-		lld_expressions_simplify(&trigger->expression, &trigger->recovery_expression, &trigger->functions);
+		lld_trigger_expression_simplify(trigger, &trigger->expression, &trigger->functions);
+		lld_trigger_expression_simplify(trigger, &trigger->recovery_expression, &trigger->functions);
 	}
 
 	/* making triggers */

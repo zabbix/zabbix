@@ -60,6 +60,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'module' => CModule::class,
 		'problem' => CProblem::class,
 		'proxy' => CProxy::class,
+		'report' => CReport::class,
 		'role' => CRole::class,
 		'service' => CService::class,
 		'script' => CScript::class,

@@ -885,7 +885,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_uint64_t	hostid;
-	char		*error;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

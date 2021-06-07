@@ -1,0 +1,86 @@
+---
+test case: Replace '{$U} -> 10'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1 + {$U}'
+  replace: 
+  - {token: '{$U}', value: 10}
+out:
+  expression: '1 + 10'
+---
+test case: Replace '{$U} -> xyz'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1 + {$U}'
+  replace: 
+  - {token: '{$U}', value: 'xyz'}
+out:
+  expression: '1 + "xyz"'
+---
+test case: Replace '{$U} -> x\y/z'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: '1 + {$U}'
+  replace: 
+  - {token: '{$U}', value: 'x\y/z'}
+out:
+  expression: '1 + "x\\y/z"'
+---
+test case: Replace '{$U} -> xyz'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'strlen({$U})'
+  replace: 
+  - {token: '{$U}', value: 'xyz'}
+out:
+  expression: 'strlen("xyz")'
+---
+test case: Replace '"{$U}" -> 123'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'strlen("{$U}")'
+  replace: 
+  - {token: '"{$U}"', value: '123'}
+out:
+  expression: 'strlen("123")'
+---
+test case: Replace '"{#LLD}" -> c:\data'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_LLD,ZBX_EVAL_PARSE_COMPARE]
+  expression: '{123} < {$LIMIT:"{#LLD}"}'
+  replace: 
+  - {token: '{$LIMIT:"{#LLD}"}', value: '{$LIMIT:"c:\\data"}'}
+out:
+  expression: '{123} < {$LIMIT:"c:\\data"}'
+---
+test case: Replace '"{#U}" -> 123'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_COMPOSE_LLD]
+  expression: 'strlen({#U})'
+  replace: 
+  - {token: '{#U}', value: 'xyz'}
+out:
+  expression: 'strlen("xyz")'
+---
+test case: Replace '{123} -> {456}'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_FUNCTIONID,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_VAR]
+  expression: '{123} < 0'
+  replace: 
+  - {token: '{123}', value: '456'}
+out:
+  expression: '{456} < 0'
+---
+test case: Replace '"{#U}" -> 1m'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_COMPOSE_LLD,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_VAR]
+  expression: '{#U} = 60'
+  replace: 
+  - {token: '{#U}', value: '1m'}
+out:
+  expression: '1m = 60'
+...
+
+
+
+

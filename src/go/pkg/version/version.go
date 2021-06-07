@@ -23,17 +23,14 @@ package version
 import (
 	"fmt"
 	"strings"
-
-	"zabbix.com/pkg/tls"
 )
 
 const (
-	APPLICATION_NAME        = "Zabbix Agent"
-	ZABBIX_REVDATE          = "22 March 2021"
-	ZABBIX_VERSION_MAJOR    = 5
-	ZABBIX_VERSION_MINOR    = 4
+	ZABBIX_REVDATE          = "14 May 2021"
+	ZABBIX_VERSION_MAJOR    = 6
+	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "rc1"
+	ZABBIX_VERSION_RC       = "alpha1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2021 Zabbix SIA\n" +
@@ -43,17 +40,15 @@ const (
 )
 
 var (
-	titleMessage string = "{undefined}"
-	compileDate  string = "{undefined}"
-	compileTime  string = "{undefined}"
-	compileOs    string = "{undefined}"
-	compileArch  string = "{undefined}"
-	compileMode  string
+	titleMessage  string = "{undefined}"
+	compileDate   string = "{undefined}"
+	compileTime   string = "{undefined}"
+	compileOs     string = "{undefined}"
+	compileArch   string = "{undefined}"
+	compileMode   string
+	extraLicenses []string
 )
 
-func ApplicationName() string {
-	return APPLICATION_NAME
-}
 func RevDate() string {
 	return ZABBIX_REVDATE
 }
@@ -98,28 +93,14 @@ func Revision() string {
 	return ZABBIX_VERSION_REVISION
 }
 
-func copyrightMessageMQTT() string {
-	return "\nWe use the library Eclipse Paho (eclipse/paho.mqtt.golang), which is\n" +
-		"distributed under the terms of the Eclipse Distribution License 1.0 (The 3-Clause BSD License)\n" +
-		"available at https://www.eclipse.org/org/documents/edl-v10.php\n"
-}
-
-func copyrightMessageModbus() string {
-	return "\nWe use the library go-modbus (goburrow/modbus), which is\n" +
-		"distributed under the terms of the 3-Clause BSD License\n" +
-		"available at https://github.com/goburrow/modbus/blob/master/LICENSE\n"
-}
-
 func CopyrightMessage() string {
 	msg := copyrightMessage
-	tlsMsg := tls.CopyrightMessage()
-	if tlsMsg == "" {
-		msg += "\n"
-	} else {
-		msg += tlsMsg
+
+	for _, license := range extraLicenses {
+		msg += license
 	}
 
-	return msg + copyrightMessageModbus() + copyrightMessageMQTT()
+	return msg
 }
 
 func CompileDate() string {
@@ -163,4 +144,13 @@ func Display() {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
 	fmt.Println(CopyrightMessage())
+}
+
+func Init(title string, extra ...string) {
+	titleMessage = title
+	extraLicenses = append(extraLicenses, extra...)
+}
+
+func init() {
+	extraLicenses = make([]string, 0)
 }

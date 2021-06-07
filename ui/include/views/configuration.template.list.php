@@ -96,9 +96,8 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", jQuery.extend('.
-						json_encode(['rules_preset' => 'template']).', null), null, this);'
-					)
+					->onClick('return PopUp("popup.import", {rules_preset: "template"}, null, this);')
+					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

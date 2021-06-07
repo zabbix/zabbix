@@ -31,6 +31,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/alias.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o

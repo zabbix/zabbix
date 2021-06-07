@@ -24,6 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
@@ -1910,69 +1911,15 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
-	char		*exp, *tmp, *e;
-	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r;
-	int		ret = FAIL;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() formula:%s", __func__, *data);
 
-	exp = (char *)zbx_malloc(NULL, exp_alloc);
-	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
+	ret = zbx_substitute_expression_lld_macros(data, ZBX_EVAL_CALC_EXPRESSION_LLD, jp_row, lld_macro_paths, error);
 
-	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len); e += par_r + 1)
-	{
-		/* substitute LLD macros in the part of the string preceding function parameters */
-
-		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
-		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error,
-				max_error_len))
-		{
-			goto out;
-		}
-
-		tmp_offset = strlen(tmp);
-		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
-
-		tmp_alloc = tmp_offset + 1;
-		tmp_offset = 0;
-
-		/* substitute LLD macros in function parameters */
-
-		if (SUCCEED != substitute_function_lld_param(e + par_l + 1, par_r - (par_l + 1), 1,
-				&exp, &exp_alloc, &exp_offset, jp_row, lld_macro_paths, error, max_error_len))
-		{
-			goto out;
-		}
-
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
-	}
-
-	if (par_l > par_r)
-		goto out;
-
-	/* substitute LLD macros in the remaining part */
-
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
-	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error, max_error_len))
-		goto out;
-
-	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
-
-	ret = SUCCEED;
-out:
-	zbx_free(tmp);
-
-	if (SUCCEED == ret)
-	{
-		zbx_free(*data);
-		*data = exp;
-	}
-	else
-		zbx_free(exp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, *data);
 
 	return ret;
 }
@@ -2062,10 +2009,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
+		char	*errmsg = NULL;
 		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths,
-				err, sizeof(err))))
+				&errmsg)))
 		{
-			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", errmsg);
+			zbx_free(errmsg);
 		}
 	}
 	else
@@ -2305,7 +2254,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
+		char	*errmsg = NULL;
+
+		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, lld_macro_paths, &errmsg))
 		{
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
@@ -2318,7 +2269,10 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			}
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", err);
+		{
+			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", errmsg);
+			zbx_free(errmsg);
+		}
 	}
 	else
 	{

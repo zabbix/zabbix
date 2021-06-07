@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@
  * @var CView $this
  */
 $form = (new CForm())
-	->cleanItems()
 	->setId('valuemap-edit-form')
 	->setName('valuemap-edit-form')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
 	->addVar('source-name', $data['name'])
+	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')))
 	->addItem((new CInput('submit', 'submit'))
 		->addStyle('display: none;')
 		->removeId()
@@ -48,19 +48,55 @@ foreach (array_values($data['valuemap_names']) as $index => $name) {
 
 $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
 
-$table = (new CTable())
-	->setId('mappings_table')
-	->addClass(ZBX_STYLE_TABLE_FORMS)
-	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
-	->addStyle('width: 100%;');
+$header_row = ['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''];
+$mappings = (new CDiv([
+	(new CTable())
+		->setId('mappings_table')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->setHeader($header_row)
+		->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+		->setFooter(new CRow(
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-row-action', 'add_row')
+			))->setColSpan(count($header_row))
+		))
+]))->setAttribute('data-sortable-pairs-table', '1');
 
-$table->addRow([
-		(new CCol(
-			(new CButton(null, _('Add')))
+// Value map mapping template.
+$mappings->addItem(
+	(new CTag('script', true))
+		->setAttribute('type', 'text/x-jquery-tmpl')
+		->addItem((new CRow([
+			(new CCol((new CDiv)
+				->addClass(ZBX_STYLE_DRAG_ICON)))
+				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CSelect('mappings[#{index}][type]'))
+				->setValue('#{type}')
+				->addOptions(CSelect::createOptionsFromArray([
+					VALUEMAP_MAPPING_TYPE_EQUAL => _('equals'),
+					VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('is greater than or equals'),
+					VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('is less than or equals'),
+					VALUEMAP_MAPPING_TYPE_IN_RANGE => _('in range'),
+					VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
+					VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
+				])),
+			(new CTextBox('mappings[#{index}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			'&rArr;',
+			(new CTextBox('mappings[#{index}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired(),
+			(new CButton('mappings[#{index}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-		))->setColSpan(4)
-	]);
+				->setAttribute('data-row-action', 'remove_row')
+		])))
+);
+
+$mappings_data = (new CTag('script', true))->setAttribute('type', 'text/json');
+$mappings_data->items = [json_encode($data['mappings'])];
+$mappings->addItem($mappings_data);
 
 $form_grid
 	->addItem([
@@ -75,7 +111,7 @@ $form_grid
 	->addItem([
 		(new CLabel(_('Mappings'), 'mappings'))->setAsteriskMark(),
 		(new CFormField(
-			(new CDiv($table))
+			(new CDiv($mappings))
 				->addStyle('width: 100%;')
 				->addClass('table-forms-separator')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -83,24 +119,9 @@ $form_grid
 
 $form->addItem($form_grid);
 
-// Value map mapping template.
-$form->addItem((new CScriptTemplate('mapping-row-tmpl'))->addItem(
-	(new CRow([
-		(new CTextBox('mappings[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		'&rArr;',
-		(new CTextBox('mappings[#{rowNum}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired(),
-		(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	]))->addClass('form_row')
-));
-
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php', ['mappings' => $data['mappings']]),
+	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php', []),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

@@ -21,9 +21,12 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
+#include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "sysinfo.h"
 
 /*
  * 5.4 development database patches
@@ -1939,12 +1942,18 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 
 	do
 	{
+		char	*name_esc;
+
 		DBfree_result(result);
+
+		name_esc = DBdyn_escape_string(*new_name);
 
 		result = DBselect("select count(*)"
 				" from dashboard"
 				" where name='%s' and templateid is null",
-				*new_name);
+				name_esc);
+
+		zbx_free(name_esc);
 
 		if (NULL == result || NULL == (row = DBfetch(result)))
 		{
@@ -2895,15 +2904,18 @@ static int 	DBpatch_add_dashboard_page(zbx_db_dashboard_page_t *dashboard_page, 
 		int display_period, int sortorder)
 {
 	int	res;
+	char	*name_esc;
 
 	dashboard_page->dashboard_pageid = DBget_maxid("dashboard_page");
 	dashboard_page->dashboardid = dashboardid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard_page id:" ZBX_FS_UI64, dashboard_page->dashboard_pageid);
 
+	name_esc = DBdyn_escape_string(name);
 	res = DBexecute("insert into dashboard_page (dashboard_pageid,dashboardid,name,display_period,sortorder)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",'%s',%d,%d)",
-			dashboard_page->dashboard_pageid, dashboardid, name, display_period, sortorder);
+			dashboard_page->dashboard_pageid, dashboardid, name_esc, display_period, sortorder);
+	zbx_free(name_esc);
 
 	return ZBX_DB_OK > res ? FAIL : SUCCEED;
 }
@@ -2937,44 +2949,19 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
-		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1],
-					s3[ZBX_MAX_UINT64_LEN + 1], s4[ZBX_MAX_UINT64_LEN + 1],
-					s5[ZBX_MAX_UINT64_LEN + 1], *url_esc;
+		char			*url_esc;
 		zbx_db_widget_field_t	*f;
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
 		url_esc = DBdyn_escape_string(f->value_str);
 
-		if (0 != f->value_itemid)
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_itemid);
-		else
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_graphid)
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_graphid);
-		else
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_groupid)
-			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_groupid);
-		else
-			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_hostid)
-			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_hostid);
-		else
-			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_sysmapid)
-			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_sysmapid);
-		else
-			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, "null");
-
 		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid,value_groupid,value_hostid,value_sysmapid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%s,%s,%s,%s,%s)",
 				new_fieldid++, widget->widgetid, f->type, f->name, f->value_int, url_esc,
-				s1, s2, s3, s4, s5))
+				DBsql_id_ins(f->value_itemid), DBsql_id_ins(f->value_graphid),
+				DBsql_id_ins(f->value_groupid), DBsql_id_ins(f->value_hostid),
+				DBsql_id_ins(f->value_sysmapid)))
 		{
 			ret = FAIL;
 		}
@@ -2987,43 +2974,32 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screenid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	dashboard_userid = DBget_maxid("dashboard_user");
-
-	result = DBselect("select userid, permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
+	result = DBselect("select userid,permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3037,44 +3013,33 @@ out:
 
 static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slideshowid)
 {
-	int		ret = SUCCEED, permission;
-	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	dashboard_userid = DBget_maxid("dashboard_user");
 
 	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(userid, row[0]);
-		permission = atoi(row[1]);
-
 		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission))
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
 		}
 	}
-
 	DBfree_result(result);
-
-	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
 	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(usrgrpid, row[0]);
-		permission = atoi(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
-			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
+			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3131,6 +3096,20 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		scr_item->sort_triggers = atoi(row[13]);
 		scr_item->application = zbx_strdup(NULL, row[14]);
 		scr_item->dynamic = atoi(row[15]);
+
+		if (0 == scr_item->colspan)
+		{
+			scr_item->colspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: colspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (0 == scr_item->rowspan)
+		{
+			scr_item->rowspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
 
 		DBpatch_trace_screen_item(scr_item);
 
@@ -3878,160 +3857,6 @@ static int	DBpatch_5030123(void)
 	return ret;
 }
 
-static int	DBpatch_5030124(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	zbx_db_insert_t	db_insert;
-	int		ret;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-
-	result = DBselect(
-			"select distinct e.eventid,it.tag,it.value from events e"
-			" join triggers t on e.objectid=t.triggerid"
-			" join functions f on t.triggerid=f.triggerid"
-			" join items i on i.itemid=f.itemid"
-			" join item_tag it on i.itemid=it.itemid"
-			" where e.source in (%d,%d) and e.object=%d and t.flags in (%d,%d) order by e.eventid",
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, ZBX_FLAG_DISCOVERY_NORMAL,
-			ZBX_FLAG_DISCOVERY_CREATED);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		DB_ROW		rowN;
-		DB_RESULT	resultN;
-		zbx_uint64_t	eventid;
-		char		*tag, *value, tmp[MAX_STRING_LEN];
-
-		ZBX_DBROW2UINT64(eventid, row[0]);
-		tag = DBdyn_escape_string(row[1]);
-		value = DBdyn_escape_string(row[2]);
-		zbx_snprintf(tmp, sizeof(tmp),
-				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
-				eventid, tag, value);
-
-		resultN = DBselectN(tmp, 1);
-
-		if (NULL == (rowN = DBfetch(resultN)))
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
-
-		DBfree_result(resultN);
-		zbx_free(tag);
-		zbx_free(value);
-	}
-	DBfree_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
-}
-
-static int	DBpatch_5030125(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	zbx_db_insert_t	db_insert;
-	int		ret;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-
-	result = DBselect(
-			"select distinct e.eventid,it.tag,it.value from events e"
-			" join items i on i.itemid=e.objectid"
-			" join item_tag it on i.itemid=it.itemid"
-			" where e.source=%d and e.object=%d and i.flags in (%d,%d)",
-			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, ZBX_FLAG_DISCOVERY_NORMAL,
-			ZBX_FLAG_DISCOVERY_CREATED);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		DB_ROW		rowN;
-		DB_RESULT	resultN;
-		zbx_uint64_t	eventid;
-		char		*tag, *value, tmp[MAX_STRING_LEN];
-
-		ZBX_DBROW2UINT64(eventid, row[0]);
-		tag = DBdyn_escape_string(row[1]);
-		value = DBdyn_escape_string(row[2]);
-		zbx_snprintf(tmp, sizeof(tmp),
-				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
-				eventid, tag, value);
-
-		resultN = DBselectN(tmp, 1);
-
-		if (NULL == (rowN = DBfetch(resultN)))
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
-
-		DBfree_result(resultN);
-		zbx_free(tag);
-		zbx_free(value);
-	}
-	DBfree_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
-}
-
-static int	DBpatch_5030126(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	zbx_db_insert_t	db_insert;
-	int		ret;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
-
-	result = DBselect(
-			"select distinct e.eventid,e.tag,e.value from event_tag e"
-			" join problem p on e.eventid=p.eventid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		DB_ROW		rowN;
-		DB_RESULT	resultN;
-		zbx_uint64_t	eventid;
-		char		*tag, *value, tmp[MAX_STRING_LEN];
-
-		ZBX_DBROW2UINT64(eventid, row[0]);
-		tag = DBdyn_escape_string(row[1]);
-		value = DBdyn_escape_string(row[2]);
-		zbx_snprintf(tmp, sizeof(tmp),
-				"select null from problem_tag where eventid=" ZBX_FS_UI64 " and tag='%s'"
-				" and value='%s'", eventid, tag, value);
-
-		resultN = DBselectN(tmp, 1);
-
-		if (NULL == (rowN = DBfetch(resultN)))
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
-
-		DBfree_result(resultN);
-		zbx_free(tag);
-		zbx_free(value);
-	}
-	DBfree_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "problemtagid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
-}
-
 static int	DBpatch_5030127(void)
 {
 #define CONDITION_TYPE_APPLICATION	15
@@ -4441,6 +4266,3114 @@ static int	DBpatch_5030142(void)
 
 static int	DBpatch_5030143(void)
 {
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030144(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030145(void)
+{
+	const ZBX_TABLE	table =
+			{"report", "reportid", 0,
+				{
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"cycle", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"weekdays", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"start_time", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_since", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_till", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastsent", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030146(void)
+{
+	return DBcreate_index("report", "report_1", "name", 1);
+}
+
+static int	DBpatch_5030147(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 1, &field);
+}
+
+static int	DBpatch_5030148(void)
+{
+	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 2, &field);
+}
+
+static int	DBpatch_5030149(void)
+{
+	const ZBX_TABLE	table =
+			{"report_param", "reportparamid", 0,
+				{
+					{"reportparamid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030150(void)
+{
+	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
+}
+
+static int	DBpatch_5030151(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_param", 1, &field);
+}
+
+static int	DBpatch_5030152(void)
+{
+	const ZBX_TABLE	table =
+			{"report_user", "reportuserid", 0,
+				{
+					{"reportuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"exclude", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030153(void)
+{
+	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
+}
+
+static int	DBpatch_5030154(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 1, &field);
+}
+
+static int	DBpatch_5030155(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 2, &field);
+}
+
+static int	DBpatch_5030156(void)
+{
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_user", 3, &field);
+}
+
+static int	DBpatch_5030157(void)
+{
+	const ZBX_TABLE	table =
+			{"report_usrgrp", "reportusrgrpid", 0,
+				{
+					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030158(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
+}
+
+static int	DBpatch_5030159(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 1, &field);
+}
+
+static int	DBpatch_5030160(void)
+{
+	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 2, &field);
+}
+
+static int	DBpatch_5030161(void)
+{
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_usrgrp", 3, &field);
+}
+
+static int	DBpatch_5030162(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5030163(void)
+{
+	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5030164(void)
+{
+	const ZBX_FIELD	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+/* trigger function conversion to new syntax */
+
+#define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
+#define ZBX_DBPATCH_FUNCTION_UPDATE_PARAM		0x02
+#define ZBX_DBPATCH_FUNCTION_UPDATE			(ZBX_DBPATCH_FUNCTION_UPDATE_NAME | \
+							ZBX_DBPATCH_FUNCTION_UPDATE_PARAM)
+
+#define ZBX_DBPATCH_FUNCTION_CREATE			0x40
+#define ZBX_DBPATCH_FUNCTION_DELETE			0x80
+
+#define ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION		0x01
+#define ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION	0x02
+
+#define ZBX_DBPATCH_TRIGGER_UPDATE			(ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION | \
+							ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION)
+
+/* Function argument descriptors.                                                */
+/* Used in varargs list to describe following parameter mapping to old position. */
+/* Terminated with ZBX_DBPATCH_ARG_NONE.                                         */
+/* For example:                                                                  */
+/* ..., ZBX_DBPATCH_ARG_NUM, 1, ZBX_DBPATCH_ARG_STR, 0, ZBX_DBPATCH_ARG_NONE)    */
+/*  meaning first numeric parameter copied from second parameter                 */
+/*          second string parameter copied from first parameter                  */
+typedef enum
+{
+	ZBX_DBPATCH_ARG_NONE,		/* terminating descriptor, must be put at the end of the list */
+	ZBX_DBPATCH_ARG_HIST,		/* history period followed by sec/num (int) and timeshift (int) indexes */
+	ZBX_DBPATCH_ARG_TIME,		/* time value followed by argument index (int)  */
+	ZBX_DBPATCH_ARG_NUM,		/* number value followed by argument index (int)  */
+	ZBX_DBPATCH_ARG_STR,		/* string value  followed by argument index (int)  */
+	ZBX_DBPATCH_ARG_TREND,		/* trend period, followed by period (int) and timeshift (int) indexes */
+	ZBX_DBPATCH_ARG_CONST_STR,	/* constant,fffffff followed by string (char *) value */
+}
+zbx_dbpatch_arg_t;
+
+ZBX_VECTOR_DECL(loc, zbx_strloc_t)
+ZBX_VECTOR_IMPL(loc, zbx_strloc_t)
+
+typedef struct
+{
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	itemid;
+
+	/* hostid for time based functions to track associated            */
+	/* hosts when replacing with history function with common function */
+	zbx_uint64_t	hostid;
+
+	/* function location - expression|recovery expression */
+	unsigned char	location;
+
+	char		*name;
+	char		*parameter;
+
+	/* the first parameter (host:key) for calculated item */
+	/* formula functions, NULL for trigger functions      */
+	char		*arg0;
+
+	unsigned char	flags;
+}
+zbx_dbpatch_function_t;
+
+typedef struct
+{
+	zbx_uint64_t	triggerid;
+	unsigned char	recovery_mode;
+	unsigned char	flags;
+	char		*expression;
+	char		*recovery_expression;
+}
+zbx_dbpatch_trigger_t;
+
+static void	dbpatch_function_free(zbx_dbpatch_function_t *func)
+{
+	zbx_free(func->name);
+	zbx_free(func->parameter);
+	zbx_free(func->arg0);
+	zbx_free(func);
+}
+
+static void	dbpatch_trigger_clear(zbx_dbpatch_trigger_t *trigger)
+{
+	zbx_free(trigger->expression);
+	zbx_free(trigger->recovery_expression);
+}
+
+static zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx_uint64_t itemid, const char *name,
+		const char *parameter, unsigned char flags)
+{
+	zbx_dbpatch_function_t	*func;
+
+	func = (zbx_dbpatch_function_t *)zbx_malloc(NULL, sizeof(zbx_dbpatch_function_t));
+	func->functionid = functionid;
+	func->itemid = itemid;
+	func->name = (NULL != name ? zbx_strdup(NULL, name) : NULL);
+	func->parameter = (NULL != parameter ? zbx_strdup(NULL, parameter) : NULL);
+	func->flags = flags;
+	func->arg0 = NULL;
+
+	return func;
+}
+
+static void	dbpatch_add_function(const zbx_dbpatch_function_t *template, zbx_uint64_t functionid, const char *name,
+		const char *parameter, unsigned char flags, zbx_vector_ptr_t *functions)
+{
+	zbx_dbpatch_function_t	*func;
+
+	func = dbpatch_new_function(functionid, template->itemid, name, parameter, flags);
+	func->arg0 = (NULL != template->arg0 ? zbx_strdup(NULL, template->arg0) : NULL);
+
+	zbx_vector_ptr_append(functions, func);
+}
+
+static void	dbpatch_update_function(zbx_dbpatch_function_t *func, const char *name,
+		const char *parameter, unsigned char flags)
+{
+	if (0 != (flags & ZBX_DBPATCH_FUNCTION_UPDATE_NAME))
+		func->name = zbx_strdup(func->name, name);
+
+	if (0 != (flags & ZBX_DBPATCH_FUNCTION_UPDATE_PARAM))
+		func->parameter = zbx_strdup(func->parameter, parameter);
+
+	func->flags = flags;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_update_expression                                        *
+ *                                                                            *
+ * Purpose: replace {functionid} occurrences in expression with the specified *
+ *          replacement string                                                *
+ *                                                                            *
+ * Return value: SUCCEED - expression was changed                             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_update_expression(char **expression, zbx_uint64_t functionid, const char *replace)
+{
+	int		pos = 0, last_pos = 0;
+	zbx_token_t	token;
+	char		*out = NULL;
+	size_t		out_alloc = 0, out_offset = 0;
+	zbx_uint64_t	id;
+
+	for (; SUCCEED == zbx_token_find(*expression, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				if (SUCCEED == is_uint64_n(*expression + token.data.objectid.name.l,
+						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
+						functionid == id)
+				{
+					zbx_strncpy_alloc(&out, &out_alloc, &out_offset,
+							*expression + last_pos, token.loc.l - last_pos);
+					zbx_strcpy_alloc(&out, &out_alloc, &out_offset, replace);
+					last_pos = token.loc.r + 1;
+				}
+				pos = token.loc.r;
+				break;
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.loc.r;
+				break;
+		}
+	}
+
+	if (NULL == out)
+		return FAIL;
+
+	zbx_strcpy_alloc(&out, &out_alloc, &out_offset, *expression + last_pos);
+
+	zbx_free(*expression);
+	*expression = out;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_update_trigger                                           *
+ *                                                                            *
+ * Purpose: replace {functionid} occurrences in trigger expression and        *
+ *          recovery expression with the specified replacement string         *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t functionid, const char *replace)
+{
+	if (SUCCEED == dbpatch_update_expression(&trigger->expression, functionid, replace))
+		trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION;
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+	{
+		if (SUCCEED == dbpatch_update_expression(&trigger->recovery_expression, functionid, replace))
+			trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
+	}
+}
+
+static void	dbpatch_update_func_abschange(zbx_dbpatch_function_t *function, char **replace)
+{
+	dbpatch_update_function(function, "change", "", ZBX_DBPATCH_FUNCTION_UPDATE);
+	*replace = zbx_dsprintf(NULL, "abs({" ZBX_FS_UI64 "})", function->functionid);
+}
+
+static void	dbpatch_update_func_delta(zbx_dbpatch_function_t *function, const char *parameter, char **replace,
+		zbx_vector_ptr_t *functions)
+{
+	zbx_uint64_t	functionid2;
+
+	dbpatch_update_function(function, "max", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	dbpatch_add_function(function, functionid2, "min", parameter, ZBX_DBPATCH_FUNCTION_CREATE, functions);
+
+	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", function->functionid, functionid2);
+}
+
+static void	dbpatch_update_func_diff(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions)
+{
+	zbx_uint64_t	functionid2;
+
+	dbpatch_update_function(function, "last", "#1", ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	dbpatch_add_function(function, functionid2, "last", "#2", ZBX_DBPATCH_FUNCTION_CREATE, functions);
+
+	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", function->functionid, functionid2);
+}
+
+static void	dbpatch_update_func_trenddelta(zbx_dbpatch_function_t *function, const char *parameter, char **replace,
+		zbx_vector_ptr_t *functions)
+{
+	zbx_uint64_t	functionid2;
+
+	dbpatch_update_function(function, "trendmax", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	dbpatch_add_function(function, functionid2, "trendmin", parameter, ZBX_DBPATCH_FUNCTION_CREATE, functions);
+
+	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", function->functionid, functionid2);
+}
+
+static void	dbpatch_update_func_strlen(zbx_dbpatch_function_t *function, const char *parameter, char **replace)
+{
+	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	*replace = zbx_dsprintf(NULL, "length({" ZBX_FS_UI64 "})", function->functionid);
+}
+
+static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int extended, char **expression)
+{
+	char	*str  = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+
+	if (ZBX_DBPATCH_FUNCTION_DELETE == function->flags)
+		dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	if (0 == extended)
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, *expression);
+	if (0 == extended)
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ')');
+
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})",
+			function->functionid, function->functionid);
+
+	zbx_free(*expression);
+	*expression = str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_parse_function_params                                    *
+ *                                                                            *
+ * Purpose: parse function parameter string into parameter location vector    *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_t *params)
+{
+	const char	*ptr;
+	size_t		len, pos, sep = 0, eol;
+	zbx_strloc_t	loc;
+
+	eol = strlen(parameter);
+
+	for (ptr = parameter; ptr < parameter + eol; ptr += sep + 1)
+	{
+		zbx_function_param_parse(ptr, &pos, &len, &sep);
+
+		if (0 < len)
+		{
+			loc.l = ptr - parameter + pos;
+			loc.r = loc.l + len - 1;
+		}
+		else
+		{
+			loc.l = ptr - parameter + eol - (ptr - parameter);
+			loc.r = loc.l;
+		}
+
+		zbx_vector_loc_append_ptr(params, &loc);
+	}
+
+	while (0 < params->values_num && '\0' == parameter[params->values[params->values_num - 1].l])
+		--params->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_strcpy_alloc_quoted                                      *
+ *                                                                            *
+ * Purpose: quote and text to a buffer                                        *
+ *                                                                            *
+ * Parameters: str        - [OUT] the output buffer                           *
+ *             str_alloc  - [IN/OUT] an offset in the output buffer           *
+ *             str_offset - [IN/OUT] the size of the output buffer            *
+ *             source     - [IN] the source text                              *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
+{
+	char	raw[FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
+
+	zbx_strlcpy(raw, source, sizeof(raw));
+	zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+	zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_is_composite_constant                                    *
+ *                                                                            *
+ * Purpose: check for composite (consisting of macro(s) + text) constant      *
+ *                                                                            *
+ * Parameters: str - [IN] the text to check                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the text is a composite constant                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_is_composite_constant(const char *str)
+{
+	zbx_token_t	token;
+
+	if (SUCCEED == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_LLD_MACRO != token.type)
+			return SUCCEED;
+
+		if (0 != token.loc.l || strlen(str) - 1 != token.loc.r)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_convert_params                                           *
+ *                                                                            *
+ * Purpose: convert function parameters into new syntax                       *
+ *                                                                            *
+ * Parameters: out       - [OUT] the converted parameter string               *
+ *             parameter - [IN] the original parameter string                 *
+ *             params    - [IN] the parameter locations in original parameter *
+ *                              string                                        *
+ *             ...       - list of parameter descriptors with parameter data  *
+ *                         (see zbx_dbpatch_arg_t enum for parameter list     *
+ *                         description)                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_loc_t *params, ...)
+{
+	size_t			out_alloc = 0, out_offset = 0;
+	va_list 		args;
+	int			index, type, param_num = 0;
+	const zbx_strloc_t	*loc;
+	const char		*ptr;
+	char			*arg;
+
+	va_start(args, params);
+
+	while (ZBX_DBPATCH_ARG_NONE != (type = va_arg(args, int)))
+	{
+		if (0 != param_num++)
+			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ',');
+
+		switch (type)
+		{
+			case ZBX_DBPATCH_ARG_HIST:
+				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
+				{
+					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+
+					if ('\0' != *arg)
+					{
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
+
+						if ('#' != *arg && 0 != isdigit(arg[strlen(arg) - 1]))
+							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					}
+
+					zbx_free(arg);
+				}
+
+				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
+				{
+					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+
+					if ('\0' != *arg)
+					{
+						if (0 == out_offset)
+							zbx_strcpy_alloc(out, &out_alloc, &out_offset, "#1");
+
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, ":now-");
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
+						if (0 != isdigit(arg[strlen(arg) - 1]))
+							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					}
+
+					zbx_free(arg);
+				}
+
+				break;
+			case ZBX_DBPATCH_ARG_TIME:
+				if (params->values_num > (index = va_arg(args, int)))
+				{
+					char	*str;
+
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					if ('\0' != *str)
+					{
+						if (SUCCEED == dbpatch_is_composite_constant(str))
+							dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+						else
+							zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+						if (0 != isdigit((*out)[out_offset - 1]))
+							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					}
+					zbx_free(str);
+				}
+				break;
+			case ZBX_DBPATCH_ARG_NUM:
+				if (params->values_num > (index = va_arg(args, int)))
+				{
+					char	*str;
+
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+
+					if (SUCCEED == dbpatch_is_composite_constant(str))
+						dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+					else
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+
+					zbx_free(str);
+				}
+				break;
+			case ZBX_DBPATCH_ARG_STR:
+				if (params->values_num > (index = va_arg(args, int)))
+				{
+					char	*str;
+
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
+
+					zbx_free(str);
+				}
+				break;
+			case ZBX_DBPATCH_ARG_TREND:
+				if (params->values_num > (index = va_arg(args, int)))
+				{
+					char	*str;
+
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					zbx_free(str);
+				}
+				if (params->values_num > (index = va_arg(args, int)))
+				{
+					char	*str;
+
+					loc = &params->values[index];
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ':');
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					zbx_free(str);
+				}
+				break;
+			case ZBX_DBPATCH_ARG_CONST_STR:
+				if (NULL != (ptr = va_arg(args, char *)))
+				{
+					char	quoted[MAX_STRING_LEN];
+
+					zbx_escape_string(quoted, sizeof(quoted), ptr, "\"\\");
+					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, quoted);
+					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
+				}
+				break;
+		}
+	}
+
+	va_end(args);
+
+	if (0 != out_offset)
+	{
+		/* trim trailing empty parameters */
+		while (0 < out_offset && ',' == (*out)[out_offset - 1])
+			(*out)[--out_offset] = '\0';
+	}
+	else
+		*out = zbx_strdup(*out, "");
+}
+
+static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const zbx_vector_loc_t *params,
+		char **replace)
+{
+	char	*parameter = NULL, *mask = NULL;
+	int	secnum = 0;
+
+	if (2 <= params->values_num && '\0' != function->parameter[params->values[1].l])
+	{
+		mask = zbx_substr_unquote(function->parameter, params->values[1].l, params->values[1].r);
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "},%s)", function->functionid, mask);
+		zbx_free(mask);
+	}
+	else
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "})", function->functionid);
+
+	if (0 < params->values_num)
+	{
+		char	*param;
+
+		param = zbx_substr_unquote(function->parameter, params->values[0].l, params->values[0].r);
+
+		if ('#' != *param && '{' != *param)
+			secnum = -1;
+
+		zbx_free(param);
+	}
+
+	dbpatch_convert_params(&parameter, function->parameter, params,
+			ZBX_DBPATCH_ARG_HIST, secnum, 2,
+			ZBX_DBPATCH_ARG_NONE);
+
+	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	zbx_free(parameter);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_convert_function                                         *
+ *                                                                            *
+ * Purpose: convert function to new parameter syntax/order                    *
+ *                                                                            *
+ * Parameters: function   - [IN/OUT] the function to convert                  *
+ *             replace    - [OUT] the replacement for {functionid} in the     *
+ *                          expression                                        *
+ *             functions  - [IN/OUT] the functions                            *
+ *                                                                            *
+ * Comments: The function conversion can result in another function being     *
+ *           added.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions)
+{
+	zbx_vector_loc_t	params;
+	char			*parameter = NULL;
+
+	zbx_vector_loc_create(&params);
+
+	dbpatch_parse_function_params(function->parameter, &params);
+
+	if (0 == strcmp(function->name, "abschange"))
+	{
+		dbpatch_update_func_abschange(function, replace);
+	}
+	else if (0 == strcmp(function->name, "change"))
+	{
+		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "avg") || 0 == strcmp(function->name, "max") ||
+			0 == strcmp(function->name, "min") || 0 == strcmp(function->name, "sum"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "delta"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_func_delta(function, parameter, replace, functions);
+	}
+	else if (0 == strcmp(function->name, "diff"))
+	{
+		dbpatch_update_func_diff(function, replace, functions);
+	}
+	else if (0 == strcmp(function->name, "fuzzytime"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_TIME, 0,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "nodata"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_TIME, 0,
+				ZBX_DBPATCH_ARG_STR, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "percentile"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_NUM, 2,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "trendavg") || 0 == strcmp(function->name, "trendmin") ||
+			0 == strcmp(function->name, "trendmax") || 0 == strcmp(function->name, "trendsum") ||
+			0 == strcmp(function->name, "trendcount"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_TREND, 0, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "trenddelta"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_TREND, 0, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_func_trenddelta(function, parameter, replace, functions);
+	}
+	else if (0 == strcmp(function->name, "band"))
+	{
+		dbpatch_update_func_bitand(function, &params, replace);
+	}
+	else if (0 == strcmp(function->name, "forecast"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_TIME, 2,
+				ZBX_DBPATCH_ARG_STR, 3,
+				ZBX_DBPATCH_ARG_STR, 4,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "timeleft"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_NUM, 2,
+				ZBX_DBPATCH_ARG_STR, 3,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "count"))
+	{
+		char	*op = NULL;
+
+		if (2 <= params.values_num)
+		{
+			if (3 <= params.values_num && '\0' != function->parameter[params.values[2].l])
+			{
+				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
+
+				if (0 == strcmp(op, "band"))
+					op = zbx_strdup(op, "bitand");
+				else if ('\0' == *op && '"' != function->parameter[params.values[2].l])
+					zbx_free(op);
+			}
+		}
+
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 0, 3,
+				ZBX_DBPATCH_ARG_CONST_STR, op,
+				ZBX_DBPATCH_ARG_STR, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+
+		zbx_free(op);
+	}
+	else if (0 == strcmp(function->name, "iregexp") || 0 == strcmp(function->name, "regexp"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 1, -1,
+				ZBX_DBPATCH_ARG_CONST_STR, function->name,
+				ZBX_DBPATCH_ARG_STR, 0,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, "find", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+	}
+	else if (0 == strcmp(function->name, "str"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, 1, -1,
+				ZBX_DBPATCH_ARG_CONST_STR, "like",
+				ZBX_DBPATCH_ARG_STR, 0,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, "find", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+	}
+	else if (0 == strcmp(function->name, "last"))
+	{
+		int	secnum = 0;
+
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
+
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, secnum, 1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "prev"))
+	{
+		dbpatch_update_function(function, "last", "#2", ZBX_DBPATCH_FUNCTION_UPDATE);
+	}
+	else if (0 == strcmp(function->name, "strlen"))
+	{
+		int	secnum = 0;
+
+		if (0 < params.values_num)
+		{
+			char	*param;
+
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
+
+			if ('#' != *param && '{' != *param)
+				secnum = -1;
+
+			zbx_free(param);
+		}
+
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, secnum, 1,
+				ZBX_DBPATCH_ARG_NONE);
+
+		dbpatch_update_func_strlen(function, parameter, replace);
+	}
+	else if (0 == strcmp(function->name, "logeventid") || 0 == strcmp(function->name, "logsource"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
+				ZBX_DBPATCH_ARG_STR, 0,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "logseverity"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+
+	zbx_free(parameter);
+	zbx_vector_loc_destroy(&params);
+}
+
+static int	dbpatch_is_time_function(const char *name, size_t len)
+{
+	const char	*functions[] = {"date", "dayofmonth", "dayofweek", "now", "time", NULL}, **func;
+	size_t		func_len;
+
+	for (func = functions; NULL != *func; func++)
+	{
+		func_len = strlen(*func);
+		if (func_len == len && 0 == memcmp(*func, name, len))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+#define ZBX_DBPATCH_EXPRESSION			0x01
+#define ZBX_DBPATCH_RECOVERY_EXPRESSION		0x02
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_find_function                                            *
+ *                                                                            *
+ * Purpose: check if the expression contains specified functionid             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid)
+{
+	int		pos = 0;
+	zbx_token_t	token;
+	zbx_uint64_t	id;
+
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				if (SUCCEED == is_uint64_n(expression + token.data.objectid.name.l,
+						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
+						functionid == id)
+				{
+					return SUCCEED;
+				}
+				pos = token.loc.r;
+				break;
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.loc.r;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_get_function_location                                    *
+ *                                                                            *
+ * Purpose: return function location mask (expression | recovery expression)  *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char	dbpatch_get_function_location(const zbx_dbpatch_trigger_t *trigger, zbx_uint64_t functionid)
+{
+	unsigned char	mask = 0;
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != trigger->recovery_mode)
+		return ZBX_DBPATCH_EXPRESSION;
+
+	if (SUCCEED == dbpatch_find_function(trigger->expression, functionid))
+		mask |= ZBX_DBPATCH_EXPRESSION;
+
+	if (SUCCEED == dbpatch_find_function(trigger->recovery_expression, functionid))
+		mask |= ZBX_DBPATCH_RECOVERY_EXPRESSION;
+
+	return mask;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_convert_trigger                                          *
+ *                                                                            *
+ * Purpose: convert trigger and its functions to use new expression syntax    *
+ *                                                                            *
+ * Parameters: trigger   - [IN/OUT] the trigger data/updates                  *
+ *             functions - [OUT] the function updates                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_ptr_t *functions)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	int				i, index;
+	zbx_uint64_t			functionid, itemid, hostid;
+	zbx_vector_loc_t		params;
+	zbx_vector_ptr_t		common_functions, trigger_functions;
+	zbx_vector_uint64_t		hostids, r_hostids;
+	zbx_dbpatch_function_t		*func;
+
+	index = functions->values_num;
+
+	zbx_vector_loc_create(&params);
+	zbx_vector_ptr_create(&common_functions);
+	zbx_vector_ptr_create(&trigger_functions);
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&r_hostids);
+
+	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,h.hostid"
+			" from functions f"
+			" join items i"
+				" on f.itemid=i.itemid"
+			" join hosts h"
+				" on i.hostid=h.hostid"
+			" where triggerid=" ZBX_FS_UI64
+			" order by functionid",
+			trigger->triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char		*replace = NULL;
+		unsigned char	location;
+
+		ZBX_STR2UINT64(functionid, row[0]);
+		ZBX_STR2UINT64(itemid, row[1]);
+		ZBX_STR2UINT64(hostid, row[4]);
+
+		if (SUCCEED == dbpatch_is_time_function(row[2], strlen(row[2])))
+		{
+			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
+
+			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
+			func->hostid = hostid;
+			func->location = dbpatch_get_function_location(trigger, functionid);
+			zbx_vector_ptr_append(&common_functions, func);
+
+			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
+			dbpatch_update_trigger(trigger, functionid, func_name);
+
+			continue;
+		}
+
+		location = dbpatch_get_function_location(trigger, functionid);
+
+		if (0 != (location & ZBX_DBPATCH_EXPRESSION))
+			zbx_vector_uint64_append(&hostids, hostid);
+
+		if (0 != (location & ZBX_DBPATCH_RECOVERY_EXPRESSION))
+			zbx_vector_uint64_append(&r_hostids, hostid);
+
+		func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
+		zbx_vector_ptr_append(functions, func);
+		dbpatch_convert_function(func, &replace, functions);
+
+		if (NULL != replace)
+		{
+			dbpatch_update_trigger(trigger, func->functionid, replace);
+			zbx_free(replace);
+		}
+	}
+	DBfree_result(result);
+
+	for (i = index; i < functions->values_num; i++)
+	{
+		func = (zbx_dbpatch_function_t *)functions->values[i];
+
+		if (0 == (func->flags & ZBX_DBPATCH_FUNCTION_DELETE) && NULL != func->parameter)
+		{
+			if ('\0' != *func->parameter)
+				func->parameter = zbx_dsprintf(func->parameter, "$,%s", func->parameter);
+			else
+				func->parameter = zbx_strdup(func->parameter, "$");
+
+			func->flags |= ZBX_DBPATCH_FUNCTION_UPDATE_PARAM;
+		}
+	}
+
+	/* ensure that with history time functions converted to common time functions */
+	/* the trigger is still linked to the same hosts                              */
+	if (0 != common_functions.values_num)
+	{
+		int	extended = 0, r_extended = 0;
+
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_vector_uint64_sort(&r_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&r_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < common_functions.values_num; i++)
+		{
+			func = (zbx_dbpatch_function_t *)common_functions.values[i];
+			func->flags = ZBX_DBPATCH_FUNCTION_DELETE;
+
+			if (0 != (func->location & ZBX_DBPATCH_EXPRESSION) &&
+					(FAIL == zbx_vector_uint64_search(&hostids, func->hostid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				dbpatch_update_hist2common(func, extended, &trigger->expression);
+				extended = 1;
+				zbx_vector_uint64_append(&hostids, func->hostid);
+				trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION;
+			}
+
+			if (0 != (func->location & ZBX_DBPATCH_RECOVERY_EXPRESSION) &&
+					(FAIL == zbx_vector_uint64_search(&r_hostids, func->hostid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				dbpatch_update_hist2common(func, r_extended, &trigger->recovery_expression);
+				r_extended = 1;
+				zbx_vector_uint64_append(&r_hostids, func->hostid);
+				trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
+			}
+
+			zbx_vector_ptr_append(functions, func);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_uint64_destroy(&r_hostids);
+	zbx_vector_ptr_destroy(&trigger_functions);
+	zbx_vector_ptr_destroy(&common_functions);
+	zbx_vector_loc_destroy(&params);
+
+	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
+	{
+		if (zbx_strlen_utf8(trigger->expression) > TRIGGER_EXPRESSION_LEN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" expression is too long: %s",
+					trigger->triggerid, trigger->expression);
+			return FAIL;
+		}
+	}
+
+	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
+	{
+		if (zbx_strlen_utf8(trigger->recovery_expression) > TRIGGER_EXPRESSION_LEN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger \"" ZBX_FS_UI64 "\" recovery expression is too long: %s",
+					trigger->triggerid, trigger->recovery_expression);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030165(void)
+{
+	int			i, ret = SUCCEED;
+	DB_ROW			row;
+	DB_RESULT		result;
+	char			*sql;
+	size_t			sql_alloc = 4096, sql_offset = 0;
+	zbx_db_insert_t		db_insert_functions;
+	zbx_vector_ptr_t	functions;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_ptr_create(&functions);
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
+			"parameter", NULL);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select triggerid,recovery_mode,expression,recovery_expression from triggers"
+			" order by triggerid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			delim, *esc;
+		zbx_dbpatch_trigger_t	trigger;
+
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		ZBX_STR2UCHAR(trigger.recovery_mode, row[1]);
+		trigger.expression = zbx_strdup(NULL, row[2]);
+		trigger.recovery_expression = zbx_strdup(NULL, row[3]);
+		trigger.flags = 0;
+
+		if (SUCCEED == dbpatch_convert_trigger(&trigger, &functions))
+		{
+			for (i = 0; i < functions.values_num; i++)
+			{
+				zbx_dbpatch_function_t	*func = (zbx_dbpatch_function_t *)functions.values[i];
+
+				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_CREATE))
+				{
+					zbx_db_insert_add_values(&db_insert_functions, func->functionid,
+							func->itemid, trigger.triggerid, func->name, func->parameter);
+					continue;
+				}
+
+				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_DELETE))
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"delete from functions where functionid=" ZBX_FS_UI64 ";\n",
+							func->functionid);
+
+					if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+						break;
+
+					continue;
+				}
+
+				delim = ' ';
+
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update functions set");
+				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_UPDATE_NAME))
+				{
+					esc = DBdyn_escape_field("functions", "name", func->name);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cname='%s'", delim, esc);
+					zbx_free(esc);
+					delim = ',';
+				}
+
+				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_UPDATE_PARAM))
+				{
+					esc = DBdyn_escape_field("functions", "parameter", func->parameter);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cparameter='%s'", delim, esc);
+					zbx_free(esc);
+				}
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where functionid=" ZBX_FS_UI64
+						";\n", func->functionid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
+			}
+
+			if (SUCCEED == ret && 0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
+			{
+				delim = ' ';
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set");
+
+				if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
+				{
+					esc = DBdyn_escape_field("triggers", "expression", trigger.expression);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cexpression='%s'", delim,
+							esc);
+					zbx_free(esc);
+					delim = ',';
+				}
+
+				if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
+				{
+					esc = DBdyn_escape_field("triggers", "recovery_expression",
+							trigger.recovery_expression);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%crecovery_expression='%s'",
+							delim, esc);
+					zbx_free(esc);
+				}
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64
+						";\n", trigger.triggerid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
+			}
+		}
+
+		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+		dbpatch_trigger_clear(&trigger);
+
+		if (SUCCEED != ret)
+			break;
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	if (SUCCEED == ret)
+		zbx_db_insert_execute(&db_insert_functions);
+
+	zbx_db_insert_clean(&db_insert_functions);
+	zbx_free(sql);
+
+	zbx_vector_ptr_destroy(&functions);
+
+	return ret;
+}
+
+static int	DBpatch_5030166(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update trigger_queue set type=4 where type=3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_replace_functionids                                      *
+ *                                                                            *
+ * Purpose: replace functionids {<index in functions vector>} in expression   *
+ *          with their string format                                          *
+ *                                                                            *
+ * Parameters: expression - [IN/OUT] the expression                           *
+ *             functions  - [IN] the functions                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_replace_functionids(char **expression, const zbx_vector_ptr_t *functions)
+{
+	zbx_uint64_t	index;
+	int		pos = 0, last_pos = 0;
+	zbx_token_t	token;
+	char		*out = NULL;
+	size_t		out_alloc = 0, out_offset = 0;
+
+	for (; SUCCEED == zbx_token_find(*expression, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				if (SUCCEED == is_uint64_n(*expression + token.loc.l + 1,
+						token.loc.r - token.loc.l - 1, &index) &&
+						(int)index < functions->values_num)
+				{
+					zbx_dbpatch_function_t	*func = functions->values[index];
+
+					zbx_strncpy_alloc(&out, &out_alloc, &out_offset,
+							*expression + last_pos, token.loc.l - last_pos);
+
+					zbx_snprintf_alloc(&out, &out_alloc, &out_offset, "%s(%s",
+							func->name, func->arg0);
+					if ('\0' != *func->parameter)
+					{
+						zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ',');
+						zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->parameter);
+					}
+					zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ')');
+					last_pos = token.loc.r + 1;
+				}
+				pos = token.loc.r;
+				break;
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.loc.r;
+				break;
+		}
+	}
+
+	if (0 != out_alloc)
+	{
+		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, *expression + last_pos);
+		zbx_free(*expression);
+		*expression = out;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_convert_simple_macro                                     *
+ *                                                                            *
+ * Purpose: convert simple macro {host.key:func(params)} to the new syntax    *
+ *          func(/host/key,params)                                            *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression with simple macro             *
+ *             data       - [IN] the simple macro token data                  *
+ *             function   - [OUT] the simple macro replacement function       *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple_macro_t *data,
+		char **function)
+{
+	zbx_dbpatch_function_t	*func;
+	zbx_vector_ptr_t	functions;
+	char			*name, *host, *key;
+
+	name = zbx_substr(expression, data->func.l, data->func_param.l - 1);
+
+	if (SUCCEED == dbpatch_is_time_function(name, strlen(name)))
+	{
+		*function = zbx_dsprintf(NULL, "%s()", name);
+		zbx_free(name);
+		return;
+	}
+
+	zbx_vector_ptr_create(&functions);
+
+	func = (zbx_dbpatch_function_t *)zbx_malloc(NULL, sizeof(zbx_dbpatch_function_t));
+	func->functionid = 0;
+	func->itemid = 0;
+	func->flags = 0;
+	func->name = name;
+
+	if (data->func_param.l + 1 == data->func_param.r)
+		func->parameter = zbx_strdup(NULL, "");
+	else
+		func->parameter = zbx_substr(expression, data->func_param.l + 1, data->func_param.r - 1);
+
+	host = zbx_substr(expression, data->host.l, data->host.r);
+	key = zbx_substr(expression, data->key.l, data->key.r);
+
+	if (0 == strcmp(host, "{HOST.HOST}"))
+		func->arg0 = zbx_dsprintf(NULL, "//%s", key);
+	else
+		func->arg0 = zbx_dsprintf(NULL, "/%s/%s", host, key);
+
+	zbx_vector_ptr_append(&functions, func);
+
+	dbpatch_convert_function(func, function, &functions);
+	if (NULL == *function)
+		*function = zbx_strdup(NULL, "{0}");
+	dbpatch_replace_functionids(function, &functions);
+
+	zbx_free(key);
+	zbx_free(host);
+	zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+	zbx_vector_ptr_destroy(&functions);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_convert_expression_macro                                 *
+ *                                                                            *
+ * Purpose: convert simple macros in expression macro {? } to function calls  *
+ *          using new expression syntax                                       *
+ *                                                                            *
+ * Parameters: expression - [IN] the original expression                      *
+ *             loc        - [IN] the macro location within expression         *
+ *             replace    - [OUT] the expression macro replacement expression *
+ *                                                                            *
+ * Return value: SUCCEED - expression macro was converted                     *
+ *               FAIL    - expression macro does not contain simple macros    *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_convert_expression_macro(const char *expression, const zbx_strloc_t *loc, char **replace)
+{
+	zbx_token_t	token;
+	char		*out = NULL;
+	size_t		out_alloc = 0, out_offset = 0, pos = loc->l + 2, last_pos = loc->l;
+
+	for (; SUCCEED == zbx_token_find(expression, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < loc->r;
+			pos++)
+	{
+		char	*macro = NULL;
+
+		switch (token.type)
+		{
+			case ZBX_TOKEN_SIMPLE_MACRO:
+				dbpatch_convert_simple_macro(expression, &token.data.simple_macro, &macro);
+				zbx_strncpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos,
+						token.loc.l - last_pos);
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, macro);
+				zbx_free(macro);
+				last_pos = token.loc.r + 1;
+				pos = token.loc.r;
+				break;
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.loc.r;
+				break;
+		}
+	}
+
+	if (0 == out_offset)
+		return FAIL;
+
+	if (last_pos <= loc->r)
+		zbx_strncpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos, loc->r - last_pos + 1);
+	*replace = out;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030167(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql;
+	size_t		sql_alloc = 4096, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select triggerid,event_name from triggers order by triggerid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_token_t	token;
+		char		*out = NULL;
+		size_t		out_alloc = 0, out_offset = 0, pos = 0, last_pos = 0;
+
+		for (; SUCCEED == zbx_token_find(row[1], (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO); pos++)
+		{
+			char		*replace = NULL;
+			zbx_strloc_t	*loc = NULL;
+
+			switch (token.type)
+			{
+				case ZBX_TOKEN_EXPRESSION_MACRO:
+					loc = &token.loc;
+					break;
+				case ZBX_TOKEN_FUNC_MACRO:
+					loc = &token.data.func_macro.macro;
+					if ('?' != row[1][loc->l + 1])
+					{
+						pos = token.loc.r;
+						continue;
+					}
+					break;
+				case ZBX_TOKEN_MACRO:
+				case ZBX_TOKEN_USER_MACRO:
+				case ZBX_TOKEN_LLD_MACRO:
+					pos = token.loc.r;
+					continue;
+				default:
+					continue;
+			}
+
+			if (SUCCEED == dbpatch_convert_expression_macro(row[1], loc, &replace))
+			{
+				zbx_strncpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos, loc->l - last_pos);
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, replace);
+				zbx_free(replace);
+				last_pos = loc->r + 1;
+			}
+			pos = token.loc.r;
+		}
+
+		if (0 == out_alloc)
+			continue;
+
+		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos);
+
+		if (TRIGGER_EVENT_NAME_LEN < zbx_strlen_utf8(out))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert trigger \"%s\" event name: too long expression",
+					row[0]);
+		}
+		else
+		{
+			char	*esc;
+
+			esc = DBdyn_escape_field("triggers", "event_name", out);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set event_name='%s'"
+					" where triggerid=%s;\n", esc, row[0]);
+			zbx_free(esc);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_free(out);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	dbpatch_validate_key_macro(const char *key)
+{
+	char	*params, *macro;
+
+	if (NULL == (macro = strchr(key, '{')))
+		return SUCCEED;
+
+	if (NULL != (params = strchr(key, '[')) && params < macro)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *formula, zbx_vector_ptr_t *functions)
+{
+	zbx_dbpatch_function_t	*func;
+	const char		*ptr;
+	char			*exp = NULL, error[128];
+	size_t			exp_alloc = 0, exp_offset = 0, pos = 0, par_l, par_r;
+
+	for (ptr = formula; SUCCEED == zbx_function_find(ptr, &pos, &par_l, &par_r, error, sizeof(error));
+			ptr += par_r + 1)
+	{
+		size_t	param_pos, param_len, sep_pos;
+		int	quoted;
+
+		/* copy the part of the string preceding function */
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, ptr, pos);
+
+		if (SUCCEED != dbpatch_is_time_function(ptr + pos, par_l - pos))
+		{
+			char	*arg0, *host = NULL, *key = NULL;
+			int	ret;
+			size_t	arg0_len;
+
+			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
+
+			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted);
+			arg0_len = strlen(arg0);
+			zbx_remove_chars(arg0, "\t\n\r");
+			if (strlen(arg0) != arg0_len)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "control characters were removed from calculated item \""
+						ZBX_FS_UI64 "\" formula host:key parameter at %s", itemid, ptr);
+			}
+
+			ret = parse_host_key(arg0, &host, &key);
+			zbx_free(arg0);
+
+			if (FAIL == ret)
+			{
+				zbx_vector_ptr_clear_ext(functions, (zbx_clean_func_t)dbpatch_function_free);
+				zbx_free(exp);
+				return NULL;
+			}
+
+			if (SUCCEED != dbpatch_validate_key_macro(key))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid key parameter \"%s\" in calculated item \""
+						ZBX_FS_UI64 "\" formula: using macro within item key is not supported"
+								" anymore", key, itemid);
+			}
+
+			func = (zbx_dbpatch_function_t *)zbx_malloc(NULL, sizeof(zbx_dbpatch_function_t));
+			func->itemid = itemid;
+			func->name = zbx_substr(ptr, pos, par_l - 1);
+			func->flags = 0;
+
+			func->arg0 = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(host), key);
+			zbx_free(host);
+			zbx_free(key);
+
+			if (')' != ptr[par_l + 1 + sep_pos])
+				func->parameter = zbx_substr(ptr, par_l + sep_pos + 2, par_r - 1);
+			else
+				func->parameter = zbx_strdup(NULL, "");
+
+			func->functionid = functions->values_num;
+			zbx_vector_ptr_append(functions, func);
+
+			zbx_snprintf_alloc(&exp, &exp_alloc, &exp_offset, "{" ZBX_FS_UI64 "}", func->functionid);
+		}
+		else
+		{
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, ptr + pos, par_l - pos);
+			zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, "()");
+		}
+	}
+
+	if (par_l <= par_r)
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ptr);
+
+	return exp;
+}
+
+static int	DBpatch_5030168(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_ptr_t	functions;
+	int			i, ret = SUCCEED;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_ptr_create(&functions);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select i.itemid,i.params"
+			" from items i,hosts h"
+			" where i.type=15"
+				" and h.hostid=i.hostid"
+			" order by i.itemid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid, index;
+		char		*expression, *out = NULL;
+		int		pos = 0, last_pos = 0;
+		zbx_token_t	token;
+		size_t		out_alloc = 0, out_offset = 0;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		if (NULL == (expression = dbpatch_formula_to_expression(itemid, row[1], &functions)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\"formula",
+					itemid);
+			continue;
+		}
+
+		for (i = 0; i < functions.values_num; i++)
+		{
+			char			*replace = NULL;
+			zbx_dbpatch_function_t	*func = functions.values[i];
+
+			dbpatch_convert_function(func, &replace, &functions);
+			if (NULL != replace)
+			{
+				dbpatch_update_expression(&expression, func->functionid, replace);
+				zbx_free(replace);
+			}
+		}
+
+		for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+		{
+			switch (token.type)
+			{
+				case ZBX_TOKEN_OBJECTID:
+					if (SUCCEED == is_uint64_n(expression + token.loc.l + 1,
+							token.loc.r - token.loc.l - 1, &index) &&
+							(int)index < functions.values_num)
+					{
+						zbx_dbpatch_function_t	*func = functions.values[index];
+
+						zbx_strncpy_alloc(&out, &out_alloc, &out_offset,
+								expression + last_pos, token.loc.l - last_pos);
+
+						zbx_snprintf_alloc(&out, &out_alloc, &out_offset, "%s(%s",
+								func->name, func->arg0);
+						if ('\0' != *func->parameter)
+						{
+							zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ',');
+							zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->parameter);
+						}
+						zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ')');
+						last_pos = token.loc.r + 1;
+					}
+					pos = token.loc.r;
+					break;
+				case ZBX_TOKEN_MACRO:
+				case ZBX_TOKEN_USER_MACRO:
+				case ZBX_TOKEN_LLD_MACRO:
+					pos = token.loc.r;
+					break;
+			}
+		}
+
+		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
+
+		if (ITEM_PARAM_LEN < zbx_strlen_utf8(out))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\" formula:"
+					" too long expression", itemid);
+		}
+		else
+		{
+			char	*esc;
+
+			esc = DBdyn_escape_field("items", "params", out);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid="
+					ZBX_FS_UI64 ";\n", esc, itemid);
+			zbx_free(esc);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+		zbx_free(expression);
+		zbx_free(out);
+	}
+
+	DBfree_result(result);
+	zbx_vector_ptr_destroy(&functions);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *request, char **str,
+		size_t *str_alloc, size_t *str_offset, char **error)
+{
+	char	*esc;
+
+	if (3 > request->nparam)
+	{
+		*error = zbx_strdup(NULL, "invalid number of parameters");
+		return FAIL;
+	}
+
+	if (0 == strcmp(request->key, "grpavg"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "avg");
+	}
+	else if (0 == strcmp(request->key, "grpmax"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "max");
+	}
+	else if (0 == strcmp(request->key, "grpmin"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "min");
+	}
+	else if (0 == strcmp(request->key, "grpsum"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "sum");
+	}
+	else
+	{
+		*error = zbx_dsprintf(NULL, "unknown group function \"%s\"", request->key);
+		return FAIL;
+	}
+
+	if (SUCCEED != dbpatch_validate_key_macro(request->params[1]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid key parameter \"%s\" when converting aggregate check \"%s\""
+				" to calculated item: using macro within item key is not supported anymore",
+				request->params[1], itemid);
+	}
+
+	zbx_rtrim(request->params[1], " ");
+	zbx_snprintf_alloc(str, str_alloc, str_offset, "(%s_foreach(/*/%s?[", request->params[2], request->params[1]);
+
+	if (REQUEST_PARAMETER_TYPE_ARRAY == get_rparam_type(request, 0))
+	{
+		int				i, groups_num;
+		char				*group;
+		zbx_request_parameter_type_t	type;
+
+		groups_num = num_param(request->params[0]);
+
+		for (i = 1; i <= groups_num; i++)
+		{
+			if (NULL == (group = get_param_dyn(request->params[0], i, &type)))
+				continue;
+
+			if ('[' != (*str)[*str_offset - 1])
+				zbx_strcpy_alloc(str, str_alloc, str_offset, " or ");
+
+			esc = zbx_dyn_escape_string(group, "\\\"");
+			zbx_snprintf_alloc(str, str_alloc, str_offset, "group=\"%s\"", esc);
+			zbx_free(esc);
+			zbx_free(group);
+		}
+	}
+	else
+	{
+		esc = zbx_dyn_escape_string(request->params[0], "\\\"");
+		zbx_snprintf_alloc(str, str_alloc, str_offset, "group=\"%s\"", esc);
+		zbx_free(esc);
+	}
+
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
+
+	if (4 == request->nparam)
+	{
+		zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
+
+		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
+		{
+			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+		}
+		else
+		{
+			zbx_strcpy_alloc(str, str_alloc, str_offset, request->params[3]);
+
+			if (0 != isdigit((*str)[*str_offset - 1]))
+				zbx_chrcpy_alloc(str, str_alloc, str_offset, 's');
+		}
+	}
+
+	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
+
+	if (ITEM_PARAM_LEN < zbx_strlen_utf8(*str))
+	{
+		*error = zbx_strdup(NULL, "resulting formula is too long");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030169(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *params = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_AGGREGATE = 8 */
+	result = DBselect("select itemid,key_ from items where type=8");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		AGENT_REQUEST	request;
+		char		*error = NULL, *esc;
+		int		ret_formula;
+
+		params_offset = 0;
+
+		init_request(&request);
+
+		if (SUCCEED != parse_item_key(row[1], &request))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
+			continue;
+		}
+
+		ret_formula = dbpatch_aggregate2formula(row[0], &request, &params, &params_alloc, &params_offset,
+				&error);
+		free_request(&request);
+
+		if (FAIL == ret_formula)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert aggregate checks item \"%s\": %s", row[0], error);
+			zbx_free(error);
+			continue;
+		}
+
+		esc = DBdyn_escape_field("items", "params", params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set type=15,params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(params);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030170(void)
+{
+#ifdef HAVE_MYSQL
+	return DBcreate_index("items", "items_8", "key_(1024)", 0);
+#else
+	return DBcreate_index("items", "items_8", "key_", 0);
+#endif
+}
+
+static int	DBpatch_5030171(void)
+{
+	return DBrename_table("trigger_queue", "trigger_queue_tmp");
+}
+
+static int	DBpatch_5030172(void)
+{
+	const ZBX_TABLE	table =
+			{"trigger_queue", "trigger_queueid", 0,
+				{
+					{"trigger_queueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030173(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	objectid, type, clock, ns;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+
+	result = DBselect("select objectid,type,clock,ns from trigger_queue_tmp");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_STR2UINT64(type, row[1]);
+		ZBX_STR2UINT64(clock, row[2]);
+		ZBX_STR2UINT64(ns, row[3]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), objectid, type, clock, ns);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "trigger_queueid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030174(void)
+{
+	return DBdrop_table("trigger_queue_tmp");
+}
+
+static int	DBpatch_5030175(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("valuemap_mapping", &field);
+}
+
+static int	DBpatch_5030176(void)
+{
+	return DBdrop_foreign_key("valuemap_mapping", 1);
+}
+
+static int	DBpatch_5030177(void)
+{
+	return DBdrop_index("valuemap_mapping", "valuemap_mapping_1");
+}
+
+static int	DBpatch_5030178(void)
+{
+	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value,type", 1);
+}
+
+static int	DBpatch_5030179(void)
+{
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap_mapping", 1, &field);
+}
+
+static int	DBpatch_5030180(void)
+{
+	const ZBX_FIELD	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("valuemap_mapping", &field);
+}
+
+static int	DBpatch_5030181(void)
+{
+	int		ret = SUCCEED;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	result = DBselect("select valuemapid from valuemap order by valuemapid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		int		i = 0;
+		char		*sql = NULL;
+		zbx_uint64_t	valuemapid;
+		size_t		sql_alloc = 0, sql_offset = 0;
+		DB_ROW		in_row;
+		DB_RESULT	in_result;
+
+		ZBX_DBROW2UINT64(valuemapid, row[0]);
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		in_result = DBselect("select valuemap_mappingid"
+				" from valuemap_mapping"
+				" where valuemapid=" ZBX_FS_UI64
+				" order by valuemap_mappingid asc", valuemapid);
+
+		while (NULL != (in_row = DBfetch(in_result)))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update valuemap_mapping set sortorder=%d where valuemap_mappingid=%s;\n",
+					i, in_row[0]);
+			i++;
+
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto out;
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+out:
+		DBfree_result(in_result);
+		zbx_free(sql);
+
+		if (FAIL == ret)
+			break;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+#undef HOST_STATUS_TEMPLATE
+#define HOST_STATUS_TEMPLATE		3
+#undef ZBX_FLAG_DISCOVERY_NORMAL
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00
+#undef ZBX_FLAG_DISCOVERY_RULE
+#define ZBX_FLAG_DISCOVERY_RULE		0x01
+#undef ZBX_FLAG_DISCOVERY_PROTOTYPE
+#define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
+
+#define ZBX_FIELD_UUID			{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0}
+
+static int	DBpatch_5030182(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_5030183(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_5030184(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_5030185(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("dashboard", &field);
+}
+
+static int	DBpatch_5030186(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("graphs", &field);
+}
+
+static int	DBpatch_5030187(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("hstgrp", &field);
+}
+
+static int	DBpatch_5030188(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("httptest", &field);
+}
+
+static int	DBpatch_5030189(void)
+{
+	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+
+	return DBadd_field("valuemap", &field);
+}
+
+static char	*update_template_name(char *old)
+{
+	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
+
+#define MIN_TEMPLATE_NAME_LEN	3
+
+	ptr = old;
+
+	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
+			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "[^\n]s", new) &&
+			MIN_TEMPLATE_NAME_LEN <= strlen(new))
+	{
+		ptr = zbx_strdup(ptr, new);
+	}
+
+	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
+	zbx_free(ptr);
+
+	return ptr_snmp;
+}
+
+static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
+{
+	char	*template_name, *func = NULL;
+	size_t	func_alloc = 0, func_offset = 0;
+
+	template_name = zbx_strdup(NULL, tpl);
+	template_name = update_template_name(template_name);
+
+	zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s", name, template_name, key);
+
+	if ('$' == *param && ',' == *++param)
+		param++;
+
+	if ('\0' != *param)
+		zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", param);
+
+	zbx_chrcpy_alloc(&func, &func_alloc, &func_offset, ')');
+
+	zbx_free(template_name);
+
+	return func;
+}
+
+static int	DBpatch_5030190(void)
+{
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select h.hostid,h.host"
+			" from hosts h"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name = zbx_strdup(NULL, row[1]);
+		name = update_template_name(name);
+		uuid = zbx_gen_uuid4(name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030191(void)
+{
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select i.itemid,i.key_,h.host"
+			" from items i"
+			" join hosts h on h.hostid=i.hostid"
+			" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name = zbx_strdup(NULL, row[2]);
+		name = update_template_name(name);
+		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030192(void)
+{
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is null and t.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char		*trigger_expr, *uuid, *seed = NULL;
+		char		*composed_expr[] = { NULL, NULL };
+		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		for (i = 0; i < 2; i++)
+		{
+			int			j;
+			char			*error = NULL;
+			zbx_eval_context_t	ctx;
+
+			trigger_expr = row[i + 2];
+
+			if ('\0' == *trigger_expr)
+			{
+				if (0 == i)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
+				continue;
+			}
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+						__func__, row[0], error);
+				zbx_free(error);
+				DBfree_result(result);
+				return FAIL;
+			}
+
+			for (j = 0; j < ctx.stack.values_num; j++)
+			{
+				zbx_eval_token_t	*token = &ctx.stack.values[j];
+				zbx_uint64_t		functionid;
+
+				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+					continue;
+
+				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" is_uint64_n error", __func__, row[0]);
+					DBfree_result(result);
+					return FAIL;
+				}
+
+				result2 = DBselect(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				if (NULL != (row2 = DBfetch(result2)))
+				{
+					char	*func;
+
+					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					zbx_variant_clear(&token->value);
+					zbx_variant_set_str(&token->value, func);
+				}
+
+				DBfree_result(result2);
+			}
+
+			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+			zbx_eval_clear(&ctx);
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", composed_expr[0]);
+		if (NULL != composed_expr[1])
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", composed_expr[1]);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
+				" where triggerid=%s;\n", uuid, row[0]);
+
+		zbx_free(composed_expr[0]);
+		zbx_free(composed_expr[1]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030193(void)
+{
+	int		ret = SUCCEED;
+	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = DBselect(
+			"select distinct g.graphid,g.name"
+			" from graphs g"
+			" join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where g.templateid is null and g.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+
+		result2 = DBselect(
+				"select h.host"
+				" from graphs_items gi"
+				" join items i on i.itemid=gi.itemid"
+				" join hosts h on h.hostid=i.hostid"
+				" where gi.graphid=%s"
+				" order by h.host",
+				row[0]);
+
+		while (NULL != (row2 = DBfetch(result2)))
+		{
+			host_name = zbx_strdup(NULL, row2[0]);
+			host_name = update_template_name(host_name);
+
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
+			zbx_free(host_name);
+		}
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
+				" where graphid=%s;\n", uuid, row[0]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		DBfree_result(result2);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030194(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select d.dashboardid,d.name,h.host"
+			" from dashboard d"
+			" join hosts h on h.hostid=d.templateid"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update dashboard set uuid='%s' where dashboardid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030195(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select ht.httptestid,ht.name,h.host"
+			" from httptest ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" where ht.templateid is null",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update httptest set uuid='%s' where httptestid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030196(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select v.valuemapid,v.name,h.host"
+			" from valuemap v"
+			" join hosts h on h.hostid=v.hostid"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update valuemap set uuid='%s' where valuemapid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030197(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select groupid,name from hstgrp");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		uuid = zbx_gen_uuid4(row[1]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hstgrp set uuid='%s' where groupid=%s;\n", uuid, row[0]);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030198(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select i.itemid,i.key_,h.host,i2.key_"
+			" from items i"
+			" join hosts h on h.hostid=i.hostid"
+			" join item_discovery id on id.itemid=i.itemid"
+			" join items i2 on id.parent_itemid=i2.itemid"
+			" where h.status=%d and i.flags=%d and i.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", template_name, row[3], row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
+				uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030199(void)
+{
+	int			ret = SUCCEED;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW			row;
+	DB_RESULT		result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is null and t.flags=%d",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char		*trigger_expr, *uuid, *seed = NULL;
+		char		*composed_expr[] = { NULL, NULL };
+		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		result2 = DBselect(
+				"select distinct i2.key_"
+				" from items i"
+				" join item_discovery id on id.itemid=i.itemid"
+				" join items i2 on id.parent_itemid=i2.itemid"
+				" join functions f on i.itemid=f.itemid and f.triggerid=%s"
+				" where i.flags=%d",
+				row[0], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		if (NULL == (row2 = DBfetch(result2)))
+		{
+			DBfree_result(result2);
+			continue;
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row2[0]);
+
+		DBfree_result(result2);
+
+		for (i = 0; i < 2; i++)
+		{
+			int			j;
+			char			*error = NULL;
+			zbx_eval_context_t	ctx;
+
+			trigger_expr = row[i + 2];
+
+			if ('\0' == *trigger_expr)
+			{
+				if (0 == i)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
+				continue;
+			}
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_TRIGGER_EXPRESSION_LLD,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+						__func__, row[0], error);
+				zbx_free(error);
+				DBfree_result(result);
+				return FAIL;
+			}
+
+			for (j = 0; j < ctx.stack.values_num; j++)
+			{
+				zbx_eval_token_t	*token = &ctx.stack.values[j];
+				zbx_uint64_t		functionid;
+
+				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+					continue;
+
+				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" is_uint64_n error", __func__, row[0]);
+					DBfree_result(result);
+					return FAIL;
+				}
+
+				result2 = DBselect(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				if (NULL != (row2 = DBfetch(result2)))
+				{
+					char	*func;
+
+					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					zbx_variant_clear(&token->value);
+					zbx_variant_set_str(&token->value, func);
+				}
+
+				DBfree_result(result2);
+			}
+
+			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+			zbx_eval_clear(&ctx);
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s/", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", composed_expr[0]);
+		if (NULL != composed_expr[1])
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", composed_expr[1]);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
+				" where triggerid=%s;\n", uuid, row[0]);
+
+		zbx_free(composed_expr[0]);
+		zbx_free(composed_expr[1]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030200(void)
+{
+	int		ret = SUCCEED;
+	char		*templ_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = DBselect(
+			"select distinct g.graphid,g.name,h.host,i2.key_"
+			" from graphs g"
+			" join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid and i.flags=%d"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" join item_discovery id on id.itemid=i.itemid"
+			" join items i2 on id.parent_itemid=i2.itemid"
+			" where g.templateid is null and g.flags=%d",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		templ_name = zbx_strdup(NULL, row[2]);
+		templ_name = update_template_name(templ_name);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/%s/%s", templ_name, row[3], row[1]);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
+				" where graphid=%s;\n", uuid, row[0]);
+		zbx_free(templ_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030201(void)
+{
+	int		ret = SUCCEED;
+	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select h.hostid,h.host,h2.host,i.key_"
+			" from hosts h"
+			" join host_discovery hd on hd.hostid=h.hostid"
+			" join items i on i.itemid=hd.parent_itemid"
+			" join hosts h2 on h2.hostid=i.hostid and h2.status=%d"
+			" where h.flags=%d and h.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name_tmpl = zbx_strdup(NULL, row[2]);
+		name_tmpl = update_template_name(name_tmpl);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", name_tmpl, row[3], row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
+				uuid, row[0]);
+		zbx_free(name_tmpl);
+		zbx_free(seed);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+#undef HOST_STATUS_TEMPLATE
+#undef ZBX_FLAG_DISCOVERY_NORMAL
+#undef ZBX_FLAG_DISCOVERY_RULE
+#undef ZBX_FLAG_DISCOVERY_PROTOTYPE
+
+static int	DBpatch_5030202(void)
+{
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -4450,7 +7383,7 @@ static int	DBpatch_5030143(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030144(void)
+static int	DBpatch_5030203(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4461,7 +7394,7 @@ static int	DBpatch_5030144(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030145(void)
+static int	DBpatch_5030204(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4470,6 +7403,7 @@ static int	DBpatch_5030145(void)
 
 	return DBset_default("config", &field);
 }
+
 #endif
 
 DBPATCH_START(5030)
@@ -4600,9 +7534,6 @@ DBPATCH_ADD(5030120, 0, 1)
 DBPATCH_ADD(5030121, 0, 1)
 DBPATCH_ADD(5030122, 0, 1)
 DBPATCH_ADD(5030123, 0, 1)
-DBPATCH_ADD(5030124, 0, 1)
-DBPATCH_ADD(5030125, 0, 1)
-DBPATCH_ADD(5030126, 0, 1)
 DBPATCH_ADD(5030127, 0, 1)
 DBPATCH_ADD(5030128, 0, 1)
 DBPATCH_ADD(5030129, 0, 1)
@@ -4622,5 +7553,64 @@ DBPATCH_ADD(5030142, 0, 1)
 DBPATCH_ADD(5030143, 0, 1)
 DBPATCH_ADD(5030144, 0, 1)
 DBPATCH_ADD(5030145, 0, 1)
+DBPATCH_ADD(5030146, 0, 1)
+DBPATCH_ADD(5030147, 0, 1)
+DBPATCH_ADD(5030148, 0, 1)
+DBPATCH_ADD(5030149, 0, 1)
+DBPATCH_ADD(5030150, 0, 1)
+DBPATCH_ADD(5030151, 0, 1)
+DBPATCH_ADD(5030152, 0, 1)
+DBPATCH_ADD(5030153, 0, 1)
+DBPATCH_ADD(5030154, 0, 1)
+DBPATCH_ADD(5030155, 0, 1)
+DBPATCH_ADD(5030156, 0, 1)
+DBPATCH_ADD(5030157, 0, 1)
+DBPATCH_ADD(5030158, 0, 1)
+DBPATCH_ADD(5030159, 0, 1)
+DBPATCH_ADD(5030160, 0, 1)
+DBPATCH_ADD(5030161, 0, 1)
+DBPATCH_ADD(5030162, 0, 1)
+DBPATCH_ADD(5030163, 0, 1)
+DBPATCH_ADD(5030164, 0, 1)
+DBPATCH_ADD(5030165, 0, 1)
+DBPATCH_ADD(5030166, 0, 1)
+DBPATCH_ADD(5030167, 0, 1)
+DBPATCH_ADD(5030168, 0, 1)
+DBPATCH_ADD(5030169, 0, 1)
+DBPATCH_ADD(5030170, 0, 1)
+DBPATCH_ADD(5030171, 0, 1)
+DBPATCH_ADD(5030172, 0, 1)
+DBPATCH_ADD(5030173, 0, 1)
+DBPATCH_ADD(5030174, 0, 1)
+DBPATCH_ADD(5030175, 0, 1)
+DBPATCH_ADD(5030176, 0, 1)
+DBPATCH_ADD(5030177, 0, 1)
+DBPATCH_ADD(5030178, 0, 1)
+DBPATCH_ADD(5030179, 0, 1)
+DBPATCH_ADD(5030180, 0, 1)
+DBPATCH_ADD(5030181, 0, 1)
+DBPATCH_ADD(5030182, 0, 1)
+DBPATCH_ADD(5030183, 0, 1)
+DBPATCH_ADD(5030184, 0, 1)
+DBPATCH_ADD(5030185, 0, 1)
+DBPATCH_ADD(5030186, 0, 1)
+DBPATCH_ADD(5030187, 0, 1)
+DBPATCH_ADD(5030188, 0, 1)
+DBPATCH_ADD(5030189, 0, 1)
+DBPATCH_ADD(5030190, 0, 1)
+DBPATCH_ADD(5030191, 0, 1)
+DBPATCH_ADD(5030192, 0, 1)
+DBPATCH_ADD(5030193, 0, 1)
+DBPATCH_ADD(5030194, 0, 1)
+DBPATCH_ADD(5030195, 0, 1)
+DBPATCH_ADD(5030196, 0, 1)
+DBPATCH_ADD(5030197, 0, 1)
+DBPATCH_ADD(5030198, 0, 1)
+DBPATCH_ADD(5030199, 0, 1)
+DBPATCH_ADD(5030200, 0, 1)
+DBPATCH_ADD(5030201, 0, 1)
+DBPATCH_ADD(5030202, 0, 1)
+DBPATCH_ADD(5030203, 0, 1)
+DBPATCH_ADD(5030204, 0, 1)
 
 DBPATCH_END()

@@ -1267,6 +1267,51 @@ class CUser extends CApiService {
 				)
 			);
 		}
+
+		// Check if deleted users used in scheduled reports.
+		$db_reports = DBselect(
+			'SELECT r.name,r.userid,ru.userid AS recipientid,ru.access_userid AS user_creatorid,'.
+					'rug.access_userid AS usrgrp_creatorid'.
+			' FROM report r'.
+				' LEFT JOIN report_user ru ON r.reportid=ru.reportid'.
+				' LEFT JOIN report_usrgrp rug ON r.reportid=rug.reportid'.
+			' WHERE '.dbConditionInt('r.userid', $userids).
+				' OR '.dbConditionInt('ru.userid', $userids).
+				' OR '.dbConditionInt('ru.access_userid', $userids).
+				' OR '.dbConditionInt('rug.access_userid', $userids),
+			1
+		);
+
+		if ($db_report = DBfetch($db_reports)) {
+			if (array_key_exists($db_report['userid'], $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is report "%2$s" owner.', $db_users[$db_report['userid']]['username'],
+						$db_report['name']
+					)
+				);
+			}
+
+			if (array_key_exists($db_report['recipientid'], $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is report "%2$s" recipient.', $db_users[$db_report['recipientid']]['username'],
+						$db_report['name']
+					)
+				);
+			}
+
+			if (array_key_exists($db_report['user_creatorid'], $db_users)
+					|| array_key_exists($db_report['usrgrp_creatorid'], $db_users)) {
+				$creator = array_key_exists($db_report['user_creatorid'], $db_users)
+					? $db_users[$db_report['user_creatorid']]
+					: $db_users[$db_report['usrgrp_creatorid']];
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User "%1$s" is user on whose behalf report "%2$s" is created.', $creator['username'],
+						$db_report['name']
+					)
+				);
+			}
+		}
 	}
 
 	/**
@@ -1715,12 +1760,18 @@ class CUser extends CApiService {
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
+			$mediaTypes = [];
 			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
-			$mediaTypes = API::Mediatype()->get([
-				'output' => $options['selectMediatypes'],
-				'mediatypeids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$mediaTypes = API::Mediatype()->get([
+					'output' => $options['selectMediatypes'],
+					'mediatypeids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 

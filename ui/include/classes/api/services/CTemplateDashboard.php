@@ -46,6 +46,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'dashboardids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'templateids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'uuid' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -60,7 +61,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start', 'uuid']), 'default' => API_OUTPUT_EXTEND],
 			'selectPages' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['dashboard_pageid', 'name', 'display_period', 'widgets']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
@@ -245,7 +246,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$dashboards): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid', 'name']], 'fields' => [
+			'uuid' =>			['type' => API_UUID],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
@@ -289,9 +291,38 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$this->checkAndAddUuid($dashboards);
 		$this->checkDuplicates($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
+	}
+
+	/**
+	 * Check that no duplicate UUID is being added. Add UUID to all template dashboards, if it doesn't exist.
+	 *
+	 * @param array $dashboards_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$dashboards_to_create): void {
+		foreach ($dashboards_to_create as &$dashboard) {
+			if (!array_key_exists('uuid', $dashboard)) {
+				$dashboard['uuid'] = generateUuidV4();
+			}
+		}
+		unset($dashboard);
+
+		$db_uuid = DB::select('dashboard', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($dashboards_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**

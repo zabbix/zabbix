@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:30Z'
+  date: '2021-05-11T08:05:07Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 395184b5d5b048a68e06c91154c56847
       template: 'D-Link DES 7200 SNMP'
       name: 'D-Link DES 7200 SNMP'
       description: |
@@ -29,6 +31,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: ec0e7cc71b39447087f580569559a6d6
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.171.10.97.2.36.1.1.3.0
@@ -45,12 +48,14 @@ zabbix_export:
               value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              uuid: 6e12ba6b60b94ec6bf531b4bb234dc80
+              expression: 'min(/D-Link DES 7200 SNMP/system.cpu.util[myCPUUtilization5Min.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: c48928c7392d472d950804ee30936f0f
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
@@ -71,13 +76,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 7d8f92f3c5df4b5091f49e07e50fae44
+              expression: '(last(/D-Link DES 7200 SNMP/system.hw.firmware,#1)<>last(/D-Link DES 7200 SNMP/system.hw.firmware,#2))=1 and length(last(/D-Link DES 7200 SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 9461071bb9fa44909aa181779c894a7b
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -102,6 +109,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: fd86860f9ebc42b1970a845b7940daed
           name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.8.1
@@ -121,6 +129,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: 8d31f35a9d8842f086a123014bfd27ad
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.171.10.97.2.1.1.2.0
@@ -142,13 +151,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 01ca34ebe7a94ed3b3e5ee8320ebce73
+              expression: '(last(/D-Link DES 7200 SNMP/system.sw.os[mySystemSwVersion.0],#1)<>last(/D-Link DES 7200 SNMP/system.sw.os[mySystemSwVersion.0],#2))=1 and length(last(/D-Link DES 7200 SNMP/system.sw.os[mySystemSwVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 5e0940a9219c4d3094c85777e89c63a6
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.171.10.97.2.1.1.21.1.3]'
@@ -156,6 +167,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: 77005f8940f44f47abe28debbcea1573
               name: '{#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.171.10.97.2.1.1.21.1.2.{#SNMPINDEX}'
@@ -172,12 +184,14 @@ zabbix_export:
                   value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: a5cb052573394829877fdc6bf3d501c0
+                  expression: 'count(/D-Link DES 7200 SNMP/sensor.fan.status[mySystemFanIsNormal.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: 80a71c76148f4408993f4d2fba2aac4c
           name: 'Memory Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.171.10.97.2.35.1.1.1.2]'
@@ -185,6 +199,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: aa68024ac558424a8147f8d1e59a7b50
               name: '{#SNMPINDEX}: Memory utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.171.10.97.2.35.1.1.1.3.{#SNMPINDEX}'
@@ -201,12 +216,14 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  uuid: fd484f9b3a6a414fb2bba47d5804cc62
+                  expression: 'min(/D-Link DES 7200 SNMP/vm.memory.util[myMemoryPoolCurrentUtilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: b1d8dafbce0c4b6abc0ad18f2a91d1e3
               name: '{#SNMPINDEX}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -218,6 +235,7 @@ zabbix_export:
                     host: 'D-Link DES 7200 SNMP'
                     key: 'vm.memory.util[myMemoryPoolCurrentUtilization.{#SNMPINDEX}]'
         -
+          uuid: 1290d8eb44564a15b98d212c6f007b05
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.171.10.97.2.1.1.18.1.3]'
@@ -225,6 +243,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: 949bf64a7d75429586292fd0acf4b84e
               name: '{#SNMPVALUE}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.171.10.97.2.1.1.18.1.2.{#SNMPINDEX}'
@@ -241,12 +260,14 @@ zabbix_export:
                   value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: 4cc6f58430374fc4b2f1bced4e2097f6
+                  expression: 'count(/D-Link DES 7200 SNMP/sensor.psu.status[mySystemElectricalSourceIsNormal.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
         -
+          uuid: d596adf697c1431cbe1244fe2737ca55
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.171.10.97.2.1.1.23.1.2]'
@@ -254,6 +275,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: d861801102794d989895b4546a0e10fb
               name: '{#SNMPVALUE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.171.10.97.2.1.1.23.1.3.{#SNMPINDEX}'
@@ -270,17 +292,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: b675df20392d458f9a53dace6bde978a
+                  expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: 8486ed430ee24b13b65786e5b4857684
+                  expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -288,12 +312,13 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: ef5a9113e96d4cc095d384cbeeef9bc5
+                  expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -321,6 +346,7 @@ zabbix_export:
           value: '65'
       valuemaps:
         -
+          uuid: 5889e276245d411bacd130427ae4a5d4
           name: 'MY-SYSTEM-MIB::mySystemFanIsNormal'
           mappings:
             -
@@ -343,6 +369,7 @@ zabbix_export:
               newvalue: unknown
   graphs:
     -
+      uuid: 7d05108847574098a7a15db5faf12b7c
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED

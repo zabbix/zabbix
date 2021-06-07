@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -23,58 +23,59 @@
  * Class that holds processed (created and updated) host and template IDs during the current import.
  */
 class CImportedObjectContainer {
+
 	/**
 	 * @var array with created and updated hosts.
 	 */
-	protected $hostIds = [];
+	protected $hostids = [];
 
 	/**
 	 * @var array with created and updated templates.
 	 */
-	protected $templateIds = [];
+	protected $templateids = [];
 
 	/**
 	 * Add host IDs that have been created and updated.
 	 *
-	 * @param array $hostIds
+	 * @param array $hostids
 	 */
-	public function addHostIds(array $hostIds) {
-		foreach ($hostIds as $hostId) {
-			$this->hostIds[$hostId] = $hostId;
+	public function addHostIds(array $hostids): void {
+		foreach ($hostids as $hostid) {
+			$this->hostids[$hostid] = $hostid;
 		}
 	}
 
 	/**
 	 * Add template IDs that have been created and updated.
 	 *
-	 * @param array $templateIds
+	 * @param array $templateids
 	 */
-	public function addTemplateIds(array $templateIds) {
-		foreach ($templateIds as $templateId) {
-			$this->templateIds[$templateId] = $templateId;
+	public function addTemplateIds(array $templateids): void {
+		foreach ($templateids as $templateid) {
+			$this->templateids[$templateid] = $templateid;
 		}
 	}
 
 	/**
 	 * Checks if host has been created and updated during the current import.
 	 *
-	 * @param string $hostId
+	 * @param string $hostids
 	 *
 	 * @return bool
 	 */
-	public function isHostProcessed($hostId) {
-		return isset($this->hostIds[$hostId]);
+	public function isHostProcessed(string $hostids): bool {
+		return array_key_exists($hostids, $this->hostids);
 	}
 
 	/**
 	 * Checks if template has been created and updated during the current import.
 	 *
-	 * @param string $templateId
+	 * @param string $templateid
 	 *
 	 * @return bool
 	 */
-	public function isTemplateProcessed($templateId) {
-		return isset($this->templateIds[$templateId]);
+	public function isTemplateProcessed(string $templateid): bool {
+		return array_key_exists($templateid, $this->templateids);
 	}
 
 	/**
@@ -82,8 +83,8 @@ class CImportedObjectContainer {
 	 *
 	 * @return array
 	 */
-	public function getHostIds() {
-		return array_values($this->hostIds);
+	public function getHostids(): array {
+		return array_keys($this->hostids);
 	}
 
 	/**
@@ -91,7 +92,7 @@ class CImportedObjectContainer {
 	 *
 	 * @return array
 	 */
-	public function getTemplateIds() {
-		return array_values($this->templateIds);
+	public function getTemplateids(): array {
+		return array_keys($this->templateids);
 	}
 }

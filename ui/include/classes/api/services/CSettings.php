@@ -52,7 +52,7 @@ class CSettings extends CApiService {
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout'
+		'item_test_timeout', 'url', 'report_test_timeout'
 	];
 
 	/**
@@ -106,7 +106,7 @@ class CSettings extends CApiService {
 		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
 			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
 			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'x_frame_options', 'default_timezone', 'session_key'
+			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status'
 		];
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
@@ -149,7 +149,8 @@ class CSettings extends CApiService {
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
 			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
 			'default_timezone', 'login_block', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions',
-			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout'
+			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout',
+			'url', 'report_test_timeout'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] !== $db_settings[$field_name]) {
@@ -250,7 +251,9 @@ class CSettings extends CApiService {
 			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300']
+			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
+			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300']
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

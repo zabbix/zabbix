@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:32Z'
+  date: '2021-05-11T08:05:09Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 2b9039885edf45b8bdd39f16dd069133
       template: 'TP-LINK SNMP'
       name: 'TP-LINK SNMP'
       description: |
@@ -36,6 +38,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
+          uuid: 1d20905fda0442b8b7b0eefcf473afd9
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.6.0
@@ -58,13 +61,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: ee797ebfc568468d8a3e9a8b388afb6d
+              expression: '(last(/TP-LINK SNMP/system.hw.firmware,#1)<>last(/TP-LINK SNMP/system.hw.firmware,#2))=1 and length(last(/TP-LINK SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: a571370a974c43deb9b5bb531d4dc4ce
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
@@ -87,6 +92,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
+          uuid: d2cc080e7e7f49a19bb27737c749ba36
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.8.0
@@ -110,12 +116,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 57a906ac8f994ebaa2543a5eb4949db7
+              expression: '(last(/TP-LINK SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK SNMP/system.hw.serialnumber,#2))=1 and length(last(/TP-LINK SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 20690cbfeb924ec79f67200da3e0577c
           name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
@@ -138,6 +146,7 @@ zabbix_export:
               value: Inventory
       discovery_rules:
         -
+          uuid: 5325de505855448a8c785066374ba201
           name: 'CPU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.1.1.1.1]'
@@ -146,6 +155,7 @@ zabbix_export:
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
           item_prototypes:
             -
+              uuid: 84929a905e144746b047a20bbfb7ae40
               name: '#{#SNMPVALUE}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11863.6.4.1.1.1.1.3.{#SNMPINDEX}'
@@ -163,13 +173,15 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  uuid: 667a09c4f1c04a1a84c7c79adb9cbc70
+                  expression: 'min(/TP-LINK SNMP/system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
           graph_prototypes:
             -
+              uuid: 6ec1580dfdcb46ec933cf2e4ef3122da
               name: '#{#SNMPVALUE}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -181,6 +193,7 @@ zabbix_export:
                     host: 'TP-LINK SNMP'
                     key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
         -
+          uuid: 7a3144453fc644b3bd42dec4ba843bef
           name: 'Memory Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.2.1.1.1]'
@@ -189,6 +202,7 @@ zabbix_export:
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
           item_prototypes:
             -
+              uuid: 5800682fc8f8439eb404707f995ec9a6
               name: '#{#SNMPVALUE}: Memory utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.11863.6.4.1.2.1.1.2.{#SNMPINDEX}'
@@ -206,12 +220,14 @@ zabbix_export:
                   value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  uuid: 3bd3af786eb34b5e9a05f3113fce8007
+                  expression: 'min(/TP-LINK SNMP/vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: 7c0b7c99942e41348c2dc3350f2323cc
               name: '#{#SNMPVALUE}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED

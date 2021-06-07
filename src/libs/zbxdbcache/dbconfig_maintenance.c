@@ -1532,8 +1532,15 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 			{
 				continue;
 			}
-			get_functionids(&query->functionids, trigger->expression);
-			get_functionids(&query->functionids, trigger->recovery_expression);
+
+			zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
+					&query->functionids);
+
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+			{
+				zbx_get_serialized_expression_functionids(trigger->recovery_expression,
+						trigger->recovery_expression_bin, &query->functionids);
+			}
 		}
 
 		for (j = 0; j < query->functionids.values_num; j++)

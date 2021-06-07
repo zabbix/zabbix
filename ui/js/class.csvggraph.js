@@ -555,7 +555,7 @@ jQuery(function ($) {
 
 				if (show_hint) {
 					// Calculate time at mouse position.
-					var time = parseInt(data.timeFrom + ((offsetX - data.dimX) * data.spp));
+					var time = parseInt(data.timeFrom) + parseInt((offsetX - data.dimX) * data.spp);
 
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')

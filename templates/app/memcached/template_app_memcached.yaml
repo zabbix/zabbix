@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:05:32Z'
+  date: '2021-05-11T08:04:14Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 05894ba2c9184d33992bf1bd21c347f6
       template: Memcached
       name: Memcached
       description: |
@@ -19,6 +21,7 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: 2c9d2fd0c59249c999cb315243ae994e
           name: 'Memcached: Commands: FLUSH per second'
           type: DEPENDENT
           key: memcached.commands.flush.rate
@@ -42,6 +45,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 1f636f46889e41cda9abf80df4ae53a7
           name: 'Memcached: Commands: GET per second'
           type: DEPENDENT
           key: memcached.commands.get.rate
@@ -65,6 +69,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 82988c3b793841c4b99a7cbf18f9ac5f
           name: 'Memcached: Commands: SET per second'
           type: DEPENDENT
           key: memcached.commands.set.rate
@@ -88,6 +93,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: d19885f5dc5b4afaa68ae180c60117ca
           name: 'Memcached: Maximum number of bytes'
           type: DEPENDENT
           key: memcached.config.limit_maxbytes
@@ -111,6 +117,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 4ac11cc6469346aa88ad804c8af749a8
           name: 'Memcached: Open connections'
           type: DEPENDENT
           key: memcached.connections.current
@@ -129,6 +136,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 2d9fee94ab6e458b953bf6f4808e9300
           name: 'Memcached: Max connections'
           type: DEPENDENT
           key: memcached.connections.max
@@ -151,6 +159,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 166f2d677f0d4d31bdd5313fa7755d56
           name: 'Memcached: Queued connections per second'
           type: DEPENDENT
           key: memcached.connections.queued.rate
@@ -175,11 +184,13 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
+              uuid: 922a59008cd94e0688db8528be296f89
+              expression: 'min(/Memcached/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
               name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'The max number of connections is reachedand and a new connection had to wait in the queue as a result.'
         -
+          uuid: 7ecc849f54be41dcbc6c037d89a6c240
           name: 'Memcached: New connections per second'
           type: DEPENDENT
           key: memcached.connections.rate
@@ -203,6 +214,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 8c224388b06b417fbf89dd25631b10ad
           name: 'Memcached: Connection structures'
           type: DEPENDENT
           key: memcached.connections.structures
@@ -221,6 +233,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 891b3347dac6440caef69c9dd7ec0a18
           name: 'Memcached: Throttled connections'
           type: DEPENDENT
           key: memcached.connections.throttled.rate
@@ -245,13 +258,15 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{min(5m)}>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
+              uuid: 33c9b918d21343dea3bcd2c3e3505fc5
+              expression: 'min(/Memcached/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
               name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
               priority: WARNING
               description: |
                 Number of times a client connection was throttled is too high.
                 When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.
         -
+          uuid: f67cae24aa3d4b56b00ef7a3e3a45432
           name: 'Memcached: CPU sys'
           type: DEPENDENT
           key: memcached.cpu.sys
@@ -273,7 +288,8 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: a30bb4344e714b7f984e86046797b9b1
+              expression: 'nodata(/Memcached/memcached.cpu.sys,30m)=1'
               name: 'Memcached: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -281,8 +297,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Memcached: Service is down'
-                  expression: '{Memcached:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0'
+                  expression: 'last(/Memcached/memcached.ping["{$MEMCACHED.CONN.URI}"])=0'
         -
+          uuid: d7b2094d846243e59a092dc42bbe30c3
           name: 'Memcached: CPU user'
           type: DEPENDENT
           key: memcached.cpu.user
@@ -303,6 +320,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 57a4c2e763c3430daacd4495b91c3e74
           name: 'Memcached: Ping'
           key: 'memcached.ping["{$MEMCACHED.CONN.URI}"]'
           history: 7d
@@ -319,11 +337,13 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: c6184e4c3cc54e199244dc8efb3cacf8
+              expression: 'last(/Memcached/memcached.ping["{$MEMCACHED.CONN.URI}"])=0'
               name: 'Memcached: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
         -
+          uuid: 7ecd604d8f1143d6b3cf02c4d0ef22dc
           name: 'Memcached: Process id'
           type: DEPENDENT
           key: memcached.process_id
@@ -346,6 +366,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: ce294455f98a4c8c98a4ec70abb2b996
           name: 'Memcached: Bytes used'
           type: DEPENDENT
           key: memcached.stats.bytes
@@ -366,6 +387,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 7977b28169a9411d98549d0c85ffb78b
           name: 'Memcached: Read bytes per second'
           type: DEPENDENT
           key: memcached.stats.bytes_read.rate
@@ -390,6 +412,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: e81a3fa33a124cdfba36e40d1be6edd8
           name: 'Memcached: Written bytes per second'
           type: DEPENDENT
           key: memcached.stats.bytes_written.rate
@@ -414,6 +437,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: efc05c70a56d4be4a6ad59fa1c2915a3
           name: 'Memcached: Current number of items stored'
           type: DEPENDENT
           key: memcached.stats.curr_items
@@ -432,6 +456,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: ce47a49ce6af46b7bc9757ed1b5cd02e
           name: 'Memcached: Evictions per second'
           type: DEPENDENT
           key: memcached.stats.evictions.rate
@@ -457,6 +482,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 07acbb8eb36049258ca414d9e314ed79
           name: 'Memcached: Hits per second'
           type: DEPENDENT
           key: memcached.stats.hits.rate
@@ -479,6 +505,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 3988a6c751814573869ed3533039faac
           name: 'Memcached: Misses per second'
           type: DEPENDENT
           key: memcached.stats.misses.rate
@@ -501,6 +528,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 7c28164178fc493c9f202df0c7103bb5
           name: 'Memcached: Threads'
           type: DEPENDENT
           key: memcached.stats.threads
@@ -519,6 +547,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 6bbc3deb32f947b2bc966c15f6e76726
           name: 'Memcached: New items per second'
           type: DEPENDENT
           key: memcached.stats.total_items.rate
@@ -541,6 +570,7 @@ zabbix_export:
               tag: Application
               value: Memcached
         -
+          uuid: 3a096b6d7d9945fe9a25d1fb5c835f1a
           name: 'Memcached: Get status'
           key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           history: '0'
@@ -551,6 +581,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix raw items'
         -
+          uuid: 4e90d731c49447cf9bb6a72cb9675586
           name: 'Memcached: Uptime'
           type: DEPENDENT
           key: memcached.uptime
@@ -571,12 +602,14 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: c53a2d7b861b41458976bfa03ab1a105
+              expression: last(/Memcached/memcached.uptime)<10m
               name: 'Memcached: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 64986809298145ebbf8f6ded1c41f2df
           name: 'Memcached: Memcached version'
           type: DEPENDENT
           key: memcached.version
@@ -602,7 +635,8 @@ zabbix_export:
               value: Memcached
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 086e757b4a2048eabd5e91b4a0ccc07b
+              expression: '(last(/Memcached/memcached.version,#1)<>last(/Memcached/memcached.version,#2))=1 and length(last(/Memcached/memcached.version))>0'
               name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Memcached version has changed. Ack to close.'
@@ -630,6 +664,7 @@ zabbix_export:
           description: 'Maximum percentage of memory used'
       valuemaps:
         -
+          uuid: acd57d4f29a34286a801ce49cd6553fe
           name: 'Service state'
           mappings:
             -
@@ -640,16 +675,19 @@ zabbix_export:
               newvalue: Up
   triggers:
     -
-      expression: '{Memcached:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
+      uuid: e6129a8ace1945fa9020c6c0008cb19c
+      expression: 'min(/Memcached/memcached.stats.bytes,5m)/last(/Memcached/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
       name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
       priority: WARNING
     -
-      expression: '{Memcached:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
+      uuid: 61021d383c9f41b990292bab2738356d
+      expression: 'min(/Memcached/memcached.connections.current,5m)/last(/Memcached/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
       name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: 'When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.'
   graphs:
     -
+      uuid: 72cf2b87802c4eeca5411946e6b1a29b
       name: 'Memcached: Commands'
       graph_items:
         -
@@ -670,6 +708,7 @@ zabbix_export:
             host: Memcached
             key: memcached.commands.get.rate
     -
+      uuid: 3d738b083ce04ffa8d4bd9bf2e394f6a
       name: 'Memcached: Connections'
       graph_items:
         -
@@ -693,6 +732,7 @@ zabbix_export:
             host: Memcached
             key: memcached.connections.structures
     -
+      uuid: 195f209046ba426c9e57c6a317c76ef4
       name: 'Memcached: Connections rate'
       graph_items:
         -
@@ -716,6 +756,7 @@ zabbix_export:
             host: Memcached
             key: memcached.connections.queued.rate
     -
+      uuid: 8ace604110bf4a4d9eb7a4b6add0492d
       name: 'Memcached: Keyspace'
       graph_items:
         -
@@ -730,6 +771,7 @@ zabbix_export:
             host: Memcached
             key: memcached.stats.misses.rate
     -
+      uuid: bb6305e9a84749669433e53cd2b7b8b8
       name: 'Memcached: Network'
       graph_items:
         -
@@ -746,6 +788,7 @@ zabbix_export:
             host: Memcached
             key: memcached.stats.bytes_written.rate
     -
+      uuid: 599a96c18e214610a41afadef8f11e11
       name: 'Memcached: Uptime'
       graph_items:
         -

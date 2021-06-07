@@ -234,10 +234,6 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	_getTimePeriod() {
-		return this._time_period;
-	}
-
 	setTimePeriod(time_period) {
 		this._time_period = time_period;
 	}

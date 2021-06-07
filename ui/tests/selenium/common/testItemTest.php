@@ -70,7 +70,6 @@ class testItemTest extends CWebTest {
 	public function getItemTestButtonStateData() {
 		return array_merge($this->getCommonTestButtonStateData(), [
 				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback'],
-				['Type' => 'Zabbix aggregate', 'Key' => 'grpmax["Zabbix",key,last]'],
 				['Type' => 'Calculated', 'Formula' => '"formula"']
 		]);
 	}
@@ -522,25 +521,6 @@ class testItemTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Zabbix aggregate',
-						'Key' => 'grpsum["MySQL Servers","vfs.fs.size[/,total]",last]'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Zabbix aggregate',
-						'Key' => 'key'
-					],
-					'error' => 'Key "key" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"].'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
 						'Type' => 'Calculated',
 						'Key' => 'test.calculated'
 					]
@@ -873,7 +853,6 @@ class testItemTest extends CWebTest {
 						$fields_state = ['address' => false, 'port' => false, 'proxy' => true];
 						break;
 
-					case 'Zabbix aggregate':
 					case 'Calculated':
 						$fields_value = ['address' => '', 'port' => '', 'proxy' => '(no proxy)'];
 						$fields_state = ['address' => false, 'port' => false, 'proxy' => false];
@@ -898,7 +877,7 @@ class testItemTest extends CWebTest {
 
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
-						'Zabbix aggregate', 'Calculated'])) {
+						'Calculated'])) {
 					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
 				}
 				else {

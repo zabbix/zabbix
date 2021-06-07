@@ -832,9 +832,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
 					" and",
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
@@ -1761,21 +1761,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		const char *recovery_expression, unsigned char recovery_mode, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments, const char *url, unsigned char flags,
 		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
-		const char *opdata, unsigned char discover, const char *event_name)
+		const char *opdata, unsigned char discover, const char *event_name, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t	itemid,	h_triggerid, functionid;
-	char		*old_expression = NULL,
-			*new_expression = NULL,
-			*expression_esc = NULL,
-			*new_recovery_expression = NULL,
-			*recovery_expression_esc = NULL,
-			search[MAX_ID_LEN + 3],
-			replace[MAX_ID_LEN + 3],
-			*description_esc = NULL,
+	char		*description_esc = NULL,
 			*comments_esc = NULL,
 			*url_esc = NULL,
 			*function_esc = NULL,
@@ -1838,12 +1831,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
-		res = SUCCEED;
+		zbx_eval_context_t	ctx, ctx_r;
 
 		*new_triggerid = DBget_maxid("triggers");
 		*cur_triggerid = 0;
-		new_expression = zbx_strdup(NULL, expression);
-		new_recovery_expression = zbx_strdup(NULL, recovery_expression);
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
@@ -1865,6 +1856,19 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
+		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, expression,
+				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
+			goto out;
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode &&
+				(SUCCEED != (res = zbx_eval_parse_expression(&ctx_r, recovery_expression,
+						ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID,
+						error))))
+		{
+			zbx_eval_clear(&ctx);
+			goto out;
+		}
+
 		/* Loop: functions */
 		result = DBselect(
 				"select hi.itemid,tf.functionid,tf.name,tf.parameter,ti.key_"
@@ -1880,12 +1884,11 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		{
 			if (SUCCEED != DBis_null(row[0]))
 			{
+				zbx_uint64_t	old_functionid;
+
 				ZBX_STR2UINT64(itemid, row[0]);
 
 				functionid = DBget_maxid("functions");
-
-				zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
-				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
 
 				function_esc = DBdyn_escape_string(row[2]);
 				parameter_esc = DBdyn_escape_string(row[3]);
@@ -1898,52 +1901,62 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 						functionid, itemid, *new_triggerid,
 						function_esc, parameter_esc);
 
-				old_expression = new_expression;
-				new_expression = string_replace(new_expression, search, replace);
-				zbx_free(old_expression);
-
-				old_expression = new_recovery_expression;
-				new_recovery_expression = string_replace(new_recovery_expression, search, replace);
-				zbx_free(old_expression);
+				ZBX_DBROW2UINT64(old_functionid, row[1]);
+				zbx_eval_replace_functionid(&ctx, old_functionid, functionid);
+				if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+					zbx_eval_replace_functionid(&ctx_r, old_functionid, functionid);
 
 				zbx_free(parameter_esc);
 				zbx_free(function_esc);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Missing similar key '%s'"
-						" for host [" ZBX_FS_UI64 "]",
+				*error = zbx_dsprintf(*error, "Missing similar key '%s' for host [" ZBX_FS_UI64 "]",
 						row[4], hostid);
 				res = FAIL;
 			}
 		}
 		DBfree_result(result);
 
-		if (SUCCEED == res)
+		if (SUCCEED == (res = zbx_eval_validate_replaced_functionids(&ctx, error)) &&
+				TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
 		{
-			expression_esc = DBdyn_escape_field("triggers", "expression", new_expression);
-			recovery_expression_esc = DBdyn_escape_field("triggers", "recovery_expression",
-					new_recovery_expression);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update triggers"
-						" set expression='%s',recovery_expression='%s'"
-					" where triggerid=" ZBX_FS_UI64 ";\n",
-					expression_esc, recovery_expression_esc, *new_triggerid);
-
-			zbx_free(recovery_expression_esc);
-			zbx_free(expression_esc);
+			res = zbx_eval_validate_replaced_functionids(&ctx_r, error);
 		}
 
-		zbx_free(new_recovery_expression);
-		zbx_free(new_expression);
+		if (SUCCEED == res)
+		{
+			char	*new_expression = NULL, *esc;
+
+			zbx_eval_compose_expression(&ctx, &new_expression);
+			esc = DBdyn_escape_field("triggers", "expression", new_expression);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set expression='%s'", esc);
+			zbx_free(esc);
+			zbx_free(new_expression);
+
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+			{
+				zbx_eval_compose_expression(&ctx_r, &new_expression);
+				esc = DBdyn_escape_field("triggers", "recovery_expression", new_expression);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",recovery_expression='%s'", esc);
+				zbx_free(esc);
+				zbx_free(new_expression);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
+					*new_triggerid);
+		}
+
+		zbx_eval_clear(&ctx);
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+			zbx_eval_clear(&ctx_r);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
-
+out:
 	zbx_free(sql);
 	zbx_free(correlation_tag_esc);
 	zbx_free(event_name_esc);
@@ -2596,7 +2609,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover"
+				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover,h.custom_interfaces"
 				" from items i,host_discovery hd,hosts h"
 				" where i.itemid=hd.parent_itemid"
 					" and hd.hostid=h.hostid"
@@ -4223,6 +4236,7 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
+ *             error       - [IN] the error message                           *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -4231,7 +4245,7 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
+static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
@@ -4283,7 +4297,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[13]),	/* manual_close */
 				row[14],			/* opdata */
 				(unsigned char)atoi(row[15]),	/* discover */
-				row[16]);			/* event_name */
+				row[16],			/* event_name */
+				error);
 
 		if (0 != new_triggerid)				/* new trigger added */
 			zbx_vector_uint64_append(&new_triggerids, new_triggerid);
@@ -4300,6 +4315,9 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	zbx_vector_uint64_destroy(&cur_triggerids);
 	zbx_vector_uint64_destroy(&new_triggerids);
+
+	if (FAIL == res && NULL == *error)
+		*error = zbx_strdup(NULL, "unknown error while linking triggers");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -4749,7 +4767,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest = (httptest_t *)zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[11]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 		zbx_vector_ptr_create(&httptest->fields);
@@ -5580,7 +5598,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	DBcopy_template_items(hostid, lnk_templateids);
 	DBcopy_template_host_prototypes(hostid, lnk_templateids);
-	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
+	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids, error)))
 	{
 		DBcopy_template_graphs(hostid, lnk_templateids);
 		DBcopy_template_httptests(hostid, lnk_templateids);

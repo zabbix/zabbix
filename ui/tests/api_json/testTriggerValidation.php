@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -163,11 +163,11 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with unique name 1',
-						'expression' => '{Trigger validation test host:item.last()}=0'
+						'expression' => 'last(/Trigger validation test host/item)=0'
 					],
 					[
 						'description' => 'Trigger with unique name 2',
-						'expression' => '{Trigger validation test host:item.last()}=0'
+						'expression' => 'last(/Trigger validation test host/item)=0'
 					]
 				],
 				'expected_error' => null
@@ -176,7 +176,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with null values for array properties',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [],
 						'dependencies' => []
 					]
@@ -187,9 +187,9 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with recovery expression',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1,
-						'recovery_expression' => '{Trigger validation test host:item.last()}=1'
+						'recovery_expression' => 'last(/Trigger validation test host/item)=1'
 					]
 				],
 				'expected_error' => null
@@ -198,7 +198,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with correlation tag',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 0,
 						'correlation_mode' => 1,
 						'correlation_tag' => 'tag'
@@ -210,7 +210,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [
 							[
 								'tag' => 'tag1'
@@ -227,7 +227,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with dependencies',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => [
 							[
 								'triggerid' => self::UPDATE_TRIGGER_1
@@ -243,20 +243,20 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Duplicate trigger name',
-						'expression' => '{Trigger validation test host:item.last()}=0'
+						'expression' => 'last(/Trigger validation test host/item)=0'
 					],
 					[
 						'description' => 'Duplicate trigger name',
-						'expression' => '{Trigger validation test host:item.last()}=0'
+						'expression' => 'last(/Trigger validation test host/item)=0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (description, expression)=(Duplicate trigger name, {Trigger validation test host:item.last()}=0) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (description, expression)=(Duplicate trigger name, last(/Trigger validation test host/item)=0) already exists.'
 			],
 			'Trigger with invalid severity #1' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid severity',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'priority' => null
 					]
 				],
@@ -266,7 +266,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid severity',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'priority' => 9
 					]
 				],
@@ -276,8 +276,8 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with unexpected recovery exporession',
-						'expression' => '{Trigger validation test host:item.last()}=0',
-						'recovery_expression' => '{Trigger validation test host:item.last()}=1'
+						'expression' => 'last(/Trigger validation test host/item)=0',
+						'recovery_expression' => 'last(/Trigger validation test host/item)=1'
 					]
 				],
 				'expected_error' => 'Incorrect value for field "recovery_expression": should be empty.'
@@ -286,7 +286,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with unspecified recovery exporession',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1
 					]
 				],
@@ -296,9 +296,9 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1,
-						'recovery_expression' => ['{Trigger validation test host:item.last()}=1']
+						'recovery_expression' => ['last(/Trigger validation test host/item)=1']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/recovery_expression": a character string is expected.'
@@ -307,18 +307,18 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1,
 						'recovery_expression' => '1+1'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/recovery_expression": trigger expression must contain at least one host:key reference.'
+				'expected_error' => 'Invalid parameter "/1/recovery_expression": trigger expression must contain at least one /host/key reference.'
 			],
 			'Trigger with unexpected correlation tag #1' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with unexpected correlation tag',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'correlation_mode' => 0,
 						'correlation_tag' => 'tag'
 					]
@@ -329,7 +329,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with unexpected correlation tag',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 2,
 						'correlation_tag' => 'tag'
 					]
@@ -340,7 +340,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with unexpected correlation tag',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'correlation_mode' => 1,
 						'correlation_tag' => ''
 					]
@@ -351,7 +351,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [[]]
 					]
 				],
@@ -361,7 +361,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [[
 							'tag' => '',
 							'value' => 'value'
@@ -374,7 +374,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid dependencies',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => [[
 							'triggerid' => ''
 						]]
@@ -386,7 +386,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid dependencies',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => [[
 							'triggerid' => self::TEMPLATE_TRIGGERID
 						]]
@@ -398,7 +398,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with invalid dependencies',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => [[
 							'triggerid' => 0
 						]]
@@ -410,7 +410,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with non-unique tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [
 							[
 								'tag' => 'tag'
@@ -427,7 +427,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with non-unique tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [
 							[
 								'tag' => 'tag',
@@ -446,7 +446,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with null values for array properties',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => null
 					]
 				],
@@ -456,7 +456,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with null values for array properties',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => null
 					]
 				],
@@ -466,7 +466,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with tags',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'tags' => [
 							'tag' => 'tag1',
 							'tag' => 'tag2'
@@ -479,7 +479,7 @@ class testTriggerValidation extends CAPITest {
 				'triggers' => [
 					[
 						'description' => 'Trigger with dependencies',
-						'expression' => '{Trigger validation test host:item.last()}=0',
+						'expression' => 'last(/Trigger validation test host/item)=0',
 						'dependencies' => [
 							'triggerid' => self::UPDATE_TRIGGER_1
 						]

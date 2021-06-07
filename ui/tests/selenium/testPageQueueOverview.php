@@ -38,7 +38,6 @@ class testPageQueueOverview extends CLegacyWebTest {
 				'SNMPv2 agent',
 				'SNMPv3 agent',
 				'Zabbix internal',
-				'Zabbix aggregate',
 				'External check',
 				'Database monitor',
 				'IPMI agent',

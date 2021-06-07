@@ -139,6 +139,7 @@ require_once dirname(__FILE__).'/testFormUserMedia.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
+require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
@@ -170,6 +171,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -296,6 +298,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
+		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testPageBrowserWarning');
@@ -327,6 +330,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testSID');
 
 		return $suite;
 	}

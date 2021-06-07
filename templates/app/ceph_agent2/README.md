@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
 2. Set the {$CEPH.CONNSTRING} such as <protocol(host:port)> or named session.

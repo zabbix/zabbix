@@ -29,7 +29,6 @@ $form = (new CForm('GET', 'history.php'))
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-$table = (new CTableInfo());
 
 // Latest data header.
 $col_check_all = new CColHeader(
@@ -57,7 +56,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 5%'),
+		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
@@ -70,7 +69,7 @@ else {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 5%')
+		(new CColHeader())->addStyle('width: 6%')
 	]);
 }
 
@@ -170,7 +169,8 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$item_config_url = (new CUrl('items.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid);
+			->setArgument('itemid', $itemid)
+			->setArgument('context', 'host');
 
 		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)

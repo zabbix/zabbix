@@ -1,12 +1,168 @@
+Changes for 6.0.0alpha1
+
+New features:
+.........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
+.........T [ZBXNEXT-6626] updated Zabbix Server according to the latest template guidelines (abakaldin)
+.........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
+.........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+.........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
+..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
+
+Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
+..F....... [ZBX-19487] fixed PHP runtime errors in the Monitoring->Problems view (Sasha)
+..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
+....I...S. [ZBX-19468] fixed escaped symbols in screen name during conversion to dashboard (akozlovs)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+..F....... [ZBX-19446] fixed item prototype massupdate form (Ivo)
+....I...S. [ZBX-19452] fixed colspan or rowspan equal to 0 during screen to dashboard conversion (akozlovs)
+.......PS. [ZBX-19114] fixed slow detection of vmware hv multipath values for medium and huge vc instances (MVekslers)
+.........T [ZBX-19462] fixed VMWare template (tuskov)
+.......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
+...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+..F....... [ZBX-19017] fixed massupdate popup form of discovered hosts with enabled inventory mode (Ivo)
+.........T [ZBX-19344] changed regular expression for trunk active channels counting in template Asterisk by HTTP (mchudinov)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+..F....... [ZBX-19373] fixed security vulnerability for links having target="_blank" (Ivo)
+.........T [ZBX-19354] fixed typo and added override for MongoDB templates (ychukina)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
+..F....... [ZBX-19360] fixed conversion of trigger expressions, as well as calculated and aggregated items (averza)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+........S. [ZBX-19291] fixed memory error when linking host prototypes (asestakovs)
+...G...... [ZBX-19348] use MNT_NOWAIT for VFS_FS_DISCOVERY on BSDs (dgoloscapov)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19420] fixed crash when comparing two out of range floating values in string format (wiper)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+..F....... [ZBX-19105] fixed value mappings with duplicate names after update of existing value mapping (ashubin, gcalenko)
+.........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+.......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.1rc2
+
+Bug fixes:
+.......PS. [ZBX-19398] fixed deadlock between configuration syncer and history syncer on Zabbix proxy when using sqlite3 (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.1rc1
+
+New features:
+.........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
+.........T [ZBXNEXT-6626] updated Zabbix Server according to the latest template guidelines (abakaldin)
+.........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
+.........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+.........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
+..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
+
+Bug fixes:
+..F....... [ZBX-19487] fixed PHP runtime errors in the Monitoring->Problems view (Sasha)
+..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
+.........T [ZBX-19462] fixed VMWare template (tuskov)
+....I...S. [ZBX-19468] fixed escaped symbols in screen name during conversion to dashboard (akozlovs)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+..F....... [ZBX-19446] fixed item prototype massupdate form (Ivo)
+.......PS. [ZBX-19114] fixed slow detection of vmware hv multipath values for medium and huge vc instances (MVekslers)
+....I...S. [ZBX-19452] fixed colspan or rowspan equal to 0 during screen to dashboard conversion (akozlovs)
+.......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
+...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+..F....... [ZBX-19017] fixed massupdate popup form of discovered hosts with enabled inventory mode (Ivo)
+.........T [ZBX-19344] changed regular expression for trunk active channels counting in template Asterisk by HTTP (mchudinov)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+..F....... [ZBX-19373] fixed security vulnerability for links having target="_blank" (Ivo)
+.........T [ZBX-19354] fixed typo and added override for MongoDB templates (ychukina)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
+..F....... [ZBX-19360] fixed conversion of trigger expressions, as well as calculated and aggregated items (averza)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+........S. [ZBX-19291] fixed memory error when linking host prototypes (asestakovs)
+...G...... [ZBX-19348] use MNT_NOWAIT for VFS_FS_DISCOVERY on BSDs (dgoloscapov)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19420] fixed crash when comparing two out of range floating values in string format (wiper)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+..F....... [ZBX-19105] fixed value mappings with duplicate names after update of existing value mapping (ashubin, gcalenko)
+.......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0
+
+5.4.0rc2 was released as 5.4.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0rc2
+
+Bug fixes:
+....I..... [ZBX-19361] fixed number/time parameter conversion in calculated checks and period parameter conversion in aggregate checks (wiper)
+........S. [ZBX-19368] reduced functionids sorting when extracting functionids from expressions during trigger processing (wiper)
+..F....... [ZBX-19370] fixed displaying time in popups of graph widgets (ashubin, averza)
+........S. [ZBX-19366] fixed duplicate key error for screen and slideshow in dbupgrade patch (MVekslers)
+A......... [ZBXNEXT-6411] fixed incorrect argument type in item/discovery rule/web scenario import (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0rc1
 
 New features:
+........S. [ZBXNEXT-6658] added warning for unsupported DB version (arimdjonoks)
+A.F.I...S. [ZBXNEXT-6411] added uniqueness criteria in template elements and added option to compare templates before importing (akozlovs, ashubin, vmurzins)
+A.F.I..PS. [ZBXNEXT-6452] implemented new syntax for aggregated checks (averza, gcalenko, Sasha, vso, wiper)
+A.F.....S. [ZBXNEXT-114,ZBXNEXT-6572] added support of ranges and regular expressions for value mappings (akozlovs, gcalenko)
+A.F.....S. [ZBXNEXT-6544] added new set of mathematical, aggregate and string functions for trigger expressions (agriscenko, Andris, asestakovs, averza, dgoloscapov)
+A.F.I..PS. [ZBXNEXT-6451] implemented new syntax for trigger expressions (averza, gcalenko, miks, Sasha, vso, wiper)
+A.F.I..PS. [ZBXNEXT-6453] implemented new syntax for calculated checks (averza, gcalenko, Sasha, vso, wiper)
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
+.........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
+
+Bug fixes:
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
+.......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
+...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
+.......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
+........S. [ZBX-19321] fixed missing event tags in case of multiple problems (dgoloscapov)
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+..F....... [ZBX-19306] fixed broken item configuration link in latest data results (miks)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+...G...... [ZBX-19297] fixed agent compilation under Windows (wiper)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0beta3
+
+New features:
+A.F.....ST [ZBXNEXT-6478] added dashboard based pdf report support (abakaldin, agriscenko, ashubin, esneiders, wiper)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in the template MSSQL by ODBC (mchudinov)
+.........T [ZBXNEXT-6571] added templates with multi-page dashboards (afayantsev)
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP", "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 A.F.....S. [ZBXNEXT-6288,ZBXNEXT-6289] removed screens and slideshows (akozlovs, talbergs)
 A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, ashubin, averza)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+..F....... [ZBX-19240] fixed JavaScript errors upon copying map or map navigation tree widgets (averza)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
 .........T [ZBX-19220] fixed broken link to Hikvision camera manufacturer page (abakaldin)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
@@ -176,10 +332,47 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map (mchudinov)
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+..F....... [ZBX-18891] fixed "Cancel" button disappearing on last setup step (Ivo, vmurzins)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+.......PS. [ZBX-19114] fixed slow detection of vmware hv multipath values for medium and huge vc instances (MVekslers)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+........S. [ZBX-19291] fixed memory error when linking host prototypes (asestakovs)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+.......PS. [ZBX-19313] improved performance by removing redundant lastclock update in configuration cache (vso)
+...G...... [ZBX-19208] fixed imprecise ns on windows (dgoloscapov)
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
+.......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
+...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
+.......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
+........S. [ZBX-19321] fixed missing event tags in case of multiple problems (dgoloscapov)
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
@@ -665,13 +858,85 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.13rc1
+
+New features:
+A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
+.........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
+.........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
+.........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
+.........T [ZBXNEXT-6626] updated Zabbix Server according to the latest template guidelines (abakaldin)
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+.........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
+
+Bug fixes:
+A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+.......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
+...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19017] fixed massupdate form of discovered hosts with enabled inventory mode (Ivo)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+.........T [ZBX-19344] changed regular expression for trunk active channels counting in template Asterisk by HTTP (mchudinov)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+..F....... [ZBX-19373] fixed security vulnerability for links having target="_blank" (Ivo)
+.........T [ZBX-19354] fixed typo and added override for MongoDB templates (ychukina)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.12
+
+5.0.12rc1 was released as 5.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.12rc1
+
+New features:
+........S. [ZBXNEXT-4910] added severity in problem real-time export protocol (akozlovs)
+.........T [ZBXNEXT-6613] added Express.ms media (tuskov)
+.........T [ZBXNEXT-6592] added ManageEngine ServiceDesk media (tuskov)
+.........T [ZBXNEXT-6505] added  "WildFly Domain by JMX "and "WildFly Server by JMX" templates (ychukina)
+.........T [ZBXNEXT-6589] added Job discovery, backup process items in Database discovery, macros, and value map in Template DB MSSQL by ODBC (mchudinov)
+
+Bug fixes:
+...G...... [ZBX-19065] fixed Zabbix agent 2 logging if the file is moved or removed (esneiders)
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
+.......PS. [ZBX-19038] fixed lld manager not to process lld rules on same host in parallel to avoid duplicated item keys being discovered; fixed crash when duplicated item key on same host exists (vso)
+.......P.. [ZBX-19324] fixed possible deadlocks between configuration and history syncers on proxy (wiper)
+...G...... [ZBX-19209] fixed panic in proc plugin for Zabbix agent 2 (esneiders)
+.......P.. [ZBX-19241] stopped proxy from overwriting local lastlogsize and mtime (dgoloscapov)
+........S. [ZBX-19321] fixed missing event tags in case of multiple problems (dgoloscapov)
+...G...... [ZBX-19063] fixed logging for unsupported windows service command in Zabbix agent 2 (esneiders)
+...G...... [ZBX-19099] fixed Zabbix agent 2 windows services plugin second parameter (esneiders)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+...G...PS. [ZBX-19274] fixed semaphore not being cleaned up on Solaris when terminating Zabbix sender (vso)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.11
+
+5.0.11rc1 was released as 5.0.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.11rc1
 
 New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 .........T [ZBX-18667] fixed code spelling in templates (abakaldin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
@@ -2695,11 +2960,31 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.31rc1
+Changes for 4.0.32rc1
 
 New features:
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.31
+
+4.0.31rc1 was released as 4.0.31 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.31rc1
+
+Bug fixes:
+....I..... [ZBX-19334] removed redundant ListenIP parameter in server's configuration file (dgoloscapov)
+.......PS. [ZBX-19233] fixed potential loss of original error when reading vmware events (MVekslers)
+...G...... [ZBX-18883] fixed logrt[] monitoring with copytruncate rotation (Andris)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)

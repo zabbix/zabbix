@@ -36,7 +36,7 @@ Format explanation:<br>
 "Send to" field should be filled as "Default" or your routing key.<br>
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into VictorOps tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/5.4/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
 
 ## Supported versions
 Zabbix 5.4 and higher

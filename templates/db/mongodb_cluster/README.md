@@ -7,7 +7,7 @@ For Zabbix version: 5.4 and higher
 The template to monitor MongoDB sharded cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`MongoDB cluster by Zabbix Agent 2` — collects metrics by polling zabbix-agent2.
+`MongoDB cluster by Zabbix Agent 2` — collects metrics from mongos proxy(router) by polling zabbix-agent2.
 
 
 This template was tested on:
@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 
 1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.

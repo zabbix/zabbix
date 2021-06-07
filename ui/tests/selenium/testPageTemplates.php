@@ -30,7 +30,9 @@ class testPageTemplates extends CLegacyWebTest {
 	use TableTrait;
 
 	public static function allTemplates() {
-		return CDBHelper::getRandomizedDataProvider('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25);
+		// TODO: remove 'AND name NOT LIKE "%Cisco Catalyst%"' and change to single quotes after fix ZBX-19356
+		return CDBHelper::getRandomizedDataProvider("SELECT * FROM hosts WHERE status IN (".HOST_STATUS_TEMPLATE.")".
+				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%'", 25);
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -59,8 +61,8 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allTemplates
-	*/
+	 * @dataProvider allTemplates
+	 */
 	public function testPageTemplates_SimpleUpdate($template) {
 		$host = $template['host'];
 		$name = $template['name'];
@@ -82,8 +84,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false)->isValid() === false) {
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 2; $i++) {
+			if ($this->query('link', $name)->one(false)->isValid() === true) {
+				break;
+			}
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}

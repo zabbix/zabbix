@@ -842,13 +842,6 @@ if (hasRequest('form')) {
 
 			// Valuemap
 			order_result($dbHost['valuemaps'], 'name');
-
-			foreach ($dbHost['valuemaps'] as &$valuemap) {
-				order_result($valuemap['mappings'], 'value');
-				$valuemap['mappings'] = array_values($valuemap['mappings']);
-			}
-			unset($valuemap);
-
 			$data['valuemaps'] = array_values($dbHost['valuemaps']);
 
 			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
