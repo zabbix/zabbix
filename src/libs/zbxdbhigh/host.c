@@ -4953,8 +4953,6 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	DBcopy_template_items(hostid, lnk_templateids);
 	DBcopy_template_host_prototypes(hostid, lnk_templateids);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "RRRRRRRRRRRRRRRRR: %d", DBcopy_template_triggers3(hostid, lnk_templateids, error));
-
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids, error)))
 	{
 		DBcopy_template_graphs(hostid, lnk_templateids);

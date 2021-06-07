@@ -26,6 +26,6 @@
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error);
-int	DBcopy_template_triggers3(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error);
+int	DBcopy_template_triggers2(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error);
 
 #endif
