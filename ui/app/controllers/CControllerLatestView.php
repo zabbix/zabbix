@@ -61,6 +61,13 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction() {
+		$same_page_submit = false;
+		$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER) ? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY) : false;
+		if ($url_to_check !== false) {
+			parse_str($url_to_check, $url_params);
+			$same_page_submit = (array_key_exists('action', $url_params) && strtolower($url_params['action']) == $this->getAction());
+		}
+
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []),
@@ -71,7 +78,8 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_STR
 			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
+			CProfile::update('web.latest.filter.show_without_data',
+				$this->getInput('filter_show_without_data', $same_page_submit ? 0 : 1),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
@@ -85,6 +93,9 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::delete('web.latest.filter.select');
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
+		}
+		else {
+			CProfile::update('web.latest.filter.show_without_data', 1, PROFILE_TYPE_INT);
 		}
 
 		// Force-check "Show items without data" if there are no hosts selected.
