@@ -37,7 +37,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_hostids' =>				'array_id',
 			'filter_application' =>			'string',
 			'filter_select' =>				'string',
-			'filter_show_without_data' =>	'in 1',
+			'filter_show_without_data' =>	'in 0,1',
 			'filter_show_details' =>		'in 1',
 			'filter_set' =>					'in 1',
 			'filter_rst' =>					'in 1',
@@ -61,13 +61,6 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction() {
-		$same_page_submit = false;
-		$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER) ? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY) : false;
-		if ($url_to_check !== false) {
-			parse_str($url_to_check, $url_params);
-			$same_page_submit = (array_key_exists('action', $url_params) && strtolower($url_params['action']) == $this->getAction());
-		}
-
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []),
@@ -78,10 +71,10 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_STR
 			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.show_without_data',
-				$this->getInput('filter_show_without_data', $same_page_submit ? 0 : 1),
-				PROFILE_TYPE_INT
-			);
+
+			$show_without_data = $this->hasInput('filter_show_without_data') ? $this->getInput('filter_show_without_data', 0) : 1;
+			CProfile::update('web.latest.filter.show_without_data',	$show_without_data, PROFILE_TYPE_INT);
+
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
 				PROFILE_TYPE_INT
 			);

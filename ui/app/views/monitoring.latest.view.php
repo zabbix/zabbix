@@ -106,6 +106,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					(new CCheckBox('filter_show_without_data'))
 						->setChecked($data['filter']['show_without_data'] == 1)
 						->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
+						->setUncheckedValue(0)
 				)
 				->addRow(_('Show details'),
 					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1)
