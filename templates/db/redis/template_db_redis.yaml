@@ -3015,7 +3015,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Slowlog'
-                        
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
