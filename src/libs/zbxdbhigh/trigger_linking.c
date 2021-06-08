@@ -1,4 +1,4 @@
-/*
+\/*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
 **
@@ -1015,7 +1015,7 @@ static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *inser
 				zbx_vector_str_append(&(found->parameters), DBdyn_escape_string(row[3]));
 
 				for (i = 0; i < (found->names).values_num; i++)
-				  zabbix_log(LOG_LEVEL_INFORMATION, "BADGER STRA0: ->%s<-",(found->names).values[i]);
+					zabbix_log(LOG_LEVEL_INFORMATION, "BADGER STRA0: ->%s<-",(found->names).values[i]);
 			}
 			else
 			{
@@ -1108,7 +1108,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, trigger_copy_template->expression,
 				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
 		{
-			 goto func_out;
+			goto func_out;
 		}
 
 		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == (int)trigger_copy_template->recovery_mode &&
@@ -1619,7 +1619,7 @@ int	DBcopy_template_triggers2(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 	if (SUCCEED == res)
 	{
 		res = DBadd_template_dependencies_for_new_triggers(hostid, new_triggerids.values,
-								   new_triggerids.values_num);
+				new_triggerids.values_num);
 	}
 
 	if (SUCCEED == res)
