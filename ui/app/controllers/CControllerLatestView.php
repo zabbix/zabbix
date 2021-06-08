@@ -72,7 +72,7 @@ class CControllerLatestView extends CControllerLatest {
 			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
 
-			$show_without_data = $this->hasInput('filter_show_without_data') ? $this->getInput('filter_show_without_data', 0) : 1;
+			$show_without_data = $this->hasInput('filter_show_without_data') ? $this->getInput('filter_show_without_data') : 1;
 			CProfile::update('web.latest.filter.show_without_data',	$show_without_data, PROFILE_TYPE_INT);
 
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
