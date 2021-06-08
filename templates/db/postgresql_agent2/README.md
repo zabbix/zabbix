@@ -1,5 +1,5 @@
 
-# PostgreSQL Agent 2
+# PostgreSQL by Zabbix agent 2
 
 ## Overview
 

@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d670c32f007d438c9dcd32db57d2b691
-      template: 'Oracle by Zabbix Agent 2'
-      name: 'Oracle by Zabbix Agent 2'
+      template: 'Oracle by Zabbix agent 2'
+      name: 'Oracle by Zabbix agent 2'
       description: 'Template tooling version used: 0.38'
       groups:
         -

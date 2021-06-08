@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: e111446745a1425b862f8727ae63bce4
-      template: Redis
-      name: Redis
+      template: 'Redis by Zabbix agent 2'
+      name: 'Redis by Zabbix agent 2'
       description: |
         Get Redis metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         
