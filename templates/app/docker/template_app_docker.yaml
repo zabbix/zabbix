@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: c5fd214cdd0d4b3b8272e73b022ba5c2
-      template: Docker by Zabbix agent 2
-      name: Docker by Zabbix agent 2
+      template: 'Docker by Zabbix agent 2'
+      name: 'Docker by Zabbix agent 2'
       description: |
         Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         
@@ -727,7 +727,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2c62bb4d95684e6984447027d117ff4d
-              expression: 'nodata(/Docker/docker.name,30m)=1'
+              expression: 'nodata(/Docker by Zabbix agent 2/docker.name,30m)=1'
               name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -735,7 +735,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Docker: Service is down'
-                  expression: last(/Docker/docker.ping)=0
+                  expression: last(/Docker by Zabbix agent 2/docker.ping)=0
         -
           uuid: 5e4999067e6948f893dc465f8e5a2b5f
           name: 'Docker: NCPU'
@@ -912,7 +912,7 @@ zabbix_export:
           triggers:
             -
               uuid: a4f00b4d25b54acfa61475c94651d8a5
-              expression: last(/Docker/docker.ping)=0
+              expression: last(/Docker by Zabbix agent 2/docker.ping)=0
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -967,7 +967,7 @@ zabbix_export:
           triggers:
             -
               uuid: f5f4fb1337264ac2bec6b6505dfe180b
-              expression: '(last(/Docker/docker.server_version,#1)<>last(/Docker/docker.server_version,#2))=1 and length(last(/Docker/docker.server_version))>0'
+              expression: '(last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2))=1 and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
@@ -1208,7 +1208,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ee70b91196494eccb54772b22051a456
-                  expression: '(last(/Docker/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker/docker.container_info.state.error["{#NAME}"]))>0'
+                  expression: '(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
@@ -1866,7 +1866,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: db675ff608a14b12bcc02e6b500c557f
-              expression: 'last(/Docker/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker/docker.container_info.state.running["{#NAME}"])=0'
+              expression: 'last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0'
               name: 'Container {#NAME}: Container has been stopped with error code'
               opdata: 'Exit code: {ITEM.LASTVALUE1}'
               priority: AVERAGE

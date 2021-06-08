@@ -57,7 +57,7 @@ zabbix_export:
           triggers:
             -
               uuid: 716f166b3943443aba70a4faed882ffb
-              expression: '(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name))>0'
+              expression: '(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
@@ -586,22 +586,22 @@ zabbix_export:
           triggers:
             -
               uuid: 6ab06350bd8b426681f1b8bddde76a13
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
               name: 'Ceph: Cluster in ERROR state'
               priority: AVERAGE
               manual_close: 'YES'
             -
               uuid: 8b6ba1a7ae014e80a5287ffd13b5d8aa
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=1'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=1'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=0'
+              recovery_expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=0'
               name: 'Ceph: Cluster in WARNING state'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Ceph: Cluster in ERROR state'
-                  expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
         -
           uuid: 9b073153d7474b0abfccb1844d0e6981
           name: 'Ceph: Number of Placement Groups in Active state'
@@ -887,7 +887,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9ffc9a5c3d1c47d288c665c8be7d2fbb
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
@@ -1215,7 +1215,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 21535bb935b44b3aa073542db3cc7827
-                  expression: 'last(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},up]) = 0'
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0'
                   name: 'Ceph: OSD osd.{#OSDNAME} is down'
                   priority: AVERAGE
                   description: |
@@ -1224,16 +1224,16 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: cd04e8d542a04bdf89abad7ee4719e75
-              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_nearfull_ratio)*100'
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100'
               name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
               priority: WARNING
               dependencies:
                 -
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
-                  expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
+                  expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
             -
               uuid: 5d7a028166584c29b959914ce904a713
-              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE
           graph_prototypes:
