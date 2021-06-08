@@ -469,6 +469,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
 		ZBX_STR2UCHAR(item->discover, row[48]);
 
+		item->upd_flags = 0;
+
 		if (SUCCEED != DBis_null(row[26]))
 		{
 			char		*str_orig = NULL;
@@ -561,7 +563,6 @@ do {							\
 		{
 			item->key = zbx_strdup(NULL, row[2]);
 			item->itemid = 0;
-			item->upd_flags = 0;
 		}
 
 		zbx_vector_ptr_create(&item->dependent_items);
