@@ -117,6 +117,9 @@ typedef struct
 	zbx_hashset_t	service_problem_tags_index;
 	zbx_hashset_t	services_links;
 	zbx_hashset_t	service_problems_index;
+	zbx_hashset_t	problem_events;
+	zbx_hashset_t	recovery_events;
+
 }
 zbx_service_manager_t;
 
@@ -1095,6 +1098,51 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 }
 
 
+static void	service_manager_init(zbx_service_manager_t *service_manager)
+{
+	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->recovery_events, 1, default_uint64_ptr_hash_func,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->service_problem_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_problem_tag_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->service_problem_tags_index, 1000, tag_services_hash,
+			tag_services_compare, tag_services_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->service_problems_index, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_problems_index_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->services_links, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create_ext(&service_manager->services_diff, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_diff_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+}
+
+static void	service_manager_free(zbx_service_manager_t *service_manager)
+{
+	zbx_hashset_destroy(&service_manager->service_problems_index);
+	zbx_hashset_destroy(&service_manager->services_links);
+	zbx_hashset_destroy(&service_manager->service_problem_tags);
+	zbx_hashset_destroy(&service_manager->services);
+	zbx_hashset_destroy(&service_manager->problem_events);
+	zbx_hashset_destroy(&service_manager->recovery_events);
+}
+
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
 	zbx_ipc_service_t	service;
@@ -1103,8 +1151,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_message_t	*message;
 	int			ret, processed_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, sec;
-	zbx_vector_ptr_t	events;
-	zbx_hashset_t		problem_events, recovery_events;
 	zbx_service_manager_t	service_manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -1133,40 +1179,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	/* initialize statistics */
 	time_stat = zbx_time();
 
-	zbx_vector_ptr_create(&events);
-	zbx_hashset_create_ext(&problem_events, 1000, default_uint64_ptr_hash_func,
-			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	service_manager_init(&service_manager);
 
-	zbx_hashset_create_ext(&recovery_events, 1, default_uint64_ptr_hash_func,
-			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.service_problem_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_problem_tag_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.service_problem_tags_index, 1000, tag_services_hash,
-			tag_services_compare, tag_services_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.service_problems_index, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_problems_index_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.services_links, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	zbx_hashset_create_ext(&service_manager.services_diff, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_diff_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	DBbegin();
-	db_get_events(&problem_events);	/* TODO: housekeeping, get events before history syncer starts to recover */
+	db_get_events(&service_manager.problem_events);	/* TODO: housekeeping, get events before history syncer starts to recover */
 	DBcommit();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
@@ -1209,7 +1225,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 				flags = ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_DELETE;
 
-				zbx_hashset_iter_reset(&problem_events, &iter);
+				zbx_hashset_iter_reset(&service_manager.problem_events, &iter);
 				while (NULL != (event = (zbx_event_t **)zbx_hashset_iter_next(&iter)))
 				{
 					match_event_to_service_problem_tags(*event,
@@ -1256,23 +1272,24 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 		if (NULL != message)
 		{
+			zbx_vector_ptr_t	events;
+
+			zbx_vector_ptr_create(&events);
+
 			zbx_service_deserialize(message->data, message->size, &events);
 			zbx_ipc_message_free(message);
-			process_events(&problem_events, &recovery_events, &events, &service_manager);
-			zbx_vector_ptr_clear(&events);
+			process_events(&service_manager.problem_events, &service_manager.recovery_events, &events,
+					&service_manager);
+
+			zbx_vector_ptr_destroy(&events);
 		}
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
 
-	zbx_hashset_destroy(&service_manager.service_problems_index);
-	zbx_hashset_destroy(&service_manager.services_links);
-	zbx_hashset_destroy(&service_manager.service_problem_tags);
-	zbx_hashset_destroy(&service_manager.services);
-	zbx_hashset_destroy(&problem_events);
-	zbx_hashset_destroy(&recovery_events);
-	zbx_vector_ptr_destroy(&events);
+	service_manager_free(&service_manager);
+
 	DBclose();
 
 	exit(EXIT_SUCCESS);
