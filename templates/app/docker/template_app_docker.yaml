@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: c5fd214cdd0d4b3b8272e73b022ba5c2
-      template: Docker
-      name: Docker
+      template: Docker by Zabbix agent 2
+      name: Docker by Zabbix agent 2
       description: |
         Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         

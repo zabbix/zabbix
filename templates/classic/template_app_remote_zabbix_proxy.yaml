@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 970c2342146549768e6b91a26089bcdf
-      template: 'Remote Zabbix proxy'
-      name: 'Remote Zabbix proxy'
+      template: 'Remote Zabbix proxy health'
+      name: 'Remote Zabbix proxy health'
       groups:
         -
           name: Templates/Applications

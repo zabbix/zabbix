@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 399bd1ee587245ecac6f39beaa99886f
-      template: PostgreSQL
-      name: PostgreSQL
+      template: PostgreSQL by user parameters
+      name: PostgreSQL by user parameters
       groups:
         -
           name: Templates/Databases

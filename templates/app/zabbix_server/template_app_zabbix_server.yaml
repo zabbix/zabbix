@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: e2d2b4e4ac28483996cc11fe42823d57
-      template: 'Zabbix Server'
-      name: 'Zabbix Server'
+      template: 'Zabbix server health'
+      name: 'Zabbix server health'
       description: 'Template tooling version used: 0.38'
       groups:
         -

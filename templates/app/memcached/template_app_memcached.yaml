@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 05894ba2c9184d33992bf1bd21c347f6
-      template: Memcached
-      name: Memcached
+      template: Memcached by Zabbix agent 2
+      name: Memcached by Zabbix agent 2
       description: |
         Get Memcached metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         

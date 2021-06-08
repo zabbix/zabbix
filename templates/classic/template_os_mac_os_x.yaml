@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: f895df5b37494f668cde1a2388d7af8b
-      template: 'Mac OS X'
-      name: 'Mac OS X'
+      template: macOS
+      name: macOS
       templates:
         -
           name: 'Zabbix agent'

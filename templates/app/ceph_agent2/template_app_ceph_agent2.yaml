@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 09fb25d089f7467f860895f6e71d3fa2
-      template: 'Ceph by Zabbix Agent2'
-      name: 'Ceph by Zabbix Agent2'
+      template: 'Ceph by Zabbix agent 2'
+      name: 'Ceph by Zabbix agent 2'
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph
         

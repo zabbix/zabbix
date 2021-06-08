@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d0ef7d659a8f4beaaabfc4b6134e737a
-      template: 'PostgreSQL Agent 2'
-      name: 'PostgreSQL Agent 2'
+      template: 'PostgreSQL by Zabbix agent 2'
+      name: 'PostgreSQL by Zabbix agent 2'
       description: 'Template tooling version used: 0.38'
       groups:
         -
