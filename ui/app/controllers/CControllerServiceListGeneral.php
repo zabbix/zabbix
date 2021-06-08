@@ -22,6 +22,7 @@
 abstract class CControllerServiceListGeneral extends CController {
 
 	protected $validation_fields = [
+		'serviceid' =>			'db services.serviceid',
 		'filter_name' =>		'string',
 		'filter_status' =>		'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
 		'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
@@ -51,7 +52,7 @@ abstract class CControllerServiceListGeneral extends CController {
 		// TODO: Implement doAction() method.
 	}
 
-	protected function getFilter(): array {
+	protected function updateFilter(): void {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.service.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 
@@ -81,7 +82,9 @@ abstract class CControllerServiceListGeneral extends CController {
 			CProfile::deleteIdx('web.service.filter.tags.value');
 			CProfile::deleteIdx('web.service.filter.tags.operator');
 		}
+	}
 
+	protected function getFilter(): array {
 		$filter = [
 			'name' => CProfile::get('web.service.filter_name', ''),
 			'status' => CProfile::get('web.service.filter_status', SERVICE_STATUS_ANY),

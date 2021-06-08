@@ -69,21 +69,30 @@ foreach ($data['services'] as $serviceid => $service) {
 	$table->addRow(new CRow([
 		new CCheckBox('serviceid['.$serviceid.']', $serviceid),
 		$dependencies_count > 0
-			? [new CLink($service['name'], new CUrl('#')), CViewHelper::showNum($dependencies_count)]
+			? [
+				(new CLink($service['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list.edit')
+					->setArgument('serviceid', $serviceid)
+				))->setAttribute('data-id', $serviceid),
+				CViewHelper::showNum($dependencies_count)
+			]
 			: $service['name'],
 		'OK',
 		'Root cause',
 		sprintf('%.4f', $service['goodsla']),
-		$data['tags'][$serviceid] ?? 'tags',
+		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : 'tags',
 		(new CCol([
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)
+				->addClass('service-add-child-js')
 				->setAttribute('data-id', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
+				->addClass('service-edit-js')
 				->setAttribute('data-id', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
+				->addClass('service-remove-js')
 				->setAttribute('data-id', $serviceid)
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]));
@@ -98,19 +107,15 @@ $form->addItem($table);
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Create service'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'dashboard.view')
-							->setArgument('new', '1')
-							->getUrl()
-					))
+					(new CSimpleButton(_('Create service')))
+						->addClass('service-create-js')
+						->setAttribute('data-id', $data['serviceid'])
 				)
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
 						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
 						->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
 						->setModern(true)
-						->setId('list-mode')
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
@@ -120,8 +125,9 @@ $form->addItem($table);
 	->show();
 
 (new CScriptTag('
-	initializeView();
+	initializeView(
+		'.json_encode($data['serviceid']).'
+	);
 '))
 	->setOnDocumentReady()
 	->show();
-

@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	function initializeView() {
+	function initializeView(serviceid) {
 
 		const init = () => {
 			initViewModeSwitcher();
@@ -35,11 +35,16 @@
 			for (const element of document.getElementsByName('list_mode')) {
 				if (!element.checked) {
 					element.addEventListener('click', (e) => {
-						const url = new Curl('zabbix.php');
+						const url = new Curl('zabbix.php', false);
+
 						url.setArgument('action', (e.target.value == <?= ZBX_LIST_MODE_VIEW ?>)
 							? 'service.list'
 							: 'service.list.edit'
 						);
+
+						if (serviceid !== null) {
+							url.setArgument('serviceid', serviceid);
+						}
 
 						redirect(url.getUrl());
 					});

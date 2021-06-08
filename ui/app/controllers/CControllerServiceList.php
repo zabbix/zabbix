@@ -26,9 +26,13 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 	}
 
 	protected function doAction(): void {
+		$serviceid = $this->hasInput('serviceid') ? $this->getInput('serviceid') : null;
+
+		$this->updateFilter();
 		$filter = $this->getFilter();
 
 		$data = [
+			'can_edit' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES),
 			'filter' => $filter,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'service.list'),
@@ -38,9 +42,10 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
 				->setArgument('filter_tags', $filter['tags'])
-				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null),
+				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
+				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'can_edit' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES),
+			'serviceid' => $serviceid,
 			'tags' => []
 		];
 

@@ -62,12 +62,18 @@ foreach ($data['services'] as $serviceid => $service) {
 
 	$table->addRow(new CRow([
 		$dependencies_count > 0
-			? [new CLink($service['name'], new CUrl('#')), CViewHelper::showNum($dependencies_count)]
+			? [
+				(new CLink($service['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('serviceid', $serviceid)
+				))->setAttribute('data-id', $serviceid),
+				CViewHelper::showNum($dependencies_count)
+			]
 			: $service['name'],
 		'OK',
 		'Root cause',
 		sprintf('%.4f', $service['goodsla']),
-		$data['tags'][$serviceid] ?? 'tags'
+		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : 'tags'
 	]));
 }
 
@@ -80,10 +86,9 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(
 					$data['can_edit']
 						? (new CRadioButtonList('list_mode', ZBX_LIST_MODE_VIEW))
-						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
-						->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
-						->setModern(true)
-						->setId('list-mode')
+							->addValue(_('View'), ZBX_LIST_MODE_VIEW)
+							->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
+							->setModern(true)
 						: null
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
@@ -94,7 +99,9 @@ foreach ($data['services'] as $serviceid => $service) {
 	->show();
 
 (new CScriptTag('
-	initializeView();
+	initializeView(
+		'.json_encode($data['serviceid']).'
+	);
 '))
 	->setOnDocumentReady()
 	->show();
