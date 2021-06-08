@@ -45,6 +45,11 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 ........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.1
+
+5.4.1rc2 was released as 5.4.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.1rc2
 
 Bug fixes:
@@ -870,6 +875,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 .......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
 ...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
