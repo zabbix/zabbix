@@ -97,8 +97,8 @@ typedef struct
 }
 zbx_target_host_trigger_entry_t;
 
-ZBX_PTR_VECTOR_DECL(target_host_trigger_data, zbx_target_host_trigger_entry_t *);
-ZBX_PTR_VECTOR_IMPL(target_host_trigger_data, zbx_target_host_trigger_entry_t *);
+ZBX_PTR_VECTOR_DECL(target_host_trigger_data, zbx_target_host_trigger_entry_t *)
+ZBX_PTR_VECTOR_IMPL(target_host_trigger_data, zbx_target_host_trigger_entry_t *)
 
 static unsigned	zbx_host_triggers_main_data_hash_func(const void *data)
 {
