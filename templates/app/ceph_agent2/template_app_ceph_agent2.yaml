@@ -1244,13 +1244,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_apply]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_commit]'
         -
           uuid: fb6b4d27f46e4160ad978244aa845d0e
@@ -1465,13 +1465,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
             -
               uuid: 7870932ea335481db1c23224dfb33f60
@@ -1480,13 +1480,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
             -
               uuid: 3da48042fdaa4c01825c3eea7ab5af6b
@@ -1495,19 +1495,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",bytes_used]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",max_avail]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",stored_raw]'
       macros:
         -
@@ -1551,13 +1551,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_bytes.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_bytes.rate
     -
       uuid: 4191a30a9a7c4e5aa48d96238ca8f20c
@@ -1566,13 +1566,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_ops.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_ops.rate
     -
       uuid: 515e2c5239f94ee7a52ecdb834079e06
@@ -1583,14 +1583,14 @@ zabbix_export:
           drawtype: FILLED_REGION
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_used_bytes
         -
           sortorder: '1'
           drawtype: FILLED_REGION
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_avail_bytes
     -
       uuid: 8714a8cf50bd43c2b54e410a439d320b
@@ -1600,38 +1600,38 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.min
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.avg
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.max
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.min
     -
       uuid: 716d959b255a47779b9aaf376be8ba03
@@ -1641,17 +1641,17 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.min

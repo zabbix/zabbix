@@ -693,19 +693,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.commands.flush.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.commands.set.rate
         -
           sortorder: '2'
           color: F63100
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.commands.get.rate
     -
       uuid: 3d738b083ce04ffa8d4bd9bf2e394f6a
@@ -715,21 +715,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.max
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.current
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.structures
     -
       uuid: 195f209046ba426c9e57c6a317c76ef4
@@ -739,21 +739,21 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.rate
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.throttled.rate
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.connections.queued.rate
     -
       uuid: 8ace604110bf4a4d9eb7a4b6add0492d
@@ -762,13 +762,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.stats.hits.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.stats.misses.rate
     -
       uuid: bb6305e9a84749669433e53cd2b7b8b8
@@ -778,14 +778,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.stats.bytes_read.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.stats.bytes_written.rate
     -
       uuid: 599a96c18e214610a41afadef8f11e11
@@ -794,5 +794,5 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Memcached
+            host: 'Memcached by Zabbix agent 2'
             key: memcached.uptime

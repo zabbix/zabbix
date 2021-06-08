@@ -1084,7 +1084,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Zabbix server performance'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1100,7 +1100,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Zabbix data gathering process busy %'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1116,7 +1116,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Zabbix internal process busy %'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1133,7 +1133,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Zabbix cache usage, % free'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1149,7 +1149,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Value cache effectiveness'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1166,7 +1166,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Zabbix internal queues'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
         -
           uuid: 32994a87287449eab12bed911880ef13
           name: 'Zabbix server processes'
@@ -1187,7 +1187,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Data handling processes'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1203,7 +1203,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Reporting processes'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1219,7 +1219,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Internal processes'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1236,7 +1236,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix server: Data gathering processes'
-                        host: 'Zabbix Server'
+                        host: 'Zabbix server health'
       valuemaps:
         -
           uuid: 97bbea700550483bbd8405b4dd9d8005
@@ -1258,66 +1258,66 @@ zabbix_export:
         -
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,trapper,avg,busy]'
         -
           sortorder: '1'
           color: '990000'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,poller,avg,busy]'
         -
           sortorder: '2'
           color: 0000EE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,ipmi poller,avg,busy]'
         -
           sortorder: '3'
           color: FF33FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
           sortorder: '4'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,icmp pinger,avg,busy]'
         -
           sortorder: '5'
           color: '003300'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,http poller,avg,busy]'
         -
           sortorder: '6'
           color: 33FFFF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,unreachable poller,avg,busy]'
         -
           sortorder: '7'
           color: DD0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,java poller,avg,busy]'
         -
           sortorder: '8'
           color: '000099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,snmp trapper,avg,busy]'
         -
           sortorder: '9'
           color: 00FF00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,vmware collector,avg,busy]'
         -
           sortorder: '10'
           color: 5A2B57
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
     -
       uuid: ee66abf6d914407c8133b00acad77f17
@@ -1328,31 +1328,31 @@ zabbix_export:
         -
           color: 00EE00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,history syncer,avg,busy]'
         -
           sortorder: '1'
           color: 0000EE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
           sortorder: '2'
           color: FFAA00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
           sortorder: '3'
           color: 00EEEE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,lld worker,avg,busy]'
         -
           sortorder: '4'
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
     -
       uuid: df8944bf1e2f4149b5fbfe945548d1d8
@@ -1363,49 +1363,49 @@ zabbix_export:
         -
           color: 00EE00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,timer,avg,busy]'
         -
           sortorder: '1'
           color: FFAA00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,housekeeper,avg,busy]'
         -
           sortorder: '2'
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,configuration syncer,avg,busy]'
         -
           sortorder: '3'
           color: FF66FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
           sortorder: '4'
           color: '009999'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,task manager,avg,busy]'
         -
           sortorder: '5'
           color: 2B5429
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,availability manager,avg,busy]'
         -
           sortorder: '6'
           color: 8048B4
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,discoverer,avg,busy]'
         -
           sortorder: '7'
           color: FD5434
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,proxy poller,avg,busy]'
     -
       uuid: 821dc2e1b416449ca0d356a0a34f58ac
@@ -1416,37 +1416,37 @@ zabbix_export:
         -
           color: 00EE00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,escalator,avg,busy]'
         -
           sortorder: '1'
           color: 0000EE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alerter,avg,busy]'
         -
           sortorder: '2'
           color: FFAA00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alert manager,avg,busy]'
         -
           sortorder: '3'
           color: 00EEEE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alert syncer,avg,busy]'
         -
           sortorder: '4'
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,report manager,avg,busy]'
         -
           sortorder: '5'
           color: EE0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,report writer,avg,busy]'
     -
       uuid: 739c5a4a46e949c69c46073c39ce3ef8
@@ -1455,13 +1455,13 @@ zabbix_export:
         -
           color: C80000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[tcache,cache,pmisses]'
         -
           sortorder: '1'
           color: 00C800
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[tcache,cache,pitems]'
     -
       uuid: d2841f4fbb33411d9ab1b1b48e7e959f
@@ -1471,13 +1471,13 @@ zabbix_export:
         -
           color: C80000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[vcache,cache,misses]'
         -
           sortorder: '1'
           color: 00C800
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[vcache,cache,hits]'
     -
       uuid: 0432df37a8f34cf7978531642037c1a1
@@ -1488,37 +1488,37 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[wcache,trend,pused]'
         -
           sortorder: '1'
           color: DD0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[rcache,buffer,pused]'
         -
           sortorder: '2'
           color: 00DDDD
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[wcache,index,pused]'
         -
           sortorder: '3'
           color: 3333FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[wcache,history,pused]'
         -
           sortorder: '4'
           color: '999900'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[vcache,buffer,pused]'
         -
           sortorder: '5'
           color: 00FF00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[vmware,buffer,pused]'
     -
       uuid: 99fbcd47f72148f486f3b5e7d49596b8
@@ -1529,72 +1529,72 @@ zabbix_export:
         -
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,trapper,avg,busy]'
         -
           sortorder: '1'
           color: '990000'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,poller,avg,busy]'
         -
           sortorder: '2'
           color: 0000EE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,ipmi poller,avg,busy]'
         -
           sortorder: '3'
           color: FF33FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,discoverer,avg,busy]'
         -
           sortorder: '4'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,icmp pinger,avg,busy]'
         -
           sortorder: '5'
           color: '003300'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,http poller,avg,busy]'
         -
           sortorder: '6'
           color: CCCC00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,proxy poller,avg,busy]'
         -
           sortorder: '7'
           color: 33FFFF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,unreachable poller,avg,busy]'
         -
           sortorder: '8'
           color: DD0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,java poller,avg,busy]'
         -
           sortorder: '9'
           color: '000099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,snmp trapper,avg,busy]'
         -
           sortorder: '10'
           color: 00FF00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,vmware collector,avg,busy]'
         -
           sortorder: '11'
           color: 5A2B57
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
     -
       uuid: 630f638ad0054d3380f941e72805ea1d
@@ -1605,109 +1605,109 @@ zabbix_export:
         -
           color: 00EE00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,timer,avg,busy]'
         -
           sortorder: '1'
           color: 0000EE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,escalator,avg,busy]'
         -
           sortorder: '2'
           color: FFAA00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,housekeeper,avg,busy]'
         -
           sortorder: '3'
           color: 00EEEE
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alerter,avg,busy]'
         -
           sortorder: '4'
           color: '990099'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,configuration syncer,avg,busy]'
         -
           sortorder: '5'
           color: EE0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,history syncer,avg,busy]'
         -
           sortorder: '6'
           color: FF66FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
           sortorder: '7'
           color: '009999'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,task manager,avg,busy]'
         -
           sortorder: '8'
           color: BBBB00
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
           sortorder: '9'
           color: AA0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alert manager,avg,busy]'
         -
           sortorder: '10'
           color: '990000'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
           sortorder: '11'
           color: '008800'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
           sortorder: '12'
           color: 80B0E0
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
         -
           sortorder: '13'
           color: 4080B0
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,lld worker,avg,busy]'
         -
           sortorder: '14'
           color: 8000FF
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,alert syncer,avg,busy]'
         -
           sortorder: '15'
           color: 2B5429
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,availability manager,avg,busy]'
         -
           sortorder: '16'
           color: 8048B4
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,report manager,avg,busy]'
         -
           sortorder: '17'
           color: FD5434
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[process,report writer,avg,busy]'
     -
       uuid: b053dc416ee3422b94e46fb415ea87e6
@@ -1716,13 +1716,13 @@ zabbix_export:
         -
           color: '008800'
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[preprocessing_queue]'
         -
           sortorder: '1'
           color: EE0000
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[lld_queue]'
     -
       uuid: 3d256a358da74f469700eea05173343a
@@ -1732,11 +1732,11 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 00C800
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[wcache,values]'
         -
           sortorder: '1'
           color: F63100
           item:
-            host: 'Zabbix Server'
+            host: 'Zabbix server health'
             key: 'zabbix[queue]'

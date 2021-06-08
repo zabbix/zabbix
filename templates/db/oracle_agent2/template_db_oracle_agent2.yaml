@@ -1890,13 +1890,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Oracle by Zabbix Agent 2'
+                    host: 'Oracle by Zabbix agent 2'
                     key: 'oracle.asm_free_size["{#DG_NAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Oracle by Zabbix Agent 2'
+                    host: 'Oracle by Zabbix agent 2'
                     key: 'oracle.asm_total_size["{#DG_NAME}"]'
         -
           uuid: 479a56fe538f46c094cc4b595d070776
@@ -2174,19 +2174,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Oracle by Zabbix Agent 2'
+                    host: 'Oracle by Zabbix agent 2'
                     key: 'oracle.tbs_alloc_bytes["{#TABLESPACE}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Oracle by Zabbix Agent 2'
+                    host: 'Oracle by Zabbix agent 2'
                     key: 'oracle.tbs_max_bytes["{#TABLESPACE}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Oracle by Zabbix Agent 2'
+                    host: 'Oracle by Zabbix agent 2'
                     key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
       macros:
         -
@@ -2476,13 +2476,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: 'oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.db_files_limit
     -
       uuid: 4b4d2430750c4885b4764c3b602dc091
@@ -2491,19 +2491,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.total_pga_used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.pga_target
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.total_pga_allocated
     -
       uuid: 4e02f667b98042f6ac538692a074a982
@@ -2512,13 +2512,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.physical_writes_rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.physical_reads_rate
     -
       uuid: 2bfd6cda93da4201a73c3d16caea8284
@@ -2527,13 +2527,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.physical_write_bytes_rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.physical_read_bytes_rate
     -
       uuid: e51ad4ba7cca491faf7564a8d26bc1da
@@ -2542,13 +2542,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: 'oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.processes_limit
     -
       uuid: 3323be96dd454a92ade913ab6c2b589c
@@ -2557,31 +2557,31 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.session_count
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.session_active_background
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.session_inactive_user
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.session_active_user
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.session_limit
     -
       uuid: ad7c9a7b4c7a4b4885cb1e91e7e79d3d
@@ -2591,35 +2591,35 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_java_pool
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_large_pool
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_shared_pool
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_log_buffer
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_fixed
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'Oracle by Zabbix Agent 2'
+            host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_buffer_cache

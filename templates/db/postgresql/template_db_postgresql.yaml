@@ -1540,13 +1540,13 @@ zabbix_export:
                 -
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 42A5F5
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
             -
               uuid: 6bd0a0d65b8d43ad946b145cf8a8b533
@@ -1556,7 +1556,7 @@ zabbix_export:
                 -
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
             -
               uuid: 41e765d906324595a396d8985b204ff5
@@ -1567,25 +1567,25 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
             -
               uuid: 2b260fdf7623476095429434b5c79041
@@ -1595,7 +1595,7 @@ zabbix_export:
                 -
                   color: EC407A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.locks.total["{#DBNAME}"]'
             -
               uuid: 8a60a92b41b146f49145b86bab559b2e
@@ -1606,42 +1606,42 @@ zabbix_export:
                   color: 4CAF50
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 03A9F4
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 9C27B0
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: 81C784
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: 90CAF9
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
                   color: CE93D8
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
             -
               uuid: 93518b06f71e46ada3dabefa1726b867
@@ -1651,19 +1651,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
             -
               uuid: 779b872280ad46c7a6cdf95c2df7c646
@@ -1673,14 +1673,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 42A5F5
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
             -
               uuid: f10be22e3bac4d66936c34ec99446c64
@@ -1690,31 +1690,31 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
       macros:
         -
@@ -1809,7 +1809,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Tuples'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1833,7 +1833,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Events'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '6'
@@ -1857,7 +1857,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Block hit/read'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1882,7 +1882,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Temp files'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '12'
@@ -1906,7 +1906,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Locks'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1931,7 +1931,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Database size'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '18'
@@ -1955,7 +1955,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Queries'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1980,7 +1980,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Slow queries'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
         -
           uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
@@ -2001,7 +2001,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL connections'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2017,7 +2017,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL transactions'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   'y': '6'
@@ -2033,7 +2033,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL ping'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2050,7 +2050,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL uptime'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   'y': '12'
@@ -2066,7 +2066,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL replication lag'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2083,7 +2083,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL WAL'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   'y': '18'
@@ -2099,7 +2099,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL bgwriter'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2116,7 +2116,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL checkpoints'
-                        host: PostgreSQL
+                        host: 'PostgreSQL by user parameters'
       valuemaps:
         -
           uuid: 2e376ee568d04e7bbe98cbae4181f313
@@ -2161,40 +2161,40 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_alloc.rate
         -
           sortorder: '1'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_clean.rate
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_backend.rate
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_checkpoint.rate
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.maxwritten_clean.rate
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_backend_fsync.rate
     -
       uuid: 4a105d193df64be7898ac19a2f07faa4
@@ -2204,27 +2204,27 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoints_timed.rate
         -
           sortorder: '1'
           color: F63100
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoints_req.rate
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoint_sync_time
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoint_write_time
     -
       uuid: 8d41d719832049a5a1fcd6f4da67fb6a
@@ -2236,48 +2236,48 @@ zabbix_export:
           color: C8E6C9
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total
         -
           sortorder: '1'
           color: 6C59DC
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total_pct
         -
           sortorder: '2'
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.active
         -
           sortorder: '3'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle
         -
           sortorder: '4'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle_in_transaction
         -
           sortorder: '5'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.prepared
         -
           sortorder: '6'
           color: AC8C14
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.waiting
     -
       uuid: 1e9a55ee61824779a9f46f42ec21abef
@@ -2288,14 +2288,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: A5D6A7
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
           color: 039BE5
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
       uuid: d8cf31fc39584a63b9384d9c3ebf40ee
@@ -2305,7 +2305,7 @@ zabbix_export:
         -
           color: 42A5F5
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
       uuid: 10d1de74e9d848399ca038055e5cc8ce
@@ -2316,28 +2316,28 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.active
         -
           sortorder: '1'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.idle
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.prepared
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.waiting
     -
       uuid: 45fe7967596741129b4f2462922636bf
@@ -2348,14 +2348,14 @@ zabbix_export:
         -
           color: 66BB6A
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
           color: 03A9F4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
       uuid: 93ca2dc7a3ff4a458c45e2a56390ce72
@@ -2365,12 +2365,12 @@ zabbix_export:
         -
           color: 29B6F6
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.wal.write
         -
           sortorder: '1'
           color: AB47BC
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.wal.count

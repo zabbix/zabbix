@@ -381,13 +381,13 @@ zabbix_export:
                   color: C80000
                   type: GRAPH_SUM
                   item:
-                    host: 'Mac OS X'
+                    host: macOS
                     key: 'vfs.fs.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: 00C800
                   item:
-                    host: 'Mac OS X'
+                    host: macOS
                     key: 'vfs.fs.size[{#FSNAME},free]'
       dashboards:
         -
@@ -410,7 +410,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'CPU load'
-                        host: 'Mac OS X'
+                        host: macOS
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -426,7 +426,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Memory usage'
-                        host: 'Mac OS X'
+                        host: macOS
   graphs:
     -
       uuid: f0e648fb4c5345748b11a7bdb05f6526
@@ -436,19 +436,19 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg1]'
         -
           sortorder: '1'
           color: '000099'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg5]'
         -
           sortorder: '2'
           color: '990000'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg15]'
     -
       uuid: 5c942cb1fe5b440aa9428d45ee85e09c
@@ -456,14 +456,14 @@ zabbix_export:
       ymin_type_1: FIXED
       ymax_type_1: ITEM
       ymax_item_1:
-        host: 'Mac OS X'
+        host: macOS
         key: 'vm.memory.size[total]'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 00C800
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'vm.memory.size[available]'
     -
       uuid: 5c4b08f992c541dbb02835bbd4f0a55e
@@ -474,12 +474,12 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 00AA00
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'net.if.in[en0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 3333FF
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'net.if.out[en0]'

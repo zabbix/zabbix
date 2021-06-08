@@ -1510,13 +1510,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]'
           preprocessing:
             -
@@ -1614,14 +1614,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'redis.db.keys["{#DB}"]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'redis.db.expires["{#DB}"]'
           master_item:
             key: 'redis.info["{$REDIS.CONN.URI}"]'
@@ -2631,7 +2631,7 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]'
           master_item:
             key: 'redis.info["{$REDIS.CONN.URI}"]'
@@ -2843,7 +2843,7 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Redis
+                    host: 'Redis by Zabbix agent 2'
                     key: 'redis.replication.master_last_io_seconds_ago[{#SINGLETON}]'
           master_item:
             key: 'redis.info["{$REDIS.CONN.URI}"]'
@@ -2917,7 +2917,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Clients'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2933,7 +2933,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Keyspace'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2949,7 +2949,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Commands'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2966,7 +2966,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Expired keys'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2982,7 +2982,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Persistence'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2999,7 +2999,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Slaves'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -3015,7 +3015,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Slowlog'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3032,7 +3032,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Uptime'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -3056,7 +3056,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Replication lag time{#SINGLETON}'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
         -
           uuid: ee4c29eb7a0f443fafb7e7d3b9df7b24
           name: 'Redis performance'
@@ -3077,7 +3077,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: CPU'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3093,7 +3093,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Network'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -3109,7 +3109,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Memory'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3126,7 +3126,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Redis: Memory fragmentation'
-                        host: Redis
+                        host: 'Redis by Zabbix agent 2'
       valuemaps:
         -
           uuid: 82f4dc4ef0c9471d82dbe3605f4f31d0
@@ -3191,14 +3191,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.clients.connected
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.clients.blocked
     -
       uuid: 8643a1b690dc456b8daacc4b2b0810d4
@@ -3207,7 +3207,7 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.instantaneous_ops.rate
     -
       uuid: 765c0125e8d549dc88279f65f38b6ed9
@@ -3217,26 +3217,26 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.cpu.sys
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.cpu.sys_children
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.cpu.user
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.cpu.user_children
     -
       uuid: fd25ac6239064cd29dc1939cd15005de
@@ -3246,14 +3246,14 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.expired_keys
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.evicted_keys
     -
       uuid: 24cff7af388e41a8899e2916f12224d1
@@ -3262,13 +3262,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.keyspace_hits
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.keyspace_misses
     -
       uuid: a3ea32878f25481998e0fde7ba00a11b
@@ -3278,21 +3278,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.memory.used_memory
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.memory.used_memory_rss
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.memory.used_memory_peak
     -
       uuid: ff8d6320a8e246a39d35ccb93220eb3a
@@ -3302,7 +3302,7 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.memory.fragmentation_ratio
     -
       uuid: b3db4cc8247647faae0d3c2389f37d80
@@ -3312,14 +3312,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.instantaneous_input.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.stats.instantaneous_output.rate
     -
       uuid: 81fde2046d2340119b2002da2b75df16
@@ -3329,14 +3329,14 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.persistence.rdb_last_bgsave_time_sec
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.persistence.aof_last_rewrite_time_sec
     -
       uuid: 1ace370516b74875977788d44ab478e5
@@ -3346,7 +3346,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.replication.connected_slaves
     -
       uuid: 8dd9935cb7a24004b9783c3f1a445f1b
@@ -3356,7 +3356,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: 'redis.slowlog.count["{$REDIS.CONN.URI}"]'
     -
       uuid: 32d954e849e64fe99bd8846b54aadede
@@ -3365,5 +3365,5 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: Redis
+            host: 'Redis by Zabbix agent 2'
             key: redis.server.uptime
