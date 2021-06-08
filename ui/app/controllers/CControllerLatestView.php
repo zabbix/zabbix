@@ -87,9 +87,6 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
 		}
-		else {
-			CProfile::update('web.latest.filter.show_without_data', 1, PROFILE_TYPE_INT);
-		}
 
 		// Force-check "Show items without data" if there are no hosts selected.
 		$filter_hostids = CProfile::getArray('web.latest.filter.hostids');
