@@ -103,8 +103,7 @@ typedef struct
 	zbx_vector_ptr_t	service_problems;
 	zbx_vector_ptr_t	service_problems_recovered;
 #define ZBX_FLAG_SERVICE_RECALCULATE	__UINT64_C(0x01)
-#define ZBX_FLAG_SERVICE_ADD		__UINT64_C(0x02)
-#define ZBX_FLAG_SERVICE_DELETE		__UINT64_C(0x04)
+#define ZBX_FLAG_SERVICE_DELETE		__UINT64_C(0x02)
 	int			flags;
 }
 zbx_services_diff_t;
@@ -207,6 +206,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 			if (NULL == (pservices_diff = zbx_hashset_search(services_diffs, &services_diff)))
 			{
 				zbx_vector_ptr_create(&services_diff.service_problems);
+				zbx_vector_ptr_create(&services_diff.service_problems_recovered);
 				services_diff.flags = flags;
 				pservices_diff = zbx_hashset_insert(services_diffs, &services_diff, sizeof(services_diff));
 			}
@@ -474,11 +474,13 @@ static void	index_service_problem(zbx_service_t *service, zbx_hashset_t *service
 	zbx_vector_ptr_append(&service->service_problems, pservice_problem);
 }
 
-static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashset_t *service_problems_index,
-		zbx_service_problem_t *pservice_problem)
+static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashset_t *service_problems_index)
 {
 	zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
 	int				i;
+	zbx_service_problem_t		*pservice_problem;
+
+	pservice_problem = (zbx_service_problem_t *)service->service_problems.values[index];
 
 	service_problem_index.eventid = pservice_problem->eventid;
 	if (NULL == (pservice_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index)))
@@ -558,8 +560,10 @@ static void	service_diff_clean(void *data)
 {
 	zbx_services_diff_t	*d = (zbx_services_diff_t *)data;
 
+	zbx_vector_ptr_clear_ext(&d->service_problems_recovered, zbx_ptr_free);
 	zbx_vector_ptr_clear_ext(&d->service_problems, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&d->service_problems);
+	zbx_vector_ptr_destroy(&d->service_problems_recovered);
 }
 
 static zbx_hash_t	tag_services_hash(const void *data)
@@ -901,7 +905,7 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 						&service_problem->eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					zbx_vector_uint64_append(&service_problemids, service_problem->service_problemid);
-					remove_service_problem(pservice, i, service_problems_index, service_problem);
+					remove_service_problem(pservice, i, service_problems_index);
 					i--;
 					continue;
 				}
@@ -920,6 +924,31 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 			i--;
 			index_service_problem(pservice, service_problems_index, service_problem);
 			zbx_vector_ptr_append(&service_problems_new, service_problem);
+		}
+
+		for (i = 0; i < pservices_diff->service_problems_recovered.values_num; i++)
+		{
+			zbx_service_problem_t	*service_problem;
+			int			index;
+
+			service_problem = (zbx_service_problem_t *)pservices_diff->service_problems_recovered.values[i];
+
+			if (FAIL == (index = zbx_vector_ptr_search(&pservice->service_problems,
+					&service_problem->eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			else
+			{
+				if (clock < service_problem->clock)
+					clock = service_problem->clock;
+
+				service_problem = (zbx_service_problem_t *)pservice->service_problems.values[index];
+				zbx_vector_uint64_append(&service_problemids, service_problem->service_problemid);
+
+				remove_service_problem(pservice, index, service_problems_index);
+			}
 		}
 
 		for (i = 0; i < pservice->service_problems.values_num; i++)
@@ -976,7 +1005,8 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 
 	for (i = 0; i < events->values_num; i++)
 	{
-		zbx_event_t	*event, **ptr;
+		zbx_event_t			*event, **ptr;
+		zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
 
 		event = events->values[i];
 
@@ -988,6 +1018,38 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 					/* handle possible race condition when recovery is received before problem */
 					zbx_hashset_insert(recovery_events, &event, sizeof(zbx_event_t **));
 					continue;
+				}
+
+				service_problem_index.eventid = event->eventid;
+				if (NULL != (pservice_problem_index = zbx_hashset_search(
+						&service_manager->service_problems_index, &service_problem_index)))
+				{
+					int	j;
+
+					for (j = 0; j < pservice_problem_index->services.values_num; j++)
+					{
+						zbx_service_t		*service;
+						zbx_services_diff_t	services_diff, *pservices_diff;
+						zbx_service_problem_t	*service_problem;
+
+						service = (zbx_service_t *)pservice_problem_index->services.values[j];
+						services_diff.serviceid = service->serviceid;
+						if (NULL == (pservices_diff = zbx_hashset_search(&service_manager->services_diff, &services_diff)))
+						{
+							zbx_vector_ptr_create(&services_diff.service_problems);
+							zbx_vector_ptr_create(&services_diff.service_problems_recovered);
+							services_diff.flags = ZBX_FLAG_SERVICE_RECALCULATE;
+							pservices_diff = zbx_hashset_insert(&service_manager->services_diff, &services_diff, sizeof(services_diff));
+						}
+
+						service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
+						service_problem->eventid = event->eventid;
+						service_problem->serviceid = pservices_diff->serviceid;
+						service_problem->severity = event->severity;
+						service_problem->clock = event->clock;
+
+						zbx_vector_ptr_append(&pservices_diff->service_problems_recovered, service_problem);
+					}
 				}
 
 				event_clean(event);
@@ -1016,7 +1078,7 @@ static void	process_events(zbx_hashset_t *problem_events, zbx_hashset_t *recover
 				match_event_to_service_problem_tags(event,
 						&service_manager->service_problem_tags_index,
 						&service_manager->services_diff,
-						ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_ADD);
+						ZBX_FLAG_SERVICE_RECALCULATE);
 
 				break;
 			default:
@@ -1145,7 +1207,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				zbx_services_diff_t	services_diff, *pservices_diff;
 				int			flags;
 
-				flags = ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_ADD|ZBX_FLAG_SERVICE_DELETE;
+				flags = ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_DELETE;
 
 				zbx_hashset_iter_reset(&problem_events, &iter);
 				while (NULL != (event = (zbx_event_t **)zbx_hashset_iter_next(&iter)))
@@ -1167,6 +1229,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					if (NULL == pservices_diff)
 					{
 						zbx_vector_ptr_create(&services_diff.service_problems);
+						zbx_vector_ptr_create(&services_diff.service_problems_recovered);
 						services_diff.flags = flags;
 						zbx_hashset_insert(&service_manager.services_diff, &services_diff,
 								sizeof(services_diff));
