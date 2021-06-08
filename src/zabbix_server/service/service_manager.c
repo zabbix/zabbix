@@ -234,6 +234,8 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 	DB_ROW		row;
 	zbx_uint64_t	eventid;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	result = DBselect("select p.eventid,p.clock,p.severity,t.tag,t.value"
 			" from problem p"
 			" left join problem_tag t"
@@ -271,9 +273,11 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 		}
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	sync_services(zbx_hashset_t *services)
+static void	sync_services(zbx_hashset_t *services, int *updated)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -296,11 +300,16 @@ static void	sync_services(zbx_hashset_t *services)
 			zbx_vector_ptr_create(&service.service_problems);
 
 			zbx_hashset_insert(services, &service, sizeof(service));
+			(*updated)++;
 			continue;
 		}
 
-		pservice->status = service.status;		/* status can only be changed by service manager */
-		pservice->algorithm = service.algorithm;	/* TODO: recalculate services with changed algorithm */
+		if (pservice->status != service.status || pservice->algorithm != service.algorithm)
+		{
+			pservice->status = service.status;
+			pservice->algorithm = service.algorithm;
+			(*updated)++;
+		}
 	}
 	DBfree_result(result);
 }
@@ -876,6 +885,8 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 	zbx_vector_uint64_t	service_problemids;
 	zbx_hashset_t		service_updates;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_ptr_create(&alarms);
 	zbx_vector_ptr_create(&service_problems_new);
 	zbx_vector_uint64_create(&service_problemids);
@@ -999,6 +1010,8 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 	zbx_hashset_destroy(&service_updates);
 	zbx_vector_ptr_clear_ext(&alarms, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&alarms);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
@@ -1150,6 +1163,8 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 	zbx_services_diff_t	services_diff, *pservices_diff;
 	int			flags;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	flags = ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_DELETE;
 
 	zbx_hashset_iter_reset(&service_manager->problem_events, &iter);
@@ -1181,6 +1196,8 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 	db_update_services(&service_manager->services, &service_manager->services_diff,
 			&service_manager->service_problems_index);
 	zbx_hashset_clear(&service_manager->services_diff);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 ZBX_THREAD_ENTRY(service_manager_thread, args)
@@ -1245,8 +1262,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //
 		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush)
 		{
+			int	updated = 0;
+
 			DBbegin();
-			sync_services(&service_manager.services);
+			sync_services(&service_manager.services, &updated);
 			sync_service_problem_tags(&service_manager);
 			sync_services_links(&service_manager);
 
@@ -1255,7 +1274,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 			DBcommit();
 
-			if (0 == time_flush)
+			if (0 != updated)
 				recalculate_services(&service_manager);
 
 			time_flush = time_now;
