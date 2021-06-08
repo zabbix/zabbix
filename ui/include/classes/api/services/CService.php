@@ -173,7 +173,7 @@ class CService extends CApiService {
 				$dependencies[] = [
 					'serviceid' => $service['parentid'],
 					'dependsOnServiceid' => $serviceId,
-					'soft' => 0
+//					'soft' => 0
 				];
 			}
 
@@ -293,7 +293,7 @@ class CService extends CApiService {
 					$parentDependencies[] = [
 						'serviceid' => $service['parentid'],
 						'dependsOnServiceid' => $service['serviceid'],
-						'soft' => 0
+//						'soft' => 0
 					];
 				}
 			}
@@ -422,7 +422,7 @@ class CService extends CApiService {
 			$data[] = [
 				'serviceupid' => $dependency['serviceid'],
 				'servicedownid' => $dependency['dependsOnServiceid'],
-				'soft' => $dependency['soft']
+//				'soft' => $dependency['soft']
 			];
 		}
 		DB::insert('services_links', $data);
@@ -672,7 +672,7 @@ class CService extends CApiService {
 	protected function deleteParentDependencies($serviceIds) {
 		DB::delete('services_links', [
 			'servicedownid' => $serviceIds,
-			'soft' => 0
+//			'soft' => 0
 		]);
 	}
 
@@ -826,7 +826,7 @@ class CService extends CApiService {
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
 		if ($soft !== null) {
-			$sqlParts['where'][] = 'sl.soft='.($soft ? 1 : 0);
+//			$sqlParts['where'][] = 'sl.soft='.($soft ? 1 : 0);
 		}
 		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
 		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
@@ -1039,7 +1039,7 @@ class CService extends CApiService {
 			'output' => ['serviceupid'],
 			'filter' => [
 				'serviceupid' => $serviceIds,
-				'soft' => 0
+//				'soft' => 0
 			],
 			'limit' => 1
 		]);
@@ -1075,16 +1075,16 @@ class CService extends CApiService {
 		}
 
 		// check 'soft' field value
-		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], [0, 1], true)) {
-			$service = API::getApiService()->select($this->tableName(), [
-				'output' => ['name'],
-				'serviceids' => $dependency['serviceid']
-			]);
-			$service = reset($service);
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect "soft" field value for dependency for service "%1$s".', $service['name'])
-			);
-		}
+//		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], [0, 1], true)) {
+//			$service = API::getApiService()->select($this->tableName(), [
+//				'output' => ['name'],
+//				'serviceids' => $dependency['serviceid']
+//			]);
+//			$service = reset($service);
+//			self::exception(ZBX_API_ERROR_PARAMETERS,
+//				_s('Incorrect "soft" field value for dependency for service "%1$s".', $service['name'])
+//			);
+//		}
 	}
 
 	/**
@@ -1098,11 +1098,11 @@ class CService extends CApiService {
 	protected function checkForHardlinkedDependencies(array $dependencies) {
 		// only check hard dependencies
 		$hardDepServiceIds = [];
-		foreach ($dependencies as $dependency) {
-			if (!$dependency['soft']) {
-				$hardDepServiceIds[] = $dependency['dependsOnServiceid'];
-			}
-		}
+//		foreach ($dependencies as $dependency) {
+//			if (!$dependency['soft']) {
+//				$hardDepServiceIds[] = $dependency['dependsOnServiceid'];
+//			}
+//		}
 
 		if ($hardDepServiceIds) {
 			// look for at least one hardlinked service among the given
@@ -1110,7 +1110,7 @@ class CService extends CApiService {
 			$dep = API::getApiService()->select('services_links', [
 				'output' => ['servicedownid'],
 				'filter' => [
-					'soft' => 0,
+//					'soft' => 0,
 					'servicedownid' => $hardDepServiceIds
 				],
 				'limit' => 1
@@ -1238,13 +1238,13 @@ class CService extends CApiService {
 		// parentids
 		if ($options['parentids'] !== null) {
 			$sqlParts['from'][] = 'services_links slp';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
+//			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
 			$sqlParts['where'][] = dbConditionInt('slp.serviceupid', (array) $options['parentids']);
 		}
 		// childids
 		if ($options['childids'] !== null) {
 			$sqlParts['from'][] = 'services_links slc';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
+//			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
 			$sqlParts['where'][] = dbConditionInt('slc.servicedownid', (array) $options['childids']);
 		}
 
