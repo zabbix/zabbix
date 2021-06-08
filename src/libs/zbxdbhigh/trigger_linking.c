@@ -121,14 +121,21 @@ static int	zbx_host_triggers_main_data_compare_func(const void *d1, const void *
 static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 {
 	zbx_hashset_iter_t		iter;
-	zbx_target_host_trigger_entry_t	**trigger_entry;
+	zbx_target_host_trigger_entry_t	*trigger_entry;
 
 	zbx_hashset_iter_reset(h, &iter);
 
-	while (NULL != (trigger_entry = (zbx_target_host_trigger_entry_t **)zbx_hashset_iter_next(&iter)))
+	while (NULL != (trigger_entry = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
-		/*zbx_free((*audit_entry)->name);*/
-		/*zbx_free(*audit_entry);*/
+		zbx_free(trigger_entry->description);
+		zbx_free(trigger_entry->expression);
+		zbx_free(trigger_entry->recovery_expression);
+		zbx_free(trigger_entry->opdata_orig);
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA))
+			zbx_free(trigger_entry->opdata);
+		zbx_free(trigger_entry->event_name_orig);
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME))
+			zbx_free(trigger_entry->event_name);
 	}
 
 	zbx_hashset_destroy(h);
@@ -169,18 +176,22 @@ static int	zbx_triggers_functions_compare_func(const void *d1, const void *d2)
 static void	zbx_triggers_functions_clean(zbx_hashset_t *h)
 {
 	zbx_hashset_iter_t		iter;
-	zbx_trigger_functions_entry_t	**trigger_entry;
+	zbx_trigger_functions_entry_t	*trigger_entry;
 
 	zbx_hashset_iter_reset(h, &iter);
 
-	while (NULL != (trigger_entry = (zbx_trigger_functions_entry_t **)zbx_hashset_iter_next(&iter)))
+	while (NULL != (trigger_entry = (zbx_trigger_functions_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
-		/*zbx_vector_str_destroy(&((*trigger_entry)->functionids));
-		zbx_vector_uint64_destroy(&((*trigger_entry)->itemids));
-		zbx_vector_str_destroy(&((*trigger_entry)->itemkeys));
-		zbx_vector_str_destroy(&((*trigger_entry)->parameters));
-		zbx_vector_str_destroy(&((*trigger_entry)->names));
-		zbx_free(*trigger_entry);*/
+		zbx_vector_str_clear_ext(&((trigger_entry)->functionids), zbx_str_free);
+		zbx_vector_str_destroy(&((trigger_entry)->functionids));
+		zbx_vector_uint64_destroy(&((trigger_entry)->itemids));
+		zbx_vector_str_clear_ext(&((trigger_entry)->itemkeys), zbx_str_free);
+		zbx_vector_str_destroy(&((trigger_entry)->itemkeys));
+		zbx_vector_str_clear_ext(&((trigger_entry)->parameters), zbx_str_free);
+		zbx_vector_str_destroy(&((trigger_entry)->parameters));
+		zbx_vector_str_clear_ext(&((trigger_entry)->names), zbx_str_free);
+		zbx_vector_str_destroy(&((trigger_entry)->names));
+		zbx_free(trigger_entry);
 	}
 	zbx_hashset_destroy(h);
 }
@@ -209,17 +220,16 @@ static int	zbx_triggers_descriptions_compare_func(const void *d1, const void *d2
 	return strcmp((trigger_entry_1)->description, (trigger_entry_2)->description);
 }
 
-static void	zbx_templates_triggers_descriptions_clean(zbx_hashset_t *x)
+static void	zbx_triggers_descriptions_clean(zbx_hashset_t *x)
 {
 	zbx_hashset_iter_t			iter;
-	zbx_trigger_descriptions_entry_t	**trigger_entry;
+	zbx_trigger_descriptions_entry_t	*trigger_entry;
 
 	zbx_hashset_iter_reset(x, &iter);
 
-	while (NULL != (trigger_entry = (zbx_trigger_descriptions_entry_t **)zbx_hashset_iter_next(&iter)))
+	while (NULL != (trigger_entry = (zbx_trigger_descriptions_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
-		/*zbx_free((*audit_entry)->name);*/
-		/*zbx_free(*audit_entry);*/
+		zbx_vector_uint64_destroy(&(trigger_entry->triggerids));
 	}
 
 	zbx_hashset_destroy(x);
@@ -540,12 +550,6 @@ static void	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fu
 			zbx_vector_str_append(&itemkeys_local, zbx_strdup(NULL, row[4]));
 			zbx_vector_str_append(&parameters_local, zbx_strdup(NULL, row[2]));
 
-			/* zbx_vector_str_append(&functionids_local, row[1]); */
-			/* zbx_vector_str_append(&itemkeys_local, row[4]); */
-			/* zbx_vector_str_append(&parameters_local, row[2]); */
-
-			/*local_temp_t = (zbx_trigger_functions_entry_t *)zbx_malloc(NULL,
-				sizeof(zbx_trigger_functions_entry_t));*/
 			local_temp_t.triggerid = temp_t.triggerid;
 			local_temp_t.functionids = functionids_local;
 			local_temp_t.itemids = itemids_local;
@@ -616,9 +620,6 @@ static void	get_templates_triggers_data(zbx_uint64_t hostid, const zbx_vector_ui
 		trigger_copy->comments = zbx_strdup(NULL, row[6]);
 		trigger_copy->url = zbx_strdup(NULL, row[7]);
 		trigger_copy->flags = (unsigned char)atoi(row[8]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "KRONEG ALPHA 0000: %u", trigger_copy->flags);
-		zabbix_log(LOG_LEVEL_INFORMATION, "KRONEG ALPHA S: %s", row[8]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "KRONEG ALPHA S: %d", atoi(row[8]));
 		trigger_copy->correlation_mode = (unsigned char)atoi(row[11]);
 		trigger_copy->correlation_tag = zbx_strdup(NULL, row[12]);
 		trigger_copy->manual_close = (unsigned char)atoi(row[13]);
@@ -646,8 +647,6 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zbx_vector_uint64_create(temp_host_triggerids);
-
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -668,26 +667,31 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_target_host_trigger_entry_t		target_host_trigger_entry;
+	  zbx_target_host_trigger_entry_t		target_host_trigger_entry;
+	  //zbx_target_host_trigger_entry_t		*target_host_trigger_entry = (zbx_target_host_trigger_entry_t *)
+	    //zbx_malloc(NULL, sizeof(zbx_target_host_trigger_entry_t));
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
 		target_host_trigger_entry.update_flags = 0;
 		ZBX_STR2UINT64(target_host_trigger_entry.triggerid,row[0]);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
+		//zabbix_log(LOG_LEVEL_INFORMATION, "22222222 desc: ->%s<-", target_host_trigger_entry.description);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
-		ZBX_STR2UINT64(target_host_trigger_entry.flags_orig, zbx_strdup(NULL, row[4]));
-		ZBX_STR2UCHAR(target_host_trigger_entry.recovery_mode_orig, zbx_strdup(NULL, row[5]));
-		ZBX_STR2UCHAR(target_host_trigger_entry.correlation_mode_orig, zbx_strdup(NULL, row[6]));
-		ZBX_STR2UCHAR(target_host_trigger_entry.manual_close_orig, zbx_strdup(NULL, row[7]));
+		ZBX_STR2UINT64(target_host_trigger_entry.flags_orig, row[4]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.recovery_mode_orig, row[5]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.correlation_mode_orig, row[6]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.manual_close_orig, row[7]);
 		target_host_trigger_entry.opdata_orig = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(target_host_trigger_entry.discover_orig, zbx_strdup(NULL, row[9]));
+		ZBX_STR2UCHAR(target_host_trigger_entry.discover_orig, row[9]);
 		target_host_trigger_entry.event_name_orig = zbx_strdup(NULL, row[10]);
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
 				sizeof(target_host_trigger_entry));
 		zbx_vector_uint64_append(temp_host_triggerids, target_host_trigger_entry.triggerid);
 
-		temp_t.description = zbx_strdup(NULL, target_host_trigger_entry.description);
+		//temp_t.description = zbx_strdup(NULL, target_host_trigger_entry.description);
+
+		temp_t.description = target_host_trigger_entry.description;
 
 		if (NULL != (found = (zbx_trigger_descriptions_entry_t *)zbx_hashset_search(
 				triggers_descriptions, &temp_t)))
@@ -696,17 +700,19 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		}
 		else
 		{
-			zbx_vector_uint64_t			triggerids_local;
+		  //zbx_vector_uint64_t			triggerids_local;
 			zbx_trigger_descriptions_entry_t	local_temp_t;
 
-			zbx_vector_uint64_create(&triggerids_local);
-			zbx_vector_uint64_append(&triggerids_local, target_host_trigger_entry.triggerid);
+			//zbx_vector_uint64_create(&triggerids_local);
+			//zbx_vector_uint64_append(&triggerids_local, target_host_trigger_entry.triggerid);
 			zbx_vector_uint64_create(&(local_temp_t.triggerids));
 
-			local_temp_t.description = zbx_strdup(NULL, target_host_trigger_entry.description);
+			//local_temp_t.description = zbx_strdup(NULL, target_host_trigger_entry.description);
+			local_temp_t.description = target_host_trigger_entry.description;
 			zbx_vector_uint64_append(&(local_temp_t.triggerids), target_host_trigger_entry.triggerid);
 			zbx_hashset_insert(triggers_descriptions, &local_temp_t, sizeof(local_temp_t));
 		}
+		//zbx_free(temp_t.description);
 	}
 
 	zbx_free(sql);
@@ -737,15 +743,6 @@ static int	compare_triggers(zbx_trigger_copy_t * template_trigger, zbx_target_ho
 			zbx_hashset_search(zbx_host_triggers_funcs,
 			&temp_t_host_trigger_funcs)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers one of funcs is NOT NULL, functionids values: %d",
-				found_template_trigger_funcs->functionids.values_num);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers one of funcs is NOT NULL, itemkeys: %d",
-				found_template_trigger_funcs->itemkeys.values_num);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers one of funcs is NOT NULL, parameters: %d",
-				found_template_trigger_funcs->parameters.values_num);
-
 		for (i = 0; i < found_template_trigger_funcs->functionids.values_num; i++)
 		{
 
@@ -755,15 +752,6 @@ static int	compare_triggers(zbx_trigger_copy_t * template_trigger, zbx_target_ho
 			for (j = 0; j < found_host_trigger_funcs->functionids.values_num;
 					j++)
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers, found functionsids: %s",
-						found_host_trigger_funcs->functionids.values[j]);
-
-				zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers, found itemkeys: %s",
-						found_host_trigger_funcs->itemkeys.values[j]);
-
-				zabbix_log(LOG_LEVEL_INFORMATION, "compare_triggers, found parameters: %s",
-						found_host_trigger_funcs->itemkeys.values[j]);
-
 				if (0 == strcmp(found_template_trigger_funcs->itemkeys.values[i],
 						found_host_trigger_funcs->itemkeys.values[j]) &&
 						0 == strcmp(found_template_trigger_funcs->parameters.values[i],
@@ -1672,13 +1660,14 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 						zbx_host_triggers_main_data, host_triggers_descriptions,
 						zbx_insert_triggers_funcs;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&new_triggerids);
 	zbx_vector_uint64_create(&cur_triggerids);
 	zbx_vector_uint64_create(&insert_templateid_triggerids);
 	zbx_vector_uint64_create(&temp_templates_triggerids);
+	zbx_vector_uint64_create(&temp_host_triggerids);
+
 	zbx_vector_str_create(&templates_triggers_descriptions);
 
 	zbx_vector_trigger_copies_insert_create(&trigger_copies_insert);
@@ -1712,6 +1701,7 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	get_target_host_main_data(hostid, &templates_triggers_descriptions, &zbx_host_triggers_main_data,
 			&temp_host_triggerids, &host_triggers_descriptions);
+
 	get_trigger_funcs(&temp_templates_triggerids, &zbx_templates_triggers_funcs);
 	get_trigger_funcs(&temp_host_triggerids, &zbx_host_triggers_funcs);
 
@@ -1764,6 +1754,9 @@ end:
 	zbx_vector_uint64_destroy(&cur_triggerids);
 	zbx_vector_uint64_destroy(&insert_templateid_triggerids);
 	zbx_vector_uint64_destroy(&temp_templates_triggerids);
+	zbx_vector_uint64_destroy(&temp_host_triggerids);
+
+	zbx_vector_str_clear_ext(&templates_triggers_descriptions, zbx_str_free);
 	zbx_vector_str_destroy(&templates_triggers_descriptions);
 
 	zbx_vector_trigger_copies_templates_clear_ext(&trigger_copies_templates, trigger_copies_free);
@@ -1771,8 +1764,11 @@ end:
 	zbx_vector_trigger_copies_insert_clear_ext(&trigger_copies_insert, trigger_copies_free);
 	zbx_vector_trigger_copies_insert_destroy(&trigger_copies_insert);
 
-	zbx_hashset_destroy(&host_triggers_descriptions);
-	zbx_hashset_destroy(&zbx_host_triggers_main_data);
+	zbx_triggers_descriptions_clean(&host_triggers_descriptions);
+
+	zbx_host_triggers_main_data_clean(&zbx_host_triggers_main_data);
+
+
 	zbx_hashset_destroy(&zbx_insert_triggers_funcs);
 
 	zbx_triggers_functions_clean(&zbx_templates_triggers_funcs);
