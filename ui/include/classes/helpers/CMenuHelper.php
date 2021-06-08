@@ -78,6 +78,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
 				? (new CMenuItem(_('New Services')))
 					->setAction('service.list')
+					->setAliases(['service.list.edit'])
 				: null
 		];
 		$submenu_monitoring = array_filter($submenu_monitoring);

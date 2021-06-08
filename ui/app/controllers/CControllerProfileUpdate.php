@@ -67,6 +67,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.service.filter.active':
 				case 'web.sidebar.mode':
 				case 'web.sysmapconf.filter.active':
 				case 'web.templates.filter.active':

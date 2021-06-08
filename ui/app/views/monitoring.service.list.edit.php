@@ -48,28 +48,48 @@ $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
 		])
 	: null;
 
+$form = (new CForm())->setName('service_form');
+
 $table = (new CTableInfo())
 	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_services'))->onClick("checkAll('".$form->getName()."', 'all_services', 'serviceids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		(new CColHeader(_('Name')))->addStyle('width: 40%'),
 		(new CColHeader(_('Status')))->addStyle('width: 14%'),
 		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
 		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
+		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		(new CColHeader())
 	]);
 
 foreach ($data['services'] as $serviceid => $service) {
 	$dependencies_count = count($service['dependencies']);
 
 	$table->addRow(new CRow([
+		new CCheckBox('serviceid['.$serviceid.']', $serviceid),
 		$dependencies_count > 0
 			? [new CLink($service['name'], new CUrl('#')), CViewHelper::showNum($dependencies_count)]
 			: $service['name'],
 		'OK',
 		'Root cause',
 		sprintf('%.4f', $service['goodsla']),
-		$data['tags'][$serviceid] ?? 'tags'
+		$data['tags'][$serviceid] ?? 'tags',
+		(new CCol([
+			(new CButton(null))
+				->addClass(ZBX_STYLE_BTN_ADD)
+				->setAttribute('data-id', $serviceid),
+			(new CButton(null))
+				->addClass(ZBX_STYLE_BTN_EDIT)
+				->setAttribute('data-id', $serviceid),
+			(new CButton(null))
+				->addClass(ZBX_STYLE_BTN_REMOVE)
+				->setAttribute('data-id', $serviceid)
+		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]));
 }
+
+$form->addItem($table);
 
 (new CWidget())
 	->setTitle(_('Services'))
@@ -78,19 +98,25 @@ foreach ($data['services'] as $serviceid => $service) {
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					$data['can_edit']
-						? (new CRadioButtonList('list_mode', ZBX_LIST_MODE_VIEW))
+					(new CRedirectButton(_('Create service'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->setArgument('new', '1')
+							->getUrl()
+					))
+				)
+				->addItem(
+					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
 						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
 						->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
 						->setModern(true)
 						->setId('list-mode')
-						: null
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
-	->addItem($table)
+	->addItem($form)
 	->show();
 
 (new CScriptTag('
@@ -98,3 +124,4 @@ foreach ($data['services'] as $serviceid => $service) {
 '))
 	->setOnDocumentReady()
 	->show();
+

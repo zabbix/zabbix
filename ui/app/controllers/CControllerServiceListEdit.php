@@ -19,10 +19,11 @@
 **/
 
 
-class CControllerServiceList extends CControllerServiceListGeneral {
+class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
-	protected function init(): void {
-		$this->disableSIDValidation();
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
+			&& $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
 	}
 
 	protected function doAction(): void {
@@ -31,9 +32,9 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data = [
 			'filter' => $filter,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
-			'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'service.list'),
+			'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'service.list.edit'),
 			'refresh_url' => (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list.refresh')
+				->setArgument('action', 'service.list.edit.refresh')
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
@@ -61,20 +62,5 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));
 		$this->setResponse($response);
-
-
-//		$tree_data = [];
-//		createServiceConfigurationTree($db_services, $tree_data);
-
-//		$tree = new CServiceTree('service_conf_tree', $tree_data, [
-//			'caption' => _('Service'),
-//			'action' => _('Action'),
-//			'algorithm' => _('Status calculation'),
-//			'description' => _('Trigger')
-//		]);
-
-//		if (!$tree_data) {
-//			CMessageHelper::setErrorTitle(_('Cannot format tree.'));
-//		}
 	}
 }
