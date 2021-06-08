@@ -1036,8 +1036,8 @@ static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *inser
 				zbx_vector_str_append(&names_local, DBdyn_escape_string(row[2]));
 				zbx_vector_str_append(&parameters_local, DBdyn_escape_string(row[3]));
 
-				//local_temp_t = (zbx_trigger_functions_entry_t *)zbx_malloc(NULL,
-				//		sizeof(zbx_trigger_functions_entry_t));
+				/*local_temp_t = (zbx_trigger_functions_entry_t *)zbx_malloc(NULL,
+					sizeof(zbx_trigger_functions_entry_t));*/
 				local_temp_t.triggerid = temp_t.triggerid;
 				local_temp_t.functionids = functionids_local;
 				local_temp_t.itemids = itemids_local;
@@ -1217,11 +1217,6 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 {
 	int					j, found_descriptions_match = FAIL;
 	zbx_trigger_descriptions_entry_t	*found, temp_t;
-	//zbx_trigger_copy_t			*trigger_copy_template;
-
-
-	//warning may need to restore
-	//trigger_copy_template = (trigger_copies_templates->values[i]);
 
 	temp_t.description = trigger_copy_template->description;
 
@@ -1552,8 +1547,6 @@ out:
 	return res;
 }
 
-////
-
 int	DBcopy_template_triggers2(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error)
 {
 	char			*sql = NULL;
@@ -1635,9 +1628,6 @@ int	DBcopy_template_triggers2(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 
 	return res;
 }
-
-
-////
 
 static void trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 {
