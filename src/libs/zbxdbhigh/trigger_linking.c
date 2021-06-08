@@ -539,7 +539,7 @@ static void	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fu
 			zbx_vector_uint64_create(&(local_temp_t.itemids));
 			zbx_vector_str_create(&(local_temp_t.itemkeys));
 
-			/* do not need names, but still initialze it to make it consistent with other funcs */
+			/* do not need names, but still initialize it to make it consistent with other funcs */
 			zbx_vector_str_create(&(local_temp_t.names));
 			zbx_vector_str_create(&(local_temp_t.parameters));
 
@@ -809,70 +809,70 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 	char				*sql = NULL;
 	size_t				sql_alloc = 512, sql_offset = 0;
 	zbx_hashset_iter_t		iter1;
-	zbx_target_host_trigger_entry_t	*fo;
+	zbx_target_host_trigger_entry_t	*found;
 
 	zbx_hashset_iter_reset(zbx_host_triggers_main_data, &iter1);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (fo = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter1)))
+	while (NULL != (found = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter1)))
 	{
 		d = "";
 
-		if (0 != (fo->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE))
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)fo->flags);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
-						fo->recovery_mode);
+						found->recovery_mode);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_mode=%d", d,
-						fo->correlation_mode);
+						found->correlation_mode);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
-						fo->manual_close);
+						found->manual_close);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA))
 			{
-				char	*opdata_esc = DBdyn_escape_string(fo->opdata);
+				char	*opdata_esc = DBdyn_escape_string(found->opdata);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
 				zbx_free(opdata_esc);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, fo->discover);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, found->discover);
 				d = ",";
 			}
 
-			if (0 != (fo->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME))
 			{
-				char	*event_name_esc = DBdyn_escape_string(fo->event_name);
+				char	*event_name_esc = DBdyn_escape_string(found->event_name);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
-						fo->event_name);
+						found->event_name);
 				zbx_free(event_name_esc);
 				d = ",";
 			}
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
-					fo->triggerid);
+					found->triggerid);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
