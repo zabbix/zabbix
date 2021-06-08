@@ -392,9 +392,7 @@ class CItem extends CItemGeneral {
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
-			if ($this->outputIsRequested('discover', $options['output'])) {
-				unset($item['discover']);
-			}
+			unset($item['discover']);
 
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
