@@ -40,7 +40,7 @@ type fsCaller struct {
 
 func (f *fsCaller) run(path string) (stat *FsStats, err error) {
 	if isStuck(path) {
-		return nil, fmt.Errorf("mount %s is timed out", path)
+		return nil, fmt.Errorf("mount '%s' is unavailable", path)
 	}
 
 	go f.execute(path)
@@ -54,22 +54,23 @@ func (f *fsCaller) run(path string) (stat *FsStats, err error) {
 		stuckMounts[path] = true
 		stuckMux.Unlock()
 
-		return nil, fmt.Errorf("mount %s has timed out", path)
+		return nil, fmt.Errorf("operation on mount '%s' timed out", path)
 	}
 }
 
 func (f *fsCaller) execute(path string) {
 	stats, err := f.fsFunc(path)
-	if err != nil {
-		f.errChan <- err
-		return
-	}
 
 	if isStuck(path) {
-		f.p.Debugf("mount %s has unstuck", path)
+		f.p.Debugf("mount '%s' has become available", path)
 		stuckMux.Lock()
 		stuckMounts[path] = false
 		stuckMux.Unlock()
+		return
+	}
+
+	if err != nil {
+		f.errChan <- err
 		return
 	}
 
