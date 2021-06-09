@@ -79,7 +79,8 @@
 				'<?= CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::ACTIONS_EXECUTE_SCRIPTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::ACTIONS_MANAGE_API_TOKENS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>
+				'<?= CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
+				'<?= CRoleHelper::ACTIONS_MANAGE_SERVICES; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>
 			};
 
 			Object.keys(access).forEach((selector) => {

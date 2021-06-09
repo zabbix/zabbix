@@ -78,6 +78,7 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
+	public const ACTIONS_MANAGE_SERVICES = 'actions.manage_services';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
 	public const DEFAULT_ACCESS_ENABLED = 1;
@@ -330,6 +331,7 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
+			$rules[] = self::ACTIONS_MANAGE_SERVICES;
 		}
 
 		return $rules;
@@ -501,7 +503,10 @@ class CRoleHelper {
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-			$labels += [self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports')];
+			$labels += [
+				self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports'),
+				self::ACTIONS_MANAGE_SERVICES => _('Manage services')
+			];
 		}
 
 		return $labels;
