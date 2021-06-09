@@ -497,6 +497,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_service_problem_tag_t	service_problem_tag, *pservice_problem_tag;
+	zbx_hashset_iter_t		iter;
 
 	result = DBselect("select service_problem_tagid,serviceid,tag,operator,value from service_problem_tag");
 
@@ -530,6 +531,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 				THIS_SHOULD_NEVER_HAPPEN;
 
 			add_service_problem_tag_index(&service_manager->service_problem_tags_index, pservice_problem_tag);
+			(*updated)++;
 
 			continue;
 		}
@@ -555,12 +557,13 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 			pservice_problem_tag->service = pservice;
 		}*/
 
+		pservice_problem_tag->revision = revision;
+
 		operator = (unsigned char)atoi(row[3]);
 
 		if (0 != strcmp(pservice_problem_tag->tag, row[2]) || pservice_problem_tag->operator != operator ||
 				0 != strcmp(pservice_problem_tag->value, row[4]))
 		{
-
 			remove_service_problem_tag_index(&service_manager->service_problem_tags_index,
 					pservice_problem_tag);
 
@@ -574,6 +577,30 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 		}
 	}
 	DBfree_result(result);
+
+	zbx_hashset_iter_reset(&service_manager->service_problem_tags, &iter);
+	while (NULL != (pservice_problem_tag = (zbx_service_problem_tag_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (revision == pservice_problem_tag->revision)
+			continue;
+
+		remove_service_problem_tag_index(&service_manager->service_problem_tags_index, pservice_problem_tag);
+
+		if (NULL != pservice_problem_tag->service)
+		{
+			int	i;
+
+			i = zbx_vector_ptr_search(&pservice_problem_tag->service->service_problem_tags,
+					pservice_problem_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+			if (FAIL == i)
+				THIS_SHOULD_NEVER_HAPPEN;
+			else
+				zbx_vector_ptr_remove_noorder(&pservice_problem_tag->service->service_problem_tags, i);
+		}
+
+		(*updated)++;
+		zbx_hashset_iter_remove(&iter);
+	}
 }
 
 static void	sync_services_links(zbx_service_manager_t *service_manager, int *updated, int revision)
