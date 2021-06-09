@@ -649,7 +649,7 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 
 	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 	$exceeded_trigs = (count($triggers_by_name) > $limit);
-	$triggers_by_name = array_slice($triggers_by_name, 0, $limit);
+	$triggers_by_name = array_slice($triggers_by_name, 0, $limit, true);
 	foreach ($triggers_by_name as $name => $triggers) {
 		$triggers_by_name[$name] = array_slice($triggers, 0, $limit, true);
 	}
