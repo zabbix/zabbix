@@ -178,7 +178,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 					service_problem_tag->current_eventid = event->eventid;
 
 					if (service_problem_tag->service->current_eventid != event->eventid ||
-							0 ==candidates->values_num)
+							0 == candidates->values_num)
 					{
 						service_problem_tag->service->current_eventid = event->eventid;
 						zbx_vector_ptr_append(&candidates, service_problem_tag->service);
