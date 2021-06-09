@@ -524,7 +524,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email with 100 attempts',
 					'sessions' => 'Unlimited',
 					'attempts' => 100,
-					'interval' => 3600,
+					'interval' => 3600
 				]
 			],
 			[
@@ -534,7 +534,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email with 3600s interval',
 					'sessions' => 'Unlimited',
 					'attempts' => 100,
-					'interval' => '3600s',
+					'interval' => '3600s'
 				]
 			],
 			[
@@ -544,7 +544,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email with 0s interval',
 					'sessions' => 'Unlimited',
 					'attempts' => 1,
-					'interval' => '0s',
+					'interval' => '0s'
 				]
 			],
 			[
