@@ -65,7 +65,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @backup-once triggers
+	 * @backupOnce triggers
 	 */
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
@@ -100,7 +100,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider rule
-	 * @backup-once triggers
+	 * @backupOnce triggers
 	 */
 	public function testPageItemPrototypes_MassDelete($rule) {
 		$itemid = $rule['itemid'];

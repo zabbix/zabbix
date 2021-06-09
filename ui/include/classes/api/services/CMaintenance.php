@@ -1027,24 +1027,36 @@ class CMaintenance extends CApiService {
 
 		// selectGroups
 		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$groups = [];
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'hostgroupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$groups = API::HostGroup()->get([
+					'output' => $options['selectGroups'],
+					'hostgroupids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = [];
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
-			$groups = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'hosts');
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// Adding problem tags.

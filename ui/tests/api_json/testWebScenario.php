@@ -1657,7 +1657,7 @@ class testWebScenario extends CAPITest {
 
 	/**
 	* @dataProvider httptest_update_name_key
-	* @on-after after_update_name_key
+	* @onAfter after_update_name_key
 	*/
 	public function testWebScenario_Update_Name_Key($httptests, $expected_error) {
 		$result = $this->call('httptest.update', $httptests, $expected_error);

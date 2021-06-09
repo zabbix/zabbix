@@ -63,7 +63,7 @@ class CControllerProxyHostEnable extends CController {
 		}
 		unset($host);
 
-		$result = API::Host()->update($hosts);
+		$result = $hosts ? (bool) API::Host()->update($hosts) : true;
 
 		$updated = count($hosts);
 

@@ -55,8 +55,9 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
 		char **preproc_error, char **error);
 
-int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error);
-
+int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
+		int *pending, char **error);
 
 int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
+int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error);
 #endif /* ZABBIX_PREPROC_H */

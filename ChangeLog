@@ -1,3 +1,33 @@
+Changes for 5.0.13rc1
+
+New features:
+A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
+.........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
+.........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
+.........T [ZBXNEXT-6587] added template for Cisco UCS Manager (mchudinov)
+.........T [ZBXNEXT-6626] updated Zabbix Server according to the latest template guidelines (abakaldin)
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+.........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
+
+Bug fixes:
+A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+.......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
+...G...... [ZBX-19208] fixed imprecise logfile timestamps in Agent2 on Windows (dgoloscapov)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19320] fixed SAML advanced configuration ignores "baseurl" option; added custom option "use_proxy_headers" (agriscenko)
+..F....... [ZBX-19017] fixed massupdate form of discovered hosts with enabled inventory mode (Ivo)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+.........T [ZBX-19344] changed regular expression for trunk active channels counting in template Asterisk by HTTP (mchudinov)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+........S. [ZBX-19340] optimized history cache to reduce storage of metadata-only records (wiper)
+..F....... [ZBX-19373] fixed security vulnerability for links having target="_blank" (Ivo)
+.........T [ZBX-19354] fixed typo and added override for MongoDB templates (ychukina)
+.......PS. [ZBX-18524] improved preprocessing diagnostic information to include oldest values in queue and totals to include done, queued, processing and pending (vso)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.12
 
 5.0.12rc1 was released as 5.0.12 without any changes
@@ -2068,6 +2098,20 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.32rc1
+
+New features:
+..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
+
+Bug fixes:
+.......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
+A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
+..F....... [ZBX-19300] updated jquery version (ashubin)
+...G...... [ZBX-19139] fixed memory errors in cmdline parsing on freebsd (dgoloscapov)
+.......PS. [ZBX-19359] fixed error in logsource function due to empty source (dgoloscapov)
+A......... [ZBX-8999] fixed exporting of images separately from other objects (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.31
