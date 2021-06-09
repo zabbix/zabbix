@@ -535,25 +535,25 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 		}
 
 		/* handle existing tag being moved to other service */
-//		if (NULL != pservice_problem_tag->service && pservice_problem_tag->service != pservice)
-//		{
-//			int	index;
-//
-//			THIS_SHOULD_NEVER_HAPPEN;
-//
-//			index = zbx_vector_ptr_search(&pservice_problem_tag->service->service_problem_tags,
-//					pservice_problem_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-//
-//			if (FAIL == index)
-//				THIS_SHOULD_NEVER_HAPPEN;
-//			else
-//				zbx_vector_ptr_remove(&pservice_problem_tag->service->service_problem_tags, index);
-//
-//			if (NULL != pservice)
-//				zbx_vector_ptr_append(&pservice->service_problem_tags, pservice_problem_tag);
-//
-//			pservice_problem_tag->service = pservice;
-//		}
+		/*if (NULL != pservice_problem_tag->service && pservice_problem_tag->service != pservice)
+		{
+			int	index;
+
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			index = zbx_vector_ptr_search(&pservice_problem_tag->service->service_problem_tags,
+					pservice_problem_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+			if (FAIL == index)
+				THIS_SHOULD_NEVER_HAPPEN;
+			else
+				zbx_vector_ptr_remove(&pservice_problem_tag->service->service_problem_tags, index);
+
+			if (NULL != pservice)
+				zbx_vector_ptr_append(&pservice->service_problem_tags, pservice_problem_tag);
+
+			pservice_problem_tag->service = pservice;
+		}*/
 
 		operator = (unsigned char)atoi(row[3]);
 
