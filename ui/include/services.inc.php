@@ -37,14 +37,13 @@ function serviceAlgorithm($algorithm = null) {
 	}
 }
 
-function get_service_children($serviceid, $soft = 0) {
+function get_service_children($serviceid) {
 	$children = [];
 
 	$result = DBselect(
 		'SELECT sl.servicedownid'.
 		' FROM services_links sl'.
-		' WHERE sl.serviceupid='.zbx_dbstr($serviceid).
-			($soft ? '' : ' AND sl.soft=0')
+		' WHERE sl.serviceupid='.zbx_dbstr($serviceid)
 	);
 	while ($row = DBfetch($result)) {
 		$children[] = $row['servicedownid'];
@@ -89,7 +88,6 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			if (!$topService['parent']) {
 				$service['dependencies'][] = [
 					'servicedownid' => $topService['serviceid'],
-					'soft' => 0,
 					'linkid' => 0
 				];
 			}
@@ -98,15 +96,6 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		$tree = [$serviceNode];
 	}
 	else {
-		// service is deletable only if it has no hard dependency
-		$deletable = true;
-		foreach ($service['dependencies'] as $dep) {
-			if ($dep['soft'] == 0) {
-				$deletable = false;
-				break;
-			}
-		}
-
 		$serviceNode = [
 			'id' => $service['serviceid'],
 			'caption' => new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']),
@@ -114,12 +103,10 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 				(new CLink(_('Add child'),
 					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.urlencode($service['name'])
 				))->addClass(ZBX_STYLE_LINK_ACTION),
-				$deletable
-					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
-						->addClass(ZBX_STYLE_LINK_ACTION)
-						->addConfirmation(_s('Delete service "%1$s"?', $service['name']))
-						->addSID()
-					: null
+				(new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addConfirmation(_s('Delete service "%1$s"?', $service['name']))
+					->addSID()
 			]),
 			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
@@ -127,7 +114,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		];
 	}
 
-	if (!$dependency || !$dependency['soft']) {
+	if (!$dependency) {
 		$tree[$serviceNode['id']] = $serviceNode;
 
 		foreach ($service['dependencies'] as $dependency) {
@@ -179,7 +166,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			if (!$topService['parent']) {
 				$service['dependencies'][] = [
 					'servicedownid' => $topService['serviceid'],
-					'soft' => 0,
 					'linkid' => 0
 				];
 			}
@@ -298,7 +284,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	}
 
 	// hard dependencies and dependencies for the "root" node
-	if (!$dependency || $dependency['soft'] == 0) {
+	if (!$dependency) {
 		$tree[$serviceNode['id']] = $serviceNode;
 
 		foreach ($service['dependencies'] as $dependency) {

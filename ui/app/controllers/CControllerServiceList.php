@@ -50,7 +50,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		];
 
 		$data['services'] = API::Service()->get([
-			'output' => ['name', 'goodsla', 'sortorder'],
+			'output' => ['name', 'status', 'goodsla', 'sortorder'],
 			'selectParent' => ['serviceid', 'name', 'sortorder'],
 			'selectDependencies' => [],
 			'selectTrigger' => ['description'],
@@ -66,20 +66,5 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));
 		$this->setResponse($response);
-
-
-//		$tree_data = [];
-//		createServiceConfigurationTree($db_services, $tree_data);
-
-//		$tree = new CServiceTree('service_conf_tree', $tree_data, [
-//			'caption' => _('Service'),
-//			'action' => _('Action'),
-//			'algorithm' => _('Status calculation'),
-//			'description' => _('Trigger')
-//		]);
-
-//		if (!$tree_data) {
-//			CMessageHelper::setErrorTitle(_('Cannot format tree.'));
-//		}
 	}
 }

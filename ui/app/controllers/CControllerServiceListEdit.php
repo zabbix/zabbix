@@ -50,7 +50,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		];
 
 		$data['services'] = API::Service()->get([
-			'output' => ['name', 'goodsla', 'sortorder'],
+			'output' => ['name', 'status', 'goodsla', 'sortorder'],
 			'selectParent' => ['serviceid', 'name', 'sortorder'],
 			'selectDependencies' => [],
 			'selectTrigger' => ['description'],

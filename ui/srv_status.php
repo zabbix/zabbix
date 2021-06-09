@@ -100,7 +100,7 @@ else {
 	$services = API::Service()->get([
 		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm', 'sortorder'],
 		'selectParent' => ['serviceid'],
-		'selectDependencies' => ['servicedownid', 'soft', 'linkid'],
+		'selectDependencies' => ['servicedownid', 'linkid'],
 		'selectTrigger' => ['description', 'triggerid', 'expression'],
 		'preservekeys' => true
 	]);

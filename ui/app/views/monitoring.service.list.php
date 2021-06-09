@@ -50,7 +50,7 @@ $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
 
 $table = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(_('Name')))->addStyle('width: 40%'),
+		(new CColHeader(_('Name')))->addStyle('width: 25%'),
 		(new CColHeader(_('Status')))->addStyle('width: 14%'),
 		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
 		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
@@ -70,10 +70,12 @@ foreach ($data['services'] as $serviceid => $service) {
 				CViewHelper::showNum($dependencies_count)
 			]
 			: $service['name'],
-		'OK',
-		'Root cause',
+		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
+			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
+		'',
 		sprintf('%.4f', $service['goodsla']),
-		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : 'tags'
+		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : ''
 	]));
 }
 
