@@ -581,7 +581,6 @@ do {							\
 			SET_FLAG_UCHAR(row[96], item->discover, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER);
 
 			zbx_free(str_orig);
-
 		}
 		else
 		{

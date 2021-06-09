@@ -3111,15 +3111,17 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(const zbx_uint64_t inte
  *                                                                            *
  * Parameters: host_prototypes      - [IN] vector of host prototypes          *
  *             del_hosttemplateids  - [IN] host template ids for delate       *
- *             del_hostmacroids     - [IN] host macro ids for delete           *
+ *             del_hostmacroids     - [IN] host macro ids for delete          *
  *             del_tagids           - [IN] tag ids for delete                 *
  *             del_interfaceids     - [IN] interface ids for delete           *
  *             del_snmpids          - [IN] SNMP interface ids for delete      *
+ *             db_insert_htemplates - [IN/OUT] templates insert structure     *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids,
 		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_tagids,
-		zbx_vector_uint64_t *del_interfaceids ,zbx_vector_uint64_t *del_snmpids)
+		zbx_vector_uint64_t *del_interfaceids ,zbx_vector_uint64_t *del_snmpids,
+		zbx_db_insert_t *db_insert_htemplates)
 {
 	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
@@ -3135,7 +3137,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0,
 					new_tags = 0, new_interfaces = 0, upd_interfaces = 0, new_snmp = 0,
 					upd_snmp = 0;
-	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_htemplates, db_insert_gproto,
+	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_gproto,
 					db_insert_hmacro, db_insert_tag, db_insert_iface, db_insert_snmp;
 	zbx_vector_db_tag_ptr_t		upd_tags;
 
@@ -3220,12 +3222,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	}
 
 	if (0 != new_hosts_templates)
-	{
 		hosttemplateid = DBget_maxid_num("hosts_templates", new_hosts_templates);
-
-		zbx_db_insert_prepare(&db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid",
-				"templateid", NULL);
-	}
 
 	if (0 != del_hosttemplateids->values_num)
 	{
@@ -3349,7 +3346,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
 		{
-			zbx_db_insert_add_values(&db_insert_htemplates, hosttemplateid++, host_prototype->hostid,
+			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 		}
 
@@ -3565,12 +3562,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_db_insert_clean(&db_insert_hdiscovery);
 	}
 
-	if (0 != new_hosts_templates)
-	{
-		zbx_db_insert_execute(&db_insert_htemplates);
-		zbx_db_insert_clean(&db_insert_htemplates);
-	}
-
 	if (0 != new_group_prototypes)
 	{
 		zbx_db_insert_execute(&db_insert_gproto);
@@ -3630,10 +3621,14 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
  * Purpose: copy host prototypes from templates and create links between      *
  *          them and discovery rules                                          *
  *                                                                            *
+ * Parameters: hostid               - [IN] host id                            *
+ *             templateids          - [IN] host template ids                  *
+ *             db_insert_htemplates - [IN/OUT] templates insert structure     *
  * Comments: auxiliary function for DBcopy_template_elements()                *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		zbx_db_insert_t *db_insert_htemplates)
 {
 	zbx_vector_ptr_t	host_prototypes;
 
@@ -3663,7 +3658,7 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 		DBhost_prototypes_tags_make(&host_prototypes, &del_tagids);
 		DBhost_prototypes_interfaces_make(&host_prototypes, &del_interfaceids, &del_snmp_interfaceids);
 		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids, &del_tagids,
-				&del_interfaceids, &del_snmp_interfaceids);
+				&del_interfaceids, &del_snmp_interfaceids, db_insert_htemplates);
 		DBgroup_prototypes_delete(&del_group_prototypeids);
 
 		zbx_vector_uint64_destroy(&del_tagids);
@@ -4896,6 +4891,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
 	char			*template_names, err[MAX_STRING_LEN];
+	zbx_db_insert_t 	*db_insert_htemplates = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4943,15 +4939,19 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	hosttemplateid = DBget_maxid_num("hosts_templates", lnk_templateids->values_num);
 
+	db_insert_htemplates = zbx_malloc(db_insert_htemplates, sizeof(zbx_db_insert_t));
+
+	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
+
 	for (i = 0; i < lnk_templateids->values_num; i++)
-	{
-		DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				hosttemplateid++, hostid, lnk_templateids->values[i]);
-	}
+		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, hostid, lnk_templateids->values[i]);
 
 	DBcopy_template_items(hostid, lnk_templateids);
-	DBcopy_template_host_prototypes(hostid, lnk_templateids);
+	DBcopy_template_host_prototypes(hostid, lnk_templateids, db_insert_htemplates);
+
+	zbx_db_insert_execute(db_insert_htemplates);
+	zbx_db_insert_clean(db_insert_htemplates);
+	zbx_free(db_insert_htemplates);
 
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids, error)))
 	{
