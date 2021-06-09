@@ -830,6 +830,7 @@ class CDashboard extends CBaseComponent {
 		dashboard_page
 			.on(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW, this._events.dashboardPageWidgetAddNew)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
@@ -848,6 +849,7 @@ class CDashboard extends CBaseComponent {
 		dashboard_page
 			.off(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW, this._events.dashboardPageWidgetAddNew)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
@@ -1652,7 +1654,7 @@ class CDashboard extends CBaseComponent {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
-			dashboardPageEdit: (e) => {
+			dashboardPageEdit: () => {
 				this.setEditMode({is_internal_call: true});
 			},
 
@@ -1703,6 +1705,10 @@ class CDashboard extends CBaseComponent {
 				else {
 					this.editWidgetProperties({}, {new_widget_pos});
 				}
+			},
+
+			dashboardPageWidgetAddNew: () => {
+				this.editWidgetProperties();
 			},
 
 			dashboardPageWidgetDelete: () => {
