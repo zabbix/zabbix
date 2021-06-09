@@ -102,8 +102,8 @@ typedef struct
 	zbx_uint64_t		serviceid;
 	zbx_vector_ptr_t	service_problems;
 	zbx_vector_ptr_t	service_problems_recovered;
+#define ZBX_FLAG_SERVICE_UPDATE		__UINT64_C(0x00)
 #define ZBX_FLAG_SERVICE_RECALCULATE	__UINT64_C(0x01)
-#define ZBX_FLAG_SERVICE_DELETE		__UINT64_C(0x02)
 	int			flags;
 }
 zbx_services_diff_t;
@@ -828,7 +828,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx_vector_ptr_t *alarms,
-		zbx_hashset_t *service_updates)
+		zbx_hashset_t *service_updates, int flags)
 {
 	int	status, i;
 
@@ -871,8 +871,22 @@ static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx
 
 		/* update parent services */
 		for (i = 0; i < itservice->parents.values_num; i++)
-			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms, service_updates);
+		{
+			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms,
+					service_updates, flags);
+		}
 	}
+	else if (0 != (ZBX_FLAG_SERVICE_RECALCULATE & flags))
+	{
+		/* update parent services */
+		for (i = 0; i < itservice->parents.values_num; i++)
+		{
+			its_itservice_update_status((zbx_service_t *)itservice->parents.values[i], clock, alarms,
+					service_updates, flags);
+		}
+	}
+
+
 out:
 	;
 }
@@ -907,7 +921,7 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 			continue;
 		}
 
-		if (pservices_diff->flags & ZBX_FLAG_SERVICE_DELETE)
+		if (pservices_diff->flags & ZBX_FLAG_SERVICE_RECALCULATE)
 		{
 			for (i = 0; i < pservice->service_problems.values_num; i++)
 			{
@@ -982,19 +996,31 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *services_
 		if (0 == clock)
 			clock = time(NULL);
 
-		if (pservice->status == status || SERVICE_ALGORITHM_NONE == pservice->algorithm)
+		if (SERVICE_ALGORITHM_NONE == pservice->algorithm)
 			continue;
 
-		update_service(&service_updates, pservice->serviceid, pservice->status, status);
-		pservice->status = status;
-
-		its_updates_append(&alarms, pservice->serviceid, pservice->status, clock);
-
-		/* update parent services */
-		for (i = 0; i < pservice->parents.values_num; i++)
+		if (pservice->status != status)
 		{
-			its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms,
-					&service_updates);
+			update_service(&service_updates, pservice->serviceid, pservice->status, status);
+			pservice->status = status;
+
+			its_updates_append(&alarms, pservice->serviceid, pservice->status, clock);
+
+			/* update parent services */
+			for (i = 0; i < pservice->parents.values_num; i++)
+			{
+				its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms,
+						&service_updates, pservices_diff->flags);
+			}
+		}
+		else if (0 != (ZBX_FLAG_SERVICE_RECALCULATE & pservices_diff->flags))
+		{
+			/* update parent services */
+			for (i = 0; i < pservice->parents.values_num; i++)
+			{
+				its_itservice_update_status((zbx_service_t *)pservice->parents.values[i], clock, &alarms,
+						&service_updates, pservices_diff->flags);
+			}
 		}
 	}
 
@@ -1054,7 +1080,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 						{
 							zbx_vector_ptr_create(&services_diff.service_problems);
 							zbx_vector_ptr_create(&services_diff.service_problems_recovered);
-							services_diff.flags = ZBX_FLAG_SERVICE_RECALCULATE;
+							services_diff.flags = ZBX_FLAG_SERVICE_UPDATE;
 							pservices_diff = zbx_hashset_insert(&service_manager->services_diff, &services_diff, sizeof(services_diff));
 						}
 
@@ -1094,7 +1120,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 				match_event_to_service_problem_tags(event,
 						&service_manager->service_problem_tags_index,
 						&service_manager->services_diff,
-						ZBX_FLAG_SERVICE_RECALCULATE);
+						ZBX_FLAG_SERVICE_UPDATE);
 
 				break;
 			default:
@@ -1166,7 +1192,7 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	flags = ZBX_FLAG_SERVICE_RECALCULATE|ZBX_FLAG_SERVICE_DELETE;
+	flags = ZBX_FLAG_SERVICE_RECALCULATE;
 
 	zbx_hashset_iter_reset(&service_manager->problem_events, &iter);
 	while (NULL != (event = (zbx_event_t **)zbx_hashset_iter_next(&iter)))
