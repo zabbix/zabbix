@@ -1,0 +1,2517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-06-09T06:51:44Z</date>
+   <groups>
+      <group>
+         <name>Templates/Server hardware</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Server DELL PowerEdge R820 by HTTP</template>
+         <name>Template Server DELL PowerEdge R820 by HTTP</name>
+         <description>Template for DELL PowerEdge R820 servers with iDRAC version 7 and later and RESTful API enabled.&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Server hardware</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Network interfaces</name>
+            </application>
+            <application>
+               <name>Physical disks</name>
+            </application>
+            <application>
+               <name>Power supply</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Virtual disks</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Dell R820: Firmware version</name>
+               <type>DEPENDENT</type>
+               <key>dell.server.hw.firmware</key>
+               <delay>0</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>This attribute defines the firmware version of a remote access card.</description>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.firmware</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>dell.server.system.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Dell R820: Firmware has changed</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>INFO</priority>
+                     <description>Firmware version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Dell R820: Hardware model name</name>
+               <type>DEPENDENT</type>
+               <key>dell.server.hw.model</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>This attribute defines the model name of the system.</description>
+               <inventory_link>MODEL</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.model</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>dell.server.system.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Dell R820: Hardware serial number</name>
+               <type>DEPENDENT</type>
+               <key>dell.server.hw.serialnumber</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>This attribute defines the service tag of the system.</description>
+               <inventory_link>SERIALNO_A</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.serialnumber</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>dell.server.system.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Dell R820: Device has been replaced (new serial number received)</name>
+                     <priority>INFO</priority>
+                     <description>Device serial number has changed. Ack to close</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Dell R820: Overall system health status</name>
+               <type>DEPENDENT</type>
+               <key>dell.server.status</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.status</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>dell.server.system.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}={$HEALTH.STATUS.DISASTER}</expression>
+                     <name>Dell R820: System is in unrecoverable state</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>DISASTER</priority>
+                     <description>Please check the device for faults.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}={$HEALTH.STATUS.CRIT}</expression>
+                     <name>Dell R820: System status is in critical state</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                     <description>Please check the device for errors.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}={$HEALTH.STATUS.WARN}</expression>
+                     <name>Dell R820: System status is in warning state</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <description>Please check the device for warnings.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Dell R820: System status is in critical state</name>
+                           <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.status.last()}={$HEALTH.STATUS.CRIT}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Get system</name>
+               <type>HTTP_AGENT</type>
+               <key>dell.server.system.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <description>Returns the metrics of a system.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    system = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    system = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = {};
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (typeof system.Model === 'string') {
+    result["model"] = system.Model;
+}
+if (typeof system.Oem.Dell.DellSystem.ChassisServiceTag === 'string') {
+    result["serialnumber"] = system.Oem.Dell.DellSystem.ChassisServiceTag;
+}
+if (typeof system.Status.Health === 'string') {
+    result["status"] = system.Status.Health;
+}
+
+response = request(params.url + '/redfish/v1/Managers/iDRAC.Embedded.1');
+if (typeof response.body.FirmwareVersion === 'string') {
+    result["firmware"] = response.body.FirmwareVersion;
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1</url>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Array controller cache discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>array.cache.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage</url>
+               <description>Discovery of a cache of disk array controllers.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#BATTERY_NAME} Status</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::batteryState</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Oem.Dell.DellControllerBattery.PrimaryStatus</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
+                           <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</expression>
+                           <name>Dell R820: {#BATTERY_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for faults.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;&gt;{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}</expression>
+                           <name>Dell R820: {#BATTERY_NAME} is not in optimal state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for faults.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
+                              </dependency>
+                              <dependency>
+                                 <name>Dell R820: {#BATTERY_NAME} is in warning state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    storages = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    storages = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (storages.Members instanceof Array) {
+    storages.Members.forEach(function (storage) {
+        if (typeof storage["@odata.id"] === 'string') {
+            response = request(params.url + storage["@odata.id"]);
+            controller = response.body;
+            if (controller.Id.search('RAID') &gt; -1) {
+                if (typeof response.body.Name === 'string') {
+                    result.push({ '{#BATTERY_NAME}': response.body.Oem.Dell.DellControllerBattery.Name, '{#ODATA}': controller["@odata.id"] });
+                }
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Array controller discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>array.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage</url>
+               <description>Discovery of disk array controllers.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#CNTLR_NAME} Status</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    storages = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    storages = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (storages.Members instanceof Array) {
+    storages.Members.forEach(function (storage) {
+        if (typeof storage["@odata.id"] === 'string') {
+            response = request(params.url + storage["@odata.id"]);
+            controller = response.body;
+            if (controller.Id.search('RAID') &gt; -1) {
+                if (typeof response.body.Name === 'string') {
+                    result.push({ '{#CNTLR_NAME}': response.body.Name, '{#SLOT}': response.body.Oem.Dell.DellController.PCISlot, '{#ODATA}': controller["@odata.id"] });
+                }
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FAN discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>fan.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors</url>
+               <description>Discovery of FAN sensors.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Get sensor</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.sensor.fan.get[{#SENSOR_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a sensor.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.sensor.fan.speed[{#SENSOR_NAME}]</key>
+                     <delay>0</delay>
+                     <status>ENABLED</status>
+                     <units>rpm</units>
+                     <description>The sensor value.</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Reading</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.sensor.fan.get[{#SENSOR_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.sensor.fan.status[{#SENSOR_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.sensor.fan.get[{#SENSOR_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    sensors = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    sensors = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (sensors.Members instanceof Array) {
+    sensors.Members.forEach(function (sensor) {
+        if (typeof sensor["@odata.id"] === 'string') {
+            response = request(params.url + sensor["@odata.id"]);
+            if (response.body.ReadingType === 'Rotational') {
+                if (typeof response.body.Name === 'string') {
+                    result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
+                }
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Network interface discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>net.if.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/NetworkInterfaces</url>
+               <description>The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#NETIF} Get interface</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.net.if.get[{#NETIF}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a network interface.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#NETIF} Health</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.net.if.health[{#NETIF}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Network interfaces</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#NETIF} Speed</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.net.if.speed[{#NETIF}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!Mbps</units>
+                     <description>Network port current link speed.</description>
+                     <applications>
+                        <application>
+                           <name>Network interfaces</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.CurrentLinkSpeedMbps</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#NETIF} State</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.net.if.state[{#NETIF}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The known state of the Resource, such as, enabled. Possible value: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
+                     <applications>
+                        <application>
+                           <name>Network interfaces</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.State</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#NETIF} Link status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.net.if.status[{#NETIF}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the link between this port and its link partner. Possible value: Down, Up, null.</description>
+                     <applications>
+                        <application>
+                           <name>Network interfaces</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.LinkStatus</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    adapters = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    adapters = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (adapters.Members instanceof Array) {
+    adapters.Members.forEach(function (adapter) {
+        if (typeof adapter["@odata.id"] === 'string') {
+            response = request(params.url + adapter["@odata.id"] + "/NetworkPorts");
+            ports = response.body;
+            if (ports.Members instanceof Array) {
+                ports.Members.forEach(function (port) {
+                    if (typeof port["@odata.id"] === 'string') {
+                        response = request(params.url + port["@odata.id"]);
+                        if (typeof response.body.Id === 'string') {
+                            result.push({ '{#NETIF}': response.body.Id, '{#ODATA}': port["@odata.id"] });
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Physical disk discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>physicaldisk.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage</url>
+               <description>Discovery of physical disks.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Get disk</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a physical disk.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Media type</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.physicaldisk.media_type[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The type of media contained in this drive. Possible value: HDD, SSD, SMR, null.</description>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.MediaType</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Model name</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.physicaldisk.model[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The model number for the drive.</description>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Model</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Serial number</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The serial number for this drive.</description>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.SerialNumber</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>Dell R820: {#DISK_NAME} has been replaced (new serial number received)</name>
+                           <priority>INFO</priority>
+                           <description>{#DISK_NAME} serial number has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Size</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.physicaldisk.size[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <units>B</units>
+                     <description>The size, in bytes, of this drive.</description>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.CapacityBytes</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.physicaldisk.status[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    storages = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    storages = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (storages.Members instanceof Array) {
+    storages.Members.forEach(function (storage) {
+        if (typeof storage["@odata.id"] === 'string') {
+            response = request(params.url + storage["@odata.id"]);
+            drives = response.body;
+            if (drives.Drives instanceof Array) {
+                drives.Drives.forEach(function (drive) {
+                    if (typeof drive["@odata.id"] === 'string') {
+                        response = request(params.url + drive["@odata.id"]);
+                        if (typeof response.body.Name === 'string') {
+                            result.push({ '{#DISK_NAME}': response.body.Name, '{#ODATA}': drive["@odata.id"] });
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>psu.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors</url>
+               <description>Discovery of PSU sensors.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Get sensor</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.sensor.psu.get[{#SENSOR_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a sensor.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.sensor.psu.status[{#SENSOR_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Power supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.sensor.psu.get[{#SENSOR_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    sensors = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    sensors = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (sensors.Members instanceof Array) {
+    sensors.Members.forEach(function (sensor) {
+        if (typeof sensor["@odata.id"] === 'string') {
+            response = request(params.url + sensor["@odata.id"]);
+            if (response.body.ReadingType === 'Voltage') {
+                if (typeof response.body.Name === 'string') {
+                    result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
+                }
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>temp.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors</url>
+               <description>Discovery of temperature sensors.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Get sensor</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.sensor.temp.get[{#SENSOR_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a sensor.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.sensor.temp.status[{#SENSOR_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.sensor.temp.get[{#SENSOR_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#SENSOR_NAME} Value</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.sensor.temp.value[{#SENSOR_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>°C</units>
+                     <description>The sensor value.</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Reading</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.sensor.temp.get[{#SENSOR_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    sensors = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    sensors = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (sensors.Members instanceof Array) {
+    sensors.Members.forEach(function (sensor) {
+        if (typeof sensor["@odata.id"] === 'string') {
+            response = request(params.url + sensor["@odata.id"]);
+            if (response.body.ReadingType === 'Temperature') {
+                if (typeof response.body.Name === 'string') {
+                    result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
+                }
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Virtual disk discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>virtualdisk.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$API.USER}</username>
+               <password>{$API.PASSWORD}</password>
+               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage</url>
+               <description>Discovery of virtual disks.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Get disk</name>
+                     <type>HTTP_AGENT</type>
+                     <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <authtype>BASIC</authtype>
+                     <username>{$API.USER}</username>
+                     <password>{$API.PASSWORD}</password>
+                     <description>Returns the metrics of a virtual disk.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <url>{$API.URL}{#ODATA}</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Layout type</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.layout[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The RAID type of this volume. Possible value: RAID0, RAID1, RAID3, RAID4, RAID5, RAID6, RAID10, RAID01, RAID6TP, RAID1E, RAID50, RAID60, RAID00, RAID10E, RAID1Triple, RAID10Triple.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.RAIDType</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Read policy</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>Indicates the read cache policy setting for the Volume. Possible value: ReadAhead, AdaptiveReadAhead, Off.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.ReadCachePolicy</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Size</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.size[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <units>B</units>
+                     <description>The size in bytes of this Volume.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.CapacityBytes</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Current state</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.state[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The known state of the Resource, such as, enabled. Possible value: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.State</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Status</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.status[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.Status.Health</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Dell R820: {#DISK_NAME} Write policy</name>
+                     <type>DEPENDENT</type>
+                     <key>dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]</key>
+                     <delay>0</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>Indicates the write cache policy setting for the Volume. Possible value: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</description>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.WriteCachePolicy</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>function request(url) {
+  api_request = new CurlHttpRequest();
+  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+
+  try {
+      response = api_request.Get(url);
+  } catch (error) {
+      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+      throw 'Get request returned error ' + error + '. Check debug log for more information.';
+  }
+
+  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+      api_request.Status() + '\n' + response);
+
+  if (api_request.Status() !== 200) {
+      var message = 'Request failed with status code ' + api_request.Status();
+      if (response !== null) {
+          if (typeof response.message === 'string') {
+              message += ': ' + response.message;
+          }
+      }
+
+      throw message + ' Check debug log for more information.';
+  }
+
+  if (response !== null) {
+      try {
+          response = JSON.parse(response);
+      }
+      catch (error) {
+          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+          response = null;
+      }
+  }
+
+  return {
+      status: api_request.Status(),
+      body: response
+  };
+}
+
+try {
+    storages = JSON.parse(value);
+}
+catch (error) {
+    Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+    storages = null;
+}
+
+var params = {
+    url: '{$API.URL}',
+    user: '{$API.USER}',
+    password: '{$API.PASSWORD}'
+};
+var result = [];
+
+var index = params.url.indexOf('://');
+index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+if (index !== -1) {
+    params.url = params.url.substring(0, index);
+}
+
+if (storages.Members instanceof Array) {
+    storages.Members.forEach(function (storage) {
+        if (typeof storage["@odata.id"] === 'string') {
+            response = request(params.url + storage["@odata.id"] + "/Volumes");
+            volumes = response.body;
+            if (volumes.Members instanceof Array) {
+                volumes.Members.forEach(function (volume) {
+                    if (typeof volume["@odata.id"] === 'string') {
+                        response = request(params.url + volume["@odata.id"]);
+                        if (typeof response.body.Name === 'string') {
+                            result.push({ '{#DISK_NAME}': response.body.Name, '{#ODATA}': volume["@odata.id"] });
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$API.PASSWORD}</macro>
+               <value>&lt;Put your password here&gt;</value>
+               <description>The Dell iDRAC user password.</description>
+            </macro>
+            <macro>
+               <macro>{$API.URL}</macro>
+               <value>&lt;Put your URL here&gt;</value>
+               <description>The Dell iDRAC Redfish API URL in the format `&lt;scheme&gt;://&lt;host&gt;:&lt;port&gt;`.</description>
+            </macro>
+            <macro>
+               <macro>{$API.USER}</macro>
+               <value>&lt;Put your username here&gt;</value>
+               <description>The Dell iDRAC username.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</macro>
+               <value>3</value>
+               <description>The critical status of the disk array cache battery for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}</macro>
+               <value>2</value>
+               <description>The OK status of the disk array cache battery for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</macro>
+               <value>4</value>
+               <description>The warning status of the disk array cache battery for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.STATUS.CRIT}</macro>
+               <value>5</value>
+               <description>The critical status of the disk array for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.STATUS.FAIL}</macro>
+               <value>6</value>
+               <description>The disaster status of the disk array for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.ARRAY.STATUS.WARN}</macro>
+               <value>4</value>
+               <description>The warning status of the disk array for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.SMART.STATUS.FAIL}</macro>
+               <value>1</value>
+               <description>The critical S.M.A.R.T status of the disk for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.STATUS.FAIL:"critical"}</macro>
+               <value>5</value>
+               <description>The critical status of the disk for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.STATUS.FAIL:"nonRecoverable"}</macro>
+               <value>6</value>
+               <description>The critical status of the disk for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$DISK.STATUS.WARN:"nonCritical"}</macro>
+               <value>4</value>
+               <description>The warning status of the disk for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.CRIT:"criticalLower"}</macro>
+               <value>8</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.CRIT:"criticalUpper"}</macro>
+               <value>5</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.CRIT:"failed"}</macro>
+               <value>10</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.CRIT:"nonRecoverableLower"}</macro>
+               <value>9</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.CRIT:"nonRecoverableUpper"}</macro>
+               <value>6</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.WARN:"nonCriticalLower"}</macro>
+               <value>7</value>
+               <description>The warning value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$FAN.STATUS.WARN:"nonCriticalUpper"}</macro>
+               <value>4</value>
+               <description>The warning value of the FAN sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$HEALTH.STATUS.CRIT}</macro>
+               <value>5</value>
+               <description>The critical status of the health for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$HEALTH.STATUS.DISASTER}</macro>
+               <value>6</value>
+               <description>The disaster status of the health for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$HEALTH.STATUS.WARN}</macro>
+               <value>4</value>
+               <description>The warning status of the health for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$PSU.STATUS.CRIT:"critical"}</macro>
+               <value>5</value>
+               <description>The critical value of the PSU sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$PSU.STATUS.CRIT:"nonRecoverable"}</macro>
+               <value>6</value>
+               <description>The critical value of the PSU sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$PSU.STATUS.WARN:"nonCritical"}</macro>
+               <value>4</value>
+               <description>The warning value of the PSU sensor for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.CRIT:"criticalLower"}</macro>
+               <value>8</value>
+               <description>The critical status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}</macro>
+               <value>5</value>
+               <description>The critical status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}</macro>
+               <value>9</value>
+               <description>The critical status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}</macro>
+               <value>6</value>
+               <description>The critical status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.OK}</macro>
+               <value>3</value>
+               <description>The OK status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}</macro>
+               <value>7</value>
+               <description>The warning status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}</macro>
+               <value>4</value>
+               <description>The warning status of the temperature probe for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$SNMP.TIMEOUT}</macro>
+               <value>5m</value>
+               <description>The time interval for SNMP agent availability trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$VDISK.STATUS.CRIT:"failed"}</macro>
+               <value>3</value>
+               <description>The critical status of the virtual disk for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$VDISK.STATUS.WARN:"degraded"}</macro>
+               <value>4</value>
+               <description>The warning status of the virtual disk for trigger expression.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCriticalUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>criticalUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverableUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>nonCriticalLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>criticalLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>nonRecoverableLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::BooleanType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>HDD</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>SSD</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::batteryState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ready</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Charging</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Below threshold</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>RAID-0</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>RAID-1</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>RAID-5</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>RAID-6</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>RAID-10</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>RAID-50</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>RAID-60</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>Concatenated RAID 1</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>Concatenated RAID 5</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Not applicable</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Reconstructing</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Resynching</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Initializing</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Background init</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Write Through</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Write Back</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Force Write Back</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>No Read Ahead</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Read Ahead</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Adaptive Read Ahead</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Online</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>zabbix.host.available</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>not available</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>available</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
