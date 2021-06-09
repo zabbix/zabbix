@@ -36,6 +36,50 @@ class testFormTags extends CWebTest {
 	public $host;
 	public $template;
 
+	// Tags on host "Host for tags testing".
+	const HOST_TAGS = [
+		[
+			'tag' => 'a:',
+			'value' => 'a'
+		],
+		[
+			'tag' => 'action',
+			'value' => 'simple'
+		],
+		[
+			'tag' => 'tag',
+			'value' => 'HOST'
+		],
+		[
+			'tag' => 'host tag without value',
+			'value' => ''
+		],
+		[
+			'tag' => 'common tag on host and element',
+			'value' => 'common value'
+		]
+	];
+
+	// Tags on template "Template for tags testing".
+	const TEMPLATE_TAGS = [
+		[
+			'tag' => 'action',
+			'value' => 'simple'
+		],
+		[
+			'tag' => 'tag',
+			'value' => 'TEMPLATE'
+		],
+		[
+			'tag' => 'templateTag without value',
+			'value' => ''
+		],
+		[
+			'tag' => 'common tag on template and element',
+			'value' => 'common value'
+		]
+	];
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -252,11 +296,11 @@ class testFormTags extends CWebTest {
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
-		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-			$this->page->removeFocus();
-			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
-		}
+//		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+//			$this->page->removeFocus();
+//			$screenshot_area = $this->query('id:tags-table')->one();
+//			$this->assertScreenshot($screenshot_area, $data['name']);
+//		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -620,11 +664,11 @@ class testFormTags extends CWebTest {
 		$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected);
 
 		// Check screenshot of text area after saving.
-		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-			$this->page->removeFocus();
-			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
-		}
+//		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+//			$this->page->removeFocus();
+//			$screenshot_area = $this->query('id:tags-table')->one();
+//			$this->assertScreenshot($screenshot_area, $data['name']);
+//		}
 	}
 
 	/**
@@ -725,19 +769,11 @@ class testFormTags extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 			$this->page->waitUntilReady();
 			$result_form->waitUntilReloaded();
-			/** TODO: better solution? doesn't work "foreach" when navigate from table to another page
-			$rows = $table->findRows(['Name' => $this->clone_name]);
-			foreach ($rows as $row) {
-					$row->getColumn('Name')->click(); ...
-			 */
-			// Get row indices.
-			$indices = [];
-			foreach ($table->getRows() as $i => $row) {
-				if ($row->getColumn('Name')->getText() === $this->clone_name) {
-					$indices[] = $i;
-				}
-			}
-			foreach ($indices as $index) {
+			// Find row indices with the cloned entity name.
+			$indices = $table->findRows(function ($row) {
+				return $row->getColumn('Name')->getText() === $this->clone_name;
+			});
+			foreach (array_keys($indices) as $index) {
 				$table->getRow($index)->getColumn('Name')->children()->waitUntilClickable()->one()->click();
 				$form->invalidate();
 				$form->selectTab('Tags');
@@ -799,47 +835,6 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression  trigger or trigger prototype expression
 	 */
 	public function checkTagsInheritance($data, $object, $host_link, $expression = null) {
-		$host_tags = [
-			[
-				'tag' => 'a:',
-				'value' => 'a'
-			],
-			[
-				'tag' => 'action',
-				'value' => 'simple'
-			],
-			[
-				'tag' => 'tag',
-				'value' => 'HOST'
-			],
-			[
-				'tag' => 'host tag without value',
-				'value' => ''
-			],
-			[
-				'tag' => 'common tag on host and element',
-				'value' => 'common value'
-			]
-		];
-		$template_tags = [
-			[
-				'tag' => 'action',
-				'value' => 'simple'
-			],
-			[
-				'tag' => 'tag',
-				'value' => 'TEMPLATE'
-			],
-			[
-				'tag' => 'templateTag without value',
-				'value' => ''
-			],
-			[
-				'tag' => 'common tag on template and element',
-				'value' => 'common value'
-			]
-		];
-
 		// Create element tags on template.
 		$form = $this->checkTagsCreate($data, $object, $expression);
 
@@ -847,7 +842,7 @@ class testFormTags extends CWebTest {
 		unset($data['tags'][0]['action'], $data['tags'][0]['index']);
 
 		// Prepare all tags data (inherited form host and template, and element tags).
-		$all_tags = array_merge($host_tags, $template_tags, $data['tags']);
+		$all_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS, $data['tags']);
 		// Sort reference tags array by field "tag".
 		usort($all_tags, function($a, $b) {
 			return strcasecmp($a['tag'], $b['tag']);
@@ -856,7 +851,7 @@ class testFormTags extends CWebTest {
 		$expected_all_tags = array_values(array_unique($all_tags, SORT_REGULAR));
 
 		// Prepare only inherited form host and template tags data and remove element tags from them.
-		$host_template_tags = array_merge($host_tags, $template_tags);
+		$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
 		usort($host_template_tags, function($a, $b) {
 			return strcasecmp($a['tag'], $b['tag']);
 		});
@@ -874,7 +869,8 @@ class testFormTags extends CWebTest {
 		$disabled_tags = array_values($disabled_tags);
 
 		// Prepare tags that unique only for template (remove host tags from template tags).
-		$unique_template_tags = array_filter($template_tags, function ($tag) use ($host_tags) {
+		$host_tags = self::HOST_TAGS;
+		$unique_template_tags = array_filter(self::TEMPLATE_TAGS, function ($tag) use ($host_tags) {
 			foreach ($host_tags as $host_tag) {
 				if ($host_tag == $tag) {
 					return false;
@@ -910,21 +906,8 @@ class testFormTags extends CWebTest {
 
 		// Check inherited tags.
 		$headers = $tags_table->getHeadersText();
-		$disabled_rows = [];
 
 		foreach ($tags_table->getRows() as $row) {
-			// Check disabled fields of host and template tags.
-			$state = [];
-			foreach (['Name', 'Value', 'Action'] as $field) {
-				$state[$field] = $row->getColumn($field)->children()->one()->detect()->isEnabled();
-			}
-			if ($state['Name'] === false) {
-				// Check disabled Value and Action fields.
-				$this->assertFalse($state['Value']);
-				$this->assertFalse($state['Action']);
-				$disabled_rows[] = $row;
-			}
-
 			// Check empty column "Parent templates" except for inhereted unique template tags.
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
@@ -939,11 +922,19 @@ class testFormTags extends CWebTest {
 			}
 		}
 
-		// Get disabled row values.
-		$actual_disabled_tags = [];
-		foreach ($disabled_rows as $row) {
-			$values = [];
 
+		$actual_disabled_tags = [];
+		// Find disabled rows of host and template tags by disabled Name field.
+		$disabled_rows = $tags_table->findRows(function ($row) {
+			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
+		});
+		foreach ($disabled_rows as $row) {
+			// Check other disabled fields.
+			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
+			$this->assertFalse($row->getColumn('Action')->children()->one()->detect()->isEnabled());
+
+			$values = [];
+			// Get disabled row values.
 			foreach ($tags_table->getRowControls($row, $headers) as $name => $control) {
 				$values[$name] = $control->getValue();
 			}

@@ -106,20 +106,45 @@ class CDataHelper extends CAPIHelper {
 	}
 
 	/**
-	 * Create host with items.
+	 * Create host with items and discovery rules.
 	 *
 	 * @param mixed $params    API call params.
-	 *                         In addition to the default host.create params, "items" can be set for any of the host in
-	 *                         order to create host items.
+	 *                         In addition to the default host.create params, "items" and "discoveryrules" can be set
+	 *			               for any of the host in order to create host items and discovery rules.
 	 *
 	 * @return array
-	 *
-	 * @throws Exception on API error
 	 */
 	public static function createHosts($params) {
+		return static::executeHostTemplateCreation($params, 'host');
+	}
+
+	/**
+	 * Create template with items and discovery rules.
+	 *
+	 * @param mixed $params    API call params
+	 *
+	 * @return array
+	 */
+	public static function createTemplates($params) {
+		return static::executeHostTemplateCreation($params, 'template');
+	}
+
+	/**
+	 * Execute creation of host or template.
+	 *
+	 * @param mixed $params    API call params
+	 * @param string $object   host or template object
+	 *
+	 * @return array
+	 */
+	public static function executeHostTemplateCreation($params, $object) {
 		$items = [];
 		$discoveryrules = [];
 		foreach ($params as &$param) {
+			if ($object === 'template') {
+				$param['status'] = HOST_STATUS_TEMPLATE;
+			}
+
 			if (array_key_exists('items', $param)) {
 				$items[$param['host']] = $param['items'];
 				unset($param['items']);
@@ -131,118 +156,48 @@ class CDataHelper extends CAPIHelper {
 		}
 		unset($param);
 
-		static::call('host.create', $params);
-		$hostids = static::getIds('host');
+		static::call($object.'.create', $params);
+		$objectids = static::getIds('host');
 
 		$result = [
-			'hostids' => $hostids
+			$object.'ids' => $objectids
 		];
 
-		if (!$items) {
-			return $result;
+		if ($items) {
+			$result['itemids'] = static::createItems('item', $items, $objectids, $object);
 		}
 
+		if ($discoveryrules) {
+			$result['discoveryruleids'] = static::createItems('discoveryrule', $discoveryrules, $objectids, $object);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get host interfaces.
+	 *
+	 * @param array $hostids	host ids
+	 *
+	 * @return array
+	 */
+	public static function getInterfaces($hostids) {
 		$hosts = static::call('host.get', [
 			'output' => ['host'],
 			'hostids' => array_values($hostids),
 			'selectInterfaces' => ['interfaceid', 'useip', 'ip', 'type', 'dns', 'port', 'main']
 		]);
 
-		$default_interfaces = [];
-		$interfaceids = [];
+		$result['default_interfaces'] = [];
+		$result['ids'] = [];
 		foreach ($hosts as $host) {
 			foreach ($host['interfaces'] as $interface) {
 				if ($interface['main'] == 1) {
-					$default_interfaces[$host['host']][$interface['type']] = $interface['interfaceid'];
+					$result['default_interfaces'][$host['host']][$interface['type']] = $interface['interfaceid'];
 				}
 
 				$address = ($interface['useip'] == 1) ? $interface['ip'] : $interface['dns'];
-				$interfaceids[$host['host']][$address.':'.$interface['port']] = $interface['interfaceid'];
-			}
-		}
-
-		$items_request = [];
-		foreach ($items as $host => $host_items) {
-			foreach ($host_items as $item) {
-				$item['hostid'] = $hostids[$host];
-
-				if (array_key_exists($host, $default_interfaces)) {
-					$interface_type = null;
-					switch (CTestArrayHelper::get($item, 'type')) {
-						case ITEM_TYPE_ZABBIX:
-						case ITEM_TYPE_ZABBIX_ACTIVE:
-							$interface_type = 1;
-							break;
-
-						case ITEM_TYPE_SNMP:
-						case ITEM_TYPE_SNMPTRAP:
-							$interface_type = 2;
-							break;
-
-						case ITEM_TYPE_IPMI:
-							$interface_type = 3;
-							break;
-
-						case ITEM_TYPE_JMX:
-							$interface_type = 4;
-							break;
-					}
-
-					if ($interface_type !== null && array_key_exists($interface_type, $default_interfaces[$host])) {
-						$item['interfaceid'] = $default_interfaces[$host][$interface_type];
-					}
-				}
-
-				if (array_key_exists($host, $interfaceids)) {
-					$interface = CTestArrayHelper::get($item, 'interface');
-					unset($item['interface']);
-					if ($interface !== null && array_key_exists($interfaceids[$host], $interface)) {
-						$item['interfaceid'] = $interfaceids[$host][$interface];
-					}
-				}
-
-				$items_request[] = $item;
-			}
-		}
-
-		// Create items.
-		$items_response = static::call('item.create', $items_request);
-		$i = 0;
-
-		$result['itemids'] = [];
-		foreach ($items as $host => $host_items) {
-			foreach ($host_items as $item) {
-				if (!array_key_exists($i, $items_response['itemids'])) {
-					throw new Exception('Failed to get ids: element ('.$i.') is not present in result.');
-				}
-
-				$result['itemids'][$host.':'.$item['key_']] = $items_response['itemids'][$i++];
-			}
-		}
-
-		if (!$discoveryrules) {
-			return $result;
-		}
-
-		$discoveryrules_request = [];
-		foreach ($discoveryrules as $host => $host_discoveryrules) {
-			foreach ($host_discoveryrules as $discoveryrule) {
-				$discoveryrule['hostid'] = $hostids[$host];
-				$discoveryrules_request[] = $discoveryrule;
-			}
-		}
-		// Create discovery rules.
-		$discoveryrules_response = static::call('discoveryrule.create', $discoveryrules_request);
-		$i = 0;
-
-		$result['discoveryruleids'] = [];
-		foreach ($discoveryrules as $host => $host_discoveryrules) {
-			foreach ($host_discoveryrules as $discoveryrule) {
-				if (!array_key_exists($i, $discoveryrules_response['itemids'])) {
-					throw new Exception('Failed to get ids: element ('.$i.') is not present in result.');
-				}
-
-				$result['discoveryruleids'][$host.':'.$discoveryrule['key_']] = $discoveryrules_response['itemids'][$i++];
+				$result['ids'][$host['host']][$address.':'.$interface['port']] = $interface['interfaceid'];
 			}
 		}
 
@@ -250,90 +205,79 @@ class CDataHelper extends CAPIHelper {
 	}
 
 	/**
-	 * Create template with items.
+	 * Create items or discovery rule for host and template.
 	 *
-	 * @param mixed $params    API call params.
-	 *                         In addition to the default template.create params, "items" can be set for any of the host in
-	 *                         order to create template items.
+	 * @param string $type			item or discoveryrule type
+	 * @param mixed $items			API call items or discovery params
+	 * @param array $objectids		host or template ids
+	 * @param string $object		host or template
 	 *
 	 * @return array
 	 *
 	 * @throws Exception on API error
 	 */
-	public static function createTemplates($params) {
-		$items = [];
-		$discoveryrules = [];
-		foreach ($params as &$param) {
-			$param['status'] = HOST_STATUS_TEMPLATE;
-
-			if (array_key_exists('items', $param)) {
-				$items[$param['host']] = $param['items'];
-				unset($param['items']);
-			}
-			if (array_key_exists('discoveryrules', $param)) {
-				$discoveryrules[$param['host']] = $param['discoveryrules'];
-				unset($param['discoveryrules']);
-			}
-		}
-		unset($param);
-
-		static::call('template.create', $params);
-		$templateids = static::getIds('host');
-
-		$result = [
-			'templateids' => $templateids
-		];
-
-		if (!$items) {
-			return $result;
-		}
-
+	public static function createItems($type, $items, $objectids, $object = 'host') {
 		$request = [];
-		foreach ($items as $template => $template_items) {
-			foreach ($template_items as $item) {
-				$item['hostid'] = $templateids[$template];
+		foreach ($items as $host => $host_items) {
+			foreach ($host_items as $item) {
+				$item['hostid'] = $objectids[$host];
+
+				if ($object === 'host') {
+
+					$interfaces = static::getInterfaces($objectids);
+
+					if (array_key_exists($host, $interfaces['default_interfaces'])) {
+						$interface_type = null;
+						switch (CTestArrayHelper::get($item, 'type')) {
+							case ITEM_TYPE_ZABBIX:
+							case ITEM_TYPE_ZABBIX_ACTIVE:
+								$interface_type = 1;
+								break;
+
+							case ITEM_TYPE_SNMP:
+							case ITEM_TYPE_SNMPTRAP:
+								$interface_type = 2;
+								break;
+
+							case ITEM_TYPE_IPMI:
+								$interface_type = 3;
+								break;
+
+							case ITEM_TYPE_JMX:
+								$interface_type = 4;
+								break;
+						}
+
+						if ($interface_type !== null && array_key_exists($interface_type, $interfaces['default_interfaces'][$host])) {
+							$item['interfaceid'] = $interfaces['default_interfaces'][$host][$interface_type];
+						}
+					}
+
+					if (array_key_exists($host, $interfaces['ids'])) {
+						$interface = CTestArrayHelper::get($item, 'interface');
+						unset($item['interface']);
+						if ($interface !== null && array_key_exists($$interfaces['ids'][$host], $interface)) {
+							$item['interfaceid'] = $interfaces['ids'][$host][$interface];
+						}
+					}
+				}
+
 				$request[] = $item;
 			}
 		}
 
-		// Create items.
-		$response = static::call('item.create', $request);
+		// Create items or discovery rules.
+		$response = static::call($type.'.create', $request);
 		$i = 0;
 
-		$result['itemids'] = [];
-		foreach ($items as $template => $template_items) {
-			foreach ($template_items as $item) {
+		$result = [];
+		foreach ($items as $host => $host_items) {
+			foreach ($host_items as $item) {
 				if (!array_key_exists($i, $response['itemids'])) {
 					throw new Exception('Failed to get ids: element ('.$i.') is not present in result.');
 				}
 
-				$result['itemids'][$template.':'.$item['key_']] = $response['itemids'][$i++];
-			}
-		}
-
-		if (!$discoveryrules) {
-			return $result;
-		}
-
-		$discoveryrules_request = [];
-		foreach ($discoveryrules as $host => $host_discoveryrules) {
-			foreach ($host_discoveryrules as $discoveryrule) {
-				$discoveryrule['hostid'] = $templateids[$template];
-				$discoveryrules_request[] = $discoveryrule;
-			}
-		}
-		// Create discovery rules.
-		$discoveryrules_response = static::call('discoveryrule.create', $discoveryrules_request);
-		$i = 0;
-
-		$result['discoveryruleids'] = [];
-		foreach ($discoveryrules as $template => $template_discoveryrules) {
-			foreach ($template_discoveryrules as $discoveryrule) {
-				if (!array_key_exists($i, $discoveryrules_response['itemids'])) {
-					throw new Exception('Failed to get ids: element ('.$i.') is not present in result.');
-				}
-
-				$result['discoveryruleids'][$template.':'.$discoveryrule['key_']] = $discoveryrules_response['itemids'][$i++];
+				$result[$host.':'.$item['key_']] = $response['itemids'][$i++];
 			}
 		}
 

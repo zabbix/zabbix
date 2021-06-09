@@ -176,38 +176,49 @@ class CTableElement extends CElement {
 	}
 
 	/**
-	 * Find row by column value.
+	 * Find rows by column value or by criteria in function.
 	 *
-	 * @param array $content    column data
+	 * @param array $param    column data or function.
 	 *
 	 * @return CElementCollection
 	 */
-	public function findRows($content) {
-		$rows = [];
-
-		if (CTestArrayHelper::isAssociative($content)) {
-			$content = [$content];
-		}
-
-		foreach ($this->getRows() as $row) {
-			foreach ($content as $columns) {
-				$found = true;
-
-				foreach ($columns as $name => $value) {
-					if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
-						$found = false;
-						break;
-					}
-				}
-
-				if ($found) {
-					$rows[] = $row;
-					break;
+	public function findRows($param) {
+		if (is_callable($param)) {
+			foreach ($this->getRows() as $i => $row) {
+				if (call_user_func($param, $row)) {
+					$result[$i] = $row;
 				}
 			}
 		}
+		else {
+			$rows = [];
 
-		return new CElementCollection($rows, CTableRowElement::class);
+			if (CTestArrayHelper::isAssociative($param)) {
+				$param = [$param];
+			}
+
+			foreach ($this->getRows() as $row) {
+				foreach ($param as $columns) {
+					$found = true;
+
+					foreach ($columns as $name => $value) {
+						if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
+							$found = false;
+							break;
+						}
+					}
+
+					if ($found) {
+						$rows[] = $row;
+						break;
+					}
+				}
+			}
+
+			$result = new CElementCollection($rows, CTableRowElement::class);
+		}
+
+		return $result;
 	}
 
 	/**
