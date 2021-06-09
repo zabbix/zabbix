@@ -25,6 +25,7 @@ const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
 const DASHBOARD_PAGE_EVENT_EDIT = 'dashboard-page-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'dashboard-page-widget-add';
+const DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW = 'dashboard-page-widget-add-new';
 const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'dashboard-page-widget-delete';
 const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'dashboard-page-widget-position';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'dashboard-page-widget-edit';
@@ -104,8 +105,9 @@ class CDashboardPage extends CBaseComponent {
 		if (this._is_edit_mode) {
 			this._initWidgetDragging();
 			this._initWidgetResizing();
-			this._initWidgetPlaceholder();
 		}
+
+		this._initWidgetPlaceholder();
 	}
 
 	// Logical state control methods.
@@ -142,8 +144,9 @@ class CDashboardPage extends CBaseComponent {
 		if (this._is_edit_mode) {
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
-			this.resetWidgetPlaceholder();
 		}
+
+		this.resetWidgetPlaceholder();
 	}
 
 	_activateWidget(widget) {
@@ -167,9 +170,9 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		this._deactivateEvents();
+		this._deactivateWidgetPlaceholder();
 
 		if (this._is_edit_mode) {
-			this._deactivateWidgetPlaceholder();
 			this._deactivateWidgetDragging();
 			this._deactivateWidgetResizing();
 		}
@@ -220,7 +223,6 @@ class CDashboardPage extends CBaseComponent {
 
 		this._initWidgetDragging();
 		this._initWidgetResizing();
-		this._initWidgetPlaceholder();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
 			this._resizeGrid(this._getNumOccupiedRows() + this._grid_pad_rows);
@@ -783,6 +785,7 @@ class CDashboardPage extends CBaseComponent {
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 		this._widget_placeholder_is_active = false;
+		this._widget_placeholder_is_edit_mode = null;
 		this._widget_placeholder_move_animation_frame = null;
 
 		this._dashboard_grid.appendChild(this._widget_placeholder.getNode());
@@ -938,6 +941,15 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		this._widget_placeholder_events = {
+			addNewWidget: () => {
+				if (!this._is_edit_mode) {
+					this.setEditMode();
+					this.fire(DASHBOARD_PAGE_EVENT_EDIT);
+				}
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD_NEW);
+			},
+
 			mouseDown: (e) => {
 				if (e.button != 0) {
 					return;
@@ -1007,6 +1019,10 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	resetWidgetPlaceholder() {
+		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode != this._is_edit_mode) {
+			this._deactivateWidgetPlaceholder();
+		}
+
 		if (!this._widget_placeholder_is_active) {
 			this._activateWidgetPlaceholder();
 		}
@@ -1014,55 +1030,59 @@ class CDashboardPage extends CBaseComponent {
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 
-		if (this._is_editable) {
-			if (this._is_kiosk_mode) {
-				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
-			}
-			else {
-				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
-			}
-		}
-		else {
-			this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_READONLY);
-		}
-
-		if (this._widgets.size == 0) {
-			this._widget_placeholder.showAtDefaultPosition();
+		if (this._is_editable && this._widgets.size == 0) {
+			this._widget_placeholder
+				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
+				.showAtDefaultPosition();
 		}
 	}
 
 	_activateWidgetPlaceholder() {
-		this._widget_placeholder.on('mousedown', this._widget_placeholder_events.mouseDown);
+		this._widget_placeholder.on(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+			this._widget_placeholder_events.addNewWidget
+		);
 
-		this._dashboard_grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
-		this._dashboard_grid.addEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+		if (this._is_edit_mode) {
+			this._widget_placeholder.on('mousedown', this._widget_placeholder_events.mouseDown);
 
-		document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
+			this._dashboard_grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+			this._dashboard_grid.addEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+			document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
+		}
 
 		this._widget_placeholder_is_active = true;
+		this._widget_placeholder_is_edit_mode = this._is_edit_mode;
 	}
 
 	_deactivateWidgetPlaceholder({do_hide = true} = {}) {
-		if (this._widget_placeholder_move_animation_frame !== null) {
-			cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
-			this._widget_placeholder_move_animation_frame = null;
+		this._widget_placeholder.off(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+			this._widget_placeholder_events.addNewWidget
+		);
+
+		if (this._widget_placeholder_is_edit_mode) {
+			if (this._widget_placeholder_move_animation_frame !== null) {
+				cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
+				this._widget_placeholder_move_animation_frame = null;
+			}
+
+			this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
+
+			this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+			this._dashboard_grid.removeEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+			document.querySelector('.wrapper').removeEventListener('scroll', this._widget_placeholder_events.scroll);
+
+			document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+			document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 		}
-
-		this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
-
-		this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
-		this._dashboard_grid.removeEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
-
-		document.querySelector('.wrapper').removeEventListener('scroll', this._widget_placeholder_events.scroll);
-
-		document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
-		document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 
 		if (do_hide) {
 			this._widget_placeholder.hide();
 		}
 
 		this._widget_placeholder_is_active = false;
+		this._widget_placeholder_is_edit_mode = null;
 	}
 
 	// Widget dragging methods.

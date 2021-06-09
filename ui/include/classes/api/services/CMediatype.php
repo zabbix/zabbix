@@ -398,10 +398,10 @@ class CMediatype extends CApiService {
 					));
 				}
 
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 100
 						|| $mediatype['maxattempts'] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 10)
+						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 100)
 					));
 				}
 			}
@@ -417,15 +417,15 @@ class CMediatype extends CApiService {
 				if ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS) {
 					$attempt_interval = timeUnitToSeconds($mediatype['attempt_interval']);
 
-					if ($attempt_interval < 0 || $attempt_interval > 60) {
+					if ($attempt_interval < 0 || $attempt_interval > 3600) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 60)
+							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
 						));
 					}
 				}
 				else {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 60)
+						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
 					));
 				}
 			}
@@ -732,10 +732,10 @@ class CMediatype extends CApiService {
 					));
 				}
 
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 10
+				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 100
 						|| $mediatype['maxattempts'] < 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 10)
+						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 100)
 					));
 				}
 			}
@@ -752,15 +752,15 @@ class CMediatype extends CApiService {
 				if ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS) {
 					$attempt_interval = timeUnitToSeconds($mediatype['attempt_interval']);
 
-					if ($attempt_interval < 0 || $attempt_interval > 60) {
+					if ($attempt_interval < 0 || $attempt_interval > 3600) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 60)
+							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
 						));
 					}
 				}
 				else {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 60)
+						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
 					));
 				}
 			}
