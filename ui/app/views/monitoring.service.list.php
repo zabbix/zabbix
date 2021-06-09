@@ -96,8 +96,11 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem($filter)
-	->addItem($table)
+	->addItem([
+		$filter,
+		$table,
+		$data['paging']
+	])
 	->show();
 
 (new CScriptTag('

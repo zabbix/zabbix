@@ -49,19 +49,28 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'tags' => []
 		];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
+		$db_servicesids = API::Service()->get([
+			'output' => [],
+			'sortfield' => ['sortorder', 'name'],
+			'sortorder' => ZBX_SORT_UP,
+			'preservekeys' => true,
+			'limit' => $limit
+		]);
+
+		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $db_servicesids, ZBX_SORT_UP,
+			$data['view_curl']
+		);
+
 		$data['services'] = API::Service()->get([
 			'output' => ['name', 'status', 'goodsla', 'sortorder'],
+			'serviceids' => array_keys($db_servicesids),
 			'selectParent' => ['serviceid', 'name', 'sortorder'],
 			'selectDependencies' => [],
 			'selectTrigger' => ['description'],
 			'preservekeys' => true
 		]);
-
-		sortServices($data['services']);
-
-		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $data['services'], ZBX_SORT_UP,
-			$data['view_curl']
-		);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

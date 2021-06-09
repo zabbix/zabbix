@@ -67,7 +67,7 @@ foreach ($data['services'] as $serviceid => $service) {
 	$dependencies_count = count($service['dependencies']);
 
 	$table->addRow(new CRow([
-		new CCheckBox('serviceid['.$serviceid.']', $serviceid),
+		new CCheckBox('serviceids['.$serviceid.']', $serviceid),
 		$dependencies_count > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
@@ -100,8 +100,6 @@ foreach ($data['services'] as $serviceid => $service) {
 	]));
 }
 
-$form->addItem($table);
-
 (new CWidget())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
@@ -122,8 +120,22 @@ $form->addItem($table);
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem($filter)
-	->addItem($form)
+	->addItem([
+		$filter,
+		$form->addItem([
+			$table,
+			$data['paging'],
+			new CActionButtonList('action', 'serviceids', [
+				'popup.massupdate.service' => [
+					'content' => (new CButton('', _('Mass update')))
+						->onClick("return openMassupdatePopup(this, 'popup.massupdate.service');")
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->removeAttribute('id')
+				],
+				'service.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected services?')]
+			])
+		])
+	])
 	->show();
 
 (new CScriptTag('
