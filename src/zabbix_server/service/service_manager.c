@@ -37,13 +37,13 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	zbx_uint64_t		current_eventid;
-	int			status;
-	int			old_status;
-	int			algorithm;
 	zbx_vector_ptr_t	service_problems;
 	zbx_vector_ptr_t	service_problem_tags;
 	zbx_vector_ptr_t	children;
 	zbx_vector_ptr_t	parents;
+	int			status;
+	int			algorithm;
+	int			revision;
 }
 zbx_service_t;
 
@@ -92,8 +92,7 @@ zbx_values_eq_t;
 typedef struct
 {
 	zbx_uint64_t	linkid;
-	zbx_service_t	*parent;
-	zbx_service_t	*child;
+	int		revision;
 }
 zbx_services_link_t;
 
@@ -278,11 +277,63 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	sync_services(zbx_hashset_t *services, int *updated)
+static void	index_service_problem(zbx_service_t *service, zbx_hashset_t *service_problems_index,
+		zbx_service_problem_t *pservice_problem)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_service_t	service, *pservice;
+	zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
+
+	service_problem_index.eventid = pservice_problem->eventid;
+	if (NULL == (pservice_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index)))
+	{
+		zbx_vector_ptr_create(&service_problem_index.services);
+		pservice_problem_index = zbx_hashset_insert(service_problems_index, &service_problem_index,
+				sizeof(service_problem_index));
+	}
+
+	zbx_vector_ptr_append(&pservice_problem_index->services, service);
+
+	zbx_vector_ptr_append(&service->service_problems, pservice_problem);
+}
+
+static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashset_t *service_problems_index)
+{
+	zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
+	int				i;
+	zbx_service_problem_t		*pservice_problem;
+
+	pservice_problem = (zbx_service_problem_t *)service->service_problems.values[index];
+
+	service_problem_index.eventid = pservice_problem->eventid;
+	if (NULL == (pservice_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+	{
+		if (FAIL == (i = zbx_vector_ptr_search(&pservice_problem_index->services, service,
+				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+		else
+		{
+			zbx_vector_ptr_remove_noorder(&pservice_problem_index->services, i);
+
+			if (0 == pservice_problem_index->services.values_num)
+				zbx_hashset_remove_direct(service_problems_index, pservice_problem_index);
+		}
+	}
+
+	zbx_vector_ptr_remove_noorder(&service->service_problems, index);
+	zbx_free(pservice_problem);
+}
+
+static void	sync_services(zbx_service_manager_t *service_manager, int *updated, int revision)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_service_t		service, *pservice;
+	zbx_hashset_iter_t	iter;
 
 	result = DBselect("select serviceid,status,algorithm from services");
 
@@ -292,18 +343,26 @@ static void	sync_services(zbx_hashset_t *services, int *updated)
 		service.status = atoi(row[1]);
 		service.algorithm = atoi(row[2]);
 
-		if (NULL == (pservice = zbx_hashset_search(services, &service)))
+		if (NULL == (pservice = zbx_hashset_search(&service_manager->services, &service)))
 		{
+			service.revision = revision;
 			service.current_eventid = 0;
+
 			zbx_vector_ptr_create(&service.children);
 			zbx_vector_ptr_create(&service.parents);
 			zbx_vector_ptr_create(&service.service_problem_tags);
 			zbx_vector_ptr_create(&service.service_problems);
 
-			zbx_hashset_insert(services, &service, sizeof(service));
+			zbx_hashset_insert(&service_manager->services, &service, sizeof(service));
+
 			(*updated)++;
 			continue;
 		}
+
+		pservice->revision = revision;
+
+		zbx_vector_ptr_clear(&pservice->children);
+		zbx_vector_ptr_clear(&pservice->parents);
 
 		if (pservice->status != service.status || pservice->algorithm != service.algorithm)
 		{
@@ -313,6 +372,32 @@ static void	sync_services(zbx_hashset_t *services, int *updated)
 		}
 	}
 	DBfree_result(result);
+
+	zbx_hashset_iter_reset(&service_manager->services, &iter);
+	while (NULL != (pservice = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	i;
+
+		if (revision == pservice->revision)
+			continue;
+
+		for (i = 0; i < pservice->service_problem_tags.values_num; i++)
+		{
+			zbx_service_problem_tag_t	*service_problem_tag;
+
+			service_problem_tag = (zbx_service_problem_tag_t *)pservice->service_problem_tags.values[i];
+			service_problem_tag->service = NULL;
+		}
+
+		for (i = 0; i < pservice->service_problems.values_num; i++)
+		{
+			remove_service_problem(pservice, i, &service_manager->service_problems_index);
+			i--;
+		}
+
+		zbx_hashset_iter_remove(&iter);
+		(*updated)++;
+	}
 }
 
 static zbx_hash_t	values_eq_hash(const void *data)
@@ -428,17 +513,20 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager)
 	DBfree_result(result);
 }
 
-static void	sync_services_links(zbx_service_manager_t *service_manager)
+static void	sync_services_links(zbx_service_manager_t *service_manager, int *updated, int revision)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_hashset_iter_t	iter;
+	zbx_services_link_t	services_link, *pservices_link;
 
 	result = DBselect("select linkid,serviceupid,servicedownid from services_links");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t		serviceupid, servicedownid;
-		zbx_services_link_t	services_link, *pservices_link;
+		zbx_service_t	*parent, *child;
+		zbx_uint64_t	serviceupid;
+		zbx_uint64_t	servicedownid;
 
 		ZBX_STR2UINT64(services_link.linkid, row[0]);
 		ZBX_STR2UINT64(serviceupid, row[1]);
@@ -446,79 +534,36 @@ static void	sync_services_links(zbx_service_manager_t *service_manager)
 
 		if (NULL == (pservices_link = zbx_hashset_search(&service_manager->services_links, &services_link)))
 		{
-			services_link.parent = zbx_hashset_search(&service_manager->services, &serviceupid);
-			services_link.child = zbx_hashset_search(&service_manager->services, &servicedownid);
+			pservices_link = zbx_hashset_insert(&service_manager->services_links, &services_link,
+					sizeof(services_link));
+		}
 
-			if (NULL == services_link.parent || NULL == services_link.child)
-			{
-				/* it is not possible for link to exist without corresponding service */
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
+		pservices_link->revision = revision;
 
-			zbx_vector_ptr_append(&services_link.parent->children, services_link.child);
-			zbx_vector_ptr_append(&services_link.child->parents, services_link.parent);
-			zbx_hashset_insert(&service_manager->services_links, &services_link, sizeof(services_link));
+		parent = zbx_hashset_search(&service_manager->services, &serviceupid);
+		child = zbx_hashset_search(&service_manager->services, &servicedownid);
+
+		if (NULL == parent || NULL == child)
+		{
+			/* it is not possible for link to exist without corresponding service */
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		/* links cannot be changed */
-
-		/* TODO: handle deleted links by removing child and parent from services vector */
+		zbx_vector_ptr_append(&parent->children, child);
+		zbx_vector_ptr_append(&child->parents, parent);
 	}
 	DBfree_result(result);
-}
 
-static void	index_service_problem(zbx_service_t *service, zbx_hashset_t *service_problems_index,
-		zbx_service_problem_t *pservice_problem)
-{
-	zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
-
-	service_problem_index.eventid = pservice_problem->eventid;
-	if (NULL == (pservice_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index)))
+	zbx_hashset_iter_reset(&service_manager->services_links, &iter);
+	while (NULL != (pservices_link = (zbx_services_link_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_create(&service_problem_index.services);
-		pservice_problem_index = zbx_hashset_insert(service_problems_index, &service_problem_index,
-				sizeof(service_problem_index));
+		if (revision == pservices_link->revision)
+			continue;
+
+		zbx_hashset_iter_remove(&iter);
+		(*updated)++;
 	}
-
-	zbx_vector_ptr_append(&pservice_problem_index->services, service);
-
-	zbx_vector_ptr_append(&service->service_problems, pservice_problem);
-}
-
-static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashset_t *service_problems_index)
-{
-	zbx_service_problem_index_t	*pservice_problem_index, service_problem_index;
-	int				i;
-	zbx_service_problem_t		*pservice_problem;
-
-	pservice_problem = (zbx_service_problem_t *)service->service_problems.values[index];
-
-	service_problem_index.eventid = pservice_problem->eventid;
-	if (NULL == (pservice_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
-	else
-	{
-		if (FAIL == (i = zbx_vector_ptr_search(&pservice_problem_index->services, service,
-				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-		}
-		else
-		{
-			zbx_vector_ptr_remove_noorder(&pservice_problem_index->services, i);
-
-			if (0 == pservice_problem_index->services.values_num)
-				zbx_hashset_remove_direct(service_problems_index, pservice_problem_index);
-		}
-	}
-
-	zbx_vector_ptr_remove_noorder(&service->service_problems, index);
-	zbx_free(pservice_problem);
-
 }
 
 static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *service_problems_index)
@@ -1289,12 +1334,12 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //
 		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush)
 		{
-			int	updated = 0;
+			int	updated = 0, revision = time(NULL);
 
 			DBbegin();
-			sync_services(&service_manager.services, &updated);
+			sync_services(&service_manager, &updated, revision);
 			sync_service_problem_tags(&service_manager);
-			sync_services_links(&service_manager);
+			sync_services_links(&service_manager, &updated, revision);
 
 			if (0 == time_flush)
 				sync_service_problems(&service_manager.services, &service_manager.service_problems_index);
