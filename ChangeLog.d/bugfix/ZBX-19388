@@ -1,0 +1,1 @@
+A......... [ZBX-19388] fixed inherited graph and graph prototype update if user has no permissions to child host or template (Ivo)
