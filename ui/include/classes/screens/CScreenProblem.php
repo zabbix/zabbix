@@ -770,7 +770,7 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], $this->config, true);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
-		if ($this->data['action'] === 'problem.view') {
+		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
 		}
 
@@ -802,7 +802,7 @@ class CScreenProblem extends CScreenBase {
 			? OPERATIONAL_DATA_SHOW_NONE
 			: $this->data['filter']['show_opdata'];
 
-		if ($this->data['action'] === 'problem.view') {
+		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
 				->setName('problem')
@@ -1133,7 +1133,7 @@ class CScreenProblem extends CScreenBase {
 				'popup.acknowledge.edit' => ['name' => _('Mass update')]
 			], 'problem');
 
-			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
+			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
 		}
 
 		/*

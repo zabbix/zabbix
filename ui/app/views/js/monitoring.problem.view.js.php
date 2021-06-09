@@ -65,10 +65,157 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$(function() {
-			$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
-			$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+
+		$(document).on({
+			mouseenter: function() {
+				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
+					$(this).attr({title: $(this).text()});
+				}
+			},
+			mouseleave: function() {
+				if ($(this).is('[title]')) {
+					$(this).removeAttr('title');
+				}
+			}
+		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
+
+		$.subscribe('acknowledge.create', function(event, response) {
+			// Clear all selected checkboxes in Monitoring->Problems.
+			if (chkbxRange.prefix === 'problem') {
+				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+				chkbxRange.clearSelectedOnFilterChange();
+			}
+
+			window.problems_page.refreshNow();
+
+			clearMessages();
+			addMessage(makeMessageBox('good', [], response.message, true, false));
 		});
+
+		$.subscribe('timeselector.rangeupdate', function(event, response) {
+			let refresh_url = new Curl(window.problems_page.refresh_url);
+			refresh_url.setArgument('from', response.from);
+			refresh_url.setArgument('to', response.to);
+			window.problems_page.refresh_url = refresh_url.getUrl();
+
+			window.problems_page.refreshNow();
+		});
+
+		$(document).on('submit', '#problem_form', function(e) {
+			e.preventDefault();
+
+			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
+					return $(this).val();
+				}).get();
+
+			acknowledgePopUp({eventids: eventids}, this);
+		});
+	});
+
+	function problemsPage() {
+		this.refresh_url = '<?= $data['refresh_url'] ?>';
+		this.refresh_interval = <?= $data['refresh_interval'] ?>;
+		this.running = false;
+		this.timeout = null;
+	}
+
+	problemsPage.prototype.addMessages = function(messages) {
+		$('.wrapper main').before(messages);
+	};
+
+	problemsPage.prototype.removeMessages = function() {
+		$('.wrapper .msg-bad').remove();
+	};
+
+	problemsPage.prototype.getCurrentResultTable = function() {
+		return $('#flickerfreescreen_problem');
+	};
+
+	problemsPage.prototype.getCurrentDebugBlock = function() {
+		return $('.wrapper > .debug-output');
+	};
+
+	problemsPage.prototype.setLoading = function() {
+		this.getCurrentResultTable().addClass('is-loading is-loading-fadein delayed-15s');
+	};
+
+	problemsPage.prototype.clearLoading = function() {
+		this.getCurrentResultTable().removeClass('is-loading is-loading-fadein delayed-15s');
+	};
+
+	problemsPage.prototype.refreshBody = function(body) {
+		this.getCurrentResultTable().replaceWith(body);
+		chkbxRange.init();
+	};
+
+	problemsPage.prototype.refreshDebug = function(debug) {
+		this.getCurrentDebugBlock().replaceWith(debug);
+	};
+
+	problemsPage.prototype.refresh = function() {
+		this.setLoading();
+
+		var deferred = $.getJSON(this.refresh_url);
+
+		return this.bindDataEvents(deferred);
+	};
+
+	problemsPage.prototype.refreshNow = function() {
+		this.unscheduleRefresh();
+		this.refresh();
+	};
+
+	problemsPage.prototype.scheduleRefresh = function() {
+		this.unscheduleRefresh();
+		this.timeout = setTimeout((function() {
+			this.timeout = null;
+			this.refresh();
+		}).bind(this), this.refresh_interval);
+	};
+
+	problemsPage.prototype.unscheduleRefresh = function() {
+		if (this.timeout !== null) {
+			clearTimeout(this.timeout);
+			this.timeout = null;
+		}
+	};
+
+	problemsPage.prototype.start = function() {
+		if (this.refresh_interval != 0) {
+			this.running = true;
+			this.scheduleRefresh();
+		}
+	};
+
+	problemsPage.prototype.bindDataEvents = function(deferred) {
+		var that = this;
+
+		deferred
+			.done(function(response) {
+				that.onDataDone.call(that, response);
+			})
+			.always(this.onDataAlways.bind(this));
+
+		return deferred;
+	};
+
+	problemsPage.prototype.onDataAlways = function() {
+		if (this.running) {
+			this.scheduleRefresh();
+		}
+	};
+
+	problemsPage.prototype.onDataDone = function(response) {
+		this.clearLoading();
+		this.removeMessages();
+		this.refreshBody(response.body);
+		('messages' in response) && this.addMessages(response.messages);
+		('debug' in response) && this.refreshDebug(response.debug);
+	};
+
+	problemsPage.prototype.liveFilter = function() {
+		$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
+		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
 
 		$('#filter_show').change(function() {
 			var	filter_show = jQuery('input[name=filter_show]:checked').val();
@@ -97,41 +244,10 @@
 			$('#filter_tag_priority').prop('disabled', disabled);
 			$('#filter_tag_name_format input').prop('disabled', disabled);
 		});
+	};
 
-		$(document).on({
-			mouseenter: function() {
-				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
-					$(this).attr({title: $(this).text()});
-				}
-			},
-			mouseleave: function() {
-				if ($(this).is('[title]')) {
-					$(this).removeAttr('title');
-				}
-			}
-		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
-
-		$.subscribe('acknowledge.create', function(event, response) {
-			// Clear all selected checkboxes in Monitoring->Problems.
-			if (chkbxRange.prefix === 'problem') {
-				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-				chkbxRange.clearSelectedOnFilterChange();
-			}
-
-			window.flickerfreeScreen.refresh('problem');
-
-			clearMessages();
-			addMessage(makeMessageBox('good', [], response.message, true, false));
-		});
-
-		$(document).on('submit', '#problem_form', function(e) {
-			e.preventDefault();
-
-			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
-
-			acknowledgePopUp({eventids: eventids}, this);
-		});
+	$(function() {
+		window.problems_page = new problemsPage();
+		window.problems_page.liveFilter();
 	});
 </script>
