@@ -78,8 +78,9 @@ zbx_service_problem_tag_t;
 
 typedef struct
 {
-	char		*tag;
-	zbx_hashset_t	values;
+	char			*tag;
+	zbx_hashset_t		values;
+	zbx_vector_ptr_t	service_problem_tags_like;
 }
 zbx_tag_services_t;
 
@@ -156,24 +157,24 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 	for (i = 0; i < event->tags.values_num; i++)
 	{
-		zbx_tag_services_t	tag_services, *ptag_services;
+		zbx_tag_services_t	tag_services_local, *tag_services;
 		const zbx_tag_t		*tag = (const zbx_tag_t *)event->tags.values[i];
 
-		tag_services.tag = tag->tag;
+		tag_services_local.tag = tag->tag;
 
-		if (NULL != (ptag_services = (zbx_tag_services_t *)zbx_hashset_search(service_problem_tags_index,
-				&tag_services)))
+		if (NULL != (tag_services = (zbx_tag_services_t *)zbx_hashset_search(service_problem_tags_index,
+				&tag_services_local)))
 		{
-			zbx_values_eq_t	values_eq = {.value = tag->value}, *pvalues_eq;
+			zbx_values_eq_t	values_eq_local = {.value = tag->value}, *values_eq;
 
-			if (NULL != (pvalues_eq = (zbx_values_eq_t *)zbx_hashset_search(&ptag_services->values,
-					&values_eq)))
+			if (NULL != (values_eq = (zbx_values_eq_t *)zbx_hashset_search(&tag_services->values,
+					&values_eq_local)))
 			{
-				for (j = 0; j < pvalues_eq->service_problem_tags.values_num; j++)
+				for (j = 0; j < values_eq->service_problem_tags.values_num; j++)
 				{
 					zbx_service_problem_tag_t	*service_problem_tag;
 
-					service_problem_tag = (zbx_service_problem_tag_t *)pvalues_eq->service_problem_tags.values[j];
+					service_problem_tag = (zbx_service_problem_tag_t *)values_eq->service_problem_tags.values[j];
 
 					service_problem_tag->current_eventid = event->eventid;
 
@@ -183,6 +184,25 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 						service_problem_tag->service->current_eventid = event->eventid;
 						zbx_vector_ptr_append(&candidates, service_problem_tag->service);
 					}
+				}
+			}
+
+			for (j = 0; j < tag_services->service_problem_tags_like.values_num; j++)
+			{
+				zbx_service_problem_tag_t	*service_problem_tag;
+
+				service_problem_tag = (zbx_service_problem_tag_t *)tag_services->service_problem_tags_like.values[j];
+
+				if (NULL == strstr(tag->value, service_problem_tag->value))
+					continue;
+
+				service_problem_tag->current_eventid = event->eventid;
+
+				if (service_problem_tag->service->current_eventid != event->eventid ||
+						0 == candidates.values_num)
+				{
+					service_problem_tag->service->current_eventid = event->eventid;
+					zbx_vector_ptr_append(&candidates, service_problem_tag->service);
 				}
 			}
 		}
@@ -364,27 +384,37 @@ static void	add_service_problem_tag_index(zbx_hashset_t *service_problem_tags_in
 		zbx_hashset_create_ext(&tag_services_local.values, 1,
 				values_eq_hash, values_eq_compare, values_eq_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+		zbx_vector_ptr_create(&tag_services_local.service_problem_tags_like);
 
 		tag_services = zbx_hashset_insert(service_problem_tags_index, &tag_services_local,
 				sizeof(tag_services_local));
+
 	}
 
-	/* add value to index */
-	value_eq_local.value = service_problem_tag->value;
-	if (NULL == (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
+	if (ZBX_SERVICE_TAG_OPERATOR_LIKE == service_problem_tag->operator)
 	{
-		value_eq_local.value = zbx_strdup(NULL, service_problem_tag->value);
-		zbx_vector_ptr_create(&value_eq_local.service_problem_tags);
-		value_eq = zbx_hashset_insert(&tag_services->values, &value_eq_local, sizeof(value_eq_local));
+		zbx_vector_ptr_append(&tag_services->service_problem_tags_like, service_problem_tag);
 	}
+	else
+	{
+		/* add value to index */
+		value_eq_local.value = service_problem_tag->value;
+		if (NULL == (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
+		{
+			value_eq_local.value = zbx_strdup(NULL, service_problem_tag->value);
+			zbx_vector_ptr_create(&value_eq_local.service_problem_tags);
+			value_eq = zbx_hashset_insert(&tag_services->values, &value_eq_local, sizeof(value_eq_local));
+		}
 
-	zbx_vector_ptr_append(&value_eq->service_problem_tags, service_problem_tag);
+		zbx_vector_ptr_append(&value_eq->service_problem_tags, service_problem_tag);
+	}
 }
 static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags_index,
 		zbx_service_problem_tag_t *service_problem_tag)
 {
 	zbx_tag_services_t	tag_services_local, *tag_services;
 	zbx_values_eq_t		value_eq_local, *value_eq;
+	int			i;
 
 	tag_services_local.tag = service_problem_tag->tag;
 
@@ -394,12 +424,9 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 	}
 	else
 	{
-		value_eq_local.value = service_problem_tag->value;
-		if (NULL != (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
+		if (ZBX_SERVICE_TAG_OPERATOR_LIKE == service_problem_tag->operator)
 		{
-			int	i;
-
-			i = zbx_vector_ptr_search(&value_eq->service_problem_tags, service_problem_tag,
+			i = zbx_vector_ptr_search(&tag_services->service_problem_tags_like, service_problem_tag,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 			if (FAIL == i)
@@ -407,14 +434,30 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 				THIS_SHOULD_NEVER_HAPPEN;
 			}
 			else
+				zbx_vector_ptr_remove_noorder(&tag_services->service_problem_tags_like, i);
+		}
+		else
+		{
+			value_eq_local.value = service_problem_tag->value;
+			if (NULL != (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
 			{
-				zbx_vector_ptr_remove_noorder(&value_eq->service_problem_tags, i);
-				if (0 == value_eq->service_problem_tags.values_num)
-					zbx_hashset_remove_direct(&tag_services->values, value_eq);
+				i = zbx_vector_ptr_search(&value_eq->service_problem_tags, service_problem_tag,
+						ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+				if (FAIL == i)
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+				else
+				{
+					zbx_vector_ptr_remove_noorder(&value_eq->service_problem_tags, i);
+					if (0 == value_eq->service_problem_tags.values_num)
+						zbx_hashset_remove_direct(&tag_services->values, value_eq);
+				}
 			}
 		}
 
-		if (0 == tag_services->values.num_data)
+		if (0 == tag_services->values.num_data && 0 == tag_services->service_problem_tags_like.values_num)
 			zbx_hashset_remove_direct(service_problem_tags_index, tag_services);
 	}
 }
@@ -717,6 +760,7 @@ static void	tag_services_clean(void *data)
 {
 	zbx_tag_services_t	*d = (zbx_tag_services_t *)data;
 
+	zbx_vector_ptr_destroy(&d->service_problem_tags_like);
 	zbx_hashset_destroy(&d->values);
 	zbx_free(d->tag);
 }
