@@ -117,6 +117,7 @@ const char	*help_message[] = {
 	"                                 section (historycache, preprocessing, alerting,",
 	"                                 lld, valuecache, locks) or everything if section is",
 	"                                 not specified",
+	"      " ZBX_SERVICE_CACHE_RELOAD "       Reload service cache",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
