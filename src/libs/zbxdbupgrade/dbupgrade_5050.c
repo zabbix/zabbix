@@ -101,7 +101,7 @@ static int	DBpatch_5050004(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	int	i, ret = SUCCEED;
+	int		ret = SUCCEED;
 
 	result = DBselect("select distinct roleid from role_rule");
 
@@ -125,8 +125,8 @@ static int	DBpatch_5050004(void)
 		}
 		else if (1 == ui_def_access && -1 == ui_conf_services && 0 == act_def_access)
 		{
-			if (ZBX_DB_OK > DBexecute("insert into role_rule (role_ruleid, roleid, type, name, value_int, "
-					"value_str, value_moduleid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",0,"
+			if (ZBX_DB_OK > DBexecute("insert into role_rule (role_ruleid,roleid,type,name,value_int,"
+					"value_str,value_moduleid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",0,"
 					"'actions.manage_services',1,'',NULL)", DBget_maxid("role_rule"), roleid))
 			{
 				ret = FAIL;
@@ -142,7 +142,6 @@ static int	DBpatch_5050004(void)
 				goto out;
 			}
 		}
-
 	}
 out:
 	DBfree_result(result);
