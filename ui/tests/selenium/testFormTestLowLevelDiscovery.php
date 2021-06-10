@@ -30,7 +30,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	/**
 	 * Check Test LLD Button enabled/disabled state depending on item type for Host.
 	 *
-	 * @backup-once items
+	 * @backupOnce items
 	 */
 	public function testFormTestLowLevelDiscovery_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(), 'LLD for Test Button check', 'Discovery rule',

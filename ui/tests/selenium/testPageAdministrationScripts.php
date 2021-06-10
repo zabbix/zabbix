@@ -88,7 +88,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allScripts
-	 * @backup-once scripts
+	 * @backupOnce scripts
 	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');

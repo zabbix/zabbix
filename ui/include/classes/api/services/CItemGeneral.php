@@ -120,6 +120,20 @@ abstract class CItemGeneral extends CApiService {
 	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
+		]];
+		if ($update) {
+			unset($api_input_rules['fields']['type']['flags']);
+		}
+
+		foreach ($items as $num => $item) {
+			$data = array_intersect_key($item, $api_input_rules['fields']);
+			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($num + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+
 		if ($update) {
 			$itemDbFields = ['itemid' => null];
 

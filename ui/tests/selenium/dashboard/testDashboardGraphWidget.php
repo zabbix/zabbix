@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
  * @backup widget
  * @backup profiles
  *
- * @on-before setDefaultWidgetType
+ * @onBefore setDefaultWidgetType
  */
 class testDashboardGraphWidget extends CWebTest {
 
