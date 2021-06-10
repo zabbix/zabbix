@@ -981,11 +981,11 @@ static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx
 			}
 			break;
 		case SERVICE_ALGORITHM_NONE:
-			goto out;
+			return;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
 					itservice->algorithm);
-			goto out;
+			return;
 	}
 
 	if (itservice->status != status)
@@ -1011,10 +1011,6 @@ static void	its_itservice_update_status(zbx_service_t *itservice, int clock, zbx
 					service_updates, flags);
 		}
 	}
-
-
-out:
-	;
 }
 
 static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *service_diffs,
