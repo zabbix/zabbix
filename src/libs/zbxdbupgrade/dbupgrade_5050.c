@@ -135,8 +135,8 @@ static int	DBpatch_5050004(void)
 		}
 		else if (0 == ui_def_access && 1 == ui_conf_services && 1 == act_def_access)
 		{
-			if (ZBX_DB_OK > DBexecute("delete from role_rule where roleid=2 and "
-					"name='ui.configuration.services'"))
+			if (ZBX_DB_OK > DBexecute("delete from role_rule where roleid=" ZBX_FS_UI64 " and "
+					"name='ui.configuration.services'", roleid))
 			{
 				ret = FAIL;
 				goto out;
