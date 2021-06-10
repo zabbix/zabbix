@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -499,7 +499,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * @dataProvider getHttpData
 	 * @backup config
-	 * @on-after removeConfigurationFiles
+	 * @onAfter removeConfigurationFiles
 	 *
 	 * Internal authentication with HTTP settings.
 	 */
