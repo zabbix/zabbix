@@ -1696,15 +1696,15 @@ static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 
 static zbx_hash_t	template_item_hash_func(const void *d)
 {
-	const zbx_template_item_t	*item = *(const zbx_template_item_t **)d;
+	const zbx_template_item_t	*item = *(const zbx_template_item_t * const *)d;
 
 	return ZBX_DEFAULT_UINT64_HASH_FUNC(&item->templateid);
 }
 
 static int	template_item_compare_func(const void *d1, const void *d2)
 {
-	const zbx_template_item_t	*item1 = *(const zbx_template_item_t **)d1;
-	const zbx_template_item_t	*item2 = *(const zbx_template_item_t **)d2;
+	const zbx_template_item_t	*item1 = *(const zbx_template_item_t * const *)d1;
+	const zbx_template_item_t	*item2 = *(const zbx_template_item_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item1->templateid, item2->templateid);
 	return 0;
@@ -2661,8 +2661,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
  ******************************************************************************/
 static int	compare_template_items(const void *d1, const void *d2)
 {
-	const zbx_template_item_t	*i1 = *(const zbx_template_item_t **)d1;
-	const zbx_template_item_t	*i2 = *(const zbx_template_item_t **)d2;
+	const zbx_template_item_t	*i1 = *(const zbx_template_item_t * const *)d1;
+	const zbx_template_item_t	*i2 = *(const zbx_template_item_t * const *)d2;
 
 	return zbx_default_uint64_compare_func(&i1->templateid, &i2->templateid);
 }
@@ -2717,8 +2717,8 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 
 static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 {
-	zbx_template_item_preproc_t	*op1 = *(zbx_template_item_preproc_t **)d1;
-	zbx_template_item_preproc_t	*op2 = *(zbx_template_item_preproc_t **)d2;
+	zbx_template_item_preproc_t *op1 = *(zbx_template_item_preproc_t * const *)d1;
+	zbx_template_item_preproc_t *op2 = *(zbx_template_item_preproc_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(op1->step, op2->step);
 	return 0;
@@ -2726,8 +2726,8 @@ static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 
 static int	template_item_tag_sort_by_tag(const void *d1, const void *d2)
 {
-	zbx_template_item_tag_t	*it1 = *(zbx_template_item_tag_t **)d1;
-	zbx_template_item_tag_t	*it2 = *(zbx_template_item_tag_t **)d2;
+	zbx_template_item_tag_t	*it1 = *(zbx_template_item_tag_t * const *)d1;
+	zbx_template_item_tag_t	*it2 = *(zbx_template_item_tag_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
 	return 0;
@@ -2735,8 +2735,8 @@ static int	template_item_tag_sort_by_tag(const void *d1, const void *d2)
 
 static int	template_item_param_sort_by_name(const void *d1, const void *d2)
 {
-	zbx_template_item_param_t	*ip1 = *(zbx_template_item_param_t **)d1;
-	zbx_template_item_param_t	*ip2 = *(zbx_template_item_param_t **)d2;
+	zbx_template_item_param_t	*ip1 = *(zbx_template_item_param_t * const *)d1;
+	zbx_template_item_param_t	*ip2 = *(zbx_template_item_param_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ip1->name, ip2->name);
 	return 0;
@@ -2744,8 +2744,8 @@ static int	template_item_param_sort_by_name(const void *d1, const void *d2)
 
 static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 {
-	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t **)d1;
-	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t **)d2;
+	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t * const *)d1;
+	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ip1->lld_macro, ip2->lld_macro);
 	return 0;
@@ -2767,7 +2767,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
 	zbx_template_item_preproc_t	*ppsrc, *ppdst;
-	const zbx_template_item_t	*item;
+	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
 	DB_ROW				row;
@@ -2776,11 +2776,11 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+	zbx_hashset_create(&items_t, (size_t)items->values_num, template_item_hash_func, template_item_compare_func);
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
 		if (NULL == item->key)
 			zbx_vector_uint64_append(&itemids, item->itemid);
@@ -2809,7 +2809,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 				continue;
 			}
 
-			item = (const zbx_template_item_t *)items->values[index];
+			item = (zbx_template_item_t *)items->values[index];
 
 			ppdst = (zbx_template_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_template_item_preproc_t));
 
@@ -2821,7 +2821,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 			ppdst->error_handler = atoi(row[5]);
 			ppdst->error_handler_params = zbx_strdup(NULL, row[6]);
 
-			zbx_vector_item_preproc_ptr_append(&item->item_preprocs, ppdst);
+			zbx_vector_item_preproc_ptr_append(&((zbx_template_item_t *)item)->item_preprocs, ppdst);
 		}
 		DBfree_result(result);
 		zbx_free(sql);
@@ -2841,11 +2841,10 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local;
-		const zbx_template_item_t	**pitem;
+		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
-		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -2870,7 +2869,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		int	j, preproc_num;
 		char	*buffer = NULL;
 
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
 		zbx_vector_item_preproc_ptr_sort(&item->item_preprocs, template_item_preproc_sort_by_step);
 		zbx_vector_item_preproc_ptr_sort(&item->template_preprocs, template_item_preproc_sort_by_step);
@@ -2961,7 +2960,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
 	zbx_template_item_tag_t		*ptsrc, *ptdst;
-	const zbx_template_item_t	*item;
+	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
 	DB_ROW				row;
@@ -2970,11 +2969,11 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+	zbx_hashset_create(&items_t, (size_t)items->values_num, template_item_hash_func, template_item_compare_func);
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
 		if (NULL == item->key)
 			zbx_vector_uint64_append(&itemids, item->itemid);
@@ -3002,7 +3001,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 				continue;
 			}
 
-			item = (const zbx_template_item_t *)items->values[index];
+			item = (zbx_template_item_t *)items->values[index];
 
 			ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
 
@@ -3030,11 +3029,10 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local;
-		const zbx_template_item_t	**pitem;
+		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
-		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -3056,7 +3054,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		int	j, tag_num;
 		char	*buffer = NULL;
 
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
 		zbx_vector_item_tag_ptr_sort(&item->item_tags, template_item_tag_sort_by_tag);
 		zbx_vector_item_tag_ptr_sort(&item->template_tags, template_item_tag_sort_by_tag);
@@ -3132,7 +3130,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
 	zbx_template_item_param_t	*ppsrc, *ppdst;
-	const zbx_template_item_t	*item;
+	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
 	DB_ROW				row;
@@ -3141,11 +3139,11 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+	zbx_hashset_create(&items_t, (size_t)items->values_num, template_item_hash_func, template_item_compare_func);
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
 		if (NULL == item->key)
 			zbx_vector_uint64_append(&itemids, item->itemid);
@@ -3173,7 +3171,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 				continue;
 			}
 
-			item = (const zbx_template_item_t *)items->values[index];
+			item = (zbx_template_item_t *)items->values[index];
 
 			ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 
@@ -3201,11 +3199,10 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local;
-		const zbx_template_item_t	**pitem;
+		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
-		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -3227,10 +3224,10 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 		int	j, param_num;
 		char	*buffer = NULL;
 
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
-		zbx_vector_item_param_ptr_sort(&item->item_tags, template_item_param_sort_by_name);
-		zbx_vector_item_param_ptr_sort(&item->template_tags, template_item_param_sort_by_name);
+		zbx_vector_item_param_ptr_sort(&item->item_params, template_item_param_sort_by_name);
+		zbx_vector_item_param_ptr_sort(&item->template_params, template_item_param_sort_by_name);
 
 		param_num = MAX(item->item_params.values_num, item->template_params.values_num);
 
@@ -3306,7 +3303,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
 	zbx_template_lld_macro_t	*plmpsrc, *plmpdst;
-	const zbx_template_item_t	*item;
+	zbx_template_item_t		*item;
 	DB_ROW				row;
 	DB_RESULT			result;
 
@@ -3333,7 +3330,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 				continue;
 			}
 
-			item = (const zbx_template_item_t *)items->values[index];
+			item = (zbx_template_item_t *)items->values[index];
 
 			plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
 
@@ -3361,11 +3358,10 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local;
-		const zbx_template_item_t	**pitem;
+		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
-		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(lld_items, &pitem_local)))
+		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(lld_items, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -3387,10 +3383,10 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 		int	j, lld_macro_num;
 		char	*buffer = NULL;
 
-		item = (const zbx_template_item_t *)items->values[i];
+		item = (zbx_template_item_t *)items->values[i];
 
-		zbx_vector_lld_macro_ptr_sort(&item->item_tags, template_lld_macro_sort_by_macro);
-		zbx_vector_lld_macro_ptr_sort(&item->template_tags, template_lld_macro_sort_by_macro);
+		zbx_vector_lld_macro_ptr_sort(&item->item_lld_macros, template_lld_macro_sort_by_macro);
+		zbx_vector_lld_macro_ptr_sort(&item->template_lld_macros, template_lld_macro_sort_by_macro);
 
 		lld_macro_num = MAX(item->item_lld_macros.values_num, item->template_lld_macros.values_num);
 
@@ -3521,7 +3517,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	copy_template_item_tags(&items);
 
 	zbx_vector_uint64_create(&lld_itemids);
-	zbx_hashset_create(&lld_items, items.values_num, template_item_hash_func, template_item_compare_func);
+	zbx_hashset_create(&lld_items, (size_t)items.values_num, template_item_hash_func, template_item_compare_func);
 
 	prepare_lld_items(&items, &lld_itemids, &lld_items);
 	if (0 != lld_items.num_data)
