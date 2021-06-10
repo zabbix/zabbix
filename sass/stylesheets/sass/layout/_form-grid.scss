@@ -1,19 +1,16 @@
 .form-grid {
+	$label-width: minmax(auto, 15%);
+
 	display: grid;
+	padding: 5px;
 	row-gap: 10px;
 	column-gap: 10px;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: $label-width 1fr;
 
 	> label {
 		line-height: 24px;
 		text-align: right;
 		word-wrap: break-word;
-	}
-
-	&.form-grid-offset {
-		> label {
-			min-width: 185px;
-		}
 	}
 
 	.form-actions,
@@ -38,12 +35,16 @@
 		}
 	}
 
+	.rowspan-2 {
+		grid-row: span 2;
+	}
+
 	&.form-grid-3-1 {
-		grid-template-columns: auto 3fr auto auto;
+		grid-template-columns: $label-width 3fr $label-width auto;
 	}
 
 	&.form-grid-1-1 {
-		grid-template-columns: repeat(2, auto 1fr);
+		grid-template-columns: repeat(2, $label-width 1fr);
 	}
 
 	&.form-grid-3-1,
@@ -61,6 +62,16 @@
 
 		td {
 			padding: 5px 5px 5px 0;
+		}
+	}
+
+	.form-field {
+		table {
+			width: 100%;
+		}
+
+		td {
+			padding: 0 5px 5px 0;
 		}
 	}
 

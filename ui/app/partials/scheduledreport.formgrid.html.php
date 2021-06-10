@@ -25,10 +25,6 @@
 
 $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
 
-if ($data['source'] === 'reports') {
-	$form_grid->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_OFFSET);
-}
-
 $user_multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'object_name' => 'users',

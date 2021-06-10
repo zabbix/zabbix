@@ -35,16 +35,45 @@ $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())
-				->addRow(_('Name'),
-					(new CTextBox('filter_select', $data['filter']['name']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				),
-			(new CFormList())
-				->addRow(_('Tags'), CTagFilterFieldHelper::getTagFilterField([
-					'evaltype' => $data['filter']['evaltype'],
-					'tags' => $data['filter']['tags']
-				]))
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1)
+				->addItem([
+					new CLabel(_('Name'), 'filter_select'),
+					new CFormField(
+						(new CTextBox('filter_select', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					),
+					(new CLabel(_('Tags')))->addClass(CFormGrid::ZBX_STYLE_ROWSPAN_2),
+					(new CFormField(
+						CTagFilterFieldHelper::getTagFilterField([
+							'evaltype' => $data['filter']['evaltype'],
+							'tags' => $data['filter']['tags']
+								? $data['filter']['tags']
+								: [
+									['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE],
+									['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE],
+									['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE],
+									['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE],
+									]
+						])
+					))->addClass(CFormGrid::ZBX_STYLE_ROWSPAN_2),
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), SERVICE_STATUS_ANY)
+							->addValue(_('OK'), SERVICE_STATUS_OK)
+							->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+							->setModern(true)
+					),
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), SERVICE_STATUS_ANY)
+							->addValue(_('OK'), SERVICE_STATUS_OK)
+							->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+							->setModern(true)
+					)
+				]),
 		])
 	: null;
 
