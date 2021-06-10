@@ -111,7 +111,7 @@ class CControllerPopupTriggerWizard extends CController {
 			$exprs[] = array_shift($input) + array_shift($input);
 		}
 
-		$constructor = new CTextTriggerConstructor(new CExpressionParser(['lldmacros' => true]));
+		$constructor = new CTextTriggerConstructor(new CExpressionParser(['usermacros' => true, 'lldmacros' => true]));
 
 		if ($this->hasInput('triggerid')) {
 			$page_options['triggerid'] = $this->getInput('triggerid');
