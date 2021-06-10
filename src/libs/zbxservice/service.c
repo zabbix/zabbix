@@ -22,7 +22,7 @@
 #include "zbxipcservice.h"
 #include "service_protocol.h"
 
-void	zbx_service_flush(unsigned char *data, zbx_uint32_t size)
+void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
 
@@ -38,7 +38,7 @@ void	zbx_service_flush(unsigned char *data, zbx_uint32_t size)
 		}
 	}
 
-	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, size))
+	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to service manager service");
 		exit(EXIT_FAILURE);

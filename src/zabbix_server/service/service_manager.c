@@ -280,7 +280,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			event->value = TRIGGER_VALUE_PROBLEM;
 			event->severity = atoi(row[2]);
 			zbx_vector_ptr_create(&event->tags);
-			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t **));
+			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t *));
 		}
 
 		if (FAIL == DBis_null(row[3]))
@@ -1290,7 +1290,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 					continue;
 				}
 
-				zbx_hashset_insert(&service_manager->problem_events, &event, sizeof(zbx_event_t **));
+				zbx_hashset_insert(&service_manager->problem_events, &event, sizeof(zbx_event_t *));
 
 				match_event_to_service_problem_tags(event,
 						&service_manager->service_problem_tags_index,
@@ -1495,13 +1495,20 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			zbx_vector_ptr_t	events;
 
-			zbx_vector_ptr_create(&events);
+			switch (message->code)
+			{
+				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS:
+					zbx_vector_ptr_create(&events);
 
-			zbx_service_deserialize(message->data, message->size, &events);
-			zbx_ipc_message_free(message);
-			process_events(&events, &service_manager);
+					zbx_service_deserialize(message->data, message->size, &events);
+					zbx_ipc_message_free(message);
+					process_events(&events, &service_manager);
 
-			zbx_vector_ptr_destroy(&events);
+					zbx_vector_ptr_destroy(&events);
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 
 		if (NULL != client)
