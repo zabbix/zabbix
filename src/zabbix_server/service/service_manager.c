@@ -33,6 +33,8 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+static volatile sig_atomic_t	service_cache_reload_requested;
+
 typedef struct
 {
 	zbx_uint64_t		serviceid;
@@ -1347,6 +1349,21 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+static void	zbx_serviceman_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags))
+		return;
+
+	if (service_cache_reload_requested == 1)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
+	}
+	else
+	{
+		service_cache_reload_requested = 1;
+		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service cache");
+	}
+}
 
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
@@ -1373,6 +1390,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_set_sigusr_handler(zbx_serviceman_sigusr_handler);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_SERVICE, &error))
 	{
@@ -1408,7 +1427,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //			processed_num = 0;
 //		}
 //
-		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush)
+		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush || 1 == service_cache_reload_requested)
 		{
 			int	updated = 0, revision = time(NULL);
 
@@ -1417,8 +1436,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			sync_service_problem_tags(&service_manager, &updated, revision);
 			sync_services_links(&service_manager, &updated, revision);
 
-			if (0 == time_flush)
+			if (0 == time_flush || 1 == service_cache_reload_requested)
+			{
 				sync_service_problems(&service_manager.services, &service_manager.service_problems_index);
+				service_cache_reload_requested = 0;
+			}
 
 			DBcommit();
 
