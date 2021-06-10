@@ -1222,13 +1222,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_create_itservices_lock(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IT services lock: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
@@ -1525,8 +1518,6 @@ void	zbx_on_exit(int ret)
 
 	/* free history value cache */
 	zbx_vc_destroy();
-
-	zbx_destroy_itservices_lock();
 
 	/* free vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)

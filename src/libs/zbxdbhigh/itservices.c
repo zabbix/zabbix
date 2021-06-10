@@ -807,13 +807,3 @@ out:
 
 	return ret;
 }
-
-int	zbx_create_itservices_lock(char **error)
-{
-	return zbx_mutex_create(&itservices_lock, ZBX_MUTEX_ITSERVICES, error);
-}
-
-void	zbx_destroy_itservices_lock(void)
-{
-	zbx_mutex_destroy(&itservices_lock);
-}
