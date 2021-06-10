@@ -48,14 +48,17 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 		}
 	}
 
-	if (NULL == *data)
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
 		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
 
-	while (data_len > *data_alloc - *data_offset)
-	{
-		*data_alloc *= 2;
-		*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
-	}
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 

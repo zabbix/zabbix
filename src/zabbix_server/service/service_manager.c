@@ -1263,7 +1263,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 				{
 					/* handle possible race condition when recovery is received before problem */
 					zbx_hashset_insert(&service_manager->recovery_events, &event,
-							sizeof(zbx_event_t **));
+							sizeof(zbx_event_t *));
 					continue;
 				}
 
