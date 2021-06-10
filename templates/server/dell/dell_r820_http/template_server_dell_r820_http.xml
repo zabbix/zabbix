@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-09T06:51:44Z</date>
+   <date>2021-06-10T06:21:16Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -190,29 +190,22 @@ Template tooling version used: 0.38</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}={$HEALTH.STATUS.DISASTER}</expression>
-                     <name>Dell R820: System is in unrecoverable state</name>
+                     <expression>{str("Critical")}=1</expression>
+                     <name>Dell R820: Server is in a critical state</name>
                      <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                     <priority>DISASTER</priority>
+                     <priority>HIGH</priority>
                      <description>Please check the device for faults.</description>
                   </trigger>
                   <trigger>
-                     <expression>{last()}={$HEALTH.STATUS.CRIT}</expression>
-                     <name>Dell R820: System status is in critical state</name>
-                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                     <description>Please check the device for errors.</description>
-                  </trigger>
-                  <trigger>
-                     <expression>{last()}={$HEALTH.STATUS.WARN}</expression>
-                     <name>Dell R820: System status is in warning state</name>
+                     <expression>{str("Warning")}=1</expression>
+                     <name>Dell R820: Server is in warning state</name>
                      <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>Please check the device for warnings.</description>
                      <dependencies>
                         <dependency>
-                           <name>Dell R820: System status is in critical state</name>
-                           <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.status.last()}={$HEALTH.STATUS.CRIT}</expression>
+                           <name>Dell R820: Server is in a critical state</name>
+                           <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.status.str("Critical")}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -280,6 +273,22 @@ Template tooling version used: 0.38</description>
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     system = JSON.parse(value);
 }
@@ -293,7 +302,12 @@ var params = {
     user: '{$API.USER}',
     password: '{$API.PASSWORD}'
 };
-var result = {};
+var result = {
+  model: '',
+  serialnumber: '',
+  status: '',
+  firmware: ''
+};
 
 var index = params.url.indexOf('://');
 index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
@@ -301,27 +315,15 @@ if (index !== -1) {
     params.url = params.url.substring(0, index);
 }
 
-if (typeof system.Model === 'string') {
-    result["model"] = system.Model;
-}
-if (typeof system.Oem.Dell.DellSystem.ChassisServiceTag === 'string') {
-    result["serialnumber"] = system.Oem.Dell.DellSystem.ChassisServiceTag;
-}
-if (typeof system.Status.Health === 'string') {
-    result["status"] = system.Status.Health;
-}
+result.model = getField(system, 'Model', '');
+result.serialnumber = getField(system, 'Oem.Dell.DellSystem.ChassisServiceTag', '');
+result.status = getField(system, 'Status.Health', '');
 
 response = request(params.url + '/redfish/v1/Managers/iDRAC.Embedded.1');
-if (typeof response.body.FirmwareVersion === 'string') {
-    result["firmware"] = response.body.FirmwareVersion;
-}
+result.firmware = getField(response.body, 'FirmwareVersion', '');
 
 return JSON.stringify(result);
 </params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>6h</params>
                   </step>
                </preprocessing>
                <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1</url>
@@ -343,7 +345,7 @@ return JSON.stringify(result);
                      <name>Dell R820: {#BATTERY_NAME} Status</name>
                      <type>HTTP_AGENT</type>
                      <key>dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]</key>
-                     <history>0</history>
+                     <history>7d</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
@@ -372,39 +374,22 @@ return JSON.stringify(result);
                      <url>{$API.URL}{#ODATA}</url>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
-                           <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#BATTERY_NAME} is in a critical state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                           <priority>AVERAGE</priority>
+                           <priority>HIGH</priority>
                            <description>Please check the device for faults.</description>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</expression>
+                           <expression>{str("Warning")}=1</expression>
                            <name>Dell R820: {#BATTERY_NAME} is in warning state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
-                           <description>Please check the device for faults.</description>
+                           <description>Please check the device for warnings.</description>
                            <dependencies>
                               <dependency>
-                                 <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
-                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{last()}&lt;&gt;{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}</expression>
-                           <name>Dell R820: {#BATTERY_NAME} is not in optimal state</name>
-                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <description>Please check the device for faults.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>Dell R820: {#BATTERY_NAME} is in critical state</name>
-                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
-                              </dependency>
-                              <dependency>
-                                 <name>Dell R820: {#BATTERY_NAME} is in warning state</name>
-                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</expression>
+                                 <name>Dell R820: {#BATTERY_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}].str("Critical")}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -457,6 +442,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     storages = JSON.parse(value);
 }
@@ -483,10 +484,8 @@ if (storages.Members instanceof Array) {
         if (typeof storage["@odata.id"] === 'string') {
             response = request(params.url + storage["@odata.id"]);
             controller = response.body;
-            if (controller.Id.search('RAID') &gt; -1) {
-                if (typeof response.body.Name === 'string') {
-                    result.push({ '{#BATTERY_NAME}': response.body.Oem.Dell.DellControllerBattery.Name, '{#ODATA}': controller["@odata.id"] });
-                }
+            if (getField(controller, 'Id', '').search('RAID') &gt; -1) {
+                result.push({ '{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''), '{#ODATA}': controller["@odata.id"] });
             }
         }
     });
@@ -513,10 +512,10 @@ return JSON.stringify(result);
                <description>Discovery of disk array controllers.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Dell R820: {#CNTLR_NAME} Status</name>
+                     <name>Dell R820: {#CNTLR_NAME} in slot {#SLOT} Status</name>
                      <type>HTTP_AGENT</type>
                      <key>dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]</key>
-                     <history>0</history>
+                     <history>7d</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
@@ -543,6 +542,28 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#CNTLR_NAME} in slot {#SLOT} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#CNTLR_NAME} in slot {#SLOT} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#CNTLR_NAME} in slot {#SLOT} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -591,6 +612,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     storages = JSON.parse(value);
 }
@@ -617,10 +654,9 @@ if (storages.Members instanceof Array) {
         if (typeof storage["@odata.id"] === 'string') {
             response = request(params.url + storage["@odata.id"]);
             controller = response.body;
-            if (controller.Id.search('RAID') &gt; -1) {
-                if (typeof response.body.Name === 'string') {
-                    result.push({ '{#CNTLR_NAME}': response.body.Name, '{#SLOT}': response.body.Oem.Dell.DellController.PCISlot, '{#ODATA}': controller["@odata.id"] });
-                }
+            if (getField(controller, 'Id', '').search('RAID') &gt; -1) {
+                result.push({ '{#CNTLR_NAME}': getField(response.body, 'Name', ''), '{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
+                    '{#ODATA}': controller["@odata.id"] });
             }
         }
     });
@@ -663,12 +699,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
@@ -725,6 +755,28 @@ return JSON.stringify(result);
                      <master_item>
                         <key>dell.server.sensor.fan.get[{#SENSOR_NAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.sensor.fan.status[{#SENSOR_NAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -828,9 +880,9 @@ return JSON.stringify(result);
                <description>The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Dell R820: {#NETIF} Get interface</name>
+                     <name>Dell R820: {#IFNAME} Get interface</name>
                      <type>HTTP_AGENT</type>
-                     <key>dell.server.net.if.get[{#NETIF}]</key>
+                     <key>dell.server.net.if.get[{#IFNAME}]</key>
                      <history>0</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
@@ -844,18 +896,12 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#NETIF} Health</name>
+                     <name>Dell R820: {#IFNAME} Status</name>
                      <type>DEPENDENT</type>
-                     <key>dell.server.net.if.health[{#NETIF}]</key>
+                     <key>dell.server.net.if.health[{#IFNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -878,13 +924,35 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                        <key>dell.server.net.if.get[{#IFNAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#IFNAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#IFNAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#IFNAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.net.if.health[{#IFNAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#NETIF} Speed</name>
+                     <name>Dell R820: {#IFNAME} Speed</name>
                      <type>DEPENDENT</type>
-                     <key>dell.server.net.if.speed[{#NETIF}]</key>
+                     <key>dell.server.net.if.speed[{#IFNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -906,13 +974,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                        <key>dell.server.net.if.get[{#IFNAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#NETIF} State</name>
+                     <name>Dell R820: {#IFNAME} State</name>
                      <type>DEPENDENT</type>
-                     <key>dell.server.net.if.state[{#NETIF}]</key>
+                     <key>dell.server.net.if.state[{#IFNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -935,13 +1003,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                        <key>dell.server.net.if.get[{#IFNAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#NETIF} Link status</name>
+                     <name>Dell R820: {#IFNAME} Link status</name>
                      <type>DEPENDENT</type>
-                     <key>dell.server.net.if.status[{#NETIF}]</key>
+                     <key>dell.server.net.if.status[{#IFNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -964,8 +1032,25 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>dell.server.net.if.get[{#NETIF}]</key>
+                        <key>dell.server.net.if.get[{#IFNAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({str()}="Down" and {diff()}=1)</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{str()}&lt;&gt;"Down" or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <name>Dell R820: {#IFNAME} Link down</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>This trigger expression works as follows:&#13;
+1. Can be triggered if operations status is down.&#13;
+2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.&#13;
+3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)&#13;
+&#13;
+WARNING: if closed manually - won't fire again on next poll, because of .diff.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -1014,6 +1099,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     adapters = JSON.parse(value);
 }
@@ -1044,9 +1145,7 @@ if (adapters.Members instanceof Array) {
                 ports.Members.forEach(function (port) {
                     if (typeof port["@odata.id"] === 'string') {
                         response = request(params.url + port["@odata.id"]);
-                        if (typeof response.body.Id === 'string') {
-                            result.push({ '{#NETIF}': response.body.Id, '{#ODATA}': port["@odata.id"] });
-                        }
+                        result.push({ '{#IFNAME}': getField(response.body, 'Id', ''), '{#ODATA}': port["@odata.id"] });
                     }
                 });
             }
@@ -1091,12 +1190,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
@@ -1259,6 +1352,28 @@ return JSON.stringify(result);
                      <master_item>
                         <key>dell.server.hw.physicaldisk.get[{#DISK_NAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#DISK_NAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#DISK_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#DISK_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.physicaldisk.status[{#DISK_NAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -1307,6 +1422,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     storages = JSON.parse(value);
 }
@@ -1337,9 +1468,7 @@ if (storages.Members instanceof Array) {
                 drives.Drives.forEach(function (drive) {
                     if (typeof drive["@odata.id"] === 'string') {
                         response = request(params.url + drive["@odata.id"]);
-                        if (typeof response.body.Name === 'string') {
-                            result.push({ '{#DISK_NAME}': response.body.Name, '{#ODATA}': drive["@odata.id"] });
-                        }
+                        result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': drive["@odata.id"] });
                     }
                 });
             }
@@ -1384,12 +1513,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
@@ -1423,6 +1546,28 @@ return JSON.stringify(result);
                      <master_item>
                         <key>dell.server.sensor.psu.get[{#SENSOR_NAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.sensor.psu.status[{#SENSOR_NAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -1471,6 +1616,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     sensors = JSON.parse(value);
 }
@@ -1496,10 +1657,8 @@ if (sensors.Members instanceof Array) {
     sensors.Members.forEach(function (sensor) {
         if (typeof sensor["@odata.id"] === 'string') {
             response = request(params.url + sensor["@odata.id"]);
-            if (response.body.ReadingType === 'Voltage') {
-                if (typeof response.body.Name === 'string') {
-                    result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
-                }
+            if (getField(response.body, 'ReadingType', '') === 'Voltage') {
+                result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
             }
         }
     });
@@ -1542,12 +1701,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
@@ -1581,6 +1734,28 @@ return JSON.stringify(result);
                      <master_item>
                         <key>dell.server.sensor.temp.get[{#SENSOR_NAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#SENSOR_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#SENSOR_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.sensor.temp.status[{#SENSOR_NAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>Dell R820: {#SENSOR_NAME} Value</name>
@@ -1654,6 +1829,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     sensors = JSON.parse(value);
 }
@@ -1679,10 +1870,8 @@ if (sensors.Members instanceof Array) {
     sensors.Members.forEach(function (sensor) {
         if (typeof sensor["@odata.id"] === 'string') {
             response = request(params.url + sensor["@odata.id"]);
-            if (response.body.ReadingType === 'Temperature') {
-                if (typeof response.body.Name === 'string') {
-                    result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
-                }
+            if (getField(response.body, 'ReadingType', '') === 'Temperature') {
+                result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
             }
         }
     });
@@ -1725,12 +1914,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>6h</params>
-                        </step>
-                     </preprocessing>
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
@@ -1890,6 +2073,28 @@ return JSON.stringify(result);
                      <master_item>
                         <key>dell.server.hw.virtualdisk.get[{#DISK_NAME}]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Critical")}=1</expression>
+                           <name>Dell R820: {#DISK_NAME} is in a critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check the device for faults.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Warning")}=1</expression>
+                           <name>Dell R820: {#DISK_NAME} is in warning state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>Please check the device for warnings.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Dell R820: {#DISK_NAME} is in a critical state</name>
+                                 <expression>{Template Server DELL PowerEdge R820 by HTTP:dell.server.hw.virtualdisk.status[{#DISK_NAME}].str("Critical")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>Dell R820: {#DISK_NAME} Write policy</name>
@@ -1970,6 +2175,22 @@ return JSON.stringify(result);
   };
 }
 
+function getField(object, field, def) {
+    var names = field.split('.');
+    var name = names.shift();
+
+    while (typeof name !== 'undefined') {
+        if (typeof object === undefined || typeof object[name] === 'undefined') {
+            return def;
+        }
+
+        object = object[name];
+        name = names.shift();
+    }
+
+    return object;
+}
+
 try {
     storages = JSON.parse(value);
 }
@@ -2000,9 +2221,7 @@ if (storages.Members instanceof Array) {
                 volumes.Members.forEach(function (volume) {
                     if (typeof volume["@odata.id"] === 'string') {
                         response = request(params.url + volume["@odata.id"]);
-                        if (typeof response.body.Name === 'string') {
-                            result.push({ '{#DISK_NAME}': response.body.Name, '{#ODATA}': volume["@odata.id"] });
-                        }
+                        result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': volume["@odata.id"] });
                     }
                 });
             }
@@ -2037,169 +2256,9 @@ return JSON.stringify(result);
                <description>The Dell iDRAC username.</description>
             </macro>
             <macro>
-               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</macro>
-               <value>3</value>
-               <description>The critical status of the disk array cache battery for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}</macro>
-               <value>2</value>
-               <description>The OK status of the disk array cache battery for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}</macro>
-               <value>4</value>
-               <description>The warning status of the disk array cache battery for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.ARRAY.STATUS.CRIT}</macro>
-               <value>5</value>
-               <description>The critical status of the disk array for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.ARRAY.STATUS.FAIL}</macro>
-               <value>6</value>
-               <description>The disaster status of the disk array for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.ARRAY.STATUS.WARN}</macro>
-               <value>4</value>
-               <description>The warning status of the disk array for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.SMART.STATUS.FAIL}</macro>
+               <macro>{$IFCONTROL}</macro>
                <value>1</value>
-               <description>The critical S.M.A.R.T status of the disk for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.STATUS.FAIL:"critical"}</macro>
-               <value>5</value>
-               <description>The critical status of the disk for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.STATUS.FAIL:"nonRecoverable"}</macro>
-               <value>6</value>
-               <description>The critical status of the disk for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$DISK.STATUS.WARN:"nonCritical"}</macro>
-               <value>4</value>
-               <description>The warning status of the disk for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.CRIT:"criticalLower"}</macro>
-               <value>8</value>
-               <description>The critical value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.CRIT:"criticalUpper"}</macro>
-               <value>5</value>
-               <description>The critical value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.CRIT:"failed"}</macro>
-               <value>10</value>
-               <description>The critical value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.CRIT:"nonRecoverableLower"}</macro>
-               <value>9</value>
-               <description>The critical value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.CRIT:"nonRecoverableUpper"}</macro>
-               <value>6</value>
-               <description>The critical value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.WARN:"nonCriticalLower"}</macro>
-               <value>7</value>
-               <description>The warning value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$FAN.STATUS.WARN:"nonCriticalUpper"}</macro>
-               <value>4</value>
-               <description>The warning value of the FAN sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$HEALTH.STATUS.CRIT}</macro>
-               <value>5</value>
-               <description>The critical status of the health for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$HEALTH.STATUS.DISASTER}</macro>
-               <value>6</value>
-               <description>The disaster status of the health for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$HEALTH.STATUS.WARN}</macro>
-               <value>4</value>
-               <description>The warning status of the health for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$PSU.STATUS.CRIT:"critical"}</macro>
-               <value>5</value>
-               <description>The critical value of the PSU sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$PSU.STATUS.CRIT:"nonRecoverable"}</macro>
-               <value>6</value>
-               <description>The critical value of the PSU sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$PSU.STATUS.WARN:"nonCritical"}</macro>
-               <value>4</value>
-               <description>The warning value of the PSU sensor for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.CRIT:"criticalLower"}</macro>
-               <value>8</value>
-               <description>The critical status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}</macro>
-               <value>5</value>
-               <description>The critical status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}</macro>
-               <value>9</value>
-               <description>The critical status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}</macro>
-               <value>6</value>
-               <description>The critical status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.OK}</macro>
-               <value>3</value>
-               <description>The OK status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}</macro>
-               <value>7</value>
-               <description>The warning status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}</macro>
-               <value>4</value>
-               <description>The warning status of the temperature probe for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$SNMP.TIMEOUT}</macro>
-               <value>5m</value>
-               <description>The time interval for SNMP agent availability trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$VDISK.STATUS.CRIT:"failed"}</macro>
-               <value>3</value>
-               <description>The critical status of the virtual disk for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$VDISK.STATUS.WARN:"degraded"}</macro>
-               <value>4</value>
-               <description>The warning status of the virtual disk for trigger expression.</description>
+               <description>Link status trigger will be fired only for interfaces that have the context macro equaled 1.</description>
             </macro>
          </macros>
       </template>
