@@ -127,16 +127,16 @@ zbx_service_manager_t;
 /*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
 #define ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC		5
 
-static void	event_clean(zbx_event_t *event)
+static void	event_free(zbx_event_t *event)
 {
 	zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&event->tags);
 	zbx_free(event);
 }
 
-static void	event_ptr_clean(zbx_event_t **event)
+static void	event_ptr_free(zbx_event_t **event)
 {
-	event_clean(*event);
+	event_free(*event);
 }
 
 static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
@@ -1269,7 +1269,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 
 				recover_services_problem(service_manager, event);
 
-				event_clean(event);
+				event_free(event);
 				zbx_hashset_remove_direct(&service_manager->problem_events, ptr);
 				break;
 			case TRIGGER_VALUE_PROBLEM:
@@ -1278,7 +1278,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 					zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\": event"
 							" already processed", event->eventid);
 					THIS_SHOULD_NEVER_HAPPEN;
-					event_clean(event);
+					event_free(event);
 					continue;
 				}
 
@@ -1286,7 +1286,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 				{
 					/* handle possible race condition when recovery is received before problem */
 					zbx_hashset_remove_direct(&service_manager->recovery_events, ptr);
-					event_clean(event);
+					event_free(event);
 					continue;
 				}
 
@@ -1302,7 +1302,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 				zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\" unexpected value:%d",
 						event->eventid, event->value);
 				THIS_SHOULD_NEVER_HAPPEN;
-				event_clean(event);
+				event_free(event);
 		}
 	}
 
@@ -1314,11 +1314,11 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 static void	service_manager_init(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
-			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_free,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->recovery_events, 1, default_uint64_ptr_hash_func,
-			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_clean,
+			zbx_default_uint64_ptr_compare_func, (zbx_clean_func_t)event_ptr_free,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
