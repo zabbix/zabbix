@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-10T06:21:16Z</date>
+   <date>2021-06-10T19:15:59Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Server DELL PowerEdge R820 by HTTP</template>
          <name>Template Server DELL PowerEdge R820 by HTTP</name>
-         <description>Template for DELL PowerEdge R820 servers with iDRAC version 7 and later and RESTful API enabled.&#13;
+         <description>Template for DELL PowerEdge R820 servers with iDRAC version 7 and later and Redfish API enabled.&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -172,9 +172,6 @@ Template tooling version used: 0.38</description>
                      <name>Status</name>
                   </application>
                </applications>
-               <valuemap>
-                  <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
-               </valuemap>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
@@ -212,7 +209,7 @@ Template tooling version used: 0.38</description>
                </triggers>
             </item>
             <item>
-               <name>Get system</name>
+               <name>Dell R820: Get system</name>
                <type>HTTP_AGENT</type>
                <key>dell.server.system.get</key>
                <history>0</history>
@@ -328,6 +325,33 @@ return JSON.stringify(result);
                </preprocessing>
                <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1</url>
             </item>
+            <item>
+               <name>Dell R820: Redfish API</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service[https]</key>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <description>The availability of Redfish API on the server.&#13;
+Possible value: &#13;
+  0 unavailable&#13;
+  1 available</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>zabbix.host.available</name>
+               </valuemap>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>Dell R820: Redfish API service is unavailable</name>
+                     <priority>HIGH</priority>
+                     <description>The service is unavailable or does not accept TCP connections.</description>
+                  </trigger>
+               </triggers>
+            </item>
          </items>
          <discovery_rules>
             <discovery_rule>
@@ -358,9 +382,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::batteryState</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -528,9 +549,6 @@ return JSON.stringify(result);
                            <name>Zabbix raw items</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -702,7 +720,7 @@ return JSON.stringify(result);
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#SENSOR_NAME} Status</name>
+                     <name>Dell R820: {#SENSOR_NAME} Speed</name>
                      <type>DEPENDENT</type>
                      <key>dell.server.sensor.fan.speed[{#SENSOR_NAME}]</key>
                      <delay>0</delay>
@@ -739,9 +757,6 @@ return JSON.stringify(result);
                            <name>Fans</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1207,9 +1222,6 @@ return JSON.stringify(result);
                            <name>Physical disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1297,9 +1309,8 @@ return JSON.stringify(result);
                      <key>dell.server.hw.physicaldisk.size[{#DISK_NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>0</trends>
+                     <trends>0d</trends>
                      <status>ENABLED</status>
-                     <value_type>CHAR</value_type>
                      <units>B</units>
                      <description>The size, in bytes, of this drive.</description>
                      <applications>
@@ -1336,9 +1347,6 @@ return JSON.stringify(result);
                            <name>Physical disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1530,9 +1538,6 @@ return JSON.stringify(result);
                            <name>Power supply</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1718,9 +1723,6 @@ return JSON.stringify(result);
                            <name>Temperature</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1931,9 +1933,6 @@ return JSON.stringify(result);
                            <name>Virtual disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1963,9 +1962,6 @@ return JSON.stringify(result);
                            <name>Virtual disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1986,9 +1982,8 @@ return JSON.stringify(result);
                      <key>dell.server.hw.virtualdisk.size[{#DISK_NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>0</trends>
+                     <trends>0d</trends>
                      <status>ENABLED</status>
-                     <value_type>CHAR</value_type>
                      <units>B</units>
                      <description>The size in bytes of this Volume.</description>
                      <applications>
@@ -2025,9 +2020,6 @@ return JSON.stringify(result);
                            <name>Virtual disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -2057,9 +2049,6 @@ return JSON.stringify(result);
                            <name>Virtual disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -2111,9 +2100,6 @@ return JSON.stringify(result);
                            <name>Virtual disks</name>
                         </application>
                      </applications>
-                     <valuemap>
-                        <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
-                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -2265,297 +2251,6 @@ return JSON.stringify(result);
    </templates>
    <value_maps>
       <value_map>
-         <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>nonCritical</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>critical</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>nonRecoverable</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>nonCriticalUpper</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>criticalUpper</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>nonRecoverableUpper</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>nonCriticalLower</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>criticalLower</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>nonRecoverableLower</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>nonCritical</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>critical</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>nonRecoverable</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::BooleanType</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>HDD</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>SSD</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::batteryState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Ready</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Missing</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Charging</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Below threshold</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>RAID-0</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>RAID-1</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>RAID-5</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>RAID-6</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>RAID-10</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>RAID-50</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>RAID-60</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>Concatenated RAID 1</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>Concatenated RAID 5</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Not applicable</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Reconstructing</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Resynching</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Initializing</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Background init</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Write Through</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Write Back</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Force Write Back</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>No Read Ahead</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Read Ahead</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Adaptive Read Ahead</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Online</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>zabbix.host.available</name>
          <mappings>
             <mapping>
@@ -2565,10 +2260,6 @@ return JSON.stringify(result);
             <mapping>
                <value>1</value>
                <newvalue>available</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
             </mapping>
          </mappings>
       </value_map>

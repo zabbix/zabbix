@@ -4,13 +4,19 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later via Zabbix HTTP Agent that works without any external scripts.
+This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later with Redfish API enabled via Zabbix HTTP agent that works without any external scripts.
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Refer to the vendor documentation.
+1\. Enable Redfish API in Dell iDRAC interface of your server.
+2\. Create an user for monitoring with read-only permissions in Dell iDRAC interface.
+3\. Create a host for Dell server with iDRAC IP as the Zabbix agent interface.
+4\. Link the template to the host.
+5\. Customize values of {$API.URL}, {$API.USER}, {$API.PASSWORD} macros.
+
+
 
 ## Zabbix configuration
 
@@ -46,7 +52,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Fans |Dell R820: {#SENSOR_NAME} Status |<p>The sensor value.</p> |DEPENDENT |dell.server.sensor.fan.speed[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Reading`</p> |
+|Fans |Dell R820: {#SENSOR_NAME} Speed |<p>The sensor value.</p> |DEPENDENT |dell.server.sensor.fan.speed[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Reading`</p> |
 |Fans |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.fan.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Inventory |Dell R820: Hardware model name |<p>This attribute defines the model name of the system.</p> |DEPENDENT |dell.server.hw.model<p>**Preprocessing**:</p><p>- JSONPATH: `$.model`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Inventory |Dell R820: Hardware serial number |<p>This attribute defines the service tag of the system.</p> |DEPENDENT |dell.server.hw.serialnumber<p>**Preprocessing**:</p><p>- JSONPATH: `$.serialnumber`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -62,6 +68,7 @@ There are no template links in this template.
 |Physical_disks |Dell R820: {#DISK_NAME} Size |<p>The size, in bytes, of this drive.</p> |DEPENDENT |dell.server.hw.physicaldisk.size[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.CapacityBytes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Power_supply |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.psu.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Status |Dell R820: Overall system health status |<p>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p> |DEPENDENT |dell.server.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Status |Dell R820: Redfish API |<p>The availability of Redfish API on the server.</p><p>Possible value: </p><p>  0 unavailable</p><p>  1 available</p> |SIMPLE |net.tcp.service[https] |
 |Temperature |Dell R820: {#SENSOR_NAME} Value |<p>The sensor value.</p> |DEPENDENT |dell.server.sensor.temp.value[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Reading`</p> |
 |Temperature |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.temp.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.hw.virtualdisk.status[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -70,7 +77,7 @@ There are no template links in this template.
 |Virtual_disks |Dell R820: {#DISK_NAME} Current state |<p>The known state of the Resource, such as, enabled. Possible value: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</p> |DEPENDENT |dell.server.hw.virtualdisk.state[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.State`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Read policy |<p>Indicates the read cache policy setting for the Volume. Possible value: ReadAhead, AdaptiveReadAhead, Off.</p> |DEPENDENT |dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ReadCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Write policy |<p>Indicates the write cache policy setting for the Volume. Possible value: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</p> |DEPENDENT |dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.WriteCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Zabbix_raw_items |Get system |<p>Returns the metrics of a system.</p> |HTTP_AGENT |dell.server.system.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Zabbix_raw_items |Dell R820: Get system |<p>Returns the metrics of a system.</p> |HTTP_AGENT |dell.server.system.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Zabbix_raw_items |Dell R820: {#SENSOR_NAME} Get sensor |<p>Returns the metrics of a sensor.</p> |HTTP_AGENT |dell.server.sensor.temp.get[{#SENSOR_NAME}] |
 |Zabbix_raw_items |Dell R820: {#SENSOR_NAME} Get sensor |<p>Returns the metrics of a sensor.</p> |HTTP_AGENT |dell.server.sensor.psu.get[{#SENSOR_NAME}] |
 |Zabbix_raw_items |Dell R820: {#SENSOR_NAME} Get sensor |<p>Returns the metrics of a sensor.</p> |HTTP_AGENT |dell.server.sensor.fan.get[{#SENSOR_NAME}] |
@@ -98,6 +105,7 @@ There are no template links in this template.
 |Dell R820: {#SENSOR_NAME} is in warning state |<p>Please check the device for warnings.</p> |`{TEMPLATE_NAME:dell.server.sensor.psu.status[{#SENSOR_NAME}].str("Warning")}=1` |WARNING |<p>**Depends on**:</p><p>- Dell R820: {#SENSOR_NAME} is in a critical state</p> |
 |Dell R820: Server is in a critical state |<p>Please check the device for faults.</p> |`{TEMPLATE_NAME:dell.server.status.str("Critical")}=1` |HIGH | |
 |Dell R820: Server is in warning state |<p>Please check the device for warnings.</p> |`{TEMPLATE_NAME:dell.server.status.str("Warning")}=1` |WARNING |<p>**Depends on**:</p><p>- Dell R820: Server is in a critical state</p> |
+|Dell R820: Redfish API service is unavailable |<p>The service is unavailable or does not accept TCP connections.</p> |`{TEMPLATE_NAME:net.tcp.service[https].last()}=0` |HIGH | |
 |Dell R820: {#SENSOR_NAME} is in a critical state |<p>Please check the device for faults.</p> |`{TEMPLATE_NAME:dell.server.sensor.temp.status[{#SENSOR_NAME}].str("Critical")}=1` |HIGH | |
 |Dell R820: {#SENSOR_NAME} is in warning state |<p>Please check the device for warnings.</p> |`{TEMPLATE_NAME:dell.server.sensor.temp.status[{#SENSOR_NAME}].str("Warning")}=1` |WARNING |<p>**Depends on**:</p><p>- Dell R820: {#SENSOR_NAME} is in a critical state</p> |
 |Dell R820: {#DISK_NAME} is in a critical state |<p>Please check the device for faults.</p> |`{TEMPLATE_NAME:dell.server.hw.virtualdisk.status[{#DISK_NAME}].str("Critical")}=1` |HIGH | |
