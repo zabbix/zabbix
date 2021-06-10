@@ -120,7 +120,7 @@ static void	DBpatch_get_eventid_by_triggerid(zbx_uint64_t triggerid, zbx_vector_
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select eventid from events where value=1 and source in (0,3) and object=0 and objectid="
+	result = DBselect("select eventid from events where value=1 and source=0 and object=0 and objectid="
 			ZBX_FS_UI64, triggerid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -140,7 +140,7 @@ static int	DBpatch_5050009(void)
 	DB_ROW		row;
 	zbx_db_insert_t	ins_service_problem_tag, ins_trigger_tag, ins_problem_tag;
 	zbx_uint64_t	old_triggerid = 0, triggerid, serviceid;
-	int		ret = FAIL;
+	int		ret = SUCCEED;
 
 	result = DBselect("select t.triggerid,t.description,s.serviceid from triggers t join services s "
 			"on t.triggerid=s.triggerid order by t.triggerid");
@@ -165,11 +165,13 @@ static int	DBpatch_5050009(void)
 		if (ZBX_TAGVALUE_MAX_LEN < zbx_strlen_utf8(tag_value))
 			DBpatch_trim_tag_value(tag_value);
 
-		zbx_db_insert_add_values(&ins_service_problem_tag, __UINT64_C(0), serviceid, "ServiceLink", 0,
-				tag_value);
 
 		if (old_triggerid != triggerid)
+		{
 			zbx_db_insert_add_values(&ins_trigger_tag, __UINT64_C(0), triggerid, "ServiceLink", tag_value);
+			zbx_db_insert_add_values(&ins_service_problem_tag, __UINT64_C(0), serviceid, "ServiceLink", 0,
+					tag_value);
+		}
 
 		zbx_vector_uint64_create(&problemtag_eventids);
 
@@ -188,19 +190,23 @@ static int	DBpatch_5050009(void)
 	}
 
 	zbx_db_insert_autoincrement(&ins_service_problem_tag, "service_problem_tagid");
-	zbx_db_insert_execute(&ins_service_problem_tag);
+	ret = zbx_db_insert_execute(&ins_service_problem_tag);
 	zbx_db_insert_clean(&ins_service_problem_tag);
 
+	if (FAIL == ret)
+		goto out;
+
 	zbx_db_insert_autoincrement(&ins_trigger_tag, "triggertagid");
-	zbx_db_insert_execute(&ins_trigger_tag);
+	ret = zbx_db_insert_execute(&ins_trigger_tag);
 	zbx_db_insert_clean(&ins_trigger_tag);
 
+	if (FAIL == ret)
+		goto out;
+
 	zbx_db_insert_autoincrement(&ins_problem_tag, "problemtagid");
-	zbx_db_insert_execute(&ins_problem_tag);
+	ret = zbx_db_insert_execute(&ins_problem_tag);
 	zbx_db_insert_clean(&ins_problem_tag);
-
-	ret = SUCCEED;
-
+out:
 	DBfree_result(result);
 
 	return ret;
