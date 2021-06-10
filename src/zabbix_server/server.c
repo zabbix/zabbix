@@ -344,6 +344,12 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* fail if the main process is queried */
 		return FAIL;
 	}
+	else if (local_server_num <= (server_count += CONFIG_SERVICEMAN_FORKS))
+	{
+		/* start service manager process and load configuration cache in parallel */
+		*local_process_type = ZBX_PROCESS_TYPE_SERVICEMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_SERVICEMAN_FORKS;
+	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
 		/* make initial configuration sync before worker processes are forked */
@@ -494,11 +500,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_REPORTWRITER;
 		*local_process_num = local_server_num - server_count + CONFIG_REPORTWRITER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_SERVICEMAN_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_SERVICEMAN;
-		*local_process_num = local_server_num - server_count + CONFIG_SERVICEMAN_FORKS;
 	}
 	else
 		return FAIL;
@@ -1332,6 +1333,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		switch (thread_args.process_type)
 		{
+			case ZBX_PROCESS_TYPE_SERVICEMAN:
+				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
+				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
@@ -1451,10 +1456,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
-				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
