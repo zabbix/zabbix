@@ -643,7 +643,7 @@ footer {
   padding: 5px;
   row-gap: 10px;
   column-gap: 10px;
-  grid-template-columns: minmax(auto, 15%) 1fr; }
+  grid-template-columns: minmax(15%, max-content) 1fr; }
   .form-grid > label {
     line-height: 24px;
     text-align: right;
@@ -663,9 +663,9 @@ footer {
   .form-grid .rowspan-2 {
     grid-row: span 2; }
   .form-grid.form-grid-3-1 {
-    grid-template-columns: minmax(auto, 15%) 3fr minmax(auto, 15%) auto; }
+    grid-template-columns: minmax(15%, max-content) 3fr minmax(15%, max-content) auto; }
   .form-grid.form-grid-1-1 {
-    grid-template-columns: repeat(2, minmax(auto, 15%) 1fr); }
+    grid-template-columns: repeat(2, minmax(15%, max-content) 1fr); }
   .form-grid.form-grid-3-1 .form-field:not(.field-fluid), .form-grid.form-grid-1-1 .form-field:not(.field-fluid) {
     grid-column-start: initial;
     grid-column-end: span 1; }

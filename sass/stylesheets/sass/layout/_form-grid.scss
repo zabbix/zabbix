@@ -1,5 +1,5 @@
 .form-grid {
-	$label-width: minmax(auto, 15%);
+	$label-width: minmax(15%, max-content);
 
 	display: grid;
 	padding: 5px;
