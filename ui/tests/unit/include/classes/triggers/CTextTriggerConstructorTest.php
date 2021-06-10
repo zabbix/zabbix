@@ -29,7 +29,7 @@ class CTextTriggerConstructorTest extends TestCase {
 	protected $constructor;
 
 	protected function setUp(): void {
-		$this->constructor = new CTextTriggerConstructor(new CExpressionParser(['lldmacros' => true]));
+		$this->constructor = new CTextTriggerConstructor(new CExpressionParser());
 	}
 
 	public function dataProviderGetExpressionFromPartsValid() {

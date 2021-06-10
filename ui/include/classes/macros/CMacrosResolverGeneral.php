@@ -54,7 +54,11 @@ class CMacrosResolverGeneral {
 	 */
 	protected function resolveTriggerReferences($expression, $references) {
 		$values = [];
-		$expression_parser = new CExpressionParser(['collapsed_expression' => true, 'lldmacros' => true]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'collapsed_expression' => true
+		]);
 
 		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 			foreach ($expression_parser->getResult()->getTokens() as $token) {
