@@ -58,6 +58,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $db_servicesids, ZBX_SORT_UP,
 			$data['view_curl']
 		);
+		$data['page'] =  $this->hasInput('page') ? $this->getInput('page') : null;
 
 		$data['services'] = API::Service()->get([
 			'output' => ['name', 'status', 'goodsla', 'sortorder'],

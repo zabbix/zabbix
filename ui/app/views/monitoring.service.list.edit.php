@@ -140,7 +140,8 @@ foreach ($data['services'] as $serviceid => $service) {
 
 (new CScriptTag('
 	initializeView(
-		'.json_encode($data['serviceid']).'
+		'.json_encode($data['serviceid']).',
+		null
 	);
 '))
 	->setOnDocumentReady()

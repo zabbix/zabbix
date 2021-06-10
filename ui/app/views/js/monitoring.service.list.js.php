@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	function initializeView(serviceid) {
+	function initializeView(serviceid, page) {
 
 		const init = () => {
 			initViewModeSwitcher();
@@ -44,6 +44,10 @@
 
 						if (serviceid !== null) {
 							url.setArgument('serviceid', serviceid);
+						}
+
+						if (page !== null) {
+							url.setArgument('page', page);
 						}
 
 						redirect(url.getUrl());
