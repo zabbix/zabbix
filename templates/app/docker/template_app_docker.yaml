@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: c5fd214cdd0d4b3b8272e73b022ba5c2
-      template: Docker
-      name: Docker
+      template: 'Docker by Zabbix agent 2'
+      name: 'Docker by Zabbix agent 2'
       description: |
         Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         
@@ -727,7 +727,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2c62bb4d95684e6984447027d117ff4d
-              expression: 'nodata(/Docker/docker.name,30m)=1'
+              expression: 'nodata(/Docker by Zabbix agent 2/docker.name,30m)=1'
               name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -735,7 +735,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Docker: Service is down'
-                  expression: last(/Docker/docker.ping)=0
+                  expression: last(/Docker by Zabbix agent 2/docker.ping)=0
         -
           uuid: 5e4999067e6948f893dc465f8e5a2b5f
           name: 'Docker: NCPU'
@@ -912,7 +912,7 @@ zabbix_export:
           triggers:
             -
               uuid: a4f00b4d25b54acfa61475c94651d8a5
-              expression: last(/Docker/docker.ping)=0
+              expression: last(/Docker by Zabbix agent 2/docker.ping)=0
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -967,7 +967,7 @@ zabbix_export:
           triggers:
             -
               uuid: f5f4fb1337264ac2bec6b6505dfe180b
-              expression: '(last(/Docker/docker.server_version,#1)<>last(/Docker/docker.server_version,#2))=1 and length(last(/Docker/docker.server_version))>0'
+              expression: '(last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2))=1 and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
@@ -1208,7 +1208,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ee70b91196494eccb54772b22051a456
-                  expression: '(last(/Docker/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker/docker.container_info.state.error["{#NAME}"]))>0'
+                  expression: '(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
@@ -1866,7 +1866,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: db675ff608a14b12bcc02e6b500c557f
-              expression: 'last(/Docker/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker/docker.container_info.state.running["{#NAME}"])=0'
+              expression: 'last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0'
               name: 'Container {#NAME}: Container has been stopped with error code'
               opdata: 'Exit code: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1881,21 +1881,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.user.rate["{#NAME}"]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.total.rate["{#NAME}"]'
             -
               uuid: ef48f834b7d543169b21caff1e1d2ade
@@ -1905,14 +1905,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.memory.usage["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.memory.max_usage["{#NAME}"]'
             -
               uuid: 5cc619d6da2046928ad6d0c28a0e4186
@@ -1922,42 +1922,42 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_packets["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_packets["{#NAME}"]'
                 -
                   sortorder: '2'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_errors["{#NAME}"]'
                 -
                   sortorder: '3'
                   drawtype: BOLD_LINE
                   color: A54F10
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_errors["{#NAME}"]'
                 -
                   sortorder: '4'
                   drawtype: BOLD_LINE
                   color: FC6EA3
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_dropped["{#NAME}"]'
                 -
                   sortorder: '5'
                   drawtype: BOLD_LINE
                   color: 6C59DC
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_dropped["{#NAME}"]'
             -
               uuid: 1952afdd7ab54a65b7f839fd6490f9ff
@@ -1967,14 +1967,14 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_bytes["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_bytes["{#NAME}"]'
         -
           uuid: 0b31468772c942cc8a401af2d33f17d2
@@ -2075,7 +2075,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Docker: Containers'
-                        host: Docker
+                        host: 'Docker by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2091,7 +2091,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Docker: Size'
-                        host: Docker
+                        host: 'Docker by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2107,7 +2107,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Docker: Memory total'
-                        host: Docker
+                        host: 'Docker by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2124,7 +2124,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Docker: Goroutines'
-                        host: Docker
+                        host: 'Docker by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2140,7 +2140,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Docker: Images'
-                        host: Docker
+                        host: 'Docker by Zabbix agent 2'
       valuemaps:
         -
           uuid: c289195aa4dc47ab883fa95c9cb6fd07
@@ -2171,28 +2171,28 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.running
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.paused
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.stopped
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.total
     -
       uuid: b9131437fcc24587b47ef6dd5d51e15b
@@ -2202,7 +2202,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.goroutines
     -
       uuid: 130ff603f0cd4ac4844817ccede8cfac
@@ -2212,14 +2212,14 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images.top_level
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images.total
     -
       uuid: 5115b03abf71402db63c59b570e83dba
@@ -2229,7 +2229,7 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.mem.total
     -
       uuid: 815866ae9f77447bbf15a1b91f7c7708
@@ -2239,26 +2239,26 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images_size
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.layers_size
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers_size
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.volumes_size
