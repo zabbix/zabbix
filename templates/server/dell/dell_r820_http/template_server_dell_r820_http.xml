@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-10T19:15:59Z</date>
+   <date>2021-06-11T13:20:27Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -229,45 +229,45 @@ Template tooling version used: 0.38</description>
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -300,10 +300,10 @@ var params = {
     password: '{$API.PASSWORD}'
 };
 var result = {
-  model: '',
-  serialnumber: '',
-  status: '',
-  firmware: ''
+    model: '',
+    serialnumber: '',
+    status: '',
+    firmware: ''
 };
 
 var index = params.url.indexOf('://');
@@ -332,7 +332,7 @@ return JSON.stringify(result);
                <history>7d</history>
                <status>ENABLED</status>
                <description>The availability of Redfish API on the server.&#13;
-Possible value: &#13;
+Possible value:&#13;
   0 unavailable&#13;
   1 available</description>
                <applications>
@@ -422,45 +422,45 @@ Possible value: &#13;
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -506,7 +506,10 @@ if (storages.Members instanceof Array) {
             response = request(params.url + storage["@odata.id"]);
             controller = response.body;
             if (getField(controller, 'Id', '').search('RAID') &gt; -1) {
-                result.push({ '{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''), '{#ODATA}': controller["@odata.id"] });
+                result.push({
+                    '{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''),
+                    '{#ODATA}': controller["@odata.id"]
+                });
             }
         }
     });
@@ -589,45 +592,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -673,8 +676,11 @@ if (storages.Members instanceof Array) {
             response = request(params.url + storage["@odata.id"]);
             controller = response.body;
             if (getField(controller, 'Id', '').search('RAID') &gt; -1) {
-                result.push({ '{#CNTLR_NAME}': getField(response.body, 'Name', ''), '{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
-                    '{#ODATA}': controller["@odata.id"] });
+                result.push({
+                    '{#CNTLR_NAME}': getField(response.body, 'Name', ''),
+                    '{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
+                    '{#ODATA}': controller["@odata.id"]
+                });
             }
         }
     });
@@ -799,45 +805,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 try {
@@ -1073,45 +1079,45 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -1389,45 +1395,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -1580,45 +1586,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -1790,45 +1796,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {
@@ -2120,45 +2126,45 @@ return JSON.stringify(result);
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>function request(url) {
-  api_request = new CurlHttpRequest();
-  api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-  Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+    api_request = new CurlHttpRequest();
+    api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+    Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
 
-  try {
-      response = api_request.Get(url);
-  } catch (error) {
-      Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
-      throw 'Get request returned error ' + error + '. Check debug log for more information.';
-  }
+    try {
+        response = api_request.Get(url);
+    } catch (error) {
+        Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+        throw 'Get request returned error ' + error + '. Check debug log for more information.';
+    }
 
-  Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-      api_request.Status() + '\n' + response);
+    Zabbix.Log(4, '[ DELL ] Received response with status code ' +
+        api_request.Status() + '\n' + response);
 
-  if (api_request.Status() !== 200) {
-      var message = 'Request failed with status code ' + api_request.Status();
-      if (response !== null) {
-          if (typeof response.message === 'string') {
-              message += ': ' + response.message;
-          }
-      }
+    if (api_request.Status() !== 200) {
+        var message = 'Request failed with status code ' + api_request.Status();
+        if (response !== null) {
+            if (typeof response.message === 'string') {
+                message += ': ' + response.message;
+            }
+        }
 
-      throw message + ' Check debug log for more information.';
-  }
+        throw message + ' Check debug log for more information.';
+    }
 
-  if (response !== null) {
-      try {
-          response = JSON.parse(response);
-      }
-      catch (error) {
-          Zabbix.Log(4, '[ DELL ] Failed to parse response.');
-          response = null;
-      }
-  }
+    if (response !== null) {
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+            response = null;
+        }
+    }
 
-  return {
-      status: api_request.Status(),
-      body: response
-  };
+    return {
+        status: api_request.Status(),
+        body: response
+    };
 }
 
 function getField(object, field, def) {

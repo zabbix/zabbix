@@ -11,9 +11,13 @@ This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1\. Enable Redfish API in Dell iDRAC interface of your server.
+
 2\. Create an user for monitoring with read-only permissions in Dell iDRAC interface.
+
 3\. Create a host for Dell server with iDRAC IP as the Zabbix agent interface.
+
 4\. Link the template to the host.
+
 5\. Customize values of {$API.URL}, {$API.USER}, {$API.PASSWORD} macros.
 
 
@@ -68,7 +72,7 @@ There are no template links in this template.
 |Physical_disks |Dell R820: {#DISK_NAME} Size |<p>The size, in bytes, of this drive.</p> |DEPENDENT |dell.server.hw.physicaldisk.size[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.CapacityBytes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Power_supply |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.psu.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Status |Dell R820: Overall system health status |<p>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p> |DEPENDENT |dell.server.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Status |Dell R820: Redfish API |<p>The availability of Redfish API on the server.</p><p>Possible value: </p><p>  0 unavailable</p><p>  1 available</p> |SIMPLE |net.tcp.service[https] |
+|Status |Dell R820: Redfish API |<p>The availability of Redfish API on the server.</p><p>Possible value:</p><p>  0 unavailable</p><p>  1 available</p> |SIMPLE |net.tcp.service[https] |
 |Temperature |Dell R820: {#SENSOR_NAME} Value |<p>The sensor value.</p> |DEPENDENT |dell.server.sensor.temp.value[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Reading`</p> |
 |Temperature |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.temp.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Status |<p>The status of the job. Possible value: OK, Warning, Critical.</p> |DEPENDENT |dell.server.hw.virtualdisk.status[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
