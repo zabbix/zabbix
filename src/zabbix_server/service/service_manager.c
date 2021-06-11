@@ -1354,7 +1354,7 @@ static void	zbx_serviceman_sigusr_handler(int flags)
 	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags))
 		return;
 
-	if (service_cache_reload_requested == 1)
+	if (1 == service_cache_reload_requested)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
 	}
