@@ -115,7 +115,7 @@ static void	DBpatch_trim_tag_value(char *value)
 	memcpy(value + len, "...", ZBX_CONST_STRLEN("...") + 1);
 }
 
-static void	DBpatch_get_eventid_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *eventids)
+static void	DBpatch_get_problems_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *eventids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -175,7 +175,7 @@ static int	DBpatch_5050009(void)
 
 			zbx_vector_uint64_create(&problemtag_eventids);
 
-			DBpatch_get_eventid_by_triggerid(triggerid, &problemtag_eventids);
+			DBpatch_get_problems_by_triggerid(triggerid, &problemtag_eventids);
 
 			for (i = 0; i < problemtag_eventids.values_num; i++)
 			{
