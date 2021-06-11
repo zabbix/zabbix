@@ -928,6 +928,7 @@ function getConditionFormula(conditions, evalType) {
 	 * @param {jQuery} row
 	 */
 	function disableRow(row) {
+		row.find('textarea').prop('readonly', true);
 		row.find('input').prop('readonly', true);
 		row.find('button').prop('disabled', true);
 	}

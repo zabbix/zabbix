@@ -201,7 +201,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'disabled' => true,
 					'message' => 'Cannot send request',
-					'details' => 'Cannot send request: discovery rule is disabled.',
+					'details' => 'Cannot send request: discovery rule "Discovery rule 2" on host "Host for host prototype tests" is not monitored.',
 					'hostid' => self::HOST_ID
 				]
 			],
