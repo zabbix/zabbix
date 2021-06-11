@@ -23,8 +23,12 @@
 #include "common.h"
 #include "db.h"
 #include "zbxalgo.h"
+#include "dbcache.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int value, int severity, const zbx_vector_ptr_t *tags);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
+void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t eventid, const zbx_vector_tags_t *tags);
+void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
 #endif

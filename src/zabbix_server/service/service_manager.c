@@ -1115,11 +1115,10 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *service_d
 			zbx_service_problem_t	*service_problem;
 
 			service_problem = (zbx_service_problem_t *)service_diff->service_problems.values[i];
-			zbx_vector_ptr_remove_noorder(&service_diff->service_problems, i);
-			i--;
 			add_service_problem(service, service_problems_index, service_problem);
 			zbx_vector_ptr_append(&service_problems_new, service_problem);
 		}
+		service_diff->service_problems.values_num = 0;
 
 		for (i = 0; i < service_diff->service_problems_recovered.values_num; i++)
 		{
@@ -1244,6 +1243,37 @@ static void	recover_services_problem(zbx_service_manager_t *service_manager, con
 			zbx_vector_ptr_append(&service_diff->service_problems_recovered, service_problem);
 		}
 	}
+}
+
+static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
+{
+	int	i, j;
+
+	for (i = 0; i < events->values_num; i++)
+	{
+		zbx_event_t	*event, **ptr;
+
+		event = (zbx_event_t *)events->values[i];
+
+		if (NULL == (ptr = zbx_hashset_search(&service_manager->problem_events, &event)))
+		{
+			event_free(event);
+			continue;
+		}
+
+		for (j = 0; j < event->tags.values_num; j++)
+			zbx_vector_ptr_append(&(*ptr)->tags, event->tags.values[j]);
+
+		event->tags.values_num = 0;
+		event_free(event);
+
+		match_event_to_service_problem_tags(*ptr, &service_manager->service_problem_tags_index,
+				&service_manager->service_diffs, ZBX_FLAG_SERVICE_RECALCULATE);
+	}
+
+	db_update_services(&service_manager->services, &service_manager->service_diffs,
+			&service_manager->service_problems_index);
+	zbx_hashset_clear(&service_manager->service_diffs);
 }
 
 static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
@@ -1495,20 +1525,24 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			zbx_vector_ptr_t	events;
 
+			zbx_vector_ptr_create(&events);
+
 			switch (message->code)
 			{
 				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS:
-					zbx_vector_ptr_create(&events);
-
 					zbx_service_deserialize(message->data, message->size, &events);
-					zbx_ipc_message_free(message);
 					process_events(&events, &service_manager);
-
-					zbx_vector_ptr_destroy(&events);
+					break;
+				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS:
+					zbx_service_deserialize_problem_tags(message->data, message->size, &events);
+					process_problem_tags(&events, &service_manager);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
+
+			zbx_ipc_message_free(message);
+			zbx_vector_ptr_destroy(&events);
 		}
 
 		if (NULL != client)

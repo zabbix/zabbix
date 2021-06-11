@@ -193,6 +193,8 @@ static int	hc_get_history_compression_age(void);
 ZBX_PTR_VECTOR_DECL(item_tag, zbx_tag_t)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_tag_t)
 
+ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+
 /******************************************************************************
  *                                                                            *
  * Function: DCget_stats_all                                                  *
