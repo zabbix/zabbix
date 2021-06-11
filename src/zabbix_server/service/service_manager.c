@@ -32,6 +32,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern int		CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
 typedef struct
 {
@@ -125,7 +126,6 @@ typedef struct
 zbx_service_manager_t;
 
 /*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
-#define ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC		5
 
 static void	event_free(zbx_event_t *event)
 {
@@ -1492,7 +1492,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 //			processed_num = 0;
 //		}
 //
-		if (ZBX_SERVICE_MANAGER_SYNC_DELAY_SEC < time_now - time_flush)
+		if (CONFIG_SERVICEMAN_SYNC_FREQUENCY < time_now - time_flush)
 		{
 			int	updated = 0, revision = time(NULL);
 
