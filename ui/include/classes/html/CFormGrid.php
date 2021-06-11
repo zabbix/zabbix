@@ -26,13 +26,16 @@ class CFormGrid extends CTag {
 	 */
 	private const ZBX_STYLE_CLASS = 'form-grid';
 
-	public const ZBX_STYLE_ROWSPAN_2 = 'rowspan-2';
-
-	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
+	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 
-	public function __construct() {
-		parent::__construct('div', true);
+	// 100px label column width for use in popup forms.
+	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED = 'label-width-fixed';
+	// True label column width for use in filter forms.
+	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE = 'label-width-true';
+
+	public function __construct($items = null) {
+		parent::__construct('div', true, $items);
 
 		$this->addClass(self::ZBX_STYLE_CLASS);
 	}

@@ -192,7 +192,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 }
 
 .hor-list {
-	li {
+	> li {
 		display: inline-block;
 		margin: 0 6px 0 0;
 
@@ -282,6 +282,34 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 form {
 	&.is-loading {
 		position: relative;
+	}
+}
+
+.form-grid {
+	.table-forms-separator {
+		line-height: 1.4;
+
+		td {
+			padding: 5px 5px 5px 0;
+		}
+	}
+
+	.form-field {
+		table {
+			width: 100%;
+		}
+
+		td {
+			padding: 0 5px 5px 0;
+		}
+	}
+
+	.form-actions {
+		button {
+			&:not(:first-of-type) {
+				margin-left: 10px;
+			}
+		}
 	}
 }
 

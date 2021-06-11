@@ -46,7 +46,7 @@ foreach (array_values($data['valuemap_names']) as $index => $name) {
 	$form->addVar('valuemap_names['.$index.']', $name);
 }
 
-$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
+$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
 
 $header_row = ['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''];
 $mappings = (new CDiv([
@@ -101,20 +101,18 @@ $mappings->addItem($mappings_data);
 $form_grid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CFormField(
+		new CFormField(
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('valuemap', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		(new CLabel(_('Mappings'), 'mappings'))->setAsteriskMark(),
-		(new CFormField(
-			(new CDiv($mappings))
-				->addStyle('width: 100%;')
-				->addClass('table-forms-separator')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		new CFormField(
+			(new CDiv($mappings))->addClass('table-forms-separator')
+		)
 	]);
 
 $form->addItem($form_grid);

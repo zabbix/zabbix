@@ -1,11 +1,21 @@
 .form-grid {
-	$label-width: minmax(15%, max-content);
-
 	display: grid;
 	padding: 5px;
 	row-gap: 10px;
 	column-gap: 10px;
-	grid-template-columns: $label-width 1fr;
+
+	// 15% label column width for use in standalone forms.
+	grid-template-columns: minmax(15%, max-content) auto;
+
+	// 100px label column width for use in popup forms.
+	&.label-width-fixed {
+		grid-template-columns: minmax(100px, max-content) auto;
+	}
+
+	// True label column width for use in filter forms.
+	&.label-width-true {
+		grid-template-columns: max-content auto;
+	}
 
 	> label {
 		line-height: 24px;
@@ -35,51 +45,35 @@
 		}
 	}
 
-	.rowspan-2 {
-		grid-row: span 2;
+	&.form-grid-1-1 {
+		grid-template-columns: repeat(2, minmax(15%, max-content) auto);
+
+		&.label-width-fixed {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.label-width-true {
+			grid-template-columns: repeat(2, max-content auto);
+		}
 	}
 
 	&.form-grid-3-1 {
-		grid-template-columns: $label-width 3fr $label-width auto;
+		grid-template-columns: minmax(15%, max-content) 3fr max-content auto;
+
+		&.label-width-fixed {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
+
+		&.label-width-true {
+			grid-template-columns: max-content auto 3fr max-content auto;
+		}
 	}
 
-	&.form-grid-1-1 {
-		grid-template-columns: repeat(2, $label-width 1fr);
-	}
-
-	&.form-grid-3-1,
-	&.form-grid-1-1 {
+	&.form-grid-1-1,
+	&.form-grid-3-1 {
 		.form-field:not(.field-fluid) {
 				grid-column-start: initial;
 				grid-column-end: span 1;
-		}
-	}
-}
-
-.form-grid {
-	.table-forms-separator {
-		line-height: 1.4;
-
-		td {
-			padding: 5px 5px 5px 0;
-		}
-	}
-
-	.form-field {
-		table {
-			width: 100%;
-		}
-
-		td {
-			padding: 0 5px 5px 0;
-		}
-	}
-
-	.form-actions {
-		button {
-			&:not(:first-of-type) {
-				margin-left: 10px;
-			}
 		}
 	}
 }

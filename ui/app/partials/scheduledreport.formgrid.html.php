@@ -23,7 +23,11 @@
  * @var CPartial $this
  */
 
-$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
+$form_grid = new CFormGrid();
+
+if ($data['source'] == 'popup') {
+	$form_grid->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
+}
 
 $user_multiselect = (new CMultiSelect([
 	'name' => 'userid',
@@ -63,25 +67,25 @@ $dashboard_multiselect = (new CMultiSelect([
 $form_grid
 	->addItem([
 		(new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(),
-		(new CFormField($user_multiselect))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		new CFormField($user_multiselect)
 	])
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CFormField(
+		new CFormField(
 			(new CTextBox('name', $data['name'], !$data['allowed_edit'], DB::getFieldLength('report', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('maxlength', DB::getFieldLength('report', 'name'))
 				->setAttribute('autofocus', 'autofocus')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		(new CLabel(_('Dashboard'), 'dashboardid_ms'))->setAsteriskMark(),
-		(new CFormField($dashboard_multiselect))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		new CFormField($dashboard_multiselect)
 	])
 	->addItem([
 		new CLabel(_('Period'), 'period'),
-		(new CFormField(
+		new CFormField(
 			(new CRadioButtonList('period', (int) $data['period']))
 				->addValue(_('Previous day'), ZBX_REPORT_PERIOD_DAY)
 				->addValue(_('Previous week'), ZBX_REPORT_PERIOD_WEEK)
@@ -89,11 +93,11 @@ $form_grid
 				->addValue(_('Previous year'), ZBX_REPORT_PERIOD_YEAR)
 				->setEnabled($data['allowed_edit'])
 				->setModern(true)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('Cycle'), 'cycle'),
-		(new CFormField(
+		new CFormField(
 			(new CRadioButtonList('cycle', (int) $data['cycle']))
 				->addValue(_('Daily'), ZBX_REPORT_CYCLE_DAILY)
 				->addValue(_('Weekly'), ZBX_REPORT_CYCLE_WEEKLY)
@@ -101,11 +105,11 @@ $form_grid
 				->addValue(_('Yearly'), ZBX_REPORT_CYCLE_YEARLY)
 				->setEnabled($data['allowed_edit'])
 				->setModern(true)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('Start time')),
-		(new CFormField(
+		new CFormField(
 			(new CDiv([
 				(new CNumericBox('hours', $data['hours'], 2))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -115,7 +119,7 @@ $form_grid
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 					->setEnabled($data['allowed_edit'])
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	]);
 
 $show_weekdays = ($data['cycle'] == ZBX_REPORT_CYCLE_WEEKLY);
@@ -145,68 +149,66 @@ $form_grid
 				->setEnabled($data['allowed_edit'])
 		))
 			->setId('weekdays')
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass($show_weekdays ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
 		new CLabel(_('Start date'), 'active_since'),
-		(new CFormField(
+		new CFormField(
 			(new CDateSelector('active_since', $data['active_since']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
 				->setEnabled($data['allowed_edit'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('End date'), 'active_till'),
-		(new CFormField(
+		new CFormField(
 			(new CDateSelector('active_till', $data['active_till']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
 				->setEnabled($data['allowed_edit'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('Subject'), 'subject'),
-		(new CFormField(
+		new CFormField(
 			(new CTextBox('subject', $data['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
 				->setEnabled($data['allowed_edit'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('Message'), 'message'),
-		(new CFormField(
+		new CFormField(
 			(new CTextArea('message', $data['message']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('report_param', 'value'))
 				->setEnabled($data['allowed_edit'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		(new CLabel(_('Subscriptions'), 'subscriptions'))->setAsteriskMark(),
-		(new CFormField(new CPartial('scheduledreport.subscription', $data)))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		new CFormField(new CPartial('scheduledreport.subscription', $data))
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
-		(new CFormField(
+		new CFormField(
 			(new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxLength(DB::getFieldLength('report', 'description'))
 				->setEnabled($data['allowed_edit'])
 				->setAriaRequired()
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
-		(new CFormField(
+		new CFormField(
 			(new CCheckBox('status', ZBX_REPORT_STATUS_ENABLED))
 				->setChecked($data['status'] == ZBX_REPORT_STATUS_ENABLED)
 				->setUncheckedValue(ZBX_REPORT_STATUS_DISABLED)
 				->setEnabled($data['allowed_edit'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	]);
 
 if ($data['source'] === 'reports') {
@@ -251,9 +253,7 @@ if ($data['source'] === 'reports') {
 					->setId('add')
 					->setEnabled($data['allowed_edit']),
 			$buttons
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
 }
 
