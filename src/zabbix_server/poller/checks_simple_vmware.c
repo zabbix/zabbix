@@ -2759,6 +2759,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.GUESTFULLNAME}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_GUESTFULLNAME]),
 					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}
