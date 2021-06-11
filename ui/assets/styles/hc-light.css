@@ -6491,6 +6491,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .menu-popup .menu-popup-item.selected::before {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -164px -835px; }
 .menu-popup .menu-popup-item.disabled {
+  background-color: transparent;
   color: #9f9f9f; }
 
 .add-child-btn {

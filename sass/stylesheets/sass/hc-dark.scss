@@ -597,6 +597,7 @@ $icon-widget-btn: (
 		}
 
 		&.disabled {
+			background-color: transparent;
 			color: $form-disabled-font-color;
 		}
 	}
