@@ -5093,13 +5093,51 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	zbx_vector_ptr_create(&counters);
 
-	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
-		goto out;
-
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
+	if (0 == (service->state & ZBX_VMWARE_STATE_NEW) && 0 == strcmp(service->version, version))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
+		goto out;
+
 	zbx_vmware_lock();
+
+	if (NULL != service->version)
+		vmware_shared_strfree(service->version);
+
+	if (NULL != service->fullname)
+		vmware_shared_strfree(service->fullname);
+
+	if (0 != service->entities.num_data)
+	{
+		zbx_hashset_iter_t		iter;
+		zbx_vmware_perf_entity_t	*entity;
+
+		zbx_hashset_iter_reset(&service->entities, &iter);
+
+		while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
+			vmware_shared_perf_entity_clean(entity);
+
+		zbx_hashset_clear(&service->entities);
+	}
+
+	if (0 != service->counters.num_data)
+	{
+		zbx_hashset_iter_t		iter;
+		zbx_vmware_counter_t		*counter;
+
+		zbx_hashset_iter_reset(&service->counters, &iter);
+
+		while (NULL != (counter = (zbx_vmware_counter_t *)zbx_hashset_iter_next(&iter)))
+			vmware_counter_shared_clean(counter);
+
+		zbx_hashset_clear(&service->counters);
+	}
 
 	service->fullname = vmware_shared_strdup(fullname);
 	vmware_counters_shared_copy(&service->counters, &counters);
@@ -5334,11 +5372,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
 
-	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
-			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
-	{
+	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 		goto clean;
-	}
 
 	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
 			((const zbx_vmware_event_t *)service->data->events.values[0])->key > evt_last_key)
