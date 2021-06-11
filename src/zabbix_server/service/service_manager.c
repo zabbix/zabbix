@@ -237,6 +237,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 			service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
 			service_problem->eventid = event->eventid;
+			service_problem->service_problemid = 0;
 			service_problem->serviceid = pservices_diff->serviceid;
 			service_problem->severity = event->severity;
 			service_problem->clock = event->clock;
