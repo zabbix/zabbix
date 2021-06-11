@@ -1,5 +1,5 @@
 
-# Remote Zabbix server
+# Remote Zabbix server health
 
 ## Overview
 
