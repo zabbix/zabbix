@@ -427,6 +427,10 @@ function submitPopup(overlay) {
 		$(form).trimValues(['[name^="valuemap_rename["]']);
 	}
 
+	if (form.querySelector('#visible_tags:checked')) {
+		$(form).trimValues(['[name^="tags"][name$="[tag]"]', '[name^="tags"][name$="[value]"]']);
+	}
+
 	if (action == 'popup.massupdate.host') {
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
 		let tls_accept = 0x00;
