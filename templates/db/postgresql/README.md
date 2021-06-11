@@ -1,5 +1,5 @@
 
-# Template DB PostgreSQL
+# PostgreSQL by user parameters
 
 ## Overview
 
