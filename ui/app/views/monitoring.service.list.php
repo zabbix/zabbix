@@ -24,6 +24,7 @@
  */
 
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('monitoring.service.list.js.php');
 
@@ -35,32 +36,38 @@ $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			new CFormGrid([
-				new CLabel(_('Name'), 'filter_select'),
-				new CFormField(
-					(new CTextBox('filter_select', $data['filter']['name']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				),
-				new CLabel(_('Status')),
-				new CFormField(
-					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-						->addValue(_('Any'), SERVICE_STATUS_ANY)
-						->addValue(_('OK'), SERVICE_STATUS_OK)
-						->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
-						->setModern(true)
-				)
-			]),
-			new CFormGrid([
-				new CLabel(_('Tags')),
-				new CFormField(
-					CTagFilterFieldHelper::getTagFilterField([
-						'evaltype' => $data['filter']['evaltype'],
-						'tags' => $data['filter']['tags'] ?: [
-							['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
-						]
-					])
-				)
-			])
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Name'), 'filter_select'),
+					new CFormField(
+						(new CTextBox('filter_select', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					)
+				])
+				->addItem([
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), SERVICE_STATUS_ANY)
+							->addValue(_('OK'), SERVICE_STATUS_OK)
+							->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+							->setModern(true)
+					)
+				]),
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Tags')),
+					new CFormField(
+						CTagFilterFieldHelper::getTagFilterField([
+							'evaltype' => $data['filter']['evaltype'],
+							'tags' => $data['filter']['tags'] ?: [
+								['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+							]
+						])
+					)
+				])
 		])
 	: null;
 

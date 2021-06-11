@@ -24,11 +24,16 @@
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate() ?>
+</script>
+
 <script>
 	function initializeView(serviceid, page) {
 
 		const init = () => {
 			initViewModeSwitcher();
+			initTagFilter();
 		}
 
 		const initViewModeSwitcher = () => {
@@ -54,6 +59,19 @@
 					});
 				}
 			}
+		}
+
+		const initTagFilter = () => {
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function() {
+					const rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
+
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
 		}
 
 		init();
