@@ -159,7 +159,7 @@ class testFormulaCalculatedItem extends testCalculatedFormula {
 				[
 					'expected' => TEST_BAD,
 					'formula' => "max(min_foreach(/*/trap?[group=\"Servers\"],{#LLD}))+avg(count_foreach(/*/trap?[tag=\"tag1\"],\"{#LLD}h\"))-bitrshift".
-							"(last(//trap),1)/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,\"{#LLD}:now/h\")",
+							"(last(/host/trap),1)/between(5,(last(/host/trap)),10)*fuzzytime(/host/trap,60)>=trendsum(/host/item,\"{#LLD}:now/h\")",
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "max(min_foreach(/*/trap?[group="Servers"],'.
 							'{#LLD}))+avg(count_foreach(/*/trap?[tag="tag1"],"{#LLD}h"))-bitrshift(last(/host/trap),1)/between(5,(last(/host/trap)),10)*'.
 							'fuzzytime(/host/trap,60)>=trendsum(/host/item,"{#LLD}:now/h")".'
