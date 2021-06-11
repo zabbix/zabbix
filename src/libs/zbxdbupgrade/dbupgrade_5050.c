@@ -120,7 +120,7 @@ static void	DBpatch_get_problems_by_triggerid(zbx_uint64_t triggerid, zbx_vector
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select eventid from events where value=1 and source=0 and object=0 and objectid="
+	result = DBselect("select eventid from problem where source=0 and object=0 and objectid="
 			ZBX_FS_UI64, triggerid);
 
 	while (NULL != (row = DBfetch(result)))
