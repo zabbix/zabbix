@@ -225,6 +225,7 @@ class CRouter {
 		'script.list'								=> ['CControllerScriptList',							'layout.htmlpage',		'administration.script.list'],
 		'script.update'								=> ['CControllerScriptUpdate',							null,					null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
+		'service.delete'							=> ['CControllerServiceDelete',							null,					null],
 		'service.list'								=> ['CControllerServiceList',							'layout.htmlpage',		'monitoring.service.list'],
 		'service.list.refresh'						=> ['CControllerServiceListRefresh',					'layout.json',			'monitoring.service.list.refresh'],
 		'service.list.edit'							=> ['CControllerServiceListEdit',						'layout.htmlpage',		'monitoring.service.list.edit'],
