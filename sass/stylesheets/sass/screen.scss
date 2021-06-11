@@ -3012,6 +3012,7 @@ $form-icon-btn: (
 		}
 
 		&.disabled {
+			background-color: transparent;
 			color: $font-alt-color;
 			opacity: 1;
 		}

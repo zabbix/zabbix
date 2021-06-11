@@ -3928,6 +3928,7 @@ z-select[disabled] button,
       height: 22px;
       content: ""; }
     .menu-popup .menu-popup-item.disabled {
+      background-color: transparent;
       color: #cacaca;
       opacity: 1; }
   .menu-popup h3 {
