@@ -173,7 +173,7 @@ class C50ImportConverter extends CConverter {
 	 */
 	protected static function convertPreprocessingSteps(array $preprocessing_steps): array {
 		foreach ($preprocessing_steps as &$preprocessing_step) {
-			$preprocessing_step['parameters'] = ($preprocessing_step['type'] == ZBX_PREPROC_SCRIPT)
+			$preprocessing_step['parameters'] = ($preprocessing_step['type'] === CXmlConstantName::JAVASCRIPT)
 				? [$preprocessing_step['params']]
 				: explode("\n", $preprocessing_step['params']);
 			unset($preprocessing_step['params']);
