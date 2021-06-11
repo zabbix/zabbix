@@ -29,6 +29,7 @@
 #include "alert_syncer.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
+#include "service_protocol.h"
 
 #include "../../libs/zbxalgo/vectorimpl.h"
 
