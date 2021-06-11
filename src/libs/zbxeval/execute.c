@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ zbx_function_trim_optype_t;
 static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
 	char	suffix;
+	double	result;
 
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
@@ -70,7 +71,12 @@ static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
 	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
 		return FAIL;
 
-	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(suffix));
+	result = atof(value_num->data.str) * suffix2factor(suffix);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+		return FAIL;
+
+	zbx_variant_set_dbl(value, result);
 
 	return SUCCEED;
 }

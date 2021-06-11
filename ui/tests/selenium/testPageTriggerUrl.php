@@ -124,7 +124,7 @@ class testPageTriggerUrl extends CWebTest {
 	/**
 	 * Check resolved trigger context menu on overview page, when {EVENT.ID} macro can't be resolved.
 	 *
-	 * @on-after resetFilter
+	 * @onAfter resetFilter
 	 */
 	public function testPageTriggerUrl_OverviewPageResolvedTrigger() {
 		$filter = [

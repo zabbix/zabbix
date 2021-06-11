@@ -742,7 +742,7 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setArgument('action', 'housekeeping.edit')
 				->getUrl()
 			))
-				->setAttribute('target', '_blank')
+				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
 	$keep_history_hint = (new CDiv(makeInformationIcon([
@@ -778,7 +778,7 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setArgument('action', 'housekeeping.edit')
 				->getUrl()
 			))
-				->setAttribute('target', '_blank')
+				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
 	$keep_trend_hint = (new CDiv(makeInformationIcon([

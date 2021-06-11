@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,22 +151,34 @@ class testGraphAxis extends CWebTest {
 		// Set timezone.
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
+
 		if (CTestArrayHelper::get($data, 'settings.Time zone')) {
 			$data['settings']['Time zone'] = CDateTimeHelper::getTimeZoneFormat($data['settings']['Time zone']);
 		}
+
 		$form->fill($data['settings']);
 		$form->submit();
+
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')
 				->waitUntilReady()->asTable()->one();
 		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->click();
 		$this->page->waitUntilReady();
+		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
+		sleep(1);
 
+		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
+	}
+
+	/**
+	 * Function for waiting loader ring.
+	 */
+	private function waitUntilGraphIsLoaded() {
 		try {
 			$this->query('xpath://div[contains(@class,"is-loading")]/img')->waitUntilPresent();
 		}
@@ -174,7 +186,6 @@ class testGraphAxis extends CWebTest {
 			// Code is not missing here.
 		}
 
-		$this->assertScreenshot($this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()
-				->one(), $data['name']);
+		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
 }

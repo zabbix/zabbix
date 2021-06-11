@@ -531,6 +531,7 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
 	double	value1_dbl, value2_dbl;
+	char	buf1[ZBX_MAX_DOUBLE_LEN + 1], buf2[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (value1->type)
 	{
@@ -569,8 +570,13 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 
 	ZBX_RETURN_IF_NOT_EQUAL(value1_dbl, value2_dbl);
 
+	zbx_print_double(buf1, sizeof(buf1), value1_dbl);
+	zbx_print_double(buf2, sizeof(buf2), value2_dbl);
+	zabbix_log(LOG_LEVEL_ERR, "\"%s\" to \"%s\" comparison result forced to 0", buf1, buf2);
+
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+
+	return 0;
 }
 
 /******************************************************************************

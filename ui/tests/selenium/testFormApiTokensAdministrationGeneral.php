@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * @backup token
  *
- * @on-before prepareTokenData
+ * @onBefore prepareTokenData
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
@@ -255,14 +255,14 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	/**
-	 * @on-before-once getTokenId
+	 * @onBeforeOnce getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_RegenerationFormLayout() {
 		$this->checkTokensRegenerateFormLayout('administration');
 	}
 
 	/**
-	 * @backup-once token
+	 * @backupOnce token
 	 *
 	 * @dataProvider getTokenData
 	 */
@@ -271,9 +271,9 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	/**
-	 * @backup-once token
+	 * @backupOnce token
 	 *
-	 * @on-before-once getTokenId
+	 * @onBeforeOnce getTokenId
 	 *
 	 * @dataProvider getTokenData
 	 */
@@ -301,14 +301,14 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	/**
-	 * @on-before-once getTokenId
+	 * @onBeforeOnce getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_SimpleUpdate() {
 		$this->checkTokenSimpleUpdate('zabbix.php?action=token.edit&tokenid='.self::$tokenid);
 	}
 
 	/**
-	 * @on-before-once getTokenId
+	 * @onBeforeOnce getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_Cancel() {
 		$this->checkTokenCancel('zabbix.php?action=token.edit', 'Admin');
@@ -321,7 +321,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	/**
-	 * @on-before-once getTokenId
+	 * @onBeforeOnce getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_Regenerate() {
 		$data = [
