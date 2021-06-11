@@ -96,7 +96,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list.edit')
 					->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-id', $serviceid),
+				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($dependencies_count)
 			]
 			: $service['name'],
@@ -110,15 +110,15 @@ foreach ($data['services'] as $serviceid => $service) {
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-service-add-child')
-				->setAttribute('data-id', $serviceid),
+				->setAttribute('data-serviceid', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-service-edit')
-				->setAttribute('data-id', $serviceid),
+				->setAttribute('data-serviceid', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-service-remove')
-				->setAttribute('data-id', $serviceid)
+				->setAttribute('data-serviceid', $serviceid)
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]));
 }
@@ -132,7 +132,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(
 					(new CSimpleButton(_('Create service')))
 						->addClass('js-service-create')
-						->setAttribute('data-id', $data['serviceid'])
+						->setAttribute('data-serviceid', $data['serviceid'])
 				)
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))

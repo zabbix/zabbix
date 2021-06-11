@@ -89,7 +89,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
 					->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-id', $serviceid),
+				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($dependencies_count)
 			]
 			: $service['name'],
