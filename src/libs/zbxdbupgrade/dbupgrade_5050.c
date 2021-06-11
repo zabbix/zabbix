@@ -152,9 +152,8 @@ static int	DBpatch_5050009(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_vector_uint64_t	problemtag_eventids;
-		int			i;
-		char			*desc, *tag_value = NULL;
+		int	i;
+		char	*desc, *tag_value = NULL;
 
 		ZBX_STR2UINT64(triggerid, row[0]);
 		desc = row[1];
@@ -165,48 +164,51 @@ static int	DBpatch_5050009(void)
 		if (ZBX_TAGVALUE_MAX_LEN < zbx_strlen_utf8(tag_value))
 			DBpatch_trim_tag_value(tag_value);
 
+		zbx_db_insert_add_values(&ins_service_problem_tag, __UINT64_C(0), serviceid, "ServiceLink", 0,
+				tag_value);
 
 		if (old_triggerid != triggerid)
 		{
+			zbx_vector_uint64_t	problemtag_eventids;
+
 			zbx_db_insert_add_values(&ins_trigger_tag, __UINT64_C(0), triggerid, "ServiceLink", tag_value);
-			zbx_db_insert_add_values(&ins_service_problem_tag, __UINT64_C(0), serviceid, "ServiceLink", 0,
-					tag_value);
-		}
 
-		zbx_vector_uint64_create(&problemtag_eventids);
+			zbx_vector_uint64_create(&problemtag_eventids);
 
-		DBpatch_get_eventid_by_triggerid(triggerid, &problemtag_eventids);
+			DBpatch_get_eventid_by_triggerid(triggerid, &problemtag_eventids);
 
-		for (i = 0; i < problemtag_eventids.values_num; i++)
-		{
-			zbx_db_insert_add_values(&ins_problem_tag, __UINT64_C(0), problemtag_eventids.values[i],
-					"ServiceLink", tag_value);
+			for (i = 0; i < problemtag_eventids.values_num; i++)
+			{
+				zbx_db_insert_add_values(&ins_problem_tag, __UINT64_C(0), problemtag_eventids.values[i],
+						"ServiceLink", tag_value);
+			}
+
+			zbx_vector_uint64_destroy(&problemtag_eventids);
 		}
 
 		old_triggerid = triggerid;
 
-		zbx_vector_uint64_destroy(&problemtag_eventids);
 		zbx_free(tag_value);
 	}
 
 	zbx_db_insert_autoincrement(&ins_service_problem_tag, "service_problem_tagid");
 	ret = zbx_db_insert_execute(&ins_service_problem_tag);
-	zbx_db_insert_clean(&ins_service_problem_tag);
 
 	if (FAIL == ret)
 		goto out;
 
 	zbx_db_insert_autoincrement(&ins_trigger_tag, "triggertagid");
 	ret = zbx_db_insert_execute(&ins_trigger_tag);
-	zbx_db_insert_clean(&ins_trigger_tag);
 
 	if (FAIL == ret)
 		goto out;
 
 	zbx_db_insert_autoincrement(&ins_problem_tag, "problemtagid");
 	ret = zbx_db_insert_execute(&ins_problem_tag);
-	zbx_db_insert_clean(&ins_problem_tag);
 out:
+	zbx_db_insert_clean(&ins_service_problem_tag);
+	zbx_db_insert_clean(&ins_trigger_tag);
+	zbx_db_insert_clean(&ins_problem_tag);
 	DBfree_result(result);
 
 	return ret;
