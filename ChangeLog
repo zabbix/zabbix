@@ -2931,6 +2931,10 @@ New features:
 ..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
+.......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
+A......... [ZBX-19447] implemented item type validation by API (miks)
+A......... [ZBX-19388] fixed inherited graph and graph prototype update if user has no permissions to child host or template (Ivo)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
 ..F....... [ZBX-19300] updated jquery version (ashubin)
