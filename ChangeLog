@@ -1,6 +1,8 @@
 Changes for 5.0.13rc1
 
 New features:
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
+...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 .........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
 .........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
@@ -10,6 +12,17 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+.......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
+..F....... [ZBX-19203] fixed filter values to be unset when switching between pages and resetting filter in latest data history screen (miks)
+.......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
+...G...... [ZBX-18914] fixed timeout issue with vfs.fs plugin for Zabbix agent 2 (esneiders)
+..F....... [ZBX-19123] fixed sorting by name or status on action page (jfreibergs)
+A......... [ZBX-18941] improved error messages on "Execute now" by adding item and host names (miks)
+A......... [ZBX-19447] implemented item type validation by API (miks)
+..F....... [ZBX-18863] fixed error when overviews skipped entries with numeric host/item/trigger names (miks)
+A......... [ZBX-19388] fixed inherited graph and graph prototype update if user has no permissions to child host or template (Ivo)
+..F....... [ZBX-18699] fixed selected value appearance in popup host group filter (miks)
+..F....... [ZBX-19084] fixed removal of inherited tags in "Tags" tab (Ivo)
 A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 .......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
