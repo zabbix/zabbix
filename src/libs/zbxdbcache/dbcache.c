@@ -1583,7 +1583,8 @@ static void	DCsync_trends(void)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS) && 0 != trends_num)
 		DCexport_all_trends(trends, trends_num);
 
-	qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
+	if (0 < trends_num)
+		qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 	DBbegin();
 
