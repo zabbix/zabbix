@@ -36,11 +36,47 @@ extern int		server_num, process_num;
 
 extern int CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY;
 
+static int	housekeep_problems_without_triggers(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids;
+	int			deleted;
+
+	zbx_vector_uint64_create(&ids);
+
+	result = DBselect("select eventid"
+			" from problem"
+			" where source=0"
+				" and object=0"
+				" and not exists (select NULL from triggers where triggerid=objectid)");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	id;
+
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(&ids, id);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 != ids.values_num)
+	{
+		if (SUCCEED == DBexecute_multiple_query("delete from problem where", "eventid", &ids))
+			deleted = ids.values_num;
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return deleted;
+}
+
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime,
-		records;
-	double	sec, time_slept, time_now;
+	int	deleted;
+	double	sec, time_now;
 	char	sleeptext[25];
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -55,6 +91,11 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
+			CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+
+	zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d second(s)", CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_sleep_loop(CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
@@ -65,21 +106,14 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		time_now = zbx_time();
 		zbx_update_env(time_now);
 
-		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");
-
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		/*d_cleanup = housekeeping_cleanup();*/
+
+		sec = zbx_time();
+		deleted = housekeep_problems_without_triggers();
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d records in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_problems, d_sessions, d_services, d_audit, records, sec, sleeptext);
-
-		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, records, sec, sleeptext);
+		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, %s]",
+				get_process_type_string(process_type), deleted, sec, sleeptext);
 	}
 
 	DBclose();
