@@ -1657,7 +1657,7 @@ else {
 			: [];
 	}
 
-	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
+	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['context'], $data['items']);
 
 	if (!$data['filter_data']['filter_tags']) {
 		$data['filter_data']['filter_tags'] = [[
