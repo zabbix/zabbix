@@ -25,6 +25,10 @@
 
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('class.calendar.js');
+$this->addJsFile('multiselect.js');
+$this->addJsFile('textareaflexible.js');
+$this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('monitoring.service.list.js.php');
 

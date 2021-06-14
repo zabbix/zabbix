@@ -42,6 +42,10 @@ $table = (new CTable())
 		$show_inherited_tags ? _('Parent templates') : null
 	]);
 
+if ($data['source'] === 'service') {
+	$table->addStyle('width: 100%');
+}
+
 $allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 // fields

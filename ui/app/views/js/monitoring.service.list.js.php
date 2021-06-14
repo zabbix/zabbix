@@ -34,6 +34,7 @@
 		const init = () => {
 			initViewModeSwitcher();
 			initTagFilter();
+			initActionButtons();
 		}
 
 		const initViewModeSwitcher = () => {
@@ -72,6 +73,41 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
+		}
+
+		const initActionButtons = () => {
+			for (const element of document.querySelectorAll('.js-service-create, .js-service-add-child')) {
+				let popup_options = {};
+
+				if (element.dataset.parent_serviceid !== 'undefined') {
+					popup_options = {
+						parent_serviceids: [element.dataset.parent_serviceid]
+					};
+				}
+
+				element.addEventListener('click', (e) => {
+					PopUp('popup.service.edit', popup_options, null, e.target);
+				});
+			}
+
+			for (const element of document.querySelectorAll('.js-service-edit')) {
+				element.addEventListener('click', (e) => {
+					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, null, e.target);
+				});
+			}
+
+			for (const element of document.querySelectorAll('.js-service-remove')) {
+				element.addEventListener('click', (e) => {
+					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
+						const url_delete = new Curl('zabbix.php', false);
+
+						url_delete.setArgument('action', 'service.delete');
+						url_delete.setArgument('serviceids', [element.dataset.serviceid]);
+
+						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+					}
+				});
+			}
 		}
 
 		init();
