@@ -655,6 +655,7 @@ static void	sync_services_links(zbx_service_manager_t *service_manager, int *upd
 		if (NULL == (services_link = zbx_hashset_search(&service_manager->services_links,
 				&services_link_local)))
 		{
+			(*updated)++;
 			services_link = zbx_hashset_insert(&service_manager->services_links, &services_link_local,
 					sizeof(services_link_local));
 		}
