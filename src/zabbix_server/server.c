@@ -336,6 +336,8 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
 
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
+int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 5;
+
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -926,7 +928,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TriggerHousekeepingFrequency",	&CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_DAY},
+			PARM_OPT,	1,			3600},
+		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
+			PARM_OPT,	1,			3600},
 		{NULL}
 	};
 
