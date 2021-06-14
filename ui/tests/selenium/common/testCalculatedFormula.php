@@ -2395,14 +2395,14 @@ class testCalculatedFormula extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$title = (CTestArrayHelper::get($data, 'formula') === '')
 				? 'Page received incorrect data'
-				: (($prototype) ? 'Cannot add item prototype' : 'Cannot add item');
+				: ($prototype ? 'Cannot add item prototype' : 'Cannot add item');
 
 			$this->assertMessage(TEST_BAD, $title, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, (($prototype) ? 'Item prototype added' : 'Item added'));
+			$this->assertMessage(TEST_GOOD, ($prototype ? 'Item prototype added' : 'Item added'));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 		}
 	}
