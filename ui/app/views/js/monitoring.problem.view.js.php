@@ -22,112 +22,7 @@
 /**
  * @var CView $this
  */
-?>
 
-<script type="text/javascript">
-function problemsPage() {
-	this.refresh_url = '<?= $data['refresh_url'] ?>';
-	this.refresh_interval = <?= $data['refresh_interval'] ?>;
-	this.running = false;
-	this.timeout = null;
-}
-
-problemsPage.prototype.addMessages = function(messages) {
-	$('.wrapper main').before(messages);
-};
-
-problemsPage.prototype.removeMessages = function() {
-	$('.wrapper .msg-bad').remove();
-};
-
-problemsPage.prototype.getCurrentResultsTable = function() {
-	return $('#flickerfreescreen_problem');
-};
-
-problemsPage.prototype.getCurrentDebugBlock = function() {
-	return $('.wrapper > .debug-output');
-};
-
-problemsPage.prototype.setLoading = function() {
-	this.getCurrentResultsTable().addClass('is-loading is-loading-fadein delayed-15s');
-};
-
-problemsPage.prototype.clearLoading = function() {
-	this.getCurrentResultsTable().removeClass('is-loading is-loading-fadein delayed-15s');
-};
-
-problemsPage.prototype.refreshBody = function(body) {
-	this.getCurrentResultsTable().replaceWith(body);
-	chkbxRange.init();
-};
-
-problemsPage.prototype.refreshDebug = function(debug) {
-	this.getCurrentDebugBlock().replaceWith(debug);
-};
-
-problemsPage.prototype.refresh = function() {
-	this.setLoading();
-
-	var deferred = $.getJSON(this.refresh_url);
-
-	return this.bindDataEvents(deferred);
-};
-
-problemsPage.prototype.refreshNow = function() {
-	this.unscheduleRefresh();
-	this.refresh();
-};
-
-problemsPage.prototype.scheduleRefresh = function() {
-	this.unscheduleRefresh();
-	this.timeout = setTimeout((function() {
-		this.timeout = null;
-		this.refresh();
-	}).bind(this), this.refresh_interval);
-};
-
-problemsPage.prototype.unscheduleRefresh = function() {
-	if (this.timeout !== null) {
-		clearTimeout(this.timeout);
-		this.timeout = null;
-	}
-};
-
-problemsPage.prototype.start = function() {
-	if (this.refresh_interval != 0) {
-		this.running = true;
-		this.scheduleRefresh();
-	}
-};
-
-problemsPage.prototype.bindDataEvents = function(deferred) {
-	var that = this;
-
-	deferred
-		.done(function(response) {
-			that.onDataDone.call(that, response);
-		})
-		.always(this.onDataAlways.bind(this));
-
-	return deferred;
-};
-
-problemsPage.prototype.onDataAlways = function() {
-	if (this.running) {
-		this.scheduleRefresh();
-	}
-};
-
-problemsPage.prototype.onDataDone = function(response) {
-	this.clearLoading();
-	this.removeMessages();
-	this.refreshBody(response.body);
-	('messages' in response) && this.addMessages(response.messages);
-	('debug' in response) && this.refreshDebug(response.debug);
-};
-</script>
-
-<?php
 if (array_key_exists('filter_options', $data)) { ?>
 	<script type="text/javascript">
 	$(function() {
@@ -189,11 +84,11 @@ if (array_key_exists('filter_options', $data)) { ?>
 		});
 
 		/**
-		 * Refresh results table via window.problems_page.refreshNow() call.
+		 * Refresh results table via window.flickerfreeScreen.refresh call.
 		 */
 		function refreshResults() {
 			let url = new Curl(),
-				refresh_url = new Curl('zabbix.php', false),
+				screen = window.flickerfreeScreen.screens['problem'],
 				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
 					global_timerange, url.getArgumentsObject()
 				);
@@ -208,22 +103,23 @@ if (array_key_exists('filter_options', $data)) { ?>
 				? data.severities.filter((value, key) => value == key)
 				: data.severities;
 
-			// Modify filter data.
+			// Modify filter data of flickerfreeScreen object with id 'problem'.
 			if (data.page === null) {
 				delete data.page;
 			}
 
 			if (data.filter_custom_time) {
-				data.from = data.from;
-				data.to = data.to;
+				screen.timeline.from = data.from;
+				screen.timeline.to = data.to;
 			}
 			else {
-				data.from = global_timerange.from;
-				data.to = global_timerange.to;
+				screen.timeline.from = global_timerange.from;
+				screen.timeline.to = global_timerange.to;
 			}
 
-			data.sort = data.sort;
-			data.sortorder = data.sortorder;
+			screen.data.filter = data;
+			screen.data.sort = data.sort;
+			screen.data.sortorder = data.sortorder;
 
 			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
 			for (var i = overlays_stack.length - 1; i >= 0; i--) {
@@ -235,17 +131,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 				}
 			}
 
-			Object.entries(data).forEach(([key, value]) => {
-				if (['filter_show_counter', 'filter_custom_time', 'action'].indexOf(key) !== -1) {
-					return;
-				}
-
-				refresh_url.setArgument(key, value);
-			});
-
-			refresh_url.setArgument('action', 'problem.view.refresh');
-			window.problems_page.refresh_url = refresh_url.getUrl();
-			window.problems_page.refreshNow();
+			window.flickerfreeScreen.refresh(screen.id);
 		}
 
 		function refreshCounters() {
@@ -282,7 +168,6 @@ if (array_key_exists('filter_options', $data)) { ?>
 				global_timerange.from = data.from;
 				global_timerange.to = data.to;
 			}
-			refreshResults();
 		});
 	});
 	</script>
@@ -311,7 +196,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 				chkbxRange.clearSelectedOnFilterChange();
 			}
 
-			window.problems_page.refreshNow();
+			window.flickerfreeScreen.refresh('problem');
 
 			clearMessages();
 			addMessage(makeMessageBox('good', [], response.message, true, false));
@@ -326,7 +211,5 @@ if (array_key_exists('filter_options', $data)) { ?>
 
 			acknowledgePopUp({eventids: eventids}, this);
 		});
-
-		window.problems_page = new problemsPage();
 	});
 </script>

@@ -764,7 +764,7 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], true);
 		$data = self::sortData($data, $this->data['sort'], $this->data['sortorder']);
 
-		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
+		if ($this->data['action'] === 'problem.view') {
 			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
 		}
 
@@ -796,7 +796,7 @@ class CScreenProblem extends CScreenBase {
 			? OPERATIONAL_DATA_SHOW_NONE
 			: $this->data['filter']['show_opdata'];
 
-		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
+		if ($this->data['action'] === 'problem.view') {
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
 				->setName('problem')
@@ -1146,7 +1146,7 @@ class CScreenProblem extends CScreenBase {
 				]
 			], 'problem');
 
-			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
+			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 
 		/*

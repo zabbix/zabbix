@@ -23,9 +23,60 @@
  * @var CView $this
  */
 
+$options = [
+	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
+	'mode' => SCREEN_MODE_JS,
+	'dataId' => 'problem',
+	'page' => $data['page'],
+	'data' => [
+		'action' => $data['action'],
+		'sort' => $data['sort'],
+		'sortorder' => $data['sortorder'],
+		'filter' => [
+			'show' => $data['filter']['show'],
+			'groupids' => $data['filter']['groupids'],
+			'hostids' => $data['filter']['hostids'],
+			'triggerids' => $data['filter']['triggerids'],
+			'name' => $data['filter']['name'],
+			'severities' => $data['filter']['severities'],
+			'inventory' => $data['filter']['inventory'],
+			'evaltype' => $data['filter']['evaltype'],
+			'tags' => $data['filter']['tags'],
+			'show_tags' => $data['filter']['show_tags'],
+			'tag_name_format' => $data['filter']['tag_name_format'],
+			'tag_priority' => $data['filter']['tag_priority'],
+			'show_suppressed' => $data['filter']['show_suppressed'],
+			'unacknowledged' => $data['filter']['unacknowledged'],
+			'compact_view' => $data['filter']['compact_view'],
+			'show_timeline' => $data['filter']['show_timeline'],
+			'details' => $data['filter']['details'],
+			'highlight_row' => $data['filter']['highlight_row'],
+			'show_opdata' => $data['filter']['show_opdata']
+		]
+	]
+];
+
+switch ($data['filter']['show']) {
+	case TRIGGERS_OPTION_RECENT_PROBLEM:
+	case TRIGGERS_OPTION_IN_PROBLEM:
+		$options['data']['filter']['age_state'] = $data['filter']['age_state'];
+		$options['data']['filter']['age'] = $data['filter']['age'];
+		break;
+
+	case TRIGGERS_OPTION_ALL:
+		$options['profileIdx'] = $data['tabfilter_idx'];
+		$options['profileIdx2'] = 0;
+		$options['from'] = $data['filter']['from'];
+		$options['to'] = $data['filter']['to'];
+		break;
+}
+
+$screen = CScreenBuilder::getScreen($options);
+
 if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('gtlc.js');
+	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.tabfilter.js');
@@ -70,21 +121,12 @@ if ($data['action'] === 'problem.view') {
 
 	$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	$widget
-		->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
-			array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
-		)))
+		->addItem($screen->get())
 		->show();
 
 	// Activate blinking.
 	(new CScriptTag('jqBlink.blink();'))->show();
-
-	// Initialize page refresh.
-	(new CScriptTag('problems_page.start();'))
-		->setOnDocumentReady()
-		->show();
 }
 else {
-	echo (new CPartial('monitoring.problem.view.html', array_intersect_key($data,
-		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
-	)))->getOutput();
+	echo $screen->get();
 }
