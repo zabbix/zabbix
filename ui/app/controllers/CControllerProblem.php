@@ -20,7 +20,7 @@
 
 
 /**
- * Base controller for the "Monitoring->Problems" page.
+ * Base controller for the "Monitoring->Problems" page and the "Problems" asynchronous requests.
  */
 abstract class CControllerProblem extends CController {
 
@@ -74,18 +74,6 @@ abstract class CControllerProblem extends CController {
 		$data = CScreenProblem::getData($filter);
 
 		return count($data['problems']);
-	}
-
-	/**
-	 * Get resulting rows for specified filter.
-	 *
-	 * @param array $filter  Filter fields values.
-	 *
-	 * @return array
-	 */
-	protected function getData(array $filter): array {
-		// getData is handled by jsrpc.php 'screen.get' action.
-		return [];
 	}
 
 	/**
@@ -172,5 +160,52 @@ abstract class CControllerProblem extends CController {
 		}
 
 		return $input;
+	}
+
+	/**
+	 * Validate input of filter inventory fields.
+	 *
+	 * @return boolean
+	 */
+	protected function validateInventar() {
+		if (!$this->hasInput('inventory')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('inventory') as $filter_inventory) {
+			if (count($filter_inventory) != 2
+					|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
+					|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Validate values of filter tags input fields.
+	 *
+	 * @return boolean
+	 */
+	protected function validateTags() {
+		if (!$this->hasInput('tags')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('tags') as $filter_tag) {
+			if (count($filter_tag) != 3
+					|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
+					|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
+					|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
 	}
 }

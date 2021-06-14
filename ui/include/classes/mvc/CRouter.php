@@ -189,7 +189,7 @@ class CRouter {
 		'popup.valuemap.edit'						=> ['CControllerPopupValueMapEdit',						'layout.json',			'popup.valuemap.edit'],
 		'popup.valuemap.update'						=> ['CControllerPopupValueMapUpdate',					'layout.json',			null],
 		'problem.view'								=> ['CControllerProblemView',							'layout.htmlpage',		'monitoring.problem.view'],
-		'problem.view.refresh'						=> ['CControllerProblemViewRefresh',					'layout.json',			null],
+		'problem.view.refresh'						=> ['CControllerProblemViewRefresh',					'layout.json',			'monitoring.problem.view.refresh'],
 		'problem.view.csv'							=> ['CControllerProblemView',							'layout.csv',			'monitoring.problem.view'],
 		'profile.update'							=> ['CControllerProfileUpdate',							'layout.json',			null],
 		'proxy.create'								=> ['CControllerProxyCreate',							null,					null],

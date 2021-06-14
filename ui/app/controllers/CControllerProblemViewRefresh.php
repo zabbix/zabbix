@@ -21,6 +21,53 @@
 
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
+	protected function checkInput() {
+
+		$fields = [
+			'action' =>				'string',
+			'sort' =>				'in clock,host,severity,name',
+			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'page' =>				'ge 1',
+			'show' =>				'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
+			'groupids' =>			'array_id',
+			'hostids' =>			'array_id',
+			'triggerids' =>			'array_id',
+			'name' =>				'string',
+			'severities' =>			'array',
+			'age_state' =>			'in 0,1',
+			'age' =>				'int32',
+			'inventory' =>			'array',
+			'evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'tags' =>				'array',
+			'show_tags' =>			'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
+			'show_suppressed' =>	'in 0,1',
+			'unacknowledged' =>		'in 0,1',
+			'compact_view' =>		'in 0,1',
+			'show_timeline' =>		'in 0,1',
+			'details' =>			'in 0,1',
+			'highlight_row' =>		'in 0,1',
+			'show_opdata' =>		'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
+			'tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'tag_priority' =>		'string',
+			'from' =>				'range_time',
+			'to' =>					'range_time',
+			'filter_counters' =>	'in 1'
+		];
+
+		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
+				&& $this->validateTags());
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
+	}
+
 	protected function doAction() {
 		$data = [];
 
@@ -44,12 +91,54 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 
 				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
-		}
 
-		if (($messages = getMessages()) !== null) {
-			$data['messages'] = $messages->toString();
-		}
+			if (($messages = getMessages()) !== null) {
+				$data['messages'] = $messages->toString();
+			}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($data)]))->disableView()
+			);
+		}
+		else {
+			$data = [
+				'page' => $this->getInput('page', 1),
+				'action' => $this->getInput('action'),
+				'sort' => $this->getInput('sort', 'clock'),
+				'sortorder' => $this->getInput('sortorder', ZBX_SORT_DOWN),
+				'filter' => [
+					'show' => $this->getInput('show', TRIGGERS_OPTION_RECENT_PROBLEM),
+					'groupids' => $this->getInput('groupids', []),
+					'hostids' => $this->getInput('hostids', []),
+					'triggerids' => $this->getInput('triggerids', []),
+					'name' => $this->getInput('name', ''),
+					'severities' => $this->getInput('severities', []),
+					'inventory' => array_filter($this->getInput('inventory', []), function ($filter_inventory) {
+						return ($filter_inventory['field'] !== '' && $filter_inventory['value'] !== '');
+					}),
+					'evaltype' => $this->getInput('evaltype', TAG_EVAL_TYPE_AND_OR),
+					'tags' => array_filter($this->getInput('tags', []), function ($filter_tag) {
+						return ($filter_tag['tag'] !== '');
+					}),
+					'show_tags' => $this->getInput('show_tags', PROBLEMS_SHOW_TAGS_3),
+					'tag_name_format' => $this->getInput('tag_name_format', PROBLEMS_TAG_NAME_FULL),
+					'tag_priority' => $this->getInput('tag_priority', ''),
+					'show_suppressed' => $this->getInput('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
+					'unacknowledged' => $this->getInput('unacknowledged', 0),
+					'compact_view' => $this->getInput('compact_view', 0),
+					'show_timeline' => $this->getInput('show_timeline', 0),
+					'details' => $this->getInput('details', 0),
+					'highlight_row' => $this->getInput('highlight_row', 0),
+					'show_opdata' => $this->getInput('show_opdata', 0),
+					'age_state' => $this->getInput('age_state', 0),
+					'age' => $this->getInput('age_state', 0) ? $this->getInput('age', 14) : null,
+					'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+					'to' => $this->hasInput('to') ? $this->getInput('to') : null
+				],
+				'tabfilter_idx' => 'web.problem.filter'
+			];
+
+			$this->setResponse(new CControllerResponseData($data));
+		}
 	}
 }
