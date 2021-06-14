@@ -516,7 +516,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.host', array_keys($hosts)).
+			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
 				' AND '.dbConditionInt('h.status',
 					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 				)
