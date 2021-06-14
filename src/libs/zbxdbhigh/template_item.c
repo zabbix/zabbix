@@ -2884,6 +2884,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 				ppdst = (zbx_template_item_preproc_t *)zbx_malloc(NULL,
 						sizeof(zbx_template_item_preproc_t));
 				ppdst->item_preprocid = 0;
+				ppdst->upd_flags = 0;
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
 				ppdst->params = zbx_strdup(NULL, ppsrc->params);
@@ -3068,6 +3069,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 				ptsrc = (zbx_template_item_tag_t *)item->template_tags.values[j];
 				ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
 				ptdst->itemtagid = 0;
+				ptdst->upd_flags = 0;
 				ptdst->tag = zbx_strdup(NULL, ptsrc->tag);
 				ptdst->value = zbx_strdup(NULL, ptsrc->value);
 				zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
@@ -3238,6 +3240,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 				ppsrc = (zbx_template_item_param_t *)item->template_params.values[j];
 				ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 				ppdst->item_parameterid = 0;
+				ppdst->upd_flags = 0;
 				ppdst->name = zbx_strdup(NULL, ppsrc->name);
 				ppdst->value = zbx_strdup(NULL, ppsrc->value);
 				zbx_vector_item_param_ptr_append(&item->item_params, ppdst);
@@ -3397,6 +3400,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 				plmpsrc = (zbx_template_lld_macro_t *)item->template_lld_macros.values[j];
 				plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
 				plmpdst->lld_macro_pathid = 0;
+				plmpdst->upd_flags = 0;
 				plmpdst->lld_macro = zbx_strdup(NULL, plmpsrc->lld_macro);
 				plmpdst->path = zbx_strdup(NULL, plmpsrc->path);
 				zbx_vector_lld_macro_ptr_append(&item->item_lld_macros, plmpdst);
