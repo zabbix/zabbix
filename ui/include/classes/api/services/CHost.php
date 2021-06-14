@@ -640,7 +640,6 @@ class CHost extends CHostGeneral {
 		$hosts_groups = [];
 		$hosts_tags = [];
 		$hosts_interfaces = [];
-		$hosts_macros = [];
 		$hosts_inventory = [];
 		$templates_hostids = [];
 
@@ -665,12 +664,6 @@ class CHost extends CHostGeneral {
 			if (array_key_exists('interfaces', $host)) {
 				foreach (zbx_toArray($host['interfaces']) as $interface) {
 					$hosts_interfaces[] = ['hostid' => $host['hostid']] + $interface;
-				}
-			}
-
-			if (array_key_exists('macros', $host)) {
-				foreach (zbx_toArray($host['macros']) as $macro) {
-					$hosts_macros[] = ['hostid' => $host['hostid']] + $macro;
 				}
 			}
 
@@ -706,9 +699,7 @@ class CHost extends CHostGeneral {
 			API::HostInterface()->create($hosts_interfaces);
 		}
 
-		if ($hosts_macros) {
-			API::UserMacro()->create($hosts_macros);
-		}
+		$this->createHostMacros($hosts);
 
 		while ($templates_hostids) {
 			$templateid = key($templates_hostids);
@@ -779,30 +770,6 @@ class CHost extends CHostGeneral {
 	public function update($hosts) {
 		$hosts = zbx_toArray($hosts);
 
-		if (!$hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$hostids = zbx_objectValues($hosts, 'hostid');
-
-		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
-			'hostids' => $hostids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// Load existing values of PSK fields of hosts independently from APP mode.
-		$hosts_psk_fields = DB::select($this->tableName(), [
-			'output' => ['tls_psk_identity', 'tls_psk'],
-			'hostids' => array_keys($db_hosts),
-			'preservekeys' => true
-		]);
-
-		foreach ($hosts_psk_fields as $hostid => $psk_fields) {
-			$db_hosts[$hostid] += $psk_fields;
-		}
-
 		$hosts = $this->validateUpdate($hosts, $db_hosts);
 
 		$inventories = [];
@@ -825,19 +792,12 @@ class CHost extends CHostGeneral {
 		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
 		$inventories = zbx_toHash($inventories, 'hostid');
 
-		$macros = [];
-		foreach ($hosts as &$host) {
-			if (isset($host['macros'])) {
-				$macros[$host['hostid']] = zbx_toArray($host['macros']);
+		$this->updateHostMacros($hosts, $db_hosts);
 
-				unset($host['macros']);
-			}
+		foreach ($hosts as &$host) {
+			unset($host['macros']);
 		}
 		unset($host);
-
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
-		}
 
 		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'tls_psk_identity', 'tls_psk'
@@ -865,7 +825,7 @@ class CHost extends CHostGeneral {
 
 		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
 
-		return ['hostids' => $hostids];
+		return ['hostids' => array_column($hosts, 'hostid')];
 	}
 
 	/**
@@ -1889,11 +1849,22 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+			]],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
 		$host_name_parser = new CHostNameParser();
 
 		$host_db_fields = ['host' => null];
 
 		$groupids = [];
+		$index = 1;
 
 		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
@@ -1945,6 +1916,13 @@ class CHost extends CHostGeneral {
 			if (array_key_exists('tags', $host)) {
 				$this->validateTags($host);
 			}
+
+			if (array_key_exists('macros', $host)) {
+				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.$index.'/macros', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+			$index++;
 		}
 		unset($host);
 
@@ -2091,8 +2069,40 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $hosts, array $db_hosts) {
+	protected function validateUpdate(array &$hosts, array &$db_hosts = null) {
+		if (!$hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+			'hostmacroid' =>	['type' => API_ID],
+			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
+		$db_hosts = $this->get([
+			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
+			'selectMacros' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
+			'hostids' => array_column($hosts, 'hostid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		// Load existing values of PSK fields of hosts independently from APP mode.
+		$hosts_psk_fields = DB::select($this->tableName(), [
+			'output' => ['tls_psk_identity', 'tls_psk'],
+			'hostids' => array_keys($db_hosts),
+			'preservekeys' => true
+		]);
+
+		foreach ($hosts_psk_fields as $hostid => $psk_fields) {
+			$db_hosts[$hostid] += $psk_fields;
+		}
+
 		$host_db_fields = ['hostid' => null];
+		$index = 1;
 
 		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
@@ -2135,8 +2145,22 @@ class CHost extends CHostGeneral {
 				}
 			}
 			// Permissions to host groups is validated in massUpdate().
+
+			if (array_key_exists('macros', $host)) {
+				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.$index.'/macros', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+			$index++;
 		}
 		unset($host);
+
+		foreach ($db_hosts as &$db_host) {
+			$db_host['macros'] = array_column($db_host['macros'], null, 'hostmacroid');
+		}
+		unset($db_host);
+
+		$hosts = $this->validateHostMacros($hosts, $db_hosts);
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 
