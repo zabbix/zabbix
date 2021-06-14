@@ -62,30 +62,8 @@ class CControllerProblemView extends CControllerProblem {
 			'counter_index' =>			'ge 0'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
-
-		if ($ret && $this->hasInput('inventory')) {
-			foreach ($this->getInput('inventory') as $filter_inventory) {
-				if (count($filter_inventory) != 2
-						|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
-						|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		if ($ret && $this->hasInput('tags')) {
-			foreach ($this->getInput('tags') as $filter_tag) {
-				if (count($filter_tag) != 3
-						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
-						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
-						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
+		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
+				&& $this->validateTags());
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());

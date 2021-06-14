@@ -34,6 +34,8 @@
 		active_filter: null,
 		refresh_timer: null,
 		filter_counter_fetch: null,
+		running: false,
+		timeout: null,
 
 		init({filter_options, refresh_interval, filter_defaults}) {
 			this.refresh_interval = refresh_interval;
@@ -45,6 +47,11 @@
 
 			this.initFilter(filter_options);
 			this.initAcknowledge();
+
+			if (this.refresh_interval != 0) {
+				this.running = true;
+				this.scheduleRefresh();
+			}
 
 			$(document).on({
 				mouseenter: function() {
@@ -127,6 +134,8 @@
 					this.global_timerange.from = data.from;
 					this.global_timerange.to = data.to;
 				}
+
+				this.refreshResults();
 			});
 		},
 
@@ -138,7 +147,7 @@
 					chkbxRange.clearSelectedOnFilterChange();
 				}
 
-				window.flickerfreeScreen.refresh('problem');
+				this.refreshNow();
 
 				clearMessages();
 				addMessage(makeMessageBox('good', [], response.message, true, false));
@@ -151,12 +160,95 @@
 			});
 		},
 
+		getCurrentResultsTable() {
+			return document.getElementById('flickerfreescreen_problem');
+		},
+
+		getCurrentDebugBlock() {
+			return document.querySelector('.wrapper > .debug-output');
+		},
+
+		setLoading() {
+			this.getCurrentResultsTable().classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+		},
+
+		clearLoading() {
+			this.getCurrentResultsTable().classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+		},
+
+		refreshBody(body) {
+			this.getCurrentResultsTable().replaceWith(
+				new DOMParser().parseFromString(body, 'text/html').body.firstElementChild
+			);
+			chkbxRange.init();
+		},
+
+		refreshDebug(debug) {
+			this.getCurrentDebugBlock().replaceWith(
+				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
+			);
+		},
+
+		refresh() {
+			this.setLoading();
+
+			const deferred = $.getJSON(this.refresh_url);
+
+			return this.bindDataEvents(deferred);
+		},
+
+		refreshNow() {
+			this.unscheduleRefresh();
+			this.refresh();
+		},
+
+		scheduleRefresh() {
+			this.unscheduleRefresh();
+			this.timeout = setTimeout((function () {
+				this.timeout = null;
+				this.refresh();
+			}).bind(this), this.refresh_interval);
+		},
+
+		unscheduleRefresh() {
+			if (this.timeout !== null) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+		},
+
+		bindDataEvents(deferred) {
+			const that = this;
+
+			deferred
+				.done(function(response) {
+					that.onDataDone.call(that, response);
+				})
+				.always(this.onDataAlways.bind(this));
+
+			return deferred;
+		},
+
+		onDataAlways() {
+			if (this.running) {
+				this.scheduleRefresh();
+			}
+		},
+
+		onDataDone(response) {
+			this.clearLoading();
+			clearMessages();
+			this.refreshBody(response.body);
+			('messages' in response) && addMessage(makeMessageBox('good', [], response.messages, true, false));
+			('debug' in response) && this.refreshDebug(response.debug);
+		},
+
 		/**
-		 * Refresh results table via window.flickerfreeScreen.refresh call.
+		 * Refresh results table.
 		 */
 		refreshResults() {
 			const url = new Curl();
-			const screen = window.flickerfreeScreen.screens['problem'];
+			const refresh_url = new Curl('zabbix.php', false);
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			data.inventory = data.inventory
@@ -169,23 +261,15 @@
 				? data.severities.filter((value, key) => value == key)
 				: data.severities;
 
-			// Modify filter data of flickerfreeScreen object with id 'problem'.
+			// Modify filter data.
 			if (data.page === null) {
 				delete data.page;
 			}
 
-			if (data.filter_custom_time) {
-				screen.timeline.from = data.from;
-				screen.timeline.to = data.to;
+			if (!data.filter_custom_time) {
+				data.from = this.global_timerange.from;
+				data.to = this.global_timerange.to;
 			}
-			else {
-				screen.timeline.from = this.global_timerange.from;
-				screen.timeline.to = this.global_timerange.to;
-			}
-
-			screen.data.filter = data;
-			screen.data.sort = data.sort;
-			screen.data.sortorder = data.sortorder;
 
 			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
 			for (let i = overlays_stack.length - 1; i >= 0; i--) {
@@ -197,7 +281,17 @@
 				}
 			}
 
-			window.flickerfreeScreen.refresh(screen.id);
+			Object.entries(data).forEach(([key, value]) => {
+				if (['filter_show_counter', 'filter_custom_time', 'action'].indexOf(key) !== -1) {
+					return;
+				}
+
+				refresh_url.setArgument(key, value);
+			});
+
+			refresh_url.setArgument('action', 'problem.view.refresh');
+			this.refresh_url = refresh_url.getUrl();
+			this.refreshNow();
 		},
 
 		refreshCounters() {
