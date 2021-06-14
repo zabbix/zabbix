@@ -27,6 +27,7 @@
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE	3
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 

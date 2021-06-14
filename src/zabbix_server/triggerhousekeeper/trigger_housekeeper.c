@@ -36,6 +36,22 @@ extern int		server_num, process_num;
 
 extern int CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY;
 
+static void	housekeep_service_problems(zbx_vector_uint64_t *eventids)
+{
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
+	int		i;
+
+	for (i = 0; i < eventids->values_num; i++)
+		zbx_service_serialize_eventid(&data, &data_alloc, &data_offset, eventids->values[i]);
+
+	if (NULL == data)
+		return;
+
+	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, data_offset);
+	zbx_free(data);
+}
+
 static int	housekeep_problems_without_triggers(void)
 {
 	DB_RESULT		result;
@@ -67,6 +83,8 @@ static int	housekeep_problems_without_triggers(void)
 	{
 		if (SUCCEED == DBexecute_multiple_query("delete from problem where", "eventid", &ids))
 			deleted = ids.values_num;
+
+		housekeep_service_problems(&ids);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -107,7 +125,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		time_now = zbx_time();
 		zbx_update_env(time_now);
 
-		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 		deleted = housekeep_problems_without_triggers();

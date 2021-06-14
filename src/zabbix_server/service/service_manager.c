@@ -1247,6 +1247,33 @@ static void	recover_services_problem(zbx_service_manager_t *service_manager, con
 	}
 }
 
+static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_manager_t *service_manager)
+{
+	int	i, now;
+
+	now = time(NULL);
+
+	for (i = 0; i < eventids->values_num; i++)
+	{
+		zbx_event_t	*event, event_local = {.eventid = eventids->values[i]}, **ptr;
+
+		event = &event_local;
+
+		if (NULL == (ptr = zbx_hashset_search(&service_manager->problem_events, &event)))
+			continue;
+
+		event = *ptr;
+		event->clock = now;
+		recover_services_problem(service_manager, event);
+
+		zbx_hashset_remove_direct(&service_manager->problem_events, ptr);
+	}
+
+	db_update_services(&service_manager->services, &service_manager->service_diffs,
+			&service_manager->service_problems_index);
+	zbx_hashset_clear(&service_manager->service_diffs);
+}
+
 static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
 {
 	int	i, j;
@@ -1526,8 +1553,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		if (NULL != message)
 		{
 			zbx_vector_ptr_t	events;
+			zbx_vector_uint64_t	eventids;
 
 			zbx_vector_ptr_create(&events);
+			zbx_vector_uint64_create(&eventids);
 
 			switch (message->code)
 			{
@@ -1539,11 +1568,16 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					zbx_service_deserialize_problem_tags(message->data, message->size, &events);
 					process_problem_tags(&events, &service_manager);
 					break;
+				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE:
+					zbx_service_deserialize_eventids(message->data, message->size, &eventids);
+					process_deleted_problems(&eventids, &service_manager);
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 
 			zbx_ipc_message_free(message);
+			zbx_vector_uint64_destroy(&eventids);
 			zbx_vector_ptr_destroy(&events);
 		}
 

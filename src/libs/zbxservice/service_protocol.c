@@ -201,3 +201,41 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 		}
 	}
 }
+
+void	zbx_service_serialize_eventid(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t eventid)
+{
+	zbx_uint32_t	data_len = 0;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, eventid);
+
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	(void)zbx_serialize_value(ptr, eventid);
+}
+
+void	zbx_service_deserialize_eventids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *eventids)
+{
+	const unsigned char	*end = data + size;
+
+	while (data < end)
+	{
+		zbx_uint64_t	eventid;
+
+		data += zbx_deserialize_value(data, &eventid);
+		zbx_vector_uint64_append(eventids, eventid);
+	}
+}
