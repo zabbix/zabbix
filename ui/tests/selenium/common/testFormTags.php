@@ -295,11 +295,11 @@ class testFormTags extends CWebTest {
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
-//		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-//			$this->page->removeFocus();
-//			$screenshot_area = $this->query('id:tags-table')->one();
-//			$this->assertScreenshot($screenshot_area, $data['name']);
-//		}
+		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+			$this->page->removeFocus();
+			$screenshot_area = $this->query('id:tags-table')->one();
+			$this->assertScreenshot($screenshot_area, $data['name']);
+		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -663,11 +663,11 @@ class testFormTags extends CWebTest {
 		$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected);
 
 		// Check screenshot of text area after saving.
-//		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-//			$this->page->removeFocus();
-//			$screenshot_area = $this->query('id:tags-table')->one();
-//			$this->assertScreenshot($screenshot_area, $data['name']);
-//		}
+		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+			$this->page->removeFocus();
+			$screenshot_area = $this->query('id:tags-table')->one();
+			$this->assertScreenshot($screenshot_area, $data['name']);
+		}
 	}
 
 	/**
