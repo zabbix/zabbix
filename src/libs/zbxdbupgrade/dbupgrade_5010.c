@@ -1323,7 +1323,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 
 		if (SCREEN_MAX_ROWS <= scr_item->y)
 		{
-			scr_item->y = SCREEN_MAX_COLS - 1;
+			scr_item->y = SCREEN_MAX_ROWS - 1;
 			zabbix_log(LOG_LEVEL_WARNING, "warning: y is more then %d, limited for item " ZBX_FS_UI64,
 					scr_item->y, scr_item->screenitemid);
 		}
