@@ -320,7 +320,7 @@ class CControllerProblemView extends CControllerProblem {
 		// Prepare URL for asynchronous refresh requests.
 		$refresh_curl = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view.refresh');
 
-		$regresh_url_arguments = [
+		$refresh_url_arguments = [
 			'show' => 'filter_show',
 			'groupids' => 'filter_groupids',
 			'hostids' => 'filter_hostids',
@@ -342,8 +342,8 @@ class CControllerProblemView extends CControllerProblem {
 			'tag_name_format' => 'filter_tag_name_format',
 			'tag_priority' => 'filter_tag_priority'
 		];
-		foreach (array_filter(array_intersect_key($data['filter'], $regresh_url_arguments)) as $key => $value) {
-			$refresh_curl->setArgument($regresh_url_arguments[$key], $value);
+		foreach (array_filter(array_intersect_key($data['filter'], $refresh_url_arguments)) as $key => $value) {
+			$refresh_curl->setArgument($refresh_url_arguments[$key], $value);
 		}
 
 		$refresh_curl

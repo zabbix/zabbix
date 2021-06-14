@@ -127,7 +127,7 @@
 		$('.wrapper .msg-bad').remove();
 	};
 
-	problemsPage.prototype.getCurrentResultTable = function() {
+	problemsPage.prototype.getCurrentResultsTable = function() {
 		return $('#flickerfreescreen_problem');
 	};
 
@@ -136,15 +136,15 @@
 	};
 
 	problemsPage.prototype.setLoading = function() {
-		this.getCurrentResultTable().addClass('is-loading is-loading-fadein delayed-15s');
+		this.getCurrentResultsTable().addClass('is-loading is-loading-fadein delayed-15s');
 	};
 
 	problemsPage.prototype.clearLoading = function() {
-		this.getCurrentResultTable().removeClass('is-loading is-loading-fadein delayed-15s');
+		this.getCurrentResultsTable().removeClass('is-loading is-loading-fadein delayed-15s');
 	};
 
 	problemsPage.prototype.refreshBody = function(body) {
-		this.getCurrentResultTable().replaceWith(body);
+		this.getCurrentResultsTable().replaceWith(body);
 		chkbxRange.init();
 	};
 
