@@ -3111,6 +3111,20 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 					scr_item->screenitemid);
 		}
 
+		if (SCREEN_MAX_COLS <= scr_item->x)
+		{
+			scr_item->x = SCREEN_MAX_COLS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is more then %d, limited for item " ZBX_FS_UI64,
+					scr_item->x, scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_ROWS <= scr_item->y)
+		{
+			scr_item->y = SCREEN_MAX_COLS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is more then %d, limited for item " ZBX_FS_UI64,
+					scr_item->y, scr_item->screenitemid);
+		}
+
 		DBpatch_trace_screen_item(scr_item);
 
 		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
