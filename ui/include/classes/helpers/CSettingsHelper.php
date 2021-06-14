@@ -99,7 +99,8 @@ class CSettingsHelper extends CConfigGeneralHelper {
 				: API::Settings()->get(['output' => 'extend']);
 		}
 		else if (!$is_global && $param && !array_key_exists($param, self::$params)) {
-			self::$params = API::Settings()->get(['output' => 'extend']) + self::$params;
+			$settings = API::Settings()->get(['output' => 'extend']);
+			self::$params = is_array($settings) ? ($settings + self::$params) : false;
 		}
 
 		if (self::$params === false) {
