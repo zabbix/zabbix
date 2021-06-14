@@ -32,7 +32,6 @@ class testFormTags extends CWebTest {
 	public $clone_name;
 	public $link;
 	public $saved_link;
-	public $new_name;
 	public $host;
 	public $template;
 
@@ -515,7 +514,7 @@ class testFormTags extends CWebTest {
 
 			$title = ($action === 'add') ? ucfirst($object).' added' : ucfirst($object).' updated';
 			$this->assertMessage(TEST_GOOD, $title);
-			// 2 elements for test case "Tags Inheritance"
+			// 2 elements for test case "InheritedHostAndTemplateTags"
 			$count_elements = (strpos($data['name'], 'Inheritance') !== false) ? 2 : 1;
 			$this->assertEquals($count_elements, CDBHelper::getCount($success_sql));
 			// Check the results in form.
@@ -774,7 +773,7 @@ class testFormTags extends CWebTest {
 				return $row->getColumn('Name')->getText() === $this->clone_name;
 			});
 			foreach (array_keys($indices) as $index) {
-				$table->getRow($index)->getColumn('Name')->children()->waitUntilClickable()->one()->click();
+				$table->getRow($index)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 				$form->invalidate();
 				$form->selectTab('Tags');
 				$element->checkValue($tags);
@@ -827,46 +826,60 @@ class testFormTags extends CWebTest {
 	}
 
 	/**
-	 * Check inheritance of tags.
+	 * Check inherited tags from host or template.
+	 *
+	 * @param type $data			data provider
+	 * @param type $object			trigger, item, web scenario or prototype
+	 * @param string $parent		test on host or template
+	 * @param type $expression		trigger or trigger prototype expression
+	 */
+	public function checkInheritedTags($data, $object, $parent, $expression = null) {
+		// Change name for element due to sql count in checkResult function.
+		$data['name'] = ($parent === 'Host') ? 'Inherited '.$object.' tags on '.$parent : 'Inheritance element on '.$parent;
+		// Set host or template tags data.
+		$parent_tags = ($parent === 'Host') ? self::HOST_TAGS : self::TEMPLATE_TAGS;
+
+		// Create element with tags on host or template.
+		$form = $this->checkTagsCreate($data, $object, $expression);
+
+		// Remove index and action key in tags of element.
+		unset($data['tags'][0]['action'], $data['tags'][0]['index']);
+
+		// Open created element.
+		$this->page->open($this->link);
+		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
+		$form->selectTab('Tags');
+		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+
+		// Check all tags (inherited from host/template and own) on created element.
+		if ($object === 'web scenario') {
+			$field_name = 'scenario';
+		}
+		else {
+			$field_name = (strpos($object, 'prototype') !== false) ? str_replace(' prototype', '', $object) : $object;
+		}
+		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
+		$this->page->waitUntilReady();
+		$tags_table->checkValue($this->prepareAllTags($data['tags'], $parent_tags));
+
+		// Check disabled inherited tags from host or template on created element.
+		$this->assertEquals($this->prepareInheritedTags($data['tags'], $parent_tags), $this->getInheritedTags());
+	}
+
+	/**
+	 * Check inheritance of tags from host and template on inherited element from template.
 	 *
 	 * @param array    $data		data provider
 	 * @param string   $object		trigger, item, web scenario or prototype
 	 * @param string   $host_link	link to host
 	 * @param string   $expression  trigger or trigger prototype expression
 	 */
-	public function checkTagsInheritance($data, $object, $host_link, $expression = null) {
+	public function checkInheritedElementTags($data, $object, $host_link, $expression = null) {
 		// Create element tags on template.
 		$form = $this->checkTagsCreate($data, $object, $expression);
 
 		// Remove index and action key in tags of element.
 		unset($data['tags'][0]['action'], $data['tags'][0]['index']);
-
-		// Prepare all tags data (inherited form host and template, and element tags).
-		$all_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS, $data['tags']);
-		// Sort reference tags array by field "tag".
-		usort($all_tags, function($a, $b) {
-			return strcasecmp($a['tag'], $b['tag']);
-		});
-		// Remove duplicated tags and reindex the keys.
-		$expected_all_tags = array_values(array_unique($all_tags, SORT_REGULAR));
-
-		// Prepare only inherited form host and template tags data and remove element tags from them.
-		$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
-		usort($host_template_tags, function($a, $b) {
-			return strcasecmp($a['tag'], $b['tag']);
-		});
-		$unique_host_template_tags = array_unique($host_template_tags, SORT_REGULAR);
-		$element_tags = $data['tags'];
-		$disabled_tags = array_filter($unique_host_template_tags, function ($tag) use ($element_tags) {
-			foreach ($element_tags as $element_tag) {
-				if ($element_tag == $tag) {
-					return false;
-				}
-			}
-
-			return true;
-		});
-		$disabled_tags = array_values($disabled_tags);
 
 		// Prepare tags that unique only for template (remove host tags from template tags).
 		$host_tags = self::HOST_TAGS;
@@ -881,17 +894,16 @@ class testFormTags extends CWebTest {
 		});
 		$unique_template_tags = array_values($unique_template_tags);
 
-		// Check created element tags.
+		// Open created element.
 		$this->page->open($host_link);
 		if (strpos($object, 'prototype') !== false) {
 			$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
 			$table->findRow('Name', $this->template, true)->getColumn(ucfirst(str_replace(' prototype', '', $object)).'s')
-					->children()->one()->click();
+					->query('tag:a')->one()->click();
 		}
-		$this->query('link', $data['name'])->waitUntilPresent()->one()->click();
+		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
 		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
-		$tags_table->checkValue($data['tags']);
 
 		// Check all tags (inherited from host and template and own) on created element.
 		if ($object === 'web scenario') {
@@ -902,13 +914,10 @@ class testFormTags extends CWebTest {
 		}
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 		$this->page->waitUntilReady();
-		$tags_table->checkValue($expected_all_tags);
+		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
-		// Check inherited tags.
-		$headers = $tags_table->getHeadersText();
-
+		// Check empty column "Parent templates" except for inhereted unique template tags.
 		foreach ($tags_table->getRows() as $row) {
-			// Check empty column "Parent templates" except for inhereted unique template tags.
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
 			$current_tag['tag'] = $row->getColumn('Name')->getText();
@@ -922,12 +931,25 @@ class testFormTags extends CWebTest {
 			}
 		}
 
+		// Check disabled inherited tags from host and template on created element.
+		$this->assertEquals($this->prepareInheritedTags($data['tags']), $this->getInheritedTags());
+	}
 
-		$actual_disabled_tags = [];
-		// Find disabled rows of host and template tags by disabled Name field.
+	/**
+	 * Get inherited tags from element page.
+	 *
+	 * @return array
+	 */
+	private function getInheritedTags() {
+		$inherited_tags = [];
+
+		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$headers = $tags_table->getHeadersText();
+		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
 			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
 		});
+
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
 			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
@@ -938,9 +960,59 @@ class testFormTags extends CWebTest {
 			foreach ($tags_table->getRowControls($row, $headers) as $name => $control) {
 				$values[$name] = $control->getValue();
 			}
-			$actual_disabled_tags[] = $values;
+			$inherited_tags[] = $values;
 		}
-		// Check only disabled inherited tags from host and template on created element.
-		$this->assertEquals($disabled_tags, $actual_disabled_tags);
+
+		return $inherited_tags;
+	}
+
+	/**
+	 * Prepare all tags data (inherited form host and/or template and element tags).
+	 *
+	 * @param array $tags				element tags data
+	 * @param array $parent_tags		host and/or template tags
+	 *
+	 * @return array
+	 */
+	private function prepareAllTags($tags, $parent_tags) {
+		// Prepare all tags data (inherited form host and/or template, and element tags).
+		$all_tags = array_merge($parent_tags, $tags);
+		// Sort reference tags array by field "tag".
+		usort($all_tags, function($a, $b) {
+			return strcasecmp($a['tag'], $b['tag']);
+		});
+		// Remove duplicated tags and reindex the keys.
+		return array_values(array_unique($all_tags, SORT_REGULAR));
+	}
+
+	/**
+	 * Prepare only unique inherited tags form host and/or template and remove element tags from them.
+	 *
+	 * @param array $tags			element tags data
+	 * @param array $parent_tags	host or template tags
+	 *
+	 * @return array
+	 */
+	private function prepareInheritedTags($tags, $parent_tags = false) {
+		if (!$parent_tags) {
+			$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
+			$parent_tags = array_unique($host_template_tags, SORT_REGULAR);
+		}
+
+		$inherited_tags = array_filter($parent_tags, function ($tag) use ($tags) {
+			foreach ($tags as $element_tag) {
+				if ($element_tag == $tag) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+		usort($inherited_tags, function($a, $b) {
+			return strcasecmp($a['tag'], $b['tag']);
+		});
+
+		return array_values($inherited_tags);
 	}
 }

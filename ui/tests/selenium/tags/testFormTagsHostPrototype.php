@@ -89,11 +89,11 @@ class testFormTagsHostPrototype extends testFormTags {
 //	}
 
 	/**
-	 * Test tags inheritance of template host prototype.
+	 * Test tags of inherited host prototype from template on host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-	public function testFormTagsHostPrototype_InheritanceFromTemplate($data) {
+	public function testFormTagsHostPrototype_InheritedElementTags($data) {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';

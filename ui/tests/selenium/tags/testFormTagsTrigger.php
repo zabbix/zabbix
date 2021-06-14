@@ -150,17 +150,42 @@ class testFormTagsTrigger extends testFormTags {
 	}
 
 	/**
-	 * Test tags inheritance of template trigger.
+	 * Test tags inheritance from host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-	public function testFormTagsTrigger_InheritanceFromTemplate($data) {
+	public function testFormTagsTrigger_InheritedHostTags($data) {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
+		$expression = 'last(/Host for tags testing/trap.host)=0';
+		$this->checkInheritedTags($data, 'trigger', 'Host', $expression);
+	}
+
+	/**
+	 * Test tags inheritance from template.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	// TODO: uncomment after fix ZBX-19485
+//	public function testFormTagsTrigger_InheritedTemplateTags($data) {
+//		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
+//		$this->link = 'triggers.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
+//		$expression = 'last(/Template for tags testing/trap.template)=0';
+//		$this->checkInheritedTags($data, 'trigger', 'Template', $expression);
+//	}
+
+	/**
+	 * Test tags of inherited trigger from template on host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsTrigger_InheritedElementTags($data) {
 		$expression = 'last(/Template for tags testing/trap.template)=0';
 		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$this->link = 'triggers.php?filter_set=1&context=template&filter_hostids[0]='.$templateid;
 		$host_link = 'triggers.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 
-		$this->checkTagsInheritance($data, 'trigger', $host_link, $expression);
+		$this->checkInheritedElementTags($data, 'trigger', $host_link, $expression);
 	}
 }

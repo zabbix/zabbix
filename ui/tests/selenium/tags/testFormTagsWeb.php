@@ -88,18 +88,44 @@ class testFormTagsWeb extends testFormTags {
 	}
 
 	/**
-	 * Test tags inheritance of template item.
+	 * Test tags inheritance from host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+//	TODO: uncomment after fix ZBX-19547
+//	public function testFormTagsWeb_InheritedHostTags($data) {
+//		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+//		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+//		$this->saved_link = 'httpconf.php?form=update&hostid='.$hostid.'&context=host&httptestid=';
+//		$this->checkInheritedTags($data, 'web scenario', 'Host');
+//	}
+
+	/**
+	 * Test tags inheritance from template.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
 //	TODO: uncomment after fix ZBX-19490
-//	public function testFormTagsWeb_InheritanceFromTemplate($data) {
+//	public function testFormTagsWeb_InheritedTemplateTags($data) {
+//		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
+//		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
+//		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
+//		$this->checkInheritedTags($data, 'web scenario', 'Template');
+//	}
+
+	/**
+	 * Test tags of inherited web scenario from template on host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+//	TODO: uncomment after fix ZBX-19490
+//	public function testFormTagsWeb_InheritedElementTags($data) {
 //		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 //		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 //		$this->link = 'httpconf.php?filter_set=1&context=template&filter_hostids[0]='.$templateid;
 //		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
 //		$host_link = 'httpconf.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 //
-//		$this->checkTagsInheritance($data, 'web scenario', $host_link);
+//		$this->checkInheritedElementTags($data, 'web scenario', $host_link);
 //	}
 }

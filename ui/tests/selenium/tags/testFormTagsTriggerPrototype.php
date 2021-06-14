@@ -88,11 +88,38 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	}
 
 	/**
-	 * Test tags inheritance of template Trigger prototype.
+	 * Test tags inheritance from host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-	public function testFormTagsTriggerPrototype_InheritanceFromTemplate($data) {
+	public function testFormTagsTriggerPrototype_InheritedHostTags($data) {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
+		$this->link = 'trigger_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&triggerid=';
+		$expression = 'last(/Host for tags testing/itemprototype_trap[{#KEY}])=0';
+		$this->checkInheritedTags($data, 'trigger prototype', 'Host', $expression);
+	}
+
+	/**
+	 * Test tags inheritance from template.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	// TODO: uncomment after fix ZBX-19485
+//	public function testFormTagsTriggerPrototype_InheritedTemplateTags($data) {
+//		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
+//		$this->link = 'trigger_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
+//		$this->saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&triggerid=';
+//		$expression = 'last(/Template for tags testing/template.itemprototype_trap[{#KEY}])=0';
+//		$this->checkInheritedTags($data, 'trigger prototype', 'Template', $expression);
+//	}
+
+	/**
+	 * Test tags of inherited trigger prototype from template on host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsTriggerPrototype_InheritedElementTags($data) {
 		$expression = 'last(/Template for tags testing/template.itemprototype_trap[{#KEY}])=0';
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
@@ -100,6 +127,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 		$this->saved_link = 'trigger_prototypes.php?form=update&context=template&parent_discoveryid='.$discoveryruleid.'&triggerid=';
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
-		$this->checkTagsInheritance($data, 'trigger prototype', $host_link, $expression);
+		$this->checkInheritedElementTags($data, 'trigger prototype', $host_link, $expression);
 	}
 }

@@ -87,17 +87,41 @@ class testFormTagsItemPrototype extends testFormTags {
 	}
 
 	/**
-	 * Test tags inheritance of template Item prototype.
+	 * Test tags inheritance from host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-	public function testFormTagsItemPrototype_InheritanceFromTemplate($data) {
+	public function testFormTagsItemPrototype_InheritedHostTags($data) {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
+		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->saved_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&itemid=';
+		$this->checkInheritedTags($data, 'item prototype', 'Host');
+	}
+
+	/**
+	 * Test tags inheritance from template.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsItemPrototype_InheritedTemplateTags($data) {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
+		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
+		$this->saved_link = 'disc_prototypes.php?form=update&context=template&parent_discoveryid='.$discoveryruleid.'&itemid=';
+		$this->checkInheritedTags($data, 'item prototype', 'Template');
+	}
+
+	/**
+	 * Test tags of inherited item prototype from template on host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsItemPrototype_InheritedElementTags($data) {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
 		$this->saved_link = 'disc_prototypes.php?form=update&context=template&parent_discoveryid='.$discoveryruleid.'&itemid=';
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
-		$this->checkTagsInheritance($data, 'item prototype', $host_link);
+		$this->checkInheritedElementTags($data, 'item prototype', $host_link);
 	}
 }

@@ -111,16 +111,38 @@ class testFormTagsItem extends testFormTags {
 	}
 
 	/**
-	 * Test tags inheritance of template item.
+	 * Test tags inheritance from host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-	public function testFormTagsItem_InheritanceFromTemplate($data) {
+	public function testFormTagsItem_InheritedHostTags($data) {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$this->checkInheritedTags($data, 'item', 'Host');
+	}
+
+	/**
+	 * Test tags inheritance from template.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsItem_InheritedTemplateTags($data) {
+		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
+		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
+		$this->checkInheritedTags($data, 'item', 'Template');
+	}
+
+	/**
+	 * Test tags of inherited item from template on host.
+	 *
+	 * @dataProvider getTagsInheritanceData
+	 */
+	public function testFormTagsItem_InheritedElementTags($data) {
 		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$this->link = 'items.php?filter_set=1&context=template&filter_hostids[0]='.$templateid;
 		$host_link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 
-		$this->checkTagsInheritance($data, 'item', $host_link);
+		$this->checkInheritedElementTags($data, 'item', $host_link);
 	}
 }
