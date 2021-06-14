@@ -23,25 +23,12 @@ class CClock extends CDiv {
 
 	private $width;
 	private $height;
-	private $time_zone_string;
-	private $time;
-	private $time_zone_offset;
-	private $error;
-	private $script_file;
+	private $is_enabled = true;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setId(uniqid());
 		$this->addClass(ZBX_STYLE_CLOCK);
-
-		$this->width = null;
-		$this->height = null;
-		$this->time_zone_string = null;
-		$this->time = null;
-		$this->time_zone_offset = null;
-		$this->error = null;
-		$this->script_file = 'js/class.cclock.js';
 	}
 
 	public function setWidth($value) {
@@ -56,55 +43,10 @@ class CClock extends CDiv {
 		return $this;
 	}
 
-	public function setTimeZoneString($value) {
-		$this->time_zone_string = $value;
+	public function setEnabled($is_enabled) {
+		$this->is_enabled = $is_enabled;
 
 		return $this;
-	}
-
-	public function setTime($value) {
-		$this->time = $value;
-
-		return $this;
-	}
-
-	public function setTimeZoneOffset($value) {
-		$this->time_zone_offset = $value;
-
-		return $this;
-	}
-
-	public function setError($value) {
-		$this->error = $value;
-
-		return $this;
-	}
-
-	public function getTimeDiv() {
-		return (new CDiv($this->error))
-			->addClass(ZBX_STYLE_TIME_ZONE.'-'.$this->getId())
-			->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY);
-	}
-
-	public function getScriptFile() {
-		return $this->script_file;
-	}
-
-	public function getScriptRun() {
-		if ($this->error !== null) {
-			return '';
-		}
-
-		return 'jQuery(function($) {'.
-			'$("#'.$this->getId().'").zbx_clock('.
-				json_encode([
-					'time' => $this->time,
-					'time_zone_string' => $this->time_zone_string,
-					'time_zone_offset' => $this->time_zone_offset,
-					'clock_id' => $this->getId()
-				]).
-			');'.
-		'});';
 	}
 
 	private function makeClockLine($width, $height, $x, $y, $deg) {
@@ -186,7 +128,7 @@ class CClock extends CDiv {
 			$clock->setAttribute('style', 'width: '.$this->width.'px; height:'.$this->height.'px;');
 		}
 
-		if ($this->error !== null) {
+		if (!$this->is_enabled) {
 			$clock->addClass(ZBX_STYLE_DISABLED);
 		}
 

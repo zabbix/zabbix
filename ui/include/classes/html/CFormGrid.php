@@ -26,6 +26,8 @@ class CFormGrid extends CTag {
 	 */
 	private const ZBX_STYLE_CLASS = 'form-grid';
 
+	public const ZBX_STYLE_FORM_GRID_OFFSET = 'form-grid-offset';
+
 	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
 

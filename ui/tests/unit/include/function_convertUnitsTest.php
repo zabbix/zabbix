@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,15 +21,17 @@
 
 require_once dirname(__FILE__).'/../../../include/translateDefines.inc.php';
 
-class function_convertUnits extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class function_convertUnitsTest extends TestCase {
 	protected $defaultTimezone;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->defaultTimezone = date_default_timezone_get();
 		date_default_timezone_set('UTC');
 	}
 
-	public function tearDown() {
+	protected function tearDown(): void {
 		date_default_timezone_set($this->defaultTimezone);
 	}
 

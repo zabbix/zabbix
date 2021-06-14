@@ -652,7 +652,6 @@
             <items/>
             <discovery_rules/>
             <macros/>
-            <screens/>
         </template>
         <template>
             <template>export-template</template>
@@ -1111,37 +1110,6 @@
                     <name>Template OS Linux by Zabbix agent</name>
                 </template>
             </templates>
-            <screens>
-                <screen>
-                    <name>screen</name>
-                    <hsize>1</hsize>
-                    <vsize>1</vsize>
-                    <screen_items>
-                        <screen_item>
-                            <resourcetype>0</resourcetype>
-                            <width>500</width>
-                            <height>100</height>
-                            <x>0</x>
-                            <y>0</y>
-                            <colspan>1</colspan>
-                            <rowspan>1</rowspan>
-                            <elements>0</elements>
-                            <valign>0</valign>
-                            <halign>0</halign>
-                            <style>0</style>
-                            <url/>
-                            <dynamic>0</dynamic>
-                            <sort_triggers>0</sort_triggers>
-                            <resource>
-                                <name>graph</name>
-                                <host>export-template</host>
-                            </resource>
-                            <max_columns>1</max_columns>
-                            <application/>
-                        </screen_item>
-                    </screen_items>
-                </screen>
-            </screens>
         </template>
     </templates>
     <triggers>

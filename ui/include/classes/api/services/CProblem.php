@@ -56,7 +56,6 @@ class CProblem extends CApiService {
 			'eventids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
-			'applicationids'			=> null,
 			'objectids'					=> null,
 
 			'editable'					=> false,
@@ -233,27 +232,6 @@ class CProblem extends CApiService {
 				$sqlParts['where']['p-i'] = 'p.objectid=i.itemid';
 				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
-		}
-
-		// applicationids
-		if ($options['applicationids'] !== null) {
-			zbx_value2array($options['applicationids']);
-
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['f'] = 'functions f';
-				$sqlParts['from']['ia'] = 'items_applications ia';
-				$sqlParts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sqlParts['where']['f-ia'] = 'f.itemid=ia.itemid';
-				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			}
-			// items
-			elseif ($options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['ia'] = 'items_applications ia';
-				$sqlParts['where']['p-ia'] = 'p.objectid=ia.itemid';
-				$sqlParts['where']['ia'] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			}
-			// ignore this filter for lld rules
 		}
 
 		// severities

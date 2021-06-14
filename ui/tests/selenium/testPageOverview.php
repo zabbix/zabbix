@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +27,9 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup problem
  */
 class testPageOverview extends CLegacyWebTest {
+
+	use FilterTrait;
+
 	// Check that no real host or template names displayed
 	public function testPageOverview_NoHostNames() {
 		$this->zbxTestLogin('overview.php');
@@ -163,38 +167,6 @@ class testPageOverview extends CLegacyWebTest {
 					]
 				]
 			],
-			// Application option in filter.
-			[
-				[
-					'general_filter' => 'Trigger overview',
-					'filter' => [
-						'Host groups' => 'Group to check Overview',
-						'Application' => '1 application'
-					],
-					'result_hosts' => [
-						'1_Host_to_check_Monitoring_Overview'
-					],
-					'result_triggers' => [
-						'1_trigger_Not_classified', '1_trigger_Warning', '1_trigger_Average', '1_trigger_High',
-						'1_trigger_Disaster'
-					]
-				]
-			],
-			[
-				[
-					'general_filter' => 'Trigger overview',
-					'filter' => [
-						'Host groups' => 'Group to check Overview',
-						'Application' => '2 application'
-					],
-					'result_hosts' => [
-						'1_Host_to_check_Monitoring_Overview'
-					],
-					'result_triggers' => [
-						'2_trigger_Information'
-					]
-				]
-			],
 			// Name option in filter.
 			[
 				[
@@ -289,8 +261,10 @@ class testPageOverview extends CLegacyWebTest {
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Average',
 						'Show' => 'Any',
-						'Application' => '3 application',
 						'Name' => '3_'
+					],
+					'tags' => [
+						['name' => 'DataBase', 'value' => 'Oracle', 'operator' => 'Equals']
 					],
 					'age' => '365',
 					'inventories' => [
@@ -411,8 +385,10 @@ class testPageOverview extends CLegacyWebTest {
 				[
 					'general_filter' => 'Data overview',
 					'filter' => [
-						'Host groups' => 'Group to check Overview',
-						'Application' => '1 application'
+						'Host groups' => 'Group to check Overview'
+					],
+					'tags' => [
+						['name' => 'DataBase', 'value' => 'mysql', 'operator' => 'Contains']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'
@@ -425,8 +401,8 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'general_filter' => 'Data overview',
-					'filter' => [
-						'Application' => '3 application'
+					'tags' => [
+						['name' => 'DataBase', 'value' => 'Oracle', 'operator' => 'Equals']
 					],
 					'result_hosts' => [
 						'3_Host_to_check_Monitoring_Overview'
@@ -515,7 +491,8 @@ class testPageOverview extends CLegacyWebTest {
 		}
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$filter->fill($data['filter']);
+		$filter->fill(CTestArrayHelper::get($data, 'filter', []));
+		$this->setTags(CTestArrayHelper::get($data, 'tags', []));
 
 		if (array_key_exists('age', $data)) {
 			$this->zbxTestCheckboxSelect('status_change');
@@ -567,7 +544,7 @@ class testPageOverview extends CLegacyWebTest {
 				$this->checkResultsInTable($view_style, $data['result_triggers'], $data['result_hosts']);
 			}
 		}
-		elseif ($data['general_filter'] === 'Data') {
+		elseif ($data['general_filter'] === 'Data overview') {
 			if ($view_style === 'Top') {
 				$this->zbxTestAssertElementPresentXpath('//th[text()="Items"]');
 				$this->checkResultsInTable($view_style, $data['result_hosts'], $data['result_items']);
@@ -578,7 +555,7 @@ class testPageOverview extends CLegacyWebTest {
 			}
 
 			// Suppressed trigger contains background color.
-			if (array_key_exists('Show suppressed problems', $data['filter'])) {
+			if (CTestArrayHelper::get($data, 'filter.Show suppressed problems')) {
 				$this->zbxTestAssertElementPresentXpath('//table[@class="list-table"]//td[contains(@class, "-bg")]');
 			}
 		}
@@ -620,14 +597,7 @@ class testPageOverview extends CLegacyWebTest {
 						'Configuration',
 						'Trigger URL',
 						'Webhook url for all',
-						'1_item',
-						'Detect operating system',
-						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
-						'Selenium script',
-						'Traceroute'
+						'1_item'
 					]
 				]
 			],

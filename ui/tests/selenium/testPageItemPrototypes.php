@@ -54,9 +54,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 			$this->zbxTestTextPresent('All templates');
 		}
 
-		$this->zbxTestTextPresent(
-			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Create enabled']
-		);
+		$this->zbxTestTextPresent(['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled']);
 		$this->zbxTestTextNotPresent('Info');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
@@ -65,7 +63,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @backup-once triggers
+	 * @backupOnce triggers
 	 */
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
@@ -100,7 +98,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider rule
-	 * @backup-once triggers
+	 * @backupOnce triggers
 	 */
 	public function testPageItemPrototypes_MassDelete($rule) {
 		$itemid = $rule['itemid'];

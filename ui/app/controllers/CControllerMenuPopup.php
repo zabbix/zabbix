@@ -84,10 +84,11 @@ class CControllerMenuPopup extends CController {
 	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
 	 * @param int    $data['severity_min']       (optional)
 	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['tags']               (optional)
+	 * @param array  $data['evaltype']           (optional)
 	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
-	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */
@@ -122,12 +123,50 @@ class CControllerMenuPopup extends CController {
 				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
 				: [];
 
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
+			// Filter only host scope scripts, get rid of excess spaces and unify slashes in menu path.
+			if ($scripts) {
+				foreach ($scripts as $num => &$script) {
+					if ($script['scope'] != ZBX_SCRIPT_SCOPE_HOST) {
+						unset($scripts[$num]);
+						continue;
+					}
 
-			CArrayHelper::sort($scripts, ['name']);
+					$script['menu_path'] = trimPath($script['menu_path']);
+					$script['sort'] = '';
+
+					if (strlen($script['menu_path']) > 0) {
+						// First or only slash from beginning is trimmed.
+						if (substr($script['menu_path'], 0, 1) === '/') {
+							$script['menu_path'] = substr($script['menu_path'], 1);
+						}
+
+						$script['sort'] = $script['menu_path'];
+
+						// If there is something more, check if last slash is present.
+						if (strlen($script['menu_path']) > 0) {
+							if (substr($script['menu_path'], -1) !== '/'
+									&& substr($script['menu_path'], -2) === '\\/') {
+								$script['sort'] = $script['menu_path'].'/';
+							}
+							else {
+								$script['sort'] = $script['menu_path'];
+							}
+
+							if (substr($script['menu_path'], -1) === '/'
+									&& substr($script['menu_path'], -2) !== '\\/') {
+								$script['menu_path'] = substr($script['menu_path'], 0, -1);
+							}
+						}
+					}
+
+					$script['sort'] = $script['sort'].$script['name'];
+				}
+				unset($script);
+			}
+
+			if ($scripts) {
+				CArrayHelper::sort($scripts, ['sort']);
+			}
 
 			$menu_data = [
 				'type' => 'host',
@@ -157,6 +196,7 @@ class CControllerMenuPopup extends CController {
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
 					'name' => $script['name'],
+					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
@@ -166,8 +206,9 @@ class CControllerMenuPopup extends CController {
 				$menu_data['urls'] = $data['urls'];
 			}
 
-			if (array_key_exists('filter_application', $data)) {
-				$menu_data['filter_application'] = $data['filter_application'];
+			if (array_key_exists('tags', $data)) {
+				$menu_data['tags'] = $data['tags'];
+				$menu_data['evaltype'] = $data['evaltype'];
 			}
 
 			return $menu_data;
@@ -220,7 +261,12 @@ class CControllerMenuPopup extends CController {
 					}
 
 					foreach ($db_trigger['functions'] as $function) {
-						if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
+						$parameters = array_map(function ($param) {
+							return trim($param, ' "');
+						}, explode(',', $function['parameter']));
+
+						if ($function['function'] !== 'find' || !array_key_exists(2, $parameters)
+								|| !in_array($parameters[2], ['regexp', 'iregexp'])) {
 							continue 2;
 						}
 					}
@@ -319,20 +365,22 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for map element context menu popup.
 	 *
-	 * @param array  $data
-	 * @param string $data['sysmapid']
-	 * @param string $data['selementid']
-	 * @param array  $data['options']        (optional)
-	 * @param int    $data['severity_min']   (optional)
-	 * @param string $data['widget_uniqueid] (optional)
-	 * @param string $data['hostid']         (optional)
+	 * @param array   $data
+	 * @param string  $data['sysmapid']
+	 * @param string  $data['selementid']
+	 * @param array   $data['options']       (optional)
+	 * @param int     $data['severity_min']  (optional)
+	 * @param int     $data['unique_id']     (optional)
+	 * @param string  $data['hostid']        (optional)
 	 *
 	 * @return mixed
 	 */
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'tags',
+				'evaltype'
+			],
 			'selectUrls' => ['name', 'url', 'elementtype'],
 			'sysmapids' => $data['sysmapid']
 		]);
@@ -369,9 +417,10 @@ class CControllerMenuPopup extends CController {
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
 						}
-						if (array_key_exists('widget_uniqueid', $data)) {
-							$menu_data['widget_uniqueid'] = $data['widget_uniqueid'];
+						if (array_key_exists('unique_id', $data)) {
+							$menu_data['unique_id'] = $data['unique_id'];
 						}
+
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
@@ -392,8 +441,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$menu_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$menu_data['evaltype'] = $selement['evaltype'];
+							$menu_data['tags'] = $selement['tags'];
 						}
 						return $menu_data;
 
@@ -410,8 +460,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application'] !== '') {
-							$host_data['filter_application'] = $selement['application'];
+						if ($selement['tags']) {
+							$host_data['evaltype'] = $selement['evaltype'];
+							$host_data['tags'] = $selement['tags'];
 						}
 						return self::getMenuDataHost($host_data);
 
@@ -447,32 +498,6 @@ class CControllerMenuPopup extends CController {
 		error(_('No permissions to referred object or it does not exist!'));
 
 		return null;
-	}
-
-	/**
-	 * Prepare data for refresh menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widgetName']
-	 * @param string $data['currentRate']
-	 * @param bool   $data['multiplier']   Multiplier or time mode.
-	 * @param array  $data['params']       (optional) URL parameters.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataRefresh(array $data) {
-		$menu_data = [
-			'type' => 'refresh',
-			'widgetName' => $data['widgetName'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		return $menu_data;
 	}
 
 	/**
@@ -595,7 +620,8 @@ class CControllerMenuPopup extends CController {
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
-							'target' => '_blank'
+							'target' => '_blank',
+							'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 						];
 					}
 				}
@@ -607,7 +633,7 @@ class CControllerMenuPopup extends CController {
 						$url['url'] = 'javascript: alert(\''.
 							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
 						'\');';
-						unset($url['target']);
+						unset($url['target'], $url['rel']);
 					}
 				}
 				unset($url);
@@ -627,11 +653,42 @@ class CControllerMenuPopup extends CController {
 				? $event ? API::Script()->getScriptsByHosts(array_keys($hosts)) : []
 				: [];
 
+			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
 			$scripts = [];
 			foreach ($scripts_by_hosts as &$host_scripts) {
 				foreach ($host_scripts as &$host_script) {
-					if (!array_key_exists($host_script['scriptid'], $scripts)) {
-						$host_script['name'] = trimPath($host_script['name']);
+					if (!array_key_exists($host_script['scriptid'], $scripts)
+							&& $host_script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
+						$host_script['menu_path'] = trimPath($host_script['menu_path']);
+						$host_script['sort'] = '';
+
+						if (strlen($host_script['menu_path']) > 0) {
+							// First or only slash from beginning is trimmed.
+							if (substr($host_script['menu_path'], 0, 1) === '/') {
+								$host_script['menu_path'] = substr($host_script['menu_path'], 1);
+							}
+
+							$host_script['sort'] = $host_script['menu_path'];
+
+							// If there is something more, check if last slash is present.
+							if (strlen($host_script['menu_path']) > 0) {
+								if (substr($host_script['menu_path'], -1) !== '/'
+										&& substr($host_script['menu_path'], -2) === '\\/') {
+									$host_script['sort'] = $host_script['menu_path'].'/';
+								}
+								else {
+									$host_script['sort'] = $host_script['menu_path'];
+								}
+
+								if (substr($host_script['menu_path'], -1) === '/'
+										&& substr($host_script['menu_path'], -2) !== '\\/') {
+									$host_script['menu_path'] = substr($host_script['menu_path'], 0, -1);
+								}
+							}
+						}
+
+						$host_script['sort'] = $host_script['sort'].$host_script['name'];
+
 						$scripts[$host_script['scriptid']] = $host_script;
 					}
 				}
@@ -639,11 +696,12 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($host_scripts);
 
-			CArrayHelper::sort($scripts, ['name']);
+			CArrayHelper::sort($scripts, ['sort']);
 
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
 					'name' => $script['name'],
+					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
@@ -664,57 +722,6 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataTriggerMacro() {
 		return ['type' => 'trigger_macro'];
-	}
-
-	/**
-	 * Prepare data for widget actions menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widget_uniqueid']  Widget instance unique id.
-	 * @param string $data['currentRate']      Refresh rate for widget.
-	 * @param bool   $data['multiplier']       Multiplier or time mode.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataWidgetActions(array $data) {
-		$menu_data = [
-			'type' => 'widget_actions',
-			'widget_uniqueid' => $data['widget_uniqueid'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if ($data['widgetType'] == WIDGET_SVG_GRAPH) {
-			$menu_data['download'] = true;
-		}
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		if ($data['widgetType'] == WIDGET_GRAPH) {
-			$options = [];
-
-			if (array_key_exists('dynamic_hostid', $data)) {
-				$options['hostids'] = $data['dynamic_hostid'];
-			}
-
-			if (array_key_exists('graphid', $data) && $data['graphid']) {
-				$menu_data['download'] = (bool) API::Graph()->get($options + [
-					'output' => ['graphid'],
-					'graphids' => $data['graphid']
-				]);
-			}
-			elseif (array_key_exists('itemid', $data) && $data['itemid']) {
-				$menu_data['download'] = (bool) API::Item()->get($options + [
-					'output' => ['itemid'],
-					'itemids' => $data['itemid'],
-					'webitems' => true
-				]);
-			}
-		}
-
-		return $menu_data;
 	}
 
 	protected function doAction() {
@@ -741,20 +748,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataMapElement($data);
 				break;
 
-			case 'refresh':
-				$menu_data = self::getMenuDataRefresh($data);
-				break;
-
 			case 'trigger':
 				$menu_data = self::getMenuDataTrigger($data);
 				break;
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
-				break;
-
-			case 'widget_actions':
-				$menu_data = self::getMenuDataWidgetActions($data);
 				break;
 		}
 

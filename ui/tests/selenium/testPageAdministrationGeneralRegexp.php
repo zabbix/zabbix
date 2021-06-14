@@ -57,7 +57,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 		$this->assertEquals([
 			'GUI', 'Autoregistration', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros',
-			'Value mapping','Trigger displaying options', 'Modules', 'API tokens', 'Other'
+			'Trigger displaying options', 'Modules', 'API tokens', 'Other'
 		], $popup_menu->getItems()->asText());
 
 		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');
@@ -88,7 +88,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allRegexps
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
@@ -106,7 +106,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');

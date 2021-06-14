@@ -1,13 +1,16 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:29Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:08Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: 6ecfb7083ddf45f183ab4be50cfba37a
       template: 'Brocade_Foundry Nonstackable SNMP'
       name: 'Brocade_Foundry Nonstackable SNMP'
       description: |
@@ -27,17 +30,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
+          uuid: 4f58884d810a416ea321dd622c876d06
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.11.0
@@ -49,23 +44,26 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form'major.minor.maintenance[letters]'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: fbe1f9d9286046bbb15fe89ec1dcc87d
+              expression: '(last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware,#1)<>last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade_Foundry Nonstackable SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 7d8b9dc153c4408c99a707a9b4d57647
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1991.1.1.1.1.2.0
@@ -76,23 +74,26 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: FOUNDRY-SN-AGENT-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 2bb9d8927e464842a55b89be412adcc4
+              expression: '(last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber,#1)<>last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber,#2))=1 and length(last(/Brocade_Foundry Nonstackable SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: cb46b61100c8456098a85b1e48644146
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#FAN_INDEX},1.3.6.1.4.1.1991.1.1.1.3.1.1.1]'
@@ -101,6 +102,7 @@ zabbix_export:
           description: 'snChasFanTable: A table of each fan information. Only installed fan appears in a table row.'
           item_prototypes:
             -
+              uuid: 9edc2a34faa84e908b33259d495b5da1
               name: 'Fan {#FAN_INDEX}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.3.1.1.3.{#SNMPINDEX}'
@@ -109,20 +111,23 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: dfb8d67a8b0c4128aff9d1643e40afc0
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#FAN_INDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  uuid: 74ef51062e194213bbf61f747624313c
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Fan {#FAN_INDEX}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -130,8 +135,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#FAN_INDEX}: Fan is in critical state'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
+          uuid: 9ea01b3ce15248868f1ced0b38bf1245
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#PSU_INDEX},1.3.6.1.4.1.1991.1.1.1.2.1.1.1]'
@@ -140,6 +146,7 @@ zabbix_export:
           description: 'snChasPwrSupplyTable: A table of each power supply information. Only installed power supply appears in a table row.'
           item_prototypes:
             -
+              uuid: 47e7c7bb4c27483bb4dd458b5a2d2c1e
               name: 'PSU {#PSU_INDEX}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.2.1.1.3.{#SNMPINDEX}'
@@ -148,20 +155,23 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: fbe256ab504b4cb98fec650972d5c41a
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#PSU_INDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  uuid: 6163e41576734f469146bc818b2856a2
+                  expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'PSU {#PSU_INDEX}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -169,8 +179,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PSU {#PSU_INDEX}: Power supply is in critical state'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
+          uuid: 5b62e90cfc5549d4b189158499b3d9fb
           name: 'Temperature Discovery Chassis'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1991.1.1.1.1.18]'
@@ -179,6 +190,7 @@ zabbix_export:
           description: 'Since temperature of the chassis is not available on all Brocade/Foundry hardware, this LLD is here to avoid unsupported items.'
           item_prototypes:
             -
+              uuid: 699f30c8feee47cf8bf3da4d10f2c8aa
               name: 'Chassis #{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.1.18.{#SNMPINDEX}'
@@ -188,30 +200,33 @@ zabbix_export:
               units: °C
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
-                Temperature of the chassis. Each unit is 0.5 degrees Celcius.
+                Temperature of the chassis. Each unit is 0.5 degrees Celsius.
                 Only management module built with temperature sensor hardware is applicable.
                 For those non-applicable management module, it returns no-such-name.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"Chassis"}'
+                  uuid: cae73cf7a78f4963ab1718446ceeb6f4
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Chassis"}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Chassis"}-3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"Chassis"}'
+                  uuid: 66c4f9fd59f043a782dd8fea11b90451
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Chassis"}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Chassis"}-3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -219,16 +234,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Chassis #{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Chassis"}'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Chassis"}'
-                      recovery_expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Chassis"}-3'
+                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Chassis"}'
+                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Chassis"}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Chassis"}'
+                  uuid: 2895da8297fc457da88ea136e61fb8d9
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Chassis"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Chassis"}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Chassis"}+3'
                   name: 'Chassis #{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Chassis"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
         -
+          uuid: 44a84963c9d04fc5a82415602ec8db33
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_DESCR},1.3.6.1.4.1.1991.1.1.2.13.1.1.3]'
@@ -237,6 +254,7 @@ zabbix_export:
           description: 'snAgentTempTable:Table to list temperatures of the modules in the device. This table is applicable to only those modules with temperature sensors.'
           item_prototypes:
             -
+              uuid: c181349497cc4d2dbaf43f51712278df
               name: '{#SENSOR_DESCR}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{#SNMPINDEX}'
@@ -247,27 +265,30 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: bace15be86774bb4a46ca491b3b53516
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: 3687c8a7e88949fb9953049fb0f5e54d
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -275,12 +296,13 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: fbe5f29b241248b4b4bff5d55fcc2180
+                  expression: 'avg(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Nonstackable SNMP/sensor.temp.value[snAgentTempValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -306,7 +328,35 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          uuid: d457efd8cee74f168bd88f4fb2376142
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
+        -
+          uuid: fe1c4f9f35a34b6189110fc95e21b086
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
     -
+      uuid: c55052212c774e3fbab00343050b3db5
       template: 'Brocade_Foundry Performance SNMP'
       name: 'Brocade_Foundry Performance SNMP'
       description: |
@@ -319,13 +369,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: CPU
-        -
-          name: Memory
       items:
         -
+          uuid: b2bda926f1864eb893c53ef0c6cad2a2
           name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.52.0
@@ -336,17 +382,20 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The statistics collection of 1 minute CPU utilization.
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              uuid: 7b068eb5d43846d987148f38f66b1f1a
+              expression: 'min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
         -
+          uuid: e357f3d53b9a48a087e140b94b3aff1d
           name: 'Memory utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.53.0
@@ -359,13 +408,15 @@ zabbix_export:
             The system dynamic memory utilization, in unit of percentage.
             Deprecated: Refer to snAgSystemDRAMUtil.
             For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              uuid: 929046c4439741a9aa3ab00933322a86
+              expression: 'min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       macros:
@@ -376,6 +427,7 @@ zabbix_export:
           macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
     -
+      uuid: f64ad01567914165a493815e492fb315
       template: 'Brocade_Foundry Stackable SNMP'
       name: 'Brocade_Foundry Stackable SNMP'
       description: |
@@ -402,17 +454,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
+          uuid: 5c17e0d80c354391b339142f2a973886
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.11.0
@@ -424,17 +468,19 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form 'major.minor.maintenance[letters]'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 891b6945b3ae4625bf77a16985219015
+              expression: '(last(/Brocade_Foundry Stackable SNMP/system.hw.firmware,#1)<>last(/Brocade_Foundry Stackable SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade_Foundry Stackable SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -442,6 +488,7 @@ zabbix_export:
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 88f67d02cd484dfb841f5f841c3e0bd6
           name: 'Chassis Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1991.1.1.1.4.1.1.1]'
@@ -450,6 +497,7 @@ zabbix_export:
           description: 'snChasUnitIndex: The index to chassis table.'
           item_prototypes:
             -
+              uuid: 2638da6ab127484f8119f8d46d5c996b
               name: 'Unit {#SNMPVALUE}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.4.1.1.2.{#SNMPINDEX}'
@@ -461,22 +509,25 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 The serial number of the chassis for each unit. If the serial number is unknown or unavailable then the value should be a zero length string.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 0144f409ccfd421cb382031cbed8a037
+                  expression: '(last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}],#2))=1 and length(last(/Brocade_Foundry Stackable SNMP/system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}]))>0'
                   name: 'Unit {#SNMPVALUE}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
         -
+          uuid: a192b69e71684d9381ca48b5453a2d8b
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#FAN_UNIT},1.3.6.1.4.1.1991.1.1.1.3.2.1.1,{#FAN_INDEX},1.3.6.1.4.1.1991.1.1.1.3.2.1.2]'
@@ -485,6 +536,7 @@ zabbix_export:
           description: 'snChasFan2Table: A table of each fan information for each unit. Only installed fan appears in a table row.'
           item_prototypes:
             -
+              uuid: 5491a504d4f8441eb3be588f2ed56d7c
               name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.3.2.1.4.{#SNMPINDEX}'
@@ -493,20 +545,23 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: 10f683ff42054948bad36cc52f9c968e
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  uuid: 821381a387194c7ca4e4ddd1cf734a4c
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -514,8 +569,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
         -
+          uuid: 36f00d10099946c9bf3a9e617252bec1
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#PSU_UNIT},1.3.6.1.4.1.1991.1.1.1.2.2.1.1,{#PSU_INDEX},1.3.6.1.4.1.1991.1.1.1.2.2.1.2]'
@@ -524,6 +580,7 @@ zabbix_export:
           description: 'snChasPwrSupply2Table: A table of each power supply information for each unit. Only installed power supply appears in a table row.'
           item_prototypes:
             -
+              uuid: d96f92d0de9e48968483b9354b99e509
               name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.2.2.1.4.{#SNMPINDEX}'
@@ -532,20 +589,23 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: b2b78ace5fc748129fd73ae4283802a6
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  uuid: d7d0b3a51e2d4737938d310ba6c4a9c9
+                  expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -553,8 +613,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
         -
+          uuid: e78f4dcfd112442f8b053f1eb0a28741
           name: 'Stack Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.1991.1.1.3.31.2.1.1.5]'
@@ -563,6 +624,7 @@ zabbix_export:
           description: 'Discovering snStackingConfigUnitTable for Model names'
           item_prototypes:
             -
+              uuid: a4fd63461cb24e4e81e4cbba9f086595
               name: 'Unit {#SNMPINDEX}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.3.31.2.1.1.5.{#SNMPINDEX}'
@@ -574,15 +636,17 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-STACKING-MIB
                 A description of the configured/active system type for each unit.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
         -
+          uuid: c700d182f3e041d3b31076984100a402
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_DESCR},1.3.6.1.4.1.1991.1.1.2.13.3.1.4]'
@@ -591,6 +655,7 @@ zabbix_export:
           description: 'snAgentTemp2Table:Table to list temperatures of the modules in the device for each unit. This table is applicable to only those modules with temperature sensors.'
           item_prototypes:
             -
+              uuid: a6bc8a2263444fa1a2b07478068d7297
               name: '{#SENSOR_DESCR}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.1991.1.1.2.13.3.1.5.{#SNMPINDEX}'
@@ -601,27 +666,30 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: e1a63b2ebef549ebbd95b307feee8b8d
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: c1e348e8a5f24100a5b29a840a43dca9
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -629,12 +697,13 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: 722ee93a637643e9b3cff31e5ea5151d
+                  expression: 'avg(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Brocade_Foundry Stackable SNMP/sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -660,8 +729,36 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          uuid: 41fadae69fa64af4a21c853fc00f23c0
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
+        -
+          uuid: 7b767e61825544bb857347f303a1f077
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
   graphs:
     -
+      uuid: ed536efa5baa4d5ca8ee1af4fc813e72
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -673,6 +770,7 @@ zabbix_export:
             host: 'Brocade_Foundry Performance SNMP'
             key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
     -
+      uuid: 8e5d8b8e81d2473c99df3d7ad5c147c3
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -683,28 +781,3 @@ zabbix_export:
           item:
             host: 'Brocade_Foundry Performance SNMP'
             key: 'vm.memory.util[snAgGblDynMemUtil.0]'
-  value_maps:
-    -
-      name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: normal
-        -
-          value: '3'
-          newvalue: failure
-    -
-      name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: normal
-        -
-          value: '3'
-          newvalue: failure

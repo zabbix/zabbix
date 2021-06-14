@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-30T08:27:06Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: 2eb43a3c9666467683b9ce09d2bd26d7
       template: 'Apache Kafka by JMX'
       name: 'Apache Kafka by JMX'
       description: |
@@ -20,11 +22,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Kafka
       items:
         -
+          uuid: cf096fad8b83431a968095ce8f5d3029
           name: 'Kafka: Leader election per second'
           type: JMX
           key: 'jmx["kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs","Count"]'
@@ -33,11 +33,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of leader elections per second.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 57efca0b4b1e4d1298d7cf77d8d04c98
           name: 'Kafka: Unclean leader election per second'
           type: JMX
           key: 'jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]'
@@ -46,22 +48,25 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of “unclean” elections per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()}>0'
+              uuid: d984a7834d7846f787ca6649bacebf7b
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"])>0'
               name: 'Kafka: Unclean leader election detected'
               priority: AVERAGE
               description: 'Unclean leader elections occur when there is no qualified partition leader among Kafka brokers. If Kafka is configured to allow an unclean leader election, a leader is chosen from the out-of-sync replicas, and any messages that were not synced prior to the loss of the former leader are lost forever. Essentially, unclean leader elections sacrifice consistency for availability.'
         -
+          uuid: 9b3ae38007db4fd5a4e0d3baf026b732
           name: 'Kafka: Controller state on broker'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ActiveControllerCount","Value"]'
@@ -69,9 +74,6 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'One indicates that the broker is the controller for the cluster.'
-          applications:
-            -
-              name: Kafka
           valuemap:
             name: 'Kafka controller state'
           preprocessing:
@@ -80,7 +82,12 @@ zabbix_export:
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 765a10af1fa6444bbeaa7b1669e3c8b2
           name: 'Kafka: Offline partitions count'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"]'
@@ -88,17 +95,20 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of partitions that don''t have an active leader.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()} > 0'
+              uuid: 5eef377125814830be8167d4d74b0d05
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"]) > 0'
               name: 'Kafka: One or more partitions have no leader'
               priority: WARNING
               description: 'Any partition without an active leader will be completely inaccessible, and both consumers and producers of that partition will be blocked until a leader becomes available.'
         -
+          uuid: 6f4b742f64a04254b607fd49fd7fbfa3
           name: 'Kafka: Ineligible pending replica deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ReplicasIneligibleToDeleteCount","Value"]'
@@ -106,11 +116,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of ineligible pending replica deletes.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 77069f977a4b4277a13ef329c4cc810f
           name: 'Kafka: Pending replica deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]'
@@ -118,11 +130,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of pending replica deletes.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: ddfd3ce0b846434fb4dddf391b956d6f
           name: 'Kafka: Ineligible pending topic deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=TopicsIneligibleToDeleteCount","Value"]'
@@ -130,11 +144,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of ineligible pending topic deletes.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 96c5cb8b0647481e90e0878c8bbc4d4b
           name: 'Kafka: Pending topic deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=TopicsToDeleteCount","Value"]'
@@ -142,11 +158,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of pending topic deletes.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: c11c8666c0ba4f03b8ba15573b7a6ffd
           name: 'Kafka: Offline log directory count'
           type: JMX
           key: 'jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]'
@@ -154,17 +172,20 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of offline log directories (for example, after a hardware failure).'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()} > 0'
+              uuid: 03fa9ceadba34643b4d3baa7be7c6bb7
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]) > 0'
               name: 'Kafka: There are offline log directories'
               priority: WARNING
               description: 'The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.'
         -
+          uuid: 4fd9235510964af99e3c174c6a18773b
           name: 'Kafka: Fetch-Consumer response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","95thPercentile"]'
@@ -174,11 +195,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 3674bdbc6d7742399478a960c1a24647
           name: 'Kafka: Fetch-Consumer response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","99thPercentile"]'
@@ -188,11 +211,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 04dea48528bb4f56bfcbf93576ba328f
           name: 'Kafka: Fetch-Consumer response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","Mean"]'
@@ -202,11 +227,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time taken, in milliseconds, to send the response.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 57af4d4b76f548e897d9e66459928b40
           name: 'Kafka: Fetch-Follower response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","95thPercentile"]'
@@ -216,11 +243,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 5222217c516a4ab9926afd9ddbe6bfdb
           name: 'Kafka: Fetch-Follower response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","99thPercentile"]'
@@ -230,11 +259,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: b11586ce79e846b495ed15a112959685
           name: 'Kafka: Fetch-Follower response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","Mean"]'
@@ -244,11 +275,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time taken, in milliseconds, to send the response.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 410c2ecf84fa4f67a9d0b0ca69d77338
           name: 'Kafka: Produce response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","95thPercentile"]'
@@ -258,11 +291,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: e5d7139fbd5a4688bba04d5837a21d3b
           name: 'Kafka: Produce response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","99thPercentile"]'
@@ -272,11 +307,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The time taken, in milliseconds, to send the response for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 6e51118940ed4bd192774b8fa44aeb26
           name: 'Kafka: Produce response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","Mean"]'
@@ -286,11 +323,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time taken, in milliseconds, to send the response.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 10cd80d9dd0e4b918138aa99dcd28b2a
           name: 'Kafka: Temporary memory size in bytes (Fetch), max'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Max"]'
@@ -299,11 +338,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The maximum of temporary memory used for converting message formats and decompressing messages.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 9034049c16424d81a22b0f0063657ed6
           name: 'Kafka: Temporary memory size in bytes (Fetch), min'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]'
@@ -312,11 +353,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The minimum of temporary memory used for converting message formats and decompressing messages.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 57a5c2d51b4f424baf34ab963eed45a4
           name: 'Kafka: Temporary memory size in bytes (Produce), max'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Max"]'
@@ -325,11 +368,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The maximum of temporary memory used for converting message formats and decompressing messages.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: f28dcdf12db44b30a82b7a1bead52521
           name: 'Kafka: Temporary memory size in bytes (Produce), avg'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Mean"]'
@@ -338,11 +383,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The amount of temporary memory used for converting message formats and decompressing messages.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: eddaa3dce4be472ba2133674c845a53f
           name: 'Kafka: Temporary memory size in bytes (Produce), min'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Min"]'
@@ -351,11 +398,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The minimum of temporary memory used for converting message formats and decompressing messages.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 36b32cc516ce48859fda10b348564446
           name: 'Kafka: Fetch-Consumer request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","95thPercentile"]'
@@ -365,11 +414,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms to serve the Fetch-Consumer request for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: e08291248e4e42858303c27de441aa1b
           name: 'Kafka: Fetch-Consumer request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","99thPercentile"]'
@@ -379,11 +430,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms to serve the specified Fetch-Consumer for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 16c3eb799dca4ed7b167e1127406766e
           name: 'Kafka: Fetch-Consumer request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","Mean"]'
@@ -393,11 +446,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time in ms to serve the Fetch-Consumer request.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 01704212d78343c597f92fa151f3372a
           name: 'Kafka: Fetch-Follower request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","95thPercentile"]'
@@ -407,11 +462,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms to serve the Fetch-Follower request for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: c7d9215ee14a4d86b5ad38dbad26c247
           name: 'Kafka: Fetch-Follower request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","99thPercentile"]'
@@ -421,11 +478,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms to serve the Fetch-Follower request for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 487274528ec646afb5e04f6edd6619b5
           name: 'Kafka: Fetch-Follower request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","Mean"]'
@@ -435,11 +494,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time in ms to serve the Fetch-Follower request.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 3680508a52524de08819abc3d81056be
           name: 'Kafka: Produce request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","95thPercentile"]'
@@ -449,11 +510,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms  to serve the Produce requests for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: b59938aa9192429890367ca1dc2e74b7
           name: 'Kafka: Produce request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","99thPercentile"]'
@@ -463,11 +526,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time in ms  to serve the Produce requests for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 5bcb9ecd5d77460fb25d2afa5173832b
           name: 'Kafka: Produce request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","Mean"]'
@@ -477,11 +542,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time in ms to serve the Produce request.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 230f713f85c748bd9d29d8d086fcc80a
           name: 'Kafka: UpdateMetadata request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","95thPercentile"]'
@@ -491,11 +558,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time for update metadata requests for 95th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 8e654055b20748a085178882d7b5bed9
           name: 'Kafka: UpdateMetadata request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","99thPercentile"]'
@@ -505,11 +574,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Time for update metadata requests for 99th percentile.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: c66e750dccd0461e82f8a3b5bd432333
           name: 'Kafka: Fetch-Consumer request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","Mean"]'
@@ -519,11 +590,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Average time for a request to update metadata.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 46a7230e12f8404c813e60fae1eaf91d
           name: 'Kafka: Network processor average idle percent'
           type: JMX
           key: 'jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"]'
@@ -533,27 +606,31 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The average percentage of time that the network processors are idle.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '100'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{nodata(15m)}=1'
+              uuid: 39bfa825d88145d5a687ba07f6b5596e
+              expression: 'nodata(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)=1'
               name: 'Kafka: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
             -
-              expression: '{max(15m)}<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}'
+              uuid: 91c95d4543ae436d986881e76f090aec
+              expression: 'max(/Apache Kafka by JMX/jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"],15m)<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}'
               name: 'Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
               description: 'The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.'
         -
+          uuid: deca38d699f44dea90961be921d096e4
           name: 'Kafka: Uptime'
           type: JMX
           key: 'jmx["kafka.server:type=app-info","start-time-ms"]'
@@ -562,23 +639,26 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Service uptime in seconds.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: JAVASCRIPT
               parameters:
                 - 'return (Math.floor((Date.now()-Number(value))/1000))'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: b2fa6148a2b24fa6890b4078c235dcd8
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","start-time-ms"])<10m'
               name: 'Kafka: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 75bf053e436e4bb8bb2a94e86a0b194c
           name: 'Kafka: Version'
           type: JMX
           key: 'jmx["kafka.server:type=app-info","version"]'
@@ -588,23 +668,26 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Current version of brocker.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 92ecd7eb1eae49d9886ecac7b8f2084a
+              expression: '(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#1)<>last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#2))=1 and length(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"]))>0'
               name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Kafka version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 47dcd92e0ca64833af8d8112b7c66731
           name: 'Kafka: Bytes in per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]'
@@ -614,16 +697,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which data sent from producers is consumed by the broker.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: d71ed49d3a1f4599b239105ab7435724
           name: 'Kafka: Bytes out per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec","Count"]'
@@ -633,16 +718,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which data is fetched and read from the broker by consumers.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 15d9fe23872541f0bb3dd1ce33598a61
           name: 'Kafka: Bytes rejected per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]'
@@ -651,16 +738,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which bytes rejected per second by the broker.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 2ce7bb5db0674cb1a9504c4d8af72a00
           name: 'Kafka: Client fetch request failed per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]'
@@ -669,16 +758,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of client fetch request failures per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: a26150db6e464090910b837b69e6df8f
           name: 'Kafka: Produce requests failed per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]'
@@ -687,16 +778,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of failed produce requests per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 28e488bbe6544d688e741b2ab0397275
           name: 'Kafka: Messages in per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec","Count"]'
@@ -705,16 +798,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which individual messages are consumed by the broker.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: a3d88b98436040e494911b94ce72de8b
           name: 'Kafka: Requests in producer purgatory'
           type: JMX
           key: 'jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Fetch","Value"]'
@@ -722,11 +817,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of requests waiting in producer purgatory.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: d68c2995725745a5b1f3f4507a5fe49c
           name: 'Kafka: Requests in fetch purgatory'
           type: JMX
           key: 'jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]'
@@ -734,11 +831,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of requests waiting in fetch purgatory.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 2e7433fbf07d415ea40251a29364264c
           name: 'Kafka: Request handler average idle percent'
           type: JMX
           key: 'jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]'
@@ -748,22 +847,25 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Indicates the percentage of time that the request handler (IO) threads are not in use.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '100'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{max(15m)}<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}'
+              uuid: 8f070e06520b4b299fcfffa952d318fc
+              expression: 'max(/Apache Kafka by JMX/jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"],15m)<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}'
               name: 'Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)'
               priority: AVERAGE
               description: 'The request handler idle ratio metric indicates the percentage of time the request handlers are not in use. The lower this number, the more loaded the broker is.'
         -
+          uuid: fb83a988422c40b792e23b10a0f2ba64
           name: 'Kafka: Replication maximum lag'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaFetcherManager,name=MaxLag,clientId=Replica","Value"]'
@@ -772,11 +874,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The maximum lag between the time that messages are received by the leader replica and by the follower replicas.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 6125c4144c42452ea20c53c5365ad970
           name: 'Kafka: ISR expands per second'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]'
@@ -785,16 +889,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which the number of ISRs in the broker increases.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 81eb0364269b40988404bd902ba409f4
           name: 'Kafka: ISR shrink per second'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=IsrShrinksPerSec","Count"]'
@@ -803,16 +909,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Rate of replicas leaving the ISR pool.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 9489608614ac4d96810362fc52901c55
           name: 'Kafka: Leader count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=LeaderCount","Value"]'
@@ -820,11 +928,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of replicas for which this broker is the leader.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 1a737ce50a274c3696beade89187afd1
           name: 'Kafka: Partition count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=PartitionCount","Value"]'
@@ -832,11 +942,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions in the broker.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 05fb33b225264059a2eef04a91963dbb
           name: 'Kafka: Number of reassigning partitions'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"]'
@@ -844,11 +956,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of reassigning leader partitions on a broker.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: b22cee3e3aa849a1b5098e18f42b3b3d
           name: 'Kafka: Under minimum ISR partition count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=UnderMinIsrPartitionCount","Value"]'
@@ -856,17 +970,20 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions under the minimum In-Sync Replica (ISR) count.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()}>0'
+              uuid: b401a90e75cd4a478d4f8b8cc4f15dc2
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=ReplicaManager,name=UnderMinIsrPartitionCount","Value"])>0'
               name: 'Kafka: There are partitions under the min ISR'
               priority: AVERAGE
               description: 'The Under min ISR partitions metric displays the number of partitions, where the number of In-Sync Replicas (ISR) is less than the minimum number of in-sync replicas specified. The two most common causes of under-min ISR partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers are falling behind.'
         -
+          uuid: f55e42503d7d4091bd4487a30bb144b9
           name: 'Kafka: Under replicated partitions'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions","Value"]'
@@ -874,17 +991,20 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions that have not been fully replicated in the follower replicas (the number of non-reassigning replicas - the number of ISR > 0).'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{last()}>0'
+              uuid: 0ecd8b4b3db6489b83d4a1f78faee03c
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions","Value"])>0'
               name: 'Kafka: There are under replicated partitions'
               priority: AVERAGE
               description: 'The Under replicated partitions metric displays the number of partitions that do not have enough replicas to meet the desired replication factor. A partition will also be considered under-replicated if the correct number of replicas exist, but one or more of the replicas have fallen significantly behind the partition leader. The two most common causes of under-replicated partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers have fallen behind.'
         -
+          uuid: c2086b19fcf84c1f948ec80726054dcd
           name: 'Kafka: Request queue size'
           type: JMX
           key: 'jmx["kafka.server:type=Request","queue-size"]'
@@ -892,11 +1012,13 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The size of the delay queue.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: e96464452c844cb7bdeaab62f7c7e5ed
           name: 'Kafka: ZooKeeper connection status'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]'
@@ -906,21 +1028,24 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Connection status of broker''s ZooKeeper session.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
           triggers:
             -
-              expression: '{regexp("CONNECTED")}=0'
+              uuid: 423144ac14694a71b9ab563eacfa840d
+              expression: 'find(/Apache Kafka by JMX/jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"],,"regexp","CONNECTED")=0'
               name: 'Kafka: Broker is not connected to ZooKeeper'
               priority: AVERAGE
         -
+          uuid: 9852aa0bf3074a319b83f695a9d0deca
           name: 'Kafka: ZooKeeper disconnect rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]'
@@ -930,16 +1055,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'ZooKeeper client disconnect per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 3e612950b2c5476e9634ce11f93dfd61
           name: 'Kafka: ZooKeeper session expiration rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]'
@@ -949,16 +1076,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'ZooKeeper client session expiration  per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: e9f647cf41214ef7aab480d349f48c21
           name: 'Kafka: ZooKeeper readonly rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]'
@@ -968,16 +1097,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'ZooKeeper client readonly  per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: b156305285bf4d508afd1d9c91ae34c0
           name: 'Kafka: ZooKeeper sync rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]'
@@ -987,16 +1118,18 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'ZooKeeper client sync  per second.'
-          applications:
-            -
-              name: Kafka
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
         -
+          uuid: 3b6de5f72ed94b928684083fbb65b6cb
           name: 'Kafka: ZooKeeper client request latency'
           type: JMX
           key: 'jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"]'
@@ -1005,12 +1138,14 @@ zabbix_export:
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Latency in millseconds for ZooKeeper requests from broker.'
-          applications:
-            -
-              name: Kafka
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Kafka
       discovery_rules:
         -
+          uuid: c4421eb9f9ab4bf2b6d4ba101c897ca7
           name: 'Topic Metrics  (read)'
           type: JMX
           key: 'jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]'
@@ -1031,6 +1166,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 42ad85334b524973afa2fd8f2a135e77
               name: 'Kafka {#JMXTOPIC}: Bytes out per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]'
@@ -1040,17 +1176,19 @@ zabbix_export:
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'The rate at which data is fetched and read from the broker by consumers (by topic).'
-              application_prototypes:
-                -
-                  name: 'Kafka topic [{#JMXTOPIC}]'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Kafka topic [{#JMXTOPIC}]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
         -
+          uuid: 82037c202489462fa9c4afbb23618315
           name: 'Topic Metrics (errors)'
           type: JMX
           key: 'jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]'
@@ -1071,6 +1209,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: abaf2616581a46158a13a71ffcf67634
               name: 'Kafka {#JMXTOPIC}: Bytes rejected per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]'
@@ -1079,17 +1218,19 @@ zabbix_export:
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'Rejected bytes rate by topic.'
-              application_prototypes:
-                -
-                  name: 'Kafka topic [{#JMXTOPIC}]'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Kafka topic [{#JMXTOPIC}]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
         -
+          uuid: d5ec81baadad41f29882757979443b5b
           name: 'Topic Metrics (write)'
           type: JMX
           key: 'jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]'
@@ -1110,6 +1251,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 61bb29999ea1465c8125b518507d9e5d
               name: 'Kafka {#JMXTOPIC}: Bytes in per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]'
@@ -1119,16 +1261,18 @@ zabbix_export:
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'The rate at which data sent from producers is consumed by topic.'
-              application_prototypes:
-                -
-                  name: 'Kafka topic [{#JMXTOPIC}]'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Kafka topic [{#JMXTOPIC}]'
             -
+              uuid: 5c18b5eca61b4ed2ae1aae197b7c9958
               name: 'Kafka {#JMXTOPIC}: Messages in per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]'
@@ -1137,15 +1281,16 @@ zabbix_export:
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'The rate at which individual messages are consumed by topic.'
-              application_prototypes:
-                -
-                  name: 'Kafka topic [{#JMXTOPIC}]'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Kafka topic [{#JMXTOPIC}]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
       macros:
         -
@@ -1170,8 +1315,20 @@ zabbix_export:
         -
           macro: '{$KAFKA.USER}'
           value: zabbix
+      valuemaps:
+        -
+          uuid: cf2440fb69c24371b231cb0a69002333
+          name: 'Kafka controller state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Inactive
+            -
+              value: '1'
+              newvalue: Active
   graphs:
     -
+      uuid: 0371c1e9aa924fb89bffa87c26e88481
       name: 'Kafka: Broker throughput'
       graph_items:
         -
@@ -1186,6 +1343,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]'
     -
+      uuid: 7a7ce78d88bc483ca07efb5c4e639c1f
       name: 'Kafka: ISR shrinks/expands rate'
       graph_items:
         -
@@ -1200,6 +1358,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]'
     -
+      uuid: bd0b892058df48d5939f2ab9de9c2768
       name: 'Kafka: Leader electoin rate'
       graph_items:
         -
@@ -1214,6 +1373,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]'
     -
+      uuid: de66fc0c0dc44fbca5fa44f9cd4716ff
       name: 'Kafka: Pending deletes'
       graph_items:
         -
@@ -1240,6 +1400,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]'
     -
+      uuid: 451bd85a6db249f1a43ac38d4361f925
       name: 'Kafka: Purgatory size'
       graph_items:
         -
@@ -1254,6 +1415,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]'
     -
+      uuid: aaef8edde7e34c33acad4e0820991bd6
       name: 'Kafka: Requests failed rate'
       graph_items:
         -
@@ -1268,6 +1430,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]'
     -
+      uuid: 35b4211374b74b68aceec66cc875816d
       name: 'Kafka: Requests performance'
       graph_items:
         -
@@ -1346,6 +1509,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","Mean"]'
     -
+      uuid: 3b531111e8194edd87d497b9fee7084c
       name: 'Kafka: Temporary memory size'
       graph_items:
         -
@@ -1386,6 +1550,7 @@ zabbix_export:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Max"]'
     -
+      uuid: e5f69b35415b49168fba4ffa10e75f25
       name: 'Kafka: ZooKeeper connections rate'
       graph_items:
         -
@@ -1411,13 +1576,3 @@ zabbix_export:
           item:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]'
-  value_maps:
-    -
-      name: 'Kafka controller state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Inactive
-        -
-          value: '1'
-          newvalue: Active

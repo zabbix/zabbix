@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class CControllerTokenUpdate extends CController {
 
 				[$user] = (CWebUser::$data['userid'] != $userid)
 					? API::User()->get([
-						'output' => ['alias', 'name', 'surname'],
+						'output' => ['username', 'name', 'surname'],
 						'userids' => $userid
 					])
 					: [CWebUser::$data];

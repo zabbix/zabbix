@@ -60,7 +60,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'hostids'						=> null,
 			'triggerids'					=> null,
 			'itemids'						=> null,
-			'applicationids'				=> null,
 			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
@@ -184,19 +183,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if ($options['groupCount']) {
 				$sqlParts['group']['f'] = 'f.itemid';
 			}
-		}
-
-		// applicationids
-		if ($options['applicationids'] !== null) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['a'] = dbConditionInt('a.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// discoveryids
@@ -1072,26 +1058,29 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggerPrototypeIds = array_keys($result);
 
+		// Add trigger prototype dependencies.
 		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
-			// Add trigger prototype dependencies.
-
+			$dependencies = [];
+			$relationMap = new CRelationMap();
 			$res = DBselect(
 				'SELECT td.triggerid_up,td.triggerid_down'.
 				' FROM trigger_depends td'.
 				' WHERE '.dbConditionInt('td.triggerid_down', $triggerPrototypeIds)
 			);
 
-			$relationMap = new CRelationMap();
-
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation['triggerid_down'], $relation['triggerid_up']);
 			}
 
-			$dependencies = API::getApiService()->select($this->tableName(), [
-				'output' => $options['selectDependencies'],
-				'triggerids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$dependencies = API::getApiService()->select($this->tableName(), [
+					'output' => $options['selectDependencies'],
+					'triggerids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
 
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
 		}

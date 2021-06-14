@@ -5,13 +5,20 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
 #ifdef __linux__
 	#include <endian.h>
+#elif __hpux
+/* Nothing to do in HP-UX */
+#elif _AIX
+/* Nothing to do in AIX */
 #else
-	#include <machine/endian.h>
+	#if defined(DUK_F_OLD_SOLARIS)
+		#include <sys/isa_defs.h>
+	#else
+		#include <machine/endian.h>
+	#endif
 #endif
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

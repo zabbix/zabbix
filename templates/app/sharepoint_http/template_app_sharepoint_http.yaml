@@ -1,0 +1,759 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T08:05:23Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 8d5fe5b4ebb64255a2429b34c7dd3681
+      template: 'Microsoft SharePoint by HTTP'
+      name: 'Microsoft SharePoint by HTTP'
+      description: |
+        Overview:
+        Template receives data via HTTP Agent.
+        Setup:
+        Create a new host. 
+        Define macros according to your Sharepoint web portal.
+        It is recommended to fill in the values of the filter macros to avoid getting redundant data.
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 71e23c666b84414490589a509b60c488
+          name: 'Sharepoint: Get directory structure'
+          type: SCRIPT
+          key: sharepoint.get_dir
+          delay: '{$SHAREPOINT.GET_INTERVAL}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            try {
+            
+                const js_start = new Date().getTime();
+            
+                var params = JSON.parse(value);
+                var result = {
+                    status: 0,
+                    data: {}
+                };
+            
+                var req = new HttpRequest();
+            
+                var out = {};
+                var queue = [];
+            
+                var node;
+                var obj_iter_by_name;
+                var cpath;
+            
+                var current_folder;
+                var child_folders;
+                var child_files;
+                var obj_iter_file;
+            
+                req.addHeader('Accept: application/json; odata=verbose');
+                req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
+                queue.push({
+                    patch: params.root,
+                    json: []
+                });
+            
+                while (queue.length) {
+                    node = queue.pop();
+                    obj_iter_by_name = out;
+                    cpath = node.json.slice()
+            
+                    current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
+            
+                    result.status = req.getStatus();
+                    if (result.status != 200) {
+                        throw result.status;
+                    }
+            
+                    cpath.forEach(function (nd) {
+                        obj_iter_by_name = obj_iter_by_name[nd]
+                    });
+            
+                    obj_iter_by_name[current_folder.d.Name] = {
+                        meta: {
+                            size: 0,
+                            created: Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
+                            modified: Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
+                        },
+                        data: {}
+                    }
+            
+                    child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
+            
+                    cpath.push(current_folder.d.Name, "data");
+                    child_folders.d.results.forEach(function (dir) {
+                        queue.push({
+                            patch: dir.ServerRelativeUrl,
+                            json: cpath
+                        });
+                    });
+            
+                    child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
+                    child_files.d.results.forEach(function (file) {
+                        obj_iter_by_name[current_folder.d.Name].data[file.Name] = {
+                            meta: {
+                                size: file.Length,
+                                created: Math.round(new Date(file.TimeCreated).getTime() / 1000),
+                                modified: Math.round(new Date(file.TimeLastModified).getTime() / 1000)
+                            }
+                        };
+            
+                        obj_iter_file = out;
+                        cpath.forEach(function (nd) {
+                            obj_iter_file = obj_iter_file[nd];
+                            if (nd != "data") {
+                                obj_iter_file.meta.size += +file.Length;
+                            }
+                        });
+                    });
+            
+                }
+            
+                result.data = out;
+            
+            } catch (error) {
+                Zabbix.log(3, "Sharepoint fs scan failed: " + params.url + " Error: " + error);
+                if (!Number.isInteger(error))
+                    result.status = 520;
+            }
+            
+            result.time = new Date().getTime() - js_start;
+            return JSON.stringify(result);
+          description: 'Used to get directory structure information'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status":520,"data":{},"time":0}'
+          parameters:
+            -
+              name: root
+              value: '{$SHAREPOINT.ROOT}'
+            -
+              name: password
+              value: '{$SHAREPOINT.PASSWORD}'
+            -
+              name: url
+              value: '{$SHAREPOINT.URL}'
+            -
+              name: user
+              value: '{$SHAREPOINT.USER}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: cd47c3d00ce545b0a557e0e68c89d53e
+          name: 'Sharepoint: Get directory structure: Status'
+          type: DEPENDENT
+          key: sharepoint.get_dir.status
+          delay: '0'
+          history: 7d
+          description: 'HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.'
+          valuemap:
+            name: 'HTTP response status code'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+              error_handler: CUSTOM_ERROR
+              error_handler_params: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
+          triggers:
+            -
+              uuid: ed1d66a1410e4af79af462e749ce979b
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200'
+              name: 'Sharepoint: Error getting directory structure.'
+              priority: WARNING
+              description: 'Error getting directory structure. Check the Zabbix server log for more details.'
+        -
+          uuid: b2daa471665541168b2a394b9b226d73
+          name: 'Sharepoint: Get directory structure: Exec time'
+          type: DEPENDENT
+          key: sharepoint.get_dir.time
+          delay: '0'
+          history: 7d
+          units: '!ms'
+          description: 'The time taken to execute the script for obtaining the data structure (in ms). Less is better.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.time
+              error_handler: CUSTOM_ERROR
+              error_handler_params: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: sharepoint.get_dir
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
+          triggers:
+            -
+              uuid: 9e5bcc08d5f040de86afa38f5a653dd7
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000'
+              name: 'Sharepoint: Server responds slowly to API request'
+              priority: WARNING
+        -
+          uuid: 7b59d767712f49b3bbc17947999ca944
+          name: 'Sharepoint: Health score'
+          type: HTTP_AGENT
+          key: sharepoint.health_score
+          history: 7d
+          authtype: NTLM
+          username: '{$SHAREPOINT.USER}'
+          password: '{$SHAREPOINT.PASSWORD}'
+          description: 'This item specifies a value between 0 and 10, where 0 represents a low load and a high ability to process requests and 10 represents a high load and that the server is throttling requests to maintain adequate throughput.'
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'X-SharePointHealthScore\b:\s(\d+)'
+                - \1
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '10'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          url: '{$SHAREPOINT.URL}'
+          retrieve_mode: HEADERS
+          request_method: HEAD
+          tags:
+            -
+              tag: Application
+              value: Sharepoint
+          triggers:
+            -
+              uuid: 3a0451e3edda4a73aded57aa254fd813
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
+              name: 'Sharepoint: Bad health score'
+              priority: AVERAGE
+      discovery_rules:
+        -
+          uuid: 0fe7e8e5480a42b7903cb7ac9bf931cc
+          name: 'Directory discovery'
+          type: SCRIPT
+          key: sharepoint.directory.discovery
+          delay: '{$SHAREPOINT.LLD_INTERVAL}'
+          params: |
+            try {
+            
+                var params = JSON.parse(value);
+                var result = [];
+            
+                var req = new HttpRequest();
+            
+                var queue = [];
+            
+                var node;
+                var current_folder;
+                var child_folders;
+                var child_files;
+            
+                req.addHeader('Accept: application/json; odata=verbose');
+                req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
+                queue.push({
+                    patch: params.root,
+                    json_query: '$["data"]'
+                });
+            
+                while (queue.length) {
+                    node = queue.pop();
+            
+                    current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
+            
+                    result.status = req.getStatus();
+                    if (result.status != 200) {
+                        throw result.status;
+                    }
+            
+                    result.push({
+                        '{#SHAREPOINT.LLD.NAME}': current_folder.d.Name,
+                        '{#SHAREPOINT.LLD.TYPE}': 'FOLDER',
+                        '{#SHAREPOINT.LLD.FULL_PATH}': node.patch,
+                        '{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]',
+                        '{#SHAREPOINT.LLD.SIZE}': 0,
+                        '{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
+                        '{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
+                    });
+            
+                    child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
+            
+                    child_folders.d.results.forEach(function (dir) {
+                        queue.push({
+                            patch: dir.ServerRelativeUrl,
+                            json_query: node.json_query + '["' + current_folder.d.Name + '"]["data"]'
+                        });
+                    });
+            
+                    child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
+                    child_files.d.results.forEach(function (file) {
+                        result.push({
+                            '{#SHAREPOINT.LLD.NAME}': file.Name,
+                            '{#SHAREPOINT.LLD.TYPE}': 'FILE',
+                            '{#SHAREPOINT.LLD.FULL_PATH}': file.ServerRelativeUrl,
+                            '{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]' + '["data"]["' + file.Name + '"]',
+                            '{#SHAREPOINT.LLD.SIZE}': file.Length,
+                            '{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(file.TimeCreated).getTime() / 1000),
+                            '{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(file.TimeLastModified).getTime() / 1000)
+                        });
+                    });
+                }
+            
+            } catch (error) {
+                Zabbix.log(3, "Sharepoint fs discovery failed: " + params.url + " Error: " + error);
+                return "Sharepoint fs discovery failed: " + params.url + " Error: " + error;
+            }
+            
+            return JSON.stringify(result);
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SHAREPOINT.LLD.NAME}'
+                value: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#SHAREPOINT.LLD.NAME}'
+                value: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#SHAREPOINT.LLD.FULL_PATH}'
+                value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#SHAREPOINT.LLD.FULL_PATH}'
+                value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#SHAREPOINT.LLD.TYPE}'
+                value: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#SHAREPOINT.LLD.TYPE}'
+                value: '{$SHAREPOINT.LLD.FILTER.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+          item_prototypes:
+            -
+              uuid: 337493ed37424be98abd4c0550279a0b
+              name: 'Sharepoint: Created ({#SHAREPOINT.LLD.FULL_PATH})'
+              type: DEPENDENT
+              key: 'sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              description: |
+                Date of creation:
+                {#SHAREPOINT.LLD.FULL_PATH}
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.created'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+            -
+              uuid: b230bfba317e4d2eb2c6a816bd357d71
+              name: 'Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH})'
+              type: DEPENDENT
+              key: 'sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              description: |
+                Date of change:
+                {#SHAREPOINT.LLD.FULL_PATH}
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.modified'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+              trigger_prototypes:
+                -
+                  uuid: d1683e2fcdda45969ff451e43ae696c2
+                  expression: '(last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2))=1'
+                  name: 'Sharepoint: Sharepoint object is changed'
+                  opdata: '{#SHAREPOINT.LLD.FULL_PATH}'
+                  priority: INFO
+                  description: 'Updated date of modification of folder / file'
+                  manual_close: 'YES'
+            -
+              uuid: 68c3d2d2b33a494ab85ca6b883398fbb
+              name: 'Sharepoint: Size ({#SHAREPOINT.LLD.FULL_PATH})'
+              type: DEPENDENT
+              key: 'sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                Size of:
+                {#SHAREPOINT.LLD.FULL_PATH}
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.size'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: sharepoint.get_dir
+              tags:
+                -
+                  tag: Application
+                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+          parameters:
+            -
+              name: password
+              value: '{$SHAREPOINT.PASSWORD}'
+            -
+              name: root
+              value: '{$SHAREPOINT.ROOT}'
+            -
+              name: url
+              value: '{$SHAREPOINT.URL}'
+            -
+              name: user
+              value: '{$SHAREPOINT.USER}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$SHAREPOINT.GET_INTERVAL}'
+          value: 1m
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
+          value: ^/
+          description: 'Filter of discoverable dictionaries by full path'
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered dictionaries by full path'
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable dictionaries by name'
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered dictionaries by name'
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
+          value: FOLDER
+          description: 'Filter of discoverable types'
+        -
+          macro: '{$SHAREPOINT.LLD.FILTER.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered types'
+        -
+          macro: '{$SHAREPOINT.LLD_INTERVAL}'
+          value: 3h
+        -
+          macro: '{$SHAREPOINT.MAX_HEALT_SCORE}'
+          value: '5'
+          description: 'Must be in the range from 0 to 10 in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33'
+        -
+          macro: '{$SHAREPOINT.PASSWORD}'
+          type: SECRET_TEXT
+        -
+          macro: '{$SHAREPOINT.ROOT}'
+          value: '/Shared Documents'
+        -
+          macro: '{$SHAREPOINT.URL}'
+          description: 'Portal page URL. For example http://sharepoint.companyname.local/'
+        -
+          macro: '{$SHAREPOINT.USER}'
+      valuemaps:
+        -
+          uuid: 70add725d6a84f6f9ed0917107dfffc9
+          name: 'HTTP response status code'
+          mappings:
+            -
+              value: '100'
+              newvalue: Continue
+            -
+              value: '101'
+              newvalue: 'Switching Protocols'
+            -
+              value: '102'
+              newvalue: Processing
+            -
+              value: '200'
+              newvalue: OK
+            -
+              value: '201'
+              newvalue: Created
+            -
+              value: '202'
+              newvalue: Accepted
+            -
+              value: '203'
+              newvalue: 'Non-Authoritative Information'
+            -
+              value: '204'
+              newvalue: 'No Content'
+            -
+              value: '205'
+              newvalue: 'Reset Content'
+            -
+              value: '206'
+              newvalue: 'Partial Content'
+            -
+              value: '207'
+              newvalue: Multi-Status
+            -
+              value: '208'
+              newvalue: 'Already Reported'
+            -
+              value: '226'
+              newvalue: 'IM Used'
+            -
+              value: '300'
+              newvalue: 'Multiple Choices'
+            -
+              value: '301'
+              newvalue: 'Moved Permanently'
+            -
+              value: '302'
+              newvalue: Found
+            -
+              value: '303'
+              newvalue: 'See Other'
+            -
+              value: '304'
+              newvalue: 'Not Modified'
+            -
+              value: '305'
+              newvalue: 'Use Proxy'
+            -
+              value: '306'
+              newvalue: 'Switch Proxy'
+            -
+              value: '307'
+              newvalue: 'Temporary Redirect'
+            -
+              value: '308'
+              newvalue: 'Permanent Redirect/Resume Incomplete'
+            -
+              value: '400'
+              newvalue: 'Bad Request'
+            -
+              value: '401'
+              newvalue: Unauthorized
+            -
+              value: '402'
+              newvalue: 'Payment Required'
+            -
+              value: '403'
+              newvalue: Forbidden
+            -
+              value: '404'
+              newvalue: 'Not Found'
+            -
+              value: '405'
+              newvalue: 'Method Not Allowed'
+            -
+              value: '406'
+              newvalue: 'Not Acceptable'
+            -
+              value: '407'
+              newvalue: 'Proxy Authentication Required'
+            -
+              value: '408'
+              newvalue: 'Request Timeout'
+            -
+              value: '409'
+              newvalue: Conflict
+            -
+              value: '410'
+              newvalue: Gone
+            -
+              value: '411'
+              newvalue: 'Length Required'
+            -
+              value: '412'
+              newvalue: 'Precondition Failed'
+            -
+              value: '413'
+              newvalue: 'Payload Too Large'
+            -
+              value: '414'
+              newvalue: 'Request-URI Too Long'
+            -
+              value: '415'
+              newvalue: 'Unsupported Media Type'
+            -
+              value: '416'
+              newvalue: 'Requested Range Not Satisfiable'
+            -
+              value: '417'
+              newvalue: 'Expectation Failed'
+            -
+              value: '418'
+              newvalue: 'I''m a Teapot'
+            -
+              value: '419'
+              newvalue: 'Authentication Timeout'
+            -
+              value: '420'
+              newvalue: 'Method Failure/Enhance Your Calm'
+            -
+              value: '421'
+              newvalue: 'Misdirected Request'
+            -
+              value: '422'
+              newvalue: 'Unprocessable Entity'
+            -
+              value: '423'
+              newvalue: Locked
+            -
+              value: '424'
+              newvalue: 'Failed Dependency'
+            -
+              value: '426'
+              newvalue: 'Upgrade Required'
+            -
+              value: '428'
+              newvalue: 'Precondition Required'
+            -
+              value: '429'
+              newvalue: 'Too Many Requests'
+            -
+              value: '431'
+              newvalue: 'Request Header Fields Too Large'
+            -
+              value: '440'
+              newvalue: 'Login Timeout'
+            -
+              value: '444'
+              newvalue: 'No Response'
+            -
+              value: '449'
+              newvalue: 'Retry With'
+            -
+              value: '450'
+              newvalue: 'Blocked by Windows Parental Controls'
+            -
+              value: '451'
+              newvalue: 'Unavailable for Legal Reasons/Redirect'
+            -
+              value: '494'
+              newvalue: 'Request Header Too Large'
+            -
+              value: '495'
+              newvalue: 'Cert Error'
+            -
+              value: '496'
+              newvalue: 'No Cert'
+            -
+              value: '497'
+              newvalue: 'HTTP to HTTPS'
+            -
+              value: '498'
+              newvalue: 'Token Expired/Invalid'
+            -
+              value: '499'
+              newvalue: 'Client Closed Request/Token Required'
+            -
+              value: '500'
+              newvalue: 'Internal Server Error'
+            -
+              value: '501'
+              newvalue: 'Not Implemented'
+            -
+              value: '502'
+              newvalue: 'Bad Gateway'
+            -
+              value: '503'
+              newvalue: 'Service Unavailable'
+            -
+              value: '504'
+              newvalue: 'Gateway Timeout'
+            -
+              value: '505'
+              newvalue: 'HTTP Version Not Supported'
+            -
+              value: '506'
+              newvalue: 'Variant Also Negotiates'
+            -
+              value: '507'
+              newvalue: 'Insufficient Storage'
+            -
+              value: '508'
+              newvalue: 'Loop Detected'
+            -
+              value: '509'
+              newvalue: 'Bandwidth Limit Exceeded'
+            -
+              value: '510'
+              newvalue: 'Not Extended'
+            -
+              value: '511'
+              newvalue: 'Network Authentication Required'
+            -
+              value: '520'
+              newvalue: 'Unknown Error'
+            -
+              value: '598'
+              newvalue: 'Network Read Timeout Error'
+            -
+              value: '599'
+              newvalue: 'Network Connect Timeout Error'

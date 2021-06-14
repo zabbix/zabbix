@@ -66,7 +66,7 @@ $fields = [
 	'discover' =>					[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
 											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
@@ -74,10 +74,7 @@ $fields = [
 										'isset({add}) || isset({update})'
 									],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
-										'(isset({add}) || isset({update})) && isset({value_type})'.
-											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
-									],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
 									],
@@ -129,12 +126,6 @@ $fields = [
 									],
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'new_application_prototype' =>	[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({parent_discoveryid})'
-									],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update}))'.
@@ -230,6 +221,8 @@ $fields = [
 									],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
+	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"itemprototype.massdelete","itemprototype.massdisable",'.
@@ -292,6 +285,19 @@ if (hasRequest('preprocessing')) {
 	unset($step);
 }
 
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+	}
+	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
+}
+
 /*
  * Actions
  */
@@ -307,33 +313,9 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (hasRequest('add') || hasRequest('update')) {
-	$applications = getRequest('applications', []);
-	$application = reset($applications);
-	if ($application == 0) {
-		array_shift($applications);
-	}
-
 	$result = true;
 	DBstart();
-
-	if (!zbx_empty($_REQUEST['new_application'])) {
-		$new_appid = API::Application()->create([
-			'name' => $_REQUEST['new_application'],
-			'hostid' => $discoveryRule['hostid']
-		]);
-		if ($new_appid) {
-			$new_appid = reset($new_appid['applicationids']);
-			$applications[$new_appid] = $new_appid;
-		}
-		else {
-			$result = false;
-		}
-	}
 
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
@@ -399,25 +381,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		$application_prototypes = getRequest('application_prototypes', []);
-		$application_prototype = reset($application_prototypes);
-
-		if ($application_prototype === '0') {
-			array_shift($application_prototypes);
-		}
-
-		if ($application_prototypes) {
-			foreach ($application_prototypes as &$application_prototype) {
-				$application_prototype = ['name' => $application_prototype];
-			}
-			unset($application_prototype);
-		}
-
-		$new_application_prototype = getRequest('new_application_prototype', '');
-		if ($new_application_prototype !== '') {
-			$application_prototypes[] = ['name' => $new_application_prototype];
-		}
-
 		$preprocessing = getRequest('preprocessing', []);
 
 		foreach ($preprocessing as &$step) {
@@ -494,7 +457,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				: getRequest('history'),
 			'units'			=> getRequest('units'),
 			'logtimefmt'	=> getRequest('logtimefmt'),
-			'valuemapid'	=> getRequest('valuemapid'),
+			'valuemapid'	=> getRequest('valuemapid', 0),
 			'authtype'		=> getRequest('authtype'),
 			'username'		=> getRequest('username'),
 			'password'		=> getRequest('password'),
@@ -541,9 +504,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps',
 					'discover', 'parameters'
 				],
-				'selectApplications' => ['applicationid'],
-				'selectApplicationPrototypes' => ['name'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+				'selectTags' => ['tag', 'value'],
 				'itemids' => [$itemId]
 			]);
 
@@ -582,27 +544,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$item['itemid'] = $itemId;
 
-			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
-
-			// compare applications
-			natsort($db_item['applications']);
-			natsort($applications);
-
-			if (array_values($db_item['applications']) !== array_values($applications)) {
-				$item['applications'] = $applications;
-			}
-
-			// compare application prototypes
-			$db_application_prototype_names = zbx_objectValues($db_item['applicationPrototypes'], 'name');
-			natsort($db_application_prototype_names);
-
-			$application_prototype_names = zbx_objectValues($application_prototypes, 'name');
-			natsort($application_prototype_names);
-
-			if (array_values($db_application_prototype_names) !== array_values($application_prototype_names)) {
-				$item['applicationPrototypes'] = $application_prototypes;
-			}
-
 			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
@@ -617,12 +558,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($item['parameters']);
 			}
 
+			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+			if (array_values($db_item['tags']) !== array_values($tags)) {
+				$item['tags'] = $tags;
+			}
+
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
-			$item['applications'] = $applications;
-			$item['applicationPrototypes'] = $application_prototypes;
-
 			if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
 				$http_item = [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
@@ -653,6 +597,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($preprocessing) {
 				$item['preprocessing'] = $preprocessing;
 			}
+
+			$item['tags'] = $tags;
 
 			$result = API::ItemPrototype()->create($item);
 		}
@@ -733,11 +679,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$itemPrototype = [];
 	$has_errors = false;
 
-	if (hasRequest('itemid')) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
@@ -749,7 +695,9 @@ if (isset($_REQUEST['form'])) {
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover'
 			],
-			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
+			'selectDiscoveryRule' => ['itemid', 'templateid'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value']
 		]);
 		$itemPrototype = reset($itemPrototype);
 
@@ -804,7 +752,8 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	$data = getItemFormData($itemPrototype);
+	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
+	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
@@ -870,7 +819,7 @@ else {
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'selectApplications' => API_OUTPUT_EXTEND,
+		'selectTags' => ['tag', 'value'],
 		'sortfield' => $sortField,
 		'limit' => $limit
 	]);
@@ -915,6 +864,8 @@ else {
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 
 	// render view
 	echo (new CView('configuration.item.prototype.list', $data))->getOutput();

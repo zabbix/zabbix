@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXDB_H
 
 #include "common.h"
+#include "zbxjson.h"
 
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
@@ -97,7 +98,8 @@ int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
 
 #ifdef HAVE_POSTGRESQL
-int	zbx_dbms_get_version(void);
+int	zbx_tsdb_get_version(void);
+#define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
 #ifdef HAVE_ORACLE
@@ -143,6 +145,51 @@ char		*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_ch
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
-int		zbx_db_strlen_n(const char *text, size_t maxlen);
+int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
+
+#define ZBX_MYSQL_MIN_VERSION			50728
+#define ZBX_MYSQL_MIN_VERSION_FRIENDLY		"5.07.28"
+#define ZBX_MYSQL_MAX_VERSION			80099
+#define ZBX_MYSQL_MAX_VERSION_FRIENDLY		"8.00.x"
+
+#define ZBX_MARIA_MIN_VERSION			100037
+#define ZBX_MARIA_MIN_VERSION_FRIENDLY		"10.00.37"
+#define ZBX_MARIA_MAX_VERSION			100599
+#define ZBX_MARIA_MAX_VERSION_FRIENDLY		"10.05.x"
+
+#define ZBX_POSTGRESQL_MIN_VERSION		100900
+#define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY	"10.9"
+#define ZBX_POSTGRESQL_MAX_VERSION		139999
+#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY	"13.x"
+
+#define ZBX_ORACLE_MIN_VERSION			1201000200
+#define ZBX_ORACLE_MIN_VERSION_FRIENDLY		"Database 12c Release 12.01.00.02.x"
+#define ZBX_ORACLE_MAX_VERSION			1999000000
+#define ZBX_ORACLE_MAX_VERSION_FRIENDLY		"Database 19c Release 19.x.x"
+
+#define ZBX_ELASTIC_MIN_VERSION			70000
+#define ZBX_ELASTIC_MIN_VERSION_FRIENDLY	"7.x"
+
+#define ZBX_DBVERSION_UNDEFINED			0
+
+typedef enum
+{	/* db version status flags shared with FRONTEND */
+	DB_VERSION_SUPPORTED,
+	DB_VERSION_LOWER_THAN_MINIMUM,
+	DB_VERSION_HIGHER_THAN_MAXIMUM,
+	DB_VERSION_FAILED_TO_RETRIEVE
+} zbx_db_version_status_t;
+
+zbx_uint32_t	zbx_dbms_version_get(void);
+zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json);
+
+#ifdef HAVE_MYSQL
+int	zbx_dbms_mariadb_used(void);
+#endif
+
+int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
+		zbx_uint32_t max_version);
+void	zbx_db_version_json_create(struct zbx_json *json, const char *database, const char *friendly_current_version,
+		const char *friendly_min_version, const char *friendly_max_version, int flag);
 
 #endif

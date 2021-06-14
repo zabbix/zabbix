@@ -624,6 +624,10 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
+		if (!$data['hostids'] || !$data['interfaces']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
 
@@ -645,12 +649,8 @@ class CHostInterface extends CApiService {
 				'port' => $interface['port']
 			];
 
-			if (array_key_exists('bulk', $interface)) {
-				$filter['bulk'] = $interface['bulk'];
-			}
-
 			// check main interfaces
-			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
+			$interfacesToRemove = DB::select($this->tableName(), [
 				'output' => ['interfaceid'],
 				'filter' => $filter
 			]);
@@ -671,6 +671,10 @@ class CHostInterface extends CApiService {
 	 * @return array
 	 */
 	public function massRemove(array $data) {
+		if (!array_key_exists('hostids', $data) || !array_key_exists('interfaces', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		}
+
 		$data['interfaces'] = zbx_toArray($data['interfaces']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
@@ -1121,8 +1125,7 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpAuthProtocol(array $interface) {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('authprotocol', $interface['details'])
-					&& !in_array($interface['details']['authprotocol'], [ITEM_AUTHPROTOCOL_MD5,
-						ITEM_AUTHPROTOCOL_SHA]))) {
+					&& !array_key_exists($interface['details']['authprotocol'], getSnmpV3AuthProtocols()))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
@@ -1139,7 +1142,7 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpPrivProtocol(array $interface) {
 		if ($interface['details']['version'] == SNMP_V3 && (array_key_exists('privprotocol', $interface['details'])
-				&& !in_array($interface['details']['privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
+				&& !array_key_exists($interface['details']['privprotocol'], getSnmpV3PrivProtocols()))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,  _('Incorrect arguments passed to function.'));
 		}
 	}
@@ -1168,11 +1171,11 @@ class CHostInterface extends CApiService {
 				$sqlParts
 			);
 			$sqlParts = $this->addQuerySelect(
-				dbConditionCoalesce('his.authprotocol', ITEM_AUTHPROTOCOL_MD5, 'authprotocol'),
+				dbConditionCoalesce('his.authprotocol', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'authprotocol'),
 				$sqlParts
 			);
 			$sqlParts = $this->addQuerySelect(
-				dbConditionCoalesce('his.privprotocol', ITEM_PRIVPROTOCOL_DES, 'privprotocol'),
+				dbConditionCoalesce('his.privprotocol', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'privprotocol'),
 				$sqlParts
 			);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.contextname', '', 'contextname'), $sqlParts);

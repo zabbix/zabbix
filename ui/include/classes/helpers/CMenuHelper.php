@@ -62,17 +62,6 @@ class CMenuHelper {
 					->setAction('latest.view')
 					->setAliases(['history.php', 'chart.php'])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
-				? (new CMenuItem(_('Screens')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Screens')))
-							->setUrl(new CUrl('screens.php'), 'screens.php')
-							->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*']),
-						(new CMenuItem(_('Slide shows')))
-							->setUrl(new CUrl('slides.php'), 'slides.php')
-							->setAliases(['slideconf.php'])
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 				? (new CMenuItem(_('Maps')))
 					->setAction('map.view')
@@ -122,6 +111,11 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SYSTEM_INFO)
 				? (new CMenuItem(_('System information')))->setAction('report.status')
 				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
+				? (new CMenuItem(_('Scheduled reports')))
+					->setAction('scheduledreport.list')
+					->setAliases(['scheduledreport.edit'])
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
 				? (new CMenuItem(_('Availability report')))
 					->setUrl(new CUrl('report2.php'), 'report2.php')
@@ -170,10 +164,10 @@ class CMenuHelper {
 				? (new CMenuItem(_('Hosts')))
 					->setUrl(new CUrl('hosts.php'), 'hosts.php')
 					->setAliases([
-						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
-						'graphs.php?context=host', 'host_discovery.php?context=host',
-						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
-						'host_prototypes.php?context=host', 'httpconf.php?context=host'
+						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
+						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
+						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
+						'httpconf.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
@@ -250,9 +244,6 @@ class CMenuHelper {
 							->setAliases(['regex.edit']),
 						(new CMenuItem(_('Macros')))
 							->setAction('macros.edit'),
-						(new CMenuItem(_('Value mapping')))
-							->setAction('valuemap.list')
-							->setAliases(['valuemap.edit']),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Modules')))
@@ -361,7 +352,7 @@ class CMenuHelper {
 				->setTarget('_blank')
 		);
 
-		$user = array_intersect_key(CWebUser::$data, array_flip(['alias', 'name', 'surname'])) + [
+		$user = array_intersect_key(CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
 			'name' => null,
 			'surname' => null
 		];

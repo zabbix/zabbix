@@ -24,6 +24,8 @@
 #include "db.h"
 #include "dbcache.h"
 #include "zbxjson.h"
+#include "zbxvariant.h"
+#include "zbxeval.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
@@ -49,43 +51,78 @@
 #define MACRO_TYPE_ALLOWED_HOSTS	0x00800000
 #define MACRO_TYPE_ITEM_TAG		0x01000000
 #define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
-#define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
-#define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x08000000
+#define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x04000000
+#define MACRO_TYPE_SCRIPT_NORMAL	0x08000000
+#define MACRO_TYPE_SCRIPT_RECOVERY	0x10000000
+#define MACRO_TYPE_REPORT		0x20000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
-void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
-
 int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
+int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
+		const zbx_timespec_t *ts, char **error);
 
-int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+int	zbx_is_trigger_function(const char *name, size_t len);
 
-int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen);
 
-void	evaluate_expressions(zbx_vector_ptr_t *triggers);
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen);
+
+void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const DC_ITEM *history_items, const int *history_errcodes);
+void	prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
-void	get_trigger_expression_constant(const char *expression, const zbx_token_reference_t *reference,
-		char **constant);
+#define ZBX_EXPRESSION_NORMAL		0
+#define ZBX_EXPRESSION_AGGREGATE	1
+
+typedef struct
+{
+	zbx_eval_context_t	*ctx;
+	zbx_vector_ptr_t	queries;
+	int			mode;
+	int			one_num;
+	int			many_num;
+	zbx_uint64_t		hostid;
+
+	/* cache to resolve one item queries */
+	zbx_host_key_t		*hostkeys;
+	DC_ITEM			*dcitems_hk;
+	int			*errcodes_hk;
+
+	/* cache to resolve many item queries */
+	zbx_vector_ptr_t	groups;
+	zbx_vector_ptr_t	itemtags;
+	zbx_vector_ptr_t	dcitem_refs;
+	DC_ITEM			*dcitems;
+	int			*errcodes;
+	int			dcitems_num;
+}
+zbx_expression_eval_t;
+
+void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
+void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
+void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item);
+void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger);
+int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
+		char **error);
 
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
-#define ZBX_MACRO_NUMERIC	(ZBX_MACRO_ANY | ZBX_TOKEN_NUMERIC)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_XML		(ZBX_MACRO_ANY | ZBX_TOKEN_XML)
 #define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
@@ -109,4 +146,8 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
+
+int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error);
+
 #endif

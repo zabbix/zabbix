@@ -27,47 +27,47 @@ class testFormUser extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// Alias is already taken by another user.
+			// Username is already taken by another user.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Admin',
+						'Username' => 'Admin',
 						'Groups' => 'Zabbix administrators',
 						'Password' => '123',
 						'Password (once again)' => '123'
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'User with alias "Admin" already exists.'
+					'error_details' => 'User with username "Admin" already exists.'
 				]
 			],
-			// Empty 'Alias' field.
+			// Empty 'Username' field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => '',
+						'Username' => '',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "alias": cannot be empty.'
+					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
-			// Space as 'Alias' field value.
+			// Space as 'Username' field value.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => '   ',
+						'Username' => '   ',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "alias": cannot be empty.'
+					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
 			// Empty 'Group' field.
@@ -75,7 +75,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test1',
+						'Username' => 'Negative_Test1',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
@@ -88,7 +88,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test2',
+						'Username' => 'Negative_Test2',
 						'Groups' => 'Zabbix administrators'
 					],
 					'role' => 'Super admin role',
@@ -101,7 +101,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test3',
+						'Username' => 'Negative_Test3',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix'
 					],
@@ -115,7 +115,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test4',
+						'Username' => 'Negative_Test4',
 						'Groups' => 'Zabbix administrators',
 						'Password (once again)' => 'zabbix'
 					],
@@ -129,7 +129,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test5',
+						'Username' => 'Negative_Test5',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'PaSSwOrD',
 						'Password (once again)' => 'password'
@@ -144,7 +144,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test6',
+						'Username' => 'Negative_Test6',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -159,7 +159,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test7',
+						'Username' => 'Negative_Test7',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -175,7 +175,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test8',
+						'Username' => 'Negative_Test8',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -190,7 +190,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test_2h',
+						'Username' => 'Negative_Test_2h',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -205,7 +205,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test_61m',
+						'Username' => 'Negative_Test_61m',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -221,7 +221,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test9',
+						'Username' => 'Negative_Test9',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -237,7 +237,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test10',
+						'Username' => 'Negative_Test10',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -253,7 +253,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test11',
+						'Username' => 'Negative_Test11',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -269,7 +269,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test12',
+						'Username' => 'Negative_Test12',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -287,7 +287,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test12_1m',
+						'Username' => 'Negative_Test12_1m',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -306,7 +306,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test13',
+						'Username' => 'Negative_Test13',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -324,7 +324,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test13_1441m',
+						'Username' => 'Negative_Test13_1441m',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -342,7 +342,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test13_25h',
+						'Username' => 'Negative_Test13_25h',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -361,7 +361,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test14',
+						'Username' => 'Negative_Test14',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -380,7 +380,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test15',
+						'Username' => 'Negative_Test15',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -398,7 +398,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test16',
+						'Username' => 'Negative_Test16',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -414,7 +414,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test19',
+						'Username' => 'Negative_Test19',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -430,7 +430,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'Mandatory_user',
+						'Username' => 'Mandatory_user',
 						'Groups' => 'Guests',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -443,7 +443,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'Оверлорд',
+						'Username' => 'Оверлорд',
 						'Name' => 'Антон Антонович',
 						'Surname' => 'Антонов',
 						'Groups' => ['Zabbix administrators'],
@@ -464,7 +464,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'Detailed user',
+						'Username' => 'Detailed user',
 						'Name' => 'Bugs',
 						'Surname' => 'Bunny',
 						'Groups' => [
@@ -494,7 +494,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'LDAP_user',
+						'Username' => 'LDAP_user',
 						'Groups' => 'LDAP user group'
 					],
 					'role' => 'Super admin role'
@@ -505,7 +505,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'No_frontend_user',
+						'Username' => 'No_frontend_user',
 						'Groups' => 'No access to the frontend'
 					],
 					'role' => 'User role'
@@ -556,12 +556,12 @@ class testFormUser extends CWebTest {
 	 * Check the field values after creating or updating user.
 	 */
 	private function assertFormFields($data) {
-		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
 		$this->page->open('zabbix.php?action=user.edit&userid='.$userid);
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 
 		// Verify that fields are updated.
-		$check_fields = ['Alias', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
+		$check_fields = ['Username', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
 		foreach ($check_fields as $field_name) {
 			if (array_key_exists($field_name, $data['fields'])) {
 				$this->assertEquals($data['fields'][$field_name], $form_update->getField($field_name)->getValue());
@@ -591,7 +591,7 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 			// Log in with the created or updated user.
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-			$this->page->userLogin($data['fields']['Alias'], $password);
+			$this->page->userLogin($data['fields']['Username'], $password);
 			// Verification of URL after login.
 			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 			// Verification of the number of rows per page parameter.
@@ -599,7 +599,7 @@ class testFormUser extends CWebTest {
 			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
 
 			// Verification of default theme.
-			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 			$parts = explode('/', $stylesheet->getAttribute('href'));
@@ -627,15 +627,15 @@ class testFormUser extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// Alias is already taken by another user.
+			// Username is already taken by another user.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Admin'
+						'Username' => 'Admin'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'User with alias "Admin" already exists.'
+					'error_details' => 'User with username "Admin" already exists.'
 				]
 			],
 			// Empty 'Group' field.
@@ -879,7 +879,7 @@ class testFormUser extends CWebTest {
 					'expected' => TEST_GOOD,
 					'user_to_update' => 'disabled-user',
 					'fields' => [
-						'Alias' => 'Updated_user_1',
+						'Username' => 'Updated_user_1',
 						'Name' => 'Test_Name',
 						'Surname' => 'Test_Surname',
 						'Groups' => [
@@ -903,7 +903,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'Updated_user',
+						'Username' => 'Updated_user',
 						'Name' => 'Road',
 						'Surname' => 'Runner',
 						'Groups' => [
@@ -987,14 +987,14 @@ class testFormUser extends CWebTest {
 	 */
 	public function testFormUser_PasswordUpdate() {
 		$data = [
-			'alias' => 'user-zabbix',
+			'username' => 'user-zabbix',
 			'old_password' => 'zabbix',
 			'new_password' => 'zabbix_new',
 			'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
 			'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
 		];
 		$this->page->login()->open('zabbix.php?action=user.list');
-		$this->query('link', $data['alias'])->waitUntilVisible()->one()->click();
+		$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form_update->query('button:Change password')->one()->click();
 
@@ -1009,12 +1009,12 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Atempt to sign in with old password.
-			$this->page->userLogin($data['alias'],$data['old_password']);
+			$this->page->userLogin($data['username'],$data['old_password']);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 
 			// Sign in with new password.
-			$this->page->userLogin($data['alias'],$data['new_password']);
+			$this->page->userLogin($data['username'],$data['new_password']);
 			$attempt_message = CMessageElement::find()->one();
 			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 			$this->page->logout();
@@ -1032,7 +1032,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'no-access-to-the-frontend'
+						'Username' => 'no-access-to-the-frontend'
 					]
 				]
 			],
@@ -1057,30 +1057,12 @@ class testFormUser extends CWebTest {
 					'error_details' => 'User "user-zabbix" is map "Local network" owner.'
 				]
 			],
-			// Attempt to delete a user that owns a screen.
+			// Attempt to delete a user that owns a dashboard.
 			[
 				[
 					'expected' => TEST_BAD,
-					'username' => 'test-user',
-					'parameters' => [
-						'DB_table' => 'screens',
-						'column' => 'name',
-						'value' => 'Zabbix server'
-					],
-					'error_details' => 'User "test-user" is screen "Zabbix server" owner.'
-				]
-			],
-			// Attempt to delete a user that owns a slide show.
-			[
-				[
-					'expected' => TEST_BAD,
-					'username' => 'admin-zabbix',
-					'parameters' => [
-						'DB_table' => 'slideshows',
-						'column' => 'name',
-						'value' => 'Test slide show 1'
-					],
-					'error_details' => 'User "admin-zabbix" is slide show "Test slide show 1" owner.'
+					'username' => 'test-timezone',
+					'error_details' => 'User "test-timezone" is dashboard "Testing share dashboard" owner.'
 				]
 			],
 			// Attempt to delete a user that is mentioned in an action.
@@ -1108,14 +1090,14 @@ class testFormUser extends CWebTest {
 			$username = $data['username'];
 		}
 		else {
-			$username = $data['fields']['Alias'];
+			$username = $data['fields']['Username'];
 		}
 
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $username)->one()->click();
-		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username =' . zbx_dbstr($username));
 
-		// Link user with map, screen, slideshow, action to validate user deletion.
+		// Link user with map, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
 					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid).
@@ -1130,7 +1112,7 @@ class testFormUser extends CWebTest {
 		// Validate if the user was deleted.
 		$this->assertUserMessage($data, 'User deleted', 'Cannot delete user');
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username =' . zbx_dbstr($username)));
 		}
 	}
 
@@ -1144,7 +1126,7 @@ class testFormUser extends CWebTest {
 
 	public function testFormUser_Cancel() {
 		$data = [
-			'Alias' => 'user-cancel',
+			'Username' => 'user-cancel',
 			'Password' => 'zabbix',
 			'Password (once again)' => 'zabbix',
 			'Groups' => 'Guests'
@@ -1174,7 +1156,7 @@ class testFormUser extends CWebTest {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
 				$this->assertEquals($good_title, $message->getTitle());
-				$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+				$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
 				if ($good_title === 'User deleted') {
 					$this->assertTrue($user_count === 0);
 				}

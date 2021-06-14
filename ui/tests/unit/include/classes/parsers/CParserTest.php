@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
-abstract class CParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	abstract public function testProvider();
+abstract class CParserTest extends TestCase {
+
+	abstract public function dataProvider();
 
 	/**
 	 * Return an instance of the tested parser.
@@ -31,7 +33,7 @@ abstract class CParserTest extends PHPUnit_Framework_TestCase {
 	abstract protected function getParser();
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param $string
 	 * @param $pos

@@ -1,23 +1,21 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:22Z'
+  version: '5.4'
+  date: '2021-05-11T08:04:22Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
-      template: PostgreSQL
-      name: PostgreSQL
+      uuid: 399bd1ee587245ecac6f39beaa99886f
+      template: 'PostgreSQL by user parameters'
+      name: 'PostgreSQL by user parameters'
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: PostgreSQL
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: d17c6c15154d40d1afa5b1eafb2ed93e
           name: 'Bgwriter: Buffers allocated per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_alloc.rate
@@ -26,9 +24,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of buffers allocated'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -40,7 +35,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 2c3ee691d4a54fb6b566739a3a648df4
           name: 'Bgwriter: Buffers written directly by a backend per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend.rate
@@ -49,9 +49,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of buffers written directly by a backend'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -63,7 +60,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 77e1eb202a6346ce9df0f1bb2c078688
           name: "Bgwriter:\_Buffers backend fsync per second"
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend_fsync.rate
@@ -71,9 +73,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -85,7 +84,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: e29d26a48d0143579bf3acc6655cd659
           name: 'Bgwriter: Buffers written during checkpoints per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_checkpoint.rate
@@ -94,9 +98,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of buffers written during checkpoints'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -108,7 +109,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 5151183461a54d2bbfaad04b8cab3798
           name: 'Bgwriter: Buffers written by the background writer per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_clean.rate
@@ -117,9 +123,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of buffers written by the background writer'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -131,7 +134,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: ff290c0602b9447e87240c1ecf467050
           name: 'Bgwriter: Requested checkpoints per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_req.rate
@@ -139,9 +147,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of requested checkpoints that have been performed'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -153,15 +158,21 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{last()} > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
+              uuid: 65e7954489854ad3ad1698dead7c4c02
+              expression: 'last(/PostgreSQL by user parameters/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
               name: 'PostgreSQL: Required checkpoints occurs too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
               priority: AVERAGE
               description: |
                 Checkpoints are points in the sequence of transactions at which it is guaranteed that the heap and index data files have been updated with all information written before that checkpoint. At checkpoint time, all dirty data pages are flushed to disk and a special checkpoint record is written to the log file.
                 https://www.postgresql.org/docs/current/wal-configuration.html
         -
+          uuid: a5271230be8b431cb96580180e099b98
           name: 'Bgwriter: Scheduled checkpoints per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_timed.rate
@@ -169,9 +180,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of scheduled checkpoints that have been performed'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -183,7 +191,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 782d2368763b48ad8663aa9fb75c3326
           name: 'Bgwriter: Checkpoint sync time'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_sync_time
@@ -192,9 +205,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -210,7 +220,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: b5e5f463978c46dd9401963f48ea72eb
           name: "Bgwriter:\_Checkpoint write time"
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_write_time
@@ -219,9 +234,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -237,7 +249,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: f273c71f92bf4ac0b6ec5a0a88d1239c
           name: 'Bgwriter: Max written per second'
           type: DEPENDENT
           key: pgsql.bgwriter.maxwritten_clean.rate
@@ -245,9 +262,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of times the background writer stopped a cleaning scan because it had written too many buffers'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -259,42 +273,53 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 1fc5ba48a0974bd7bf965b5f130deded
           name: 'PostgreSQL: Get bgwriter'
           key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: 'Statistics about the background writer process''s activity'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)} = 1'
+              uuid: 768d28b9360b46cda3065f5082ba97ac
+              expression: 'nodata(/PostgreSQL by user parameters/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],30m) = 1'
               name: 'PostgreSQL: Failed to get items (no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: '{PostgreSQL:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0'
+                  expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
         -
+          uuid: 70a7581fabd14e05bda762b79811187c
           name: 'Status: Cache hit ratio %'
           key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Cache hit ratio'
-          applications:
+          tags:
             -
-              name: PostgreSQL
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{max(5m)} < {$PG.CACHE_HITRATIO.MIN.WARN}'
+              uuid: 4d87cc71b40f4b59ad27f30f33b15a69
+              expression: 'max(/PostgreSQL by user parameters/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
               name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
         -
+          uuid: 248cbe5067324b9ca435f2aced5e2a5f
           name: 'Status: Config hash'
           key: 'pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           delay: 15m
@@ -302,29 +327,29 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'PostgreSQL configuration hash'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
+              expression: '(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
         -
+          uuid: c78116d3acf24e6990ed27ba8008728c
           name: 'Connections sum: Active'
           type: DEPENDENT
           key: pgsql.connections.sum.active
           delay: '0'
           history: 7d
           description: 'Total number of connections executing a query'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -332,16 +357,18 @@ zabbix_export:
                 - $.active
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: be6eb6ecbfad420b889c58d1f1550b23
           name: 'Connections sum: Idle'
           type: DEPENDENT
           key: pgsql.connections.sum.idle
           delay: '0'
           history: 7d
           description: 'Total number of connections waiting for a new client command'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -349,16 +376,18 @@ zabbix_export:
                 - $.idle
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 6471d014722c4072ae045df4c69578e3
           name: 'Connections sum: Idle in transaction'
           type: DEPENDENT
           key: pgsql.connections.sum.idle_in_transaction
           delay: '0'
           history: 7d
           description: 'Total number of connections in a transaction state, but not executing a query'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -366,7 +395,12 @@ zabbix_export:
                 - $.idle_in_transaction
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 197cc14f55db485b891614c7b7ee2a51
           name: 'Connections sum: Prepared'
           type: DEPENDENT
           key: pgsql.connections.sum.prepared
@@ -375,9 +409,6 @@ zabbix_export:
           description: |
             Total number of prepared transactions
             https://www.postgresql.org/docs/current/sql-prepare-transaction.html
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -385,16 +416,18 @@ zabbix_export:
                 - $.prepared
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 24d23377c7cd4cc5b63f98a261c2501c
           name: 'Connections sum: Total'
           type: DEPENDENT
           key: pgsql.connections.sum.total
           delay: '0'
           history: 7d
           description: 'Total number of connections'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -402,7 +435,12 @@ zabbix_export:
                 - $.total
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 488050d9aa8e4c2ea5b3e991ec5ddacc
           name: 'Connections sum: Total %'
           type: DEPENDENT
           key: pgsql.connections.sum.total_pct
@@ -410,9 +448,6 @@ zabbix_export:
           history: 7d
           units: '%'
           description: 'Total number of connections in percentage'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -420,12 +455,18 @@ zabbix_export:
                 - $.total_pct
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              uuid: 54ef12b8ff1e4383a3097c71478ceefa
+              expression: 'min(/PostgreSQL by user parameters/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
+          uuid: fadd1333189c4ed29db57cf2acd158d0
           name: 'Connections sum: Waiting'
           type: DEPENDENT
           key: pgsql.connections.sum.waiting
@@ -434,9 +475,6 @@ zabbix_export:
           description: |
             Total number of waiting connections
             https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -444,7 +482,12 @@ zabbix_export:
                 - $.waiting
           master_item:
             key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: b0da0c4856a645ca8ef03405d2d8d4a5
           name: 'PostgreSQL: Get connections sum'
           key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 1h
@@ -453,10 +496,12 @@ zabbix_export:
           description: |
             Collect all metrics from pg_stat_activity
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: b44f263fb33e461e8c3d700fb7688c7b
           name: 'PostgreSQL: Get dbstat'
           key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 1h
@@ -465,10 +510,12 @@ zabbix_export:
           description: |
             Collect all metrics from pg_stat_database per database
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 7cee21f6225340ef80e9cdef7ce20b10
           name: 'PostgreSQL: Get locks'
           key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 1h
@@ -477,40 +524,46 @@ zabbix_export:
           description: |
             Collect all metrics from pg_locks per database
             https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: f42bd73b3af6451b8a3a6113dcc1b675
           name: 'Status: Ping time'
           key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           value_type: FLOAT
-          units: ms
-          applications:
-            -
-              name: PostgreSQL
+          units: s
           preprocessing:
             -
               type: REGEX
               parameters:
                 - 'Time:\s(\d+\.\d+)\sms'
                 - \1
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.PING_TIME.MAX.WARN}'
+              uuid: e19b5630737b4c63886b5df77a3c748c
+              expression: 'min(/PostgreSQL by user parameters/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.PING_TIME.MAX.WARN}'
               name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: '{PostgreSQL:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0'
+                  expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
         -
+          uuid: f5bd615243b344cb88dac1e83436cc85
           name: 'Status: Ping'
           key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
-          applications:
-            -
-              name: PostgreSQL
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -522,69 +575,87 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{last()} = 0'
+              uuid: 6d9c2b5353ce4f6baeeb0f254fb7d1e2
+              expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
         -
+          uuid: 47bf580e1e4e48cf9c0e94fcf90288ac
           name: 'PostgreSQL: Get queries'
           key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: 'Collect all metrics by query execution time'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: d8a509bd011a4ecda5d439295e257e9d
           name: 'Replication: standby count'
           key: 'pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           description: 'Number of standby servers'
-          applications:
+          tags:
             -
-              name: PostgreSQL
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 21f8bea1141249c7a4dfafad5bc3ef41
           name: 'Replication: lag in seconds'
           key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           units: s
           description: 'Replication lag with Master in seconds'
-          applications:
+          tags:
             -
-              name: PostgreSQL
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{min(5m)} > {$PG.REPL_LAG.MAX.WARN}'
+              uuid: 11831c52e86445498eed42de6a629b65
+              expression: 'min(/PostgreSQL by user parameters/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
               name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
+          uuid: 09f696124fca4c5b844bf66c9c912b87
           name: 'Replication: recovery role'
           key: 'pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
-          applications:
-            -
-              name: PostgreSQL
           valuemap:
             name: 'PostgreSQL recovery role'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: d449017462704508a4aad51a6b45fb30
           name: 'Replication: status'
           key: 'pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode'
-          applications:
-            -
-              name: PostgreSQL
           valuemap:
             name: 'PostgreSQL replication status'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{max(5m)}=0'
+              uuid: aef1e1d2bab540f8ab738b4a3fad863c
+              expression: 'max(/PostgreSQL by user parameters/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m)=0'
               name: 'PostgreSQL: Replication is down'
               priority: AVERAGE
         -
+          uuid: 4883717865c84c19b48d46f009317de2
           name: 'Transactions: Max active transaction time'
           type: DEPENDENT
           key: pgsql.transactions.active
@@ -593,9 +664,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Current max active transaction time'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -603,7 +671,12 @@ zabbix_export:
                 - $.active
           master_item:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 4c89121d71a14c15b6169417ea69d0a3
           name: 'Transactions: Max idle transaction time'
           type: DEPENDENT
           key: pgsql.transactions.idle
@@ -612,9 +685,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Current max idle transaction time'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -622,7 +692,12 @@ zabbix_export:
                 - $.idle
           master_item:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 0ee43ddd9da246d19097107b45e4c8e8
           name: 'Transactions: Max prepared transaction time'
           type: DEPENDENT
           key: pgsql.transactions.prepared
@@ -631,9 +706,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Current max prepared transaction time'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -641,7 +713,12 @@ zabbix_export:
                 - $.prepared
           master_item:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: da341b2011714a1f994ecbe96bd52155
           name: 'Transactions: Max waiting transaction time'
           type: DEPENDENT
           key: pgsql.transactions.waiting
@@ -650,9 +727,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Current max waiting transaction time'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -660,31 +734,41 @@ zabbix_export:
                 - $.waiting
           master_item:
             key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: ff26a1c256bd40978f49a7a025538aa1
           name: 'PostgreSQL: Get transactions'
           key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: 'Collect metrics by transaction execution time'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 6418a2f286e64ecabf2295fca063f8af
           name: 'Status: Uptime'
           key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           units: uptime
-          applications:
+          tags:
             -
-              name: PostgreSQL
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{last()} < 10m'
+              uuid: 85565aba402740868a16c0e4639a98fc
+              expression: 'last(/PostgreSQL by user parameters/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) < 10m'
               name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'PostgreSQL uptime is less than 10 minutes'
         -
+          uuid: 321525ebcea44396922e96deec2e8ad1
           name: 'Status: Version'
           key: 'pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           delay: 15m
@@ -692,29 +776,29 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'PostgreSQL version'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 8111eb42b0e74fffb43da474677ebc2f
+              expression: '(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
         -
+          uuid: 5385ec7d39514039a641d18cba335ddc
           name: 'WAL: Segments count'
           type: DEPENDENT
           key: pgsql.wal.count
           delay: '0'
           history: 7d
           description: 'Number of WAL segments'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -722,7 +806,12 @@ zabbix_export:
                 - $.count
           master_item:
             key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
         -
+          uuid: 7cd6c524ecab41f9a22489866d503361
           name: 'PostgreSQL: Get WAL'
           key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           delay: 5m
@@ -730,10 +819,12 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Master item to collect WAL metrics'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 5cc9c67621cc46e0a42b1eb79bda83b3
           name: 'WAL: Bytes written'
           type: DEPENDENT
           key: pgsql.wal.write
@@ -741,9 +832,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'WAL write in bytes'
-          applications:
-            -
-              name: PostgreSQL
           preprocessing:
             -
               type: JSONPATH
@@ -755,8 +843,13 @@ zabbix_export:
                 - ''
           master_item:
             key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
       discovery_rules:
         -
+          uuid: 5c4c658507394f5bb362e601f7c59d63
           name: 'Database discovery'
           key: 'pgsql.discovery.db["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           delay: 1h
@@ -768,16 +861,19 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: 69575e9785184ef5be2502e3cc282220
               name: 'DB {#DBNAME}: Database size'
               key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
               delay: 15m
               history: 7d
               units: B
               description: 'Database size'
-              application_prototypes:
+              tags:
                 -
-                  name: 'PostgreSQL: DB {#DBNAME}'
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 615e6567a85e421bb06ab8cac0eaba69
               name: 'DB {#DBNAME}: Blocks hit per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
@@ -785,9 +881,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -799,7 +892,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 9136517d08b447869e5b8f5fd684c3b9
               name: 'DB {#DBNAME}: Disk blocks read per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
@@ -807,9 +905,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of disk blocks read in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -821,7 +916,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: a76f6d28995441ff9fe28bbc09445e64
               name: 'DB {#DBNAME}: Detected conflicts per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
@@ -829,9 +929,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of queries canceled due to conflicts with recovery in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -843,15 +940,21 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  uuid: 3b51f02258bd4e02829f04ca016dd01d
+                  expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
                     https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT
             -
+              uuid: b874cc2dd80643208c2479ad25fae0ac
               name: 'DB {#DBNAME}: Detected deadlocks per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
@@ -859,9 +962,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of detected deadlocks in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -873,12 +973,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  uuid: 3bee63fa04d94586937e22aafab9bdd8
+                  expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
             -
+              uuid: d235ead54c8b41f9a91398c75383e5d7
               name: 'DB {#DBNAME}: Temp_bytes written per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
@@ -886,9 +992,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total amount of data written to temporary files by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -900,16 +1003,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: af4e35eee1764d3f97d9c1218867f885
               name: 'DB {#DBNAME}: Temp_files created per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Total number of temporary files created by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -921,7 +1026,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 35c6f93aefe4439bbc36f2f358440b16
               name: 'DB {#DBNAME}: Tuples deleted per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
@@ -929,9 +1039,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of rows deleted by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -943,7 +1050,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 92f33d96f8a348088cdba593c0e66929
               name: 'DB {#DBNAME}: Tuples fetched per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
@@ -951,9 +1063,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of rows fetched by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -965,7 +1074,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 8c03c87a44fe43928c32087ca7561e88
               name: 'DB {#DBNAME}: Tuples inserted per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
@@ -973,9 +1087,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of rows inserted by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -987,7 +1098,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: f6d378f4e38e455fa5a12467fe977657
               name: 'DB {#DBNAME}: Tuples returned per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
@@ -995,9 +1111,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of rows updated by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1009,7 +1122,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 4c8de8c1064d43ffa18c4f37fead37f7
               name: 'DB {#DBNAME}: Tuples updated per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
@@ -1017,9 +1135,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of rows updated by queries in this database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1031,7 +1146,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 81c33f5b3c31475fa5f28f4ad149a328
               name: 'DB {#DBNAME}: Commits per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
@@ -1039,9 +1159,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of transactions in this database that have been committed'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1053,7 +1170,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 8e5080186d034323be21473099b0b0ce
               name: 'DB {#DBNAME}: Rollbacks per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
@@ -1061,9 +1183,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of transactions in this database that have been rolled back'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1075,7 +1194,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: df9dd9bac2a54f1085b29fb22b394a1f
               name: 'DB {#DBNAME}: Frozen XID before avtovacuum %'
               type: DEPENDENT
               key: 'pgsql.frozenxid.prc_before_av["{#DBNAME}"]'
@@ -1086,9 +1210,6 @@ zabbix_export:
               description: |
                 reventing Transaction ID Wraparound Failures
                 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1096,7 +1217,12 @@ zabbix_export:
                     - $.prc_before_av
               master_item:
                 key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 44ddd66ea37449cb8fab6979b98dfd3c
               name: 'DB {#DBNAME}: Frozen XID before stop %'
               type: DEPENDENT
               key: 'pgsql.frozenxid.prc_before_stop["{#DBNAME}"]'
@@ -1107,9 +1233,6 @@ zabbix_export:
               description: |
                 Preventing Transaction ID Wraparound Failures
                 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1117,33 +1240,38 @@ zabbix_export:
                     - $.prc_before_stop
               master_item:
                 key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{last()}<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
+                  uuid: 709df9c1e29a4ff68a3de9423ff7ae58
+                  expression: 'last(/PostgreSQL by user parameters/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures
                     https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
             -
+              uuid: ddf6d0b7b5fe4cbbb540687051b8e5f5
               name: 'DB {#DBNAME}: Get frozen XID'
               key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
               history: 1h
               trends: '0'
               value_type: TEXT
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
+              uuid: 3d0acf4b45fc4a72bb2a214222f93f2a
               name: 'DB {#DBNAME}: Locks total'
               type: DEPENDENT
               key: 'pgsql.locks.total["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Total number of locks in the database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1151,21 +1279,24 @@ zabbix_export:
                     - '$[''{#DBNAME}''].total'
               master_item:
                 key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
+                  uuid: ef7d3c9866df44aa9b378e7f125a34de
+                  expression: 'min(/PostgreSQL by user parameters/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
+              uuid: 939ab05c71ed4be9979662203ebba980
               name: 'DB {#DBNAME}: Queries slow maintenance count'
               type: DEPENDENT
               key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Slow maintenance query count'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1173,7 +1304,12 @@ zabbix_export:
                     - '$[''{#DBNAME}''].mro_slow_count'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: bbc8f9bf86394cf28e0c2db44ee4711d
               name: 'DB {#DBNAME}: Queries max maintenance time'
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
@@ -1181,9 +1317,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Max maintenance query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1191,7 +1324,12 @@ zabbix_export:
                     - '$[''{#DBNAME}''].mro_time_max'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: f1427228bfa14ad3b7bb9d63bcfaec59
               name: 'DB {#DBNAME}: Queries sum maintenance time'
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
@@ -1199,9 +1337,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Sum maintenance query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1209,16 +1344,18 @@ zabbix_export:
                     - '$[''{#DBNAME}''].mro_time_sum'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 5d937f46f4684f1e8253ec62e0f75379
               name: 'DB {#DBNAME}: Queries slow query count'
               type: DEPENDENT
               key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Slow query count'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1226,12 +1363,18 @@ zabbix_export:
                     - '$[''{#DBNAME}''].query_slow_count'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
+                  uuid: facc8f6976664da4ad5567d270f0f311
+                  expression: 'min(/PostgreSQL by user parameters/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'Database {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
+              uuid: 044cc16d0a2f46b28d88eff86c33b30b
               name: 'DB {#DBNAME}: Queries max query time'
               type: DEPENDENT
               key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
@@ -1239,9 +1382,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Max query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1249,7 +1389,12 @@ zabbix_export:
                     - '$[''{#DBNAME}''].query_time_max'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: c6232400b39c4564a30a403859ffb4ee
               name: 'DB {#DBNAME}: Queries sum query time'
               type: DEPENDENT
               key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
@@ -1257,9 +1402,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Sum query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1267,16 +1409,18 @@ zabbix_export:
                     - '$[''{#DBNAME}''].query_time_sum'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: f7099043ea6345f0a5531f70f9573a3e
               name: 'DB {#DBNAME}: Queries slow transaction count'
               type: DEPENDENT
               key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Slow transaction query count'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1284,7 +1428,12 @@ zabbix_export:
                     - '$[''{#DBNAME}''].tx_slow_count'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: c6800ca30a564766ba745e875cb4e929
               name: 'DB {#DBNAME}: Queries max transaction time'
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
@@ -1292,9 +1441,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Max transaction query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1302,7 +1448,12 @@ zabbix_export:
                     - '$[''{#DBNAME}''].tx_time_max'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 0eda974576794768ac9ddc592ff27e19
               name: 'DB {#DBNAME}: Queries sum transaction time'
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
@@ -1310,9 +1461,6 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Sum transaction query time'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1320,16 +1468,18 @@ zabbix_export:
                     - '$[''{#DBNAME}''].tx_time_sum'
               master_item:
                 key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: cafcc00cce824c33a321da0e9ecc7f6e
               name: 'DB {#DBNAME}: Index scans per second'
               type: DEPENDENT
               key: 'pgsql.scans.idx.rate["{#DBNAME}"]'
               delay: '0'
               history: 7d
               description: 'Number of index scans in the database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1341,7 +1491,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: f07396ca9d224e1b819f22efe6c4259d
               name: 'DB {#DBNAME}: Sequential scans per second'
               type: DEPENDENT
               key: 'pgsql.scans.seq.rate["{#DBNAME}"]'
@@ -1349,9 +1504,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of sequential scans in the database'
-              application_prototypes:
-                -
-                  name: 'PostgreSQL: DB {#DBNAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1363,42 +1515,51 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'PostgreSQL: DB {#DBNAME}'
             -
+              uuid: 4bf92e4b0fed4d32b808b299d9e1fb0c
               name: 'DB {#DBNAME}: Get scans'
               key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
               history: 1h
               trends: '0'
               value_type: TEXT
               description: 'Number of scans done for table/index in the database'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
           graph_prototypes:
             -
+              uuid: 3f8124b817f2437096c620d62ec2e055
               name: 'DB {#DBNAME}: Block hit/read'
               ymin_type_1: FIXED
               graph_items:
                 -
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 42A5F5
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
             -
+              uuid: 6bd0a0d65b8d43ad946b145cf8a8b533
               name: 'DB {#DBNAME}: Database size'
               ymin_type_1: FIXED
               graph_items:
                 -
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
             -
+              uuid: 41e765d906324595a396d8985b204ff5
               name: 'DB {#DBNAME}: Events'
               ymin_type_1: FIXED
               graph_items:
@@ -1406,36 +1567,38 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
             -
+              uuid: 2b260fdf7623476095429434b5c79041
               name: 'DB {#DBNAME}: Locks'
               ymin_type_1: FIXED
               graph_items:
                 -
                   color: EC407A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.locks.total["{#DBNAME}"]'
             -
+              uuid: 8a60a92b41b146f49145b86bab559b2e
               name: 'DB {#DBNAME}: Queries'
               ymin_type_1: FIXED
               graph_items:
@@ -1443,112 +1606,115 @@ zabbix_export:
                   color: 4CAF50
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 03A9F4
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 9C27B0
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: 81C784
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: 90CAF9
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
                   color: CE93D8
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
             -
+              uuid: 93518b06f71e46ada3dabefa1726b867
               name: 'DB {#DBNAME}: Slow queries'
               ymin_type_1: FIXED
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
             -
+              uuid: 779b872280ad46c7a6cdf95c2df7c646
               name: 'DB {#DBNAME}: Temp files'
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
                   color: 66BB6A
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 42A5F5
                   yaxisside: RIGHT
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
             -
+              uuid: f10be22e3bac4d66936c34ec99446c64
               name: 'DB {#DBNAME}: Tuples'
               ymin_type_1: FIXED
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: PostgreSQL
+                    host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
       macros:
         -
@@ -1616,337 +1782,378 @@ zabbix_export:
           value: zbx_monitor
       dashboards:
         -
+          uuid: d95f29826778497a9ed265e0c335fd0f
           name: 'PostgreSQL databases'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Tuples'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Events'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Tuples'
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Block hit/read'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Temp files'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  x: '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Events'
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Locks'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Database size'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Block hit/read'
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Queries'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  x: '12'
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Temp files'
+                        host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Slow queries'
-                    host: PostgreSQL
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Locks'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Database size'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_PROTOTYPE
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Queries'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Slow queries'
+                        host: 'PostgreSQL by user parameters'
         -
+          uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '6'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL connections'
+                        host: 'PostgreSQL by user parameters'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL connections'
-                    host: PostgreSQL
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL transactions'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL ping'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL uptime'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL replication lag'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL WAL'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL bgwriter'
+                        host: 'PostgreSQL by user parameters'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL checkpoints'
+                        host: 'PostgreSQL by user parameters'
+      valuemaps:
+        -
+          uuid: 2e376ee568d04e7bbe98cbae4181f313
+          name: 'PostgreSQL recovery role'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL transactions'
-                    host: PostgreSQL
+              value: '0'
+              newvalue: Master
             -
-              type: GRAPH_CLASSIC
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL ping'
-                    host: PostgreSQL
+              value: '1'
+              newvalue: Standby
+        -
+          uuid: 7f553f18ef6544ceaa4b50c4ebf0e583
+          name: 'PostgreSQL replication status'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL uptime'
-                    host: PostgreSQL
+              value: '0'
+              newvalue: Down
             -
-              type: GRAPH_CLASSIC
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL replication lag'
-                    host: PostgreSQL
+              value: '1'
+              newvalue: Up
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL WAL'
-                    host: PostgreSQL
+              value: '2'
+              newvalue: Master
+        -
+          uuid: 372bc939f3924aafa13c4821b83a9276
+          name: 'Service state'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL bgwriter'
-                    host: PostgreSQL
+              value: '0'
+              newvalue: Down
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL checkpoints'
-                    host: PostgreSQL
+              value: '1'
+              newvalue: Up
   graphs:
     -
+      uuid: 6b4b92c62cb94e10b11f218ed35f6211
       name: 'PostgreSQL bgwriter'
       ymin_type_1: FIXED
       graph_items:
@@ -1954,71 +2161,73 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_alloc.rate
         -
           sortorder: '1'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_clean.rate
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_backend.rate
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_checkpoint.rate
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.maxwritten_clean.rate
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_backend_fsync.rate
     -
+      uuid: 4a105d193df64be7898ac19a2f07faa4
       name: 'PostgreSQL checkpoints'
       ymin_type_1: FIXED
       graph_items:
         -
           color: 1A7C11
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoints_timed.rate
         -
           sortorder: '1'
           color: F63100
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoints_req.rate
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoint_sync_time
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoint_write_time
     -
+      uuid: 8d41d719832049a5a1fcd6f4da67fb6a
       name: 'PostgreSQL connections'
       ymin_type_1: FIXED
       graph_items:
@@ -2027,50 +2236,51 @@ zabbix_export:
           color: C8E6C9
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total
         -
           sortorder: '1'
           color: 6C59DC
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total_pct
         -
           sortorder: '2'
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.active
         -
           sortorder: '3'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle
         -
           sortorder: '4'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle_in_transaction
         -
           sortorder: '5'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.prepared
         -
           sortorder: '6'
           color: AC8C14
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.waiting
     -
+      uuid: 1e9a55ee61824779a9f46f42ec21abef
       name: 'PostgreSQL ping'
       ymin_type_1: FIXED
       graph_items:
@@ -2078,25 +2288,27 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: A5D6A7
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
           color: 039BE5
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
+      uuid: d8cf31fc39584a63b9384d9c3ebf40ee
       name: 'PostgreSQL replication lag'
       ymin_type_1: FIXED
       graph_items:
         -
           color: 42A5F5
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
+      uuid: 10d1de74e9d848399ca038055e5cc8ce
       name: 'PostgreSQL transactions'
       ymin_type_1: FIXED
       graph_items:
@@ -2104,30 +2316,31 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.active
         -
           sortorder: '1'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.idle
         -
           sortorder: '2'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.prepared
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.waiting
     -
+      uuid: 45fe7967596741129b4f2462922636bf
       name: 'PostgreSQL uptime'
       show_triggers: 'NO'
       ymin_type_1: FIXED
@@ -2135,59 +2348,29 @@ zabbix_export:
         -
           color: 66BB6A
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
           color: 03A9F4
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
     -
+      uuid: 93ca2dc7a3ff4a458c45e2a56390ce72
       name: 'PostgreSQL WAL'
       ymin_type_1: FIXED
       graph_items:
         -
           color: 29B6F6
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.wal.write
         -
           sortorder: '1'
           color: AB47BC
           yaxisside: RIGHT
           item:
-            host: PostgreSQL
+            host: 'PostgreSQL by user parameters'
             key: pgsql.wal.count
-  value_maps:
-    -
-      name: 'PostgreSQL recovery role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Master
-        -
-          value: '1'
-          newvalue: Standby
-    -
-      name: 'PostgreSQL replication status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
-        -
-          value: '2'
-          newvalue: Master
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

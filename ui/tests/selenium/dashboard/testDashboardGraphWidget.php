@@ -22,10 +22,9 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  *
- * @on-before setDefaultWidgetType
+ * @onBefore setDefaultWidgetType
  */
 class testDashboardGraphWidget extends CWebTest {
 
@@ -36,7 +35,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -47,9 +46,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Set "Graph" as default widget type.
 	 */
 	public function setDefaultWidgetType() {
-		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashbrd.last_widget_type\' AND userid=\'1\'');
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.dashboard.last_widget_type\' AND userid=\'1\'');
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-				' VALUES (99999,1,\'web.dashbrd.last_widget_type\',\'svggraph\',3)');
+				' VALUES (99999,1,\'web.dashboard.last_widget_type\',\'svggraph\',3)');
 	}
 
 	/**
@@ -166,7 +165,7 @@ class testDashboardGraphWidget extends CWebTest {
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
-				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
+				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
@@ -597,8 +596,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019-25-09 00:00:00'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021-25-09 00:00:00'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
@@ -607,8 +606,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-05-02 00:00:00',
-						'To' => '2019.07.31 15:53:07'
+						'From' => '2021-05-02 00:00:00',
+						'To' => '2021.07.31 15:53:07'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
@@ -2219,7 +2218,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
-		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 						->asOverlayDialog()->one();
 		$overlay->close();
 
@@ -2227,7 +2226,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 

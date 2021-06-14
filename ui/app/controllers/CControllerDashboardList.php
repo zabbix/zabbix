@@ -55,29 +55,29 @@ class CControllerDashboardList extends CController {
 	}
 
 	protected function doAction() {
-		CProfile::delete('web.dashbrd.dashboardid');
-		CProfile::update('web.dashbrd.list_was_opened', 1, PROFILE_TYPE_INT);
+		CProfile::delete('web.dashboard.dashboardid');
+		CProfile::update('web.dashboard.list_was_opened', 1, PROFILE_TYPE_INT);
 
-		$sort_field = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.dashboard.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashboard.list.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.dashboard.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.dashboard.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.dashbrd.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.dashbrd.filter_show', $this->getInput('filter_show', DASHBOARD_FILTER_SHOW_ALL),
+			CProfile::update('web.dashboard.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.dashboard.filter_show', $this->getInput('filter_show', DASHBOARD_FILTER_SHOW_ALL),
 				PROFILE_TYPE_INT
 			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.dashbrd.filter_name');
-			CProfile::delete('web.dashbrd.filter_show');
+			CProfile::delete('web.dashboard.filter_name');
+			CProfile::delete('web.dashboard.filter_show');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.dashbrd.filter_name', ''),
-			'show' => CProfile::get('web.dashbrd.filter_show', DASHBOARD_FILTER_SHOW_ALL)
+			'name' => CProfile::get('web.dashboard.filter_name', ''),
+			'show' => CProfile::get('web.dashboard.filter_show', DASHBOARD_FILTER_SHOW_ALL)
 		];
 
 		$data = [
@@ -85,8 +85,8 @@ class CControllerDashboardList extends CController {
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.dashbrd.filter',
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+			'profileIdx' => 'web.dashboard.filter',
+			'active_tab' => CProfile::get('web.dashboard.filter.active', 1),
 			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 		];
 

@@ -70,12 +70,13 @@ int __wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 void	zbx_mock_test_entry(void **state)
 {
 	int			err, expected_ret, returned_ret;
-	char			*error = NULL, *returned_value = NULL;
+	char			*error = NULL;
 	const char		*function, *params;
 	DC_ITEM			item;
 	zbx_vcmock_ds_item_t	*ds_item;
 	zbx_timespec_t		ts;
 	zbx_mock_handle_t	handle;
+	zbx_variant_t		returned_value;
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
@@ -97,8 +98,13 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
+	if (SUCCEED != (returned_ret = evaluate_function2(&returned_value, &item, function, params, &ts, &error)))
+	{
 		printf("evaluate_function returned error: %s\n", error);
+		zbx_free(error);
+	}
+
+	zbx_vc_flush_stats();
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
@@ -106,21 +112,41 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == expected_ret)
 	{
 		const char		*expected_value;
-		char			*ptr;
-		double			expected_dbl;
+		zbx_uint64_t		expected_ui64;
 
 		handle = zbx_mock_get_parameter_handle("out.value");
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &expected_value)))
 			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
 
-		expected_dbl = strtod(expected_value, &ptr);
+		switch (returned_value.type)
+		{
+			case ZBX_VARIANT_DBL:
+				zbx_mock_assert_double_eq("function result", atof(expected_value),
+						returned_value.data.dbl);
+				break;
+			case ZBX_VARIANT_UI64:
+				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
+				{
+					fail_msg("function result '" ZBX_FS_UI64 "' does not match expected result '%s'",
+							returned_value.data.ui64, expected_value);
 
-		if (ptr != expected_value && '\0' == *ptr)
-			zbx_mock_assert_double_eq("function result", expected_dbl, atof(returned_value));
-		else
-			zbx_mock_assert_str_eq("function result", expected_value, returned_value);
+				}
+				zbx_mock_assert_uint64_eq("function result", expected_ui64, returned_value.data.ui64);
+				break;
+			case ZBX_VARIANT_STR:
+				zbx_mock_assert_str_eq("function result", expected_value, returned_value.data.str);
+				break;
+			default:
+				fail_msg("function result '%s' has unexpected type '%s'",
+						zbx_variant_value_desc(&returned_value),
+						zbx_variant_type_desc(&returned_value));
+				break;
+		}
 	}
-	zbx_free(returned_value);
+	if (SUCCEED == returned_ret)
+		zbx_variant_clear(&returned_value);
+
+	zbx_vcmock_ds_destroy();
 
 	ZBX_UNUSED(state);
 }

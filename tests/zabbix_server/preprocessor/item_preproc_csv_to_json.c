@@ -22,6 +22,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 #include "common.h"
+#include "zbxvariant.h"
 
 #include "item_preproc_test.h"
 #include "zbxembed.h"

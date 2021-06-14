@@ -164,7 +164,6 @@ $house_keeper_tab = (new CFormList())
 				new CLabel(_('Enable compression'), 'compression_status'),
 				(new CCheckBox('compression_status'))
 					->setChecked($data['compression_status'] == 1)
-					->setEnabled($data['compression_availability'] == 1)
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
@@ -173,15 +172,9 @@ $house_keeper_tab = (new CFormList())
 					DB::getFieldLength('config', 'compress_older')
 				))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					->setEnabled($data['compression_availability'] == 1 && $data['compression_status'] == 1)
+					->setEnabled($data['compression_status'] == 1)
 					->setAriaRequired()
 			);
-
-		if ($data['compression_availability'] == 0) {
-			$house_keeper_tab->addRow('',
-				(new CSpan(_('Compression is not available due to incompatible DB version')))->addClass(ZBX_STYLE_RED)
-			);
-		}
 	}
 
 $house_keeper_view = (new CTabView())

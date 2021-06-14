@@ -184,7 +184,7 @@ class CControllerUsergroupEdit extends CController {
 	 */
 	private function getUsersMs() {
 		$options = [
-			'output' => ['userid', 'alias', 'name', 'surname']
+			'output' => ['userid', 'username', 'name', 'surname']
 		];
 
 		if ($this->hasInput('usrgrpid') && !$this->hasInput('form_refresh')) {

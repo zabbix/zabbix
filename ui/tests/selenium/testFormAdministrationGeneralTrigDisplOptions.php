@@ -116,8 +116,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckLayout() {
 		$this->page->login()->open($this->config_link);
-		$this->assertPageTitle('Configuration of trigger displaying options');
-		$this->assertPageHeader('Trigger displaying options');
+		$this->page->assertTitle('Configuration of trigger displaying options');
+		$this->page->assertHeader('Trigger displaying options');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$limits = [

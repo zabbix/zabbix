@@ -21,8 +21,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
- * @backup dashboard
- * @backup profiles
+ * @backup dashboard, profiles
  */
 class testPageDashboardWidgets extends CWebTest {
 
@@ -38,28 +37,28 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Opening edit widget form.
-		$form = $dashboard->getWidget('System information')->edit();
-		$this->assertEquals('System information', $form->getField('Type')->getValue());
-		$form->submit();
+		$form_system_info = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $form_system_info->getField('Type')->getValue());
+		$form_system_info->submit();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
 		// Making changes in widget form that are not "Widget type".
-		$form = $dashboard->getWidget('Problems')->edit();
-		$this->assertEquals('Problems', $form->getField('Type')->getValue());
+		$form_problems = $dashboard->getWidget('Problems')->edit();
+		$this->assertEquals('Problems', $form_problems->getField('Type')->getValue());
 		$data =[
 			'Name' => 'check widget type',
 			'Refresh interval' => 'No refresh',
 			'Show' => 'Recent problems',
 			'Show tags' => 'None'
 		];
-		$form->fill($data);
-		$form->submit();
+		$form_problems->fill($data);
+		$form_problems->submit();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
-		$form = $dashboard->addWidget()->asForm();
-		$form->submit();
+		$dashboard->addWidget();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();
 		// Check if widget was added.
 		$dashboard->getWidget('Action log');
 		$this->checkLastSelectedWidgetType();
@@ -83,11 +82,11 @@ class testPageDashboardWidgets extends CWebTest {
 
 		if ($db_type) {
 			$this->assertEquals($db_type, CDBHelper::getValue("SELECT value_str FROM profiles".
-					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
+					" WHERE userid=1 AND idx='web.dashboard.last_widget_type'"));
 		}
 		else {
 			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM profiles".
-					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
+					" WHERE userid=1 AND idx='web.dashboard.last_widget_type'"));
 		}
 
 		$overlay->close();
@@ -101,24 +100,24 @@ class testPageDashboardWidgets extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		// Opening widget configuration form for new Clock widget.
 		$overlay = $dashboard->addWidget();
-		$form = $overlay->asForm();
-		$form->fill(['Type' => 'Clock']);
-		$form->waitUntilReloaded();
+		$default_form = $overlay->asForm();
+		$default_form->fill(['Type' => 'Clock']);
+		$default_form->waitUntilReloaded();
 		$overlay->close();
 		// Check that widget type is remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Save edit widget form without changing widget type.
-		$form = $dashboard->getWidget('System information')->edit();
-		$this->assertEquals('System information', $form->getField('Type')->getValue());
-		$form->submit();
+		$sys_info_form = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $sys_info_form->getField('Type')->getValue());
+		$sys_info_form->submit();
 		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Opening edit widget form and change widget type.
-		$form = $dashboard->getWidget('System information')->edit();
-		$form->fill(['Type' => 'Data overview']);
+		$change_form = $dashboard->getWidget('System information')->edit();
+		$change_form->fill(['Type' => 'Data overview']);
 		$overlay->close();
 		// Check that widget type inherited from previous widget.
 		$this->checkLastSelectedWidgetType('Data overview', 'dataover');
@@ -139,7 +138,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Get dashboard widget element by widget title ('Problem hosts').
 		$widget = $dashboard->getWidget('Problem hosts');
 		// Check refresh interval of widget.
-		$this->assertEquals(60, $widget->getRefreshInterval());
+		$this->assertEquals('1 minute', $widget->getRefreshInterval());
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();
@@ -224,6 +223,10 @@ class testPageDashboardWidgets extends CWebTest {
 		$configuration->getField('Name')->clear()->type('Dashboard create test');
 		$configuration->submit();
 
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
+
 		$dashboard = CDashboardElement::find()->one();
 		// Check the name of dashboard.
 		$this->query('id:page-title-general')->waitUntilTextPresent('Dashboard create test');
@@ -239,6 +242,10 @@ class testPageDashboardWidgets extends CWebTest {
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
 		$form->submit();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 
 		// Check if widget was added.
 		$widget = $dashboard->getWidget('Clock test');
@@ -283,6 +290,10 @@ class testPageDashboardWidgets extends CWebTest {
 		$form->getField('Show')->select('Host groups');
 		// Submit the form.
 		$form->submit();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 
 		// Check if widget can be found by a new name.
 		$dashboard->getWidget('New widget name');

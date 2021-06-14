@@ -53,7 +53,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options
 	 * @param array|null  $options['groupids']
 	 * @param array|null  $options['hostids']
-	 * @param array|null  $options['applicationids']
 	 * @param array|null  $options['objectids']
 	 * @param string|null $options['eventid_till']
 	 * @param int|null    $options['time_from']
@@ -85,7 +84,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options
 	 * @param array|null  $options['groupids']
 	 * @param array|null  $options['hostids']
-	 * @param array|null  $options['applicationids']
 	 * @param array|null  $options['objectids']
 	 * @param string|null $options['eventid_till']
 	 * @param bool        $options['recent']
@@ -125,7 +123,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['inventory']             (optional)
 	 * @param string $filter['inventory'][]['field']
 	 * @param string $filter['inventory'][]['value']
-	 * @param string $filter['application']           (optional)
 	 * @param string $filter['name']                  (optional)
 	 * @param int    $filter['show']                  TRIGGERS_OPTION_*
 	 * @param int    $filter['from']                  (optional) usable together with 'to' and only for
@@ -144,21 +141,24 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param int    $filter['show_opdata']           (optional)
 	 * @param bool   $resolve_comments
-	 * @param bool   $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
-		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
+	public static function getData(array $filter, bool $resolve_comments = false) {
+		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
+			? getSubGroups($filter['groupids'])
+			: null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
-		$filter_applicationids = null;
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
+		$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
+
 			if ($filter_hostids === null) {
 				// get all groups if no selected groups defined
 				if ($filter_groupids === null) {
@@ -169,7 +169,7 @@ class CScreenProblem extends CScreenBase {
 					]));
 				}
 
-				$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
 				// get available hosts
 				$filter_hostids = array_keys(API::Host()->get([
@@ -181,7 +181,7 @@ class CScreenProblem extends CScreenBase {
 
 			$exclude_hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => $filter['exclude_groupids'],
+				'groupids' => $exclude_groupids,
 				'preservekeys' => true
 			]));
 
@@ -204,18 +204,6 @@ class CScreenProblem extends CScreenBase {
 			$filter_hostids = ($filter_hostids !== null) ? array_intersect($filter_hostids, $hostids) : $hostids;
 		}
 
-		if (array_key_exists('application', $filter) && $filter['application'] !== '') {
-			$filter_applicationids = array_keys(API::Application()->get([
-				'output' => [],
-				'groupids' => $filter_groupids,
-				'hostids' => $filter_hostids,
-				'search' => ['name' => $filter['application']],
-				'preservekeys' => true
-			]));
-			$filter_groupids = null;
-			$filter_hostids = null;
-		}
-
 		$data = [
 			'problems' => [],
 			'triggers' => []
@@ -228,7 +216,6 @@ class CScreenProblem extends CScreenBase {
 			$options = [
 				'groupids' => $filter_groupids,
 				'hostids' => $filter_hostids,
-				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
 				'suppressed' => false,
@@ -306,18 +293,14 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$show_opdata = (array_key_exists('show_opdata', $filter)
-							&& $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE);
-
 					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
-						$options['selectItems'] =
-							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
+						$options['selectFunctions'] = ['itemid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
@@ -327,10 +310,6 @@ class CScreenProblem extends CScreenBase {
 
 					if ($resolve_comments) {
 						$options['output'][] = 'comments';
-					}
-
-					if ($resolve_urls) {
-						$options['output'][] = 'url';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -350,6 +329,24 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			true
 		);
+
+		if ($show_opdata && $data['triggers']) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'selectValueMap' => ['mappings'],
+				'triggerids' => array_keys($data['triggers']),
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as &$trigger) {
+				foreach ($trigger['functions'] as $function) {
+					$trigger['items'][] = $items[$function['itemid']];
+				}
+				unset($trigger['functions']);
+			}
+			unset($trigger);
+		}
 
 		return $data;
 	}
@@ -548,13 +545,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
-	 * @param bool  $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, $resolve_comments = false, $resolve_urls = false) {
+	public static function makeData(array $data, array $filter, bool $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -620,15 +616,6 @@ class CScreenProblem extends CScreenBase {
 			unset($trigger);
 		}
 
-		if ($resolve_urls) {
-			foreach ($data['problems'] as &$problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
-				$trigger['eventid'] = $problem['eventid'];
-				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
-			}
-			unset($problem);
-		}
-
 		// get additional data
 		$eventids = array_keys($data['problems']);
 
@@ -680,7 +667,7 @@ class CScreenProblem extends CScreenBase {
 		$userids = $userids + $actions['userids'];
 		$data['users'] = $userids
 			? API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($userids + $actions['userids']),
 				'preservekeys' => true
 			])

@@ -203,12 +203,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$problem_link = [
 		(new CLinkAction($problem['name']))
-			->setHint(
-				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $allowed, $show_timeline, $data['fields']['show_tags'],
-					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
-				)
-			)
+			->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($problem['severity'])
 			))
@@ -281,8 +276,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
-		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
-			->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(
+			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
+				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,
+					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+					$data['fields']['tag_priority']
+				))
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
 			$data['data']['users']
@@ -300,21 +300,9 @@ if ($data['info'] !== '') {
 }
 
 $output = [
-	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $table->toString()
 ];
-
-if ($data['initial_load']) {
-	$output['script_inline'] =
-		'if (typeof refreshProblemsWidget !== typeof(Function)) {'.
-			'function refreshProblemsWidget(event, response, overlay) {'.
-				'refreshWidgetOnAcknowledgeCreate("problems", response, overlay);'.
-			'}'.
-
-			'$.subscribe("acknowledge.create", refreshProblemsWidget);'.
-		'}';
-}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

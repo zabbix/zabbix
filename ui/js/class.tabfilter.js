@@ -238,7 +238,7 @@ class CTabFilter extends CBaseComponent {
 	 * @return {Promise}
 	 */
 	profileUpdate(property, body) {
-		let url = new Curl('zabbix.php', false),
+		let url = new Curl('zabbix.php'),
 			signal = null;
 
 		url.setArgument('action', 'tabfilter.profile.update');

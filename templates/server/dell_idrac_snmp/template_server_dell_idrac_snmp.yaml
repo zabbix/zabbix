@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:12:39Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:37Z'
   groups:
     -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
     -
+      uuid: 43dc5c8a9a0e4786b64e44422c7f32b4
       template: 'Dell iDRAC SNMP'
       name: 'Dell iDRAC SNMP'
       description: |
@@ -21,23 +23,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: 'Disk arrays'
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: 'Virtual disks'
       items:
         -
+          uuid: e49f14d4a51f4018b17bd200d4819975
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
@@ -49,23 +37,26 @@ zabbix_export:
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the firmware version of a remote access card.
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: e816b86474e6471eb48cbda563dfddd6
+              expression: '(last(/Dell iDRAC SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC SNMP/system.hw.firmware,#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 9fc4348dc3c641dcbd0bb04b58145c91
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
@@ -78,15 +69,17 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the model name of the system.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
+          uuid: 4951ab6260b145ccb0c21abdcf5bb361
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
@@ -99,22 +92,25 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the service tag of the system.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 6f5b00a889804fbeb41c4246b29bd5f1
+              expression: '(last(/Dell iDRAC SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC SNMP/system.hw.serialnumber,#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 9750f3ffa5d648ce9e99adea1d92b54c
           name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
@@ -125,20 +121,23 @@ zabbix_export:
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
-              expression: '{count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+              uuid: 6d07848a4ded4e4fb0383ff12234ed25
+              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               name: 'System is in unrecoverable state!'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
             -
-              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              uuid: b47601a02003409896d79e3c99093aca
+              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -146,9 +145,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System is in unrecoverable state!'
-                  expression: '{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
             -
-              expression: '{count(#1,{$HEALTH_WARN_STATUS},eq)}=1'
+              uuid: a323c8f5ca8d4517b0451677bd43c4db
+              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -156,11 +156,12 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System is in unrecoverable state!'
-                  expression: '{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
                 -
                   name: 'System status is in critical state'
-                  expression: '{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
         -
+          uuid: 83ebf3d38c92457a9d0462e3849d83ce
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
@@ -173,23 +174,26 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the name of the operating system that the hostis running.
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: fba72cbc4f12495b9f35d0f77a9330b8
+              expression: '(last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#2))=1 and length(last(/Dell iDRAC SNMP/system.sw.os[systemOSName]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 2bb1759d46264c92b7cb70e7a1d18236
           name: 'Array Controller Cache Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#BATTERY_NUM},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.1]'
@@ -198,6 +202,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::batteryTable'
           item_prototypes:
             -
+              uuid: 05378fb979554b3d824c355b360f0652
               name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
@@ -215,20 +220,23 @@ zabbix_export:
                 5: The battery is missing or not detected.
                 6: The battery is undergoing the re-charge phase.
                 7: The battery voltage or charge level is below the threshold.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::batteryState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
+                  uuid: 7b9a7b970ac049589912d8e208baf2e2
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1'
+                  uuid: fc2eeac871464a65930bbbb2341c803f
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -236,9 +244,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS},ne)}=1'
+                  uuid: d36acb231d99493b9a760bf231001b4d
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -246,11 +255,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
         -
+          uuid: 10eaaac3051e47d9bf8fd5e6f0ff840e
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.12.1.5,{#FAN_DESCR},1.3.6.1.4.1.674.10892.5.4.700.12.1.8,{#TYPE},1.3.6.1.4.1.674.10892.5.4.700.12.1.7]'
@@ -265,6 +275,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             -
+              uuid: bf61401efbc44ed39bedc92b97ff563a
               name: '{#FAN_DESCR}: Fan speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
@@ -278,10 +289,12 @@ zabbix_export:
                 value returned for this attribute is the speed in RPM or the OFF/ON value
                 of the cooling device.  When the value for coolingDeviceSubType is
                 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
             -
+              uuid: 363a909cc7eb4dc6a225417b2487bad8
               name: '{#FAN_DESCR}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
@@ -292,20 +305,23 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0012.0001.0005 This attribute defines the probe status of the cooling device.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1'
+                  uuid: a1bca91682e84a7b8866ce443cfcbd44
+                  expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   name: '{#FAN_DESCR}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_WARN_STATUS:"nonCriticalUpper"},eq)}=1 or {count(#1,{$FAN_WARN_STATUS:"nonCriticalLower"},eq)}=1'
+                  uuid: 981f52ec4ba44b558bdbc5775622bc0c
+                  expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalLower\"}")=1'
                   name: '{#FAN_DESCR}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -313,8 +329,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#FAN_DESCR}: Fan is in critical state'
-                      expression: '{Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
         -
+          uuid: 49d6570731ad4cd9a33bf4afa660eaf8
           name: 'Array Controller Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38,{#CNTLR_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.79]'
@@ -323,6 +340,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::controllerTable'
           item_prototypes:
             -
+              uuid: f2d6f51d3b4047d99efe437b5995a6c5
               name: '{#CNTLR_NAME}: Disk array controller model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
@@ -333,10 +351,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The controller's name as represented in Storage Management.
-              applications:
+              tags:
                 -
-                  name: 'Disk arrays'
+                  tag: Application
+                  value: 'Disk arrays'
             -
+              uuid: 55504ef472384a8689a72ae70881fe71
               name: '{#CNTLR_NAME}: Disk array controller status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
@@ -353,14 +373,16 @@ zabbix_export:
                 4: Non-critical
                 5: Critical
                 6: Non-recoverable
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1'
+                  uuid: b037fad011764721a030bdde50f6ede3
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -368,15 +390,17 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                  uuid: 55a0631d0ab24bc6ad5a6c4ef7d1be30
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_WARN_STATUS:"nonCritical"},eq)}=1'
+                  uuid: 226ab2efc25d46c9adda8f763fe4a65f
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -384,11 +408,12 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in critical state'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
-                      expression: '{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
         -
+          uuid: 3a7ac779581345b9b4791390dee3baf4
           name: 'Physical Disk Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.2]'
@@ -397,6 +422,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::physicalDiskTable'
           item_prototypes:
             -
+              uuid: b5d7d97f769948d1986548b8f799874a
               name: '{#DISK_NAME}: Physical disk media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
@@ -410,12 +436,14 @@ zabbix_export:
                 1: The media type could not be determined.
                 2: Hard Disk Drive (HDD).
                 3: Solid State Drive (SSD).
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: f094adc420fc49b19e23a3071b8dc15f
               name: '{#DISK_NAME}: Physical disk model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
@@ -427,10 +455,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The model number of the physical disk.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: 6a6a8198b9c6485290acb703d87ec7c9
               name: '{#DISK_NAME}: Physical disk part number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.27.{#SNMPINDEX}'
@@ -442,10 +472,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The part number of the disk.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: 1cfaa7f506144a06a3ee159528a1a8fb
               name: '{#DISK_NAME}: Physical disk serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
@@ -456,17 +488,20 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The physical disk's unique identification number from the manufacturer.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: eb26b6915b9f4ce6983566df9ee4db96
+                  expression: '(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
                   name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: 17b6d1e6664e4c3e90f3e68df2316fb4
               name: '{#DISK_NAME}: Disk size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
@@ -478,15 +513,17 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The size of the physical disk in megabytes.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: 5c9de9677d214c8fa6ba706a57c46f9f
               name: '{#DISK_NAME}: Physical disk S.M.A.R.T. status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
@@ -496,14 +533,16 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Indicates whether the physical disk has received a predictive failure alert.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::BooleanType'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_SMART_FAIL_STATUS},eq)}=1'
+                  uuid: 7dc1a088ebd74702b0fb4e0a20edbed2
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS}")=1'
                   name: '{#DISK_NAME}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -511,8 +550,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
-                      expression: '{Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
             -
+              uuid: 7b1d2992683d404db552abd870c6c627
               name: '{#DISK_NAME}: Physical disk status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
@@ -529,20 +569,23 @@ zabbix_export:
                 4: Non-critical
                 5: Critical
                 6: Non-recoverable
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                  uuid: 5eedc39db9a348df8e547be6401c0814
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#DISK_NAME}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
                 -
-                  expression: '{count(#1,{$DISK_WARN_STATUS:"nonCritical"},eq)}=1'
+                  uuid: 6defa44f91ee4fb5b11b92ba64f07b48
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#DISK_NAME}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -550,8 +593,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
-                      expression: '{Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
         -
+          uuid: 2a4ea81f9ecd4d04ad508c50395551da
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.12.1.5,{#PSU_DESCR},1.3.6.1.4.1.674.10892.5.4.600.12.1.8]'
@@ -560,6 +604,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
           item_prototypes:
             -
+              uuid: 8036b7f190284e03b5cbc34e2fa081e3
               name: '{#PSU_DESCR}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
@@ -570,20 +615,23 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0600.0012.0001.0005 This attribute defines the status of the power supply.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1'
+                  uuid: 9f57b49984864af188b178dc2da85b71
+                  expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#PSU_DESCR}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_WARN_STATUS:"nonCritical"},eq)}=1'
+                  uuid: d7d1b3d889254ae288348cd6b77bad5f
+                  expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#PSU_DESCR}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -591,8 +639,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#PSU_DESCR}: Power supply is in critical state'
-                      expression: '{Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
         -
+          uuid: c3769c4cc3f3480ebad7b7c6e458c1c0
           name: 'Temperature Ambient Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]'
@@ -607,6 +656,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             -
+              uuid: 050e4ce134df4ec9b35dbb470b89811b
               name: '{#SENSOR_LOCALE}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
@@ -617,12 +667,14 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
+              uuid: 406352e7250740939c22dd5cba8cd361
               name: '{#SENSOR_LOCALE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
@@ -633,9 +685,6 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
@@ -643,35 +692,42 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  uuid: 992e0a871cef40f6b859e251fd5d75fd
+                  expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
           trigger_prototypes:
             -
+              uuid: 8d659cefdff143bbaff8d6cdc8bbf7a3
               expression: |
-                {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}
+                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
+              uuid: 45ab3beb5a3b4271861330632ff37c55
               expression: |
-                {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"Ambient"}
+                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -680,13 +736,14 @@ zabbix_export:
                 -
                   name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
                   expression: |
-                    {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}
+                    avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
-                  recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                  recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
         -
+          uuid: 3e79192b1bba479faaf852cb15fe9e26
           name: 'Temperature CPU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]'
@@ -701,6 +758,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             -
+              uuid: dfc1f114d3de4e9f98254116f5958025
               name: '{#SENSOR_LOCALE}: Temperature status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
@@ -711,12 +769,14 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
+              uuid: 9b4381f5a34a4ff4bde7294fb34f2a27
               name: '{#SENSOR_LOCALE}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
@@ -727,9 +787,6 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
@@ -737,35 +794,42 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
+                  uuid: edb89d83ecc144cdbccdb41f8842d572
+                  expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
           trigger_prototypes:
             -
+              uuid: 54c2b7095b7d4550a2d1dbe14990dd0a
               expression: |
-                {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}
+                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
             -
+              uuid: eb2182b46c294fa381b35ab31c7ac6d4
               expression: |
-                {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"CPU"}
+                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
+                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"CPU"}-3'
+              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -774,13 +838,14 @@ zabbix_export:
                 -
                   name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   expression: |
-                    {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}
+                    avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
-                  recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                  recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
         -
+          uuid: 57a914e4d66d4babaadde1b0787ba734
           name: 'Virtual Disk Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.2]'
@@ -789,6 +854,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
           item_prototypes:
             -
+              uuid: 6f600a00e0004adab0b6acaf57375a26
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
@@ -809,12 +875,14 @@ zabbix_export:
                 8: RAID-60
                 9: Concatenated RAID 1
                 10: Concatenated RAID 5
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: 5859b6822849438fa355694f42cc0b12
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Read policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
@@ -828,10 +896,12 @@ zabbix_export:
                 1: No Read Ahead.
                 2: Read Ahead.
                 3: Adaptive Read Ahead.
-              applications:
+              tags:
                 -
-                  name: 'Virtual disks'
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: f42ea3af24564ba09c306e16580df656
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Disk size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
@@ -843,15 +913,17 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The size of the virtual disk in megabytes.
-              applications:
-                -
-                  name: 'Virtual disks'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: 3134da694a68466cbe811c1658be24af
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Current state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
@@ -867,12 +939,14 @@ zabbix_export:
                 3: A Consistency Check (CC) is being performed on the virtual disk.
                 4: The virtual disk is being initialized.
                 5: BackGround Initialization (BGI) is being performed on the virtual disk.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: 1e749a7717b94b42ad52d45bebaf9dd5
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
@@ -886,22 +960,25 @@ zabbix_export:
                 1: The current state could not be determined.
                 2: The virtual disk is operating normally or optimally.
                 3: The virtual disk has encountered a failure. The data on disk is lost or is about to be lost.
-                4: The virtual disk encounterd a failure with one or all of the constituent redundant physical disks.
+                4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.
                 The data on the virtual disk might no longer be fault tolerant.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1'
+                  uuid: 457783fb014a4cae9d47a1cb17d8d31e
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
                   name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check virtual disk for warnings or errors'
                 -
-                  expression: '{count(#1,{$VDISK_WARN_STATUS:"degraded"},eq)}=1'
+                  uuid: d0c6dbaa042f40559d855acb1b61977a
+                  expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_WARN_STATUS:\"degraded\"}")=1'
                   name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -909,8 +986,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed'
-                      expression: '{Dell iDRAC SNMP:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1'
+                      expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
             -
+              uuid: 0e469e2e2a7c40998a72a986ef61a4e6
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Write policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
@@ -924,11 +1002,12 @@ zabbix_export:
                 1: Write Through.
                 2: Write Back.
                 3: Force Write Back.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
       macros:
         -
           macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}'
@@ -1035,202 +1114,212 @@ zabbix_export:
         -
           macro: '{$VDISK_WARN_STATUS:"degraded"}'
           value: '4'
-  value_maps:
-    -
-      name: 'IDRAC-MIB-SMIv2::batteryState'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: Unknown
+          uuid: 3459ea1c2ec94b3b8e39b8b7f76def81
+          name: 'IDRAC-MIB-SMIv2::batteryState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Ready
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+            -
+              value: '5'
+              newvalue: Missing
+            -
+              value: '6'
+              newvalue: Charging
+            -
+              value: '7'
+              newvalue: 'Below threshold'
         -
-          value: '2'
-          newvalue: Ready
+          uuid: 7648c14caa6e4dd4b0d2bc28e594090c
+          name: 'IDRAC-MIB-SMIv2::BooleanType'
+          mappings:
+            -
+              value: '0'
+              newvalue: ok
+            -
+              value: '1'
+              newvalue: failed
         -
-          value: '3'
-          newvalue: Failed
+          uuid: f90ca4bbf10f41deb68b458b795f6bb2
+          name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
         -
-          value: '4'
-          newvalue: Degraded
+          uuid: 3277b276bbb241699ac6011387e90126
+          name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
         -
-          value: '5'
-          newvalue: Missing
+          uuid: 3d57a8ee9167490cabf6429d9cd14b4a
+          name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: HDD
+            -
+              value: '3'
+              newvalue: SSD
         -
-          value: '6'
-          newvalue: Charging
+          uuid: ba7ff497325e4488af87afcc58e0cd42
+          name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCriticalUpper
+            -
+              value: '5'
+              newvalue: criticalUpper
+            -
+              value: '6'
+              newvalue: nonRecoverableUpper
+            -
+              value: '7'
+              newvalue: nonCriticalLower
+            -
+              value: '8'
+              newvalue: criticalLower
+            -
+              value: '9'
+              newvalue: nonRecoverableLower
+            -
+              value: '10'
+              newvalue: failed
         -
-          value: '7'
-          newvalue: 'Below threshold'
-    -
-      name: 'IDRAC-MIB-SMIv2::BooleanType'
-      mappings:
+          uuid: 65e49bfeafcd4a7287ac779cf405d4eb
+          name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: RAID-0
+            -
+              value: '3'
+              newvalue: RAID-1
+            -
+              value: '4'
+              newvalue: RAID-5
+            -
+              value: '5'
+              newvalue: RAID-6
+            -
+              value: '6'
+              newvalue: RAID-10
+            -
+              value: '7'
+              newvalue: RAID-50
+            -
+              value: '8'
+              newvalue: RAID-60
+            -
+              value: '9'
+              newvalue: 'Concatenated RAID 1'
+            -
+              value: '10'
+              newvalue: 'Concatenated RAID 5'
         -
-          value: '0'
-          newvalue: ok
+          uuid: 6b8270d891b54aef8d7889ddce498ff2
+          name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not applicable'
+            -
+              value: '2'
+              newvalue: Reconstructing
+            -
+              value: '3'
+              newvalue: Resynching
+            -
+              value: '4'
+              newvalue: Initializing
+            -
+              value: '5'
+              newvalue: 'Background init'
         -
-          value: '1'
-          newvalue: failed
-    -
-      name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
-      mappings:
+          uuid: 9da59b80065d4c46a270a544e00f18d7
+          name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Online
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
         -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCritical
-        -
-          value: '5'
-          newvalue: critical
-        -
-          value: '6'
-          newvalue: nonRecoverable
-    -
-      name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCritical
-        -
-          value: '5'
-          newvalue: critical
-        -
-          value: '6'
-          newvalue: nonRecoverable
-    -
-      name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
-      mappings:
-        -
-          value: '1'
-          newvalue: Unknown
-        -
-          value: '2'
-          newvalue: HDD
-        -
-          value: '3'
-          newvalue: SSD
-    -
-      name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCriticalUpper
-        -
-          value: '5'
-          newvalue: criticalUpper
-        -
-          value: '6'
-          newvalue: nonRecoverableUpper
-        -
-          value: '7'
-          newvalue: nonCriticalLower
-        -
-          value: '8'
-          newvalue: criticalLower
-        -
-          value: '9'
-          newvalue: nonRecoverableLower
-        -
-          value: '10'
-          newvalue: failed
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: RAID-0
-        -
-          value: '3'
-          newvalue: RAID-1
-        -
-          value: '4'
-          newvalue: RAID-5
-        -
-          value: '5'
-          newvalue: RAID-6
-        -
-          value: '6'
-          newvalue: RAID-10
-        -
-          value: '7'
-          newvalue: RAID-50
-        -
-          value: '8'
-          newvalue: RAID-60
-        -
-          value: '9'
-          newvalue: 'Concatenated RAID 1'
-        -
-          value: '10'
-          newvalue: 'Concatenated RAID 5'
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Not applicable'
-        -
-          value: '2'
-          newvalue: Reconstructing
-        -
-          value: '3'
-          newvalue: Resynching
-        -
-          value: '4'
-          newvalue: Initializing
-        -
-          value: '5'
-          newvalue: 'Background init'
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskState'
-      mappings:
-        -
-          value: '1'
-          newvalue: Unknown
-        -
-          value: '2'
-          newvalue: Online
-        -
-          value: '3'
-          newvalue: Failed
-        -
-          value: '4'
-          newvalue: Degraded
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Write Through'
-        -
-          value: '2'
-          newvalue: 'Write Back'
-        -
-          value: '3'
-          newvalue: 'Force Write Back'
+          uuid: 12019ceefc2e4ab896ea8106efac48b8
+          name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Write Through'
+            -
+              value: '2'
+              newvalue: 'Write Back'
+            -
+              value: '3'
+              newvalue: 'Force Write Back'

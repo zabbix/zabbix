@@ -1,0 +1,63 @@
+---
+test case: Success '/host/key?[filter]'
+in:
+  query: '/host/key?[filter]'
+out:
+  host: 'host'
+  key: 'key'
+  filter: 'filter'
+---
+test case: Success '/*/*'
+in:
+  query: '/*/*'
+out:
+  host: '*'
+  key: '*'
+  filter: ''
+---
+test case: Success '//*?[group="a"]'
+in:
+  query: '//*?[group="a"]'
+out:
+  host: ''
+  key: '*'
+  filter: 'group="a"'
+---
+test case: Success '/host/key[]?[group="a"]'
+in:
+  query: '/host/key[]?[group="a"]'
+out:
+  host: 'host'
+  key: 'key[]'
+  filter: 'group="a"'
+---
+test case: Success '/h o s t/key[?, "[]"]?[group="\"a\""]'
+in:
+  query: '/h o s t/key[?, "[]"]?[group="\"a\""]'
+out:
+  host: 'h o s t'
+  key: 'key[?, "[]"]'
+  filter: 'group="\"a\""'
+---
+test case: Failure '/*/*?'
+in:
+  query: '/*/*?'
+out:
+  key: ''
+---
+test case: Failure '/*/*?['
+in:
+  query: '/*/*?['
+out:
+  key: ''
+---
+test case: Failure '/*/*['
+in:
+  query: '/*/*['
+out:
+  key: ''
+...
+
+
+
+

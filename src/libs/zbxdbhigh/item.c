@@ -29,43 +29,46 @@
  *          database                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff)
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
+		zbx_uint64_t mask)
 {
 	int			i;
 	const zbx_item_diff_t	*diff;
 	char			*value_esc;
+	zbx_uint64_t		flags;
 
 	for (i = 0; i < item_diff->values_num; i++)
 	{
 		char	delim = ' ';
 
 		diff = (const zbx_item_diff_t *)item_diff->values[i];
+		flags = diff->flags & mask;
 
-		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
+		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & flags))
 			continue;
 
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update item_rtdata set");
 
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & diff->flags))
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & flags))
 		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%clastlogsize=" ZBX_FS_UI64, delim,
 					diff->lastlogsize);
 			delim = ',';
 		}
 
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME & diff->flags))
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME & flags))
 		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cmtime=%d", delim, diff->mtime);
 			delim = ',';
 		}
 
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & flags))
 		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cstate=%d", delim, (int)diff->state);
 			delim = ',';
 		}
 
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
 		{
 			value_esc = DBdyn_escape_field("item_rtdata", "error", diff->error);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, value_esc);

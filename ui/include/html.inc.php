@@ -163,7 +163,7 @@ function get_icon($type, $params = []) {
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
 					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 			else {
@@ -175,11 +175,6 @@ function get_icon($type, $params = []) {
 			}
 
 			return $icon;
-
-		case 'screenconf':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_CONF)
-				->setTitle(_('Refresh interval'));
 
 		case 'overviewhelp':
 			return (new CRedirectButton(SPACE, null))
@@ -207,7 +202,6 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		'editable' => true
 	];
 	if ($lld_ruleid == 0) {
-		$options['selectApplications'] = API_OUTPUT_COUNT;
 		$options['selectItems'] = API_OUTPUT_COUNT;
 		$options['selectTriggers'] = API_OUTPUT_COUNT;
 		$options['selectGraphs'] = API_OUTPUT_COUNT;
@@ -225,7 +219,6 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 			'editable' => true
 		];
 		if ($lld_ruleid == 0) {
-			$options['selectApplications'] = API_OUTPUT_COUNT;
 			$options['selectItems'] = API_OUTPUT_COUNT;
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
@@ -328,21 +321,6 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	 * the count of rows
 	 */
 	if ($lld_ruleid == 0) {
-		// applications
-		$applications = new CSpan([
-			new CLink(_('Applications'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'application.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$db_host['hostid']])
-			),
-			CViewHelper::showNum($db_host['applications'])
-		]);
-		if ($current_element == 'applications') {
-			$applications->addClass(ZBX_STYLE_SELECTED);
-		}
-		$content_menu->addItem($applications);
-
 		// items
 		$items = new CSpan([
 			new CLink(_('Items'),
@@ -597,17 +575,20 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Create HTML helper element for host interfaces availability.
  *
- * @param array $host_interfaces                              Array of arrays of host interfaces.
- * @param int   $host_interfaces[]['type']                    Interface type.
- * @param int   $host_interfaces[]['available']               Interface availability.
- * @param int   $host_interfaces[]['useip']                   Interface use IP or DNS.
- * @param int   $host_interfaces[]['ip']                      Interface IP address.
- * @param int   $host_interfaces[]['dns']                     Interface domain name.
- * @param int   $host_interfaces[]['port']                    Interface port.
- * @param int   $host_interfaces[]['details']['version']      Interface SNMP version.
- * @param int   $host_interfaces[]['details']['contextname']  Interface context name for SNMP version 3.
- * @param int   $host_interfaces[]['details']['community']    Interface community for SNMP non version 3 interface.
- * @param int   $host_interfaces[]['error']                   Interface error message.
+ * @param array $host_interfaces                                Array of arrays of host interfaces.
+ * @param int   $host_interfaces[]['type']                      Interface type.
+ * @param int   $host_interfaces[]['available']                 Interface availability.
+ * @param int   $host_interfaces[]['useip']                     Interface use IP or DNS.
+ * @param int   $host_interfaces[]['ip']                        Interface IP address.
+ * @param int   $host_interfaces[]['dns']                       Interface domain name.
+ * @param int   $host_interfaces[]['port']                      Interface port.
+ * @param int   $host_interfaces[]['details']['version']        Interface SNMP version.
+ * @param int   $host_interfaces[]['details']['contextname']    Interface context name for SNMP version 3.
+ * @param int   $host_interfaces[]['details']['community']      Interface community for SNMP non version 3 interface.
+ * @param int   $host_interfaces[]['details']['securitylevel']  Security level for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['details']['authprotocol']   Authentication protocol for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['details']['privprotocol']   Privacy protocol for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['error']                     Interface error message.
  *
  * @return CHostAvailability
  */
@@ -618,11 +599,7 @@ function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 		$description = null;
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$version = $interface['details']['version'];
-			$description = vsprintf('%s, %s: %s', ($version == SNMP_V3)
-				? [_s('SNMPv%1$d', $version), _('Context name'), $interface['details']['contextname']]
-				: [_s('SNMPv%1$d', $version), _x('Community', 'SNMP Community'), $interface['details']['community']]
-			);
+			$description = getSnmpInterfaceDescription($interface);
 		}
 
 		$interfaces[] = [
@@ -682,33 +659,6 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
-	}
-
-	return makeWarningIcon($warning);
-}
-
-/**
- * Returns the discovered application lifetime indicator.
- *
- * @param string $current_time	current Unix timestamp
- * @param array  $ts_delete		deletion timestamp of the application
- *
- * @return CDiv
- */
-function getApplicationLifetimeIndicator($current_time, $ts_delete) {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The application is not discovered anymore and will be deleted the next time discovery rule is processed.'
-		);
-	}
-	else {
-		$warning = _s(
-			'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
@@ -904,10 +854,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'macros.edit')
 		->getUrl();
 
-	$valuemap_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'valuemap.list')
-		->getUrl();
-
 	$trigdisplay_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
@@ -936,7 +882,6 @@ function getAdministrationGeneralSubmenu() {
 				$iconmap_url      => _('Icon mapping'),
 				$regex_url        => _('Regular expressions'),
 				$macros_url       => _('Macros'),
-				$valuemap_url     => _('Value mapping'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
 				$tokens_url       => $can_access_tokens ? _('API tokens') : null,

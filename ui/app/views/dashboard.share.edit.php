@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$form = (new CForm('post'))->setName('dashboard_sharing_form');
+$form = (new CForm('post'))->setName('dashboard_share_form');
 
 $table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
@@ -102,7 +102,7 @@ $output = [
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'dashboard_share.submit(overlay);'
+			'action' => 'window.dashboard_share.submit(overlay);'
 		]
 	]
 ];

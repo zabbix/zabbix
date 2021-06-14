@@ -800,7 +800,7 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$data = getItemFormData($form_item, ['is_discovery_rule' => true]);
+	$data = getItemFormData($form_item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');

@@ -218,6 +218,17 @@ $divTabs->addTab('macroTab', _('Macros'),
 	TAB_INDICATOR_MACROS
 );
 
+// Value mapping.
+$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+	new CPartial('configuration.valuemap', [
+		'source' => 'template',
+		'valuemaps' => $data['valuemaps'],
+		'readonly' => $data['readonly'],
+		'form' => 'template'
+	])),
+	TAB_INDICATOR_VALUEMAPS
+);
+
 // footer
 if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 	$divTabs->setFooter(makeFormFooter(

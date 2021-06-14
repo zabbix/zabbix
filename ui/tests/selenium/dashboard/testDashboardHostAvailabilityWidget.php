@@ -21,8 +21,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  */
 class testDashboardHostAvailabilityWidget extends CWebTest {
 
@@ -31,7 +30,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -275,6 +274,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
 		$form->fill($data['fields']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -713,16 +713,10 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	private function checkRefreshInterval($data, $header) {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($header);
-		$refresh = CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (15 minutes)');
-		$mapping = [
-			'Default (15 minutes)' => 900,
-			'No refresh' => 0,
-			'10 seconds' => 10,
-			'1 minute' => 60,
-			'2 minutes' => 120,
-			'10 minutes' => 600
-		];
-		$this->assertEquals($widget->getRefreshInterval(), $mapping[$refresh]);
+		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (15 minutes)')
+			? '15 minutes'
+			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '15 minutes'));
+		$this->assertEquals($refresh, $widget->getRefreshInterval());
 	}
 
 	/*

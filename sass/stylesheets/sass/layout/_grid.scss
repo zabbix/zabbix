@@ -24,29 +24,6 @@ aside,
 		margin-top: 0;
 	}
 
-	&.layout-kioskmode {
-		main {
-			// Set the same speed as for the sliding headers of the widgets.
-			@if $ui-transitions {
-				transition: margin-top .3s;
-			}
-		}
-
-		&.kiosk-slide-lines-1 {
-			// Set to the height of the sliding headers of the widgets.
-			main {
-				margin-top: 2rem;
-			}
-		}
-
-		&.kiosk-slide-lines-2 {
-			// Set to double of the height of the sliding headers of the widgets.
-			main {
-				margin-top: 4rem;
-			}
-		}
-	}
-
 	& > .debug-output {
 		flex-shrink: 0;
 	}

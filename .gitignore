@@ -63,6 +63,7 @@ etc/zabbix_agent2.conf
 etc/zabbix_agentd.conf
 etc/zabbix_proxy.conf
 etc/zabbix_server.conf
+etc/zabbix_web_service.conf
 frontend.mo
 include/config.h
 include/config.h.in
@@ -91,13 +92,14 @@ sass/stylesheets/themes
 sass/wide-table.html
 sbin/zabbix_agent2
 sbin/zabbix_agentd
+sbin/zabbix_web_service
 sbin/zabbix_java/bin/zabbix-java-gateway-4.4.0alpha1.jar
 sbin/zabbix_java/lib/android-json-4.3_r3.1.jar
-sbin/zabbix_java/lib/logback-classic-0.9.27.jar
+sbin/zabbix_java/lib/logback-classic-1.2.3.jar
 sbin/zabbix_java/lib/logback-console.xml
-sbin/zabbix_java/lib/logback-core-0.9.27.jar
+sbin/zabbix_java/lib/logback-core-1.2.3.jar
 sbin/zabbix_java/lib/logback.xml
-sbin/zabbix_java/lib/slf4j-api-1.6.1.jar
+sbin/zabbix_java/lib/slf4j-api-1.7.30.jar
 sbin/zabbix_java/settings.sh
 sbin/zabbix_java/shutdown.sh
 sbin/zabbix_java/startup.sh
@@ -108,6 +110,8 @@ share/man/man1/zabbix_sender.1
 share/man/man8/zabbix_agentd.8
 share/man/man8/zabbix_proxy.8
 share/man/man8/zabbix_server.8
+share/man/man8/zabbix_agent2.8
+share/man/man8/zabbix_web_service.8
 src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdbhigh/dbschema.c
 src/zabbix_agent/zabbix_agent
@@ -130,9 +134,11 @@ tests/libs/zbxcommon/is_double_suffix
 tests/libs/zbxcommon/parse_key
 tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_dyn_escape_string
+tests/libs/zbxcommon/zbx_get_report_nextcheck
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
+tests/libs/zbxcommon/zbx_json_to_xml
 tests/libs/zbxcommon/zbx_str_extract
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_trim_float
@@ -142,6 +148,7 @@ tests/libs/zbxcommon/zbx_truncate_value
 tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
+tests/libs/zbxcommon/zbx_xml_to_json
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
@@ -149,8 +156,6 @@ tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbcache/dc_check_maintenance_period
-tests/libs/zbxdbcache/dc_expand_user_macros_in_calcitem
-tests/libs/zbxdbcache/dc_expand_user_macros_in_expression
 tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
@@ -161,6 +166,15 @@ tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbcache/dc_function_calculate_nextcheck
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
+tests/libs/zbxeval/zbx_eval_compose_expression
+tests/libs/zbxeval/zbx_eval_execute
+tests/libs/zbxeval/zbx_eval_execute_ext
+tests/libs/zbxeval/zbx_eval_get_constant
+tests/libs/zbxeval/zbx_eval_get_group_filter
+tests/libs/zbxeval/zbx_eval_parse_expression
+tests/libs/zbxeval/zbx_eval_parse_query
+tests/libs/zbxeval/zbx_eval_prepare_filter
+tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
@@ -174,6 +188,7 @@ tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxregexp/wildcard_match
 tests/libs/zbxserver/evaluate_function
 tests/libs/zbxserver/get_trigger_expression_constant
+tests/libs/zbxserver/macro_fmttime
 tests/libs/zbxserver/substitute_lld_macros
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME

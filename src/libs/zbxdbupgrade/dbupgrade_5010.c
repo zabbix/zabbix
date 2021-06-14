@@ -476,10 +476,10 @@ zbx_db_widget_t;
 #define ZBX_WIDGET_FIELD_TYPE_GRAPH		(6)
 #define ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	(7)
 
-#define ZBX_WIDGET_FIELD_RESOURCE_GRAPH				(0)
-#define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH			(1)
-#define ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE		(2)
-#define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE	(3)
+/* #define ZBX_WIDGET_FIELD_RESOURCE_GRAPH				(0) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH			(1) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE		(2) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE	(3) */
 
 #define ZBX_WIDGET_TYPE_CLOCK			("clock")
 #define ZBX_WIDGET_TYPE_GRAPH_CLASSIC		("graph")
@@ -490,10 +490,10 @@ zbx_db_widget_t;
 #define POS_EMPTY	(127)
 #define POS_TAKEN	(1)
 
-ZBX_VECTOR_DECL(scitem_dim, zbx_screen_item_dim_t);
-ZBX_VECTOR_IMPL(scitem_dim, zbx_screen_item_dim_t);
-ZBX_VECTOR_DECL(char, char);
-ZBX_VECTOR_IMPL(char, char);
+ZBX_VECTOR_DECL(scitem_dim, zbx_screen_item_dim_t)
+ZBX_VECTOR_IMPL(scitem_dim, zbx_screen_item_dim_t)
+ZBX_VECTOR_DECL(char, char)
+ZBX_VECTOR_IMPL(char, char)
 
 #define SKIP_EMPTY(vector,index)	if (POS_EMPTY == vector->values[index]) continue
 
@@ -568,7 +568,7 @@ static void DBpatch_normalize_screen_items_pos(zbx_vector_ptr_t *scr_items)
 #define COMPRESS_SCREEN_ITEMS(axis, span, a_size)							\
 													\
 do {													\
-	for (x = DBpatch_array_max_used_index(keep_ ## axis, a_size); x >= 0; x--)			\
+	for (x = (int)DBpatch_array_max_used_index(keep_ ## axis, a_size); x >= 0; x--)			\
 	{												\
 		if (0 != keep_ ## axis[x] && 0 != used_ ## axis[x])					\
 			continue;									\
@@ -639,7 +639,7 @@ static char	*lw_array_to_str(zbx_vector_char_t *v)
 	int		i, max = MAX_STRING_LEN, len;
 
 	ptr = str;
-	len = zbx_snprintf(ptr, max, "[ ");
+	len = (int)zbx_snprintf(ptr, (size_t)max, "[ ");
 	ptr += len;
 	max -= len;
 
@@ -647,7 +647,7 @@ static char	*lw_array_to_str(zbx_vector_char_t *v)
 	{
 		if (POS_EMPTY != v->values[i])
 		{
-			len = zbx_snprintf(ptr, max, "%d:%d ", i, (int)v->values[i]);
+			len = (int)zbx_snprintf(ptr, (size_t)max, "%d:%d ", i, (int)v->values[i]);
 			ptr += len;
 			max -= len;
 		}
@@ -671,7 +671,7 @@ static void	int_array_debug(char *pfx, int *a, int alen, int emptyval)
 	int		i, max = MAX_STRING_LEN, len;
 
 	ptr = str;
-	len = zbx_snprintf(ptr, max, "[ ");
+	len = (int)zbx_snprintf(ptr, (size_t)max, "[ ");
 	ptr += len;
 	max -= len;
 
@@ -679,7 +679,7 @@ static void	int_array_debug(char *pfx, int *a, int alen, int emptyval)
 	{
 		if (emptyval != a[i])
 		{
-			len = zbx_snprintf(ptr, max, "%d:%d ", i, a[i]);
+			len = (int)zbx_snprintf(ptr, (size_t)max, "%d:%d ", i, a[i]);
 			ptr += len;
 			max -= len;
 		}
@@ -723,7 +723,7 @@ static zbx_vector_char_t	*lw_array_create_fill(int start, size_t num)
 
 	v = lw_array_create();
 
-	for (i = start; i < start + num && i < (size_t)v->values_num; i++)
+	for (i = (size_t)start; i < (size_t)start + num && i < (size_t)v->values_num; i++)
 		v->values[i] = POS_TAKEN;
 
 	return v;
@@ -834,7 +834,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 	for (i = 0; i < scitems->values_num; i++)
 	{
 		block = (sciitem_block_t *)malloc(sizeof(sciitem_block_t));
-		block->r_block = lw_array_create_fill(scitems->values[i].position, scitems->values[i].span);
+		block->r_block = lw_array_create_fill(scitems->values[i].position, (size_t)scitems->values[i].span);
 		block->index = i;
 		zbx_vector_ptr_append(&blocks, (void *)block);
 	}
@@ -863,7 +863,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 			for (n = 0; n < block_unsized->values_num; n++)
 			{
 				SKIP_EMPTY(block_unsized, n);
-				dimensions->values[n] = MAX(1, size_overflow / block_unsized_count);
+				dimensions->values[n] = (char)MAX(1, size_overflow / block_unsized_count);
 				size_overflow -= dimensions->values[n];
 				block_unsized_count--;
 			}
@@ -880,7 +880,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 				new_dimension = (int)round(factor * dimensions->values[n]);
 				block_dimensions_sum -= dimensions->values[n];
 				size_overflow -= new_dimension - dimensions->values[n];
-				dimensions->values[n] = new_dimension;
+				dimensions->values[n] = (char)new_dimension;
 			}
 		}
 
@@ -928,8 +928,11 @@ static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "dim_sum:%d pot_idx/val:%d/%.2lf", dimensions_sum,
-				potential_index, potential_value);
+		if (0 <= potential_index)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "dim_sum:%d pot_idx/val:%d/%.2lf", dimensions_sum,
+					potential_index, potential_value);
+		}
 
 		if (dimensions_sum > target && d->values[potential_index] == d_min->values[potential_index])
 			break;
@@ -1223,26 +1226,16 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
-		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1], *url_esc;
+		char			*url_esc;
 		zbx_db_widget_field_t	*f;
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
 		url_esc = DBdyn_escape_string(f->value_str);
 
-		if (0 != f->value_itemid)
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_itemid);
-		else
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_graphid)
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_graphid);
-		else
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, "null");
-
 		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,"
-				"'%s',%d,'%s',%s,%s)", new_fieldid++, widget->widgetid,
-				f->type, f->name, f->value_int, url_esc, s1, s2))
+				"'%s',%d,'%s',%s,%s)", new_fieldid++, widget->widgetid, f->type, f->name, f->value_int,
+				url_esc, DBsql_id_ins(f->value_itemid), DBsql_id_ins(f->value_graphid)))
 		{
 			ret = FAIL;
 		}
@@ -1306,6 +1299,20 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		scr_item->style = atoi(row[11]);
 		scr_item->url = zbx_strdup(NULL, row[12]);
 		scr_item->max_columns = atoi(row[13]);
+
+		if (0 == scr_item->colspan)
+		{
+			scr_item->colspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: colspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (0 == scr_item->rowspan)
+		{
+			scr_item->rowspan = 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
 
 		DBpatch_trace_screen_item(scr_item);
 
@@ -1472,10 +1479,10 @@ static int	DBpatch_5010044(void)
 #undef ZBX_WIDGET_FIELD_TYPE_GRAPH
 #undef ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
 
-#undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH
-#undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-#undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE
-#undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE */
 
 #undef ZBX_WIDGET_TYPE_CLOCK
 #undef ZBX_WIDGET_TYPE_GRAPH_CLASSIC

@@ -32,6 +32,8 @@
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
 #include "comms.h"
+#include "../../libs/zbxserver/get_host_from_event.h"
+#include "../../libs/zbxserver/zabbix_users.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -88,39 +90,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const DB_ACKNOWLEDGE *ack, int err_type, const char *tz);
 
-/******************************************************************************
- *                                                                            *
- * Function: check_perm2system                                                *
- *                                                                            *
- * Purpose: Check user permissions to access system                           *
- *                                                                            *
- * Parameters: userid - user ID                                               *
- *                                                                            *
- * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
- *                                                                            *
- ******************************************************************************/
-static int	check_perm2system(zbx_uint64_t userid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = SUCCEED;
-
-	result = DBselect(
-			"select count(*)"
-			" from usrgrp g,users_groups ug"
-			" where ug.userid=" ZBX_FS_UI64
-				" and g.usrgrpid=ug.usrgrpid"
-				" and g.users_status=%d",
-			userid, GROUP_STATUS_DISABLED);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
-		res = FAIL;
-
-	DBfree_result(result);
-
-	return res;
-}
-
 static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 {
 	int		user_type = -1;
@@ -141,24 +110,6 @@ static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 	DBfree_result(result);
 
 	return user_type;
-}
-
-static char	*get_user_timezone(zbx_uint64_t userid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*user_timezone;
-
-	result = DBselect("select timezone from users where userid=" ZBX_FS_UI64, userid);
-
-	if (NULL != (row = DBfetch(result)))
-		user_timezone = zbx_strdup(NULL, row[0]);
-	else
-		user_timezone = NULL;
-
-	DBfree_result(result);
-
-	return user_timezone;
 }
 
 /******************************************************************************
@@ -410,8 +361,7 @@ out:
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_type, const char *cancel_error, int err_type,
-		const char *tz)
+		const DB_ACKNOWLEDGE *ack, int expand_macros, int macro_type, int err_type, const char *tz)
 {
 	ZBX_USER_MSG	*p, **pnext;
 	char		*subject, *message, *tz_tmp;
@@ -419,14 +369,16 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	subject = zbx_strdup(NULL, subj);
-	message = (NULL == cancel_error ? zbx_strdup(NULL, msg) :
-			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", cancel_error, msg));
+	message = zbx_strdup(NULL, msg);
 	tz_tmp = zbx_strdup(NULL, tz);
 
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, tz, &subject,
-			macro_type, NULL, 0);
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, tz, &message,
-			macro_type, NULL, 0);
+	if (MACRO_EXPAND_YES == expand_macros)
+	{
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, tz, &subject,
+				macro_type, NULL, 0);
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, tz, &message,
+				macro_type, NULL, 0);
+	}
 
 	if (0 == mediatypeid)
 	{
@@ -483,8 +435,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src, unsigned char op_mode,
-		const char *cancel_err, const char *default_timezone, const char *user_timezone)
+		const DB_ACKNOWLEDGE *ack, int macro_type, unsigned char evt_src, unsigned char op_mode,
+		const char *default_timezone, const char *user_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -493,33 +445,33 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
+	if (NULL == user_timezone || 0 == strcmp(user_timezone, ZBX_TIMEZONE_DEFAULT_VALUE))
+		tz = default_timezone;
+	else
+		tz = user_timezone;
 
-	if (0 != operationid)
+	result = DBselect(
+			"select mediatypeid,default_msg,subject,message from opmessage where operationid=" ZBX_FS_UI64,
+			operationid);
+
+	if (NULL != (row = DBfetch(result)))
 	{
-		result = DBselect(
-				"select mediatypeid,default_msg,subject,message"
-				" from opmessage where operationid=" ZBX_FS_UI64, operationid);
-
-		if (NULL != (row = DBfetch(result)))
+		if (0 == mediatypeid)
 		{
-			if (0 == mediatypeid)
-			{
-				ZBX_DBROW2UINT64(mediatypeid, row[0]);
-			}
-
-			if (atoi(row[1]) != 1)
-			{
-				add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event,
-						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
-				goto out;
-			}
-
-			DBfree_result(result);
+			ZBX_DBROW2UINT64(mediatypeid, row[0]);
 		}
-		else
+
+		if (1 != atoi(row[1]))
+		{
+			add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event, ack,
+					MACRO_EXPAND_YES, macro_type, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
 			goto out;
+		}
+
+		DBfree_result(result);
 	}
+	else
+		goto out;
 
 	mtid = mediatypeid;
 
@@ -553,18 +505,18 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		if (0 != mtmid)
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
-					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
+					MACRO_EXPAND_YES, macro_type, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
 		}
 		else
 		{
-			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
-					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG, tz);
+			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack,
+					MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_MSG, tz);
 		}
 	}
 
 	if (0 == mediatypeid)
 	{
-		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t, cancel_err,
+		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, MACRO_EXPAND_NO, 0,
 				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, tz);
 	}
 
@@ -624,7 +576,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 		}
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, macro_type, evt_src,
-				op_mode, NULL, default_timezone, user_timezone);
+				op_mode, default_timezone, user_timezone);
 clean:
 		zbx_free(user_timezone);
 	}
@@ -649,12 +601,11 @@ clean:
  *             ack         - [IN] the acknowledge (optional, can be NULL)     *
  *             evt_src     - [IN] the action event source                     *
  *             op_mode     - [IN] the operation mode                          *
- *             cancel_err  - [IN] the error message (optional, can be NULL)   *
  *                                                                            *
  ******************************************************************************/
 static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zbx_uint64_t operationid,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, unsigned char evt_src,
-		unsigned char op_mode, const char *cancel_err, const char *default_timezone)
+		unsigned char op_mode, const char *default_timezone)
 {
 	char		*sql = NULL;
 	DB_RESULT	result;
@@ -721,7 +672,101 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		}
 
 		add_user_msgs(userid, operationid, mediatypeid, user_msg, actionid, event, r_event, ack, message_type,
-				evt_src, op_mode, cancel_err, default_timezone, user_timezone);
+				evt_src, op_mode, default_timezone, user_timezone);
+clean:
+		zbx_free(user_timezone);
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_sentusers_msg_esc_cancel                                     *
+ *                                                                            *
+ * Purpose: adds message for the canceled escalation to be sent to all        *
+ *          recipients of messages previously generated by action operations  *
+ *          or acknowledgement operations, which is related with an event or  *
+ *          recovery event                                                    *
+ *                                                                            *
+ * Parameters: user_msg         - [IN/OUT] the message list                   *
+ *             actionid         - [IN] the action identifier                  *
+ *             event            - [IN] the event                              *
+ *             error            - [IN] the error message                      *
+ *             default_timezone - [IN] the default timezone                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event,
+		const char *error, const char *default_timezone)
+{
+	char		*message_dyn, *sql = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	userid, mediatypeid, userid_prev = 0, mediatypeid_prev = 0;
+	int		esc_step, esc_step_prev = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct userid,mediatypeid,subject,message,esc_step"
+			" from alerts"
+			" where actionid=" ZBX_FS_UI64
+				" and mediatypeid is not null"
+				" and alerttype=%d"
+				" and acknowledgeid is null"
+				" and eventid=" ZBX_FS_UI64
+				" order by userid,mediatypeid,esc_step desc",
+				actionid, ALERT_TYPE_MESSAGE, event->eventid);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char		*user_timezone = NULL;
+		const char	*tz;
+
+		ZBX_DBROW2UINT64(userid, row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[1]);
+		esc_step = atoi(row[4]);
+
+		if (userid == userid_prev && mediatypeid == mediatypeid_prev && esc_step < esc_step_prev)
+			continue;
+
+		userid_prev = userid;
+		mediatypeid_prev = mediatypeid;
+		esc_step_prev = esc_step;
+
+		if (SUCCEED != check_perm2system(userid))
+			continue;
+
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+					goto clean;
+				break;
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+					goto clean;
+				break;
+			default:
+				user_timezone = get_user_timezone(userid);
+		}
+
+		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\nLast message sent:\n%s", error,
+				row[3]);
+
+		tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
+
+		add_user_msg(userid, mediatypeid, user_msg, row[2], message_dyn, actionid, event, NULL, NULL,
+				MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
+
+		zbx_free(message_dyn);
 clean:
 		zbx_free(user_timezone);
 	}
@@ -780,7 +825,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 			goto clean;
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, MACRO_TYPE_MESSAGE_ACK,
-				evt_src, ZBX_OPERATION_MODE_ACK, NULL, default_timezone, user_timezone);
+				evt_src, ZBX_OPERATION_MODE_ACK, default_timezone, user_timezone);
 clean:
 		zbx_free(user_timezone);
 	}
@@ -809,31 +854,12 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 	}
 }
 
-static int	get_scriptname_by_scriptid(zbx_uint64_t scriptid, char **script_name)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	result = DBselect("select name from scripts where scriptid=" ZBX_FS_UI64, scriptid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*script_name = zbx_strdup(NULL, row[0]);
-		DBfree_result(result);
-		return SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	return FAIL;
-}
-
-static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const DC_HOST *host,
+static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const char *host,
 		const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		const zbx_script_t *script, zbx_alert_status_t status, const char *error)
+		const char *message, zbx_alert_status_t status, const char *error)
 {
 	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL, *message;
+	char	*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -846,25 +872,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	now = (int)time(NULL);
 
-	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
-			|| ZBX_SCRIPT_TYPE_TELNET == script->type || ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
-	{
-		message = script->command_orig;
-	}
-	else
-	{
-		if (FAIL == get_scriptname_by_scriptid(script->scriptid, &message))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to find scriptname using script id " ZBX_FS_UI64,
-					script->scriptid);
-			message = NULL;
-		}
-	}
-
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
-
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
-		zbx_free(message);
+	tmp = zbx_dsprintf(tmp, "%s:%s", host, message);
 
 	if (NULL == r_event)
 	{
@@ -880,140 +888,6 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	zbx_free(tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-#ifdef HAVE_OPENIPMI
-#	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in functions */
-						/* get_dynamic_hostid() and execute_commands() */
-#else
-#	define ZBX_IPMI_FIELDS_NUM	0
-#endif
-
-static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[512];	/* do not forget to adjust size if SQLs change */
-	size_t		offset;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxy_hostid,h.host,h.tls_connect");
-#ifdef HAVE_OPENIPMI
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
-			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
-#endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk");
-#endif
-	switch (event->source)
-	{
-		case EVENT_SOURCE_TRIGGERS:
-			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from functions f,items i,hosts h"
-					" where f.itemid=i.itemid"
-						" and i.hostid=h.hostid"
-						" and h.status=%d"
-						" and f.triggerid=" ZBX_FS_UI64,
-					HOST_STATUS_MONITORED, event->objectid);
-
-			break;
-		case EVENT_SOURCE_DISCOVERY:
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from hosts h,interface i,dservices ds"
-					" where h.hostid=i.hostid"
-						" and i.ip=ds.ip"
-						" and i.useip=1"
-						" and h.status=%d",
-						HOST_STATUS_MONITORED);
-
-			switch (event->object)
-			{
-				case EVENT_OBJECT_DHOST:
-					zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" and ds.dhostid=" ZBX_FS_UI64, event->objectid);
-					break;
-				case EVENT_OBJECT_DSERVICE:
-					zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" and ds.dserviceid=" ZBX_FS_UI64, event->objectid);
-					break;
-			}
-			break;
-		case EVENT_SOURCE_AUTOREGISTRATION:
-			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from autoreg_host a,hosts h"
-					" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
-						" and a.host=h.host"
-						" and h.status=%d"
-						" and h.flags<>%d"
-						" and a.autoreg_hostid=" ZBX_FS_UI64,
-					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
-			break;
-		default:
-			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
-			return FAIL;
-	}
-
-	host->hostid = 0;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 != host->hostid)
-		{
-			switch (event->source)
-			{
-				case EVENT_SOURCE_TRIGGERS:
-					zbx_strlcpy(error, "Too many hosts in a trigger expression", max_error_len);
-					break;
-				case EVENT_SOURCE_DISCOVERY:
-					zbx_strlcpy(error, "Too many hosts with same IP addresses", max_error_len);
-					break;
-			}
-			ret = FAIL;
-			break;
-		}
-
-		ZBX_STR2UINT64(host->hostid, row[0]);
-		ZBX_DBROW2UINT64(host->proxy_hostid, row[1]);
-		strscpy(host->host, row[2]);
-		ZBX_STR2UCHAR(host->tls_connect, row[3]);
-
-#ifdef HAVE_OPENIPMI
-		host->ipmi_authtype = (signed char)atoi(row[4]);
-		host->ipmi_privilege = (unsigned char)atoi(row[5]);
-		strscpy(host->ipmi_username, row[6]);
-		strscpy(host->ipmi_password, row[7]);
-#endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
-#endif
-	}
-	DBfree_result(result);
-
-	if (FAIL == ret)
-	{
-		host->hostid = 0;
-		*host->host = '\0';
-	}
-	else if (0 == host->hostid)
-	{
-		*host->host = '\0';
-
-		zbx_strlcpy(error, "Cannot find a corresponding host", max_error_len);
-		ret = FAIL;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1045,6 +919,13 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 	zbx_vector_uint64_destroy(&parent_groupids);
 }
 
+#ifdef HAVE_OPENIPMI
+#	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */
+						/* execute_commands() */
+#else
+#	define ZBX_IPMI_FIELDS_NUM	0
+#endif
+
 static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
 		zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step, int macro_type,
 		const char *default_timezone)
@@ -1070,8 +951,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 	{
 		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				/* the 1st 'select' works if remote command target is "Host group" */
-				"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-					",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+				"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+					",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+					",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -1082,8 +964,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" from opcommand o,hosts_groups hg,hosts h"
+				" from opcommand o,hosts_groups hg,hosts h,scripts s"
 				" where o.operationid=" ZBX_FS_UI64
+					" and o.scriptid=s.scriptid"
 					" and hg.hostid=h.hostid"
 					" and h.status=%d"
 					" and",
@@ -1099,8 +982,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
-			"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+			"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+				",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
@@ -1109,15 +993,17 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 #endif
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,hosts h"
+			" from opcommand o,opcommand_hst oh,hosts h,scripts s"
 			" where o.operationid=oh.operationid"
+				" and o.scriptid=s.scriptid"
 				" and oh.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
 			/* the 3rd 'select' works if remote command target is "Current host" */
-			"select distinct 0,0,null,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,%d",
+			"select distinct 0,0,null,s.type,s.scriptid,s.execute_on,s.port"
+				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+				",s.scope,s.timeout,s.name,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
 #ifdef HAVE_OPENIPMI
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -1128,8 +1014,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				",null,null,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh"
+			" from opcommand o,opcommand_hst oh,scripts s"
 			" where o.operationid=oh.operationid"
+				" and o.scriptid=s.scriptid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
 			operationid);
@@ -1141,38 +1028,84 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int			rc = SUCCEED;
-		char			error[ALERT_ERROR_LEN_MAX];
+		int			rc = SUCCEED, scope, i;
 		DC_HOST			host;
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
-		zbx_uint64_t		alertid;
+		zbx_uint64_t		alertid, groupid;
+		char			*webhook_params_json = NULL, *script_name = NULL;
+		zbx_vector_ptr_pair_t	webhook_params;
+		char			error[ALERT_ERROR_LEN_MAX];
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
+		zbx_vector_ptr_pair_create(&webhook_params);
 
-		script.type = (unsigned char)atoi(row[3]);
+		/* fill 'script' elements */
 
-		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
-		{
-			script.command = zbx_strdup(script.command, row[12]);
-			script.command_orig = zbx_strdup(script.command_orig, row[12]);
-			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command, macro_type, NULL, 0);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, NULL, 0);
-		}
+		ZBX_STR2UCHAR(script.type, row[3]);
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
-			script.execute_on = (unsigned char)atoi(row[5]);
+			ZBX_STR2UCHAR(script.execute_on, row[5]);
+
+		if (ZBX_SCRIPT_TYPE_SSH == script.type)
+		{
+			ZBX_STR2UCHAR(script.authtype, row[7]);
+			script.publickey = zbx_strdup(script.publickey, row[10]);
+			script.privatekey = zbx_strdup(script.privatekey, row[11]);
+		}
+
+		if (ZBX_SCRIPT_TYPE_SSH == script.type || ZBX_SCRIPT_TYPE_TELNET == script.type)
+		{
+			script.port = zbx_strdup(script.port, row[6]);
+			script.username = zbx_strdup(script.username, row[8]);
+			script.password = zbx_strdup(script.password, row[9]);
+		}
+
+		script.command = zbx_strdup(script.command, row[12]);
+		script.command_orig = zbx_strdup(script.command_orig, row[12]);
+
+		ZBX_DBROW2UINT64(script.scriptid, row[4]);
+
+		if (SUCCEED != is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			zbx_strlcpy(error, "Invalid timeout value in script configuration.", sizeof(error));
+			rc = FAIL;
+			goto fail;
+		}
+
+		script_name = row[16];
+
+		/* validate script permissions */
+
+		scope = atoi(row[14]);
+		ZBX_DBROW2UINT64(groupid, row[13]);
 
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		ZBX_DBROW2UINT64(host.proxy_hostid, row[1]);
 
+		if (ZBX_SCRIPT_SCOPE_ACTION != scope)
+		{
+			zbx_snprintf(error, sizeof(error), "Script is not allowed in action operations: scope:%d",
+					scope);
+			rc = FAIL;
+			goto fail;
+		}
+
+		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
+		{
+			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+					sizeof(error));
+			rc = FAIL;
+			goto fail;
+		}
+
+		/* get host details */
+
 		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
-			if (0 != host.hostid)
+			if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -1182,22 +1115,22 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[2]);
-				host.tls_connect = (unsigned char)atoi(row[13]);
+				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[14]);
-				host.ipmi_privilege = (unsigned char)atoi(row[15]);
-				strscpy(host.ipmi_username, row[16]);
-				strscpy(host.ipmi_password, row[17]);
+				host.ipmi_authtype = (signed char)atoi(row[18]);
+				host.ipmi_privilege = (unsigned char)atoi(row[19]);
+				strscpy(host.ipmi_username, row[20]);
+				strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[14 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[15 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[16 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[17 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
-			else if (SUCCEED == (rc = get_dynamic_hostid((NULL != r_event ? r_event : event), &host, error,
-						sizeof(error))))
+			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+					sizeof(error))))	/* target is "Current host" */
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -1211,34 +1144,64 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		else
 			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
+		/* substitute macros in script body and webhook parameters */
+
+		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+		{
+			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
+					NULL, NULL, ack, default_timezone, &script.command, macro_type, error,
+					sizeof(error)))
+			{
+				rc = FAIL;
+				goto fail;
+			}
+
+			/* expand macros in command_orig used for non-secure logging */
+			if (SUCCEED != substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host,
+					NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, error,
+					sizeof(error)))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
+				rc = FAIL;
+				goto fail;
+			}
+		}
+		else
+		{
+			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			{
+				rc = FAIL;
+				goto fail;
+			}
+
+			for (i = 0; i < webhook_params.values_num; i++)
+			{
+				if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
+						&host, NULL, NULL, ack, default_timezone,
+						(char **)&webhook_params.values[i].second, macro_type, error,
+						sizeof(error)))
+				{
+					rc = FAIL;
+					goto fail;
+				}
+			}
+
+			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
+		}
+fail:
 		alertid = DBget_maxid("alerts");
 
 		if (SUCCEED == rc)
 		{
-			switch (script.type)
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 			{
-				case ZBX_SCRIPT_TYPE_SSH:
-					script.authtype = (unsigned char)atoi(row[7]);
-					script.publickey = zbx_strdup(script.publickey, row[10]);
-					script.privatekey = zbx_strdup(script.privatekey, row[11]);
-					ZBX_FALLTHROUGH;
-				case ZBX_SCRIPT_TYPE_TELNET:
-					script.port = zbx_strdup(script.port, row[6]);
-					script.username = zbx_strdup(script.username, row[8]);
-					script.password = zbx_strdup(script.password, row[9]);
-					break;
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					ZBX_DBROW2UINT64(script.scriptid, row[4]);
-					break;
-			}
-
-			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
-					event->eventid, error, sizeof(error), (DB_EVENT**)&event)))
-			{
-				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
-					rc = zbx_script_execute(&script, &host, NULL, event, ZBX_SCRIPT_CTX_ACTION,
-							NULL, error, sizeof(error), NULL);
+					rc = zbx_script_execute(&script, &host, webhook_params_json, NULL, error,
+							sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -1252,9 +1215,19 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (FAIL == rc)
 			status = ALERT_STATUS_FAILED;
 
-		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				&script, status, error);
+		add_command_alert(&db_insert, alerts_num++, alertid, host.host, event, r_event, actionid, esc_step,
+				(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ? script_name : script.command_orig,
+				status, error);
 skip:
+		zbx_free(webhook_params_json);
+
+		for (i = 0; i < webhook_params.values_num; i++)
+		{
+			zbx_free(webhook_params.values[i].first);
+			zbx_free(webhook_params.values[i].second);
+		}
+
+		zbx_vector_ptr_pair_destroy(&webhook_params);
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
@@ -1729,7 +1702,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 				break;
 			case OPERATION_TYPE_RECOVERY_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, NULL,
-						action->eventsource, ZBX_OPERATION_MODE_RECOVERY, NULL, default_timezone);
+						action->eventsource, ZBX_OPERATION_MODE_RECOVERY, default_timezone);
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, action->actionid, operationid, 1,
@@ -1794,7 +1767,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 				break;
 			case OPERATION_TYPE_ACK_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
-						action->eventsource, ZBX_OPERATION_MODE_ACK, NULL, default_timezone);
+						action->eventsource, ZBX_OPERATION_MODE_ACK, default_timezone);
 				add_sentusers_ack_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
 						action->eventsource, default_timezone);
 				break;
@@ -1863,7 +1836,12 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_create(&functionids);
 	zbx_vector_uint64_create(&itemids);
 
-	get_functionids(&functionids, trigger.expression_orig);
+	zbx_get_serialized_expression_functionids(trigger.expression, trigger.expression_bin, &functionids);
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger.recovery_mode)
+	{
+		zbx_get_serialized_expression_functionids(trigger.recovery_expression, trigger.recovery_expression_bin,
+				&functionids);
+	}
 
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
@@ -1948,6 +1926,29 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
+static	int	postpone_escalation(const DB_ESCALATION *escalation)
+{
+	int		ret;
+	char		*sql;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
+			" and status in (0,3)", escalation->eventid, escalation->actionid);
+
+	result = DBselectN(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != (row = DBfetch(result)))
+		ret = ZBX_ESCALATION_SKIP;
+	else
+		ret = ZBX_ESCALATION_PROCESS;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_escalation                                                 *
@@ -1988,11 +1989,23 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
+
+		if (0 != escalation->r_eventid)
+		{
+			ret = postpone_escalation(escalation);
+			goto out;
+		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
+			if (0 != escalation->r_eventid)
+			{
+				ret = postpone_escalation(escalation);
+				goto out;
+			}
+
 			/* item disabled or deleted? */
 			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
 
@@ -2100,12 +2113,12 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	/* the cancellation notification can be sent if no objects are deleted */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
 	{
-		add_sentusers_msg(&user_msg, action->actionid, 0, event, NULL, NULL, action->eventsource,
-				ZBX_OPERATION_MODE_NORMAL, ZBX_NULL2EMPTY_STR(error), default_timezone);
+		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
+				default_timezone);
 		flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL);
 	}
 
-	escalation_log_cancel_warning(escalation, error);
+	escalation_log_cancel_warning(escalation, ZBX_NULL2EMPTY_STR(error));
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2457,8 +2470,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		{
 			if (0 == escalation->esc_step)
 				escalation_execute(escalation, action, event, default_timezone);
-
-			escalation_recover(escalation, action, event, r_event, default_timezone);
+			else
+				escalation_recover(escalation, action, event, r_event, default_timezone);
 		}
 		else if (escalation->nextcheck <= now)
 		{

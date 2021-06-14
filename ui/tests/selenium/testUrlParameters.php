@@ -276,98 +276,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of screens',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'screenedit.php?screenid=1',
-						'text_present' => 'Screens: Zabbix server'
-					],
-					[
-						'url' => 'screenedit.php?screenid=9999999',
-						'text_not_present' => 'Screens: Zabbix server',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'screenedit.php?screenid=abc',
-						'text_not_present' => 'Screens: Zabbix server',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "screenid" is not integer.'
-						]
-					],
-					[
-						'url' => 'screenedit.php?screenid=',
-						'text_not_present' => 'Screens: Zabbix server',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "screenid" is not integer.'
-						]
-					],
-					[
-						'url' => 'screenedit.php?screenid=-1',
-						'text_not_present' => 'Screens: Zabbix server',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "screenid" field.'
-						]
-					],
-					[
-						'url' => 'screenedit.php',
-						'text_not_present' => 'Screens: Zabbix server',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "screenid" is mandatory.'
-						]
-					]
-				]
-			],
-			[
-				'title' => 'Configuration of slide shows',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'slideconf.php',
-						'text_present' => 'Slide shows'
-					],
-					[
-						'url' => 'slideconf.php?form=update&slideshowid=9999999',
-						'text_not_present' => 'Slide shows',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'slideconf.php?form=update&slideshowid=abc',
-						'text_not_present' => 'Slide shows',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "slideshowid" is not integer.'
-						]
-					],
-					[
-						'url' => 'slideconf.php?form=update&slideshowid=',
-						'text_not_present' => 'Slide shows',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "slideshowid" is not integer.'
-						]
-					],
-					[
-						'url' => 'slideconf.php?form=update',
-						'text_not_present' => 'Slide shows',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "slideshowid" is mandatory.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Configuration of network maps',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
@@ -748,59 +656,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Custom screens [refreshed every 30 sec.]',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'screens.php?elementid=16',
-						'text_present' => 'Screens'
-					],
-					[
-						'url' => 'screens.php?elementid=9999999',
-						'text_not_present' => 'Screens',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'screens.php?elementid=abc',
-						'text_not_present' => 'Screens',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "elementid" is not integer.'
-						]
-					],
-					[
-						'url' => 'screens.php?elementid=',
-						'text_not_present' => 'Screens',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "elementid" is not integer.'
-						]
-					],
-					[
-						'url' => 'screens.php?elementid=-1',
-						'text_not_present' => 'Screens',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "elementid" field.'
-						]
-					]
-				]
-			],
-			[
-				'title' => 'Configuration of screens',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'screens.php',
-						'text_present' => 'Screens'
-					]
-				]
-			],
-			[
 				'title' => 'Configuration of network maps',
 				'check_serer_name' => true,
 				'server_name_on_page' => true,
@@ -1091,7 +946,7 @@ class testUrlParameters extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider data
-	 * @ignore-browser-errors
+	 * @ignoreBrowserErrors
 	 */
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {

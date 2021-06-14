@@ -19,12 +19,18 @@
 **/
 
 
-class CRangeParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CRangeParserTest extends TestCase {
 
 	/**
 	 * An array of time periods and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
+		$negative = ['with_minus' => true];
+		$float = ['with_float' => true];
+		$suffix= ['with_suffix' => true];
+
 		return [
 			// success
 			[
@@ -309,6 +315,102 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {{#M}.regsub("^([0-9]+)", "{#M}: \1")}  -  {$M}  ',
 					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
+				]
+			],
+			[
+				'-20--10', 0, $negative,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-20--10',
+					'range' => ['-20', '-10']
+				]
+			],
+			[
+				' -20 - -10 ', 0, $negative,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => ' -20 - -10 ',
+					'range' => ['-20', '-10']
+				]
+			],
+			[
+				'20.0-30.0000', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '20.0-30.0000',
+					'range' => ['20.0', '30.0000']
+				]
+			],
+			[
+				' 20.0 - 30.0000 ', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => ' 20.0 - 30.0000 ',
+					'range' => ['20.0', '30.0000']
+				]
+			],
+			[
+				'-20.0--10.0', 0, $float + $negative,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-20.0--10.0',
+					'range' => ['-20.0', '-10.0']
+				]
+			],
+			[
+				'-2.0K--1.0K', 0, $float + $negative + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-2.0K--1.0K',
+					'range' => [strval(ZBX_KIBIBYTE * -2), strval(ZBX_KIBIBYTE * -1)]
+				]
+			],
+			[
+				'1h-1.5h', 0, $float + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '1h-1.5h',
+					'range' => [strval(SEC_PER_HOUR), strval(SEC_PER_HOUR * 1.5)]
+				]
+			],
+			[
+				'.5K-1K', 0, $float + $suffix,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '.5K-1K',
+					'range' => [strval(ZBX_KIBIBYTE * 0.5), strval(ZBX_KIBIBYTE * 1)]
+				]
+			],
+			[
+				'.2-10', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '.2-10',
+					'range' => ['.2', '10']
+				]
+			],
+			[
+				'0.2-10', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '0.2-10',
+					'range' => ['0.2', '10']
+				]
+			],
+			[
+				'{$M}-10', 0, ['usermacros' => true] + $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M}-10',
+					'range' => ['{$M}', '10']
+				]
+			],
+			[
+				'{#M}-10.0', 0, ['lldmacros' => true] + $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#M}-10.0',
+					'range' => ['{#M}', '10.0']
 				]
 			],
 			// partial success
@@ -601,6 +703,54 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 					'range' => ['100']
 				]
 			],
+			[
+				'20-30.001', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '20-30',
+					'range' => ['20', '30']
+				]
+			],
+			[
+				'20--30.001', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '20',
+					'range' => ['20']
+				]
+			],
+			[
+				'10.00-.2', 0, $float,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '10.00',
+					'range' => ['10.00']
+				]
+			],
+			[
+				'10.00-', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '10',
+					'range' => ['10']
+				]
+			],
+			[
+				'{$M}-10.0', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$M}-10',
+					'range' => ['{$M}', '10']
+				]
+			],
+			[
+				'{#M}-10K', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#M}-10',
+					'range' => ['{#M}', '10']
+				]
+			],
 			// fail
 			[
 				'', 0, [],
@@ -747,12 +897,28 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '',
 					'range' => []
 				]
+			],
+			[
+				'-10.2--20.3', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'range' => []
+				]
+			],
+			[
+				'.2', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'range' => []
+				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

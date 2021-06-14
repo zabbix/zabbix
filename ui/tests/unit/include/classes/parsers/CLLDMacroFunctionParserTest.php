@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,13 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CLLDMacroFunctionParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new CLLDMacroFunctionParser();
 	}
 
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			[
 				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
@@ -83,6 +85,12 @@ class CLLDMacroFunctionParserTest extends CParserTest {
 			],
 			[
 				'{#M}.regsub("^([0-9]+)", "{#M}: \1")',
+				0,
+				CParser::PARSE_FAIL,
+				''
+			],
+			[
+				'{{#M}.somefunc(/host/key["a", "b"])}',
 				0,
 				CParser::PARSE_FAIL,
 				''

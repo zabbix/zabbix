@@ -354,6 +354,7 @@ class CGraph extends CGraphGeneral {
 
 		foreach ($chdHosts as $chdHost) {
 			$tmpGraph = $graph;
+			$tmpGraph['uuid'] = '';
 			$tmpGraph['templateid'] = $graph['graphid'];
 
 			$tmpGraph['gitems'] = getSameGraphItemsForHost($tmpGraph['gitems'], $chdHost['hostid']);
@@ -384,7 +385,8 @@ class CGraph extends CGraphGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'hostids' => $chdHost['hostid']
+				'hostids' => $chdHost['hostid'],
+				'nopermissions' => true
 			]);
 
 			if ($chdGraph = reset($chdGraphs)) {
@@ -581,6 +583,8 @@ class CGraph extends CGraphGeneral {
 
 		// adding discoveryRule
 		if ($options['selectDiscoveryRule'] !== null) {
+			$discoveryRules = [];
+			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,gd.graphid'.
 					' FROM graph_discovery gd,item_discovery id,graphs_items gi,items i'.
@@ -590,17 +594,21 @@ class CGraph extends CGraphGeneral {
 						' AND id.parent_itemid=i.itemid'.
 						' AND i.flags='.ZBX_FLAG_DISCOVERY_RULE
 			);
-			$relationMap = new CRelationMap();
+
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['graphid'], $relation['parent_itemid']);
 			}
 
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$discoveryRules = API::DiscoveryRule()->get([
+					'output' => $options['selectDiscoveryRule'],
+					'itemids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
@@ -627,7 +635,7 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 */
-	protected function validateCreate(array $graphs) {
+	protected function validateCreate(array &$graphs) {
 		$itemIds = $this->validateItemsCreate($graphs);
 		$this->validateItems($itemIds, $graphs);
 

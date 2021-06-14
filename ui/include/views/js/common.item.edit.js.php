@@ -199,17 +199,12 @@ foreach ($this->data['types'] as $type => $label) {
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_delay');
 }
 
-// disable dropdown items for calculated and aggregate items
-foreach ([ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE] as $type) {
-	// set to disable character, log and text items in value type
-	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
-}
-
 $this->data['authTypeVisibility'] = [];
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
 
 ?>
 <script type="text/javascript">

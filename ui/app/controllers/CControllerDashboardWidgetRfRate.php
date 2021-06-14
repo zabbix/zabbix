@@ -43,7 +43,7 @@ class CControllerDashboardWidgetRfRate extends CController {
 	}
 
 	protected function doAction() {
-		CProfile::update('web.dashbrd.widget.rf_rate', $this->getInput('rf_rate'), PROFILE_TYPE_INT,
+		CProfile::update('web.dashboard.widget.rf_rate', $this->getInput('rf_rate'), PROFILE_TYPE_INT,
 			$this->getInput('widgetid')
 		);
 

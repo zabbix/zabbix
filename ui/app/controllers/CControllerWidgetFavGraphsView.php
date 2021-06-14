@@ -80,7 +80,7 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		CArrayHelper::sort($graphs, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

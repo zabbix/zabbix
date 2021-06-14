@@ -49,7 +49,7 @@ class CLdap {
 			'userfilter' => '(%{attr}=%{user})',
 			'groupkey' => 'cn',
 			'mapping' => [
-				'alias' => 'uid',
+				'username' => 'uid',
 				'userid' => 'uidnumbera',
 				'passwd' => 'userpassword'
 			],

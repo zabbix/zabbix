@@ -1,0 +1,260 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-04-28T08:05:02Z'
+  media_types:
+    -
+      name: Express.ms
+      type: WEBHOOK
+      parameters:
+        4:
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        6:
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        5:
+          name: event_value
+          value: '{EVENT.VALUE}'
+        2:
+          name: express_message
+          value: '{ALERT.MESSAGE}'
+        1:
+          name: express_send_to
+          value: '{ALERT.SENDTO}'
+        3:
+          name: express_tags
+          value: '{EVENT.TAGSJSON}'
+        7:
+          name: express_token
+          value: '<PLACE BOT TOKEN>'
+        0:
+          name: express_url
+          value: '<PLACE INSTANCE URL>'
+      script: |
+        var Express = {
+            params: [],
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                Express.params = params;
+        
+                if (typeof Express.params.url === 'string' && !Express.params.url.endsWith('/')) {
+                    Express.params.url += '/';
+                }
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Express.HTTPProxy = HTTPProxy;
+            },
+        
+            request: function (query, data) {
+                var response,
+                    url = Express.params.url + query,
+                    request = new HttpRequest();
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Bearer ' + Express.params.token);
+        
+                if (typeof Express.HTTPProxy !== 'undefined' && Express.HTTPProxy !== '') {
+                    request.setProxy(Express.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ Express Webhook ] Sending request: ' + url +
+                    ((typeof data === 'string') ? ('\n' + data) : ''));
+        
+                response = request.post(url, data);
+        
+                Zabbix.log(4, '[ Express Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ Express Webhook ] Failed to parse response received from Express');
+                        response = {};
+                    }
+                }
+        
+                if (response.status !== 'ok') {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (typeof response.reason !== 'undefined') {
+                        message += ': ' + JSON.stringify(response.reason);
+                    }
+        
+                    throw message + '. Check debug log for more information.';
+                }
+        
+                return response.result;
+            },
+        
+            postMessage: function (is_problem) {
+                var data,
+                    url,
+                    result = {tags: {}},
+                    response;
+        
+                if (is_problem) {
+                    data = {
+                        group_chat_id: Express.params.send_to,
+                        notification: {
+                            status: 'ok',
+                            body: Express.params.message
+                        }
+                    };
+                    url = 'api/v3/botx/notification/callback/direct';
+                }
+                else {
+                    data = {
+                        reply: {
+                            status: 'ok',
+                            body: Express.params.message
+                        }
+                    };
+                    url = 'api/v3/botx/events/reply_event';
+        
+                    try {
+                        var tags = JSON.parse(Express.params.tags);
+                    }
+                    catch (error) {
+                        throw 'Value of "express_tags" is not JSON. Value: ' + Express.params.tags + '.';
+                    }
+        
+                    tags.forEach(function(tag) {
+                        if (tag.tag === '__zbx_ex_sync_id_' + Express.params.send_to) {
+                            data.source_sync_id = tag.value;
+                        }
+                    });
+        
+                    if (!data.source_sync_id) {
+                        throw 'Cannot update data. sync_id for the provided sender is unknown.';
+                    }
+                }
+        
+                response = Express.request(url, data);
+        
+                if (is_problem && response.sync_id) {
+                    result.tags['__zbx_ex_sync_id_' + Express.params.send_to] = response.sync_id;
+        
+                    return JSON.stringify(result);
+                }
+                else {
+                    return 'OK';
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                express = {},
+                required_params = [
+                    'express_url', 'express_send_to', 'express_message', 'express_tags', 'express_token',
+                    'event_source', 'event_value', 'event_update_status'
+                ];
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('express_')) {
+                        express[key.substring(8)] = params[key];
+                    }
+        
+                    if (required_params.indexOf(key) !== -1
+                            && (params[key].trim() === '' || params[key] === '{ALERT.SENDTO}')) {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Forcing event_value and event_update_status for non trigger-based events.
+            if (params.event_source !== '0' ) {
+                params.event_value = '1';
+                params.event_update_status = '0';
+            }
+        
+            if (params.event_value !== '0' && params.event_value !== '1') {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            Express.setParams(express);
+            Express.setProxy(params.HTTPProxy);
+        
+            return Express.postMessage(params.event_value === '1' && params.event_update_status === '0');
+        }
+        catch (error) {
+            Zabbix.log(3, '[ Express Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Started at {EVENT.TIME} on {EVENT.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Autoregistration: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

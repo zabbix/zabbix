@@ -270,7 +270,7 @@ class CProfiler {
 	 * @param array  $params
 	 * @param array  $result
 	 */
-	public function profileApiCall($class, $method, $params, $result) {
+	public function profileApiCall($class, $method, array $params, $result) {
 		$backtrace = debug_backtrace();
 
 		// Use the file name and line number from the first call to the API wrapper object.

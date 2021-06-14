@@ -46,13 +46,6 @@ class testZBX6663 extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Host ZBX6663',
-					'link' => 'Applications',
-					'checkbox' => 'applications'
-				]
-			],
-			[
-				[
-					'host' => 'Host ZBX6663',
 					'link' => 'Items',
 					'checkbox' => 'items'
 				]
@@ -104,13 +97,6 @@ class testZBX6663 extends CLegacyWebTest {
 					'host' => 'Host ZBX6663',
 					'link' => 'Web scenarios',
 					'checkbox' => 'httptests'
-				]
-			],
-			[
-				[
-					'template' => 'Template ZBX6663 First',
-					'link' => 'Applications',
-					'checkbox' => 'applications'
 				]
 			],
 			[

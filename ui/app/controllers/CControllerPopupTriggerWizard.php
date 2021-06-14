@@ -111,7 +111,7 @@ class CControllerPopupTriggerWizard extends CController {
 			$exprs[] = array_shift($input) + array_shift($input);
 		}
 
-		$constructor = new CTextTriggerConstructor(new CTriggerExpression());
+		$constructor = new CTextTriggerConstructor(new CExpressionParser(['usermacros' => true, 'lldmacros' => true]));
 
 		if ($this->hasInput('triggerid')) {
 			$page_options['triggerid'] = $this->getInput('triggerid');
@@ -121,15 +121,13 @@ class CControllerPopupTriggerWizard extends CController {
 		if ($this->hasInput('save')) {
 			$trigger_valid = true;
 
-			$item = API::Item()->get([
+			$items = API::Item()->get([
 				'output' => ['key_'],
 				'selectHosts' => ['host'],
 				'itemids' => $page_options['itemid'],
+				'editable' => true,
 				'limit' => 1
 			]);
-
-			$item = reset($item);
-			$host = reset($item['hosts']);
 
 			// Trigger validation.
 			if ($page_options['description'] === '') {
@@ -137,13 +135,16 @@ class CControllerPopupTriggerWizard extends CController {
 				$trigger_valid = false;
 			}
 
-			if (!$item) {
+			if (!$items) {
 				error('No permissions to referred object or it does not exist!');
 				$trigger_valid = false;
 			}
 
-			if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
-				if (check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) {
+			$item = reset($items);
+			$host = reset($item['hosts']);
+
+			if ($trigger_valid) {
+				if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];
 						$description = $page_options['description'];
@@ -190,7 +191,7 @@ class CControllerPopupTriggerWizard extends CController {
 					}
 
 					// Save if no errors found.
-					if (array_key_exists('triggerid', $page_options) && $trigger_valid) {
+					if (array_key_exists('triggerid', $page_options)) {
 						$result = API::Trigger()->update($trigger);
 						$audit_action = AUDIT_ACTION_UPDATE;
 
@@ -198,7 +199,7 @@ class CControllerPopupTriggerWizard extends CController {
 							error(_('Cannot update trigger'));
 						}
 					}
-					elseif ($trigger_valid) {
+					else {
 						$result = API::Trigger()->create($trigger);
 						if ($result['triggerids']) {
 							$db_triggers = API::Trigger()->get([
@@ -214,9 +215,6 @@ class CControllerPopupTriggerWizard extends CController {
 							error(_('Cannot add trigger'));
 						}
 					}
-					else {
-						$result['triggerids'] = false;
-					}
 
 					if ($result['triggerids']) {
 						DBstart();
@@ -229,11 +227,8 @@ class CControllerPopupTriggerWizard extends CController {
 					}
 				}
 				else {
-					error('No permissions to referred object or it does not exist!');
+					error(_s('Field "%1$s" is mandatory.', 'expressions'));
 				}
-			}
-			else {
-				error(_s('Field "%1$s" is mandatory.', 'expressions'));
 			}
 
 			$output = [];

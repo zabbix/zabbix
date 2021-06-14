@@ -245,7 +245,8 @@ class CMultiSelect extends CTag {
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
-					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected'
+					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
+					'with_inherited', 'context'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -321,7 +322,7 @@ class CMultiSelect extends CTag {
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
+						'with_simple_graph_item_prototypes', 'with_triggers', 'with_inherited'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
 						$autocomplete_parameters[$name] = true;
@@ -393,6 +394,16 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('disable_selected', $parameters) && $parameters['disable_selected']) {
 					$popup_parameters['disable_selected'] = '1';
+				}
+
+				if (array_key_exists('hostids', $parameters) && $parameters['hostids']) {
+					$popup_parameters['hostids'] = $parameters['hostids'];
+					$autocomplete_parameters['hostids'] = $parameters['hostids'];
+				}
+
+				if (array_key_exists('context', $parameters)) {
+					$popup_parameters['context'] = $parameters['context'];
+					$autocomplete_parameters['context'] = $parameters['context'];
 				}
 			}
 		}

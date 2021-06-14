@@ -45,12 +45,16 @@ class CImportDataAdapter {
 		$this->data = $data['zabbix_export'];
 	}
 
+	public function getData(): array {
+		return $this->data;
+	}
+
 	/**
 	 * Get groups from the imported data.
 	 *
 	 * @return array
 	 */
-	public function getGroups() {
+	public function getGroups(): array {
 		return array_key_exists('groups', $this->data) ? $this->data['groups'] : [];
 	}
 
@@ -59,7 +63,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getTemplates() {
+	public function getTemplates(): array {
 		$templates = [];
 
 		if (array_key_exists('templates', $this->data)) {
@@ -67,7 +71,8 @@ class CImportDataAdapter {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
 				$templates[] = CArrayHelper::getByKeys($template, [
-					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags'
+					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
+					'valuemaps'
 				]);
 			}
 		}
@@ -80,7 +85,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHosts() {
+	public function getHosts(): array {
 		$hosts = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -88,15 +93,15 @@ class CImportDataAdapter {
 				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
 
 				if (array_key_exists('interfaces', $host)) {
-					foreach ($host['interfaces'] as $inum => $interface) {
-						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
+					foreach ($host['interfaces'] as $index => $interface) {
+						$host['interfaces'][$index] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}
 
 				$hosts[] = CArrayHelper::getByKeys($host, [
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
 					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-					'inventory_mode', 'tags'
+					'inventory_mode', 'tags', 'valuemaps'
 				]);
 			}
 		}
@@ -105,51 +110,11 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get applications from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getApplications() {
-		$applications = [];
-
-		if (array_key_exists('hosts', $this->data)) {
-			foreach ($this->data['hosts'] as $host) {
-				if (array_key_exists('applications', $host)) {
-					foreach ($host['applications'] as $application) {
-						$applications[$host['host']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('templates', $this->data)) {
-			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('applications', $template)) {
-					foreach ($template['applications'] as $application) {
-						$applications[$template['template']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		return $applications;
-	}
-
-	/**
-	 * Get value maps from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getValueMaps() {
-		return array_key_exists('value_maps', $this->data) ? $this->data['value_maps'] : [];
-	}
-
-	/**
 	 * Get items from the imported data.
 	 *
 	 * @return array
 	 */
-	public function getItems() {
+	public function getItems(): array {
 		$items = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -180,7 +145,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getDiscoveryRules() {
+	public function getDiscoveryRules(): array {
 		$discovery_rules = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -213,7 +178,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHttpTests() {
+	public function getHttpTests(): array {
 		$httptests = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -244,7 +209,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHttpSteps() {
+	public function getHttpSteps(): array {
 		$httpsteps = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -279,64 +244,20 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getGraphs() {
+	public function getGraphs(): array {
 		$graphs = [];
 
 		if (array_key_exists('graphs', $this->data)) {
 			foreach ($this->data['graphs'] as $graph) {
+				if (array_key_exists('uuid', $graph) && $graph['uuid'] === '') {
+					unset($graph['uuid']);
+				}
+
 				$graphs[] = $this->renameGraphFields($graph);
 			}
 		}
 
 		return $graphs;
-	}
-
-	/**
-	 * Get simple triggers from the imported data.
-	 *
-	 * @return array
-	 */
-	protected function getSimpleTriggers() {
-		$simple_triggers = [];
-		$expression_options = ['lldmacros' => false, 'allow_func_only' => true];
-
-		if (array_key_exists('hosts', $this->data)) {
-			foreach ($this->data['hosts'] as $host) {
-				if (array_key_exists('items', $host)) {
-					foreach ($host['items'] as $item) {
-						if (array_key_exists('triggers', $item)) {
-							foreach ($item['triggers'] as $simple_trigger) {
-								$simple_trigger = $this->enrichSimpleTriggerExpression($host['host'], $item['key'],
-									$simple_trigger, $expression_options
-								);
-								$simple_triggers[] = $this->renameTriggerFields($simple_trigger);
-							}
-							unset($item['triggers']);
-						}
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('templates', $this->data)) {
-			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('items', $template)) {
-					foreach ($template['items'] as $item) {
-						if (array_key_exists('triggers', $item)) {
-							foreach ($item['triggers'] as $simple_trigger) {
-								$simple_trigger = $this->enrichSimpleTriggerExpression($template['template'],
-									$item['key'], $simple_trigger, $expression_options
-								);
-								$simple_triggers[] = $this->renameTriggerFields($simple_trigger);
-							}
-							unset($item['triggers']);
-						}
-					}
-				}
-			}
-		}
-
-		return $simple_triggers;
 	}
 
 	/**
@@ -347,13 +268,33 @@ class CImportDataAdapter {
 	public function getTriggers() {
 		$triggers = [];
 
+		foreach (['hosts', 'templates'] as $source) {
+			if (array_key_exists($source, $this->data)) {
+				foreach ($this->data[$source] as $host) {
+					if (array_key_exists('items', $host)) {
+						foreach ($host['items'] as $item) {
+							if (array_key_exists('triggers', $item)) {
+								foreach ($item['triggers'] as $trigger) {
+									$triggers[] = $this->renameTriggerFields($trigger);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		if (array_key_exists('triggers', $this->data)) {
 			foreach ($this->data['triggers'] as $trigger) {
+				if (array_key_exists('uuid', $trigger) && $trigger['uuid'] === '') {
+					unset($trigger['uuid']);
+				}
+
 				$triggers[] = $this->renameTriggerFields($trigger);
 			}
 		}
 
-		return array_merge($triggers, $this->getSimpleTriggers());
+		return $triggers;
 	}
 
 	/**
@@ -383,23 +324,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get screens from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getScreens() {
-		$screens = [];
-
-		if (array_key_exists('screens', $this->data)) {
-			foreach ($this->data['screens'] as $screen) {
-				$screens[] = CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
-			}
-		}
-
-		return $screens;
-	}
-
-	/**
 	 * Get template dashboards from the imported data.
 	 *
 	 * @return array
@@ -411,14 +335,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				if (array_key_exists('dashboards', $template)) {
 					foreach ($template['dashboards'] as $dashboard) {
-						// Rename hide_header to view_mode in widgets.
-						if (array_key_exists('widgets', $dashboard)) {
-							$dashboard['widgets'] = array_map(function (array $widget): array {
-								$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+						foreach ($dashboard['pages'] as &$dashboard_page) {
+							// Rename hide_header to view_mode in widgets.
+							if (array_key_exists('widgets', $dashboard_page)) {
+								$dashboard_page['widgets'] = array_map(function (array $widget): array {
+									$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
 
-								return $widget;
-							}, $dashboard['widgets']);
+									return $widget;
+								}, $dashboard_page['widgets']);
+							}
 						}
+						unset($dashboard_page);
 
 						$dashboards[$template['template']][$dashboard['name']] = $dashboard;
 					}
@@ -468,49 +395,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Enriches trigger expression and trigger recovery expression with host:item pair.
-	 *
-	 * @param string $host
-	 * @param string $item_key
-	 * @param array  $simple_trigger
-	 * @param string $simple_trigger['expression]
-	 * @param int    $simple_trigger['recovery_mode]
-	 * @param string $simple_trigger['recovery_expression]
-	 * @param array  $options
-	 * @param bool   $options['lldmacros']                  (optional)
-	 * @param bool   $options['allow_func_only']            (optional)
-	 *
-	 * @return array
-	 */
-	protected function enrichSimpleTriggerExpression($host, $item_key, array $simple_trigger, array $options) {
-		$expression_data = new CTriggerExpression($options);
-		$prefix = $host.':'.$item_key.'.';
-
-		if ($expression_data->parse($simple_trigger['expression'])) {
-			foreach (array_reverse($expression_data->expressions) as $expression) {
-				if ($expression['host'] === '' && $expression['item'] === '') {
-					$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], $prefix,
-						$expression['pos'] + 1, 0
-					);
-				}
-			}
-		}
-
-		if ($simple_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-				&& $expression_data->parse($simple_trigger['recovery_expression'])) {
-			foreach (array_reverse($expression_data->expressions) as $expression) {
-				if ($expression['host'] === '' && $expression['item'] === '') {
-					$simple_trigger['recovery_expression'] = substr_replace($simple_trigger['recovery_expression'],
-						$prefix, $expression['pos'] + 1, 0
-					);
-				}
-			}
-		}
-
-		return $simple_trigger;
-	}
-
-	/**
 	 * Format discovery rule.
 	 *
 	 * @param array  $discovery_rule
@@ -524,12 +408,9 @@ class CImportDataAdapter {
 
 		foreach ($discovery_rule['item_prototypes'] as &$item_prototype) {
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {
-				foreach ($item_prototype['trigger_prototypes'] as $trigger_prototype) {
-					$discovery_rule['trigger_prototypes'][] =  $this->enrichSimpleTriggerExpression($host,
-						$item_prototype['key'], $trigger_prototype, ['allow_func_only' => true]
-					);
-				}
-				unset($item_prototype['trigger_prototypes']);
+				$discovery_rule['trigger_prototypes'] = array_merge($discovery_rule['trigger_prototypes'],
+					$item_prototype['trigger_prototypes']
+				);
 			}
 
 			$item_prototype = $this->renameItemFields($item_prototype);
@@ -601,6 +482,12 @@ class CImportDataAdapter {
 							}
 							if (array_key_exists('trends', $operation) && $operation['trends'] !== '') {
 								$operation['optrends']['trends'] = $operation['trends'];
+							}
+							if (array_key_exists('tags', $operation) && $operation['tags']) {
+								$operation['optag'] = [];
+								foreach ($operation['tags'] as $tag) {
+									$operation['optag'][] = $tag;
+								}
 							}
 							break;
 
@@ -702,7 +589,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	protected function renameTriggerFields(array $trigger) {
+	protected function renameTriggerFields(array $trigger): array {
 		$trigger = CArrayHelper::renameKeys($trigger, ['description' => 'comments']);
 
 		return CArrayHelper::renameKeys($trigger, ['name' => 'description', 'severity' => 'priority']);

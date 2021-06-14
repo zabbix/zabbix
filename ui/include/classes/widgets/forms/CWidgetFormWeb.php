@@ -27,6 +27,8 @@ class CWidgetFormWeb extends CWidgetForm {
 	public function __construct($data, $templateid) {
 		parent::__construct($data, $templateid, WIDGET_WEB);
 
+		$this->data = self::convertDottedKeys($this->data);
+
 		// Host groups.
 		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 
@@ -54,6 +56,29 @@ class CWidgetFormWeb extends CWidgetForm {
 		}
 
 		$this->fields[$field_hosts->getName()] = $field_hosts;
+
+		// Tag evaltype (And/Or).
+		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
+			TAG_EVAL_TYPE_OR => _('Or')
+		]))
+			->setDefault(TAG_EVAL_TYPE_AND_OR)
+			->setModern(true);
+
+		if (array_key_exists('evaltype', $this->data)) {
+			$field_evaltype->setValue($this->data['evaltype']);
+		}
+
+		$this->fields[$field_evaltype->getName()] = $field_evaltype;
+
+		// Tags array: tag, operator and value. No label, because it belongs to previous group.
+		$field_tags = new CWidgetFieldTags('tags', '');
+
+		if (array_key_exists('tags', $this->data)) {
+			$field_tags->setValue($this->data['tags']);
+		}
+
+		$this->fields[$field_tags->getName()] = $field_tags;
 
 		// Show hosts in maintenance.
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))

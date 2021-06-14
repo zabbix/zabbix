@@ -29,11 +29,11 @@ $output = [
 
 if (!$data['preview']) {
 	$output += [
-		'header' => $data['name'],
-		'script_inline' => $data['script_inline']
+		'name' => $data['name'],
+		'svg_options' => $data['svg_options']
 	];
 
-	if ($data['info']) {
+	if ($data['info'] !== null) {
 		$output += [
 			'info' => $data['info']
 		];

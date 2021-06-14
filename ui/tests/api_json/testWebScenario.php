@@ -181,7 +181,6 @@ class testWebScenario extends CAPITest {
 					'name' => 'api-symbols☺æų""\\//!@#$%^&*()_+',
 					'hostid' => '50009',
 					'agent' => 'api-symbols☺æų""\\//!@#$%^&*()_+',
-					'applicationid' => 0,
 					'authentication' => '2',
 					'http_user' => 'api-symbols☺æų""\\//!@#$%^&*()_+',
 					'http_proxy' => 'api-symbols☺æų""\\//!@#$%^&*()_+',
@@ -334,6 +333,35 @@ class testWebScenario extends CAPITest {
 					]
 				]],
 				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'name' => 'Http test with some tags',
+					'hostid' => '50009',
+					'steps' => [
+						[
+							'name' => 'Step 1',
+							'url' => 'http://zabbix.com',
+							'no' => 0
+						],
+						[
+							'name' => 'Step 2',
+							'url' => 'http://zabbix.com',
+							'no' => 1
+						]
+					],
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value 1'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value 2'
+						]
+					]
+				]],
+				'expected_error' => null
 			]
 		];
 	}
@@ -351,6 +379,28 @@ class testWebScenario extends CAPITest {
 				$this->assertEquals($db_row_web['name'], $httptests[$key]['name']);
 				$this->assertEquals($db_row_web['hostid'], $httptests[$key]['hostid']);
 
+				if (array_key_exists('tags', $httptests[$key])) {
+					// CHeck http test tags.
+					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM httptest_tag WHERE httptestid='.zbx_dbstr($id)));
+					uasort($httptests[$key]['tags'], function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					uasort($db_tags, function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+
+					// Check http test item tags.
+					$db_items = DBFetchArray(DBSelect('SELECT itemid FROM httptestitem WHERE httptestid='.zbx_dbstr($id)));
+					foreach ($db_items as $itemid) {
+						$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($itemid['itemid'])));
+						uasort($db_tags, function ($a, $b) {
+							return strnatcasecmp($a['value'], $b['value']);
+						});
+						$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+					}
+				}
+
 				$db_result_steps = DBSelect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($id).' order by no;');
 				$db_rows_steps = DBFetchArray($db_result_steps);
 				$this->assertCount(count($httptests[$key]['steps']), $db_rows_steps);
@@ -366,6 +416,18 @@ class testWebScenario extends CAPITest {
 					foreach ($dataset_step as $property_name => $expected) {
 						$debug_msg = 'Case, httptest['.$key.']->step['.$no.']->property['.$property_name.']';
 						$this->assertEquals($expected, $db_step[$property_name], $debug_msg);
+					}
+
+					// Check http test step item tags.
+					if (array_key_exists('tags', $httptests[$key])) {
+						$db_items = DBFetchArray(DBSelect('SELECT itemid FROM httpstepitem WHERE httpstepid='.zbx_dbstr($db_step['httpstepid'])));
+						foreach ($db_items as $itemid) {
+							$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($itemid['itemid'])));
+							uasort($db_tags, function ($a, $b) {
+								return strnatcasecmp($a['value'], $b['value']);
+							});
+							$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+						}
 					}
 				}
 			}
@@ -515,7 +577,6 @@ class testWebScenario extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRow['httptestid'], $httptests[$key]['httptestid']);
-				$this->assertEquals($dbRow['applicationid'], 0);
 				$this->assertEquals($dbRow['nextcheck'], 0);
 				$this->assertEquals($dbRow['delay'], 60);
 				$this->assertEquals($dbRow['status'], 0);
@@ -574,98 +635,6 @@ class testWebScenario extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/agent": value is too long.'
-			],
-			// Check web applicationid.
-			[
-				'httptest' => [
-					'name' => 'Api web with empty applicationid',
-					'applicationid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with nonexistent applicationid',
-					'applicationid' => '123456',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'Application with applicationid "123456" does not exist.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with wrong applicationid',
-					'applicationid' => 'test',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with wrong applicationid',
-					'applicationid' => '☺æų',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with wrong applicationid',
-					'applicationid' => '36.6',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with applicationid from another host',
-					'applicationid' => '376',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'The web scenario application belongs to a different host than the web scenario host.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with discovered applicationid',
-					'applicationid' => '375',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0
-						]
-					]
-				],
-				'expected_error' => 'Cannot add a discovered application "API discovery application" to a web scenario.'
 			],
 			// Check web authentication.
 			[
@@ -1509,7 +1478,6 @@ class testWebScenario extends CAPITest {
 					'httptestid' => '15015',
 					'name' => 'Webtest key_name_new',
 					'status' => '1',
-					'applicationid' => '15016',
 					'steps' => [
 						[
 							'httpstepid' => '15015',
@@ -1540,13 +1508,6 @@ class testWebScenario extends CAPITest {
 				'httptest' => [[
 					'httptestid' => '15015',
 					'status' => '1'
-				]],
-				'expected_error' => null
-			],
-			[
-				'httptest' => [[
-					'httptestid' => '15015',
-					'applicationid' => '15016'
 				]],
 				'expected_error' => null
 			],
@@ -1613,7 +1574,6 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [[
 					'httptestid' => '15015',
-					'applicationid' => '15016',
 					'steps' => [
 						[
 							'httpstepid' => '15015'
@@ -1634,7 +1594,6 @@ class testWebScenario extends CAPITest {
 				'httptestid' => '15015',
 				'name' => 'Webtest key_name',
 				'status' => '0',
-				'applicationid' => '15015',
 				'steps' => [
 					[
 						'httpstepid' => '15015',
@@ -1657,20 +1616,17 @@ class testWebScenario extends CAPITest {
 
 	/**
 	* @dataProvider httptest_update_name_key
-	* @on-after after_update_name_key
+	* @onAfter after_update_name_key
 	*/
 	public function testWebScenario_Update_Name_Key($httptests, $expected_error) {
 		$result = $this->call('httptest.update', $httptests, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $key => $httptestid) {
-				$db_httptest = CDBHelper::getRow('SELECT httptestid, name, applicationid FROM httptest WHERE httptestid='.zbx_dbstr($httptestid));
+				$db_httptest = CDBHelper::getRow('SELECT httptestid, name FROM httptest WHERE httptestid='.zbx_dbstr($httptestid));
 
 				if (array_key_exists('name', $httptests[$key])) {
 					$this->assertEquals($httptests[$key]['name'], $db_httptest['name']);
-				}
-				if (array_key_exists('applicationid', $httptests[$key])) {
-					$this->assertEquals($httptests[$key]['applicationid'], $db_httptest['applicationid']);
 				}
 
 				$db_httptest_items = CDBHelper::getAll(
@@ -1680,8 +1636,6 @@ class testWebScenario extends CAPITest {
 				);
 				$this->assertCount(3, $db_httptest_items,
 					'Incorrect item count for web scenario [httpstepid='.$httptestid.'].');
-
-				$application_itemids = array_flip(array_column($db_httptest_items, 'itemid'));
 
 				foreach ($db_httptest_items as $db_httptest_item) {
 					$this->assertContains('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
@@ -1720,8 +1674,6 @@ class testWebScenario extends CAPITest {
 					' WHERE '.dbConditionInt('hsi.httpstepid', $db_httpstepids)
 				);
 
-				$application_itemids += array_flip(array_column($db_httpstep_items, 'itemid'));
-
 				foreach ($db_httpstep_items as $db_httpstep_item) {
 					$db_httpsteps[$db_httpstep_item['httpstepid']]['db_items'][] = $db_httpstep_item;
 				}
@@ -1745,18 +1697,6 @@ class testWebScenario extends CAPITest {
 								'Status for stepitem [itemid='.$db_httpstep_item['itemid'].'] not updated.');
 						}
 					}
-				}
-
-				if (array_key_exists('applicationid', $httptests[$key])) {
-					$db_applicationids_count = CDBHelper::getCount(
-						'SELECT NULL'.
-						' FROM items_applications ia'.
-						' WHERE '.dbConditionInt('ia.itemid', array_keys($application_itemids)).
-							' AND '.dbConditionInt('ia.applicationid', [$httptests[$key]['applicationid']])
-					);
-
-					$this->assertCount($db_applicationids_count, $application_itemids,
-						'Application not updated for some items.');
 				}
 			}
 		}

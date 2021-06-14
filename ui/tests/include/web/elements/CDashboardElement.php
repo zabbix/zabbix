@@ -31,7 +31,7 @@ class CDashboardElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('class:dashbrd-grid-container'))->asDashboard();
+		return (new CElementQuery('class:dashboard-grid'))->asDashboard();
 	}
 
 	/**
@@ -49,7 +49,7 @@ class CDashboardElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEmpty() {
-		return ($this->query('xpath:.//div[@class="dashbrd-grid-new-widget-placeholder"]')->one(false)->isValid());
+		return ($this->query('xpath:.//div[@class="dashboard-widget-placeholder"]')->one(false)->isValid());
 	}
 
 	/**
@@ -58,8 +58,8 @@ class CDashboardElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getWidgets() {
-		return $this->query("xpath:.//div[".CXPathHelper::fromClass("dashbrd-grid-widget").
-				" or ".CXPathHelper::fromClass("dashbrd-grid-iterator")."]")->asWidget()->all();
+		return $this->query("xpath:.//div[".CXPathHelper::fromClass("dashboard-grid-widget").
+				" or ".CXPathHelper::fromClass("dashboard-grid-iterator")."]")->asWidget()->all();
 	}
 
 	/**
@@ -71,8 +71,8 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
-				' contains(@class, "dashbrd-grid-iterator-head")]/h4[text()='.
+		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
+				' contains(@class, "dashboard-grid-iterator-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
@@ -93,7 +93,7 @@ class CDashboardElement extends CElement {
 	 * @return CElement
 	 */
 	public function getControls() {
-		return $this->query('xpath://ul[@id="dashbrd-control"]')->one();
+		return $this->query('xpath://ul[@id="dashboard-control"]')->one();
 	}
 
 	/**
@@ -104,9 +104,9 @@ class CDashboardElement extends CElement {
 	public function edit() {
 		$controls = $this->getControls();
 
-		if (!$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-edit')->one()->click();
-			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilVisible();
+		if (!$controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
+			$controls->query('id:dashboard-edit')->one()->click();
+			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilVisible();
 		}
 
 		return $this;
@@ -120,9 +120,9 @@ class CDashboardElement extends CElement {
 	 */
 	public function addWidget() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashbrd-add-widget')->one()->click();
+		$this->getControls()->query('id:dashboard-add-widget')->one()->click();
 
-		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 
@@ -134,11 +134,15 @@ class CDashboardElement extends CElement {
 	public function cancelEditing() {
 		$controls = $this->getControls();
 
-		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-cancel')->one()->click(true);
+		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
+			$controls->query('id:dashboard-cancel')->one()->click(true);
+
+			if (CElementQuery::getPage()->isAlertPresent()) {
+				CElementQuery::getPage()->acceptAlert();
+			}
 
 			if (!$controls->isStalled()) {
-				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
+				$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 			}
 		}
 
@@ -154,9 +158,9 @@ class CDashboardElement extends CElement {
 	public function save() {
 		$controls = $this->getControls();
 
-		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-save')->one()->waitUntilClickable()->click(true);
-			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
+		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
+			$controls->query('id:dashboard-save')->one()->waitUntilClickable()->click(true);
+			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
 		return $this;
@@ -172,10 +176,9 @@ class CDashboardElement extends CElement {
 	 */
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
-		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
-				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
+				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
-
 
 		return $this;
 	}
@@ -188,8 +191,8 @@ class CDashboardElement extends CElement {
 	 * @return $this
 	 */
 	public function copyWidget($name) {
-		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
-				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
+				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
@@ -203,7 +206,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function pasteWidget() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashbrd-paste-widget')->one()->waitUntilClickable()->click(true);
+		$this->getControls()->query('id:dashboard-add')->asPopupButton()->one()->select('Paste widget');
 
 		return $this;
 	}
@@ -219,8 +222,8 @@ class CDashboardElement extends CElement {
 	public function replaceWidget($name) {
 		$this->checkIfEditable();
 
-		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
-				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
+				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
@@ -234,7 +237,7 @@ class CDashboardElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEditable($editable = true) {
-		return $this->getControls()->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed($editable);
+		return $this->getControls()->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed($editable);
 	}
 
 	/**

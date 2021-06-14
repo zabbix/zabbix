@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,11 +19,13 @@
 **/
 
 
-class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CMacrosResolverTest extends TestCase {
 
 	private $stub;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$user_macros = [
 			30896 => [
 				'hostids' => [10084],

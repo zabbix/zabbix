@@ -66,8 +66,9 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 			" and");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
-	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject in (%d,%d)",
-			ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER, ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject in (%d,%d,%d)",
+			ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER, ZBX_LLD_OVERRIDE_OP_OBJECT_HOST,
+			ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
@@ -254,8 +255,11 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 	}
 	DBfree_result(result);
 
-	if (0 != (object_mask & ((1 << ZBX_LLD_OVERRIDE_OP_OBJECT_HOST) | (1 << ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER))))
+	if (0 != (object_mask & ((1 << ZBX_LLD_OVERRIDE_OP_OBJECT_HOST) | (1 << ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER) |
+			(1 << ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM))))
+	{
 		lld_override_operations_load_tags(overrideids, sql, sql_alloc, ops);
+	}
 
 	if (0 != (object_mask & (1 << ZBX_LLD_OVERRIDE_OP_OBJECT_HOST)))
 		lld_override_operations_load_templates(overrideids, sql, sql_alloc, ops);

@@ -34,7 +34,11 @@ typedef struct
 	const char		*correlation_tag;
 	const char		*opdata;
 	const char		*event_name;
+	const unsigned char	*expression_bin;
+	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
+	int			revision;
+	int			timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -45,10 +49,17 @@ typedef struct
 	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
+	unsigned char		timer;
 
 	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_TRIGGER;
+
+/* specifies if trigger expression/recovery expression has timer functions */
+/* (date, time, now, dayofweek or dayofmonth)                              */
+#define ZBX_TRIGGER_TIMER_DEFAULT		0x00
+#define ZBX_TRIGGER_TIMER_EXPRESSION		0x01
+#define ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION	0x02
 
 typedef struct zbx_dc_trigger_deplist
 {
@@ -85,7 +96,6 @@ typedef struct
 	const char		*delay;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
-	int			lastclock;
 	int			mtime;
 	int			data_expected_from;
 	int			history_sec;
@@ -104,6 +114,8 @@ typedef struct
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
 	zbx_uint64_t		parent_itemid; /* from joined item_discovery table */
+
+	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_ITEM;
 
@@ -227,8 +239,9 @@ ZBX_DC_JMXITEM;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	const char	*params;
+	zbx_uint64_t		itemid;
+	const char		*params;
+	const unsigned char	*formula_bin;
 }
 ZBX_DC_CALCITEM;
 
@@ -592,6 +605,15 @@ zbx_dc_trigger_tag_t;
 
 typedef struct
 {
+	zbx_uint64_t	itemtagid;
+	zbx_uint64_t	itemid;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_item_tag_t;
+
+typedef struct
+{
 	zbx_uint64_t	hosttagid;
 	zbx_uint64_t	hostid;
 	const char	*tag;
@@ -825,8 +847,9 @@ typedef struct
 	zbx_hashset_t		actions;
 	zbx_hashset_t		action_conditions;
 	zbx_hashset_t		trigger_tags;
+	zbx_hashset_t		item_tags;
 	zbx_hashset_t		host_tags;
-	zbx_hashset_t		host_tags_index;		/* host tag index by hostid */
+	zbx_hashset_t		host_tags_index;	/* host tag index by hostid */
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
@@ -900,13 +923,14 @@ char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostid
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
-/******************************************************************************
- *                                                                            *
- * dc_expand_user_macros - has no autoquoting                                 *
- * for triggers and calculated items use                                      *
- * dc_expand_user_macros_in_expression - which autoquotes macros that are     *
- * not already quoted and cannot be casted to a double                        *
- *                                                                            *
- ******************************************************************************/
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
+int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error);
+
+#define ZBX_TRIGGER_TIMER_NONE			0x0000
+#define ZBX_TRIGGER_TIMER_TRIGGER		0x0001
+#define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
+#define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
+#define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
+
 #endif

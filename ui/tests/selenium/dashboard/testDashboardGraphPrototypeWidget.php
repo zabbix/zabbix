@@ -22,8 +22,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  */
 class testDashboardGraphPrototypeWidget extends CWebTest {
 
@@ -43,7 +42,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -171,7 +170,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 	/**
 	 * Test for checking new Graph prototype widget creation.
 	 *
-	 * @on-after cleanupProfile
+	 * @onAfter cleanupProfile
 	 *
 	 * @dataProvider getWidgetData
 	 */
@@ -182,7 +181,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 	/**
 	 * Test for checking existing Graph prototype widget update.
 	 *
-	 * @on-after cleanupProfile
+	 * @onAfter cleanupProfile
 	 *
 	 * @dataProvider getWidgetData
 	 */
@@ -350,8 +349,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$dashboard->save();
 		$this->page->removeFocus();
 		sleep(1);
-		$screenshot_area = $this->query('class:dashbrd-grid-container')->one();
-		$screenshot_area->query('xpath:.//div[contains(@class, "dashbrd-grid-iterator-focus")]')->waitUntilNotVisible();
+		$screenshot_area = $this->query('class:dashboard-grid')->one();
+		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
 
@@ -399,12 +398,19 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 
 				// Check that Dashboard has been saved and that widget has been added.
 				$this->assertMessage($data['expected'], 'Dashboard updated');
-				$this->assertEquals($old_widget_count + ($update ? 0 : 1),
-						$dashboard->getWidgets()->count());
+				$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
 				// Check that widget is saved in DB.
-				$db_count = CDBHelper::getCount('SELECT * FROM widget WHERE dashboardid ='.
-						self::DASHBOARD_ID.' AND name ='.zbx_dbstr($db_name));
+				$db_count = CDBHelper::getCount('SELECT * FROM widget w'.
+					' WHERE EXISTS ('.
+						'SELECT NULL'.
+						' FROM dashboard_page dp'.
+						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+							' AND dp.dashboardid='.self::DASHBOARD_ID.
+							' AND w.name ='.zbx_dbstr($db_name).
+					')'
+				);
+
 				$this->assertEquals(1, $db_count);
 
 				// Verify widget content
@@ -416,7 +422,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 						(CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
 						? $data['fields']['Columns'] * $data['fields']['Rows']
 						: 2;
-				$placeholders_count = $widget->query('class:dashbrd-grid-iterator-placeholder')->count();
+				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
 				$this->assertEquals($expected_placeholders_count, $placeholders_count);
 				// Check Dynamic item setting on Dashboard.
 				if (CTestArrayHelper::get($data['fields'], 'Dynamic item')) {

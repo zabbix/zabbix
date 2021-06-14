@@ -95,7 +95,7 @@ foreach ($data['tags'] as $i => $tag) {
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')
 							->setArgument('templateid', $templateid)
-					))->setAttribute('target', '_blank');
+					))->setTarget('_blank');
 				}
 				else {
 					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -121,11 +121,29 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
-if ($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype') {
+if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
+	switch ($data['source']) {
+		case 'trigger':
+		case 'trigger_prototype':
+			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
+			$on_change = 'this.form.submit()';
+			break;
+
+		case 'httptest':
+			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
+			$on_change = 'window.httpconf.$form.submit()';
+			break;
+
+		case 'item':
+			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
+			$on_change = 'this.form.submit()';
+			break;
+	}
+
 	$tags_form_list->addRow(null,
 		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue(_('Trigger tags'), 0, null, 'this.form.submit()')
-			->addValue(_('Inherited and trigger tags'), 1, null, 'this.form.submit()')
+			->addValue($btn_labels[0], 0, null, $on_change)
+			->addValue($btn_labels[1], 1, null, $on_change)
 			->setModern(true)
 	);
 }

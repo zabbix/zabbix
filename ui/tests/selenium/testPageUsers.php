@@ -43,7 +43,7 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[4]", $this->userSurname);
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[5]", $this->userRole);
 
-		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Alias']");
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Username']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Surname']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='User role']");
@@ -65,7 +65,7 @@ class testPageUsers extends CLegacyWebTest {
 	*/
 	public function testPageUsers_SimpleUpdate($user) {
 		$userid = $user['userid'];
-		$alias = $user['alias'];
+		$alias = $user['username'];
 
 		DBexecute('UPDATE users SET autologout=0 WHERE userid=2');
 
@@ -95,7 +95,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterByAlias() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
-		$this->zbxTestInputTypeOverwrite('filter_alias', $this->userAlias);
+		$this->zbxTestInputTypeOverwrite('filter_username', $this->userAlias);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
@@ -104,10 +104,10 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
-		$this->zbxTestInputTypeOverwrite('filter_alias', '1928379128ksdhksdjfh');
+		$this->zbxTestInputTypeOverwrite('filter_username', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-		$this->zbxTestInputTypeOverwrite('filter_alias', '%');
+		$this->zbxTestInputTypeOverwrite('filter_username', '%');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 	}
@@ -115,7 +115,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterByAllFields() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'Zabbix administrators');
-		$this->zbxTestInputTypeOverwrite('filter_alias', $this->userAlias);
+		$this->zbxTestInputTypeOverwrite('filter_username', $this->userAlias);
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->userName);
 		$this->zbxTestInputTypeOverwrite('filter_surname', $this->userSurname);
 		$this->zbxTestClickButtonMultiselect('filter_roles_');
@@ -138,7 +138,7 @@ class testPageUsers extends CLegacyWebTest {
 	 * @backup users
 	 */
 	public function testPageUsers_MassDelete() {
-		$result=DBselect("SELECT userid,alias FROM users");
+		$result=DBselect("SELECT userid,username FROM users");
 
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestCheckTitle('Configuration of users');
@@ -146,7 +146,7 @@ class testPageUsers extends CLegacyWebTest {
 
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
-			$alias = $user['alias'];
+			$alias = $user['username'];
 
 			$this->zbxTestClickButtonText('Reset');
 			$this->zbxTestWaitForPageToLoad();

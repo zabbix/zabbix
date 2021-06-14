@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,13 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CLLDMacroParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new CLLDMacroParser();
 	}
 
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['{#M}', 0, CParser::PARSE_SUCCESS, '{#M}'],
 			['{#MACRO12.A_Z}', 0, CParser::PARSE_SUCCESS, '{#MACRO12.A_Z}'],

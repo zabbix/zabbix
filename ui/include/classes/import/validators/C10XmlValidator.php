@@ -295,31 +295,6 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 					'show_unack' =>				['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
-			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-				'screen' =>					['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'screenitems' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'screenitem', 'rules' => [
-						'screenitem' =>				['type' => XML_ARRAY, 'rules' => [
-							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'resourceid' =>				['type' => XML_REQUIRED],
-							'width' =>					['type' => XML_STRING | XML_REQUIRED],
-							'height' =>					['type' => XML_STRING | XML_REQUIRED],
-							'x' =>						['type' => XML_STRING | XML_REQUIRED],
-							'y' =>						['type' => XML_STRING | XML_REQUIRED],
-							'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => XML_STRING | XML_REQUIRED],
-							'valign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'style' =>					['type' => XML_STRING | XML_REQUIRED],
-							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
-							'url' =>					['type' => XML_STRING]
-						]]
-					]]
-				]]
-			]],
 			'images' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'image', 'rules' => [
 				'image' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],

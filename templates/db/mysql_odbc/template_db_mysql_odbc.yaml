@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-12-29T13:00:44Z'
+  date: '2021-05-11T08:05:39Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
+      uuid: e19c120027e04da69b130e0f6cea29fc
       template: 'MySQL by ODBC'
       name: 'MySQL by ODBC'
       description: |
@@ -23,13 +25,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: MySQL
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: 72e0f88741d746bf88e8951ef69681f9
           name: 'MySQL: Get status variables'
           type: ODBC
           key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
@@ -40,10 +38,12 @@ zabbix_export:
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
           description: 'The item gets server global status information.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 5b7c14e38799427cb6520f47bf8afe6c
           name: 'MySQL: Status'
           type: ODBC
           key: 'db.odbc.select[ping,"{$MYSQL.DSN}"]'
@@ -51,9 +51,6 @@ zabbix_export:
           params: 'select "1"'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
-          applications:
-            -
-              name: MySQL
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -61,12 +58,18 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: e664e41d7b4f4336a3e5ef4720f6ee41
+              expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
               name: 'MySQL: Service is down'
               priority: HIGH
         -
+          uuid: b9fb80ca366e4d33801472bcd013f881
           name: 'MySQL: Version'
           type: ODBC
           key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
@@ -77,32 +80,32 @@ zabbix_export:
           params: 'select version()'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 4090a1d3d82d47ac85964baeae121b2b
+              expression: '(last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#1)<>last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#2))=1 and length(last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"]))>0'
               name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MySQL version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 73235748ba4742c0aa3c4f29509a162d
           name: 'MySQL: Aborted clients per second'
           type: DEPENDENT
           key: mysql.aborted_clients.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of connections that were aborted because the client died without closing the connection properly.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of connections that were aborted because the client died without closing the connection properly.'
           preprocessing:
             -
               type: JSONPATH
@@ -114,17 +117,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: b6185e79abd744f78ce579a83381ba87
           name: 'MySQL: Aborted connections per second'
           type: DEPENDENT
           key: mysql.aborted_connects.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of failed attempts to connect to the MySQL server.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of failed attempts to connect to the MySQL server.'
           preprocessing:
             -
               type: JSONPATH
@@ -136,27 +141,30 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{min(5m)}>{$MYSQL.ABORTED_CONN.MAX.WARN}'
+              uuid: 5934cb80f9c3442d978c63780b1ebc9f
+              expression: 'min(/MySQL by ODBC/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}'
               name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.'
               dependencies:
                 -
                   name: 'MySQL: Refused connections (max_connections limit reached)'
-                  expression: '{MySQL by ODBC:mysql.connection_errors_max_connections.rate.last()}>0'
+                  expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
         -
+          uuid: 9db77e72fd9d404a8e1fd4e72c92d75c
           name: 'MySQL: Binlog cache disk use'
           type: DEPENDENT
           key: mysql.binlog_cache_disk_use
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
           preprocessing:
             -
               type: JSONPATH
@@ -168,7 +176,12 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 05e7e91206bb4138a945ea0de2d8c01d
           name: 'MySQL: Buffer pool efficiency'
           type: CALCULATED
           key: mysql.buffer_pool_efficiency
@@ -176,15 +189,17 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: |
-            last(mysql.innodb_buffer_pool_reads) / 
-            ( last(mysql.innodb_buffer_pool_read_requests) + 
-            ( last(mysql.innodb_buffer_pool_read_requests) = 0 ) ) * 100 * 
-            ( last(mysql.innodb_buffer_pool_read_requests) > 0 )
+            last(//mysql.innodb_buffer_pool_reads) / 
+            ( last(//mysql.innodb_buffer_pool_read_requests) + 
+            ( last(//mysql.innodb_buffer_pool_read_requests) = 0 ) ) * 100 * 
+            ( last(//mysql.innodb_buffer_pool_read_requests) > 0 )
           description: 'The item shows how effectively the buffer pool is serving reads.'
-          applications:
+          tags:
             -
-              name: MySQL
+              tag: Application
+              value: MySQL
         -
+          uuid: ad5520e067ea405eb939d319fa9690e9
           name: 'MySQL: Buffer pool utilization'
           type: CALCULATED
           key: mysql.buffer_pool_utilization
@@ -192,22 +207,25 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: |
-            ( last(mysql.innodb_buffer_pool_pages_total) - 
-            last(mysql.innodb_buffer_pool_pages_free) ) / 
-            ( last(mysql.innodb_buffer_pool_pages_total) + 
-            ( last(mysql.innodb_buffer_pool_pages_total) = 0 ) ) * 100 * 
-            ( last(mysql.innodb_buffer_pool_pages_total) > 0 )
+            ( last(//mysql.innodb_buffer_pool_pages_total) - 
+            last(//mysql.innodb_buffer_pool_pages_free) ) / 
+            ( last(//mysql.innodb_buffer_pool_pages_total) + 
+            ( last(//mysql.innodb_buffer_pool_pages_total) = 0 ) ) * 100 * 
+            ( last(//mysql.innodb_buffer_pool_pages_total) > 0 )
           description: 'Ratio of used to total pages in the buffer pool.'
-          applications:
+          tags:
             -
-              name: MySQL
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{max(5m)}<{$MYSQL.BUFF_UTIL.MIN.WARN}'
-              name: 'MySQL: Buffer pool utilization is too low (less {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+              uuid: f4c2e4edf0c34bb1856ed392f2bc7c87
+              expression: 'max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}'
+              name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
         -
+          uuid: f05d592e6ae74e64bc54c649418761a6
           name: 'MySQL: Bytes received'
           type: DEPENDENT
           key: mysql.bytes_received.rate
@@ -215,10 +233,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes received from all clients.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of bytes received from all clients.'
           preprocessing:
             -
               type: JSONPATH
@@ -230,7 +245,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: ce737bc186f24014a70c75da2386986d
           name: 'MySQL: Bytes sent'
           type: DEPENDENT
           key: mysql.bytes_sent.rate
@@ -238,10 +258,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent to all clients.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of bytes sent to all clients.'
           preprocessing:
             -
               type: JSONPATH
@@ -253,7 +270,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: a43ec23dad9345a5a1b0ff8bda12ed77
           name: 'MySQL: Command Delete per second'
           type: DEPENDENT
           key: mysql.com_delete.rate
@@ -261,9 +283,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The Com_delete counter variable indicates the number of times the delete statement has been executed.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -275,7 +294,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: cd924e3b51074b3baf642a7aa1eeb474
           name: 'MySQL: Command Insert per second'
           type: DEPENDENT
           key: mysql.com_insert.rate
@@ -283,9 +307,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The Com_insert counter variable indicates the number of times the insert statement has been executed.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -297,7 +318,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 31e6372d1249442ab3ebdd993f397e26
           name: 'MySQL: Command Select per second'
           type: DEPENDENT
           key: mysql.com_select.rate
@@ -305,9 +331,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The Com_select counter variable indicates the number of times the select statement has been executed.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -319,7 +342,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 0f5f638777284093bcdc5f2dacc8e951
           name: 'MySQL: Command Update per second'
           type: DEPENDENT
           key: mysql.com_update.rate
@@ -327,9 +355,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The Com_update counter variable indicates the number of times the update statement has been executed.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -341,17 +366,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: fad5f4e1885341d1958f653afb85ff07
           name: 'MySQL: Connections per second'
           type: DEPENDENT
           key: mysql.connections.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of connection attempts (successful or not) to the MySQL server.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of connection attempts (successful or not) to the MySQL server.'
           preprocessing:
             -
               type: JSONPATH
@@ -363,7 +390,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 4b67e0e6291b4e0c841334ac052d7253
           name: 'MySQL: Connection errors accept per second'
           type: DEPENDENT
           key: mysql.connection_errors_accept.rate
@@ -371,9 +403,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors that occurred during calls to accept() on the listening port.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -385,17 +414,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 76ad3a39e89e44daad08cc00174d4918
           name: 'MySQL: Connection errors internal per second'
           type: DEPENDENT
           key: mysql.connection_errors_internal.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of refused connections due to internal server errors, for example out of memory errors, or failed thread starts.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of refused connections due to internal server errors, for example, out of memory errors, or failed thread starts.'
           preprocessing:
             -
               type: JSONPATH
@@ -407,7 +438,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 83dfb916c7674e1fbd300be444241e25
           name: 'MySQL: Connection errors max connections per second'
           type: DEPENDENT
           key: mysql.connection_errors_max_connections.rate
@@ -415,9 +451,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of refused connections due to the max_connections limit being reached.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -429,13 +462,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{last()}>0'
+              uuid: ac781c951ac0453a9c1008b2cf801518
+              expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
               name: 'MySQL: Refused connections (max_connections limit reached)'
               priority: AVERAGE
               description: 'Number of refused connections due to the max_connections limit being reached.'
         -
+          uuid: 9be4cb9e209344d0869a56082d16ec53
           name: 'MySQL: Connection errors peer address per second'
           type: DEPENDENT
           key: mysql.connection_errors_peer_address.rate
@@ -443,9 +482,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors while searching for the connecting client IP address.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -457,7 +493,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: e50b9fea89cc440abc0155dc25346f05
           name: 'MySQL: Connection errors select per second'
           type: DEPENDENT
           key: mysql.connection_errors_select.rate
@@ -465,9 +506,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors during calls to select() or poll() on the listening port. The client would not necessarily have been rejected in these cases.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -479,17 +517,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: a82a7ada012141c6bdff63bc8d615786
           name: 'MySQL: Connection errors tcpwrap per second'
           type: DEPENDENT
           key: mysql.connection_errors_tcpwrap.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of connections the libwrap library refused.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of connections the libwrap library has refused.'
           preprocessing:
             -
               type: JSONPATH
@@ -501,17 +541,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 84d748ab80444e10bdb60bcfbdfa850a
           name: 'MySQL: Created tmp tables on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_disk_tables.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of internal on-disk temporary tables created by the server while executing statements.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of internal on-disk temporary tables created by the server while executing statements.'
           preprocessing:
             -
               type: JSONPATH
@@ -523,13 +565,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
+              uuid: 8aec6a51fa3e4320b3c7c40858ac7f96
+              expression: 'min(/MySQL by ODBC/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
               name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
         -
+          uuid: c5f2ae1ef46e4f65842ab4a31625906a
           name: 'MySQL: Created tmp files on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_files.rate
@@ -537,9 +585,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'How many temporary files mysqld has created.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -551,23 +596,26 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
+              uuid: c1dbcf829bdf43fda3b4c2add576c8f0
+              expression: 'min(/MySQL by ODBC/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
               name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
         -
+          uuid: 95fa4f4f1db44b2bb65889da246c03b5
           name: 'MySQL: Created tmp tables on memory per second'
           type: DEPENDENT
           key: mysql.created_tmp_tables.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of internal temporary tables created by the server while executing statements.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of internal temporary tables created by the server while executing statements.'
           preprocessing:
             -
               type: JSONPATH
@@ -579,22 +627,25 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
+              uuid: d65c3ec6cacd41c58f5e2b209ca5a810
+              expression: 'min(/MySQL by ODBC/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
               name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
         -
+          uuid: e31f66bbc32b404c92debc4d9367162d
           name: 'MySQL: InnoDB buffer pool pages free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_free
           delay: '0'
           history: 7d
           description: 'The total size of the InnoDB buffer pool, in pages.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -602,16 +653,18 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Innodb_buffer_pool_pages_free'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 41019c084618404db183326c215d71f6
           name: 'MySQL: InnoDB buffer pool pages total'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_total
           delay: '0'
           history: 7d
           description: 'The total size of the InnoDB buffer pool, in pages.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -623,16 +676,18 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 441b718148974e289db93299f869feba
           name: 'MySQL: InnoDB buffer pool reads'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads
           delay: '0'
           history: 7d
-          description: 'The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
-          applications:
-            -
-              name: 'Zabbix raw items'
+          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -640,17 +695,19 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Innodb_buffer_pool_reads'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 22ae5946fc2548cf8eee39a57ce8512b
           name: 'MySQL: InnoDB buffer pool reads per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -662,16 +719,18 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 0a1775a7de33464e9ce8134950527021
           name: 'MySQL: InnoDB buffer pool read requests'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests
           delay: '0'
           history: 7d
-          description: 'The number of logical read requests.'
-          applications:
-            -
-              name: 'Zabbix raw items'
+          description: 'Number of logical read requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -679,17 +738,19 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Innodb_buffer_pool_read_requests'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 98684abf32e642bd8784e68e64357dc9
           name: 'MySQL: InnoDB buffer pool read requests per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of logical read requests per second.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of logical read requests per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -701,17 +762,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 4e829cbb3cc2485dac2757867badd0f4
           name: 'MySQL: Innodb buffer pool wait free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_wait_free
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing innodb_buffer_pool_size.'
           preprocessing:
             -
               type: JSONPATH
@@ -723,23 +786,30 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 4680fd31a2514e3f827b0060a6d5bfc4
           name: 'MySQL: Calculated value of innodb_log_file_size'
           type: CALCULATED
           key: mysql.innodb_log_file_size
           history: 7d
           value_type: FLOAT
-          params: '(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
-          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
-          applications:
-            -
-              name: MySQL
+          params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written)) / {$MYSQL.INNODB_LOG_FILES}'
+          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 79218a1068394ce69dfc6eeb626e83bc
           name: 'MySQL: Innodb number open files'
           type: DEPENDENT
           key: mysql.innodb_num_open_files
@@ -747,9 +817,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of open files held by InnoDB. InnoDB only.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -761,7 +828,12 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: fc561c5392bb43a4842977bdf4b882a8
           name: 'MySQL: Innodb log written'
           type: DEPENDENT
           key: mysql.innodb_os_log_written
@@ -770,9 +842,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Number of bytes written to the InnoDB log.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -784,7 +853,12 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: a62951afcfbd44e595a4d294b24056e5
           name: 'MySQL: InnoDB row lock time'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time
@@ -793,9 +867,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The total time spent in acquiring row locks for InnoDB tables, in milliseconds.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -811,7 +882,12 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 22277695b7154c019a76ca730e68e833
           name: 'MySQL: InnoDB row lock time max'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time_max
@@ -820,9 +896,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The maximum time to acquire a row lock for InnoDB tables, in milliseconds.'
-          applications:
-            -
-              name: MySQL
           preprocessing:
             -
               type: JSONPATH
@@ -838,16 +911,18 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 17c4270927a74d8388da8c25d9065556
           name: 'MySQL: InnoDB row lock waits'
           type: DEPENDENT
           key: mysql.innodb_row_lock_waits
           delay: '0'
           history: 7d
-          description: 'The number of times operations on InnoDB tables had to wait for a row lock.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of times operations on InnoDB tables had to wait for a row lock.'
           preprocessing:
             -
               type: JSONPATH
@@ -855,16 +930,18 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Innodb_row_lock_waits'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 6106ebf4cae842c1a5acc2f13518de4f
           name: 'MySQL: Max used connections'
           type: DEPENDENT
           key: mysql.max_used_connections
           delay: '0'
           history: 7d
-          description: 'The maximum number of connections that have been in use simultaneously since the server started.'
-          applications:
-            -
-              name: MySQL
+          description: 'The maximum number of connections that have been in use simultaneously since the server start.'
           preprocessing:
             -
               type: JSONPATH
@@ -876,17 +953,19 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 85e17b6b196e4916838e0318992fe33c
           name: 'MySQL: Open tables'
           type: DEPENDENT
           key: mysql.open_tables
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of tables that are open.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of tables that are open.'
           preprocessing:
             -
               type: JSONPATH
@@ -898,17 +977,19 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: c23ce7b2689745728465c5b405d7b3ba
           name: 'MySQL: Open table definitions'
           type: DEPENDENT
           key: mysql.open_table_definitions
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of cached table definitions.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of cached table definitions.'
           preprocessing:
             -
               type: JSONPATH
@@ -920,17 +1001,19 @@ zabbix_export:
                 - 6h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 2f0ced88c4524455bf790b3bc6512d04
           name: 'MySQL: Queries per second'
           type: DEPENDENT
           key: mysql.queries.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
           preprocessing:
             -
               type: JSONPATH
@@ -942,17 +1025,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 8d0fc2eb0be94d68966e09fca88e8deb
           name: 'MySQL: Questions per second'
           type: DEPENDENT
           key: mysql.questions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
           preprocessing:
             -
               type: JSONPATH
@@ -964,17 +1049,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: b0227399437f4219b65ab1511d5e67c6
           name: 'MySQL: Slow queries per second'
           type: DEPENDENT
           key: mysql.slow_queries.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of queries that have taken more than long_query_time seconds.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of queries that have taken more than long_query_time seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -986,22 +1073,25 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{min(5m)}>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
+              uuid: b981c7a2ffed4eddbc9f1d6913c2e4b0
+              expression: 'min(/MySQL by ODBC/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
               name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
         -
+          uuid: b675fd71138a4845965309dc5d6428d9
           name: 'MySQL: Threads cached'
           type: DEPENDENT
           key: mysql.threads_cached
           delay: '0'
           history: 7d
-          description: 'The number of threads in the thread cache.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of threads in the thread cache.'
           preprocessing:
             -
               type: JSONPATH
@@ -1009,16 +1099,18 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Threads_cached'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: af56c636c8b94e4f9976d0d6cf60fcbb
           name: 'MySQL: Threads connected'
           type: DEPENDENT
           key: mysql.threads_connected
           delay: '0'
           history: 7d
-          description: 'The number of currently open connections.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of currently open connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -1026,17 +1118,19 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Threads_connected'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 8a50d5788f8a449b994dbe76536076a2
           name: 'MySQL: Threads created per second'
           type: DEPENDENT
           key: mysql.threads_created.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -1048,16 +1142,18 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: c41afa83f6a94efda34d7b41c95c89ac
           name: 'MySQL: Threads running'
           type: DEPENDENT
           key: mysql.threads_running
           delay: '0'
           history: 7d
-          description: 'The number of threads that are not sleeping.'
-          applications:
-            -
-              name: MySQL
+          description: 'Number of threads which are not sleeping.'
           preprocessing:
             -
               type: JSONPATH
@@ -1065,17 +1161,19 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Threads_running'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
         -
+          uuid: 8fbad224ebdf46e7b25a0be015f21972
           name: 'MySQL: Uptime'
           type: DEPENDENT
           key: mysql.uptime
           delay: '0'
           history: 7d
           units: uptime
-          description: 'The number of seconds that the server has been up.'
-          applications:
-            -
-              name: MySQL
+          description: 'The amount of seconds that the server has been up.'
           preprocessing:
             -
               type: JSONPATH
@@ -1083,24 +1181,31 @@ zabbix_export:
                 - '$[?(@.Variable_name==''Uptime'')].Value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MySQL
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: ba9eb4fc244b41a6a30237e7a382fa54
+              expression: 'nodata(/MySQL by ODBC/mysql.uptime,30m)=1'
               name: 'MySQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'MySQL: Service is down'
-                  expression: '{MySQL by ODBC:db.odbc.select[ping,"{$MYSQL.DSN}"].last()}=0'
+                  expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
             -
-              expression: '{last()}<10m'
+              uuid: cd8f5996bd85434998595e041d6b0908
+              expression: 'last(/MySQL by ODBC/mysql.uptime)<10m'
               name: 'MySQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'MySQL uptime is less than 10 minutes.'
       discovery_rules:
         -
-          name: 'Databases discovery'
+          uuid: 0987fb6afdae4587bc32864fa42728f2
+          name: 'Database discovery'
           type: ODBC
           key: 'db.odbc.discovery[databases,"{$MYSQL.DSN}"]'
           delay: 1h
@@ -1117,6 +1222,7 @@ zabbix_export:
           description: 'Scanning databases in DBMS.'
           item_prototypes:
             -
+              uuid: f358179ef78b4a31affa9e049b4048b8
               name: 'MySQL: Size of database {#DATABASE}'
               type: ODBC
               key: 'db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]'
@@ -1126,20 +1232,22 @@ zabbix_export:
               params: 'SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"'
               username: '{$MYSQL.USER}'
               password: '{$MYSQL.PASSWORD}'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
         -
+          uuid: d0a235c0267c48e28bc6ecb99fb2380d
           name: 'Replication discovery'
           type: ODBC
           key: 'db.odbc.discovery[replication,"{$MYSQL.DSN}"]'
@@ -1150,6 +1258,7 @@ zabbix_export:
           description: 'If "show slave status" returns Master_Host, "Replication: *" items are created.'
           item_prototypes:
             -
+              uuid: d88f65c4bee84e74bb6e00061ab27f0c
               name: 'MySQL: Replication Slave status {#MASTER_HOST}'
               type: ODBC
               key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
@@ -1159,11 +1268,13 @@ zabbix_export:
               params: 'show slave status'
               username: '{$MYSQL.USER}'
               password: '{$MYSQL.PASSWORD}'
-              description: 'The item gets status information on essential parameters of the slave threads.'
-              applications:
+              description: 'The item gets status information on the essential parameters of the slave threads.'
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
+              uuid: 15f7b22867f54551afbed139d746e210
               name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
@@ -1171,12 +1282,9 @@ zabbix_export:
               history: 7d
               units: s
               description: |
-                The number of seconds that the slave SQL thread is behind processing the master binary log.
+                The amount of seconds the slave SQL thread has been behind processing the master binary log.
                 A high number (or an increasing one) can indicate that the slave is unable to handle events
                 from the master in a timely fashion.
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1194,12 +1302,18 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MYSQL.REPL_LAG.MAX.WARN}'
+                  uuid: f2188a73bbf34ffcb95b3e11e2824feb
+                  expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
                   name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
             -
+              uuid: e063b116753d4124a88443fe4de20d41
               name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
@@ -1209,11 +1323,8 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Whether the I/O thread for reading the master's binary log is running. 
-                Normally, you want this to be Yes unless you have not yet started replication or have 
+                Normally, you want this to be Yes unless you have not yet started a replication or have 
                 explicitly stopped it with STOP SLAVE.
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1225,21 +1336,28 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
               trigger_prototypes:
                 -
-                  expression: '{count(#1,"Yes",ne)}=1'
+                  uuid: 6f216036f4f14ae7adc8c70126bb315a
+                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
                   name: 'MySQL: The slave I/O thread is not connected to a replication master'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'MySQL: The slave I/O thread is not running'
-                      expression: '{MySQL by ODBC:mysql.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1'
+                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                 -
-                  expression: '{count(#1,"No",eq)}=1'
+                  uuid: ba08061a61df4bbb8bac516ecec91b70
+                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The slave I/O thread is not running'
                   priority: AVERAGE
                   description: 'Whether the I/O thread for reading the master''s binary log is running.'
             -
+              uuid: 113be79554c14c2aad08036febb15d71
               name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
@@ -1250,9 +1368,6 @@ zabbix_export:
               description: |
                 Whether the SQL thread for executing events in the relay log is running. 
                 As with the I/O thread, this should normally be Yes.
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1264,17 +1379,23 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
               trigger_prototypes:
                 -
-                  expression: '{count(#1,"No",eq)}=1'
+                  uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
+                  expression: 'count(/MySQL by ODBC/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The SQL thread is not running'
                   priority: WARNING
                   description: 'Whether the SQL thread for executing events in the relay log is running.'
                   dependencies:
                     -
                       name: 'MySQL: The slave I/O thread is not running'
-                      expression: '{MySQL by ODBC:mysql.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1'
+                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
             -
+              uuid: a88eb463bb9740a4a4256306f11816bf
               name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
@@ -1283,9 +1404,6 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'This shows the state of the SQL driver threads.'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1297,12 +1415,17 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
         -
+          uuid: ad12522557df499e9a78b8b3c07733dd
           name: 'MariaDB discovery'
           type: DEPENDENT
           key: mysql.extra_metric.discovery
@@ -1310,6 +1433,7 @@ zabbix_export:
           description: 'Additional metrics if MariaDB is used.'
           item_prototypes:
             -
+              uuid: eb8713584314461488b8769f1081d48d
               name: 'MySQL: Binlog commits'
               type: DEPENDENT
               key: 'mysql.binlog_commits[{#SINGLETON}]'
@@ -1317,9 +1441,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of transactions committed to the binary log.'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1327,7 +1448,12 @@ zabbix_export:
                     - '$[?(@.Variable_name==''Binlog_commits'')].Value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
             -
+              uuid: cbb7c1fadd934420b47950f52751795f
               name: 'MySQL: Binlog group commits'
               type: DEPENDENT
               key: 'mysql.binlog_group_commits[{#SINGLETON}]'
@@ -1335,9 +1461,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of group commits done to the binary log.'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1345,17 +1468,19 @@ zabbix_export:
                     - '$[?(@.Variable_name==''Binlog_group_commits'')].Value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
             -
+              uuid: 278488a9c0f543f6815a24592766d9bb
               name: 'MySQL: Master GTID wait count'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_count[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of times MASTER_GTID_WAIT called.'
-              applications:
-                -
-                  name: MySQL
+              description: 'The number of times MASTER_GTID_WAIT called.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1367,7 +1492,12 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
             -
+              uuid: 93ad282dc3b24dba9f0351b0d0a59d39
               name: 'MySQL: Master GTID wait timeouts'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_timeouts[{#SINGLETON}]'
@@ -1375,9 +1505,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of timeouts occurring in MASTER_GTID_WAIT.'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1389,7 +1516,12 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
             -
+              uuid: fd8bf7e639af4d3291030cdb9dd37bc9
               name: 'MySQL: Master GTID wait time'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_time[{#SINGLETON}]'
@@ -1397,9 +1529,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Total number of time spent in MASTER_GTID_WAIT.'
-              applications:
-                -
-                  name: MySQL
               preprocessing:
                 -
                   type: JSONPATH
@@ -1411,6 +1540,10 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: MySQL
           master_item:
             key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
           preprocessing:
@@ -1422,11 +1555,11 @@ zabbix_export:
         -
           macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'
           value: '3'
-          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+          description: 'Number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
           value: '50'
-          description: 'The minimum buffer pool utilization in percent for trigger expression.'
+          description: 'The minimum buffer pool utilization in percentage for trigger expression.'
         -
           macro: '{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
           value: '10'
@@ -1458,114 +1591,129 @@ zabbix_export:
         -
           macro: '{$MYSQL.SLOW_QUERIES.MAX.WARN}'
           value: '3'
-          description: 'The number of slow queries for trigger expression.'
+          description: 'Number of slow queries for trigger expression.'
         -
           macro: '{$MYSQL.USER}'
           value: '<Put your username here>'
           description: 'MySQL username.'
       dashboards:
         -
+          uuid: d56c53704c264552a09cf3e59a1835f3
           name: 'MySQL performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: Operations'
+                        host: 'MySQL by ODBC'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: Operations'
-                    host: 'MySQL by ODBC'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: Queries'
+                        host: 'MySQL by ODBC'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: Connections'
+                        host: 'MySQL by ODBC'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: Bandwidth'
+                        host: 'MySQL by ODBC'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: InnoDB buffer pool'
+                        host: 'MySQL by ODBC'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'MySQL: Threads'
+                        host: 'MySQL by ODBC'
+      valuemaps:
+        -
+          uuid: 622c38d0af2a4b6ea7a640a5d1a22b93
+          name: 'Service state'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: Queries'
-                    host: 'MySQL by ODBC'
+              value: '0'
+              newvalue: Down
             -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: Connections'
-                    host: 'MySQL by ODBC'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: Bandwidth'
-                    host: 'MySQL by ODBC'
-            -
-              type: GRAPH_CLASSIC
-              'y': '10'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: InnoDB buffer pool'
-                    host: 'MySQL by ODBC'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '10'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'MySQL: Threads'
-                    host: 'MySQL by ODBC'
+              value: '1'
+              newvalue: Up
   graphs:
     -
+      uuid: 3522a11cae374d08a751f419e51748e1
       name: 'MySQL: Bandwidth'
       graph_items:
         -
@@ -1582,6 +1730,7 @@ zabbix_export:
             host: 'MySQL by ODBC'
             key: mysql.bytes_sent.rate
     -
+      uuid: 51a6827371434314b76eaed17db0e09e
       name: 'MySQL: Connections'
       graph_items:
         -
@@ -1608,6 +1757,7 @@ zabbix_export:
             host: 'MySQL by ODBC'
             key: mysql.max_used_connections
     -
+      uuid: 07edad9e34394a689dc294c8ec27a37e
       name: 'MySQL: InnoDB buffer pool'
       graph_items:
         -
@@ -1634,6 +1784,7 @@ zabbix_export:
             host: 'MySQL by ODBC'
             key: mysql.innodb_buffer_pool_reads.rate
     -
+      uuid: 93bb7077e60047e59ac3fd308044722a
       name: 'MySQL: Operations'
       graph_items:
         -
@@ -1660,6 +1811,7 @@ zabbix_export:
             host: 'MySQL by ODBC'
             key: mysql.com_update.rate
     -
+      uuid: 172ad44d7cef4c20b08b4babf8969805
       name: 'MySQL: Queries'
       graph_items:
         -
@@ -1680,6 +1832,7 @@ zabbix_export:
             host: 'MySQL by ODBC'
             key: mysql.slow_queries.rate
     -
+      uuid: 1ce62612e1174b3fa91bde29ccaa27ef
       name: 'MySQL: Threads'
       graph_items:
         -
@@ -1705,13 +1858,3 @@ zabbix_export:
           item:
             host: 'MySQL by ODBC'
             key: mysql.threads_running
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

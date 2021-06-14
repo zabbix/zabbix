@@ -54,6 +54,8 @@ int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+void	__wrap_zbx_elastic_version_extract(void);
+int	__wrap_zbx_elastic_version_get(void);
 time_t	__wrap_time(time_t *ptr);
 void	__wrap_zbx_timespec(zbx_timespec_t *ts);
 
@@ -683,6 +685,15 @@ int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char val
 	ZBX_UNUSED(error);
 
 	return SUCCEED;
+}
+
+void	__wrap_zbx_elastic_version_extract(void)
+{
+}
+
+int	__wrap_zbx_elastic_version_get(void)
+{
+	return ZBX_DBVERSION_UNDEFINED;
 }
 
 /*

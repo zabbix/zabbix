@@ -38,9 +38,24 @@ if (array_key_exists('no_data', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('dashboard.grid.js');
+$this->addJsFile('class.calendar.js');
+$this->addJsFile('class.dashboard.js');
+$this->addJsFile('class.dashboard.page.js');
+$this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.clock.js');
+$this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.graph-prototype.js');
+$this->addJsFile('class.widget.map.js');
+$this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.problems.js');
+$this->addJsFile('class.widget.problemsbysv.js');
+$this->addJsFile('class.widget.svggraph.js');
+$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.cclock.js');
+$this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');
 
@@ -69,6 +84,35 @@ $widget = (new CWidget())
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))->setAttribute('aria-label', _('Content controls')))
+	->setKioskModeControls(
+		(count($data['dashboard']['pages']) > 1)
+			? (new CList())
+				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
+						->setTitle(_('Previous page'))
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
+						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+							? _s('Stop slideshow')
+							: _s('Start slideshow')
+						)
+						->addClass(
+							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+								? 'slideshow-state-started'
+								: 'slideshow-state-stopped'
+						)
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
+						->setTitle(_('Previous page'))
+				)
+			: null
+	)
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([
 		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
 		(new CSpan())->addItem($data['host']['name']),
@@ -81,30 +125,73 @@ $widget = (new CWidget())
 			->addClass(ZBX_STYLE_SELECTED)
 	])));
 
-if ($data['time_selector'] !== null) {
+if ($data['has_time_selector']) {
 	$widget->addItem(
 		(new CFilter(new CUrl()))
-			->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
+			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
+			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
 }
 
-if ($data['dashboard']['widgets']) {
+if (count($data['dashboard']['pages']) > 1
+		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
+	$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
+
+	if (count($data['dashboard']['pages']) > 1) {
+		$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE);
+	}
+
+	if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+		$dashboard->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+				->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
+						->addItem([
+							(new CSimpleButton())
+								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
+								->addClass('btn-iterator-page-previous')
+								->setEnabled(false),
+							(new CSimpleButton())
+								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
+								->addClass('btn-iterator-page-next')
+								->setEnabled(false),
+							(new CSimpleButton([
+								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
+								(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
+							]))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
+								->addClass(
+									($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+										? 'slideshow-state-started'
+										: 'slideshow-state-stopped'
+								)
+						])
+				)
+		);
+	}
+
+	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
+
 	$widget
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+		->addItem($dashboard)
 		->show();
 
-	(new CScriptTag(
-		'initializeHostDashboard('.
-			json_encode($data['host']).','.
-			json_encode($data['dashboard']).','.
-			json_encode($data['widget_defaults']).','.
-			json_encode($web_layout_mode).
-		');'
-	))
+	(new CScriptTag('
+		initializeView(
+			'.json_encode($data['host']).',
+			'.json_encode($data['dashboard']).',
+			'.json_encode($data['widget_defaults']).',
+			'.json_encode($data['time_period']).',
+			'.json_encode($web_layout_mode).'
+		);
+	'))
 		->setOnDocumentReady()
 		->show();
 }

@@ -220,6 +220,12 @@ $multiselect-selected-bg-color: #777777;
 $dashboard-shared-bg-color: #555555;
 $dashboard-my-bg-color: #555555;
 
+// Import compare.
+$toc-title-color: #ffffff;
+$toc-title-bg-color: #333333;
+$diff-added-bg-color: transparent;
+$diff-removed-bg-color: transparent;
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 
@@ -297,44 +303,63 @@ $dashboard-my-bg-color: #555555;
 	}
 }
 
+.dashboard-navigation-tabs {
+	.csortable-list {
+		& > .csortable-item:focus:not(:active) {
+			& > div {
+				box-shadow: 0 0 0 2px $blue;
+			}
+		}
+	}
+
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		border: 1px solid darken($action-hover-color, 40%);
+	}
+
+	& .csortable > .csortable-item > div.selected-tab,
+	& .csortable-list > .csortable-item > div.selected-tab {
+		span {
+			color: $white;
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-new-widget-placeholder {
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
+
+.dashboard-widget-placeholder {
+	.dashboard-widget-placeholder-box {
 		box-shadow: none;
 		border-color: $font-color;
 		background-color: transparent;
 	}
 
-	.dashbrd-grid-widget-set-size {
-		border: 2px dashed $font-color;
-		box-shadow: none;
-	}
-
-	.dashbrd-grid-new-widget-label {
+	.dashboard-widget-placeholder-label {
 		&::before {
 			background: url($sprite-path) no-repeat -213px -888px;
 		}
 	}
-}
 
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -401px -888px;
+	.dashboard-widget-placeholder-resizing {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+
+		.dashboard-widget-placeholder-label {
+			&::before {
+				background: url($sprite-path) no-repeat -401px -888px;
+			}
 		}
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
-	.dashbrd-grid-iterator {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-iterator {
 		&.ui-resizable-resizing,
 		&.ui-draggable-dragging {
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 0;
 			}
 		}
@@ -383,6 +408,7 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
+	dashboard-page-properties: url($sprite-path) no-repeat -318px -618px,
 	iterator-page-previous: url($sprite-path) no-repeat -244px -657px,
 	iterator-page-next: url($sprite-path) no-repeat -242px -623px,
 	widget-action: url($sprite-path) no-repeat -165px -618px,
@@ -397,6 +423,7 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
+//  .btn-dashboard-page-properties
 //  .btn-iterator-page-previous
 //  .btn-iterator-page-next
 //  .btn-widget-action
@@ -415,7 +442,7 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
+.btn-dashboard-conf {
 	background: url($sprite-path) no-repeat -201px -619px !important;
 }
 
@@ -444,10 +471,6 @@ $icon-widget-btn: (
 }
 
 .menu-popup {
-	.menu-popup-item-disabled {
-		color: $form-disabled-font-color;
-	}
-
 	.menu-popup-item {
 		&:hover,
 		&:focus,
@@ -471,6 +494,11 @@ $icon-widget-btn: (
 			&::before {
 				background: url($sprite-path) no-repeat -164px -835px;
 			}
+		}
+
+		&.disabled {
+			background-color: transparent;
+			color: $form-disabled-font-color;
 		}
 	}
 }
@@ -729,7 +757,7 @@ a.link-action {
 	color: darken($dark-yellow, 10%);
 }
 
-.dashbrd-widget-graph-link {
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;
@@ -1194,6 +1222,18 @@ td.inactive-bg {
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -285px;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -419px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -419px -8px;
 	}
 }
 

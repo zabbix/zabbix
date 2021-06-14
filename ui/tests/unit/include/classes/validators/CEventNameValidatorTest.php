@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,38 +19,41 @@
 **/
 
 
-class CEventNameValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CEventNameValidatorTest extends TestCase {
 
 	/**
 	 * @var CEventNameValidator $validator
 	 */
 	protected $validator;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->validator = new CEventNameValidator();
 	}
 
 	/**
 	 * An array of e-mails, results and error messages.
 	 */
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['', true, null],
 			['Macro except expression macro are ignored {ANY_MACRO_HERE}', true, null],
 			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', true, null],
 			['Simple expression macro {?100+1} test', true, null],
 			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', true, null],
-			['Macro as host name {?{{HOST.HOST}:item.func(1)}}', true, null],
-			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect syntax near "+321}"'],
-			['{?Expression macro without closing bracket', false, 'incorrect syntax near "Expression macro without closing bracket"'],
-			['Expression macro without closing bracket at the end of event name {?', false, 'unexpected end of string'],
-			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect syntax near "{?20+1}}"'],
-			['Empty expression macro {?}', false, 'incorrect syntax near "}"']
+			['Macro as host name {?func(/{HOST.HOST}/item)}', true, null],
+			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect expression starting from "+321}"'],
+			['Missing closing curly bracket {?123+321', false, 'unexpected end of expression macro'],
+			['{?Expression macro without closing bracket', false, 'incorrect expression starting from "Expression macro without closing bracket"'],
+			['Expression macro without closing bracket at the end of event name {?', false, 'incorrect expression starting from ""'],
+			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect expression starting from "{?20+1}}"'],
+			['Empty expression macro {?}', false, 'incorrect expression starting from "}"']
 		];
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 */
 	public function testValidateEmail($event_name, $expected, $error) {
 		$this->assertSame($this->validator->validate($event_name), $expected);

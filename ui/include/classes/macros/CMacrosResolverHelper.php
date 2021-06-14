@@ -577,23 +577,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve function parameter macros to "parameter_expanded" field.
-	 *
-	 * @static
-	 *
-	 * @param array  $data
-	 * @param string $data[n]['hostid']
-	 * @param string $data[n]['parameter']
-	 *
-	 * @return array
-	 */
-	public static function resolveFunctionParameters(array $data) {
-		self::init();
-
-		return self::$macrosResolver->resolveFunctionParameters($data);
-	}
-
-	/**
 	 * Expand functional macros in given map label.
 	 *
 	 * @param string $label			label to expand

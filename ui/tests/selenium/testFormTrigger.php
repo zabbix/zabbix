@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +27,17 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup triggers
  */
 class testFormTrigger extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	/**
 	 * The name of the Simple form test host created in the test data set.
@@ -441,7 +453,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => '6 and 0 or 0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+						'Invalid parameter "/1/expression": trigger expression must contain at least one /host/key reference.'
 					]
 				]
 			],
@@ -452,7 +464,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => '{Simple form test host}',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Invalid parameter "/1/expression": incorrect trigger expression starting from "{Simple form test host}".'
+						'Invalid parameter "/1/expression": incorrect expression starting from "{Simple form test host}".'
 					]
 				]
 			],
@@ -460,7 +472,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_simple',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -468,7 +480,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'HTML_symbols&#8704;&forall;&#8734;&ne;&sup;&Eta;&#937;&#958;&pi;&#8194;&mdash;&#8364;&loz;',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -476,7 +488,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'ASCII_characters&#33;&#40;&#51;&#101;&#10;&#25;',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -489,7 +501,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'url' => 'http://MyTrigger_allFields.com',
 					'severity' => 'Disaster',
 					'status' => false,
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -497,7 +509,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => '1234567890',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -505,7 +517,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => '0',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -513,7 +525,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -521,7 +533,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -529,7 +541,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -537,7 +549,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -545,7 +557,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -553,7 +565,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -561,7 +573,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -569,7 +581,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => '([)$^',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<0',
 					'formCheck' => true
 				]
 			],
@@ -577,7 +589,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_generalCheck',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
 					'url' => 'http://www.zabbix.com',
@@ -589,7 +601,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckURL',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<4',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<4',
 					'url' => 'triggers.php'
 				]
 			],
@@ -597,7 +609,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_CheckUrl',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<5',
 					'url' => 'javascript:alert(123);',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
@@ -609,7 +621,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0',
+					'expression' => 'last(/Zabbix host/test-item-reuse,#1)<0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
 						'Incorrect trigger expression. Host "Zabbix host" does not exist or you have no access to this host.'
@@ -620,7 +632,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
+					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
 						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
@@ -631,10 +643,10 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.somefunc(0)}<0',
+					'expression' => 'somefunc(/Simple form test host/test-item-reuse,#1)<0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
+						'Invalid parameter "/1/expression": unknown function "somefunc".'
 					]
 				]
 			],
@@ -642,10 +654,10 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)} or {#MACRO}',
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1) or {#MACRO}',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#MACRO}".'
+						'Invalid parameter "/1/expression": incorrect expression starting from "{#MACRO}".'
 					]
 				]
 			],
@@ -653,11 +665,10 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)} or {#MACRO}',
-					'constructor' => [[
+					'expression' => 'last(/Simple form test host/test-item-reuse,#1) or {#MACRO}',
+					'constructor' => [
 						'text' => ['A or B', 'A', 'B'],
 						'elements' => ['expr_0_46', 'expr_51_58']
-						]
 					]
 				]
 			],
@@ -665,11 +676,14 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0 or 8 and 9',
-					'constructor' => [[
+					'expression' => 'last(/Zabbix host/test-item-reuse,#1)<0 or 8 and 9',
+					'constructor' => [
 						'text' => ['A or (B and C)', 'Or', 'And', 'A', 'B', 'C'],
 						'elements' => ['expr_0_38', 'expr_43_43', 'expr_49_49'],
-						'elementError' => true
+						'elementError' => true,
+						'element_count' => 2,
+						'errors' => [
+							'last(/Zabbix host/test-item-reuse,#1):Unknown host, no such host present in system'
 						]
 					]
 				]
@@ -678,11 +692,14 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 or 8 and 9 + {Simple form test host:test-item-reuse.last(0)}',
-					'constructor' => [[
+					'expression' => 'last(/Simple form test host/someItem,#1)<0 or 8 and 9 + last(/Simple form test host/test-item-reuse,#1)',
+					'constructor' => [
 						'text' => ['A or (B and C)', 'A', 'B', 'C'],
-						'elements' => ['expr_0_48', 'expr_53_53', 'expr_59_109'],
-						'elementError' => true
+						'elements' => ['expr_0_41', 'expr_46_46', 'expr_52_102'],
+						'elementError' => true,
+						'element_count' => 2,
+						'errors' => [
+							'last(/Simple form test host/someItem,#1):Unknown host item, no such item in selected host'
 						]
 					]
 				]
@@ -691,11 +708,15 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.lasta(0)}<0 or 8 and 9 + {Simple form test host:test-item-reuse.last(0)}',
-					'constructor' => [[
+					'expression' => 'lasta(/Simple form test host/test-item-reuse,#1)<0 or 8 and 9 + last(/Simple form test host/test-item-reuse2,#1)',
+					'constructor' => [
 						'text' => ['A or (B and C)', 'A', 'B', 'C'],
-						'elements' => ['expr_0_49', 'expr_54_54', 'expr_60_110'],
-						'elementError' => true
+						'elements' => ['expr_0_49', 'expr_54_54', 'expr_60_111'],
+						'elementError' => true,
+						'element_count' => 4,
+						'errors' => [
+							'lasta(/Simple form test host/test-item-reuse,#1):Incorrect function is used',
+							'last(/Simple form test host/test-item-reuse2,#1):Unknown host item, no such item in selected host'
 						]
 					]
 				]
@@ -704,11 +725,12 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host@:test-item-reuse.last(0)}',
-					'constructor' => [[
+					'expression' => 'last(/Simple form test host@/test-item-reuse,#1)<0',
+					'constructor' => [
 						'errors' => [
-							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:test-item-reuse.last(0)}".']
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from "last(/Simple'.
+									' form test host@/test-item-reuse,#1)<0".'
 						]
 					]
 				]
@@ -717,11 +739,12 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:system .uptime.last(0)}',
-					'constructor' => [[
+					'expression' => 'last(/Simple form test host/system .uptime,#1)<0',
+					'constructor' => [
 						'errors' => [
-							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".']
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from '.
+									'"last(/Simple form test host/system .uptime,#1)<0".'
 						]
 					]
 				]
@@ -730,24 +753,12 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:system .uptime.last(0)}',
-					'constructor' => [[
+					'expression' => 'lastA(/Simple form test host/test-item-reuse,#1)<0',
+					'constructor' => [
 						'errors' => [
-							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".']
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.lastA(0)}',
-					'constructor' => [[
-						'errors' => [
-							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:test-item-reuse.lastA(0)}".']
+							'header' => 'Expression syntax error.',
+							'details' => 'Cannot build expression tree: incorrect expression starting from '.
+									'"lastA(/Simple form test host/test-item-reuse,#1)<0".'
 						]
 					]
 				]
@@ -836,34 +847,35 @@ class testFormTrigger extends CLegacyWebTest {
 		if (isset($data['constructor'])) {
 			$this->zbxTestClickButtonText('Expression constructor');
 
-			foreach($data['constructor'] as $constructor) {
-				if (isset($constructor['errors'])) {
-					foreach($constructor['errors'] as $err) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-bad'));
-						$this->zbxTestTextPresent($err);
+			$constructor = $data['constructor'];
+			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
+				$this->assertMessage(TEST_BAD, $constructor['errors']['header'], $constructor['errors']['details']);
+			}
+			else {
+				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
+				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
+				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'replace_expression') and text()='Replace']");
+
+				if (isset($constructor['text'])) {
+					foreach($constructor['text'] as $txt) {
+						$this->zbxTestTextPresent($txt);
+					}
+				}
+				if (isset($constructor['elements'])) {
+					foreach($constructor['elements'] as $elem) {
+						$this->zbxTestAssertElementPresentId($elem);
+					}
+				}
+				if (isset($constructor['elementError'])) {
+					$count = CTestArrayHelper::get($constructor, 'element_count', 1);
+					$this->assertEquals($count, $this->query('xpath://span[@class="icon-info status-red"]')->all()->count());
+					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
+					foreach ($constructor['errors'] as $error) {
+						$this->assertContains($error, $text);
 					}
 				}
 				else {
-					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
-					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
-					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'replace_expression') and text()='Replace']");
-
-					if (isset($constructor['text'])) {
-						foreach($constructor['text'] as $txt) {
-							$this->zbxTestTextPresent($txt);
-						}
-					}
-					if (isset($constructor['elements'])) {
-						foreach($constructor['elements'] as $elem) {
-							$this->zbxTestAssertElementPresentId($elem);
-						}
-					}
-					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//span[@class="icon-info status-red"]');
-					}
-					else {
-						$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
-					}
+					$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
 				}
 			}
 		}

@@ -81,14 +81,14 @@ class testInheritanceTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'testInheritanceTrigger',
-					'expression' => '{Inheritance test template:test-inheritance-item1.last()}=0'
+					'expression' => 'last(/Inheritance test template/test-inheritance-item1)=0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'description' => 'testInheritanceTrigger1',
-					'expression' => '{Inheritance test template:key-item-inheritance-test.last()}=0',
+					'expression' => 'last(/Inheritance test template/key-item-inheritance-test)=0',
 					'errors' => [
 						'Trigger "testInheritanceTrigger1" already exists on "Inheritance test template".'
 					]
@@ -199,7 +199,6 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$host_triggers_table->query('link', $inherited_trigger)->one()->click();
 		// Check trigger name.
 		$triggers_form->invalidate();
-//		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$name = $triggers_form->getField('Name')->getValue();
 		$this->assertEquals($name, $inherited_trigger);
 		// Check tags.

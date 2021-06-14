@@ -19,12 +19,14 @@
 **/
 
 
-class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CUpdateIntervalParserTest extends TestCase {
 
 	/**
 	 * An array of update intervals and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			// success
 			[
@@ -384,7 +386,7 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

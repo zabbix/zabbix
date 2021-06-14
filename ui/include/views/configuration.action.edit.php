@@ -31,9 +31,12 @@ $widget = (new CWidget())->setTitle(_('Actions'));
 $actionForm = (new CForm())
 	->setId('action-form')
 	->setName('action.edit')
+	->setAction((new CUrl('actionconf.php'))
+		->setArgument('eventsource', $data['eventsource'])
+		->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form'])
-	->addVar('eventsource', $data['eventsource']);
+	->addVar('form', $data['form']);
 
 if ($data['actionid']) {
 	$actionForm->addVar('actionid', $data['actionid']);
@@ -178,8 +181,6 @@ else {
 if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
-	$action_operation_hints = getActionOperationHints($data['action']['operations']);
-
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
@@ -189,16 +190,7 @@ if ($data['action']['operations']) {
 
 		if (array_key_exists('opcommand', $operation)) {
 			$operation['opcommand'] += [
-				'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scriptid' => '0',
-				'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_AGENT,
-				'port' => '',
-				'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
-				'username' => '',
-				'password' => '',
-				'publickey' => '',
-				'privatekey' => '',
-				'command' => ''
+				'scriptid' => '0'
 			];
 		}
 
@@ -210,10 +202,6 @@ if ($data['action']['operations']) {
 		}
 
 		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-
-		if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
-			$details->setHint($action_operation_hints[$operationid]);
-		}
 
 		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
@@ -335,8 +323,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
-		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations']);
-
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
 				continue;
@@ -357,10 +343,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			];
 
 			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-
-			if (array_key_exists($operationid, $action_operation_hints) && $action_operation_hints[$operationid]) {
-				$details->setHint($action_operation_hints[$operationid]);
-			}
 
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
@@ -427,8 +409,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	if ($data['action']['ack_operations']) {
 		$operation_descriptions = getActionOperationDescriptions([$data['action']], ACTION_ACKNOWLEDGE_OPERATION);
 
-		$operation_hints = getActionOperationHints($data['action']['ack_operations']);
-
 		foreach ($data['action']['ack_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_ACKNOWLEDGE_OPERATION])) {
 				continue;
@@ -439,10 +419,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			];
 
 			$details = new CSpan($operation_descriptions[0][$operationid]);
-
-			if (array_key_exists($operationid, $operation_hints) && $operation_hints[$operationid]) {
-				$details->setHint($operation_hints[$operationid]);
-			}
 
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
@@ -516,14 +492,14 @@ if ($data['actionid']) {
 				_('Delete current action?'),
 				url_param('form').url_param('eventsource').url_param('actionid')
 			),
-			new CButtonCancel(url_param('actiontype'))
+			new CButtonCancel(url_param('actiontype').url_param('eventsource'))
 		]
 	];
 }
 else {
 	$form_buttons = [
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('actiontype'))]
+		[new CButtonCancel(url_param('actiontype').url_param('eventsource'))]
 	];
 }
 

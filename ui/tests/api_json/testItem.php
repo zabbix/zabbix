@@ -24,14 +24,128 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
- * @on-before prepareUpdateData
+ * @onBefore prepareUpdateData
  */
 class testItem extends CAPITest {
 
 	protected static $items;
 
 	public static function getItemCreateData() {
+		$valid_item_types = [
+			ITEM_TYPE_ZABBIX => '50022',
+			ITEM_TYPE_TRAPPER => null,
+			ITEM_TYPE_SIMPLE => '50022',
+			ITEM_TYPE_INTERNAL => null,
+			ITEM_TYPE_ZABBIX_ACTIVE => null,
+			ITEM_TYPE_EXTERNAL => '50022',
+			ITEM_TYPE_DB_MONITOR => null,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_CALCULATED => null,
+			ITEM_TYPE_JMX => '50030',
+			ITEM_TYPE_DEPENDENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
+			ITEM_TYPE_SNMP => '50029',
+			ITEM_TYPE_SCRIPT => '50022'
+		];
+
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			switch ($type) {
+				case ITEM_TYPE_IPMI:
+					$params = [
+						'ipmi_sensor' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_TELNET:
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => '150151',
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_JMX:
+					$params = [
+						'username' => 'username',
+						'password' => 'password'
+					];
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$params = [
+						'url' => 'http://0.0.0.0'
+					];
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_SCRIPT:
+					$params = [
+						'params' => 'script',
+						'timeout' => '30s'
+					];
+					break;
+
+				default:
+					$params = [];
+					break;
+			}
+
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
+			$item_type_tests[] = [
+				'request_data' => $params + [
+					'name' => 'Item of type '.$type,
+					'key_' => 'item_of_type_'.$type,
+					'hostid' => '50009',
+					'type' => (string) $type,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'delay' => '30s'
+				],
+				'expected_error' => null
+			];
+		}
+
 		return [
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'Item with invalid item type',
+					'key_' => 'item_with_invalid_item_type',
+					'interfaceid' => '50022',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => '100',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
+					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT,
+					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				]).'.'
+			],
 			// Test update interval for mqtt key of the Agent item type.
 			[
 				'request_data' => [
@@ -95,6 +209,27 @@ class testItem extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
+					'name' => 'Item with some tags',
+					'key_' => 'trapper_item_1',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'delay' => '0',
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value 1'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value 2'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[5]',
 					'interfaceid' => '50022',
@@ -125,7 +260,7 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
 			]
-		];
+		] + $item_type_tests;
 	}
 
 	/**
@@ -144,6 +279,17 @@ class testItem extends CAPITest {
 
 				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
 					$this->assertSame($db_item[$field], strval($request_data[$field]));
+				}
+
+				if (array_key_exists('tags', $request_data)) {
+					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($id)));
+					uasort($request_data['tags'], function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					uasort($db_tags, function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					$this->assertTrue(array_values($db_tags) === array_values($request_data['tags']));
 				}
 			}
 		}

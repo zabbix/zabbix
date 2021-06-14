@@ -45,7 +45,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 		]);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'actions' => $actions,
 			'alerts'  => $alerts,
 			'db_users' => $db_users,
@@ -112,7 +112,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 
 		return $userids
 			? API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
+				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
 			])

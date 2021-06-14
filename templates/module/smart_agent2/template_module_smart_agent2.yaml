@@ -1,0 +1,370 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T08:05:35Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: 7b6c6228b25f4586b42cd1bf37ff8034
+      template: 'SMART by Zabbix agent 2'
+      name: 'SMART by Zabbix agent 2'
+      description: |
+        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 2e5275a0b4174632ace850cdf6586cb9
+          name: 'SMART: Get attributes'
+          key: smart.disk.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+      discovery_rules:
+        -
+          uuid: c5aede547c19434c90f72e43276fe1d7
+          name: 'Attribute discovery'
+          key: smart.attribute.discovery
+          delay: 1h
+          description: 'Discovery SMART Vendor Specific Attributes of disks.'
+          item_prototypes:
+            -
+              uuid: 2af3d630a99a4989b94e2afd782a3f78
+              name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME}'
+              type: DEPENDENT
+              key: 'smart.disk.error[{#NAME},{#ID}]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_attributes.table[?(@.id=={#ID})].value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 686066892ab94b86a97ba1902d361f97
+                  expression: 'last(/SMART by Zabbix agent 2/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}'
+                  name: 'SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed'
+                  priority: WARNING
+                  description: 'The value should be greater than THRESH.'
+          overrides:
+            -
+              name: 'ID filter'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ID}'
+                    value: '{$SMART.ATTRIBUTE.ID.MATCHES}'
+                    formulaid: A
+                  -
+                    macro: '{#NAME}'
+                    value: '{$SMART.DISK.NAME.MATCHES}'
+                    formulaid: B
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          uuid: 4575af2717ec4bf78645edb84a966c84
+          name: 'Disk discovery'
+          key: smart.disk.discovery
+          delay: 1h
+          description: 'Discovery SMART disks.'
+          item_prototypes:
+            -
+              uuid: c186f7ce1b8d4311997c84fd5c239819
+              name: 'SMART [{#NAME}]: Critical warning'
+              type: DEPENDENT
+              key: 'smart.disk.critical_warning[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'This field indicates critical warnings for the state of the controller.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.critical_warning.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+            -
+              uuid: 365f9642f2764116923bb3e014eefa22
+              name: 'SMART [{#NAME}]: Power on hours'
+              type: DEPENDENT
+              key: 'smart.disk.hours[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].power_on_time.hours.first()'
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+            -
+              uuid: 8478d6421fb044339e2118848ac6d56b
+              name: 'SMART [{#NAME}]: Media errors'
+              type: DEPENDENT
+              key: 'smart.disk.media_errors[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Contains the number of occurrences where the controller detected an unrecovered data integrity error. Errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch are included in this field.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.media_errors.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+            -
+              uuid: b6abf9b52c694600b63fce4a68fc0fbd
+              name: 'SMART [{#NAME}]: Device model'
+              type: DEPENDENT
+              key: 'smart.disk.model[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].model_name.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+            -
+              uuid: 6ce46d274a694eac9700bd02a936f4be
+              name: 'SMART [{#NAME}]: Percentage used'
+              type: DEPENDENT
+              key: 'smart.disk.percentage_used[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].nvme_smart_health_information_log.percentage_used.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: e2bc2b0e195446d7973037be8e41eb6f
+                  expression: 'last(/SMART by Zabbix agent 2/smart.disk.percentage_used[{#NAME}])>90'
+                  name: 'SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance'
+                  priority: AVERAGE
+            -
+              uuid: 62f98419c8034f389a5be3755eac8938
+              name: 'SMART [{#NAME}]: Serial number'
+              type: DEPENDENT
+              key: 'smart.disk.sn[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].serial_number.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 7257c02f398f4338ace1eb3a07cb7362
+                  expression: '(last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}],#2))=1 and length(last(/SMART by Zabbix agent 2/smart.disk.sn[{#NAME}]))>0'
+                  name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close.'
+                  manual_close: 'YES'
+            -
+              uuid: 2f5b054d7a644e029a195d17f525c191
+              name: 'SMART [{#NAME}]: Temperature'
+              type: DEPENDENT
+              key: 'smart.disk.temperature[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: °C
+              description: 'Current drive temperature.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].temperature.current.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: cd09aebe3ca146119cdf5b977bf6b018
+                  expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
+                  name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                  priority: AVERAGE
+                -
+                  uuid: aaa5acb3196b481f894998c0ca5ea165
+                  expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
+                  name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
+                      expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
+            -
+              uuid: 434b338d88e041dd9b6a0b7aaa403076
+              name: 'SMART [{#NAME}]: Self-test passed'
+              type: DEPENDENT
+              key: 'smart.disk.test[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The disk is passed the SMART self-test or not.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_data.self_test.status.passed.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 5fa97df4012e45279fb55724f617ef4a
+                  expression: 'last(/SMART by Zabbix agent 2/smart.disk.test[{#NAME}])="false"'
+                  name: 'SMART [{#NAME}]: Disk self-test is not passed'
+                  priority: HIGH
+          overrides:
+            -
+              name: 'Not NVMe'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#DISKTYPE}'
+                    value: nvme
+                    operator: NOT_MATCHES_REGEX
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: Media|Percentage|Critical
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: Self-test
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#DISKTYPE}'
+                    value: nvme
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: Self-test
+                  status: ENABLED
+                  discover: NO_DISCOVER
+      macros:
+        -
+          macro: '{$SMART.ATTRIBUTE.ID.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+        -
+          macro: '{$SMART.DISK.NAME.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+        -
+          macro: '{$SMART.TEMPERATURE.MAX.CRIT}'
+          value: '65'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'
+        -
+          macro: '{$SMART.TEMPERATURE.MAX.WARN}'
+          value: '50'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'

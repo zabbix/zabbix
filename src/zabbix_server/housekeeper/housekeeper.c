@@ -557,37 +557,59 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  * Parameters: rules - [IN/OUT] history housekeeping rules                    *
  *             now   - [IN] the current timestamp                             *
  *                                                                            *
- * Return value: the number of tables processed                               *
- *                                                                            *
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
-	int		keep_from, history_seconds;
+#if defined(HAVE_POSTGRESQL)
+	int		history_seconds;
 	DB_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	history_seconds = *rule->poption;
 
-	if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+	if (0 == history_seconds)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
-		return;
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, rule->table);
+
+		result = DBselect(1 == ZBX_DB_TSDB_V1 ?
+				"select drop_chunks(table_name=>'%s',newer_than=>0)" :
+				"select drop_chunks(relation=>'%s',newer_than=>0)",
+				rule->table);
+	}
+	else
+	{
+		int	keep_from;
+
+		if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
+			goto out;
+		}
+
+		keep_from = now - history_seconds;
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
+
+		result = DBselect(1 == ZBX_DB_TSDB_V1 ?
+				"select drop_chunks(table_name=>'%s',older_than=>%d)" :
+				"select drop_chunks(relation=>'%s',older_than=>%d)",
+				rule->table, keep_from);
 	}
 
-	keep_from = now - history_seconds;
-	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
-
-	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
 
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
 	else
 		DBfree_result(result);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;
+#else
+	ZBX_UNUSED(rule);
+	ZBX_UNUSED(now);
+#endif
 }
 
 /******************************************************************************

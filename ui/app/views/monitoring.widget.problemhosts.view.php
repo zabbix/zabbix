@@ -149,7 +149,7 @@ foreach ($data['groups'] as $group) {
 }
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $table->toString()
 ];
 

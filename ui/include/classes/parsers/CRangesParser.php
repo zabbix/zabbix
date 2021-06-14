@@ -32,7 +32,8 @@ class CRangesParser extends CParser {
 	private $range_parser;
 
 	/**
-	 * Array of status code ranges.
+	 * Array of ranges strings. Range value with suffix will be stored as string of calculated value, value "1K"
+	 * will be stored as "1024".
 	 *
 	 * @var array
 	 */
@@ -41,28 +42,29 @@ class CRangesParser extends CParser {
 	/**
 	 * Options to initialize other parsers.
 	 *
+	 * usermacros   Allow usermacros in ranges.
+	 * lldmacros    Allow lldmacros in ranges.
+	 * with_minus   Allow negative ranges.
+	 * with_float   Allow float number ranges.
+	 * with_suffix  Allow number ranges with suffix, supported suffixes see CNumberParser::$suffixes.
+	 *
 	 * @var array
 	 */
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'with_minus' => false,
+		'with_float' => false,
+		'with_suffix' => false
 	];
 
 	/**
 	 * @param array $options   An array of options to initialize other parsers.
 	 */
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
 
-		$this->range_parser = new CRangeParser([
-			'usermacros' => $this->options['usermacros'],
-			'lldmacros' => $this->options['lldmacros']
-		]);
+		$this->range_parser = new CRangeParser($this->options);
 	}
 
 	/**

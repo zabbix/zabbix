@@ -25,16 +25,24 @@
 class CExpressionMacroParser extends CParser {
 
 	/**
-	 * @var CTriggerExpression
+	 * @var CExpressionParser
 	 */
-	protected $trigger_expression_parser;
+	private $expression_parser;
+
+	/**
+	 * @var string
+	 */
+	private $error = '';
 
 	/**
 	 * Set up necessary parsers.
 	 */
 	public function __construct() {
-		$this->trigger_expression_parser = new CTriggerExpression([
-			'host_macro' => ['{HOST.HOST}']
+		$this->expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
 		]);
 	}
 
@@ -47,28 +55,35 @@ class CExpressionMacroParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->error = '';
 
 		$p = $pos;
 
-		if (!isset($source[$p]) || substr($source, $p, 2) !== '{?') {
-			$this->errorPos($source, $p);
-
+		if (substr($source, $p, 2) !== '{?') {
 			return CParser::PARSE_FAIL;
 		}
 		$p += 2;
 
-		$this->trigger_expression_parser->parse(substr($source, $p));
+		switch ($this->expression_parser->parse($source, $p)) {
+			case CParser::PARSE_SUCCESS_CONT:
+				$this->error = $this->expression_parser->getError();
+				break;
 
-		if ($this->trigger_expression_parser->error_type !== CTriggerExpression::ERROR_UNPARSED_CONTENT) {
-			$this->errorPos($source, $p + $this->trigger_expression_parser->error_pos);
-
-			return CParser::PARSE_FAIL;
+			case CParser::PARSE_FAIL:
+				$this->error = $this->expression_parser->getError();
+				return CParser::PARSE_FAIL;
 		}
-		$p += $this->trigger_expression_parser->error_pos;
+		$p += $this->expression_parser->getLength();
+
+		while (isset($source[$p]) && strpos(CExpressionParser::WHITESPACES, $source[$p]) !== false) {
+			$p++;
+		}
+
+		if (!isset($source[$p])) {
+			$this->error = _('unexpected end of expression macro');
+		}
 
 		if (!isset($source[$p]) || $source[$p] !== '}') {
-			$this->errorPos($source, $p);
-
 			return CParser::PARSE_FAIL;
 		}
 		$p++;
@@ -76,6 +91,16 @@ class CExpressionMacroParser extends CParser {
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return (isset($source[$pos + $this->length]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
+		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
 	}
+
+	/**
+	 * Returns the error message if the expression macro is invalid.
+	 *
+	 * @return string
+	 */
+	public function getError(): string {
+		return $this->error;
+	}
+
 }

@@ -199,20 +199,19 @@
 	 *                                          component hierarchy. These are kept in props object. Default props must
 	 *                                          be provided here.
 	 * @param {object} props['eventsource']
-	 * @param {object} props['operation_type']
-	 * @param {object} props['command_type']
+	 * @param {object} props['cmd']
+	 * @param {object} props['scriptid']
 	 */
 	function OperationView(props) {
 		this.props = props;
-
 		this.$obj = $($('#operation-popup-tmpl').html());
 		this.$wrapper = this.$obj.find('>ul');
-
 		this.operation_type = new OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
 		this.$current_focus = this.operation_type.$select;
 
-		this.operation_type.onchange = (operation_type) => {
-			this.props.operation_type = operation_type;
+		this.operation_type.onchange = ({cmd, scriptid}) => {
+			this.props.cmd = cmd;
+			this.props.scriptid = scriptid;
 			this.render();
 			this.onupdate();
 			this.operation_type.$select.focus();
@@ -220,15 +219,7 @@
 
 		this.operation_steps = new OperationViewSteps(this.$obj.find('>ul>li[id^="operation-step"]'));
 		this.operation_message = new OperationViewMessage(this.$obj.find('>ul>li[id^="operation-message"]'));
-
 		this.operation_command = new OperationViewCommand(this.$obj.find('>ul>li[id^="operation-command"]'));
-		this.operation_command.onchange = (command_type) => {
-			this.props.command_type = command_type;
-			this.render();
-			this.onupdate();
-			this.operation_command.$type_select.focus();
-		};
-
 		this.operation_attr = new OperationViewAttr(this.$obj.find('>ul>li[id^="operation-attr"]'));
 		this.operation_condition = new OperationViewCondition(this.$obj.find('>ul>li[id^="operation-condition"]'));
 	}
@@ -254,17 +245,16 @@
 	 */
 	OperationView.prototype.render = function() {
 		this.detach();
-
 		this.operation_type.attach(this.$wrapper);
 		this.operation_steps.attach(this.$wrapper);
 
-		if (this.props.operation_type == operation_details.OPERATION_TYPE_MESSAGE
-				|| this.props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE
-				|| this.props.operation_type == operation_details.OPERATION_TYPE_RECOVERY_MESSAGE) {
+		if (this.props.cmd !== null && (this.props.cmd == operation_details.OPERATION_TYPE_MESSAGE
+				|| this.props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE
+				|| this.props.cmd == operation_details.OPERATION_TYPE_RECOVERY_MESSAGE)) {
 			this.operation_message.attach(this.$wrapper, this.props);
 		}
-		else if (this.props.operation_type == operation_details.OPERATION_TYPE_COMMAND) {
-			this.operation_command.attach(this.$wrapper, this.props);
+		else if (this.props.scriptid != null) {
+			this.operation_command.attach(this.$wrapper);
 		}
 
 		this.operation_attr.attach(this.$wrapper, this.props);
@@ -302,7 +292,6 @@
 			this.operation_command.attach = this.operation_command.detach;
 		}
 		else {
-			this.props.command_type = conf.operation_command.type;
 			this.operation_command.setConfig(conf.operation_command);
 		}
 
@@ -320,12 +309,11 @@
 			this.operation_condition.setConfig(conf.operation_condition);
 		}
 
-		if (conf.operation_type === null) {
+		if (conf.operation_types === null) {
 			this.operation_type.attach = this.operation_type.detach;
 		}
 		else {
-			this.props.operation_type = conf.operation_type.selected;
-			this.operation_type.setConfig(conf.operation_type);
+			this.operation_type.setConfig(conf.operation_types);
 		}
 	};
 
@@ -335,7 +323,6 @@
 	function OperationViewMessage($obj) {
 		this.$obj = $obj;
 		this.$notice = $obj.siblings('#operation-message-notice');
-
 		this.$custom = $obj.siblings('#operation-message-custom');
 		this.$custom.find('input[type="checkbox"]')
 			.on('change', ({target}) => this.showCustomMessage(target.checked));
@@ -479,19 +466,19 @@
 	 *
 	 * @param {jQuery} $wrapper
 	 * @param {object} props
-	 * @param {string} props['operation_type']
+	 * @param {string} props['cmd']
 	 * @param {string} props['recovery_phase']
 	 */
 	OperationViewMessage.prototype.attach = function($wrapper, props) {
 		this.detach();
 
-		if (props.operation_type == operation_details.OPERATION_TYPE_MESSAGE) {
+		if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_MESSAGE) {
 			this.$notice.appendTo($wrapper);
 			this.$usergroups.appendTo($wrapper);
 			this.$users.appendTo($wrapper);
 			this.$mediatype_only.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
+		else if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
@@ -521,280 +508,10 @@
 	/**
 	 * @param {jQuery} $obj  JQuery collection to hydrate.
 	 */
-	function OperationViewCommandTypeCustomScript($obj) {
-		this.$script_target = $obj.siblings('#operation-command-script-target');
-		this.$cmd = $obj.siblings('#operation-command-cmd');
-		this.$cmd_input = this.$cmd.find('textarea');
-	}
-
-	/**
-	 * @param {object} conf  See OperationViewCommand.setConfig doc-block.
-	 */
-	OperationViewCommandTypeCustomScript.prototype.setConfig = function(conf) {
-		this.$cmd_input.val(conf.command);
-		this.$script_target.find(`[value="${conf.execute_on}"]`).prop('checked', true);
-	};
-
-	/**
-	 * @param {jQuery} $wrapper
-	 */
-	OperationViewCommandTypeCustomScript.prototype.attach = function($wrapper) {
-		this.$script_target.appendTo($wrapper);
-		this.$cmd.appendTo($wrapper);
-	};
-
-	/**
-	 * Detaches all instance nodes.
-	 */
-	OperationViewCommandTypeCustomScript.prototype.detach = function() {
-		this.$script_target.detach();
-		this.$cmd.detach();
-	};
-
-	/**
-	 * @param {jQuery} $obj  JQuery collection to hydrate.
-	 */
-	function OperationViewCommandTypeGlobalScript($obj) {
-		this.$global_script = $obj.siblings('#operation-command-global-script');
-		this.$global_script_name = this.$global_script.find('[name="operation[opcommand][script]"]')
-		this.$global_script_id = this.$global_script.find('[name="operation[opcommand][scriptid]"]')
-
-		this.$global_script_select = this.$global_script.find('button');
-		this.$global_script_select.on('click', ({target}) => this.showScriptsPopup(target));
-	}
-
-	/**
-	 * @param {Node} return_focus
-	 */
-	OperationViewCommandTypeGlobalScript.prototype.showScriptsPopup = function(return_focus) {
-		PopUp('popup.generic', {
-			srctbl: 'scripts',
-			srcfld1: 'scriptid',
-			srcfld2: 'name',
-			dstfrm: 'popup.operation',
-			dstfld1: 'operation_opcommand_scriptid',
-			dstfld2: 'operation_opcommand_script'
-		}, null, return_focus);
-	};
-
-	/**
-	 * @param {object} conf  See OperationViewCommand.setConfig doc-block.
-	 */
-	OperationViewCommandTypeGlobalScript.prototype.setConfig = function(conf) {
-		this.$global_script_name.val(conf.global_script.name);
-		this.$global_script_id.val(conf.global_script.scriptid);
-	};
-
-	/**
-	 * @param {jQuery} $wrapper
-	 */
-	OperationViewCommandTypeGlobalScript.prototype.attach = function($wrapper) {
-		this.$global_script.appendTo($wrapper);
-	};
-
-	/**
-	 * Detaches all instance nodes.
-	 */
-	OperationViewCommandTypeGlobalScript.prototype.detach = function() {
-		this.$global_script.detach();
-	};
-
-	/**
-	 * @param {jQuery} $obj  JQuery collection to hydrate.
-	 */
-	function OperationViewCommandTypeIPMI($obj) {
-		this.$cmd_ipmi = $obj.siblings('#operation-command-cmd-ipmi');
-		this.$cmd_ipmi_input = this.$cmd_ipmi.find('input');
-	}
-
-	/**
-	 * @param {object} conf  See OperationViewCommand.setConfig doc-block.
-	 */
-	OperationViewCommandTypeIPMI.prototype.setConfig = function(conf) {
-		this.$cmd_ipmi_input.val(conf.command);
-	};
-
-	/**
-	 * @param {jQuery} $wrapper
-	 */
-	OperationViewCommandTypeIPMI.prototype.attach = function($wrapper) {
-		this.$cmd_ipmi.appendTo($wrapper);
-	};
-
-	/**
-	 * Detaches all instance nodes.
-	 */
-	OperationViewCommandTypeIPMI.prototype.detach = function() {
-		this.$cmd_ipmi.detach();
-	};
-
-	/**
-	 * @param {jQuery} $obj  JQuery collection to hydrate.
-	 */
-	function OperationViewCommandTypeSSH($obj) {
-		this.$authtype = $obj.siblings('#operation-command-authtype');
-		this.$username = $obj.siblings('#operation-command-username');
-		this.$pubkey = $obj.siblings('#operation-command-pubkey');
-		this.$privatekey = $obj.siblings('#operation-command-privatekey');
-		this.$password = $obj.siblings('#operation-command-password');
-		this.$passphrase = $obj.siblings('#operation-command-passphrase');
-		this.$port = $obj.siblings('#operation-command-port');
-		this.$cmd = $obj.siblings('#operation-command-cmd');
-
-		this.$authtype_select = this.$authtype.find('z-select');
-		this.$privatekey_input = this.$privatekey.find('input');
-		this.$publickey_input = this.$pubkey.find('input');
-		this.$password_input = this.$password.find('input');
-		this.$passphrase_input = this.$passphrase.find('input');
-
-		this.$authtype_select.on('change', ({target}) => {
-			if (target.value == operation_details.ITEM_AUTHTYPE_PUBLICKEY) {
-				this.viewAuthTypePublicKey();
-			}
-			else {
-				this.viewAuthTypePassword();
-			}
-		});
-	}
-
-	/**
-	 * Sets instance view by toggling node style-display.
-	 */
-	OperationViewCommandTypeSSH.prototype.viewAuthTypePublicKey = function() {
-		this.$password.hide();
-		this.$password_input.prop('disabled', true);
-
-		this.$passphrase.show();
-		this.$passphrase_input.prop('disabled', false);
-
-		this.$privatekey.show();
-		this.$privatekey_input.prop('disabled', false);
-
-		this.$pubkey.show();
-		this.$publickey_input.prop('disabled', false);
-	};
-
-	/**
-	 * Sets instance view by toggling node style-display.
-	 */
-	OperationViewCommandTypeSSH.prototype.viewAuthTypePassword = function() {
-		this.$password.show();
-		this.$password_input.prop('disabled', false);
-
-		this.$passphrase.hide();
-		this.$passphrase_input.prop('disabled', true);
-
-		this.$privatekey.hide();
-		this.$privatekey_input.prop('disabled', true);
-
-		this.$pubkey.hide();
-		this.$publickey_input.prop('disabled', true);
-	};
-
-	/**
-	 * @param {object} conf  See OperationViewCommand.setConfig doc-block.
-	 */
-	OperationViewCommandTypeSSH.prototype.setConfig = function(conf) {
-		this.$authtype_select.val(conf.authtype);
-		this.$authtype_select.trigger('change');
-
-		this.$privatekey_input.val(conf.privatekey);
-		this.$publickey_input.val(conf.publickey);
-		this.$passphrase_input.val(conf.password);
-		this.$password_input.val(conf.password);
-	};
-
-	/**
-	 * @param {jQuery} $wrapper
-	 */
-	OperationViewCommandTypeSSH.prototype.attach = function($wrapper) {
-		this.$authtype.appendTo($wrapper);
-		this.$username.appendTo($wrapper);
-		this.$pubkey.appendTo($wrapper);
-		this.$privatekey.appendTo($wrapper);
-		this.$password.appendTo($wrapper);
-		this.$passphrase.appendTo($wrapper);
-		this.$port.appendTo($wrapper);
-		this.$cmd.appendTo($wrapper);
-	};
-
-	/**
-	 * Detaches all instance nodes.
-	 */
-	OperationViewCommandTypeSSH.prototype.detach = function() {
-		this.$authtype.detach();
-		this.$username.detach();
-		this.$pubkey.detach();
-		this.$privatekey.detach();
-		this.$password.detach();
-		this.$passphrase.detach();
-		this.$port.detach();
-		this.$cmd.detach();
-	};
-
-	/**
-	 * @param {jQuery} $obj  JQuery collection to hydrate.
-	 */
-	function OperationViewCommandTypeTelnet($obj) {
-		this.$username = $obj.siblings('#operation-command-username');
-		this.$password = $obj.siblings('#operation-command-password');
-		this.$port = $obj.siblings('#operation-command-port');
-		this.$cmd = $obj.siblings('#operation-command-cmd');
-
-		this.$username_input = this.$username.find('input');
-		this.$password_input = this.$password.find('input');
-		this.$port_input = this.$port.find('input');
-		this.$cmd_input = this.$cmd.find('input');
-	}
-
-	/**
-	 * @param {object} conf  See OperationViewCommand.setConfig doc-block.
-	 */
-	OperationViewCommandTypeTelnet.prototype.setConfig = function(conf) {
-		this.$username_input.val(conf.username);
-		this.$password_input.val(conf.password);
-		this.$port_input.val(conf.port);
-		this.$cmd_input.val(conf.command);
-	};
-
-	/**
-	 * @param {jQuery} $wrapper
-	 */
-	OperationViewCommandTypeTelnet.prototype.attach = function($wrapper) {
-		this.$username.appendTo($wrapper);
-		this.$password.appendTo($wrapper);
-		this.$port.appendTo($wrapper);
-		this.$cmd.appendTo($wrapper);
-	};
-
-	/**
-	 * Detaches all instance nodes.
-	 */
-	OperationViewCommandTypeTelnet.prototype.detach = function() {
-		this.$username.detach();
-		this.$password.detach();
-		this.$port.detach();
-		this.$cmd.detach();
-	};
-
-	/**
-	 * @param {jQuery} $obj  JQuery collection to hydrate.
-	 */
 	function OperationViewCommand($obj) {
 		this.$obj = $obj;
-
-		this.type_custom_script = new OperationViewCommandTypeCustomScript($obj);
-		this.type_global_script = new OperationViewCommandTypeGlobalScript($obj);
-		this.type_ipmi = new OperationViewCommandTypeIPMI($obj);
-		this.type_ssh = new OperationViewCommandTypeSSH($obj);
-		this.type_telnet = new OperationViewCommandTypeTelnet($obj);
-
-		this.$type = $obj.siblings('#operation-command-type');
-		this.$type_select = $obj.find('z-select[name="operation[opcommand][type]"]');
-
-		this.$targets = $obj.siblings('#operation-command-targets');
+		this.$targets = $obj;
 		this.$targets_current = this.$targets.find('#operation-command-chst');
-
 		this.$targets_hosts_ms = this.$targets.find('#operation_opcommand_hst__hostid');
 
 		const ms_hosts_url = new Curl('jsrpc.php', false);
@@ -839,32 +556,13 @@
 				}
 			}
 		});
-
-		this.$type_select.on('change', ({target}) => this.onchange(target.value));
 	}
 
 	/**
-	 * @param {string} value
-	 */
-	OperationViewCommand.prototype.onchange = function(value) {};
-
-	/**
 	 * @param {object} conf
-	 * @param {string} conf['authtype']
-	 * @param {string} conf['command']
 	 * @param {bool}   conf['current_host']
-	 * @param {string} conf['execute_on']
-	 * @param {object} conf['global_script']
-	 * @param {string} conf['global_script']['scriptid']
-	 * @param {string} conf['global_script']['name']
 	 * @param {array}  conf['groups']
 	 * @param {array}  conf['hosts']
-	 * @param {string} conf['password']
-	 * @param {string} conf['port']
-	 * @param {string} conf['privatekey']
-	 * @param {string} conf['publickey']
-	 * @param {string} conf['type']
-	 * @param {string} conf['username']
 	 */
 	OperationViewCommand.prototype.setConfig = function(conf) {
 		this.$targets_current.prop('checked', conf.current_host);
@@ -874,44 +572,15 @@
 
 		this.$targets_groups_ms.multiSelect('clean');
 		this.$targets_groups_ms.multiSelect('addData', conf.groups);
-
-		this.$type_select.val(conf.type);
-
-		this.type_custom_script.setConfig(conf);
-		this.type_global_script.setConfig(conf);
-		this.type_ipmi.setConfig(conf);
-		this.type_ssh.setConfig(conf);
-		this.type_telnet.setConfig(conf);
 	};
 
 	/**
 	 * Attaches nodes for chosen command type.
 	 *
 	 * @param {jQuery} $wrapper
-	 * @param {object} props
-	 * @param {object} props['command_type']
 	 */
-	OperationViewCommand.prototype.attach = function($wrapper, {command_type}) {
-		this.detach();
-
+	OperationViewCommand.prototype.attach = function($wrapper) {
 		this.$targets.appendTo($wrapper);
-		this.$type.appendTo($wrapper);
-
-		if (command_type == operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
-			this.type_custom_script.attach($wrapper);
-		}
-		else if (command_type == operation_details.ZBX_SCRIPT_TYPE_IPMI) {
-			this.type_ipmi.attach($wrapper);
-		}
-		else if (command_type == operation_details.ZBX_SCRIPT_TYPE_SSH) {
-			this.type_ssh.attach($wrapper);
-		}
-		else if (command_type == operation_details.ZBX_SCRIPT_TYPE_TELNET) {
-			this.type_telnet.attach($wrapper);
-		}
-		else if (command_type == operation_details.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-			this.type_global_script.attach($wrapper);
-		}
 	};
 
 	/**
@@ -919,12 +588,6 @@
 	 */
 	OperationViewCommand.prototype.detach = function() {
 		this.$targets.detach();
-		this.$type.detach();
-		this.type_custom_script.detach();
-		this.type_global_script.detach();
-		this.type_ipmi.detach();
-		this.type_ssh.detach();
-		this.type_telnet.detach();
 	};
 
 	/**
@@ -933,12 +596,22 @@
 	function OperationViewType($obj) {
 		this.$obj = $obj;
 		this.$select = this.$obj.find('z-select');
-		this.$select.on('change', ({target}) => this.onchange(target.value));
+		this.$select.on('change', ({target}) => {
+
+			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
+				command_pattern = /^cmd\[([\d]+)\]$/,
+				script_match = script_pattern.exec(target.value),
+				command_match = command_pattern.exec(target.value);
+
+			if (command_match != null) {
+				this.onchange({cmd: command_match[1], scriptid: null});
+			}
+			else if (script_match != null) {
+				this.onchange({cmd: null, scriptid: script_match[1]});
+			}
+		});
 	}
 
-	/**
-	 * @param {string} value
-	 */
 	OperationViewType.prototype.onchange = function(value) {};
 
 	/**
@@ -1054,18 +727,18 @@
 	/**
 	 * @param {jQuery} $wrapper
 	 * @param {object} props
-	 * @param {string} props['operation_type']
+	 * @param {string} props['cmd']
 	 */
 	OperationViewAttr.prototype.attach = function($wrapper, props) {
-		if (props.operation_type == operation_details.OPERATION_TYPE_TEMPLATE_REMOVE
-				|| props.operation_type == operation_details.OPERATION_TYPE_TEMPLATE_ADD) {
+		if (props.cmd == operation_details.OPERATION_TYPE_TEMPLATE_REMOVE
+				|| props.cmd == operation_details.OPERATION_TYPE_TEMPLATE_ADD) {
 			this.$templates.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_GROUP_REMOVE
-				|| props.operation_type == operation_details.OPERATION_TYPE_GROUP_ADD) {
+		else if (props.cmd == operation_details.OPERATION_TYPE_GROUP_REMOVE
+				|| props.cmd == operation_details.OPERATION_TYPE_GROUP_ADD) {
 			this.$hostgroups.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_HOST_INVENTORY) {
+		else if (props.cmd == operation_details.OPERATION_TYPE_HOST_INVENTORY) {
 			this.$inventory.appendTo($wrapper);
 		}
 	};
@@ -1303,8 +976,8 @@
 
 		const props = {
 			recovery_phase,
-			operation_type: operation_details.OPERATION_TYPE_MESSAGE,
-			command_type: operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+			cmd: operation_details.OPERATION_TYPE_MESSAGE,
+			scriptid: null
 		};
 
 		this.view = new OperationView(props);
@@ -1345,8 +1018,15 @@
 
 		form_data.append('operation[eventsource]', this.eventsource);
 		form_data.append('operation[recovery]', this.recovery_phase);
+		form_data.append('operation[operationtype]', (this.view.props.scriptid !== null)
+			? window.operation_details.OPERATION_TYPE_COMMAND
+			: this.view.props.cmd
+		);
 
-		form_data.append('operation[operationtype]', form_data.get('operationtype'));
+		if (this.view.props.scriptid !== null) {
+			form_data.append('operation[opcommand][scriptid]', this.view.props.scriptid);
+		}
+
 		form_data.delete('operationtype');
 
 		return form_data;
@@ -1489,11 +1169,6 @@
 		}
 	}
 
-	window.operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT             = <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>;
-	window.operation_details.ZBX_SCRIPT_TYPE_IPMI                      = <?= ZBX_SCRIPT_TYPE_IPMI ?>;
-	window.operation_details.ZBX_SCRIPT_TYPE_SSH                       = <?= ZBX_SCRIPT_TYPE_SSH ?>;
-	window.operation_details.ZBX_SCRIPT_TYPE_TELNET                    = <?= ZBX_SCRIPT_TYPE_TELNET ?>;
-	window.operation_details.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT             = <?= ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT ?>;
 	window.operation_details.OPERATION_TYPE_ACK_MESSAGE                = <?= OPERATION_TYPE_ACK_MESSAGE ?>;
 	window.operation_details.OPERATION_TYPE_RECOVERY_MESSAGE           = <?= OPERATION_TYPE_RECOVERY_MESSAGE ?>;
 	window.operation_details.OPERATION_TYPE_HOST_INVENTORY             = <?= OPERATION_TYPE_HOST_INVENTORY ?>;

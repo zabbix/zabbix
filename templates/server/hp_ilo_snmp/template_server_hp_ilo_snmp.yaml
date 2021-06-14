@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-04T09:01:23Z'
+  date: '2021-05-11T08:05:38Z'
   groups:
     -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
     -
+      uuid: c2a7ddca051d4b4a9553f339c57e47a9
       template: 'HP iLO SNMP'
       name: 'HP iLO SNMP'
       description: |
@@ -23,23 +25,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: 'Disk arrays'
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: 'Virtual disks'
       items:
         -
+          uuid: 399110973c134983bd5020b9e5b509f4
           name: 'System: Temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
@@ -54,9 +42,6 @@ zabbix_export:
             ok(2)  The temperature sensor is within normal operating range.
             degraded(3)  The temperature sensor is outside of normal operating range.
             failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
-          applications:
-            -
-              name: Temperature
           valuemap:
             name: 'CPQSINFO-MIB::status'
           preprocessing:
@@ -64,7 +49,12 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Temperature
         -
+          uuid: 2708e6cb2ba240a791685ebdcab3407f
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
@@ -76,15 +66,17 @@ zabbix_export:
             MIB: CPQSINFO-MIB
             The machine product name.The name of the machine used in this system.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
+          uuid: 96e27ad668944845a7f598f35b577d18
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
@@ -96,22 +88,25 @@ zabbix_export:
             MIB: CPQSINFO-MIB
             The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 7e8d377e1b49469a8b19b94e6dad97ce
+              expression: '(last(/HP iLO SNMP/system.hw.serialnumber,#1)<>last(/HP iLO SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP iLO SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 5f30715570c449ecb4e07858256a3e05
           name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
@@ -121,9 +116,6 @@ zabbix_export:
           description: |
             MIB: CPQHLTH-MIB
             The overall condition. This object represents the overall status of the server information represented by this MIB.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'CPQSINFO-MIB::status'
           preprocessing:
@@ -131,15 +123,21 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
-              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              uuid: 6d0d0554e1c945dc90701aebd531f9cb
+              expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
             -
-              expression: '{count(#1,{$HEALTH_WARN_STATUS},eq)}=1'
+              uuid: 273c27c7929649f1a45ddc92c09ab982
+              expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -147,9 +145,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System status is in critical state'
-                  expression: '{HP iLO SNMP:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+                  expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
       discovery_rules:
         -
+          uuid: 7589f2f30c7e4cf88bb7cd1d57f543a4
           name: 'Array Controller Cache Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CACHE_STATUS},1.3.6.1.4.1.232.3.2.2.2.1.2,{#CACHE_CNTRL_INDEX},1.3.6.1.4.1.232.3.2.2.2.1.1]'
@@ -158,6 +157,7 @@ zabbix_export:
           description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaAccelTable'
           item_prototypes:
             -
+              uuid: f212a5a7f2754d49aab4d4a4a6a5ca44
               name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
@@ -186,9 +186,6 @@ zabbix_export:
                 NotPresent (6)  A backup power source is not present on the cache module board. Some controllers do not have backup power sources.
                 
                 Capacitor Failed (7)  The flash backed cache module capacitor is below the sufficient voltage level and has not recharged in 10 minutes.  Your Cache Module board needs to be serviced.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelBattery'
               preprocessing:
@@ -196,15 +193,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
+                  uuid: b3049aa19e5d45d28937c1af262aba3e
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"},eq)}=1'
+                  uuid: 384fd446bcb042f89ca348ec7459f1aa
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:\"degraded\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -212,8 +215,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1'
             -
+              uuid: 2e20ec1d27374dceb363a6cdd568d23d
               name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
@@ -252,9 +256,6 @@ zabbix_export:
                 
                 Read Cache Could Not Be Mapped (9)
                  Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelStatus'
               preprocessing:
@@ -262,15 +263,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                  uuid: a4c81fb1ef6140199bbde241691183cd
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+                  uuid: 7370a7c6388c4ff8b094959ca0c34a72
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -278,9 +285,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1 and {last()}<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
+                  uuid: 4db3b402580c43eba0d9dc6349cf95ca
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_OK_STATUS:\"enabled\"}")=1 and last(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -288,16 +296,17 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1'
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: bfbfb003935f4a2da4ff253f1f01cda9
           name: 'Array Controller Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.2.1.1.1,{#CNTLR_SLOT},1.3.6.1.4.1.232.3.2.2.1.1.5,{#CNTLR_LOCATION},1.3.6.1.4.1.232.3.2.2.1.1.20]'
@@ -306,6 +315,7 @@ zabbix_export:
           description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaCntlrTable'
           item_prototypes:
             -
+              uuid: 72e008704de649bbb10df34d38158b69
               name: '{#CNTLR_LOCATION}: Disk array controller model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
@@ -315,9 +325,6 @@ zabbix_export:
               description: |
                 MIB: CPQIDA-MIB
                 Array Controller Model. The type of controller card.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaCntlrModel'
               preprocessing:
@@ -325,7 +332,12 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
             -
+              uuid: 71ae1496057044819a80f0660d838083
               name: '{#CNTLR_LOCATION}: Disk array controller status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
@@ -336,9 +348,6 @@ zabbix_export:
                 MIB: CPQIDA-MIB
                 This value represents the overall condition of this controller,
                 and any associated logical drives,physical drives, and array accelerators.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -346,15 +355,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
+                  uuid: a318564fe4eb488eba251f3cba3d31b6
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_WARN_STATUS},eq)}=1'
+                  uuid: 6b65d2b2477c4567953fcec31b1ab9a3
+                  expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS}")=1'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -362,13 +377,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: dd52cf7724f7471cabf1970707a6fdd6
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.7.1.9]'
@@ -377,6 +393,7 @@ zabbix_export:
           description: 'CPQHLTH-MIB::cpqHeFltTolFanCondition'
           item_prototypes:
             -
+              uuid: 2173681feff54bbbb27bca1c82fab363
               name: 'Fan {#SNMPINDEX}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
@@ -391,9 +408,6 @@ zabbix_export:
                 ok(2)  The fan is operating properly.
                 degraded(2)  A redundant fan is not operating properly.
                 failed(4)  A non-redundant fan is not operating properly.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -401,15 +415,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: 0731e25040504428acb466b0d4e2803a
+                  expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
                 -
-                  expression: '{count(#1,{$FAN_WARN_STATUS},eq)}=1'
+                  uuid: c8c9ea062fa849b0b550ad4dd1d2cec7
+                  expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS}")=1'
                   name: 'Fan {#SNMPINDEX}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -417,13 +437,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#SNMPINDEX}: Fan is in critical state'
-                      expression: '{HP iLO SNMP:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: 5b68bccba85349beb2800bbb99ba5e13
           name: 'Physical Disk Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.5.1.1.5,{#DISK_LOCATION},1.3.6.1.4.1.232.3.2.5.1.1.64]'
@@ -432,6 +453,7 @@ zabbix_export:
           description: 'Scanning  table of physical drive entries CPQIDA-MIB::cpqDaPhyDrvTable.'
           item_prototypes:
             -
+              uuid: a6dfc1cf30e141b6b47d463d436f14b6
               name: '{#DISK_LOCATION}: Physical disk media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
@@ -444,9 +466,6 @@ zabbix_export:
                 other(1)  The instrument agent is unable to determine the physical drive’s media type.
                 rotatingPlatters(2)  The physical drive media is composed of rotating platters.
                 solidState(3)  The physical drive media is composed of solid state electronics.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
               preprocessing:
@@ -454,7 +473,12 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: 82f09b232147488fb9bd7253ce1432c2
               name: '{#DISK_LOCATION}: Physical disk model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
@@ -468,15 +492,17 @@ zabbix_export:
                 The text that appears depends upon who manufactured the drive and the drive type.
                 If a drive fails, note the model to identify the type of drive necessary for replacement.
                 If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: 5eca1a95575f4cb891545bde063aae7b
               name: '{#DISK_LOCATION}: Physical disk serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
@@ -490,22 +516,25 @@ zabbix_export:
                 This is the serial number assigned to the physical drive.
                 This value is based upon the serial number as returned by the SCSI inquiry command
                 but may have been modified due to space limitations.  This can be used for identification purposes.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 87bcd812474b44729da19f49344ba976
+                  expression: '(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: 03cf9c027f9b4557a0d0a233347c58d2
               name: '{#DISK_LOCATION}: Disk size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
@@ -522,9 +551,6 @@ zabbix_export:
                 from the advertised size of a drive. This field is only applicable for controllers which support SCSI drives,
                 and therefore is not supported by the IDA or IDA-2 controllers. The field will contain 0xFFFFFFFF if the drive capacity cannot be calculated
                 or if the controller does not support SCSI drives.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -534,7 +560,12 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
+              uuid: e0864c9d70204f048fc0c597a996b19f
               name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
@@ -547,9 +578,6 @@ zabbix_export:
                 other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.
                 ok(2)  Indicates the drive is functioning properly.
                 replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
               preprocessing:
@@ -557,9 +585,14 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDrive"},eq)}=1 or {count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"},eq)}=1'
+                  uuid: 180f8f9124a041d0bf1c350d0226c3d3
+                  expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDrive\"}")=1 or count(/HP iLO SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDriveSSDWearOut\"}")=1'
                   name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -567,8 +600,9 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: '{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
             -
+              uuid: d88cd26724fd4f19b899b4767fb33814
               name: '{#DISK_LOCATION}: Physical disk status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
@@ -583,9 +617,6 @@ zabbix_export:
                 ok (2)  Indicates the drive is functioning properly.
                 failed (3)  Indicates that the drive is no longer operating and  should be replaced.
                 predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
               preprocessing:
@@ -593,15 +624,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+                  uuid: 95e887baa0b9480a8a59848b07418c6b
+                  expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
                   name: '{#DISK_LOCATION}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
                 -
-                  expression: '{count(#1,{$DISK_WARN_STATUS},eq)}=1'
+                  uuid: 857540089794495799eb1a04b172c70c
+                  expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS}")=1'
                   name: '{#DISK_LOCATION}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -609,13 +646,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: '{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: a77e77fc862847078ff3328f4d331747
           name: 'PSU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.9.3.1.5,{#CHASSIS_NUM},1.3.6.1.4.1.232.6.2.9.3.1.1,{#BAY_NUM},1.3.6.1.4.1.232.6.2.9.3.1.2]'
@@ -624,6 +662,7 @@ zabbix_export:
           description: 'CPQHLTH-MIB::cpqHeFltTolPowerSupplyStatus'
           item_prototypes:
             -
+              uuid: 45d3144d0e5342c6a98b6aca01f4a907
               name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
@@ -637,9 +676,6 @@ zabbix_export:
                 ok(2)  The power supply is operating normally.
                 degraded(3)  A temperature sensor, fan or other power supply component is  outside of normal operating range.
                 failed(4)  A power supply component detects a condition that could  permanently damage the system.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
               preprocessing:
@@ -647,15 +683,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  uuid: 7a34714fcbb74294af97bc4f39c21413
+                  expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
                 -
-                  expression: '{count(#1,{$PSU_WARN_STATUS},eq)}=1'
+                  uuid: db7679204aa544cb8ffe38df5c68b7ce
+                  expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -663,13 +705,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
-                      expression: '{HP iLO SNMP:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: d39d17234d34419ab9bb0c1d90505bff
           name: 'Temperature Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -684,6 +727,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable'
           item_prototypes:
             -
+              uuid: ac352f7b00d6478daf601d0f7cb508e4
               name: '{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -703,9 +747,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -713,24 +754,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: b7786ff4c57a4143b79e95bfc5470dcd
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
                   name: '{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: 11365923a7b242fea930250e26fcc548
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
                   name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: dd0fd44bd7bb43bd85fdd63a199e0e69
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
                   name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: 63fd55c6dee6427bbba7daa023d8f91a
               name: '{#SNMPINDEX}: Temperature sensor location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
@@ -740,9 +789,6 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 This specifies the location of the temperature sensor present in the system.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
               preprocessing:
@@ -750,7 +796,12 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
+              uuid: 7c7d2807f0714bca8c8f263c2a4be8e6
               name: '{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -761,20 +812,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: {#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: 279cdcdb6d304a7fb6ba0667c55fc774
           name: 'Temperature Discovery Ambient'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -793,6 +846,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter'
           item_prototypes:
             -
+              uuid: da102e6fc86b49c7bd57c2805ca08675
               name: 'Ambient: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -812,9 +866,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -822,24 +873,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: e955550a2496435eb799d317f2036c55
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
                   name: 'Ambient: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: 8cd2c8b62b164923afed02da2be52dcc
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
                   name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: d11e13c5714a42d49bea54d837f9f418
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
                   name: 'Ambient: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: fd9c9a22a2a946ef895f92300de12004
               name: 'Ambient: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -850,20 +909,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: Ambient
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: 8a0f24370b2246799b3db8c547f34d3e
           name: 'Temperature Discovery CPU'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -878,6 +939,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter'
           item_prototypes:
             -
+              uuid: 4cad241ca3bd4382879bebabc4f42201
               name: 'CPU-{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -897,9 +959,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -907,24 +966,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: 512654c27ea94ed4993380793a67f68b
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
                   name: 'CPU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: 7853d0c8ed4a4ebe98e38c7499417ebe
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: 0434d2a6a1b54cb7bcd0e6f58d973be4
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: 0bfe29bdf06e4432aafbbddb5bc02272
               name: 'CPU-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -935,20 +1002,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: CPU-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: b32425e531b444c69cdc3efc015286f2
           name: 'Temperature Discovery I/O'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -963,6 +1032,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter'
           item_prototypes:
             -
+              uuid: 51fbe5f6d6c1481e818eafa7cbe01295
               name: 'I/O-{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -982,9 +1052,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -992,24 +1059,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: 2875e5ebea474eccac8d53dd13539bd6
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
                   name: 'I/O-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: 593b167fe62e4a7fae35ebb508540325
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: bf6a10f0596a45b4b8f8a2f0acf7c778
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: 5a37a9c96a9748468d10562bd1242aa0
               name: 'I/O-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -1020,20 +1095,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: I/O-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: f35e84ec9cb74bd19610fa7fdc59433d
           name: 'Temperature Discovery Memory'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -1048,6 +1125,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter'
           item_prototypes:
             -
+              uuid: 861d683a933b4eb5989b0f5484a9a93d
               name: 'Memory-{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -1067,9 +1145,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1077,24 +1152,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: 881f28f6411c467493c56a64237d8ca8
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
                   name: 'Memory-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: c05402995e6146d28c53fc33e88d8164
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: bfac7287a9d842cb89d8089af72e2e12
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: feb78ed0e9c640f2b2e122bebca181a7
               name: 'Memory-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -1105,20 +1188,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: Memory-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: c12fc57ae86e434abd25e8ba8f6ca642
           name: 'Temperature Discovery PSU'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -1133,6 +1218,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter'
           item_prototypes:
             -
+              uuid: 01eea51183834c6a8ed7daf75abe6c87
               name: 'PSU-{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -1152,9 +1238,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1162,24 +1245,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: 14ab7adae80c4859952381bfe17a14a3
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
                   name: 'PSU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: 97481f1183c3444c851fe99428bd7bf3
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: 8c7f5250756946a595b742519e4890a5
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: d2e8eb2989364732b85dbef4eb7d1ce4
               name: 'PSU-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -1190,20 +1281,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: PSU-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: 4d513f2958ac483383ff803df781bd76
           name: 'Temperature Discovery System'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
@@ -1218,6 +1311,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter'
           item_prototypes:
             -
+              uuid: 6adae921be5545c995cf24b2b900818c
               name: 'System-{#SNMPINDEX}: Temperature sensor condition'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
@@ -1237,9 +1331,6 @@ zabbix_export:
                   The temperature sensor detects a condition that could
                   permanently damage the system.
                 The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
               preprocessing:
@@ -1247,24 +1338,32 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{last()} = 1'
+                  uuid: d161829ab0ec496bb4718ed156853c3f
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
                   name: 'System-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
                   manual_close: 'YES'
                 -
-                  expression: '{last()} = 4'
+                  uuid: a65a8386fdd048f986a3aa3fcf29a959
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
                   name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{last()} = 3'
+                  uuid: 0b13f436c7984eef9624632bb5f43970
+                  expression: 'last(/HP iLO SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
                   name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
             -
+              uuid: aa985d3fb0084e24bd9f3e81c249cae4
               name: 'System-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
@@ -1275,20 +1374,22 @@ zabbix_export:
               description: |
                 MIB: CPQHLTH-MIB
                 Temperature readings of testpoint: System-{#SNMPINDEX}
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
+          uuid: f8ddad8119414bdbb695feaa788aa89e
           name: 'Virtual Disk Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.3.1.1.2,{#DISK_NAME},1.3.6.1.4.1.232.3.2.3.1.1.14]'
@@ -1297,6 +1398,7 @@ zabbix_export:
           description: 'CPQIDA-MIB::cpqDaLogDrvTable'
           item_prototypes:
             -
+              uuid: 3d06c600df19479abc35c47832f1abc2
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}'
@@ -1305,9 +1407,6 @@ zabbix_export:
               description: |
                 Logical Drive Fault Tolerance.
                 This shows the fault tolerance mode of the logical drive.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
               preprocessing:
@@ -1315,7 +1414,12 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: 39add64d1cef451091f5416440ea0adc
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
@@ -1330,9 +1434,6 @@ zabbix_export:
                 Drive manufacturers sometimes use the number 1,000,000 as a
                 megabyte when giving drive capacities so this value may
                 differ from the advertised size of a drive.
-              applications:
-                -
-                  name: 'Virtual disks'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1342,16 +1443,18 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
+              uuid: e0de2e2cc2ac423c95bcca5c77b1a53c
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
               history: 7d
               description: 'Logical Drive Status.'
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
               preprocessing:
@@ -1359,15 +1462,21 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
+                  uuid: 3f809df0d34f47a2bc1addbf2f4387ac
+                  expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check virtual disk for warnings or errors'
                 -
-                  expression: '{count(#1,{$VDISK_OK_STATUS},ne)}=1'
+                  uuid: 439b8dfa246f42d190d8f4deeebfeb53
+                  expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS}")=1'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1375,7 +1484,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
-                      expression: '{HP iLO SNMP:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
+                      expression: 'count(/HP iLO SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1454,541 +1563,552 @@ zabbix_export:
         -
           macro: '{$VDISK_OK_STATUS}'
           value: '2'
-  value_maps:
-    -
-      name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: degraded
-        -
-          value: '4'
-          newvalue: failed
-    -
-      name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: system
-        -
-          value: '4'
-          newvalue: systemBoard
-        -
-          value: '5'
-          newvalue: ioBoard
-        -
-          value: '6'
-          newvalue: cpu
-        -
-          value: '7'
-          newvalue: memory
-        -
-          value: '8'
-          newvalue: storage
-        -
-          value: '9'
-          newvalue: removableMedia
-        -
-          value: '10'
-          newvalue: powerSupply
-        -
-          value: '11'
-          newvalue: ambient
-        -
-          value: '12'
-          newvalue: chassis
-        -
-          value: '13'
-          newvalue: bridgeCard
-    -
-      name: 'CPQIDA-MIB::cpqDaAccelBattery'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: Ok
-        -
-          value: '3'
-          newvalue: Recharging
-        -
-          value: '4'
-          newvalue: Failed
-        -
-          value: '5'
-          newvalue: Degraded
-        -
-          value: '6'
-          newvalue: 'Not Present'
-        -
-          value: '7'
-          newvalue: 'Capacitor failed'
-    -
-      name: 'CPQIDA-MIB::cpqDaAccelStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: invalid
-        -
-          value: '3'
-          newvalue: enabled
-        -
-          value: '4'
-          newvalue: tmpDisabled
-        -
-          value: '5'
-          newvalue: permDisabled
-        -
-          value: '6'
-          newvalue: cacheModFlashMemNotAttached
-        -
-          value: '7'
-          newvalue: cacheModDegradedFailsafeSpeed
-        -
-          value: '8'
-          newvalue: cacheModCriticalFailure
-        -
-          value: '9'
-          newvalue: cacheReadCacheNotMapped
-    -
-      name: 'CPQIDA-MIB::cpqDaCntlrModel'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ida
-        -
-          value: '3'
-          newvalue: idaExpansion
-        -
-          value: '4'
-          newvalue: ida-2
-        -
-          value: '5'
-          newvalue: smart
-        -
-          value: '6'
-          newvalue: smart-2e
-        -
-          value: '7'
-          newvalue: smart-2p
-        -
-          value: '8'
-          newvalue: smart-2sl
-        -
-          value: '9'
-          newvalue: smart-3100es
-        -
-          value: '10'
-          newvalue: smart-3200
-        -
-          value: '11'
-          newvalue: smart-2dh
-        -
-          value: '12'
-          newvalue: smart-221
-        -
-          value: '13'
-          newvalue: sa-4250es
-        -
-          value: '14'
-          newvalue: sa-4200
-        -
-          value: '15'
-          newvalue: sa-integrated
-        -
-          value: '16'
-          newvalue: sa-431
-        -
-          value: '17'
-          newvalue: sa-5300
-        -
-          value: '18'
-          newvalue: raidLc2
-        -
-          value: '19'
-          newvalue: sa-5i
-        -
-          value: '20'
-          newvalue: sa-532
-        -
-          value: '21'
-          newvalue: sa-5312
-        -
-          value: '22'
-          newvalue: sa-641
-        -
-          value: '23'
-          newvalue: sa-642
-        -
-          value: '24'
-          newvalue: sa-6400
-        -
-          value: '25'
-          newvalue: sa-6400em
-        -
-          value: '26'
-          newvalue: sa-6i
-        -
-          value: '27'
-          newvalue: sa-generic
-        -
-          value: '29'
-          newvalue: sa-p600
-        -
-          value: '30'
-          newvalue: sa-p400
-        -
-          value: '31'
-          newvalue: sa-e200
-        -
-          value: '32'
-          newvalue: sa-e200i
-        -
-          value: '33'
-          newvalue: sa-p400i
-        -
-          value: '34'
-          newvalue: sa-p800
-        -
-          value: '35'
-          newvalue: sa-e500
-        -
-          value: '36'
-          newvalue: sa-p700m
-        -
-          value: '37'
-          newvalue: sa-p212
-        -
-          value: '38'
-          newvalue: sa-p410
-        -
-          value: '39'
-          newvalue: sa-p410i
-        -
-          value: '40'
-          newvalue: sa-p411
-        -
-          value: '41'
-          newvalue: sa-b110i
-        -
-          value: '42'
-          newvalue: sa-p712m
-        -
-          value: '43'
-          newvalue: sa-p711m
-        -
-          value: '44'
-          newvalue: sa-p812
-        -
-          value: '45'
-          newvalue: sw-1210m
-        -
-          value: '46'
-          newvalue: sa-p220i
-        -
-          value: '47'
-          newvalue: sa-p222
-        -
-          value: '48'
-          newvalue: sa-p420
-        -
-          value: '49'
-          newvalue: sa-p420i
-        -
-          value: '50'
-          newvalue: sa-p421
-        -
-          value: '51'
-          newvalue: sa-b320i
-        -
-          value: '52'
-          newvalue: sa-p822
-        -
-          value: '53'
-          newvalue: sa-p721m
-        -
-          value: '54'
-          newvalue: sa-b120i
-        -
-          value: '55'
-          newvalue: hps-1224
-        -
-          value: '56'
-          newvalue: hps-1228
-        -
-          value: '57'
-          newvalue: hps-1228m
-        -
-          value: '58'
-          newvalue: sa-p822se
-        -
-          value: '59'
-          newvalue: hps-1224e
-        -
-          value: '60'
-          newvalue: hps-1228e
-        -
-          value: '61'
-          newvalue: hps-1228em
-        -
-          value: '62'
-          newvalue: sa-p230i
-        -
-          value: '63'
-          newvalue: sa-p430i
-        -
-          value: '64'
-          newvalue: sa-p430
-        -
-          value: '65'
-          newvalue: sa-p431
-        -
-          value: '66'
-          newvalue: sa-p731m
-        -
-          value: '67'
-          newvalue: sa-p830i
-        -
-          value: '68'
-          newvalue: sa-p830
-        -
-          value: '69'
-          newvalue: sa-p831
-        -
-          value: '70'
-          newvalue: sa-p530
-        -
-          value: '71'
-          newvalue: sa-p531
-        -
-          value: '72'
-          newvalue: sa-p244br
-        -
-          value: '73'
-          newvalue: sa-p246br
-        -
-          value: '74'
-          newvalue: sa-p440
-        -
-          value: '75'
-          newvalue: sa-p440ar
-        -
-          value: '76'
-          newvalue: sa-p441
-        -
-          value: '77'
-          newvalue: sa-p741m
-        -
-          value: '78'
-          newvalue: sa-p840
-        -
-          value: '79'
-          newvalue: sa-p841
-        -
-          value: '80'
-          newvalue: sh-h240ar
-        -
-          value: '81'
-          newvalue: sh-h244br
-        -
-          value: '82'
-          newvalue: sh-h240
-        -
-          value: '83'
-          newvalue: sh-h241
-        -
-          value: '84'
-          newvalue: sa-b140i
-        -
-          value: '85'
-          newvalue: sh-generic
-        -
-          value: '88'
-          newvalue: sa-p840ar
-    -
-      name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
-      mappings:
-        -
-          value: '0'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: none
-        -
-          value: '3'
-          newvalue: RAID-1/RAID-10
-        -
-          value: '4'
-          newvalue: RAID-4
-        -
-          value: '5'
-          newvalue: RAID-5
-        -
-          value: '7'
-          newvalue: RAID-6
-        -
-          value: '8'
-          newvalue: RAID-50
-        -
-          value: '9'
-          newvalue: RAID-60
-        -
-          value: '10'
-          newvalue: 'RAID-1 ADM'
-        -
-          value: '11'
-          newvalue: 'RAID-10 ADM'
-    -
-      name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: unconfigured
-        -
-          value: '5'
-          newvalue: recovering
-        -
-          value: '6'
-          newvalue: readyForRebuild
-        -
-          value: '7'
-          newvalue: rebuilding
-        -
-          value: '8'
-          newvalue: wrongDrive
-        -
-          value: '9'
-          newvalue: badConnect
-        -
-          value: '10'
-          newvalue: overheating
-        -
-          value: '11'
-          newvalue: shutdown
-        -
-          value: '12'
-          newvalue: expanding
-        -
-          value: '13'
-          newvalue: notAvailable
-        -
-          value: '14'
-          newvalue: queuedForExpansion
-        -
-          value: '15'
-          newvalue: multipathAccessDegraded
-        -
-          value: '16'
-          newvalue: erasing
-        -
-          value: '17'
-          newvalue: predictiveSpareRebuildReady
-        -
-          value: '18'
-          newvalue: rapidParityInitInProgress
-        -
-          value: '19'
-          newvalue: rapidParityInitPending
-        -
-          value: '20'
-          newvalue: noAccessEncryptedNoCntlrKey
-        -
-          value: '21'
-          newvalue: unencryptedToEncryptedInProgress
-        -
-          value: '22'
-          newvalue: newLogDrvKeyRekeyInProgress
-        -
-          value: '23'
-          newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
-        -
-          value: '24'
-          newvalue: unencryptedToEncryptedNotStarted
-        -
-          value: '25'
-          newvalue: newLogDrvKeyRekeyRequestReceived
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: rotatingPlatters
-        -
-          value: '3'
-          newvalue: solidState
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: replaceDrive
-        -
-          value: '4'
-          newvalue: replaceDriveSSDWearOut
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: predictiveFailure
-    -
-      name: 'CPQSINFO-MIB::status'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: degraded
-        -
-          value: '4'
-          newvalue: failed
+      valuemaps:
+        -
+          uuid: 1a03c5602a4a49f8839d820c666434fc
+          name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed
+        -
+          uuid: f1e590a8cc744e22b900595851833357
+          name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: system
+            -
+              value: '4'
+              newvalue: systemBoard
+            -
+              value: '5'
+              newvalue: ioBoard
+            -
+              value: '6'
+              newvalue: cpu
+            -
+              value: '7'
+              newvalue: memory
+            -
+              value: '8'
+              newvalue: storage
+            -
+              value: '9'
+              newvalue: removableMedia
+            -
+              value: '10'
+              newvalue: powerSupply
+            -
+              value: '11'
+              newvalue: ambient
+            -
+              value: '12'
+              newvalue: chassis
+            -
+              value: '13'
+              newvalue: bridgeCard
+        -
+          uuid: 7502d61cf7644a2d9cff7462f53569ee
+          name: 'CPQIDA-MIB::cpqDaAccelBattery'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: Ok
+            -
+              value: '3'
+              newvalue: Recharging
+            -
+              value: '4'
+              newvalue: Failed
+            -
+              value: '5'
+              newvalue: Degraded
+            -
+              value: '6'
+              newvalue: 'Not Present'
+            -
+              value: '7'
+              newvalue: 'Capacitor failed'
+        -
+          uuid: 20d96ea63e994ba49244b94a4c24aec3
+          name: 'CPQIDA-MIB::cpqDaAccelStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: invalid
+            -
+              value: '3'
+              newvalue: enabled
+            -
+              value: '4'
+              newvalue: tmpDisabled
+            -
+              value: '5'
+              newvalue: permDisabled
+            -
+              value: '6'
+              newvalue: cacheModFlashMemNotAttached
+            -
+              value: '7'
+              newvalue: cacheModDegradedFailsafeSpeed
+            -
+              value: '8'
+              newvalue: cacheModCriticalFailure
+            -
+              value: '9'
+              newvalue: cacheReadCacheNotMapped
+        -
+          uuid: 140a21785b764c95a3f78c8c05ed0844
+          name: 'CPQIDA-MIB::cpqDaCntlrModel'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ida
+            -
+              value: '3'
+              newvalue: idaExpansion
+            -
+              value: '4'
+              newvalue: ida-2
+            -
+              value: '5'
+              newvalue: smart
+            -
+              value: '6'
+              newvalue: smart-2e
+            -
+              value: '7'
+              newvalue: smart-2p
+            -
+              value: '8'
+              newvalue: smart-2sl
+            -
+              value: '9'
+              newvalue: smart-3100es
+            -
+              value: '10'
+              newvalue: smart-3200
+            -
+              value: '11'
+              newvalue: smart-2dh
+            -
+              value: '12'
+              newvalue: smart-221
+            -
+              value: '13'
+              newvalue: sa-4250es
+            -
+              value: '14'
+              newvalue: sa-4200
+            -
+              value: '15'
+              newvalue: sa-integrated
+            -
+              value: '16'
+              newvalue: sa-431
+            -
+              value: '17'
+              newvalue: sa-5300
+            -
+              value: '18'
+              newvalue: raidLc2
+            -
+              value: '19'
+              newvalue: sa-5i
+            -
+              value: '20'
+              newvalue: sa-532
+            -
+              value: '21'
+              newvalue: sa-5312
+            -
+              value: '22'
+              newvalue: sa-641
+            -
+              value: '23'
+              newvalue: sa-642
+            -
+              value: '24'
+              newvalue: sa-6400
+            -
+              value: '25'
+              newvalue: sa-6400em
+            -
+              value: '26'
+              newvalue: sa-6i
+            -
+              value: '27'
+              newvalue: sa-generic
+            -
+              value: '29'
+              newvalue: sa-p600
+            -
+              value: '30'
+              newvalue: sa-p400
+            -
+              value: '31'
+              newvalue: sa-e200
+            -
+              value: '32'
+              newvalue: sa-e200i
+            -
+              value: '33'
+              newvalue: sa-p400i
+            -
+              value: '34'
+              newvalue: sa-p800
+            -
+              value: '35'
+              newvalue: sa-e500
+            -
+              value: '36'
+              newvalue: sa-p700m
+            -
+              value: '37'
+              newvalue: sa-p212
+            -
+              value: '38'
+              newvalue: sa-p410
+            -
+              value: '39'
+              newvalue: sa-p410i
+            -
+              value: '40'
+              newvalue: sa-p411
+            -
+              value: '41'
+              newvalue: sa-b110i
+            -
+              value: '42'
+              newvalue: sa-p712m
+            -
+              value: '43'
+              newvalue: sa-p711m
+            -
+              value: '44'
+              newvalue: sa-p812
+            -
+              value: '45'
+              newvalue: sw-1210m
+            -
+              value: '46'
+              newvalue: sa-p220i
+            -
+              value: '47'
+              newvalue: sa-p222
+            -
+              value: '48'
+              newvalue: sa-p420
+            -
+              value: '49'
+              newvalue: sa-p420i
+            -
+              value: '50'
+              newvalue: sa-p421
+            -
+              value: '51'
+              newvalue: sa-b320i
+            -
+              value: '52'
+              newvalue: sa-p822
+            -
+              value: '53'
+              newvalue: sa-p721m
+            -
+              value: '54'
+              newvalue: sa-b120i
+            -
+              value: '55'
+              newvalue: hps-1224
+            -
+              value: '56'
+              newvalue: hps-1228
+            -
+              value: '57'
+              newvalue: hps-1228m
+            -
+              value: '58'
+              newvalue: sa-p822se
+            -
+              value: '59'
+              newvalue: hps-1224e
+            -
+              value: '60'
+              newvalue: hps-1228e
+            -
+              value: '61'
+              newvalue: hps-1228em
+            -
+              value: '62'
+              newvalue: sa-p230i
+            -
+              value: '63'
+              newvalue: sa-p430i
+            -
+              value: '64'
+              newvalue: sa-p430
+            -
+              value: '65'
+              newvalue: sa-p431
+            -
+              value: '66'
+              newvalue: sa-p731m
+            -
+              value: '67'
+              newvalue: sa-p830i
+            -
+              value: '68'
+              newvalue: sa-p830
+            -
+              value: '69'
+              newvalue: sa-p831
+            -
+              value: '70'
+              newvalue: sa-p530
+            -
+              value: '71'
+              newvalue: sa-p531
+            -
+              value: '72'
+              newvalue: sa-p244br
+            -
+              value: '73'
+              newvalue: sa-p246br
+            -
+              value: '74'
+              newvalue: sa-p440
+            -
+              value: '75'
+              newvalue: sa-p440ar
+            -
+              value: '76'
+              newvalue: sa-p441
+            -
+              value: '77'
+              newvalue: sa-p741m
+            -
+              value: '78'
+              newvalue: sa-p840
+            -
+              value: '79'
+              newvalue: sa-p841
+            -
+              value: '80'
+              newvalue: sh-h240ar
+            -
+              value: '81'
+              newvalue: sh-h244br
+            -
+              value: '82'
+              newvalue: sh-h240
+            -
+              value: '83'
+              newvalue: sh-h241
+            -
+              value: '84'
+              newvalue: sa-b140i
+            -
+              value: '85'
+              newvalue: sh-generic
+            -
+              value: '88'
+              newvalue: sa-p840ar
+        -
+          uuid: 442c9095de9f4aa5bcca659292b2c12b
+          name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+          mappings:
+            -
+              value: '0'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: none
+            -
+              value: '3'
+              newvalue: RAID-1/RAID-10
+            -
+              value: '4'
+              newvalue: RAID-4
+            -
+              value: '5'
+              newvalue: RAID-5
+            -
+              value: '7'
+              newvalue: RAID-6
+            -
+              value: '8'
+              newvalue: RAID-50
+            -
+              value: '9'
+              newvalue: RAID-60
+            -
+              value: '10'
+              newvalue: 'RAID-1 ADM'
+            -
+              value: '11'
+              newvalue: 'RAID-10 ADM'
+        -
+          uuid: 8db38b47aba64739ae9f078f43b42888
+          name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: unconfigured
+            -
+              value: '5'
+              newvalue: recovering
+            -
+              value: '6'
+              newvalue: readyForRebuild
+            -
+              value: '7'
+              newvalue: rebuilding
+            -
+              value: '8'
+              newvalue: wrongDrive
+            -
+              value: '9'
+              newvalue: badConnect
+            -
+              value: '10'
+              newvalue: overheating
+            -
+              value: '11'
+              newvalue: shutdown
+            -
+              value: '12'
+              newvalue: expanding
+            -
+              value: '13'
+              newvalue: notAvailable
+            -
+              value: '14'
+              newvalue: queuedForExpansion
+            -
+              value: '15'
+              newvalue: multipathAccessDegraded
+            -
+              value: '16'
+              newvalue: erasing
+            -
+              value: '17'
+              newvalue: predictiveSpareRebuildReady
+            -
+              value: '18'
+              newvalue: rapidParityInitInProgress
+            -
+              value: '19'
+              newvalue: rapidParityInitPending
+            -
+              value: '20'
+              newvalue: noAccessEncryptedNoCntlrKey
+            -
+              value: '21'
+              newvalue: unencryptedToEncryptedInProgress
+            -
+              value: '22'
+              newvalue: newLogDrvKeyRekeyInProgress
+            -
+              value: '23'
+              newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
+            -
+              value: '24'
+              newvalue: unencryptedToEncryptedNotStarted
+            -
+              value: '25'
+              newvalue: newLogDrvKeyRekeyRequestReceived
+        -
+          uuid: 8351a024aa4d42d1915b44abe8acc4aa
+          name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: rotatingPlatters
+            -
+              value: '3'
+              newvalue: solidState
+        -
+          uuid: 54b288da67e1431c9d401cf47a518bcc
+          name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: replaceDrive
+            -
+              value: '4'
+              newvalue: replaceDriveSSDWearOut
+        -
+          uuid: 68bc7370fb8a43ee9957240e29636562
+          name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: predictiveFailure
+        -
+          uuid: 8374297ea234491b980591a8daa88e1f
+          name: 'CPQSINFO-MIB::status'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed

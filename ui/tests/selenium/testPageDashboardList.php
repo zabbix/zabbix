@@ -40,7 +40,7 @@ class testPageDashboardList extends CWebTest {
 
 	public function testPageDashboardList_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
-		$this->assertPageTitle('Dashboards');
+		$this->page->assertTitle('Dashboards');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name'], $table->getHeadersText());
 
@@ -77,7 +77,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 14
+					'result_count' => 15
 				]
 			],
 			[
@@ -85,7 +85,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 13
+					'result_count' => 14
 				]
 			],
 			[

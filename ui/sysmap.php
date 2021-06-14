@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js',
-	'multiselect.js', 'colorpicker.js'
+	'multiselect.js', 'colorpicker.js', 'class.tagfilteritem.js'
 ];
 $page['type'] = detect_page_type();
 
@@ -83,6 +83,27 @@ if (isset($_REQUEST['favobj'])) {
 				$sysmapUpdate = json_decode($_REQUEST['sysmap'], true);
 				$sysmapUpdate['sysmapid'] = $sysmapid;
 				$sysmapUpdate['lines'] = [];
+
+				if (array_key_exists('selements', $sysmapUpdate)) {
+					foreach ($sysmapUpdate['selements'] as $element) {
+						if (!array_key_exists('tags', $element)) {
+							continue;
+						}
+
+						if (array_key_exists('elementtype', $element)
+								&& ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+									|| $element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
+							foreach ($element['tags'] as $key => $tag) {
+								if ($tag['tag'] === '' && $tag['value'] === '') {
+									unset($element['tags'][$key]);
+								}
+							}
+						}
+						else {
+							unset($element['tags']);
+						}
+					}
+				}
 
 				if (array_key_exists('shapes', $sysmapUpdate)) {
 					foreach ($sysmapUpdate['shapes'] as $key => &$shape) {

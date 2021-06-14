@@ -68,7 +68,7 @@ if (typeof MassUpdateMacros != 'function') {
 			});
 
 			// Show proper checkbox.
-			document.querySelector(`[data-type='${type}']`).style.display = 'block';
+			document.querySelector(`[data-type='${type}']`).style.display = '';
 		}
 
 		destroy() {

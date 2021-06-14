@@ -19,53 +19,56 @@
 **/
 
 
-class CTriggerExpressionReplaceHostTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class triggerExpressionReplaceHostTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
-				'{host:item.func()}',
+				'func(/host/item)',
 				'host', 'Zabbix server',
-				'{Zabbix server:item.func()}'
+				'func(/Zabbix server/item)'
 			],
 			[
-				'5 + {host:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
-					' {host:item.func()} or {host2:item2.func()}',
-				'host',
-				'Zabbix server',
-				'5 + {Zabbix server:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
-					' {Zabbix server:item.func()} or {host2:item2.func()}'
+				'5 + func(/host/item) <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
+					' func(/host/item) or func(/host2/item2)',
+				'host', 'Zabbix server',
+				'5 + func(/Zabbix server/item) <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
+					' func(/Zabbix server/item) or func(/host2/item2)'
 			],
 			[
-				'5 + {host:item.func()} <> 0 or {$MACRO: "context"} or'.
+				'5 + func(/host/item) <> 0 or {$MACRO: "context"} or'.
 					' {{#MACRO}.regsub("^([0-9]+)", "{#MACRO}: \1")} or {TRIGGER.VALUE} or'.
-					' {host:item.func()} or {host2:item2.func()}',
-				'host',
-				'Zabbix server',
-				'5 + {Zabbix server:item.func()} <> 0 or {$MACRO: "context"} or'.
+					' func(/host/item) or func(/host2/item2)',
+				'host', 'Zabbix server',
+				'5 + func(/Zabbix server/item) <> 0 or {$MACRO: "context"} or'.
 					' {{#MACRO}.regsub("^([0-9]+)", "{#MACRO}: \1")} or {TRIGGER.VALUE} or'.
-					' {Zabbix server:item.func()} or {host2:item2.func()}'
+					' func(/Zabbix server/item) or func(/host2/item2)'
 			],
 			[
-				'{host:item.func()} or {{#M}.regsub("{host:item.func()}", "\1")}',
-				'host',
-				'Zabbix server',
-				'{Zabbix server:item.func()} or {{#M}.regsub("{host:item.func()}", "\1")}'
+				'func(/host/item) or {{#M}.regsub("func(/host/item)", "\1")}',
+				'host', 'Zabbix server',
+				'func(/Zabbix server/item) or {{#M}.regsub("func(/host/item)", "\1")}'
 			],
 			[
-				'5 + {Zabbix server:item.func()} <> 0 or {Zabbix server:item.func()} or {host2:item2.func()}',
-				'Zabbix server',
-				'host',
-				'5 + {host:item.func()} <> 0 or {host:item.func()} or {host2:item2.func()}'
+				'5 + func(/Zabbix server/item) <> 0 or func(/Zabbix server/item) or func(/host2/item2)',
+				'Zabbix server', 'host',
+				'5 + func(/host/item) <> 0 or func(/host/item) or func(/host2/item2)'
+			],
+			[
+				'min(func(/host/item), func(/host/item), "func(/host/item)") = "func(/host/item)"',
+				'host', 'Zabbix server',
+				'min(func(/Zabbix server/item), func(/Zabbix server/item), "func(/host/item)") = "func(/host/item)"'
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param string  $expected

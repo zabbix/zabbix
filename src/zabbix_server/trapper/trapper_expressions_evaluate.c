@@ -61,38 +61,68 @@ out:
 	return ret;
 }
 
+static int	trapper_expression_evaluate(const char *expression, const zbx_timespec_t *ts, double *result,
+		char **error)
+{
+	zbx_eval_context_t	ctx;
+	int			ret;
+	zbx_variant_t		value;
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION, error))
+		return FAIL;
+
+	if (SUCCEED == (ret = zbx_eval_execute(&ctx, ts, &value, error)))
+	{
+		if (SUCCEED == zbx_variant_convert(&value, ZBX_VARIANT_DBL))
+		{
+			*result = value.data.dbl;
+		}
+		else
+		{
+			*error = zbx_dsprintf(NULL, "invalid result \"%s\" of type \"%s\"",
+					zbx_variant_value_desc(&value), zbx_variant_type_desc(&value));
+			zbx_variant_clear(&value);
+			ret = FAIL;
+		}
+	}
+
+	zbx_eval_clear(&ctx);
+
+	return ret;
+}
+
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	int					ret = FAIL, i;
-	zbx_vector_ptr_t			expressions;
+	int			ret = FAIL, i;
+	zbx_vector_ptr_t	expressions;
+	zbx_timespec_t		ts;
 
 	zbx_vector_ptr_create(&expressions);
 
-	if (FAIL == trapper_parse_expressions_evaluate(jp,  &expressions, error))
+	if (FAIL == trapper_parse_expressions_evaluate(jp, &expressions, error))
 		goto out;
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
 
+	zbx_timespec(&ts);
+
 	for (i = 0; i < expressions.values_num; i++)
 	{
-		double			expr_result;
-		zbx_vector_ptr_t	unknown_msgs;
-		char			evaluate_error[MAX_STRING_LEN];
-
-		evaluate_error[0] = '\0';
+		double	expr_result;
+		char	*errmsg = NULL;
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, expressions.values[i], ZBX_JSON_TYPE_STRING);
 
-		if (SUCCEED != evaluate(&expr_result, expressions.values[i], evaluate_error, sizeof(evaluate_error),
-			&unknown_msgs))
+		if (SUCCEED != trapper_expression_evaluate(expressions.values[i], &ts, &expr_result, &errmsg))
 		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, evaluate_error, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, errmsg, ZBX_JSON_TYPE_STRING);
+			zbx_free(errmsg);
 		}
 		else
 		{
-			zbx_uint64_t res = (ZBX_INFINITY == expr_result ||
+			zbx_uint64_t	res = (ZBX_INFINITY == expr_result ||
 					SUCCEED == zbx_double_compare(expr_result, 0.0)) ? 0 : 1;
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_VALUE, res);
 

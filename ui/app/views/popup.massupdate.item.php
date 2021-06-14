@@ -29,23 +29,16 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setName('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('ids', $data['ids'])
-	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
+	->addVar('action', $data['action'])
+	->addVar('prototype', $data['prototype'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
-	->addVar('context', $data['context'])
+	->addVar('context', $data['context'], uniqid('context_'))
 	->disablePasswordAutofill();
-
-if ($data['prototype']) {
-	$form->addVar('parent_discoveryid', $data['parent_discoveryid']);
-}
-else {
-	$form->addVar('hostid', $data['hostid']);
-}
 
 // Create item form list.
 $item_form_list = (new CFormList('item-form-list'))
@@ -57,17 +50,17 @@ $item_form_list = (new CFormList('item-form-list'))
 		(new CSelect('type'))
 			->setId('type')
 			->setValue(ITEM_TYPE_ZABBIX)
-			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
+			->addOptions(CSelect::createOptionsFromArray($data['item_types']))
 	);
 
-// Append hosts to item form list.
-if ($data['display_interfaces']) {
+// Append hosts interface select to form list.
+if ($data['single_host_selected'] && $data['context'] === 'host') {
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([
-			getInterfaceSelect($data['hosts']['interfaces'])
+			getInterfaceSelect($data['interfaces'])
 				->setId('interface-select')
 				->setValue('0')
 				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
@@ -352,27 +345,34 @@ $item_form_list->addRow(
 	(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// Append valuemap to form list.
-$valuemaps_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue(0)
-	->addOption(new CSelectOption(0, _('As is')))
-	->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-foreach ($data['valuemaps'] as $valuemap) {
-	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+// Append value map select when only one host or template is selected.
+if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data['discovered_host'])) {
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
+		(new CDiv([
+			(new CMultiSelect([
+				'name' => 'valuemapid',
+				'object_name' => 'valuemaps',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'valuemaps',
+						'srcfld1' => 'valuemapid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'valuemapid',
+						'hostids' => [$data['hostid']],
+						'context' => $data['context'],
+						'editable' => true
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->setId('valuemapid_div')
+	);
 }
 
-$item_form_list
-	->addRow(
-		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))->setLabel(_('Show value')),
-		(new CDiv([$valuemaps_select, ' ',
-			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'valuemap.list')
-				->getUrl()
-			))->setAttribute('target', '_blank')
-		]))->setId('valuemap')
-	)
-	->addRow(
+$item_form_list->addRow(
 		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))->setLabel(_('Enable trapping')),
 		(new CRadioButtonList('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF))
 			->addValue(_('Yes'), HTTPCHECK_ALLOW_TRAPS_ON)
@@ -384,74 +384,8 @@ $item_form_list
 		(new CTextBox('trapper_hosts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append applications to form list.
-if ($data['displayApplications']) {
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
-			->setLabel(_('Applications')),
-		(new CDiv([
-			(new CRadioButtonList('massupdate_app_action', ZBX_ACTION_ADD))
-				->addValue(_('Add'), ZBX_ACTION_ADD)
-				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-				->setModern(true)
-				->addStyle('margin-bottom: 5px;'),
-			(new CMultiSelect([
-				'name' => 'applications[]',
-				'object_name' => 'applications',
-				'add_new' => true,
-				'data' => [],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'applications',
-						'srcfld1' => 'applicationid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'applications_',
-						'hostid' => $data['hostid'],
-						'noempty' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('applications_div')
-	);
-}
-
-if ($data['prototype']) {
-	$item_form_list
-		->addRow(
-			(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
-				->setLabel(_('Application prototypes')),
-			(new CDiv([
-				(new CRadioButtonList('massupdate_app_prot_action', ZBX_ACTION_ADD))
-					->addValue(_('Add'), ZBX_ACTION_ADD)
-					->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-					->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-					->setModern(true)
-					->addStyle('margin-bottom: 5px;'),
-				(new CMultiSelect([
-					'name' => 'application_prototypes[]',
-					'object_name' => 'application_prototypes',
-					'add_new' => true,
-					'data' => [],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'application_prototypes',
-							'srcfld1' => 'application_prototypeid',
-							'dstfrm' => $form->getName(),
-							'dstfld1' => 'application_prototypes_',
-							'hostid' => $data['hostid'],
-							'parent_discoveryid' => $data['parent_discoveryid'],
-							'noempty' => true
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			]))
-				->setId('application_prototypes_div')
-		);
-}
-
 // Append master item select to form list.
-if ($data['displayMasteritems']) {
+if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
 		$master_item = (new CDiv([
 			(new CMultiSelect([
@@ -535,8 +469,28 @@ $item_form_list->addRow(
 		->setMaxlength(DB::getFieldLength('items', 'description'))
 );
 
+/*
+ * Tags tab
+ */
+$tags_form_list = (new CFormList('tags-form-list'))
+	->addRow(
+		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			renderTagTable([['tag' => '', 'value' => '']])
+				->setHeader([_('Name'), _('Value'), _('Action')])
+				->setId('tags-table')
+		]))->setId('tags-div')
+	);
+
 $tabs = (new CTabView())
-	->addTab('item_tab', $data['prototype'] ? _('Item prototype') :_('Item'), $item_form_list)
+	->addTab('item_tab', $data['prototype'] ? _('Item prototype') : _('Item'), $item_form_list)
+	->addTab('tags_tab', _('Tags'), $tags_form_list)
 	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
 	->setSelected(0);
 
@@ -544,7 +498,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));

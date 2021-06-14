@@ -43,8 +43,6 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=problem.view',	'Problems'],
 
 			['zabbix.php?action=charts.view',		'Custom graphs'],
-			['screens.php',							'Configuration of screens'],
-			['slides.php',							'Configuration of slide shows'],
 			['zabbix.php?action=map.view',			'Configuration of network maps'],
 			['zabbix.php?action=discovery.view',	'Status of discovery'],
 			['srv_status.php',						'Services [refreshed every 30 sec.]'],
@@ -77,8 +75,6 @@ class testGeneric extends CLegacyWebTest {
 			['actionconf.php?eventsource=2',	'Configuration of actions'],
 			['actionconf.php?eventsource=3',	'Configuration of actions'],
 
-			['screenconf.php',						'Configuration of screens'],
-			['slideconf.php',						'Configuration of slide shows'],
 			['sysmaps.php',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.list',	'Configuration of discovery rules'],
 			['services.php',						'Configuration of services'],
@@ -90,7 +86,6 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=iconmap.list',	'Configuration of icon mapping'],
 			['zabbix.php?action=regex.list',	'Configuration of regular expressions'],
 			['zabbix.php?action=macros.edit',	'Configuration of macros'],
-			['zabbix.php?action=valuemap.list',	'Configuration of value mapping'],
 			['zabbix.php?action=trigdisplay.edit',	'Configuration of trigger displaying options'],
 			['zabbix.php?action=miscconfig.edit',	'Other configuration parameters'],
 

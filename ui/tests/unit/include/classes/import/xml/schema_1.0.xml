@@ -319,34 +319,6 @@
 			<description>test:test</description>
 		</dependency>
 	</dependencies>
-	<screens>
-		<screen>
-			<name>test</name>
-			<hsize>test</hsize>
-			<vsize>test</vsize>
-			<screenitems>
-				<screenitem>
-					<resourcetype>1</resourcetype>
-					<resourceid>
-						<key_>ftp,21</key_>
-						<host>Template_Simple</host>
-					</resourceid>
-					<width>test</width>
-					<height>test</height>
-					<x>test</x>
-					<y>test</y>
-					<colspan>test</colspan>
-					<rowspan>test</rowspan>
-					<elements>test</elements>
-					<valign>test</valign>
-					<halign>test</halign>
-					<style>test</style>
-					<dynamic>test</dynamic>
-					<url>test</url>
-				</screenitem>
-			</screenitems>
-		</screen>
-	</screens>
 	<images>
 		<image>
 			<name>test</name>

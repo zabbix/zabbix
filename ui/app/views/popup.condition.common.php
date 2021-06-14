@@ -515,21 +515,6 @@ switch ($data['type']) {
 					->addRow(_('Proxy'), $proxy_multiselect);
 				break;
 
-			// Application form elements.
-			case CONDITION_TYPE_APPLICATION:
-				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($operators_by_condition[$condition_type] as $key => $value) {
-					$operator->addValue($value, $key);
-				}
-				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-
-				$inline_js .= $new_condition_value->getPostJS();
-
-				$form_list
-					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
-				break;
-
 			// Received value form elements.
 			case CONDITION_TYPE_DVALUE:
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);

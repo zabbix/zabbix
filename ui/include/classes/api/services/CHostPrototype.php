@@ -38,7 +38,7 @@ class CHostPrototype extends CHostBase {
 	public function get(array $options) {
 		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
 		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
-			'custom_interfaces'
+			'custom_interfaces', 'uuid'
 		];
 		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
@@ -196,7 +196,8 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$host_prototypes) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+			'uuid' =>				['type' => API_UUID],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
@@ -219,8 +220,8 @@ class CHostPrototype extends CHostBase {
 					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
 					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
-					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
 											]],
 											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
@@ -290,8 +291,56 @@ class CHostPrototype extends CHostBase {
 
 		$this->validateInterfaces($host_prototypes);
 
+		$this->checkAndAddUuid($host_prototypes);
 		$this->checkDuplicates('host', $hosts_by_ruleid);
 		$this->checkDuplicates('name', $names_by_ruleid);
+	}
+
+	/**
+	 * Check that only host prototypes on templates have UUID. Add UUID to all host prototypes on templates,
+	 *   if it doesn't exist.
+	 *
+	 * @param array $host_prototypes_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$host_prototypes_to_create): void {
+		$discovery_ruleids = array_flip(array_column($host_prototypes_to_create, 'ruleid'));
+
+		$db_templated_rules = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid, h.status'.
+			' FROM items i, hosts h'.
+			' WHERE '.dbConditionInt('i.itemid', array_keys($discovery_ruleids)).
+			' AND i.hostid=h.hostid'.
+			' AND h.status = ' . HOST_STATUS_TEMPLATE
+		), 'itemid');
+
+		foreach ($host_prototypes_to_create as $index => &$host_prototype) {
+			if (!array_key_exists($host_prototype['ruleid'], $db_templated_rules)
+					&& array_key_exists('uuid', $host_prototype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if (array_key_exists($host_prototype['ruleid'], $db_templated_rules)
+					&& !array_key_exists('uuid', $host_prototype)) {
+				$host_prototype['uuid'] = generateUuidV4();
+			}
+		}
+		unset($host_prototype);
+
+		$db_uuid = DB::select('hosts', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($host_prototypes_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -344,8 +393,9 @@ class CHostPrototype extends CHostBase {
 		$groupPrototypes = [];
 		$hostPrototypeDiscoveryRules = [];
 		$hostPrototypeInventory = [];
-		foreach ($hostPrototypes as $key => $hostPrototype) {
-			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
+		$hosts_tags = [];
+		foreach ($hostPrototypes as $key => &$hostPrototype) {
+			$hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
 			// save group prototypes
 			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
@@ -367,7 +417,15 @@ class CHostPrototype extends CHostBase {
 					'inventory_mode' => $hostPrototype['inventory_mode']
 				];
 			}
+
+			// tags
+			if (array_key_exists('tags', $hostPrototype)) {
+				foreach (zbx_toArray($hostPrototype['tags']) as $tag) {
+					$hosts_tags[] = ['hostid' => $hostPrototype['hostid']] + $tag;
+				}
+			}
 		}
+		unset($hostPrototype);
 
 		// save group prototypes
 		$groupPrototypes = DB::save('group_prototype', $groupPrototypes);
@@ -387,14 +445,17 @@ class CHostPrototype extends CHostBase {
 		// save inventory
 		DB::insertBatch('host_inventory', $hostPrototypeInventory, false);
 
+		// save tags
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
+		}
+
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (isset($hostPrototype['templates']) && $hostPrototype['templates']) {
 				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), [$hostPrototype['hostid']]);
 			}
 		}
-
-		$this->createTags(array_column($hostPrototypes, 'tags', 'hostid'));
 
 		return $hostPrototypes;
 	}
@@ -431,8 +492,8 @@ class CHostPrototype extends CHostBase {
 					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
 					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
-					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
 											]],
 											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
@@ -913,6 +974,7 @@ class CHostPrototype extends CHostBase {
 
 				// copy host prototype
 				$newHostPrototype = $parentHostPrototype;
+				$newHostPrototype['uuid'] = '';
 				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
 				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
 
@@ -1375,6 +1437,7 @@ class CHostPrototype extends CHostBase {
 
 		// adding host
 		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
+			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
@@ -1386,25 +1449,36 @@ class CHostPrototype extends CHostBase {
 				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
 			}
 
-			$hosts = API::Host()->get([
-				'output' => $options['selectParentHost'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'templated_hosts' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectParentHost'],
+					'hostids' => $related_ids,
+					'templated_hosts' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $templates, 'templates');
 			}
 			else {

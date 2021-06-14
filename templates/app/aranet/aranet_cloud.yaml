@@ -1,24 +1,22 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-28T10:38:45Z'
+  date: '2021-05-11T08:05:19Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
+      uuid: af21edc47557400583e537904ea632aa
       template: 'Aranet Cloud'
       name: 'Aranet Cloud'
       description: 'Template tooling version used: 0.38'
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Aranet
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: 56f89fce2b1541b7898ad56362d4b28a
           name: 'Aranet: Get data'
           type: SCRIPT
           key: aranet.get_data
@@ -288,9 +286,6 @@ zabbix_export:
                 Zabbix.log(3, '[ Aranet scraper ] ERROR: ' + error);
                 throw 'Scraping failed: ' + error;
             }
-          applications:
-            -
-              name: 'Zabbix raw items'
           timeout: 10s
           parameters:
             -
@@ -305,7 +300,12 @@ zabbix_export:
             -
               name: username
               value: '{$ARANET.API.USERNAME}'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 92fb73948fa74de8a6a219397b77b570
           name: 'Aranet: Sensors discovery'
           type: DEPENDENT
           key: aranet.sensor.discovery
@@ -314,9 +314,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Discovery for Aranet Cloud sensors'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -347,8 +344,13 @@ zabbix_export:
                 - 15m
           master_item:
             key: aranet.get_data
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
       discovery_rules:
         -
+          uuid: c4d177c29cb34e87b6bec0d22bd3ae23
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: aranet.battery.voltage.discovery
@@ -389,6 +391,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Battery voltage sensors'
           item_prototypes:
             -
+              uuid: b5fca30b1433461f82ea7fe5c72687ef
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -396,9 +399,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -406,22 +406,29 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
-                  expression: '{max(5m)} < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
+                  uuid: 6a931421d804418085e586dfc0e11311
+                  expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                 -
-                  expression: '{max(5m)} < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}'
+                  uuid: d729130760f9418baa40fb9eeb8a3ca4
+                  expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
                       name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
-                      expression: '{Aranet Cloud:aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"].max(5m)} < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
+                      expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: f10b45e1e1024cb19ea8a705281e61fc
           name: 'CO2 discovery'
           type: DEPENDENT
           key: aranet.co2.discovery
@@ -462,6 +469,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud CO2 sensors'
           item_prototypes:
             -
+              uuid: 5057bec2a8d0446cb3515f1771e30d41
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -469,9 +477,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -479,22 +484,29 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
+                  uuid: 9d88ae8357b444728c63844462d25f83
+                  expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                 -
-                  expression: '{min(5m)} > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}'
+                  uuid: cc54c75ee607485981388da0f7f99ea2
+                  expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
                       name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
-                      expression: '{Aranet Cloud:aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"].min(5m)} > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
+                      expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: c42c2ae80f0d40688031f0ef3adb4dfb
           name: 'Current discovery'
           type: DEPENDENT
           key: aranet.current.discovery
@@ -535,6 +547,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Current sensors'
           item_prototypes:
             -
+              uuid: 68434a6b6881497b8f7892b00044e3e7
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.current["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -542,9 +555,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -552,9 +562,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 0d5eca62cf6e4db8abed33e7ad907925
           name: 'Differential Pressure discovery'
           type: DEPENDENT
           key: aranet.diff_pressure.discovery
@@ -595,6 +610,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Differential Pressure sensors'
           item_prototypes:
             -
+              uuid: d02fa9c559af492d8f23503c6c0e6b67
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.diff_pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -602,9 +618,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -612,9 +625,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: b9f0950111b6488098c79a60b2a444d6
           name: 'Distance discovery'
           type: DEPENDENT
           key: aranet.distance.discovery
@@ -655,6 +673,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Distance sensors'
           item_prototypes:
             -
+              uuid: 4a2dd84d9be34e39b4b8e0c03199ebec
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.distance["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -662,9 +681,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -672,9 +688,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 7cf9f5296e784045a86aa0fc7bb1ba69
           name: 'Humidity discovery'
           type: DEPENDENT
           key: aranet.humidity.discovery
@@ -715,6 +736,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud humidity sensors'
           item_prototypes:
             -
+              uuid: b0b25cd929fe493e8db07b19f64e623a
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -722,9 +744,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -732,22 +751,29 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)} > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
+                  uuid: 9697528bedd64aca9da1e6343182fe0c
+                  expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                 -
-                  expression: '{max(5m)} < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}'
+                  uuid: 85c1be625bc940588671bc43e6ed6a8a
+                  expression: 'max(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
                       name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
-                      expression: '{Aranet Cloud:aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"].min(5m)} > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
+                      expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 144396930b4b4049acb4bfd7b183a6f7
           name: 'Illuminance discovery'
           type: DEPENDENT
           key: aranet.illuminance.discovery
@@ -788,6 +814,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Illuminance sensors'
           item_prototypes:
             -
+              uuid: 0617cbdf99844d82a469bf600c94bcfa
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.illuminance["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -795,9 +822,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -805,9 +829,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 16b57e7a700c4041b787a8916442cd59
           name: 'Last update discovery'
           type: DEPENDENT
           key: aranet.last_update.discovery
@@ -848,15 +877,13 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Last update metric'
           item_prototypes:
             -
+              uuid: 296198c168694dc0bd0af5d1cc07cc0e
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
               delay: '0'
               history: 7d
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -868,14 +895,20 @@ zabbix_export:
                     - 'return Math.floor(Date.now()/1000 - Number(value));'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
               trigger_prototypes:
                 -
-                  expression: '{last()} > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}'
+                  uuid: b0aa8bb4e07e47b5824595b824081d75
+                  expression: 'last(/Aranet Cloud/aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]) > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated (more than {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"})'
                   priority: WARNING
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 9b33a2810e644c3c998d431a4a860993
           name: 'pH discovery'
           type: DEPENDENT
           key: aranet.ph.discovery
@@ -916,15 +949,13 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud pH sensors'
           item_prototypes:
             -
+              uuid: ad6f3af944a04305a196ff60bdae078f
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.ph["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -932,9 +963,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 1763029f67494745a2f52c980ae86b9c
           name: 'Pore Electrical Conductivity discovery'
           type: DEPENDENT
           key: aranet.pore_electric_cond.discovery
@@ -975,6 +1011,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Pore Electrical Conductivity sensors'
           item_prototypes:
             -
+              uuid: 4610a3ef84e54ddeb778e4f1c9e7ab8a
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.pore_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -982,9 +1019,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -992,9 +1026,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: c1a3941026c24d178a494de66c7be2cc
           name: 'PPFD discovery'
           type: DEPENDENT
           key: aranet.ppfd.discovery
@@ -1035,6 +1074,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud PPFD sensors'
           item_prototypes:
             -
+              uuid: 7f41b6f57a024e4fa632268bec66fdd3
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.ppfd["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1042,9 +1082,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1052,9 +1089,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 11a77f7018ca4b8f92f65888e3e2a237
           name: 'Atmospheric pressure discovery'
           type: DEPENDENT
           key: aranet.pressure.discovery
@@ -1095,6 +1137,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud atmospheric pressure sensors'
           item_prototypes:
             -
+              uuid: 3534343a6f78415e94b52f791a1a419a
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1102,9 +1145,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1112,9 +1152,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 6d5e1eebba704d5e88aa67ed029d95ca
           name: 'Pulses discovery'
           type: DEPENDENT
           key: aranet.pulses.discovery
@@ -1155,6 +1200,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Pulses sensors'
           item_prototypes:
             -
+              uuid: 471e5f773216407e819c840161562d1e
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.pulses["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1162,9 +1208,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1172,9 +1215,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 92f27211f4dd4f61b7939cf8b07fc959
           name: 'Pulses Cumulative discovery'
           type: DEPENDENT
           key: aranet.pulses_cumulative.discovery
@@ -1215,6 +1263,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Pulses Cumulative sensors'
           item_prototypes:
             -
+              uuid: da698f1bec144ab8aa8d960669c385d5
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.pulses_cumulative["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1222,9 +1271,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1232,9 +1278,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 2caab3aefe0b498588aa3ec0d8578e09
           name: 'RSSI discovery'
           type: DEPENDENT
           key: aranet.rssi.discovery
@@ -1275,6 +1326,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud RSSI sensors'
           item_prototypes:
             -
+              uuid: eefb5804ec224d26a3050246907c35aa
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.rssi["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1282,9 +1334,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1292,9 +1341,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 4d6116d2bd3049b9bb550e1d77338b2e
           name: 'Soil Dielectric Permittivity discovery'
           type: DEPENDENT
           key: aranet.soil_dielectric_perm.discovery
@@ -1335,6 +1389,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Soil Dielectric Permittivity sensors'
           item_prototypes:
             -
+              uuid: 53b7bb6bab76432f95599917e61a3ea7
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.soil_dielectric_perm["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1342,9 +1397,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1352,9 +1404,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: e44cc900de3b4353bbccc6f01388c103
           name: 'Soil Electrical Conductivity discovery'
           type: DEPENDENT
           key: aranet.soil_electric_cond.discovery
@@ -1395,6 +1452,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Soil Electrical Conductivity sensors'
           item_prototypes:
             -
+              uuid: 2f73f57b147c4d3498bd46a4048e2418
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.soil_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1402,9 +1460,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1412,9 +1467,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 215affa3d0d34aa2b27be4ec75ba3349
           name: 'Temperature discovery'
           type: DEPENDENT
           key: aranet.temp.discovery
@@ -1455,6 +1515,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud temperature sensors'
           item_prototypes:
             -
+              uuid: 86a562af26184359ac7d2287c6bd87c6
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.temp["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1462,9 +1523,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1472,9 +1530,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 9e9bf9e27be743368c50036f02fab572
           name: 'Voltage discovery'
           type: DEPENDENT
           key: aranet.voltage.discovery
@@ -1515,6 +1578,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Voltage sensors'
           item_prototypes:
             -
+              uuid: 461f54e7c7ce4658b8acc83be8d6906c
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1522,9 +1586,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1532,9 +1593,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: c059e164b01242b78ab8505d12c2d291
           name: 'Volumetric Water Content discovery'
           type: DEPENDENT
           key: aranet.volum_water_content.discovery
@@ -1575,6 +1641,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Volumetric Water Content sensors'
           item_prototypes:
             -
+              uuid: 8a03e78d9f4145b58c55d04189b90423
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.volumetric.water.content["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1582,9 +1649,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1592,9 +1656,14 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
         -
+          uuid: 414889299c224d748c857fcf028d9e96
           name: 'Weight discovery'
           type: DEPENDENT
           key: aranet.weight.discovery
@@ -1635,6 +1704,7 @@ zabbix_export:
           description: 'Discovery for Aranet Cloud Weight sensors'
           item_prototypes:
             -
+              uuid: 6eb5e840b089469ca644a20bcb7739d4
               name: '{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}'
               type: DEPENDENT
               key: 'aranet.weight["{#GATEWAY_ID}", "{#SENSOR_ID}"]'
@@ -1642,9 +1712,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#UNIT}'
-              application_prototypes:
-                -
-                  name: '{#METRIC}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1652,6 +1719,10 @@ zabbix_export:
                     - '$[?(@.id == "{#SENSOR_ID}" && @.name == "{#SENSOR_NAME}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
+              tags:
+                -
+                  tag: Application
+                  value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
       macros:

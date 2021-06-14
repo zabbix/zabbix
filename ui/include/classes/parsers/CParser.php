@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 abstract class CParser {
 
 	const PARSE_FAIL = -1;
@@ -70,13 +71,13 @@ abstract class CParser {
 		if ($this->error_source === false) {
 			return '';
 		}
-		else if (!isset($this->error_source[$this->error_pos])) {
+
+		if (!isset($this->error_source[$this->error_pos])) {
 			return ($this->error_pos == 0) ? $this->error_msgs['empty'] : $this->error_msgs['unexpected_end'];
 		}
-		else {
-			// The error message is prepared here to avoid extra calculations, if error message is not used.
-			return $this->errorPosMessage($this->error_source, $this->error_pos);
-		}
+
+		// The error message is prepared here to avoid extra calculations if the error message is not used.
+		return $this->errorPosMessage($this->error_source, $this->error_pos);
 	}
 
 	/**

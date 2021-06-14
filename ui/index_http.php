@@ -62,7 +62,7 @@ if ($http_user) {
 	}
 
 	try {
-		CWebUser::$data = API::getApiService('user')->loginByAlias($http_user,
+		CWebUser::$data = API::getApiService('user')->loginByUsername($http_user,
 			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);

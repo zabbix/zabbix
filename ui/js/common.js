@@ -326,24 +326,24 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action         Popup controller related action.
- * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid     (optional) id of overlay dialogue.
- * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action          Popup controller related action.
+ * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid      (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit',
-				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.lldoperation', 'popup.lldoverride',
-				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
-				'popup.triggerwizard'
+		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit', 'dashboard.page.properties.edit',
+			'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.services', 'popup.media', 'popup.lldoperation',
+				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
+				'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec'
+				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype'
@@ -386,20 +386,24 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				if (action === 'popup.scriptexec') {
-					buttons.push({
-						'title': t('Ok'),
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
-				}
-				else {
-					buttons.push({
-						'title': t('Cancel'),
-						'class': 'btn-alt',
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
+				switch (action) {
+					case 'popup.scheduledreport.list':
+					case 'popup.scheduledreport.test':
+					case 'popup.scriptexec':
+						buttons.push({
+							'title': t('Ok'),
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
+						break;
+
+					default:
+						buttons.push({
+							'title': t('Cancel'),
+							'class': 'btn-alt',
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
 				}
 
 				overlay.setProperties({
@@ -488,11 +492,6 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
-		// Do not catch multiselect events.
-		if (jQuery(event.target).closest('.multiselect').data('multiSelect') !== undefined) {
-			return;
-		}
-
 		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {
@@ -972,43 +971,16 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-/**
- * Get first selected host from multiselect field.
- *
- * @param {string} host_field_id       Host field element ID.
- * @param {string} hostgroup_field_id  Host group field element ID.
- *
- * @return {object}
- */
-function getFirstMultiselectValue(host_field_id, hostgroup_field_id) {
-	var host_values = (typeof host_field_id !== 'undefined')
-			? jQuery('#'+host_field_id).multiSelect('getData')
-			: [],
-		hostgroup_values = (typeof hostgroup_field_id !== 'undefined')
-			? jQuery('#'+hostgroup_field_id).multiSelect('getData')
-			: [],
-		ret = {};
-
-	if (host_values.length != 0) {
-		ret.hostid = host_values[0].id;
-	}
-	if (hostgroup_values.length != 0) {
-		ret.groupid = hostgroup_values[0].id;
-	}
-
-	return ret;
-}
-
 function openMassupdatePopup(elem, popup_name) {
 	const data = {};
 	const form = elem.closest('form');
 
-	data['ids'] = [...form.querySelectorAll('input:checked')].map((input) => input.value);
+	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
 
 	switch (popup_name) {
 		case 'popup.massupdate.item':
-			data['hostid'] = form.querySelector('#hostid').value;
 			data['context'] = form.querySelector('#context').value;
+			data['prototype'] = 0;
 			break;
 
 		case 'popup.massupdate.trigger':

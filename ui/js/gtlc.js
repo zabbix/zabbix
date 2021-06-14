@@ -45,6 +45,7 @@ jQuery(function($) {
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
+	endpoint.addSID();
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
@@ -324,7 +325,7 @@ jQuery(function($) {
 		.on('click', 'a', function(event) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
 			if ($(event.target).is('img') && typeof $(event.target).data('zbx_sbox') !== 'undefined' && prevent_click
-					&& $(this).hasClass('dashbrd-widget-graph-link')) {
+					&& $(this).hasClass('dashboard-widget-graph-link')) {
 				return cancelEvent(event);
 			}
 		});
@@ -616,7 +617,7 @@ var timeControl = {
 			window.flickerfreeScreen.setElementProgressState(obj.id, true);
 			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
-				img.closest('.dashbrd-grid-widget').trigger('load.image', {imageid: id});
+				img.closest('.dashboard-grid-widget').trigger('load.image', {imageid: id});
 			});
 
 			var xhr = (obj.loadSBox == 0)
@@ -657,7 +658,7 @@ var timeControl = {
 				'class': img.attr('class')
 			})
 			.one('load', function() {
-				img.closest('.dashbrd-grid-widget').trigger('load.image', {imageid: img.attr('id')});
+				img.closest('.dashboard-grid-widget').trigger('load.image', {imageid: img.attr('id')});
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});
@@ -703,7 +704,7 @@ var timeControl = {
 	disableAllSBox: function() {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
-				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
+				jQuery('#'+obj.containerid).removeClass('dashboard-widget-graph-link');
 			}
 		});
 		jQuery(document).off('dblclick mousedown', 'img');

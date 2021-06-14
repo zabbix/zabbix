@@ -439,7 +439,7 @@ class testFormUserMedia extends CWebTest {
 				[
 					'action' => 'create',
 					'user_fields' => [
-						'Alias' => 'created-user',
+						'Username' => 'created-user',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -512,7 +512,7 @@ class testFormUserMedia extends CWebTest {
 				break;
 			case 'delete':
 				// Get userid for of the user to be deleted to verify media deletion along with the user.
-				$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['username']));
+				$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['username']));
 				$this->query('button:Delete')->one()->click();
 				$this->page->acceptAlert();
 				break;
@@ -525,7 +525,7 @@ class testFormUserMedia extends CWebTest {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT mediaid FROM media WHERE userid='.zbx_dbstr($userid)));
 		}
 		else {
-			$user = CTestArrayHelper::get($data, 'user_fields.Alias', false) ? $data['user_fields']['Alias'] : $data['username'];
+			$user = CTestArrayHelper::get($data, 'user_fields.Username', false) ? $data['user_fields']['Username'] : $data['username'];
 			$this->query('link', $user)->waitUntilVisible()->one()->click();
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 			$media_field = $user_form->getField('Media')->asTable();

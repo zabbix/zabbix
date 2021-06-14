@@ -107,7 +107,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			$history = getEventUpdates(reset($events));
 			$data['history'] = $history['data'];
 			$data['users'] = API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($history['userids']),
 				'preservekeys' => true
 			]);

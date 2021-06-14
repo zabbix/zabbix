@@ -17,7 +17,9 @@ libzbxalgo_a_SOURCES = \
 	hashmap.c \
 	hashset.c \
 	int128.c \
+	linked_list.c \
 	prediction.c \
 	queue.c \
 	vector.c \
-	vectorimpl.h
+	vectorimpl.h \
+	serialize.c

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,15 +19,17 @@
 **/
 
 
-class GetExpressionTreeTest extends PHPUnit_Framework_TestCase {
-	private $trigger_expression;
+use PHPUnit\Framework\TestCase;
 
-	protected function setUp() {
-		$this->trigger_expression = new CTriggerExpression();
+class GetExpressionTreeTest extends TestCase {
+	private $expression_parser;
+
+	protected function setUp(): void {
+		$this->expression_parser = new CExpressionParser(['usermacros' => true]);
 	}
 
-	protected function tearDown() {
-		$this->trigger_expression = null;
+	protected function tearDown(): void {
+		$this->expression_parser = null;
 	}
 
 	public function provider() {
@@ -100,11 +102,9 @@ class GetExpressionTreeTest extends PHPUnit_Framework_TestCase {
 	 * @param $expected_parsed
 	 */
 	public function test($expression, $expected_parsed) {
-		if (!$this->trigger_expression->parse($expression)) {
-			$this->fail('CTriggerExpression parse error');
-		}
+		$this->assertSame(CParser::PARSE_SUCCESS, $this->expression_parser->parse($expression));
 
-		$result = getExpressionTree($this->trigger_expression, 0, strlen($this->trigger_expression->expression) - 1);
+		$result = getExpressionTree($this->expression_parser, 0, $this->expression_parser->getLength() - 1);
 
 		if (!is_array($result)) {
 			$this->fail('getExpressionTree did not return an array');

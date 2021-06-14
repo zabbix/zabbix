@@ -35,9 +35,7 @@ $widget = (new CWidget())
 			))
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", jQuery.extend('.
-						json_encode(['rules_preset' => 'host']).', null), null, this);'
-					)
+					->onClick('return PopUp("popup.import", {rules_preset: "host"}, null, this);')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -48,54 +46,10 @@ if (!$filter_tags) {
 	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags')
-	->addRow((new CCol(
-		(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-			->setModern(true)
-		))->setColSpan(4)
-	);
-
-$i = 0;
-foreach ($filter_tags as $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CSelect('filter_tags['.$i.'][operator]'))
-			->addOptions(CSelect::createOptionsFromArray([
-				TAG_OPERATOR_EXISTS => _('Exists'),
-				TAG_OPERATOR_EQUAL => _('Equals'),
-				TAG_OPERATOR_LIKE => _('Contains'),
-				TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
-				TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
-				TAG_OPERATOR_NOT_LIKE => _('Does not contain')
-			]))
-			->setValue($tag['operator'])
-			->setFocusableElementId('filter-tags-'.$i.'-operator-select')
-			->setId('filter_tags_'.$i.'_operator'),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setId('filter_tags_'.$i.'_value'),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-
-	$i++;
-}
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('filter_tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	))->setColSpan(3)
-);
+$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
+	'evaltype' => $data['filter']['evaltype'],
+	'tags' => $filter_tags
+]);
 
 // filter
 $filter = new CFilter(new CUrl('hosts.php'));
@@ -192,7 +146,6 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'hosts.php'),
-		_('Applications'),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
@@ -412,15 +365,6 @@ foreach ($data['hosts'] as $host) {
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
-		[
-			new CLink(_('Applications'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'application.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$host['hostid']])
-			),
-			CViewHelper::showNum($host['applications'])
-		],
 		[
 			new CLink(_('Items'),
 				(new CUrl('items.php'))

@@ -1,0 +1,182 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-03-04T10:30:08Z'
+  media_types:
+    -
+      name: Brevis.one
+      type: WEBHOOK
+      parameters:
+        -
+          name: endpoint
+          value: '<PLACE HTTP API URL>'
+        -
+          name: flash
+          value: 'false'
+        -
+          name: password
+          value: '<PLACE PASSWORD>'
+        -
+          name: ring
+          value: 'false'
+        -
+          name: send_to
+          value: '{ALERT.SENDTO}'
+        -
+          name: telauto
+          value: 'true'
+        -
+          name: text
+          value: '{ALERT.MESSAGE}'
+        -
+          name: username
+          value: '<PLACE USERNAME>'
+      script: |
+        var BrevisOne = {
+            params: [],
+        
+            addParam: function (name, value) {
+                BrevisOne.params.push(name + '=' + encodeURIComponent(value));
+            },
+        
+            setProxy: function (HTTPProxy) {
+                BrevisOne.HTTPProxy = HTTPProxy;
+            },
+        
+            setPayload: function (params) {
+                var parts = params.send_to.split(':'),
+                    defaultValues = {
+                        ring: 'true',
+                        flash: 'true',
+                        telauto: 'false'
+                    };
+        
+                BrevisOne.addParam('username', params.username);
+                BrevisOne.addParam('password', params.password);
+                BrevisOne.addParam('text', params.text);
+        
+                if (parts.length > 1) {
+                    BrevisOne.addParam('mode', parts[0]);
+                    BrevisOne.addParam('to', parts[1]);
+                }
+                else {
+                    BrevisOne.addParam('to', parts[0]);
+                }
+        
+                Object.keys(defaultValues)
+                    .forEach(function (key) {
+                        if (params[key] && params[key].trim() && params[key].toLowerCase() === defaultValues[key]) {
+                            BrevisOne.addParam(key, defaultValues[key]);
+                        }
+                    });
+            },
+        
+            request: function () {
+                var response,
+                    request = new HttpRequest(),
+                    data = '?' + BrevisOne.params.join('&');
+        
+                request.addHeader('Content-Type: multipart/form-data');
+        
+                if (typeof BrevisOne.HTTPProxy !== 'undefined' && BrevisOne.HTTPProxy !== '') {
+                    request.setProxy(BrevisOne.HTTPProxy);
+                }
+        
+                Zabbix.log(4, '[ BrevisOne Webhook ] Sending request.');
+        
+                response = request.post(params.endpoint + data);
+        
+                Zabbix.log(4, '[ BrevisOne Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response) {
+                        message += ': ' + response;
+                    }
+        
+                    throw message + '. Check debug log for more information.';
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value);
+        
+            ['endpoint', 'password', 'username', 'text', 'send_to'].forEach(function (field) {
+                if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                        || !params[field].trim()) {
+                    throw 'Required parameter is not set: "' + field + '".';
+                }
+            });
+        
+            if (params.send_to === '{ALERT.SENDTO}') {
+                throw 'Required parameter is not set: "send_to".';
+            }
+        
+            BrevisOne.setProxy(params.HTTPProxy);
+            BrevisOne.setPayload(params);
+            BrevisOne.request();
+        
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(3, '[ BrevisOne Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Started at {EVENT.TIME} on {EVENT.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Autoregistration: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

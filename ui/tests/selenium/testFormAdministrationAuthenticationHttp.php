@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -499,7 +499,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * @dataProvider getHttpData
 	 * @backup config
-	 * @on-after removeConfigurationFiles
+	 * @onAfter removeConfigurationFiles
 	 *
 	 * Internal authentication with HTTP settings.
 	 */
@@ -542,16 +542,16 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			$session = $session_cookie['sessionid'];
 
 			$user_data = CDBHelper::getRow(
-				'SELECT u.alias'.
+				'SELECT u.username'.
 				' FROM users u,sessions s'.
 				' WHERE u.userid=s.userid'.
 					' AND sessionid='.zbx_dbstr($session)
 			);
 			if (array_key_exists('user_case_sensitive', $data)) {
-				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
+				$this->assertEquals($user_data['username'], $data['user_case_sensitive']);
 			}
 			else {
-				$this->assertEquals($user_data['alias'], $alias);
+				$this->assertEquals($user_data['username'], $alias);
 			}
 
 			$this->page->logout();

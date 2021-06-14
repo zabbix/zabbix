@@ -17,7 +17,9 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "base/common";
 
 @import "utils/indicator";
+@import "utils/resizable";
 @import "utils/scrollable";
+@import "utils/sortable";
 
 @import "layout/grid";
 @import "layout/header";
@@ -25,11 +27,14 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/sidebar";
 @import "layout/form-grid";
 
+@import "components/dashboard";
+@import "components/diff";
 @import "components/form-search";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/tabfilter";
+@import "components/toc";
 @import "components/z-select";
 
 .link-action {
@@ -182,40 +187,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	width: 24px;
 	height: 24px;
 	background: url($sprite-path) no-repeat -540px -400px;
-}
-
-.dashbrd-edit {
-	background-color: $ui-bg-color;
-	box-shadow: 0 0 0 4px $ui-bg-color;
-	display: inline-block;
-	margin-right: 5px;
-	position: relative;
-
-	&::after {
-		content: '';
-		position: absolute;
-		min-height: 24px;
-		z-index: -1;
-		top: -5px;
-		right: -5px;
-		bottom: -5px;
-		left: -5px;
-		border: 1px solid $ui-border-color;
-	}
-
-	ul {
-		li {
-			vertical-align: middle;
-
-			&:first-child {
-				padding: 0;
-			}
-
-			.btn-dashbrd-conf {
-				vertical-align: middle;
-			}
-		}
-	}
 }
 
 .hor-list {
@@ -909,7 +880,7 @@ form {
 	vertical-align: top;
 
 	&:last-child {
-		.dashbrd-widget {
+		.dashboard-widget {
 			margin: 0 0 10px;
 		}
 	}
@@ -1368,6 +1339,21 @@ form {
 		@extend tfoot;
 	}
 
+	td {
+		position: relative;
+
+		&.td-drag-icon {
+			padding: 0 11px 0 0;
+			vertical-align: middle;
+		}
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			margin-right: 5px;
+		}
+	}
+
 	.table-forms-td-left {
 		display: table-cell;
 		padding: 5px 0;
@@ -1399,14 +1385,7 @@ form {
 			position: relative;
 
 			&.td-drag-icon {
-				padding: 0 11px 0 0;
-				vertical-align: middle;
-			}
-
-			.drag-icon {
-				position: absolute;
-				top: 5px;
-				margin-right: 5px;
+				padding-right: 11px;
 			}
 
 			&.center {
@@ -1542,6 +1521,7 @@ form {
 }
 
 .radio-list-control {
+	display: inline-block;
 	white-space: nowrap;
 
 	li {
@@ -1634,6 +1614,10 @@ form {
 			transition: none;
 			@extend %form-disabled;
 		}
+	}
+
+	+ .icon-info {
+		margin-left: 5px;
 	}
 }
 
@@ -2089,23 +2073,28 @@ button {
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url($sprite-path) no-repeat -7px -187px,
 	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -259px,
 	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
-	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px
+	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
+	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
+	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -396px -624px
 );
 
 // Dynamically generated classes:
-//  .btn-conf
 //  .btn-kiosk
 //  .btn-min
 //  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-action
 //  .btn-info
+//  .btn-dashboard-kioskmode-toggle-slideshow
+//  .btn-dashboard-kioskmode-previous-page
+//  .btn-dashboard-kioskmode-next-page
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -2114,6 +2103,7 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	dashboard-page-properties: url($sprite-path) no-repeat -318px -618px,
 	iterator-page-previous: url($sprite-path) no-repeat -85px -657px,
 	iterator-page-next: url($sprite-path) no-repeat -83px -623px,
 	widget-action: url($sprite-path) no-repeat -6px -618px,
@@ -2128,6 +2118,7 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
+//  .btn-dashboard-page-properties
 //  .btn-iterator-page-previous
 //  .btn-iterator-page-next
 //  .btn-widget-action
@@ -2483,23 +2474,38 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
-	background: url($sprite-path) no-repeat -42px -619px;
-	@extend %btn-dashbrd;
-}
-
-.btn-dashbrd-normal {
-	box-shadow: 1px 1px 2px $action-shadow-color;
+.header-kioskmode-controls {
 	position: fixed;
-	right: 45px;
 	top: 5px;
-	opacity: 1;
+	right: 45px;
 	z-index: 1010;
+	display: flex;
 	transition: opacity 1s ease-out;
 
 	&.hidden {
 		opacity: 0;
 	}
+
+	& > li > ul {
+		margin-right: 10px;
+	}
+
+	ul {
+		display: flex;
+
+		li {
+			margin-right: 10px;
+		}
+	}
+}
+
+.btn-dashboard-conf {
+	background: url($sprite-path) no-repeat -42px -619px;
+	@extend %btn-dashboard;
+}
+
+.btn-dashboard-normal {
+	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
 %btn-widget {
@@ -2509,7 +2515,7 @@ $icon-widget-btn: (
 	@extend %btn-widget-defaults;
 }
 
-%btn-dashbrd {
+%btn-dashboard {
 	width: 24px;
 	height: 24px;
 	@extend %btn-widget-defaults;
@@ -2706,17 +2712,13 @@ $form-icon-btn: (
 }
 
 .drag-icon,
-.ui-draggable .dashbrd-widget-head,
-.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
-.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
+.ui-draggable .dashboard-widget-head {
 	@extend %cursor-drag;
 }
 
-.ui-draggable-dragging {
+.ui-draggable {
 	.drag-icon,
-	.dashbrd-widget-head,
-	.dashbrd-grid-widget-head,
-	.dashbrd-grid-iterator-head {
+	.dashboard-widget-head {
 		@extend %cursor-dragging;
 	}
 }
@@ -2908,896 +2910,6 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-// Dashboard, widgets and iterators.
-// To maintain code clarity:
-//   - Do not mix rules for dashboard view mode and dashboard edit mode.
-//   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-container {
-	position: relative;
-	margin: -4px;
-
-	// For widget sliding headers to appear over the breadcrumbs.
-	z-index: 3;
-}
-
-.dashbrd-grid-new-widget-placeholder {
-	box-sizing: border-box;
-	display: flex;
-	height: 200px;
-	padding: .25rem;
-	width: calc(100% / 6 - .65rem);
-	z-index: 999;
-	color: $font-alt-color;
-	cursor: pointer;
-
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
-		background-color: rgba($ui-bg-color, .7);
-		border: 1px dashed $form-border-color;
-		box-shadow: 2px 2px 6px $action-shadow-color;
-		flex: 1;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.dashbrd-grid-widget-set-size {
-		background: darken($body-bg-color, 6%);
-		box-shadow: inset 2px 2px 6px $action-shadow-color;
-	}
-
-	.dashbrd-grid-new-widget-label {
-		$icon-height: 28px;
-
-		position: absolute;
-		left: 0;
-		top: calc(50% - #{$icon-height / 2});
-		right: 0;
-		bottom: 0;
-		padding: ($icon-height + 10px) 5px 5px;
-		text-align: center;
-
-		&::before {
-			background: url($sprite-path) no-repeat -157px -888px;
-			content: ' ';
-			height: $icon-height;
-			width: 36px;
-			position: absolute;
-			top: 0;
-			left: 50%;
-			transform: translateX(-50%);
-		}
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		.dashbrd-grid-widget-new-box {
-			background-color: rgba($ui-bg-color, .7);
-
-			.dashbrd-grid-new-widget-label::before {
-				background: url($sprite-path) no-repeat -122px -284px;
-			}
-		}
-	}
-}
-
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -345px -888px;
-		}
-	}
-}
-
-.dashbrd-grid-widget-container {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: .25rem;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-}
-
-.dashbrd-grid-widget-head {
-	position: absolute;
-	top: .25rem;
-	left: .25rem;
-	right: .25rem;
-	height: 2rem;
-	padding-left: 10px;
-	display: flex;
-	flex-wrap: nowrap;
-	flex-direction: row;
-	overflow: hidden;
-	align-items: flex-start;
-	border: 1px solid $ui-border-color;
-	border-bottom: 0;
-	background-color: $ui-bg-color;
-
-	// For floating headers to appear over other widgets.
-	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	z-index: 3;
-
-	h4 {
-		flex-grow: 1;
-		margin-top: .5rem;
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-		@extend %overflow-ellipsis;
-	}
-
-	ul {
-		flex-shrink: 0;
-
-		li {
-			float: left;
-			padding: 0;
-
-			select {
-				margin: 4px 0;
-			}
-		}
-	}
-}
-
-.dashbrd-grid-widget-actions {
-	opacity: 0;
-	transition: opacity .2s ease-out;
-}
-
-.dashbrd-grid-widget-content {
-	flex-grow: 1;
-	margin-top: 2rem;
-	box-sizing: border-box;
-	height: calc(100% - 2rem);
-	padding-bottom: 8px;
-	overflow: auto;
-	border: 1px solid $ui-border-color;
-	background-color: $ui-bg-color;
-
-	@extend %webkit-scrollbar;
-
-	.list-table {
-		border: 0;
-
-		th {
-			@extend %dashbrd-widget-td;
-		}
-
-		td {
-			@extend %dashbrd-widget-td;
-		}
-
-		tbody tr {
-			&:last-child th,
-			&:last-child td {
-				border-bottom: 1px solid $table-border-color;
-
-				&.list-table-footer {
-					border-bottom: 0;
-				}
-			}
-		}
-	}
-
-	.debug-output {
-		max-height: none;
-		border-color: $table-border-color;
-	}
-
-	.msg-bad,
-	.msg-good,
-	.msg-warning {
-		margin: 0 10px;
-	}
-}
-
-.dashbrd-grid-widget-mask {
-	position: absolute;
-	top: .25rem;
-	left: .25rem;
-	right: .25rem;
-	bottom: .25rem;
-	display: none;
-}
-
-.dashbrd-grid-widget {
-	position: absolute;
-
-	&.dashbrd-grid-widget-hidden-header {
-		.dashbrd-grid-widget-head {
-			height: 0;
-			transition: height .3s, margin-top .3s, box-shadow .3s;
-		}
-
-		.dashbrd-grid-widget-content {
-			margin-top: 0;
-			height: 100%;
-			padding-top: 8px;
-		}
-
-		&.dashbrd-grid-widget-focus {
-			.dashbrd-grid-widget-head {
-				height: 2rem;
-				margin-top: -2rem;
-				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-				z-index: 5;
-			}
-		}
-	}
-
-	&.dashbrd-grid-widget-focus {
-		.dashbrd-grid-widget-actions {
-			opacity: 1;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashbrd-grid-widget-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashbrd-grid-widget-container {
-			left: auto;
-			right: 0;
-		}
-	}
-}
-
-.dashbrd-grid-iterator-container {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-
-.dashbrd-grid-iterator-head {
-	position: absolute;
-	top: .25rem;
-	left: .25rem;
-	right: .25rem;
-	height: 0;
-	display: flex;
-	flex-wrap: nowrap;
-	flex-direction: row;
-	overflow: hidden;
-	padding-left: 10px;
-	box-sizing: border-box;
-	border: 1px solid $ui-border-color;
-	border-bottom: 0;
-	background-color: $ui-bg-color;
-	opacity: 0;
-
-	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
-
-	// Not to loose hovered header while widget underneath is updating.
-	z-index: 3;
-
-	h4 {
-		flex-grow: 1;
-		margin-top: .5rem;
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-		@extend %overflow-ellipsis;
-	}
-
-	ul {
-		flex-shrink: 0;
-
-		li {
-			float: left;
-			padding: 0;
-		}
-	}
-
-	.dashbrd-grid-iterator-pager {
-		margin: 0 10px;
-		height: 2rem;
-		display: none;
-		flex-direction: row;
-		flex-shrink: 0; // IE11 fix.
-		align-items: center;
-
-		.dashbrd-grid-iterator-pager-info {
-			margin: 2px .5em 0;
-			white-space: nowrap;
-			color: widget-head-font-color($font-color);
-		}
-	}
-
-	&.pager-visible .dashbrd-grid-iterator-pager {
-		display: flex;
-	}
-}
-
-.dashbrd-grid-iterator-content {
-	// To catch vertical resize events correctly.
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-
-	// To allow overflowing of the floating headers of child widgets.
-	overflow: visible;
-
-	transition: margin-top .3s ease-out;
-}
-
-.dashbrd-grid-iterator-placeholder {
-	position: absolute;
-	display: flex;
-
-	> div {
-		margin: .25rem;
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		border: 1px solid $ui-border-color;
-		background-color: rgba($ui-bg-color, .3);
-	}
-}
-
-.dashbrd-grid-iterator-too-small {
-	position: absolute;
-	top: .25rem;
-	left: .25rem;
-	right: .25rem;
-	bottom: .25rem;
-	overflow: hidden;
-	display: none;
-	align-items: center;
-	justify-content: center;
-	border: 1px solid $ui-border-color;
-	background-color: $ui-bg-color;
-
-	> div {
-		padding: 0 10px;
-		text-align: center;
-		color: $font-alt-color;
-	}
-}
-
-.dashbrd-grid-iterator-mask {
-	position: absolute;
-	top: .25rem;
-	left: .25rem;
-	right: .25rem;
-	bottom: .25rem;
-	display: none;
-}
-
-.dashbrd-grid-iterator {
-	position: absolute;
-
-	&.iterator-too-small {
-		.dashbrd-grid-iterator-too-small {
-			display: flex;
-		}
-
-		.dashbrd-grid-iterator-content {
-			display: none;
-		}
-	}
-
-	&.dashbrd-grid-iterator-focus {
-		z-index: 5;
-
-		.dashbrd-grid-iterator-head {
-			margin-top: -2rem;
-			height: 2rem;
-			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-			opacity: 1;
-
-			// Not inheriting opacity transition here.
-			transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out;
-		}
-
-		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
-			.dashbrd-grid-iterator-head {
-				margin-top: -4rem;
-				height: 4rem;
-			}
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashbrd-grid-iterator-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashbrd-grid-iterator-container {
-			left: auto;
-			right: 0;
-		}
-	}
-
-	&.iterator-alt-content {
-		.dashbrd-grid-iterator-content {
-			position: absolute;
-			top: .25rem;
-			left: .25rem;
-			right: .25rem;
-			bottom: .25rem;
-			border: 1px solid $ui-border-color;
-			background-color: $ui-bg-color;
-
-			> div {
-				padding-top: 8px;
-
-				.list-table {
-					border: 0;
-
-					th {
-						@extend %dashbrd-widget-td;
-					}
-
-					td {
-						@extend %dashbrd-widget-td;
-					}
-
-					tbody tr {
-						&:last-child th,
-						&:last-child td {
-							border-bottom: 1px solid $table-border-color;
-
-							&.list-table-footer {
-								border-bottom: 0;
-							}
-						}
-					}
-				}
-
-				.msg-good,
-				.msg-bad {
-					margin: 0 10px;
-				}
-			}
-		}
-	}
-}
-
-.dashbrd-grid-container.dashbrd-mode-edit {
-	.dashbrd-grid-widget-actions {
-		opacity: 1;
-	}
-
-	&.dashbrd-positioning {
-		// No lazy transitions while dragging or resizing.
-
-		.dashbrd-grid-widget {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
-					transition: none;
-				}
-			}
-		}
-
-		.dashbrd-grid-iterator {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
-					transition: none;
-				}
-			}
-		}
-
-		// No widget interactivity while dragging or resizing.
-
-		.dashbrd-grid-widget-mask {
-			display: block;
-		}
-
-		.dashbrd-grid-iterator-mask {
-			display: block;
-		}
-	}
-
-	.dashbrd-grid-widget {
-		.ui-resizable-handle {
-			visibility: hidden;
-		}
-
-		&.dashbrd-grid-widget-focus .ui-resizable-handle {
-			visibility: visible;
-		}
-
-		&.ui-resizable-resizing {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
-					margin-top: 0;
-					height: 0;
-					box-shadow: none;
-				}
-			}
-		}
-
-		&.ui-draggable-dragging {
-			.ui-resizable-handle {
-				visibility: hidden;
-			}
-
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
-					margin-top: -2rem;
-					height: 2rem;
-					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-					opacity: .5;
-				}
-			}
-		}
-
-		&.ui-resizable-resizing,
-		&.ui-draggable-dragging {
-			z-index: 1000;
-
-			&::before {
-				content: '';
-				display: block;
-				position: absolute;
-				top: .25rem;
-				left: .25rem;
-				right: .25rem;
-				bottom: .25rem;
-				background-color: rgba(darken($body-bg-color, 6%), .75);
-				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
-			}
-
-			.dashbrd-grid-widget-head {
-				border-color: darken($ui-border-color, 6%);
-			}
-
-			.dashbrd-grid-widget-content {
-				border-color: darken($ui-border-color, 6%);
-			}
-		}
-	}
-
-	.dashbrd-grid-iterator {
-		.ui-resizable-handle {
-			visibility: hidden;
-		}
-
-		&.dashbrd-grid-iterator-focus .ui-resizable-handle {
-			visibility: visible;
-		}
-
-		&.ui-resizable-resizing {
-			.dashbrd-grid-iterator-head {
-				margin-top: 0;
-				height: 0;
-				box-shadow: none;
-				opacity: 0;
-			}
-		}
-
-		&.ui-draggable-dragging {
-			.ui-resizable-handle {
-				visibility: hidden;
-			}
-
-			.dashbrd-grid-iterator-head {
-				margin-top: -2rem;
-				height: 2rem;
-				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-				opacity: .5;
-			}
-
-			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
-				.dashbrd-grid-iterator-head {
-					margin-top: -4rem;
-					height: 4rem;
-				}
-			}
-		}
-
-		&.ui-resizable-resizing,
-		&.ui-draggable-dragging {
-			z-index: 1000;
-
-			&::before {
-				content: '';
-				display: block;
-				position: absolute;
-				top: .25rem;
-				left: .25rem;
-				right: .25rem;
-				bottom: .25rem;
-				background-color: rgba(darken($body-bg-color, 6%), .75);
-				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
-			}
-
-			.dashbrd-grid-iterator-head {
-				border-color: darken($ui-border-color, 6%);
-			}
-
-			.dashbrd-grid-iterator-content {
-				.dashbrd-grid-widget {
-					.dashbrd-grid-widget-head {
-						border-color: darken($ui-border-color, 6%);
-					}
-
-					.dashbrd-grid-widget-content {
-						border-color: darken($ui-border-color, 6%);
-					}
-				}
-
-				.dashbrd-grid-iterator-placeholder > div {
-					border-color: darken($ui-border-color, 6%);
-				}
-			}
-
-			.dashbrd-grid-iterator-mask {
-				border: 1px solid darken($ui-border-color, 8%);
-				border-top: 0;
-			}
-		}
-	}
-
-	.dashbrd-grid-widget-placeholder {
-		position: absolute;
-		z-index: 999;
-
-		> div {
-			position: absolute;
-			top: .25rem;
-			left: .25rem;
-			right: .25rem;
-			bottom: .25rem;
-			background-color: darken($body-bg-color, 6%) !important;
-		}
-	}
-}
-
-@keyframes zoom-in-out {
-	0% {
-		transform: scale(1);
-	}
-	50% {
-		transform: scale(1.05);
-	}
-	100% {
-		transform: scale(1);
-	}
-}
-
-.new-widget {
-	animation: zoom-in-out .2s linear;
-}
-
-.ui-resize-dot {
-	@extend %ui-resize-dot;
-}
-
-.ui-resizable-border-n {
-	border-top: 1px solid $form-border-focus-color;
-	height: 5px;
-	margin: 0 .25rem;
-	flex: 1;
-}
-
-.ui-resizable-border-e {
-	border-right: 1px solid $form-border-focus-color;
-	width: 5px;
-	margin: .25rem 0;
-	flex: 1;
-}
-
-.ui-resizable-border-s {
-	border-bottom: 1px solid $form-border-focus-color;
-	height: 5px;
-	margin: 0 .25rem;
-	flex: 1;
-}
-
-.ui-resizable-border-w {
-	border-left: 1px solid $form-border-focus-color;
-	width: 5px;
-	margin: .25rem 0;
-	flex: 1;
-}
-
-.ui-resizable-n {
-	@extend %ui-resizable;
-	cursor: ns-resize;
-	height: 5px;
-	width: 100%;
-	top: 4px;
-	left: 0;
-
-	.ui-resize-dot {
-		left: 0;
-		right: 0;
-		margin: auto;
-		bottom: 0;
-	}
-}
-
-.ui-resizable-ne {
-	@extend %ui-resize-dot;
-	cursor: nesw-resize;
-	right: 0;
-	top: 0;
-}
-
-.ui-resizable-nw {
-	@extend %ui-resize-dot;
-	cursor: nwse-resize;
-	left: 0;
-	top: 0;
-}
-
-.ui-resizable-e {
-	@extend %ui-resizable;
-	cursor: ew-resize;
-	width: 5px;
-	right: 4px;
-	top: 0;
-	height: 100%;
-
-	.ui-resize-dot {
-		left: 0;
-		top: 50%;
-		transform: translateY(-50%);
-	}
-}
-
-.ui-resizable-s {
-	@extend %ui-resizable;
-	cursor: ns-resize;
-	height: 5px;
-	width: 100%;
-	bottom: 5px;
-	left: 0;
-
-	.ui-resize-dot {
-		left: 0;
-		right: 0;
-		margin: auto;
-		bottom: -5px;
-	}
-}
-
-.ui-resizable-se {
-	@extend %ui-resize-dot;
-	cursor: nwse-resize;
-	right: 0;
-	bottom: 0;
-}
-
-.ui-resizable-sw {
-	@extend %ui-resize-dot;
-	cursor: nesw-resize;
-	left: 0;
-	bottom: 0;
-}
-
-.ui-resizable-w {
-	@extend %ui-resizable;
-	cursor: ew-resize;
-	width: 5px;
-	left: 4px;
-	top: 0;
-	height: 100%;
-
-	.ui-resize-dot {
-		right: 0;
-		top: 50%;
-		transform: translateY(-50%);
-	}
-}
-
-.ui-inner-handles {
-	.ui-resizable-n {
-		top: 0;
-	}
-
-	.ui-resizable-ne {
-		top: -4px;
-		right: -4px;
-	}
-
-	.ui-resizable-nw {
-		top: -4px;
-		left: -4px;
-	}
-
-	.ui-resizable-e {
-		right: 0;
-	}
-
-	.ui-resizable-s {
-		bottom: 0;
-	}
-
-	.ui-resizable-se {
-		bottom: -4px;
-		right: -4px;
-	}
-
-	.ui-resizable-sw {
-		bottom: -4px;
-		left: -4px;
-	}
-
-	.ui-resizable-w {
-		left: 0;
-	}
-}
-
-%ui-resize-dot {
-	z-index: 90;
-	width: 7px;
-	height: 7px;
-	position: absolute;
-	background-color: $ui-bg-color;
-	border: 1px solid $form-border-focus-color;
-	border-radius: 100%;
-}
-
-%ui-resizable {
-	z-index: 90;
-	position: absolute;
-	display: flex;
-}
-
-.dashbrd-widget-placeholder {
-	border-color: darken($body-bg-color, 6%) !important;
-	background-color: darken($body-bg-color, 6%) !important;
-}
-
-.dashbrd-widget-draggable {
-	border-color: $action-border-color !important;
-	border-bottom-color: darken($action-border-color, 1%) !important;
-	box-shadow: 0 4px 20px 0 $action-shadow-color;
-}
-
-.dashbrd-widget {
-	min-width: 250px;
-	margin: 0 10px 10px 0;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-
-	.list-table {
-		border: 0;
-
-		th {
-			@extend %dashbrd-widget-td;
-		}
-
-		td {
-			@extend %dashbrd-widget-td;
-		}
-
-		tbody tr {
-			&:last-child td {
-				border-bottom: 1px solid $table-border-color;
-			}
-		}
-	}
-
-	.msg-bad,
-	.msg-good,
-	.msg-warning {
-		margin: 0 10px;
-	}
-
-	&.dashbrd-widget-fluid {
-		margin-right: 0;
-	}
-}
-
 %nothing-to-show {
 	color: $font-alt-color;
 	text-align: center;
@@ -3808,72 +2920,16 @@ $form-icon-btn: (
 	}
 }
 
-%dashbrd-widget-td {
-	&:first-child {
-		padding-left: 10px;
-	}
-
-	&:last-child {
-		padding-right: 10px;
-	}
-}
-
-.dashbrd-widget-head {
-	position: relative;
-	padding: 8px 60px 8px 10px;
-
-	h4 {
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-	}
-
-	ul {
-		position: absolute;
-		top: 0;
-		right: 0;
-
-		li {
-			display: block;
-			float: left;
-			padding: 0;
-
-			select {
-				margin: 4px 0;
-			}
-		}
-	}
-
-	z-select {
-		.list {
-			li {
-				float: none;
-				line-height: normal;
-				padding: 5px;
-			}
-		}
-	}
-}
-
-.dashbrd-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	margin: 0 10px;
-
-	li {
-		display: inline-block;
-		padding: 8px 0 8px 13px;
-	}
-}
-
-.dashbrd-widget-graph-link {
-	display: block;
-
-	&:link {
-		border: 0;
-	}
-}
-
 // Action Menus, Pop-up Menus.
+.menu-popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1001;
+}
+
 .menu-popup {
 	position: absolute;
 	z-index: 1001;
@@ -3954,15 +3010,12 @@ $form-icon-btn: (
 				content: "";
 			}
 		}
-	}
 
-	.menu-popup-item-disabled {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		color: $font-alt-color;
-		border: 0;
-		cursor: default;
+		&.disabled {
+			background-color: transparent;
+			color: $font-alt-color;
+			opacity: 1;
+		}
 	}
 
 	h3 {
@@ -4006,8 +3059,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
-			padding: 0 10px;
+			margin: 0 -10px 8px;
+			padding: 2px 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -4093,6 +3146,11 @@ $form-icon-btn: (
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
+
+		&.modal-popup-fullscreen {
+			width: calc(100vw - 40px);
+			max-width: calc(100vw - 40px);
+		}
 	}
 
 	.hintbox-wrap {
@@ -4118,11 +3176,11 @@ $form-icon-btn: (
 		border: 0;
 
 		th {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		td {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 	}
 
@@ -4141,8 +3199,8 @@ $form-icon-btn: (
 		}
 	}
 
-	.dashbrd-widget-head {
-		margin: -10px -10px 6px;
+	.dashboard-widget-head {
+		margin: -10px -10px 4px;
 	}
 
 	.maps-container {
@@ -4516,7 +3574,7 @@ $form-icon-btn: (
 .notif {
 	width: 250px;
 
-	.dashbrd-widget-head {
+	.dashboard-widget-head {
 		margin: -11px 0 7px -9px;
 		padding: 0;
 
@@ -4585,64 +3643,6 @@ $form-icon-btn: (
 		float: none;
 		display: inline-block;
 		margin: 0 2px 0 0;
-	}
-}
-
-// Maps, Screens, Graphs.
-.screen-table {
-	background-color: $ui-bg-color;
-	width: 100%;
-
-	td {
-		padding: 2px 3px;
-	}
-
-	.table-forms {
-		text-align: left;
-	}
-
-	.list-table {
-		border: 0;
-
-		td {
-			text-align: left;
-			padding: 6px 5px;
-			border: 0;
-			border-bottom: 1px solid $table-border-color;
-
-			&.list-table-footer {
-				color: $font-alt-color;
-				text-align: right;
-			}
-		}
-	}
-
-	.dashbrd-widget {
-		margin: 0;
-		border: 0;
-
-		th {
-			padding: 6px 5px;
-		}
-	}
-
-	.dashbrd-widget-head {
-		text-align: left;
-		padding: 4px 5px;
-
-		li {
-			line-height: 2.9em;
-		}
-	}
-
-	.dashbrd-widget-foot {
-		margin: 0;
-	}
-
-	.nothing-to-show {
-		td {
-			text-align: center !important;
-		}
 	}
 }
 
@@ -5585,13 +4585,6 @@ span {
 	}
 }
 
-.dashbrd-grid-widget-content,
-.dashbrd-grid-iterator-content {
-	&.is-loading::before {
-		margin: calc(.25rem + 1px);
-	}
-}
-
 .overlay-dialogue.modal .overlay-dialogue-body {
 	&.is-loading {
 		overflow: hidden;
@@ -5605,7 +4598,8 @@ span {
 	}
 }
 
-.menu-popup-preloader {
+.menu-popup-preloader,
+.hintbox-preloader {
 	background: $preloader-bg-color;
 	border: 1px solid $action-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
@@ -5619,6 +4613,10 @@ span {
 	&::before {
 		background: $preloader-bg-color;
 	}
+}
+
+.hintbox-preloader {
+	position: absolute;
 }
 
 $browser-logos: (
@@ -6011,6 +5009,10 @@ svg {
 
 .display-none {
 	display: none;
+}
+
+.visibility-hidden {
+	visibility: hidden;
 }
 
 .checkbox-list {
@@ -6509,7 +5511,9 @@ svg {
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
 .icon-actions-number-red,
-.icon-description {
+.icon-description,
+.icon-user,
+.icon-user-group {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -6641,6 +5645,30 @@ svg {
 
 	&::before {
 		background-position: -474px -245px;
+	}
+}
+
+.icon-user,
+.icon-user-group {
+	height: 16px;
+	width: 16px;
+	vertical-align: top;
+
+	&::before {
+		height: inherit;
+		width: inherit;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -339px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -339px -8px;
 	}
 }
 
@@ -7139,7 +6167,6 @@ $range-input-width: 31px;
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
-	text-indent: -200px;
 
 	&[class*='icon-'] {
 		padding-left: 22px;
@@ -7158,6 +6185,10 @@ $range-input-width: 31px;
 			top: 6px;
 			right: 2px;
 		}
+	}
+
+	&:not(:empty) {
+		padding-right: 22px;
 	}
 
 	&::after {
@@ -7200,7 +6231,6 @@ $range-input-width: 31px;
 // Macros mass update tab.
 
 .checkbox-block {
-	display: none;
 	margin: 10px 0;
 }
 
@@ -7366,25 +6396,6 @@ z-select,
 	}
 }
 
-// Dashboard list table.
-.dashboard-list {
-	.dashboard-list-item {
-		display: flex;
-		justify-content: space-between;
-		height: 18px;
-
-		.status-green {
-			background-color: $dashboard-my-bg-color;
-			border-color: $dashboard-my-bg-color;
-		}
-
-		.status-yellow {
-			background-color: $dashboard-shared-bg-color;
-			border-color: $dashboard-shared-bg-color;
-		}
-	}
-}
-
 .multiselect-description-container {
 	display: flex;
 	align-items: center;
@@ -7463,5 +6474,73 @@ z-select,
 		color: $font-color;
 		background-color: $form-bg-color !important;
 		border-color: $form-border-color;
+	}
+}
+
+.valuemap-list-table {
+	tbody {
+		td {
+			border-bottom: 1px solid $table-border-color;
+
+			&.wordwrap {
+				white-space: normal;
+			}
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+		}
+	}
+}
+
+.mappings-table {
+	display: grid;
+	grid-template-columns: auto auto minmax(auto, 100%);
+
+	& > div {
+		text-align: left;
+	}
+
+	// For every 3th starting from 2nd child.
+	& > div:nth-child(3n + 2) {
+		text-align: center;
+		padding: 0 10px;
+	}
+}
+
+.valuemap-checkbox {
+	margin-top: 10px;
+}
+
+.overlay-dialogue {
+	.valuemap-list-table {
+		td {
+			vertical-align: top;
+		}
+	}
+}
+
+.subscriptions-table {
+
+	th {
+		color: $font-alt-color;
+	}
+}
+
+.import-compare {
+	display: flex;
+	max-height: calc(100vh - 190px);
+
+	.toc {
+		flex: 20%;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.diff {
+		flex: 80%;
+		margin-left: 5px;
+		overflow: auto;
+		border: 1px dashed $form-border-color;
 	}
 }

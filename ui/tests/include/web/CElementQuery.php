@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/CElementCollection.php';
 require_once dirname(__FILE__).'/CElementFilter.php';
 require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
+require_once dirname(__FILE__).'/elements/CFluidFormElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
@@ -550,6 +551,7 @@ class CElementQuery implements IWaitable {
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
+				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
 			],

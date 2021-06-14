@@ -274,8 +274,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	}
 
 	/**
-	 * @on-before createTestFile
-	 * @on-after removeTestFile
+	 * @onBefore createTestFile
+	 * @onAfter removeTestFile
 	 *
 	 * @dataProvider getWidgetsData
 	 */
@@ -296,8 +296,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 		}
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		// Show hidden headings of graph prototype.
-		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashbrd-grid-iterator");'.
-				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashbrd-grid-iterator-focus";'
+		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashboard-grid-iterator");'.
+				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashboard-grid-iterator-focus";'
 		);
 
 		$this->assertWidgetContent($data['widgets']);

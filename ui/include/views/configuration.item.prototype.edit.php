@@ -728,38 +728,32 @@ $form_list
 		'row_logtimefmt'
 	);
 
-// Append valuemap to form list.
-if ($readonly) {
-	if ($data['valuemaps']) {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
-	}
-	else {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
-	}
-}
-else {
-	$valuemaps = $data['valuemaps'];
-	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
-}
-
-$valuemap_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue($data['valuemapid'])
-	->setFocusableElementId('label-valuemap')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setReadonly($readonly);
-
-foreach ($valuemaps as $valuemap) {
-	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	$form_list->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'disabled' => $readonly,
+			'multiple' => false,
+			'data' => $data['valuemap'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_valuemap'
+	);
 }
 
 $form_list
-	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, SPACE,
-		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'valuemap.list')
-			->getUrl()
-		))->setAttribute('target', '_blank')], 'row_valuemap'
-	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
@@ -770,34 +764,6 @@ $form_list
 		(new CTextBox('trapper_hosts', $data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_trapper_hosts'
 	)
-	->addRow(new CLabel(_('New application'), 'new_application'),
-		(new CSpan(
-			(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
-
-$application_list_box = new CListBox('applications[]', $data['applications'], 6);
-$application_list_box->addItem(0, '-'._('None').'-');
-foreach ($data['db_applications'] as $application) {
-	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-}
-$form_list
-	->addRow(_('Applications'), $application_list_box)
-	// Append application prototypes to form list.
-	->addRow(new CLabel(_('New application prototype'), 'new_application_prototype'),
-		(new CSpan(
-			(new CTextBox('new_application_prototype', $data['new_application_prototype']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
-
-$application_prototype_listbox = new CListBox('application_prototypes[]', $data['application_prototypes'], 6);
-$application_prototype_listbox->addItem(0, '-'._('None').'-');
-foreach ($data['db_application_prototypes'] as $application_prototype) {
-	$application_prototype_listbox->addItem($application_prototype['name'], $application_prototype['name']);
-}
-$form_list
-	->addRow(_('Application prototypes'), $application_prototype_listbox)
 	// Append description to form list.
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
@@ -817,6 +783,15 @@ $form_list
 // Append tabs to form.
 $tab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $form_list)
+	->addTab('tags-tab', _('Tags'),
+		new CPartial('configuration.tags.tab', [
+			'source' => 'item',
+			'tags' => $data['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags'],
+			'readonly' => false
+		]),
+		TAB_INDICATOR_TAGS
+	)
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),

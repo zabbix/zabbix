@@ -1,0 +1,175 @@
+.ui-resize-dot {
+	@extend %ui-resize-dot;
+}
+
+.ui-resizable-border-n {
+	border-top: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-e {
+	border-right: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-border-s {
+	border-bottom: 1px solid $form-border-focus-color;
+	height: 5px;
+	margin: 0 .25rem;
+	flex: 1;
+}
+
+.ui-resizable-border-w {
+	border-left: 1px solid $form-border-focus-color;
+	width: 5px;
+	margin: .25rem 0;
+	flex: 1;
+}
+
+.ui-resizable-n {
+	@extend %ui-resizable;
+	cursor: ns-resize;
+	height: 5px;
+	width: 100%;
+	top: 4px;
+	left: 0;
+
+	.ui-resize-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+		bottom: 0;
+	}
+}
+
+.ui-resizable-ne {
+	@extend %ui-resize-dot;
+	cursor: nesw-resize;
+	right: 0;
+	top: 0;
+}
+
+.ui-resizable-nw {
+	@extend %ui-resize-dot;
+	cursor: nwse-resize;
+	left: 0;
+	top: 0;
+}
+
+.ui-resizable-e {
+	@extend %ui-resizable;
+	cursor: ew-resize;
+	width: 5px;
+	right: 4px;
+	top: 0;
+	height: 100%;
+
+	.ui-resize-dot {
+		left: 0;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}
+
+.ui-resizable-s {
+	@extend %ui-resizable;
+	cursor: ns-resize;
+	height: 5px;
+	width: 100%;
+	bottom: 5px;
+	left: 0;
+
+	.ui-resize-dot {
+		left: 0;
+		right: 0;
+		margin: auto;
+		bottom: -5px;
+	}
+}
+
+.ui-resizable-se {
+	@extend %ui-resize-dot;
+	cursor: nwse-resize;
+	right: 0;
+	bottom: 0;
+}
+
+.ui-resizable-sw {
+	@extend %ui-resize-dot;
+	cursor: nesw-resize;
+	left: 0;
+	bottom: 0;
+}
+
+.ui-resizable-w {
+	@extend %ui-resizable;
+	cursor: ew-resize;
+	width: 5px;
+	left: 4px;
+	top: 0;
+	height: 100%;
+
+	.ui-resize-dot {
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}
+
+.ui-inner-handles {
+	.ui-resizable-n {
+		top: 0;
+	}
+
+	.ui-resizable-ne {
+		top: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-nw {
+		top: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-e {
+		right: 0;
+	}
+
+	.ui-resizable-s {
+		bottom: 0;
+	}
+
+	.ui-resizable-se {
+		bottom: -4px;
+		right: -4px;
+	}
+
+	.ui-resizable-sw {
+		bottom: -4px;
+		left: -4px;
+	}
+
+	.ui-resizable-w {
+		left: 0;
+	}
+}
+
+%ui-resize-dot {
+	z-index: 90;
+	width: 7px;
+	height: 7px;
+	position: absolute;
+	background-color: $ui-bg-color;
+	border: 1px solid $form-border-focus-color;
+	border-radius: 100%;
+}
+
+%ui-resizable {
+	z-index: 90;
+	position: absolute;
+	display: flex;
+}

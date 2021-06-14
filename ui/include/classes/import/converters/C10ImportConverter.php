@@ -56,8 +56,6 @@ class C10ImportConverter extends CConverter {
 
 		$content = $this->convertSysmaps($content);
 
-		$content = $this->convertScreens($content);
-
 		$content = $this->filterDuplicateGroups($content);
 		$content = $this->filterDuplicateTriggers($content);
 		$content = $this->filterDuplicateGraphs($content);
@@ -867,41 +865,6 @@ class C10ImportConverter extends CConverter {
 			$map = CArrayHelper::renameKeys($map, ['backgroundid' => 'background']);
 		}
 		unset($map);
-
-		return $content;
-	}
-
-	/**
-	 * Convert screen elements.
-	 *
-	 * @param array $content
-	 *
-	 * @return array
-	 */
-	protected function convertScreens(array $content) {
-		if (!isset($content['screens']) || !$content['screens']) {
-			return $content;
-		}
-
-		foreach ($content['screens'] as &$screen) {
-			$screen = CArrayHelper::renameKeys($screen, ['screenitems' => 'screen_items']);
-
-			if (isset($screen['screen_items']) && $screen['screen_items']) {
-				foreach ($screen['screen_items'] as &$screenItem) {
-					$screenItem = CArrayHelper::renameKeys($screenItem, ['resourceid' => 'resource']);
-
-					if (isset($screenItem['resource']) && $screenItem['resource'] !== '0') {
-						$screenItem['resource'] = CArrayHelper::renameKeys($screenItem['resource'], ['key_' => 'key']);
-					}
-
-					$screenItem['sort_triggers'] = '';
-				}
-				unset($screenItem);
-
-				$screen['screen_items'] = array_values($screen['screen_items']);
-			}
-		}
-		unset($screen);
 
 		return $content;
 	}

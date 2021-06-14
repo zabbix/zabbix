@@ -40,20 +40,12 @@ class Manager extends CRegistryFactory {
 		if (!self::$instance) {
 			$class = __CLASS__;
 			self::$instance = new $class([
-				'application' => 'CApplicationManager',
 				'history' => 'CHistoryManager',
 				'httptest' => 'CHttpTestManager'
 			]);
 		}
 
 		return self::$instance;
-	}
-
-	/**
-	 * @return CApplicationManager
-	 */
-	public static function Application() {
-		return self::getInstance()->getObject('application');
 	}
 
 	/**

@@ -66,7 +66,7 @@ class CControllerWidgetUrlView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'url' => [
 				'url' => $fields['url'],
 				'error' => $error

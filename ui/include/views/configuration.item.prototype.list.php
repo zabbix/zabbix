@@ -62,9 +62,9 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
-		_('Applications'),
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
@@ -129,19 +129,6 @@ foreach ($data['items'] as $item) {
 		->addClass(itemIndicatorStyle($item['status']))
 		->addSID();
 
-	if (!empty($item['applications'])) {
-		order_result($item['applications'], 'name');
-
-		$applications = zbx_objectValues($item['applications'], 'name');
-		$applications = implode(', ', $applications);
-		if (empty($applications)) {
-			$applications = '';
-		}
-	}
-	else {
-		$applications = '';
-	}
-
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
 	}
@@ -187,9 +174,9 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		$applications,
 		$status,
-		$discover
+		$discover,
+		$data['tags'][$item['itemid']]
 	]);
 }
 

@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with dashboards.
+ * Dashboards API implementation.
  */
 class CDashboard extends CDashboardGeneral {
 
@@ -48,7 +48,9 @@ class CDashboard extends CDashboardGeneral {
 				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])]
+				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+				'display_period' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
+				'auto_start' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -58,10 +60,10 @@ class CDashboard extends CDashboardGeneral {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private', 'display_period', 'auto_start']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
 			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
-			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields']), 'default' => null],
+			'selectPages' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['dashboard_pageid', 'name', 'display_period', 'widgets']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -71,16 +73,17 @@ class CDashboard extends CDashboardGeneral {
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$sql_parts = [
-			'select'	=> ['dashboard' => 'd.dashboardid'],
-			'from'		=> ['dashboard' => 'dashboard d'],
-			'where'		=> ['d.templateid IS NULL'],
-			'order'		=> [],
-			'group'		=> []
+			'select' => ['dashboard' => 'd.dashboardid'],
+			'from' => ['dashboard' => 'dashboard d'],
+			'where' => ['d.templateid IS NULL'],
+			'order' => [],
+			'group' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
@@ -132,12 +135,12 @@ class CDashboard extends CDashboardGeneral {
 			zbx_db_search('dashboard d', $options, $sql_parts);
 		}
 
-		$db_dashboards = [];
-
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
 		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+
+		$db_dashboards = [];
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
@@ -162,17 +165,74 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * @param array $dashboards
 	 *
-	 * @throws APIException if the input is invalid
+	 * @return array
+	 */
+	public function create(array $dashboards): array {
+		$this->validateCreate($dashboards);
+
+		$ins_dashboards = [];
+
+		foreach ($dashboards as $dashboard) {
+			unset($dashboard['users'], $dashboard['userGroups'], $dashboard['pages']);
+			$ins_dashboards[] = $dashboard;
+		}
+
+		$dashboardids = DB::insert('dashboard', $ins_dashboards);
+
+		foreach ($dashboards as $index => &$dashboard) {
+			$dashboard['dashboardid'] = $dashboardids[$index];
+		}
+		unset($dashboard);
+
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
+		$this->updatePages($dashboards);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
+
+		return ['dashboardids' => $dashboardids];
+	}
+
+	/**
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	public function update(array $dashboards): array {
+		$this->validateUpdate($dashboards, $db_dashboards);
+
+		$upd_dashboards = [];
+
+		foreach ($dashboards as $dashboard) {
+			$upd_dashboard = DB::getUpdatedValues('dashboard', $dashboard, $db_dashboards[$dashboard['dashboardid']]);
+
+			if ($upd_dashboard) {
+				$upd_dashboards[] = [
+					'values' => $upd_dashboard,
+					'where' => ['dashboardid' => $dashboard['dashboardid']]
+				];
+			}
+		}
+
+		if ($upd_dashboards) {
+			DB::update('dashboard', $upd_dashboards);
+		}
+
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
+		$this->updatePages($dashboards, $db_dashboards);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
+
+		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
+	}
+
+	/**
+	 * @param array $dashboards
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$dashboards): void {
-		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-			ZBX_WIDGET_FIELD_TYPE_MAP
-		];
-		$widget_field_types = array_merge($ids_widget_field_types,
-			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
-		);
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'userid' =>			['type' => API_ID, 'default' => self::$userData['userid']],
@@ -185,21 +245,27 @@ class CDashboard extends CDashboardGeneral {
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'widgets' =>		['type' => API_OBJECTS, 'fields' => [
-				'type' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
-				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
-				'view_mode' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]), 'default' => DB::getDefault('widget', 'view_mode')],
-				'x' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_X, 'default' => DB::getDefault('widget', 'x')],
-				'y' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_Y, 'default' => DB::getDefault('widget', 'y')],
-				'width' =>			['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS, 'default' => DB::getDefault('widget', 'width')],
-				'height' =>			['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS, 'default' => DB::getDefault('widget', 'height')],
-				'fields' =>			['type' => API_OBJECTS, 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
-					'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
-					'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_INT32])], 'type' => API_INT32],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_STR])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
-											['if' => ['field' => 'type', 'in' => implode(',', $ids_widget_field_types)], 'type' => API_ID]
+			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
+			'auto_start' =>		['type' => API_INT32, 'in' => '0,1'],
+			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
+				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
+				'display_period' =>	['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
+				'widgets' =>		['type' => API_OBJECTS, 'fields' => [
+					'type' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
+					'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
+					'view_mode' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])],
+					'x' =>				['type' => API_INT32, 'in' => '0:'.(DASHBOARD_MAX_COLUMNS - 1)],
+					'y' =>				['type' => API_INT32, 'in' => '0:'.(DASHBOARD_MAX_ROWS - 2)],
+					'width' =>			['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS],
+					'height' =>			['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS],
+					'fields' =>			['type' => API_OBJECTS, 'fields' => [
+						'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(self::WIDGET_FIELD_TYPE_COLUMNS))],
+						'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
+						'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_INT32])], 'type' => API_INT32],
+												['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_STR])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
+												['if' => ['field' => 'type', 'in' => implode(',', array_keys(self::WIDGET_FIELD_TYPE_COLUMNS_FK))], 'type' => API_ID]
+						]]
 					]]
 				]]
 			]]
@@ -209,172 +275,133 @@ class CDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(array_column($dashboards, 'name'));
+		$this->checkDuplicates($dashboards);
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
 		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__);
+		$this->checkWidgetFields($dashboards);
 	}
 
 	/**
-	 * @param array $dashboards
-	 * @param array $db_dashboards
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
-		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-			ZBX_WIDGET_FIELD_TYPE_MAP
-		];
-		$widget_field_types = array_merge($ids_widget_field_types,
-			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
-		);
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid'], ['name']], 'fields' => [
-			'dashboardid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
-			'userid' =>			['type' => API_ID],
-			'private' =>		['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-			'users' =>			['type' => API_OBJECTS, 'fields' => [
-				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
+			'userid' =>				['type' => API_ID],
+			'private' =>			['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+			'users' =>				['type' => API_OBJECTS, 'fields' => [
+				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userGroups' =>		['type' => API_OBJECTS, 'fields' => [
-				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
+			'userGroups' =>			['type' => API_OBJECTS, 'fields' => [
+				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'widgets' =>		['type' => API_OBJECTS, 'fields' => [
-				'widgetid' =>		['type' => API_ID],
-				'type' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
-				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
-				'view_mode' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])],
-				'x' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_X],
-				'y' =>				['type' => API_INT32, 'in' => '0:'.self::MAX_Y],
-				'width' =>			['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS],
-				'height' =>			['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS],
-				'fields' =>			['type' => API_OBJECTS, 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
-					'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
-					'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_INT32])], 'type' => API_INT32],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_STR])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
-											['if' => ['field' => 'type', 'in' => implode(',', $ids_widget_field_types)], 'type' => API_ID]
+			'display_period' =>		['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
+			'auto_start' =>			['type' => API_INT32, 'in' => '0,1'],
+			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
+				'dashboard_pageid' =>	['type' => API_ID],
+				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
+				'display_period' =>		['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
+				'widgets' =>			['type' => API_OBJECTS, 'uniq' => [['widgetid']], 'fields' => [
+					'widgetid' =>			['type' => API_ID],
+					'type' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
+					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
+					'view_mode' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])],
+					'x' =>					['type' => API_INT32, 'in' => '0:'.(DASHBOARD_MAX_COLUMNS - 1)],
+					'y' =>					['type' => API_INT32, 'in' => '0:'.(DASHBOARD_MAX_ROWS - 2)],
+					'width' =>				['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS],
+					'height' =>				['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS],
+					'fields' =>				['type' => API_OBJECTS, 'fields' => [
+						'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(self::WIDGET_FIELD_TYPE_COLUMNS))],
+						'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
+						'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+													['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_INT32])], 'type' => API_INT32],
+													['if' => ['field' => 'type', 'in' => implode(',', [ZBX_WIDGET_FIELD_TYPE_STR])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'value_str')],
+													['if' => ['field' => 'type', 'in' => implode(',', array_keys(self::WIDGET_FIELD_TYPE_COLUMNS_FK))], 'type' => API_ID]
+						]]
 					]]
 				]]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $dashboards, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check dashboard names.
 		$db_dashboards = $this->get([
-			'output' => ['dashboardid', 'name', 'userid', 'private'],
+			'output' => ['dashboardid', 'name', 'userid', 'private', 'display_period', 'auto_start'],
 			'dashboardids' => array_column($dashboards, 'dashboardid'),
-			'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
+		if (count($db_dashboards) != count($dashboards)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// Copy original dashboard names when not specified (for error reporting).
 		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['name']);
 
-		$names = [];
+		// Add the existing pages, widgets and widget fields to $db_dashboards.
+		$this->addAffectedObjects($dashboards, $db_dashboards);
 
-		$widget_defaults = [
-			'name' => DB::getDefault('widget', 'name'),
-			'view_mode' => DB::getDefault('widget', 'view_mode'),
-			'x' => DB::getDefault('widget', 'x'),
-			'y' => DB::getDefault('widget', 'y'),
-			'width' => DB::getDefault('widget', 'width'),
-			'height' => DB::getDefault('widget', 'height')
-		];
+		// Check ownership of the referenced pages and widgets.
+		$this->checkReferences($dashboards, $db_dashboards);
 
-		foreach ($dashboards as &$dashboard) {
-			// Check if this dashboard exists.
-			if (!array_key_exists($dashboard['dashboardid'], $db_dashboards)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_dashboard = $db_dashboards[$dashboard['dashboardid']];
-
-			if ($dashboard['name'] !== $db_dashboard['name']) {
-				$names[] = $dashboard['name'];
-			}
-
-			if (array_key_exists('widgets', $dashboard)) {
-				$db_widgets = zbx_toHash($db_dashboard['widgets'], 'widgetid');
-
-				foreach ($dashboard['widgets'] as &$widget) {
-					if (!array_key_exists('widgetid', $widget)) {
-						if (!array_key_exists('type', $widget)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Cannot create widget: %1$s.', _s('the parameter "%1$s" is missing', 'type')
-							));
-						}
-
-						$widget += $widget_defaults;
-					}
-					elseif (!array_key_exists($widget['widgetid'], $db_widgets)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('No permissions to referred object or it does not exist!')
-						);
-					}
-
-				}
-				unset($widget);
-
-				$dashboard['widgets'] = $this->extendObjectsByKey($dashboard['widgets'], $db_widgets, 'widgetid',
-					['x', 'y', 'width', 'height']
-				);
-			}
-		}
-		unset($dashboard);
-
-		if ($names) {
-			$this->checkDuplicates($names);
-		}
+		$this->checkDuplicates($dashboards, $db_dashboards);
 		$this->checkUsers($dashboards, $db_dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__);
+		$this->checkWidgets($dashboards, $db_dashboards);
+		$this->checkWidgetFields($dashboards, $db_dashboards);
 	}
 
 	/**
-	 * Check for duplicated dashboards.
+	 * Check for unique dashboard names.
 	 *
-	 * @param array  $names
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
 	 *
-	 * @throws APIException  if dashboard already exists.
+	 * @throws APIException if dashboard names are not unique.
 	 */
-	protected function checkDuplicates(array $names): void {
-		$db_dashboards = DBfetchArray(DBselect(
-			'SELECT d.name'.
-			' FROM dashboard d'.
-			' WHERE d.templateid IS NULL'.
-				' AND '.dbConditionString('d.name', $names), 1
+	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+		$names = [];
+
+		foreach ($dashboards as $dashboard) {
+			if ($db_dashboards === null || $dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
+				$names[] = $dashboard['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicate = DBfetch(DBselect(
+			'SELECT d.name FROM dashboard d WHERE d.templateid IS NULL AND '.dbConditionString('d.name', $names), 1
 		));
 
-		if ($db_dashboards) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Dashboard "%1$s" already exists.', $db_dashboards[0]['name'])
-			);
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $duplicate['name']));
 		}
 	}
 
 	/**
 	 * Check for valid users.
 	 *
-	 * @param array  $dashboards
-	 * @param string $dashboards[]['userid']             (optional)
-	 * @param array  $dashboards[]['users']              (optional)
-	 * @param string $dashboards[]['users'][]['userid']
-	 * @param array  $db_dashboards
-	 * @param string $db_dashboards[]['userid']
+	 * @param array      $dashboards
+	 * @param string     $dashboards[]['userid']             (optional)
+	 * @param array      $dashboards[]['users']              (optional)
+	 * @param string     $dashboards[]['users'][]['userid']
+	 * @param array|null $db_dashboards
+	 * @param string     $db_dashboards[]['userid']
 	 *
-	 * @throws APIException  if user is not valid.
+	 * @throws APIException if user is not valid.
 	 */
 	protected function checkUsers(array $dashboards, array $db_dashboards = null): void {
 		$userids = [];
@@ -427,7 +454,7 @@ class CDashboard extends CDashboardGeneral {
 	 * @param array  $dashboards[]['userGroups']                (optional)
 	 * @param string $dashboards[]['userGroups'][]['usrgrpid']
 	 *
-	 * @throws APIException  if user group is not valid.
+	 * @throws APIException if user group is not valid.
 	 */
 	protected function checkUserGroups(array $dashboards): void {
 		$usrgrpids = [];
@@ -457,25 +484,6 @@ class CDashboard extends CDashboardGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
 			}
 		}
-	}
-
-	/**
-	 * Returns widget field name by field type.
-	 *
-	 * @return array
-	 */
-	protected static function getFieldNamesByType(): array {
-		return [
-			ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
-			ZBX_WIDGET_FIELD_TYPE_STR => 'value_str',
-			ZBX_WIDGET_FIELD_TYPE_GROUP => 'value_groupid',
-			ZBX_WIDGET_FIELD_TYPE_HOST => 'value_hostid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM => 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid'
-		];
 	}
 
 	/**
@@ -660,5 +668,96 @@ class CDashboard extends CDashboardGeneral {
 		if ($del_dashboard_usrgrpids) {
 			DB::delete('dashboard_usrgrp', ['dashboard_usrgrpid' => $del_dashboard_usrgrpids]);
 		}
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$dashboardids = array_keys($result);
+
+		// Adding user shares.
+		if ($options['selectUsers'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'userid', 'dashboard_user');
+			$related_ids = $relation_map->getRelatedIds();
+			$db_users = [];
+
+			if ($related_ids) {
+				// Get all allowed users.
+				$db_users = API::User()->get([
+					'output' => [],
+					'userids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			if ($db_users) {
+				$db_dashboard_users = API::getApiService()->select('dashboard_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['dashboardid', 'userid']),
+					'filter' => ['dashboardid' => $dashboardids, 'userid' => array_keys($db_users)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_users, 'dashboardid', 'dashboard_userid');
+
+				$db_dashboard_users = $this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
+
+				foreach ($db_dashboard_users as &$db_dashboard_user) {
+					unset($db_dashboard_user['dashboard_userid'], $db_dashboard_user['dashboardid']);
+				}
+				unset($db_dashboard_user);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_users, 'users');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		// Adding user group shares.
+		if ($options['selectUserGroups'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'usrgrpid', 'dashboard_usrgrp');
+			$related_ids = $relation_map->getRelatedIds();
+			$db_usrgrps = [];
+
+			if ($related_ids) {
+				// Get all allowed groups.
+				$db_usrgrps = API::UserGroup()->get([
+					'output' => [],
+					'usrgrpids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			if ($db_usrgrps) {
+				$db_dashboard_usrgrps = API::getApiService()->select('dashboard_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['dashboardid', 'usrgrpid']),
+					'filter' => ['dashboardid' => $dashboardids, 'usrgrpid' => array_keys($db_usrgrps)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
+
+				$db_dashboard_usrgrps =
+					$this->unsetExtraFields($db_dashboard_usrgrps, ['usrgrpid'], $options['selectUserGroups']);
+
+				foreach ($db_dashboard_usrgrps as &$db_dashboard_usrgrp) {
+					unset($db_dashboard_usrgrp['dashboard_usrgrpid'], $db_dashboard_usrgrp['dashboardid']);
+				}
+				unset($db_dashboard_usrgrp);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_usrgrps, 'userGroups');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		return $result;
 	}
 }

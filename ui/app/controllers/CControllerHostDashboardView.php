@@ -76,8 +76,8 @@ class CControllerHostDashboardView extends CController {
 			}
 
 			$dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$dashboardid]
 			]);
 
@@ -88,12 +88,12 @@ class CControllerHostDashboardView extends CController {
 					$this->getInput('hostid')
 				);
 
-				$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'],
+				$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'],
 					$dashboard['templateid'], true
 				);
 
 				$time_selector_options = [
-					'profileIdx' => 'web.dashbrd.filter',
+					'profileIdx' => 'web.dashboard.filter',
 					'profileIdx2' => $dashboard['dashboardid'],
 					'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 					'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -106,10 +106,9 @@ class CControllerHostDashboardView extends CController {
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
 					'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
-					'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
-						? getTimeSelectorPeriod($time_selector_options)
-						: null,
-					'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+					'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
+					'time_period' => getTimeSelectorPeriod($time_selector_options),
+					'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 				];
 			}
 			else {
@@ -120,7 +119,7 @@ class CControllerHostDashboardView extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of dashboards'));
+		$response->setTitle(_('Dashboards'));
 		$this->setResponse($response);
 	}
 

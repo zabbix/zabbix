@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/graphs.inc.php';
-require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
 require_once dirname(__FILE__).'/users.inc.php';
 
@@ -49,6 +48,7 @@ function getSystemStatusData(array $filter) {
 		: EXTACK_OPTION_ALL;
 	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
 	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
+	$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 		if ($filter_hostids === null) {
@@ -167,21 +167,38 @@ function getSystemStatusData(array $filter) {
 			'output' => ['priority', 'manual_close'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
 			'skipDependent' => true,
 			'preservekeys' => true
 		];
 
-		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
-			$options['output'] = array_merge(
-				$options['output'],
-				['url', 'expression', 'recovery_mode', 'recovery_expression', 'opdata']
+		if ($show_opdata) {
+			$options['selectFunctions'] = ['itemid'];
+			$options['output'] = array_merge($options['output'],
+				['expression', 'recovery_mode', 'recovery_expression', 'opdata']
 			);
 		}
 
 		$data['triggers'] = API::Trigger()->get($options);
+
+		if ($show_opdata && $data['triggers']) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'selectValueMap' => ['mappings'],
+				'triggerids' => array_keys($data['triggers']),
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as &$trigger) {
+				foreach ($trigger['functions'] as $function) {
+					$trigger['items'][] = $items[$function['itemid']];
+				}
+				unset($trigger['functions']);
+			}
+			unset($trigger);
+		}
 
 		foreach ($data['triggers'] as &$trigger) {
 			CArrayHelper::sort($trigger['hosts'], [['field' => 'name', 'order' => ZBX_SORT_UP]]);
@@ -276,7 +293,7 @@ function getSystemStatusData(array $filter) {
 		$data['actions'] = [
 			'all_actions' => $actions['data'],
 			'users' => API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($actions['userids']),
 				'preservekeys' => true
 			]),
@@ -297,151 +314,6 @@ function getSystemStatusData(array $filter) {
 	}
 
 	return $data;
-}
-
-/**
- * @param array  $filter
- * @param array  $filter['hostids']            (optional)
- * @param string $filter['problem']            (optional)
- * @param array  $filter['severities']         (optional)
- * @param int    $filter['show_suppressed']    (optional)
- * @param int    $filter['hide_empty_groups']  (optional)
- * @param int    $filter['ext_ack']            (optional)
- * @param int    $filter['show_timeline']      (optional)
- * @param int    $filter['show_opdata']        (optional)
- * @param array  $data
- * @param array  $data['groups']
- * @param string $data['groups'][]['groupid']
- * @param string $data['groups'][]['name']
- * @param bool   $data['groups'][]['has_problems']
- * @param array  $data['groups'][]['stats']
- * @param int    $data['groups'][]['stats']['count']
- * @param array  $data['groups'][]['stats']['problems']
- * @param string $data['groups'][]['stats']['problems'][]['eventid']
- * @param string $data['groups'][]['stats']['problems'][]['objectid']
- * @param int    $data['groups'][]['stats']['problems'][]['clock']
- * @param int    $data['groups'][]['stats']['problems'][]['ns']
- * @param int    $data['groups'][]['stats']['problems'][]['acknowledged']
- * @param array  $data['groups'][]['stats']['problems'][]['tags']
- * @param string $data['groups'][]['stats']['problems'][]['tags'][]['tag']
- * @param string $data['groups'][]['stats']['problems'][]['tags'][]['value']
- * @param int    $data['groups'][]['stats']['count_unack']
- * @param array  $data['groups'][]['stats']['problems_unack']
- * @param array  $data['triggers']
- * @param string $data['triggers'][<triggerid>]['expression']
- * @param string $data['triggers'][<triggerid>]['description']
- * @param array  $data['triggers'][<triggerid>]['hosts']
- * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
- * @param array  $data['triggers'][<triggerid>]['opdata']
- * @param array  $data['allowed']
- * @param bool   $data['allowed']['ui_problems']
- * @param bool   $data['allowed']['add_comments']
- * @param bool   $data['allowed']['change_severity']
- * @param bool   $data['allowed']['acknowledge']
- * @param bool   $data['allowed']['close']
- *
- * @return CDiv
- */
-function makeSystemStatus(array $filter, array $data) {
-	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
-		? $filter['severities']
-		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-	$filter_hide_empty_groups = array_key_exists('hide_empty_groups', $filter) ? $filter['hide_empty_groups'] : 0;
-	$filter_ext_ack = array_key_exists('ext_ack', $filter)
-		? $filter['ext_ack']
-		: EXTACK_OPTION_ALL;
-
-	// indicator of sort field
-	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
-
-	// Set trigger severities as table header starting from highest severity.
-	$header = [[_('Host group'), $sort_div]];
-
-	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
-		if (in_array($severity, $filter_severities)) {
-			$header[] = getSeverityName($severity);
-		}
-	}
-
-	$table = (new CTableInfo())
-		->setHeader($header)
-		->setHeadingColumn(0);
-
-	$url_group = $data['allowed']['ui_problems']
-		? (new CUrl('zabbix.php'))
-			->setArgument('action', 'problem.view')
-			->setArgument('filter_name', '')
-			->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
-			->setArgument('hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : [])
-			->setArgument('name', array_key_exists('problem', $filter) ? $filter['problem'] : null)
-			->setArgument('show_suppressed',
-				(array_key_exists('show_suppressed', $filter) && $filter['show_suppressed'] == 1)
-					? 1
-					: null
-			)
-		: null;
-
-	foreach ($data['groups'] as $group) {
-		if ($filter_hide_empty_groups && !$group['has_problems']) {
-			continue;
-		}
-
-		if ($data['allowed']['ui_problems']) {
-			$url_group->setArgument('groupids', [$group['groupid']]);
-			$row = [new CLink($group['name'], $url_group->getUrl())];
-		}
-		else {
-			$row = [$group['name']];
-		}
-
-		foreach ($group['stats'] as $severity => $stat) {
-			if ($stat['count'] == 0 && $stat['count_unack'] == 0) {
-				$row[] = '';
-				continue;
-			}
-
-			$allTriggersNum = $stat['count'];
-			if ($allTriggersNum) {
-				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $data['actions'], $filter,
-						$data['allowed']
-					));
-			}
-
-			$unackTriggersNum = $stat['count_unack'];
-			if ($unackTriggersNum) {
-				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $data['actions'], $filter,
-						$data['allowed']
-					));
-			}
-
-			switch ($filter_ext_ack) {
-				case EXTACK_OPTION_ALL:
-					$row[] = getSeverityCell($severity, $allTriggersNum);
-					break;
-
-				case EXTACK_OPTION_UNACK:
-					$row[] = getSeverityCell($severity, $unackTriggersNum);
-					break;
-
-				case EXTACK_OPTION_BOTH:
-					if ($stat['count_unack'] != 0) {
-						$row[] = getSeverityCell($severity, [
-							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
-						]);
-					}
-					else {
-						$row[] = getSeverityCell($severity, $allTriggersNum);
-					}
-					break;
-			}
-		}
-
-		$table->addRow($row);
-	}
-
-	return $table;
 }
 
 /**
@@ -745,13 +617,43 @@ function make_status_of_zbx() {
 		]);
 	}
 
+	// Check DB version.
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+
+		if ($dbversion_status !== '') {
+			$dbversion_status = json_decode($dbversion_status);
+
+			foreach ($dbversion_status as $dbversion) {
+				if ($dbversion->flag != DB_VERSION_SUPPORTED) {
+					switch ($dbversion->flag) {
+						case DB_VERSION_LOWER_THAN_MINIMUM:
+							$error = _s('Minimum required database version is %1$s.', $dbversion->min_version);
+							break;
+
+						case DB_VERSION_HIGHER_THAN_MAXIMUM:
+							$error = _s('Maximum required database version is %1$s.', $dbversion->max_version);
+							break;
+
+						case DB_VERSION_FAILED_TO_RETRIEVE:
+							$error = _('Unable to retrieve database version.');
+							$dbversion->current_version = '';
+							break;
+					}
+
+					$table->addRow(
+						(new CRow([$dbversion->database, $dbversion->current_version, $error]))->addClass(ZBX_STYLE_RED)
+					);
+				}
+			}
+		}
+	}
+
 	return $table;
 }
 
 /**
  * Generate table for dashboard triggers popup.
- *
- * @see makeSystemStatus
  *
  * @param array  $problems
  * @param string $problems[]['objectid']

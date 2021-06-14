@@ -29,7 +29,6 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // create form
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
@@ -302,6 +301,14 @@ $tabs = (new CTabView())
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list)
 	->setSelected(0);
+
+if (!$data['discovered_host']) {
+	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
+		'visible' => [],
+		'hostids' => $data['ids'],
+		'context' => 'host'
+	]));
+}
 
 $form->addItem($tabs);
 

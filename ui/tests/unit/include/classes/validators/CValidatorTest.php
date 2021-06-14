@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,12 +19,14 @@
 **/
 
 
-abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	abstract public function validParamProvider();
-	abstract public function validValuesProvider();
-	abstract public function invalidValuesProvider();
-	abstract public function invalidValuesWithObjectsProvider();
+abstract class CValidatorTest extends TestCase {
+
+	abstract public function dataProviderValidParam();
+	abstract public function dataProviderValidValues();
+	abstract public function dataProviderInvalidValues();
+	abstract public function dataProviderInvalidValuesWithObjects();
 
 	/**
 	 * Create and return a validator object using the given params.
@@ -38,7 +40,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test creating the validator with a valid set of parameters.
 	 *
-	 * @dataProvider validParamProvider
+	 * @dataProvider dataProviderValidParam
 	 *
 	 * @param array $params
 	 */
@@ -53,7 +55,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	 * Test trying to create a validator with an invalid set of parameters.
 	 */
 	public function testInvalidParams() {
-		$this->setExpectedException('Exception',
+		$this->expectException('Exception',
 			'Incorrect option "invalidParam" for validator "'.get_class($this->createValidator()).'".'
 		);
 
@@ -65,7 +67,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test setting valid parameters individually.
 	 *
-	 * @dataProvider validParamProvider
+	 * @dataProvider dataProviderValidParam
 	 *
 	 * @param array $params
 	 */
@@ -81,7 +83,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	 * Test trying to set an invalid parameter.
 	 */
 	public function testInvalidParamSet() {
-		$this->setExpectedException('Exception',
+		$this->expectException('Exception',
 			'Incorrect option "invalidParameter" for validator "'.get_class($this->createValidator()).'".'
 		);
 
@@ -92,7 +94,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test validating values that are valid.
 	 *
-	 * @dataProvider validValuesProvider()
+	 * @dataProvider dataProviderValidValues()
 	 *
 	 * @param array $params
 	 * @param $value
@@ -109,7 +111,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test validating values that are invalid and check the generated error message.
 	 *
-	 * @dataProvider invalidValuesProvider()
+	 * @dataProvider dataProviderInvalidValues()
 	 *
 	 * @param array 	$params
 	 * @param mixed 	$value
@@ -126,7 +128,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test that a correct error message is generated when setting an object name.
 	 *
-	 * @dataProvider invalidValuesWithObjectsProvider()
+	 * @dataProvider dataProviderInvalidValuesWithObjects()
 	 *
 	 * @param array 	$params
 	 * @param mixed 	$value

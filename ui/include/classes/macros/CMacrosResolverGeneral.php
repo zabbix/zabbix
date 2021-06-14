@@ -54,18 +54,22 @@ class CMacrosResolverGeneral {
 	 */
 	protected function resolveTriggerReferences($expression, $references) {
 		$values = [];
-		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'collapsed_expression' => true
+		]);
 
-		if (($result = $expression_data->parse($expression)) !== false) {
-			foreach ($result->getTokens() as $token) {
+		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+			foreach ($expression_parser->getResult()->getTokens() as $token) {
 				switch ($token['type']) {
-					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
-					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-						$values[] = $token['value'];
+					case CExpressionParserResult::TOKEN_TYPE_NUMBER:
+					case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+						$values[] = $token['match'];
 						break;
 
-					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-						$values[] = $token['data']['string'];
+					case CExpressionParserResult::TOKEN_TYPE_STRING:
+						$values[] = CExpressionParser::unquoteString($token['match']);
 						break;
 				}
 			}
@@ -389,12 +393,12 @@ class CMacrosResolverGeneral {
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
 								switch ($param_raw['type']) {
-									case CFunctionParser::PARAM_UNQUOTED:
+									case C10FunctionParser::PARAM_UNQUOTED:
 										$function_parameters[] = $param_raw['raw'];
 										break;
 
-									case CFunctionParser::PARAM_QUOTED:
-										$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+									case C10FunctionParser::PARAM_QUOTED:
+										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
 										break;
 								}
 							}
@@ -500,24 +504,25 @@ class CMacrosResolverGeneral {
 	/**
 	 * Extract macros from a trigger function.
 	 *
-	 * @param string $function	a trigger function, for example 'last({$LAST})'
+	 * @param string $function	a history function, for example 'last(/host/key, {$OFFSET})'
 	 * @param array  $types		the types of macros (see extractMacros() for more details)
 	 *
 	 * @return array			see extractMacros() for more details
 	 */
 	protected function extractFunctionMacros($function, array $types) {
-		$function_parser = new CFunctionParser();
-
+		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 		$function_parameters = [];
-		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-				switch ($param_raw['type']) {
-					case CFunctionParser::PARAM_UNQUOTED:
-						$function_parameters[] = $param_raw['raw'];
+
+		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach ($hist_function_parser->getParameters() as $parameter) {
+				switch ($parameter['type']) {
+					case CHistFunctionParser::PARAM_TYPE_PERIOD:
+					case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+						$function_parameters[] = $parameter['match'];
 						break;
 
-					case CFunctionParser::PARAM_QUOTED:
-						$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+					case CHistFunctionParser::PARAM_TYPE_QUOTED:
+						$function_parameters[] = CHistFunctionParser::unquoteParam($parameter['match']);
 						break;
 				}
 			}
@@ -597,37 +602,30 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	protected function resolveFunctionMacros($function, array $macros, array $types) {
-		$function_parser = new CFunctionParser();
+		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 
-		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			$params_raw = $function_parser->getParamsRaw();
-			$function_chain = $params_raw['raw'];
-
-			foreach (array_reverse($params_raw['parameters']) as $param_raw) {
-				$param = $param_raw['raw'];
+		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach (array_reverse($hist_function_parser->getParameters()) as $parameter) {
+				$param = $parameter['match'];
 				$forced = false;
 
-				switch ($param_raw['type']) {
-					case CFunctionParser::PARAM_QUOTED:
-						$param = CFunctionParser::unquoteParam($param);
-						$forced = true;
-						// break; is not missing here
-
-					case CFunctionParser::PARAM_UNQUOTED:
-						$matched_macros = $this->getMacroPositions($param, $types);
-
-						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-							$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
-						}
-
-						$param = quoteFunctionParam($param, $forced);
-						break;
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED) {
+					$param = CHistFunctionParser::unquoteParam($param);
+					$forced = true;
 				}
 
-				$function_chain = substr_replace($function_chain, $param, $param_raw['pos'], strlen($param_raw['raw']));
-			}
+				$matched_macros = $this->getMacroPositions($param, $types);
 
-			$function = substr_replace($function, $function_chain, $params_raw['pos'], strlen($params_raw['raw']));
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
+				}
+
+				if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+					$param = quoteFunctionParam($param, $forced);
+				}
+
+				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
+			}
 		}
 
 		return $function;
@@ -732,6 +730,55 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolves items value maps, valuemap property will be added to every item.
+	 *
+	 * @param array $items
+	 * @param int   $items[]['itemid']
+	 * @param int   $items[]['valuemapid']
+	 *
+	 * @return array
+	 */
+	protected static function getItemsValueMaps(array $items): array {
+		foreach ($items as &$item) {
+			$item['valuemap'] = [];
+		}
+		unset($item);
+
+		$valuemapids = array_flip(array_column($items, 'valuemapid'));
+		unset($valuemapids[0]);
+
+		if (!$valuemapids) {
+			return $items;
+		}
+
+		$options = [
+			'output' => ['valuemapid', 'type', 'value', 'newvalue'],
+			'filter' => ['valuemapid' => array_keys($valuemapids)],
+			'sortfield' => ['sortorder']
+		];
+		$db_mappings = DBselect(DB::makeSql('valuemap_mapping', $options));
+
+		$db_valuemaps = [];
+
+		while ($db_mapping  = DBfetch($db_mappings)) {
+			$db_valuemaps[$db_mapping['valuemapid']]['mappings'][] = [
+				'type' => $db_mapping['type'],
+				'value' => $db_mapping['value'],
+				'newvalue' => $db_mapping['newvalue']
+			];
+		}
+
+		foreach ($items as &$item) {
+			if (array_key_exists($item['valuemapid'], $db_valuemaps)) {
+				$item['valuemap'] = $db_valuemaps[$item['valuemapid']];
+			}
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -764,6 +811,7 @@ class CMacrosResolverGeneral {
 		));
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+		$functions = self::getItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
@@ -890,7 +938,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
@@ -908,9 +956,10 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$value = UNRESOLVED_MACRO_STRING;
 
-				$history = Manager::History()->getLastValues([$function], 1,
+				$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-				);
+				));
+
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
 				}
@@ -940,13 +989,7 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_value = UNRESOLVED_MACRO_STRING;
-
-					if ($value !== null) {
-						$macro_value = formatHistoryValue($value, $function);
-					}
-
-					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+					$macro_values[$function['triggerid']][$token['token']] = $value;
 				}
 			}
 		}

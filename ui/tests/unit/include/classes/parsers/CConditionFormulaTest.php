@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,18 +19,20 @@
 **/
 
 
-class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CConditionFormulaTest extends TestCase {
 
 	/**
 	 * @var CConditionFormula
 	 */
 	protected $conditionFormula;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->conditionFormula = new CConditionFormula();
 	}
 
-	public function testParseValidProvider() {
+	public function dataProviderParseValid() {
 		return [
 			['A'],
 			['A and B'],
@@ -55,7 +57,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testParseValidProvider
+	 * @dataProvider dataProviderParseValid
 	 *
 	 * @param $string
 	 */
@@ -65,7 +67,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(true, $result);
 	}
 
-	public function testParseInvalidProvider() {
+	public function dataProviderParseInvalid() {
 		return [
 			['a'],
 			['A B'],
@@ -99,7 +101,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testParseInvalidProvider
+	 * @dataProvider dataProviderParseInvalid
 	 *
 	 * @param $string
 	 */
@@ -109,7 +111,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(false, $result);
 	}
 
-	public function parseConstantsProvider() {
+	public function dataProviderParseConstants() {
 		return [
 			['A', [
 				['value' => 'A', 'pos' => 0]
@@ -142,7 +144,7 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider parseConstantsProvider
+	 * @dataProvider dataProviderParseConstants
 	 *
 	 * @param $string
 	 * @param $expectedConstants

@@ -51,4 +51,5 @@ PID_FILE="/tmp/zabbix_java.pid"
 
 # uncomment to enable remote monitoring of the standard JMX objects on the Zabbix Java Gateway itself
 #JAVA_OPTIONS="$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345
-#	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+#	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+#	-Dcom.sun.management.jmxremote.registry.ssl=false"

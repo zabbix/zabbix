@@ -154,8 +154,8 @@ abstract class DbBackend {
 	/**
 	 * Create INSERT SQL query for MySQL, PostgreSQL.
 	 * Creation example:
-	 *	INSERT INTO applications (name,hostid,templateid,applicationid)
-	 *	VALUES ('CPU','10113','13','868'),('Filesystems','10113','5','869'),('General','10113','21','870');
+	 *	INSERT INTO items (itemid,name,key_,type)
+	 *	VALUES ('10201','agent.hostname','agent.hostname',1),('10202','agent.ping','agent.ping',1);
 	 *
 	 * @param string $table
 	 * @param array $fields

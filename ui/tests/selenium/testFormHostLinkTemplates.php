@@ -91,15 +91,14 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		// this should be a separate test
-		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]", 'filter_application');
+		// should check that items, triggers and graphs are not linked to the template anymore
+		$this->zbxTestClickXpathWait("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
 		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
-		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 
@@ -154,14 +153,13 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]", 'filter_application');
+		$this->zbxTestClickXpathWait("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 
 		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
-		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 }

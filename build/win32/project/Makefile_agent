@@ -46,6 +46,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommon\file.o \
+	..\..\..\src\libs\zbxcommon\time.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
 	..\..\..\src\libs\zbxcompress\compress.o \

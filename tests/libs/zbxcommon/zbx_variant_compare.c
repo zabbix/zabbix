@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "zbxvariant.h"
 
 static unsigned int	hex2num(char c)
 {

@@ -1,13 +1,15 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-26T12:14:17Z'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
-      template: 'Ceph by Zabbix Agent2'
-      name: 'Ceph by Zabbix Agent2'
+      uuid: 09fb25d089f7467f860895f6e71d3fa2
+      template: 'Ceph by Zabbix agent 2'
+      name: 'Ceph by Zabbix agent 2'
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph
         
@@ -15,22 +17,20 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Ceph
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: af3e6faf835f41ef93cbbc44aa57f97e
           name: 'Ceph: Get df'
           key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 45c9df734d424e6a8d3fea99c4a66246
           name: 'Ceph: Minimum Mon release version'
           type: DEPENDENT
           key: ceph.min_mon_release_name
@@ -39,9 +39,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: min_mon_release_name
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -53,23 +50,26 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 716f166b3943443aba70a4faed882ffb
+              expression: '(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: 5d5276504d6c41eebe8e18846edcff45
           name: 'Ceph: Number of Monitors'
           type: DEPENDENT
           key: ceph.num_mon
           delay: '0'
           history: 7d
           description: 'Number of Monitors configured in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -81,16 +81,18 @@ zabbix_export:
                 - 30m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 09d7a872f35349c6ba7d4a678bf71652
           name: 'Ceph: Number of OSDs'
           type: DEPENDENT
           key: ceph.num_osd
           delay: '0'
           history: 7d
           description: 'Number of known storage daemons in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -102,16 +104,18 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 795939e16e70475381e917b213bf6f70
           name: 'Ceph: Number of OSDs in state: IN'
           type: DEPENDENT
           key: ceph.num_osd_in
           delay: '0'
           history: 7d
           description: 'Total number of participating storage daemons in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -123,16 +127,18 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: d2d5caaad2914fb1ba07343956edb5b8
           name: 'Ceph: Number of OSDs in state: UP'
           type: DEPENDENT
           key: ceph.num_osd_up
           delay: '0'
           history: 7d
           description: 'Total number of online storage daemons in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -144,16 +150,18 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 46ea920b0951408daa5d678f298b1097
           name: 'Ceph: Number of Placement Groups'
           type: DEPENDENT
           key: ceph.num_pg
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -165,16 +173,18 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 97fbecc8ee824e658dd95d8115fec5e9
           name: 'Ceph: Number of Placement Groups in Temporary state'
           type: DEPENDENT
           key: ceph.num_pg_temp
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in pg_temp state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -182,16 +192,18 @@ zabbix_export:
                 - $.num_pg_temp
           master_item:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: b0e36ff76db049ab870fa26c29e5e69c
           name: 'Ceph: Number of Pools'
           type: DEPENDENT
           key: ceph.num_pools
           delay: '0'
           history: 7d
           description: 'Total number of pools in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -199,25 +211,34 @@ zabbix_export:
                 - $.num_pools
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: e7eb1f67d81c4e2ba7c57cfbc81d1a00
           name: 'Ceph: Get OSD dump'
           key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 35b63ca6519e4137bb7655e37ed08e51
           name: 'Ceph: Get OSD stats'
           key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 0d6cffa1f06748738431524667ea8db0
           name: 'Ceph: Ceph backfill full ratio'
           type: DEPENDENT
           key: ceph.osd_backfillfull_ratio
@@ -225,9 +246,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Backfill full ratio setting of Ceph cluster as configured on OSDMap'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -239,7 +257,12 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 52c5efe132b8404f8fc4ac995c3d5c2c
           name: 'Ceph: Ceph OSD avg fill'
           type: DEPENDENT
           key: ceph.osd_fill.avg
@@ -248,9 +271,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Average fill of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -258,7 +278,12 @@ zabbix_export:
                 - $.osd_fill.avg
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 453cebeed3214153ba4e3a5b224c063d
           name: 'Ceph: Ceph OSD max fill'
           type: DEPENDENT
           key: ceph.osd_fill.max
@@ -267,9 +292,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Percentage fill of maximum filled OSD'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -277,7 +299,12 @@ zabbix_export:
                 - $.osd_fill.max
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: f6efbd37e8104272be131d686a700808
           name: 'Ceph: Ceph OSD min fill'
           type: DEPENDENT
           key: ceph.osd_fill.min
@@ -286,9 +313,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Percentage fill of minimum filled OSD'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -296,7 +320,12 @@ zabbix_export:
                 - $.osd_fill.min
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 532891a1d8934211a016524b136cfb1e
           name: 'Ceph: Ceph full ratio'
           type: DEPENDENT
           key: ceph.osd_full_ratio
@@ -304,9 +333,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Full ratio setting of Ceph cluster as configured on OSDMap'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -318,7 +344,12 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 074c0881384446ea90e99d355afe4f4f
           name: 'Ceph: Ceph OSD Apply latency Avg'
           type: DEPENDENT
           key: ceph.osd_latency_apply.avg
@@ -327,9 +358,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Average apply latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -337,7 +365,12 @@ zabbix_export:
                 - $.osd_latency_apply.avg
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: ef0a76f0c16147d1a280e00e66d3806f
           name: 'Ceph: Ceph OSD Apply latency Max'
           type: DEPENDENT
           key: ceph.osd_latency_apply.max
@@ -346,9 +379,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Maximum apply latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -356,7 +386,12 @@ zabbix_export:
                 - $.osd_latency_apply.max
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: d45ad876b0a04345be347af54211aa69
           name: 'Ceph: Ceph OSD Apply latency Min'
           type: DEPENDENT
           key: ceph.osd_latency_apply.min
@@ -365,9 +400,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Miniumum apply latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -375,7 +407,12 @@ zabbix_export:
                 - $.osd_latency_apply.min
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 52e1b146c36e4c2e82acf36f1c7d12eb
           name: 'Ceph: Ceph OSD Commit latency Avg'
           type: DEPENDENT
           key: ceph.osd_latency_commit.avg
@@ -384,9 +421,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Average commit latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -394,7 +428,12 @@ zabbix_export:
                 - $.osd_latency_commit.avg
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 3027a1dbdd8e4f9bbef8927b92eb8e77
           name: 'Ceph: Ceph OSD Commit latency Max'
           type: DEPENDENT
           key: ceph.osd_latency_commit.max
@@ -403,9 +442,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Maximum commit latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -413,7 +449,12 @@ zabbix_export:
                 - $.osd_latency_commit.max
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: b9900b84c22843dab4ad335b9642e040
           name: 'Ceph: Ceph OSD Commit latency Min'
           type: DEPENDENT
           key: ceph.osd_latency_commit.min
@@ -422,9 +463,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Minimum commit latency of OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -432,7 +470,12 @@ zabbix_export:
                 - $.osd_latency_commit.min
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 477d94bd838d4273a556537de36bb1f6
           name: 'Ceph: Ceph nearfull ratio'
           type: DEPENDENT
           key: ceph.osd_nearfull_ratio
@@ -440,9 +483,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Near full ratio setting of Ceph cluster as configured on OSDMap'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -454,7 +494,12 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 27ea5688271347bca429d91ace62d4e2
           name: 'Ceph: Ceph OSD avg PGs'
           type: DEPENDENT
           key: ceph.osd_pgs.avg
@@ -462,9 +507,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Average amount of PGs on OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -472,7 +514,12 @@ zabbix_export:
                 - $.osd_pgs.avg
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 4174d7d3190e47ccb55b1e50da4cedc5
           name: 'Ceph: Ceph OSD max PGs'
           type: DEPENDENT
           key: ceph.osd_pgs.max
@@ -480,9 +527,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Maximum amount of PGs on OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -490,7 +534,12 @@ zabbix_export:
                 - $.osd_pgs.max
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 47f56243cd1c430fae217d1a0cbc4a99
           name: 'Ceph: Ceph OSD min PGs'
           type: DEPENDENT
           key: ceph.osd_pgs.min
@@ -498,9 +547,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Minimum amount of PGs on OSDs'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -508,16 +554,18 @@ zabbix_export:
                 - $.osd_pgs.min
           master_item:
             key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 4023ca309692470eab2651f69d49419a
           name: 'Ceph: Overall cluster status'
           type: DEPENDENT
           key: ceph.overall_status
           delay: '0'
           history: 7d
           description: 'Overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR'
-          applications:
-            -
-              name: Ceph
           valuemap:
             name: 'Ceph cluster status'
           preprocessing:
@@ -531,33 +579,37 @@ zabbix_export:
                 - 10m
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
           triggers:
             -
-              expression: '{last()}=2'
+              uuid: 6ab06350bd8b426681f1b8bddde76a13
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
               name: 'Ceph: Cluster in ERROR state'
               priority: AVERAGE
               manual_close: 'YES'
             -
-              expression: '{last()}=1'
+              uuid: 8b6ba1a7ae014e80a5287ffd13b5d8aa
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=1'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: '{last()}=0'
+              recovery_expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=0'
               name: 'Ceph: Cluster in WARNING state'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Ceph: Cluster in ERROR state'
-                  expression: '{Ceph by Zabbix Agent2:ceph.overall_status.last()}=2'
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
         -
+          uuid: 9b073153d7474b0abfccb1844d0e6981
           name: 'Ceph: Number of Placement Groups in Active state'
           type: DEPENDENT
           key: ceph.pg_states.active
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in active state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -565,16 +617,18 @@ zabbix_export:
                 - $.pg_states.active
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 1471a13aaadc48c7a265835abcb93a03
           name: 'Ceph: Number of Placement Groups in Backfilling state'
           type: DEPENDENT
           key: ceph.pg_states.backfilling
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in backfilling state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -582,16 +636,18 @@ zabbix_export:
                 - $.pg_states.backfilling
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 3b44c79e03d4402ba442331593dbdfa3
           name: 'Ceph: Number of Placement Groups in backfill_toofull state'
           type: DEPENDENT
           key: ceph.pg_states.backfill_toofull
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in backfill_toofull state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -599,16 +655,18 @@ zabbix_export:
                 - $.pg_states.backfill_toofull
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: ada3f638ee2e48eeb8889526898aed2f
           name: 'Ceph: Number of Placement Groups in backfill_wait state'
           type: DEPENDENT
           key: ceph.pg_states.backfill_wait
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in backfill_wait state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -616,16 +674,18 @@ zabbix_export:
                 - $.pg_states.backfill_wait
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: b1af2b88fe424723b97c9aa4eee12d83
           name: 'Ceph: Number of Placement Groups in Clean state'
           type: DEPENDENT
           key: ceph.pg_states.clean
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in clean state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -633,16 +693,18 @@ zabbix_export:
                 - $.pg_states.clean
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: f8acf8f66fbc401799d3515eb3e2ea43
           name: 'Ceph: Number of Placement Groups in degraded state'
           type: DEPENDENT
           key: ceph.pg_states.degraded
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in degraded state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -650,16 +712,18 @@ zabbix_export:
                 - $.pg_states.degraded
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 79e056b9e3af40eabab0f927fb326491
           name: 'Ceph: Number of Placement Groups in inconsistent state'
           type: DEPENDENT
           key: ceph.pg_states.inconsistent
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in inconsistent state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -667,16 +731,18 @@ zabbix_export:
                 - $.pg_states.inconsistent
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 9ddef3d2e7df43eda7d2835ceac19d32
           name: 'Ceph: Number of Placement Groups in Peering state'
           type: DEPENDENT
           key: ceph.pg_states.peering
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in peering state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -684,16 +750,18 @@ zabbix_export:
                 - $.pg_states.peering
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 573461fc94e84f96b8ae6f6d89916424
           name: 'Ceph: Number of Placement Groups in recovering state'
           type: DEPENDENT
           key: ceph.pg_states.recovering
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in recovering state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -701,16 +769,18 @@ zabbix_export:
                 - $.pg_states.recovering
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: c150a9414fee40acaa65d532fd110c4e
           name: 'Ceph: Number of Placement Groups in recovery_wait state'
           type: DEPENDENT
           key: ceph.pg_states.recovery_wait
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in recovery_wait state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -718,16 +788,18 @@ zabbix_export:
                 - $.pg_states.recovery_wait
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: bac3270faf854267a466eaa6a4acad91
           name: 'Ceph: Number of Placement Groups in remapped state'
           type: DEPENDENT
           key: ceph.pg_states.remapped
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in remapped state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -735,16 +807,18 @@ zabbix_export:
                 - $.pg_states.remapped
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 8a0117845436492d951e96b46eb67e1c
           name: 'Ceph: Number of Placement Groups in Scrubbing state'
           type: DEPENDENT
           key: ceph.pg_states.scrubbing
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in scrubbing state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -752,16 +826,18 @@ zabbix_export:
                 - $.pg_states.scrubbing
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 4998e4542ed746f08f82ecf53b553c36
           name: 'Ceph: Number of Placement Groups in Undersized state'
           type: DEPENDENT
           key: ceph.pg_states.undersized
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in undersized state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -769,16 +845,18 @@ zabbix_export:
                 - $.pg_states.undersized
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: c922613c5ffb4f689c01f13143633ec3
           name: 'Ceph: Number of Placement Groups in Unknown state'
           type: DEPENDENT
           key: ceph.pg_states.unknown
           delay: '0'
           history: 7d
           description: 'Total number of Placement Groups in unknown state'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -786,13 +864,15 @@ zabbix_export:
                 - $.pg_states.unknown
           master_item:
             key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 911e8a654ca44e7ca56b8010ac7381c8
           name: 'Ceph: Ping'
           key: 'ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           history: 7d
-          applications:
-            -
-              name: Ceph
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -800,13 +880,19 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
+          tags:
+            -
+              tag: Application
+              value: Ceph
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 9ffc9a5c3d1c47d288c665c8be7d2fbb
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
         -
+          uuid: 89d7df2ebfbc4aa88b4ff4de44dc4b8b
           name: 'Ceph: Ceph Read bandwidth'
           type: DEPENDENT
           key: ceph.rd_bytes.rate
@@ -815,9 +901,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Global read Bytes per second'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -829,7 +912,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 8a35a37de63746498291993d4f3fc1cc
           name: 'Ceph: Ceph Read operations per sec'
           type: DEPENDENT
           key: ceph.rd_ops.rate
@@ -838,9 +926,6 @@ zabbix_export:
           value_type: FLOAT
           units: ops
           description: 'Global read operations per second'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -848,16 +933,23 @@ zabbix_export:
                 - $.rd_ops
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 8b43d105f9d64a3a94196f3f3bc7eac3
           name: 'Ceph: Get overall cluster status'
           key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 5e400c932acf4ad498e17daca0ad4943
           name: 'Ceph: Total bytes available'
           type: DEPENDENT
           key: ceph.total_avail_bytes
@@ -865,9 +957,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total bytes available in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -875,7 +964,12 @@ zabbix_export:
                 - $.total_avail_bytes
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: c4b1a31efb5f47518cc5dd6082f3a42b
           name: 'Ceph: Total bytes'
           type: DEPENDENT
           key: ceph.total_bytes
@@ -883,9 +977,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total (RAW) capacity of Ceph cluster in bytes'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -893,16 +984,18 @@ zabbix_export:
                 - $.total_bytes
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: d3910275462b43dba1fa8022a398ed1c
           name: 'Ceph: Total number of objects'
           type: DEPENDENT
           key: ceph.total_objects
           delay: '0'
           history: 7d
           description: 'Total number of objects in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -910,7 +1003,12 @@ zabbix_export:
                 - $.total_objects
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 6ad8e289eef349ab8ebfd4cc92a35c18
           name: 'Ceph: Total bytes used'
           type: DEPENDENT
           key: ceph.total_used_bytes
@@ -918,9 +1016,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total bytes used in Ceph cluster'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -928,7 +1023,12 @@ zabbix_export:
                 - $.total_used_bytes
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 51e100668e5344d29afd50dc9b9eabc9
           name: 'Ceph: Ceph Write bandwidth'
           type: DEPENDENT
           key: ceph.wr_bytes.rate
@@ -937,9 +1037,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Global write Bytes per second'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -951,7 +1048,12 @@ zabbix_export:
                 - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
         -
+          uuid: 0a7203defa7147f7b975b404e6706b60
           name: 'Ceph: Ceph Write operations per sec'
           type: DEPENDENT
           key: ceph.wr_ops.rate
@@ -960,9 +1062,6 @@ zabbix_export:
           value_type: FLOAT
           units: ops
           description: 'Global write operations per second'
-          applications:
-            -
-              name: Ceph
           preprocessing:
             -
               type: JSONPATH
@@ -974,13 +1073,19 @@ zabbix_export:
                 - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          tags:
+            -
+              tag: Application
+              value: Ceph
       discovery_rules:
         -
+          uuid: 374557a43a824d938e9a8e656151e0c9
           name: OSD
           key: 'ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           delay: 1h
           item_prototypes:
             -
+              uuid: 4f7a72a5c4c14b9da63ddbae9e2ebf5f
               name: 'Ceph: [osd.{#OSDNAME}] OSD fill'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},fill]'
@@ -988,9 +1093,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -999,15 +1101,17 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
             -
+              uuid: fc2518ca8b9341d8befc6f9b1cbd4b79
               name: 'Ceph: [osd.{#OSDNAME}] OSD in'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},in]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1019,7 +1123,12 @@ zabbix_export:
                     - 10m
               master_item:
                 key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
             -
+              uuid: 2eb6a0d999d14906a4737ed32834ccc7
               name: 'Ceph: [osd.{#OSDNAME}] OSD latency apply'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},latency_apply]'
@@ -1028,9 +1137,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'Time taken to flush an update to disks.'
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1039,7 +1145,12 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
             -
+              uuid: 14f392b369504f10b7e068522ac4a086
               name: 'Ceph: [osd.{#OSDNAME}] OSD latency commit'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},latency_commit]'
@@ -1048,9 +1159,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'Time taken to commit an operation to the journal.'
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1059,15 +1167,17 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
             -
+              uuid: 63234342c0bd49e6b1f8737bf595851f
               name: 'Ceph: [osd.{#OSDNAME}] OSD PGs'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},num_pgs]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1076,15 +1186,17 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
             -
+              uuid: 12c20b2fbf10466bba7e1097c014e968
               name: 'Ceph: [osd.{#OSDNAME}] OSD up'
               type: DEPENDENT
               key: 'ceph.osd[{#OSDNAME},up]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1096,9 +1208,14 @@ zabbix_export:
                     - 10m
               master_item:
                 key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph {#HOST} OSD [{#CLASS}]'
               trigger_prototypes:
                 -
-                  expression: '{last()} = 0'
+                  uuid: 21535bb935b44b3aa073542db3cc7827
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0'
                   name: 'Ceph: OSD osd.{#OSDNAME} is down'
                   priority: AVERAGE
                   description: |
@@ -1106,38 +1223,43 @@ zabbix_export:
                     The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
           trigger_prototypes:
             -
-              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100'
+              uuid: cd04e8d542a04bdf89abad7ee4719e75
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100'
               name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
               priority: WARNING
               dependencies:
                 -
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
-                  expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+                  expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
             -
-              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+              uuid: 5d7a028166584c29b959914ce904a713
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE
           graph_prototypes:
             -
+              uuid: c88d53bfa7b8456aa70b4d7a2cb63ef5
               name: 'Ceph: [osd.{#OSDNAME}] OSD latency'
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_apply]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_commit]'
         -
+          uuid: fb6b4d27f46e4160ad978244aa845d0e
           name: Pool
           key: 'ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           delay: 1h
           item_prototypes:
             -
+              uuid: 1090dc09ce79458e9471863fcb973460
               name: 'Ceph: [{#POOLNAME}] Pool Used'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",bytes_used]'
@@ -1145,9 +1267,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total bytes used in pool.'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1155,7 +1274,12 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].bytes_used'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 4e49ce8a11084dd287f89b076cc70535
               name: 'Ceph: [{#POOLNAME}] Max available'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",max_avail]'
@@ -1163,9 +1287,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The maximum available space in the given pool.'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1173,16 +1294,18 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].max_avail'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 5c7bd85f9d944215acaced87b0eb216f
               name: 'Ceph: [{#POOLNAME}] Pool objects'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",objects]'
               delay: '0'
               history: 7d
               description: 'Number of objects in the pool.'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1190,7 +1313,12 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].objects'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: eda166ae6c4c46cf8c01c2b928f07ec5
               name: 'Ceph: [{#POOLNAME}] Pool Percent Used'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",percent_used]'
@@ -1198,9 +1326,6 @@ zabbix_export:
               history: 7d
               units: '%'
               description: 'Percentage of storage used per pool'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1208,7 +1333,12 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].percent_used'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 5311f1a539284c5483458e1820496be3
               name: 'Ceph: [{#POOLNAME}] Pool Read bandwidth'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
@@ -1217,9 +1347,6 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: 'Per-pool read Bytes/second'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1231,7 +1358,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 76871b86d66d4307a83e813a8d9fc1b0
               name: 'Ceph: [{#POOLNAME}] Pool Read operations'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
@@ -1240,9 +1372,6 @@ zabbix_export:
               value_type: FLOAT
               units: ops
               description: 'Per-pool read operations/second'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1254,7 +1383,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 4c053bbaaf6946bcaf5288cc154d6fdd
               name: 'Ceph: [{#POOLNAME}] Pool RAW Used'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",stored_raw]'
@@ -1262,9 +1396,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Bytes used in pool including copies made.'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1272,7 +1403,12 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].stored_raw'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: 955353da182243e29d326b3b2807286a
               name: 'Ceph: [{#POOLNAME}] Pool Write bandwidth'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
@@ -1281,9 +1417,6 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: 'Per-pool write Bytes/second'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1295,7 +1428,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
             -
+              uuid: acb3081d772444dab060a055fb3f4304
               name: 'Ceph: [{#POOLNAME}] Pool Write operations'
               type: DEPENDENT
               key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
@@ -1304,9 +1442,6 @@ zabbix_export:
               value_type: FLOAT
               units: ops
               description: 'Per-pool write operations/second'
-              application_prototypes:
-                -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1318,54 +1453,61 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
           graph_prototypes:
             -
+              uuid: 1a469f2c99214b1ba7fe3a7520e43439
               name: 'Ceph: [{#POOLNAME}] Pool bandwidth'
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
             -
+              uuid: 7870932ea335481db1c23224dfb33f60
               name: 'Ceph: [{#POOLNAME}] Pool I/O'
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
             -
+              uuid: 3da48042fdaa4c01825c3eea7ab5af6b
               name: 'Ceph: [{#POOLNAME}] Pool Usage'
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",bytes_used]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",max_avail]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",stored_raw]'
       macros:
         -
@@ -1377,36 +1519,63 @@ zabbix_export:
         -
           macro: '{$CEPH.USER}'
           value: zabbix
+      valuemaps:
+        -
+          uuid: 2a4b2a8c55ba48b2a815e4123c9ea7fa
+          name: 'Ceph cluster status'
+          mappings:
+            -
+              value: '0'
+              newvalue: HEALTH_OK
+            -
+              value: '1'
+              newvalue: HEALTH_WARN
+            -
+              value: '2'
+              newvalue: HEALTH_ERR
+        -
+          uuid: 22fe6d6c74454775994f07fc05d7bafd
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
+      uuid: fac43ab599344f1da374bd091f6b618b
       name: 'Ceph: Cluster bandwidth'
       graph_items:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_bytes.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_bytes.rate
     -
+      uuid: 4191a30a9a7c4e5aa48d96238ca8f20c
       name: 'Ceph: Cluster I/O'
       graph_items:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_ops.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_ops.rate
     -
+      uuid: 515e2c5239f94ee7a52ecdb834079e06
       name: 'Ceph: Free space'
       type: STACKED
       graph_items:
@@ -1414,95 +1583,75 @@ zabbix_export:
           drawtype: FILLED_REGION
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_used_bytes
         -
           sortorder: '1'
           drawtype: FILLED_REGION
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_avail_bytes
     -
+      uuid: 8714a8cf50bd43c2b54e410a439d320b
       name: 'Ceph: Overall OSD latency'
       graph_items:
         -
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.min
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.avg
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.max
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.min
     -
+      uuid: 716d959b255a47779b9aaf376be8ba03
       name: 'Ceph: Overall OSD utilization'
       graph_items:
         -
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.min
-  value_maps:
-    -
-      name: 'Ceph cluster status'
-      mappings:
-        -
-          value: '0'
-          newvalue: HEALTH_OK
-        -
-          value: '1'
-          newvalue: HEALTH_WARN
-        -
-          value: '2'
-          newvalue: HEALTH_ERR
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

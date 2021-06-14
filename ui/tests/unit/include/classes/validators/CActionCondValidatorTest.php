@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,15 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CActionCondValidatorTest extends CValidatorTest {
 
-	public function validParamProvider() {
-		return [
-			[[]]
-		];
+	public function dataProviderValidParam() {
+		return [];
 	}
 
-	public function validValuesProvider() {
+	public function dataProviderValidValues() {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
@@ -146,10 +146,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => 'abc'
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_APPLICATION,
-				'value' => 'abc'
-			]],
-			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_NAME,
 				'value' => 'abc'
 			]],
@@ -169,7 +165,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider() {
+	public function dataProviderInvalidValues() {
 		return [
 			[[],
 				[
@@ -397,13 +393,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
-					'conditiontype' => CONDITION_TYPE_APPLICATION,
-					'value' => ''
-				],
-				'Incorrect value for field "value": cannot be empty.'
-			],
-			[[],
-				[
 					'conditiontype' => CONDITION_TYPE_HOST_NAME,
 					'value' => ''
 				],
@@ -431,7 +420,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 	/**
 	 * Test that a correct error message is generated when setting an object name.
 	 *
-	 * @dataProvider invalidValuesWithObjectsProvider()
+	 * @dataProvider dataProviderInvalidValuesWithObjects()
 	 *
 	 * @param array 	$params
 	 * @param mixed 	$value
@@ -442,7 +431,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 		$this->markTestIncomplete();
 	}
 
-	public function invalidValuesWithObjectsProvider() {
+	public function dataProviderInvalidValuesWithObjects() {
 		return [
 			[
 				[],

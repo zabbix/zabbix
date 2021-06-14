@@ -291,7 +291,7 @@ Please, locate Oracle directories using --with-oracle or \
             AC_LINK_IFELSE([
                 AC_LANG_PROGRAM([[@%:@include <oci.h>]],
                     [[
-OCIEnv* envh = 0;
+OCIEnv *envh = 0;
 OCIEnvNlsCreate(&envh, OCI_DEFAULT, 0, 0, 0, 0, 0, 0, 0, 0);
 if (envh) OCIHandleFree(envh, OCI_HTYPE_ENV);
                     ]]
@@ -305,6 +305,33 @@ if (envh) OCIHandleFree(envh, OCI_HTYPE_ENV);
                 [
                 oci_lib_found="no"
                 AC_MSG_RESULT([not found])
+                ]
+            )
+        fi
+
+        dnl
+        dnl Check OCIServerRelease2() API
+        dnl
+        if test "$oci_header_found" = "yes"; then
+
+            AC_MSG_CHECKING([for Oracle OCIServerRelease2() API in $oracle_lib_dir])
+
+            AC_LINK_IFELSE([
+                AC_LANG_PROGRAM([[@%:@include <oci.h>]],
+                    [[
+OCIEnv *envh = 0;
+OCIError *errh = 0;
+OraText buf[256];
+ub4 version;
+sword ret = OCIServerRelease2(envh, errh, buf, (ub4)sizeof(buf), OCI_HTYPE_SVCCTX, &version, OCI_DEFAULT);
+                    ]]
+                )],
+                [
+                AC_DEFINE(HAVE_OCI_SERVER_RELEASE2, 1, [Define to 1 if OCIServerRelease2 API are supported.])
+                AC_MSG_RESULT(yes)
+                ],
+                [
+                AC_MSG_RESULT([no])
                 ]
             )
         fi

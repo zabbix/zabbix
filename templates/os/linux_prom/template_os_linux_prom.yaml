@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:44:03Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:47Z'
   groups:
     -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
     -
+      uuid: 2506b0ca01884903b547b1e19b76ce6d
       template: 'Linux by Prom'
       name: 'Linux by Prom'
       description: |
@@ -26,27 +28,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Operating systems'
-      applications:
-        -
-          name: CPU
-        -
-          name: General
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Monitoring agent'
-        -
-          name: 'Network interfaces'
-        -
-          name: Status
-        -
-          name: Storage
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: 9a60d1e53caa4049a33aa52f3f55ad75
           name: 'Version of node_exporter running'
           type: DEPENDENT
           key: 'agent.version[node_exporter]'
@@ -54,9 +38,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Monitoring agent'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -69,16 +50,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: 'Monitoring agent'
         -
+          uuid: d3631bd7effc4cd1bc45c991b3c3038f
           name: 'Number of open file descriptors'
           type: DEPENDENT
           key: 'fd.open[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -87,7 +70,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
+          uuid: a8b78e776e1d4011bbcb6dd54e32b40b
           name: 'Maximum number of open file descriptors'
           type: DEPENDENT
           key: 'kernel.maxfiles[node_exporter]'
@@ -95,9 +83,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -110,34 +95,43 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
-              expression: '{last()}<{$KERNEL.MAXFILES.MIN}'
+              uuid: c0002ad071d7497ab32633c93624e0c2
+              expression: 'last(/Linux by Prom/kernel.maxfiles[node_exporter])<{$KERNEL.MAXFILES.MIN}'
               name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
               dependencies:
                 -
                   name: 'Running out of file descriptors (less than < 20% free)'
-                  expression: '{Linux by Prom:fd.open[node_exporter].last()}/{Linux by Prom:kernel.maxfiles[node_exporter].last()}*100>80'
+                  expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
         -
+          uuid: 8b2fffcba0b24ca8a687361645ffaa1d
           name: 'Get node_exporter metrics'
           type: HTTP_AGENT
           key: node_exporter.get
           history: 1h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: e33fafc8476e404aa4150d0d491f4c83
+              expression: 'nodata(/Linux by Prom/node_exporter.get,30m)=1'
               name: 'node_exporter is not available (or no data for 30m)'
               priority: WARNING
               description: 'Failed to fetch system metrics from node_exporter in time.'
               manual_close: 'YES'
         -
+          uuid: 75afcb39d2d7496e9490cd14f1431600
           name: 'System boot time'
           type: DEPENDENT
           key: 'system.boottime[node_exporter]'
@@ -145,9 +139,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: unixtime
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -156,7 +147,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
+          uuid: a732c4df8af047fbb874e1fb363b5e9e
           name: 'CPU guest time'
           type: DEPENDENT
           key: 'system.cpu.guest[node_exporter]'
@@ -165,9 +161,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -192,7 +185,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 759809ee6c9e43cf8ff44f987221a90e
           name: 'CPU guest nice time'
           type: DEPENDENT
           key: 'system.cpu.guest_nice[node_exporter]'
@@ -201,9 +199,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -228,7 +223,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 7bb99c606c6b497aaef279663b60829b
           name: 'CPU idle time'
           type: DEPENDENT
           key: 'system.cpu.idle[node_exporter]'
@@ -237,9 +237,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent doing nothing.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -264,7 +261,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 4d3f64c79c684d55bcde14ca5bf3022a
           name: 'CPU interrupt time'
           type: DEPENDENT
           key: 'system.cpu.interrupt[node_exporter]'
@@ -273,9 +275,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of time the CPU has been servicing hardware interrupts.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -300,16 +299,18 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 76206cf435fd4a979dbbf74807b532de
           name: 'Interrupts per second'
           type: DEPENDENT
           key: 'system.cpu.intr[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -322,7 +323,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 6a727e148a2c4956bcfb6de0a3486c2d
           name: 'CPU iowait time'
           type: DEPENDENT
           key: 'system.cpu.iowait[node_exporter]'
@@ -331,9 +337,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Amount of time the CPU has been waiting for I/O to complete.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -358,16 +361,18 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 78fb393fe3d64cd7bf79be5427715add
           name: 'Load average (1m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg1[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -376,16 +381,18 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 7fc62b26b9ff43429632f1985dc07851
           name: 'Load average (5m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg5[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -394,16 +401,18 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 35fb0319c599403bbea0e616c9066e27
           name: 'Load average (15m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg15[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -412,7 +421,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 86de794832794f57ba428cca31031005
           name: 'CPU nice time'
           type: DEPENDENT
           key: 'system.cpu.nice[node_exporter]'
@@ -421,9 +435,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that have been niced.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -448,15 +459,17 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: d7db65cfeaac4541bd98d06dc35f89e2
           name: 'Number of CPUs'
           type: DEPENDENT
           key: 'system.cpu.num[node_exporter]'
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -468,10 +481,14 @@ zabbix_export:
                 - |
                   //count the number of cores
                   return JSON.parse(value).length
-                  
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: cf3cd5840b91477d8e9254820896b978
           name: 'CPU softirq time'
           type: DEPENDENT
           key: 'system.cpu.softirq[node_exporter]'
@@ -480,9 +497,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of time the CPU has been servicing software interrupts.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -507,7 +521,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 2ee5885c4de646c0926f0c1a48890e68
           name: 'CPU steal time'
           type: DEPENDENT
           key: 'system.cpu.steal[node_exporter]'
@@ -516,9 +535,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of CPU ''stolen'' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -543,16 +559,18 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: b873e0d178d144fca3597d617fc119e7
           name: 'Context switches per second'
           type: DEPENDENT
           key: 'system.cpu.switches[node_exporter]'
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -565,7 +583,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: e296be976c5944b19a7178304ed6140c
           name: 'CPU system time'
           type: DEPENDENT
           key: 'system.cpu.system[node_exporter]'
@@ -574,9 +597,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running the kernel and its processes.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -601,7 +621,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 832698e707d14bad8171ca71a2533350
           name: 'CPU user time'
           type: DEPENDENT
           key: 'system.cpu.user[node_exporter]'
@@ -610,9 +635,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that are not niced.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -637,7 +659,12 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
+          uuid: 76f60c7e4f1a482198ff4f101020bbcc
           name: 'CPU utilization'
           type: DEPENDENT
           key: 'system.cpu.util[node_exporter]'
@@ -646,9 +673,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization in %'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JAVASCRIPT
@@ -658,9 +682,14 @@ zabbix_export:
                   return (100 - value)
           master_item:
             key: 'system.cpu.idle[node_exporter]'
+          tags:
+            -
+              tag: Application
+              value: CPU
           triggers:
             -
-              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              uuid: 4c924f8243a7431886a2d69368cb7142
+              expression: 'min(/Linux by Prom/system.cpu.util[node_exporter],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -669,10 +698,11 @@ zabbix_export:
                 -
                   name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
                   expression: |
-                    {Linux by Prom:system.cpu.load.avg1[node_exporter].min(5m)}/{Linux by Prom:system.cpu.num[node_exporter].last()}>{$LOAD_AVG_PER_CPU.MAX.WARN}
-                    and {Linux by Prom:system.cpu.load.avg5[node_exporter].last()}>0
-                    and {Linux by Prom:system.cpu.load.avg15[node_exporter].last()}>0
+                    min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
+                    and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
+                    and last(/Linux by Prom/system.cpu.load.avg15[node_exporter])>0
         -
+          uuid: c47995760ef3458eb6237e434ef4eef8
           name: 'System description'
           type: DEPENDENT
           key: 'system.descr[node_exporter]'
@@ -681,9 +711,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Labeled system information as provided by the uname system call.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -701,7 +728,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
+          uuid: 9fcb3dd70dc244f2b2ff86560b37ec7e
           name: 'System local time'
           type: DEPENDENT
           key: 'system.localtime[node_exporter]'
@@ -710,9 +742,6 @@ zabbix_export:
           value_type: FLOAT
           units: unixtime
           description: 'System local time of the host.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -721,14 +750,20 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
-              expression: '{fuzzytime({$SYSTEM.FUZZYTIME.MAX})}=0'
+              uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
+              expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MAX})=0'
               name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
         -
+          uuid: c70cfa2ad5754089935883c5b3172656
           name: 'System name'
           type: DEPENDENT
           key: 'system.name[node_exporter]'
@@ -738,9 +773,6 @@ zabbix_export:
           value_type: CHAR
           description: 'System host name.'
           inventory_link: NAME
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -753,14 +785,20 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: e827e944568b46e284820630482317bd
+              expression: '(last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2))=1 and length(last(/Linux by Prom/system.name[node_exporter]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: ce4bb6c485cc4b739dce31b631634790
           name: 'Operating system architecture'
           type: DEPENDENT
           key: 'system.sw.arch[node_exporter]'
@@ -769,9 +807,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Operating system architecture of the host.'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -784,7 +819,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
+          uuid: 11ff4e02245f4c2e9ce00e55c1a77b39
           name: 'Operating system'
           type: DEPENDENT
           key: 'system.sw.os[node_exporter]'
@@ -793,9 +833,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -803,9 +840,14 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'system.descr[node_exporter]'
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 00974d5b128c4b1db64ca100770fb11b
+              expression: '(last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2))=1 and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -813,8 +855,9 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
-                  expression: '{Linux by Prom:system.name[node_exporter].diff()}=1 and {Linux by Prom:system.name[node_exporter].strlen()}>0'
+                  expression: '(last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2))=1 and length(last(/Linux by Prom/system.name[node_exporter]))>0'
         -
+          uuid: ccc3c4d69fef412aa53c6a7320ef44fb
           name: 'Free swap space'
           type: DEPENDENT
           key: 'system.swap.free[node_exporter]'
@@ -823,9 +866,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The free space of swap volume/file in bytes.'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -834,19 +874,26 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
+          uuid: 99feb76b7da04b00a0d191b92bf979a1
           name: 'Free swap space in %'
           type: CALCULATED
           key: 'system.swap.pfree[node_exporter]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last("system.swap.free[node_exporter]")/last("system.swap.total[node_exporter]")*100'
+          params: 'last(//system.swap.free[node_exporter])/last(//system.swap.total[node_exporter])*100'
           description: 'The free space of swap volume/file in percent.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
+          uuid: d0c1ef0a679546d780df30a02a27df44
           name: 'Total swap space'
           type: DEPENDENT
           key: 'system.swap.total[node_exporter]'
@@ -855,9 +902,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The total space of swap volume/file in bytes.'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -866,7 +910,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
+          uuid: 7eeabdb6bf44483bab91faaab8bb24d5
           name: 'System uptime'
           type: DEPENDENT
           key: 'system.uptime[node_exporter]'
@@ -875,9 +924,6 @@ zabbix_export:
           trends: 0d
           units: uptime
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -892,14 +938,20 @@ zabbix_export:
                   return (Math.floor(Date.now()/1000)-Number(value));
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: 83311a7c73c441d39d88fe0fc7b55af9
+              expression: 'last(/Linux by Prom/system.uptime[node_exporter])<10m'
               name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: 70a75efafbc84cbebd1bb262ec797523
           name: 'Available memory'
           type: DEPENDENT
           key: 'vm.memory.available[node_exporter]'
@@ -908,9 +960,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.4/manual/appendix/items/vm.memory.size_params'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -919,7 +968,12 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
+          uuid: e3ad296f16084e9caa923b449d8c725f
           name: 'Total memory'
           type: DEPENDENT
           key: 'vm.memory.total[node_exporter]'
@@ -928,9 +982,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Total memory in Bytes'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -939,30 +990,38 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
+          uuid: 60c716c692fb482f9abffb0fc9ce4324
           name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[node_exporter]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: '(last("vm.memory.total[node_exporter]")-last("vm.memory.available[node_exporter]"))/last("vm.memory.total[node_exporter]")*100'
+          params: '(last(//vm.memory.total[node_exporter])-last(//vm.memory.available[node_exporter]))/last(//vm.memory.total[node_exporter])*100'
           description: 'Memory used percentage is calculated as (total-available)/total*100'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
-              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              uuid: 72304b3a167e41ccbcdb75568c65294a
+              expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-                  expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
+                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
       discovery_rules:
         -
+          uuid: 91531a7a68564860976096df6899fe88
           name: 'Network interface discovery'
           type: DEPENDENT
           key: 'net.if.discovery[node_exporter]'
@@ -1000,15 +1059,13 @@ zabbix_export:
           description: 'Discovery of network interfaces. Requires node_exporter v0.18 and up.'
           item_prototypes:
             -
+              uuid: ee28aff27b4f40eaa8e903ce3fab8555
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[node_exporter,"{#IFNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1021,16 +1078,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: f6b39f743bb6438d876236ae651f68ee
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[node_exporter,"{#IFNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1043,7 +1102,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: eea37c3779994ac5b35bb3b125429340
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
               key: 'net.if.in[node_exporter,"{#IFNAME}"]'
@@ -1051,9 +1115,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: bps
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1070,16 +1131,18 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: aec995b7fe724823bdb41f134594b648
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[node_exporter,"{#IFNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1092,16 +1155,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: 4ffe74b94eb14a4ea61c0df790d0920f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[node_exporter"{#IFNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1114,7 +1179,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: ddc4111fefec473e8d8b079f6eb50c05
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
               key: 'net.if.out[node_exporter,"{#IFNAME}"]'
@@ -1122,9 +1192,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: bps
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1141,7 +1208,12 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: 51f9a39ad6d940ae914cd0a350d83dab
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed[node_exporter,"{#IFNAME}"]'
@@ -1150,9 +1222,6 @@ zabbix_export:
               trends: 0d
               units: bps
               description: 'Sets value to 0 if metric is missing in node_exporter output.'
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1167,7 +1236,12 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
+              uuid: 4097f76d86cd417db586c5973e1da90b
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[node_exporter,"{#IFNAME}"]'
@@ -1178,9 +1252,6 @@ zabbix_export:
                 Indicates the interface RFC2863 operational state as a string.
                 Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
               preprocessing:
@@ -1219,11 +1290,16 @@ zabbix_export:
                       return newvalue;
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)'
+                  uuid: e35b59dc09754451a721793831edc3d4
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1236,6 +1312,7 @@ zabbix_export:
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
             -
+              uuid: ce9cfd9880c44aaea18cfa2ab2fdf0e1
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[node_exporter,"{#IFNAME}"]'
@@ -1243,9 +1320,6 @@ zabbix_export:
               history: 7d
               trends: 0d
               description: 'node_network_protocol_type protocol_type value of /sys/class/net/<iface>.'
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'Linux::Interface protocol types'
               preprocessing:
@@ -1256,24 +1330,29 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
           trigger_prototypes:
             -
+              uuid: 96bbb9726ef149a5b97f96d54502593a
               expression: |
-                {Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].change()}<0 and {Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}>0
+                change(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])>0
                 and (
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=6 or
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=7 or
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=11 or
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=62 or
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=69 or
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=117
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=6 or
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=7 or
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=11 or
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=62 or
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=69 or
+                last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=117
                 )
                 and
-                ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2)
+                (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                ({Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].change()}>0 and {Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].prev()}>0) or
-                ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2)
+                (change(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])>0 and last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"],#2)>0) or
+                (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1282,20 +1361,21 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
+              uuid: 08d5857e474042b5906288156c8c5d52
               expression: |
-                {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].change()}<0 and {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}>0
+                change(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])>0
                 and
-                ({Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=6
-                or {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].last()}=1)
+                (last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=6
+                or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=1)
                 and
-                ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2)
+                (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                ({Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].change()}>0 and {Linux by Prom:net.if.type[node_exporter,"{#IFNAME}"].prev()}>0) or
-                ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2)
+                (change(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])>0 and last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"],#2)>0) or
+                (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1304,18 +1384,19 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
+              uuid: 11e2c8023463482da878cdad5bb7de76
               expression: |
-                ({Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} or
-                {Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}) and
-                {Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}>0
+                (avg(/Linux by Prom/net.if.in[node_exporter,"{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"]) or
+                avg(/Linux by Prom/net.if.out[node_exporter,"{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])) and
+                last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and
-                {Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+                avg(/Linux by Prom/net.if.in[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"]) and
+                avg(/Linux by Prom/net.if.out[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1323,17 +1404,18 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
+              uuid: 6e8269b2260e42de97aec08043a768df
               expression: |
-                {Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or {Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Linux by Prom/net.if.in.errors[node_exporter,"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Linux by Prom/net.if.out.errors[node_exporter"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and {Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                max(/Linux by Prom/net.if.in.errors[node_exporter,"{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Linux by Prom/net.if.out.errors[node_exporter"{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1341,10 +1423,11 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)'
-                  recovery_expression: '{Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -
+              uuid: cf143a7bb6d548fc9d3b089dcbb47ccf
               name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
               graph_items:
                 -
@@ -1409,6 +1492,7 @@ zabbix_export:
               parameters:
                 - '{__name__=~"^node_network_info$"}'
         -
+          uuid: 920f367e232945b8992d0f32e6f9324d
           name: 'Block devices discovery'
           type: DEPENDENT
           key: 'vfs.dev.discovery[node_exporter]'
@@ -1427,6 +1511,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 0a0949bcdf754fbe82e772ffbd69b5ba
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
               type: DEPENDENT
               key: 'vfs.dev.queue_size[node_exporter,"{#DEVNAME}"]'
@@ -1434,9 +1519,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1449,19 +1531,26 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: 9d158ecffdaa43f6bd0ab867ca68620b
               name: '{#DEVNAME}: Disk read request avg waiting time (r_await)'
               type: CALCULATED
               key: 'vfs.dev.read.await[node_exporter,"{#DEVNAME}"]'
               history: 7d
               value_type: FLOAT
               units: '!ms'
-              params: '(last("vfs.dev.read.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]") > 0)'
+              params: '(last(//vfs.dev.read.time.rate[node_exporter,"{#DEVNAME}"])/(last(//vfs.dev.read.rate[node_exporter,"{#DEVNAME}"])+(last(//vfs.dev.read.rate[node_exporter,"{#DEVNAME}"])=0)))*1000*(last(//vfs.dev.read.rate[node_exporter,"{#DEVNAME}"]) > 0)'
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#DEVNAME}'
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: dcd6f61ffb2f491ba78845514654a8cf
               name: '{#DEVNAME}: Disk read rate'
               type: DEPENDENT
               key: 'vfs.dev.read.rate[node_exporter,"{#DEVNAME}"]'
@@ -1470,9 +1559,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!r/s'
               description: 'r/s. The number (after merges) of read requests completed per second for the device.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1485,7 +1571,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: 73940f30ea2b4b88b0047e54b773b747
               name: '{#DEVNAME}: Disk read time (rate)'
               type: DEPENDENT
               key: 'vfs.dev.read.time.rate[node_exporter,"{#DEVNAME}"]'
@@ -1493,9 +1584,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of total read time counter. Used in r_await calculation'
-              applications:
-                -
-                  name: 'Zabbix raw items'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1508,7 +1596,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
+              uuid: d087a0525500450c9a307ff21f58482a
               name: '{#DEVNAME}: Disk utilization'
               type: DEPENDENT
               key: 'vfs.dev.util[node_exporter,"{#DEVNAME}"]'
@@ -1517,9 +1610,6 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1536,19 +1626,26 @@ zabbix_export:
                     - '100'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: 94203a49081047b6bc76cd66aecd55ce
               name: '{#DEVNAME}: Disk write request avg waiting time (w_await)'
               type: CALCULATED
               key: 'vfs.dev.write.await[node_exporter,"{#DEVNAME}"]'
               history: 7d
               value_type: FLOAT
               units: '!ms'
-              params: '(last("vfs.dev.write.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]") > 0)'
+              params: '(last(//vfs.dev.write.time.rate[node_exporter,"{#DEVNAME}"])/(last(//vfs.dev.write.rate[node_exporter,"{#DEVNAME}"])+(last(//vfs.dev.write.rate[node_exporter,"{#DEVNAME}"])=0)))*1000*(last(//vfs.dev.write.rate[node_exporter,"{#DEVNAME}"]) > 0)'
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#DEVNAME}'
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: 806ba0a56fab4b5094008c98bb817e2b
               name: '{#DEVNAME}: Disk write rate'
               type: DEPENDENT
               key: 'vfs.dev.write.rate[node_exporter,"{#DEVNAME}"]'
@@ -1557,9 +1654,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!w/s'
               description: 'w/s. The number (after merges) of write requests completed per second for the device.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1572,7 +1666,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
+              uuid: 601cc30457934b7f8f050b2cea13ccea
               name: '{#DEVNAME}: Disk write time (rate)'
               type: DEPENDENT
               key: 'vfs.dev.write.time.rate[node_exporter,"{#DEVNAME}"]'
@@ -1580,9 +1679,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of total write time counter. Used in w_await calculation'
-              applications:
-                -
-                  name: 'Zabbix raw items'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1595,15 +1691,21 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
           trigger_prototypes:
             -
-              expression: '{Linux by Prom:vfs.dev.read.await[node_exporter,"{#DEVNAME}"].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Linux by Prom:vfs.dev.write.await[node_exporter,"{#DEVNAME}"].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+              uuid: 412381f71bba441b955898839f81d51c
+              expression: 'min(/Linux by Prom/vfs.dev.read.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or min(/Linux by Prom/vfs.dev.write.await[node_exporter,"{#DEVNAME}"],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
               name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
               description: 'This trigger might indicate disk {#DEVNAME} saturation.'
               manual_close: 'YES'
           graph_prototypes:
             -
+              uuid: 13a5a74a99734449b08075bbb25bb498
               name: '{#DEVNAME}: Disk average waiting time'
               graph_items:
                 -
@@ -1619,6 +1721,7 @@ zabbix_export:
                     host: 'Linux by Prom'
                     key: 'vfs.dev.write.await[node_exporter,"{#DEVNAME}"]'
             -
+              uuid: bad3d3ba32534ef194a4837d666ddccb
               name: '{#DEVNAME}: Disk read/write rates'
               graph_items:
                 -
@@ -1634,6 +1737,7 @@ zabbix_export:
                     host: 'Linux by Prom'
                     key: 'vfs.dev.write.rate[node_exporter,"{#DEVNAME}"]'
             -
+              uuid: aa53b66adaac4e62863ea2dd59ba3ea1
               name: '{#DEVNAME}: Disk utilization and queue'
               graph_items:
                 -
@@ -1664,6 +1768,7 @@ zabbix_export:
               parameters:
                 - 'node_disk_io_now{device=~".+"}'
         -
+          uuid: 85d047920c1342b992fa1905eb489a44
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: 'vfs.fs.discovery[node_exporter]'
@@ -1701,6 +1806,7 @@ zabbix_export:
           description: 'Discovery of file systems of different types.'
           item_prototypes:
             -
+              uuid: 3a3edb8bf5a74a63baa27c64d1a44493
               name: '{#FSNAME}: Free space'
               type: DEPENDENT
               key: 'vfs.fs.free[node_exporter,"{#FSNAME}"]'
@@ -1708,9 +1814,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1719,7 +1822,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
+              uuid: ee1dad3677214561baafa6d930358ee0
               name: '{#FSNAME}: Free inodes in %'
               type: DEPENDENT
               key: 'vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]'
@@ -1727,9 +1835,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_TO_JSON
@@ -1752,9 +1857,14 @@ zabbix_export:
                       return (inode_free/inode_total)*100;
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  uuid: 27cabcc9d9644ba6b7bd8c92a740e3cc
+                  expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1762,7 +1872,8 @@ zabbix_export:
                     It may become impossible to write to disk if there are no index nodes left.
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
                 -
-                  expression: '{min(5m)}<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
+                  uuid: c639215f6dd94c71aebf97265a282a0d
+                  expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1772,20 +1883,23 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
-                      expression: '{Linux by Prom:vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                      expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
             -
+              uuid: 89afe41bb0d74c579a9cff8b036d30dc
               name: '{#FSNAME}: Space utilization'
               type: CALCULATED
               key: 'vfs.fs.pused[node_exporter,"{#FSNAME}"]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '(last("vfs.fs.used[node_exporter,\"{#FSNAME}\"]")/last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]"))*100'
+              params: '(last(//vfs.fs.used[node_exporter,"{#FSNAME}"])/last(//vfs.fs.total[node_exporter,"{#FSNAME}"]))*100'
               description: 'Space utilization in % for {#FSNAME}'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
+              uuid: acb3d42ae23b48cbacd0e99c27697798
               name: '{#FSNAME}: Total space'
               type: DEPENDENT
               key: 'vfs.fs.total[node_exporter,"{#FSNAME}"]'
@@ -1794,9 +1908,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'Total space in Bytes'
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1805,23 +1916,30 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
+              uuid: 89e559a7ff364dd78b638454896692c5
               name: '{#FSNAME}: Used space'
               type: CALCULATED
               key: 'vfs.fs.used[node_exporter,"{#FSNAME}"]'
               history: 7d
               value_type: FLOAT
               units: B
-              params: '(last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]")-last("vfs.fs.free[node_exporter,\"{#FSNAME}\"]"))'
+              params: '(last(//vfs.fs.total[node_exporter,"{#FSNAME}"])-last(//vfs.fs.free[node_exporter,"{#FSNAME}"]))'
               description: 'Used storage in Bytes'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
+              uuid: d5687d7aa0484b389f0bd168d50ee1e6
               expression: |
-                {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                (({Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})<5G or {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}<1d)
+                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
@@ -1832,9 +1950,10 @@ zabbix_export:
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
             -
+              uuid: 8f765148cfd64d5ebda93f39d0b20e36
               expression: |
-                {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                (({Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})<10G or {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}<1d)
+                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<10G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
@@ -1848,10 +1967,11 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
-                    {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    (({Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})<5G or {Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}<1d)
+                    last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
           graph_prototypes:
             -
+              uuid: aa350a426fcd40af96cd15f778cdf62d
               name: '{#FSNAME}: Disk space usage'
               width: '600'
               height: '340'
@@ -2002,253 +2122,483 @@ zabbix_export:
           value: '80'
       dashboards:
         -
+          uuid: 19dac6b780aa49558bf4a3782ba4b3b6
           name: 'Network interfaces'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    host: 'Linux by Prom'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Linux by Prom'
         -
+          uuid: 558606056f464970a7c544ba75d544f2
           name: 'System performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'System load'
+                        host: 'Linux by Prom'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'System load'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU usage'
+                        host: 'Linux by Prom'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: 'Linux by Prom'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'CPU usage'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Memory usage'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Swap usage'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '10'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Swap usage'
+                        host: 'Linux by Prom'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#FSNAME}: Disk space usage'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '15'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#DEVNAME}: Disk read/write rates'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '20'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  'y': '10'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#FSNAME}: Disk space usage'
+                        host: 'Linux by Prom'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#DEVNAME}: Disk average waiting time'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '25'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: '{#DEVNAME}: Disk utilization and queue'
-                    host: 'Linux by Prom'
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '30'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  'y': '15'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#DEVNAME}: Disk read/write rates'
+                        host: 'Linux by Prom'
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    host: 'Linux by Prom'
+                  'y': '20'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#DEVNAME}: Disk average waiting time'
+                        host: 'Linux by Prom'
+                -
+                  type: GRAPH_PROTOTYPE
+                  'y': '25'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: '{#DEVNAME}: Disk utilization and queue'
+                        host: 'Linux by Prom'
+                -
+                  type: GRAPH_PROTOTYPE
+                  'y': '30'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Linux by Prom'
+      valuemaps:
+        -
+          uuid: 4827063819f14d539f509552c84f5f94
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 4d912f1ee95942038f306ddefb3a57b3
+          name: 'Linux::Interface protocol types'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'from KA9Q: NET/ROM pseudo'
+            -
+              value: '1'
+              newvalue: Ethernet
+            -
+              value: '2'
+              newvalue: 'Experimental Ethernet'
+            -
+              value: '3'
+              newvalue: 'AX.25 Level 2'
+            -
+              value: '4'
+              newvalue: 'PROnet token ring'
+            -
+              value: '5'
+              newvalue: Chaosnet
+            -
+              value: '6'
+              newvalue: 'IEEE 802.2 Ethernet/TR/TB'
+            -
+              value: '7'
+              newvalue: ARCnet
+            -
+              value: '8'
+              newvalue: APPLEtalk
+            -
+              value: '15'
+              newvalue: 'Frame Relay DLCI'
+            -
+              value: '19'
+              newvalue: ATM
+            -
+              value: '23'
+              newvalue: 'Metricom STRIP (new IANA id)'
+            -
+              value: '24'
+              newvalue: 'IEEE 1394 IPv4 - RFC 2734'
+            -
+              value: '27'
+              newvalue: EUI-64
+            -
+              value: '32'
+              newvalue: InfiniBand
+            -
+              value: '256'
+              newvalue: ARPHRD_SLIP
+            -
+              value: '257'
+              newvalue: ARPHRD_CSLIP
+            -
+              value: '258'
+              newvalue: ARPHRD_SLIP6
+            -
+              value: '259'
+              newvalue: ARPHRD_CSLIP6
+            -
+              value: '260'
+              newvalue: 'Notional KISS type'
+            -
+              value: '264'
+              newvalue: ARPHRD_ADAPT
+            -
+              value: '270'
+              newvalue: ARPHRD_ROSE
+            -
+              value: '271'
+              newvalue: 'CCITT X.25'
+            -
+              value: '272'
+              newvalue: 'Boards with X.25 in firmware'
+            -
+              value: '280'
+              newvalue: 'Controller Area Network'
+            -
+              value: '512'
+              newvalue: ARPHRD_PPP
+            -
+              value: '513'
+              newvalue: 'Cisco HDLC'
+            -
+              value: '516'
+              newvalue: LAPB
+            -
+              value: '517'
+              newvalue: 'Digital''s DDCMP protocol'
+            -
+              value: '518'
+              newvalue: 'Raw HDLC'
+            -
+              value: '519'
+              newvalue: 'Raw IP'
+            -
+              value: '768'
+              newvalue: 'IPIP tunnel'
+            -
+              value: '769'
+              newvalue: 'IP6IP6 tunnel'
+            -
+              value: '770'
+              newvalue: 'Frame Relay Access Device'
+            -
+              value: '771'
+              newvalue: 'SKIP vif'
+            -
+              value: '772'
+              newvalue: 'Loopback device'
+            -
+              value: '773'
+              newvalue: 'Localtalk device'
+            -
+              value: '774'
+              newvalue: 'Fiber Distributed Data Interface'
+            -
+              value: '775'
+              newvalue: 'AP1000 BIF'
+            -
+              value: '776'
+              newvalue: 'sit0 device - IPv6-in-IPv4'
+            -
+              value: '777'
+              newvalue: 'IP over DDP tunneller'
+            -
+              value: '778'
+              newvalue: 'GRE over IP'
+            -
+              value: '779'
+              newvalue: 'PIMSM register interface'
+            -
+              value: '780'
+              newvalue: 'High Performance Parallel Interface'
+            -
+              value: '781'
+              newvalue: 'Nexus 64Mbps Ash'
+            -
+              value: '782'
+              newvalue: 'Acorn Econet'
+            -
+              value: '783'
+              newvalue: Linux-IrDA
+            -
+              value: '784'
+              newvalue: 'Point to point fibrechannel'
+            -
+              value: '785'
+              newvalue: 'Fibrechannel arbitrated loop'
+            -
+              value: '786'
+              newvalue: 'Fibrechannel public loop'
+            -
+              value: '787'
+              newvalue: 'Fibrechannel fabric'
+            -
+              value: '800'
+              newvalue: 'Magic type ident for TR'
+            -
+              value: '801'
+              newvalue: 'IEEE 802.11'
+            -
+              value: '802'
+              newvalue: 'IEEE 802.11 + Prism2 header'
+            -
+              value: '803'
+              newvalue: 'IEEE 802.11 + radiotap header'
+            -
+              value: '804'
+              newvalue: ARPHRD_IEEE802154
+            -
+              value: '805'
+              newvalue: 'IEEE 802.15.4 network monitor'
+            -
+              value: '820'
+              newvalue: 'PhoNet media type'
+            -
+              value: '821'
+              newvalue: 'PhoNet pipe header'
+            -
+              value: '822'
+              newvalue: 'CAIF media type'
+            -
+              value: '823'
+              newvalue: 'GRE over IPv6'
+            -
+              value: '824'
+              newvalue: 'Netlink header'
+            -
+              value: '825'
+              newvalue: 'IPv6 over LoWPAN'
+            -
+              value: '826'
+              newvalue: 'Vsock monitor header'
   triggers:
     -
-      expression: '{Linux by Prom:system.swap.pfree[node_exporter].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Linux by Prom:system.swap.total[node_exporter].last()}>0'
-      name: 'High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)'
+      uuid: 16e6a4d340164dee9379a3fc0aac0576
+      expression: 'min(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
+      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         -
-          name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
-          expression: '{Linux by Prom:vm.memory.util[node_exporter].min(5m)}>{$MEMORY.UTIL.MAX}'
+          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+          expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-          expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
+          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
     -
-      expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
-      name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      uuid: f78ed17586964a46a9de0c4f183984f6
+      expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -
+      uuid: e5897641e5594bf6b7b18ae4e107bd50
       expression: |
-        {Linux by Prom:system.cpu.load.avg1[node_exporter].min(5m)}/{Linux by Prom:system.cpu.num[node_exporter].last()}>{$LOAD_AVG_PER_CPU.MAX.WARN}
-        and {Linux by Prom:system.cpu.load.avg5[node_exporter].last()}>0
-        and {Linux by Prom:system.cpu.load.avg15[node_exporter].last()}>0
+        min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
+        and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
+        and last(/Linux by Prom/system.cpu.load.avg15[node_exporter])>0
       name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'
     -
-      expression: '{Linux by Prom:fd.open[node_exporter].last()}/{Linux by Prom:kernel.maxfiles[node_exporter].last()}*100>80'
+      uuid: 7effa63c9c994a6786279802aa7328ad
+      expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
       name: 'Running out of file descriptors (less than < 20% free)'
       opdata: '{ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} file descriptors are in use.'
       priority: WARNING
   graphs:
     -
+      uuid: bb8bb267b32b46bfa2a6277b65730396
       name: 'CPU jumps'
       graph_items:
         -
@@ -2263,6 +2613,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'system.cpu.intr[node_exporter]'
     -
+      uuid: 09ebf28dc8504ab2bfd07130d1f6ca91
       name: 'CPU usage'
       type: STACKED
       ymin_type_1: FIXED
@@ -2322,6 +2673,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'system.cpu.guest_nice[node_exporter]'
     -
+      uuid: 9cd184535b6b4fd5978a302bdedeac0b
       name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -2333,6 +2685,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'system.cpu.util[node_exporter]'
     -
+      uuid: 1383a8b57e6743de946c8a43016ee2f7
       name: 'Memory usage'
       ymin_type_1: FIXED
       graph_items:
@@ -2350,6 +2703,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'vm.memory.available[node_exporter]'
     -
+      uuid: 81e79ef1219a4c48af1f740017bbde6a
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -2361,6 +2715,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'vm.memory.util[node_exporter]'
     -
+      uuid: 567684533d2442b286119c7d392e2bb7
       name: 'Swap usage'
       graph_items:
         -
@@ -2375,6 +2730,7 @@ zabbix_export:
             host: 'Linux by Prom'
             key: 'system.swap.total[node_exporter]'
     -
+      uuid: f9cbf136d01040ffa18753fb40d55f79
       name: 'System load'
       ymin_type_1: FIXED
       graph_items:
@@ -2402,220 +2758,3 @@ zabbix_export:
           item:
             host: 'Linux by Prom'
             key: 'system.cpu.num[node_exporter]'
-  value_maps:
-    -
-      name: 'IF-MIB::ifOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: up
-        -
-          value: '2'
-          newvalue: down
-        -
-          value: '4'
-          newvalue: unknown
-        -
-          value: '5'
-          newvalue: dormant
-        -
-          value: '6'
-          newvalue: notPresent
-        -
-          value: '7'
-          newvalue: lowerLayerDown
-    -
-      name: 'Linux::Interface protocol types'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'from KA9Q: NET/ROM pseudo'
-        -
-          value: '1'
-          newvalue: Ethernet
-        -
-          value: '2'
-          newvalue: 'Experimental Ethernet'
-        -
-          value: '3'
-          newvalue: 'AX.25 Level 2'
-        -
-          value: '4'
-          newvalue: 'PROnet token ring'
-        -
-          value: '5'
-          newvalue: Chaosnet
-        -
-          value: '6'
-          newvalue: 'IEEE 802.2 Ethernet/TR/TB'
-        -
-          value: '7'
-          newvalue: ARCnet
-        -
-          value: '8'
-          newvalue: APPLEtalk
-        -
-          value: '15'
-          newvalue: 'Frame Relay DLCI'
-        -
-          value: '19'
-          newvalue: ATM
-        -
-          value: '23'
-          newvalue: 'Metricom STRIP (new IANA id)'
-        -
-          value: '24'
-          newvalue: 'IEEE 1394 IPv4 - RFC 2734'
-        -
-          value: '27'
-          newvalue: EUI-64
-        -
-          value: '32'
-          newvalue: InfiniBand
-        -
-          value: '256'
-          newvalue: ARPHRD_SLIP
-        -
-          value: '257'
-          newvalue: ARPHRD_CSLIP
-        -
-          value: '258'
-          newvalue: ARPHRD_SLIP6
-        -
-          value: '259'
-          newvalue: ARPHRD_CSLIP6
-        -
-          value: '260'
-          newvalue: 'Notional KISS type'
-        -
-          value: '264'
-          newvalue: ARPHRD_ADAPT
-        -
-          value: '270'
-          newvalue: ARPHRD_ROSE
-        -
-          value: '271'
-          newvalue: 'CCITT X.25'
-        -
-          value: '272'
-          newvalue: 'Boards with X.25 in firmware'
-        -
-          value: '280'
-          newvalue: 'Controller Area Network'
-        -
-          value: '512'
-          newvalue: ARPHRD_PPP
-        -
-          value: '513'
-          newvalue: 'Cisco HDLC'
-        -
-          value: '516'
-          newvalue: LAPB
-        -
-          value: '517'
-          newvalue: 'Digital''s DDCMP protocol'
-        -
-          value: '518'
-          newvalue: 'Raw HDLC'
-        -
-          value: '519'
-          newvalue: 'Raw IP'
-        -
-          value: '768'
-          newvalue: 'IPIP tunnel'
-        -
-          value: '769'
-          newvalue: 'IP6IP6 tunnel'
-        -
-          value: '770'
-          newvalue: 'Frame Relay Access Device'
-        -
-          value: '771'
-          newvalue: 'SKIP vif'
-        -
-          value: '772'
-          newvalue: 'Loopback device'
-        -
-          value: '773'
-          newvalue: 'Localtalk device'
-        -
-          value: '774'
-          newvalue: 'Fiber Distributed Data Interface'
-        -
-          value: '775'
-          newvalue: 'AP1000 BIF'
-        -
-          value: '776'
-          newvalue: 'sit0 device - IPv6-in-IPv4'
-        -
-          value: '777'
-          newvalue: 'IP over DDP tunneller'
-        -
-          value: '778'
-          newvalue: 'GRE over IP'
-        -
-          value: '779'
-          newvalue: 'PIMSM register interface'
-        -
-          value: '780'
-          newvalue: 'High Performance Parallel Interface'
-        -
-          value: '781'
-          newvalue: 'Nexus 64Mbps Ash'
-        -
-          value: '782'
-          newvalue: 'Acorn Econet'
-        -
-          value: '783'
-          newvalue: Linux-IrDA
-        -
-          value: '784'
-          newvalue: 'Point to point fibrechannel'
-        -
-          value: '785'
-          newvalue: 'Fibrechannel arbitrated loop'
-        -
-          value: '786'
-          newvalue: 'Fibrechannel public loop'
-        -
-          value: '787'
-          newvalue: 'Fibrechannel fabric'
-        -
-          value: '800'
-          newvalue: 'Magic type ident for TR'
-        -
-          value: '801'
-          newvalue: 'IEEE 802.11'
-        -
-          value: '802'
-          newvalue: 'IEEE 802.11 + Prism2 header'
-        -
-          value: '803'
-          newvalue: 'IEEE 802.11 + radiotap header'
-        -
-          value: '804'
-          newvalue: ARPHRD_IEEE802154
-        -
-          value: '805'
-          newvalue: 'IEEE 802.15.4 network monitor'
-        -
-          value: '820'
-          newvalue: 'PhoNet media type'
-        -
-          value: '821'
-          newvalue: 'PhoNet pipe header'
-        -
-          value: '822'
-          newvalue: 'CAIF media type'
-        -
-          value: '823'
-          newvalue: 'GRE over IPv6'
-        -
-          value: '824'
-          newvalue: 'Netlink header'
-        -
-          value: '825'
-          newvalue: 'IPv6 over LoWPAN'
-        -
-          value: '826'
-          newvalue: 'Vsock monitor header'

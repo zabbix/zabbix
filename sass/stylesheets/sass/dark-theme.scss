@@ -3,6 +3,7 @@ $theme-name: 'dark';
 // Notification & Alert.
 $red: #e45959;
 $light-red: #503434;
+$lighter-red: #433131;
 
 $dark-yellow: #e99003;
 $yellow: #a78820;
@@ -178,6 +179,10 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+// Import compare.
+$toc-title-color: #f2f2f2;
+$toc-title-bg-color: #4f4f4f;
+
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -234,34 +239,41 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+.dashboard-navigation-tabs {
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		border: 1px solid transparent;
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
 
-.dashbrd-grid-widget {
-	&.dashbrd-grid-widget-hidden-header {
-		&.dashbrd-grid-widget-focus {
-			.dashbrd-grid-widget-head {
+.dashboard-grid-widget {
+	&.dashboard-grid-widget-hidden-header {
+		&.dashboard-grid-widget-focus {
+			.dashboard-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 			}
 		}
 	}
 }
 
-.dashbrd-grid-iterator {
-	&.dashbrd-grid-iterator-focus {
-		.dashbrd-grid-iterator-head {
+.dashboard-grid-iterator {
+	&.dashboard-grid-iterator-focus {
+		.dashboard-grid-iterator-head {
 			box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 		}
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
-	.dashbrd-grid-widget {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 				}
 			}
@@ -273,19 +285,19 @@ $multiselect-selected-bg-color: #696969;
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
 
-			.dashbrd-grid-widget-head {
+			.dashboard-grid-widget-head {
 				border-color: $ui-border-color;
 			}
 
-			.dashbrd-grid-widget-content {
+			.dashboard-grid-widget-content {
 				border-color: $ui-border-color;
 			}
 		}
 	}
 
-	.dashbrd-grid-iterator {
+	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 			}
 		}
@@ -296,33 +308,33 @@ $multiselect-selected-bg-color: #696969;
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
 
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				border-color: $ui-border-color;
 			}
 
-			.dashbrd-grid-iterator-content {
-				.dashbrd-grid-widget {
-					.dashbrd-grid-widget-head {
+			.dashboard-grid-iterator-content {
+				.dashboard-grid-widget {
+					.dashboard-grid-widget-head {
 						border-color: $ui-border-color;
 					}
 
-					.dashbrd-grid-widget-content {
+					.dashboard-grid-widget-content {
 						border-color: $ui-border-color;
 					}
 				}
 
-				.dashbrd-grid-iterator-placeholder > div {
+				.dashboard-grid-iterator-placeholder > div {
 					border-color: $ui-border-color;
 				}
 			}
 
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 0;
 			}
 		}
 	}
 
-	.dashbrd-grid-widget-placeholder > div {
+	.dashboard-grid-widget-placeholder > div {
 		background-color: darken($ui-bg-color, 3%) !important;
 	}
 }

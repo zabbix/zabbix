@@ -52,11 +52,11 @@ class CControllerTemplateDashboardList extends CController {
 	}
 
 	protected function doAction() {
-		$sort_field = $this->getInput('sort', CProfile::get('web.templates.dashbrd.list.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.templates.dashboard.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.dashboard.list.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.templates.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.templates.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.dashboard.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.dashboard.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 

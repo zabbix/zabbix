@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
- * @on-before prepareInterfacesData
+ * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
 
@@ -58,7 +58,7 @@ class testPageHostInterfaces extends CWebTest {
 				'main' => 1,
 				'useip' => 1,
 				'ip' => '127.0.0.98',
-				'dns' => 'snmpv2zabbix.com',
+				'dns' => 'snmpv3zabbix.com',
 				'port' => '163',
 				'details' => [
 					'version' => '3',
@@ -70,9 +70,25 @@ class testPageHostInterfaces extends CWebTest {
 			[
 				'type' => 2,
 				'main' => 0,
+				'useip' => 0,
+				'ip' => '',
+				'dns' => 'snmpv3auth.com',
+				'port' => '163',
+				'details' => [
+					'version' => '3',
+					'bulk' => '1',
+					'securitylevel' => 2,
+					'authprotocol' => 2,
+					'privprotocol' => 4
+				],
+				'available' => 1
+			],
+			[
+				'type' => 2,
+				'main' => 0,
 				'useip' => 1,
 				'ip' => '127.0.0.99',
-				'dns' => 'snmpv3zabbix.com',
+				'dns' => 'snmpv2zabbix.com',
 				'port' => '162',
 				'details' => [
 					'version' => '2',
@@ -223,6 +239,14 @@ class testPageHostInterfaces extends CWebTest {
 									'Status' => [
 										'text' => 'Not available',
 										'color' => self::RED
+									],
+									'Error' => ''
+								],
+								[
+									'Interface' => "snmpv3auth.com:163\nSNMPv3, Context name: , (priv: AES192C, auth: SHA224)",
+									'Status' => [
+										'text' => 'Available',
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]

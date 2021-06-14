@@ -86,10 +86,13 @@ class CAPIHelper {
 
 		if ($response !== false) {
 			$debug['response'] = $response;
-			$response = json_decode($response, true);
 
-			if (!is_array($response)) {
-				throw new Exception('API response is not in JSON format');
+			if ($response !== '') {
+				$response = json_decode($response, true);
+
+				if (!is_array($response)) {
+					throw new Exception('API response is not in JSON format');
+				}
 			}
 		}
 		else {
@@ -162,15 +165,15 @@ class CAPIHelper {
 	/**
 	 * Authorize as user.
 	 *
-	 * @param string $user        username to be used for authorization.
-	 * @param string $password    password.
+	 * @param string $username
+	 * @param string $password
 	 *
 	 * @returns CAPIHelper
 	 */
-	public static function authorize($user, $password) {
+	public static function authorize(string $username, string $password) {
 		static::$session = false;
 
-		$result = static::call('user.login', ['user' => $user, 'password' => $password]);
+		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {
 			static::setSessionId($result['result']);
 		}

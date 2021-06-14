@@ -19,6 +19,6 @@ class Module extends CModule {
 		$menu
 			->find('Monitoring')
 			->getSubMenu()
-			->remove('Screens');
+			->remove('Maps');
 	}
 }

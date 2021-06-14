@@ -32,7 +32,7 @@ class CDashboardHelper {
 	 */
 	public static function getOwnerName($userid): string {
 		$users = API::User()->get([
-			'output' => ['name', 'surname', 'alias'],
+			'output' => ['name', 'surname', 'username'],
 			'userids' => $userid
 		]);
 
@@ -63,29 +63,35 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Prepare widgets for dashboard grid.
+	 * Prepare widget pages for dashboard grid.
 	 *
 	 * @static
 	 *
-	 * @param array  $widgets
+	 * @param array  $pages
 	 * @param string $templateid
 	 * @param bool   $with_rf_rate
 	 *
 	 * @return array
 	 */
-	public static function prepareWidgetsForGrid(array $widgets, ?string $templateid, bool $with_rf_rate): array {
-		$grid_widgets = [];
+	public static function preparePagesForGrid(array $pages, ?string $templateid, bool $with_rf_rate): array {
+		if (!$pages) {
+			return [];
+		}
 
-		if ($widgets) {
-			CArrayHelper::sort($widgets, ['y', 'x']);
+		$grid_pages = [];
 
-			$context = ($templateid === null)
-				? CWidgetConfig::CONTEXT_DASHBOARD
-				: CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD;
+		$context = ($templateid === null)
+			? CWidgetConfig::CONTEXT_DASHBOARD
+			: CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD;
 
-			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes($context));
+		$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes($context));
 
-			foreach ($widgets as $widget) {
+		foreach ($pages as $page) {
+			$grid_page_widgets = [];
+
+			CArrayHelper::sort($page['widgets'], ['y', 'x']);
+
+			foreach ($page['widgets'] as $widget) {
 				if (!in_array($widget['type'], $known_widget_types)) {
 					continue;
 				}
@@ -99,7 +105,7 @@ class CDashboardHelper {
 				$fields = $widget_form->getFieldsData();
 
 				if ($with_rf_rate) {
-					$rf_rate = (int) CProfile::get('web.dashbrd.widget.rf_rate', -1, $widgetid);
+					$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widgetid);
 
 					if ($rf_rate == -1) {
 						if ($context === CWidgetConfig::CONTEXT_DASHBOARD) {
@@ -116,10 +122,10 @@ class CDashboardHelper {
 					$rf_rate = 0;
 				}
 
-				$grid_widgets[] = [
+				$grid_page_widgets[] = [
 					'widgetid' => $widgetid,
 					'type' => $widget['type'],
-					'header' => $widget['name'],
+					'name' => $widget['name'],
 					'view_mode' => $widget['view_mode'],
 					'pos' => [
 						'x' => (int) $widget['x'],
@@ -132,24 +138,32 @@ class CDashboardHelper {
 					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
 				];
 			}
+
+			$grid_pages[] = [
+				'dashboard_pageid' => $page['dashboard_pageid'],
+				'name' => $page['name'],
+				'display_period' => $page['display_period'],
+				'widgets' => $grid_page_widgets
+			];
 		}
 
-		return $grid_widgets;
+		return $grid_pages;
 	}
 
 	/**
-	 * Returns array of widgets without inaccessible fields.
+	 * Get widget pages with inaccessible fields unset.
 	 *
 	 * @static
 	 *
-	 * @param array $widgets
-	 * @param array $widgets[]['fields']
-	 * @param array $widgets[]['fields'][]['type']
-	 * @param array $widgets[]['fields'][]['value']
+	 * @param array $pages
+	 * @param array $pages[]['widgets']
+	 * @param array $pages[]['widgets'][]['fields']
+	 * @param array $pages[]['widgets'][]['fields'][]['type']
+	 * @param array $pages[]['widgets'][]['fields'][]['value']
 	 *
 	 * @return array
 	 */
-	public static function unsetInaccessibleFields(array $widgets): array {
+	public static function unsetInaccessibleFields(array $pages): array {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
@@ -160,9 +174,13 @@ class CDashboardHelper {
 			ZBX_WIDGET_FIELD_TYPE_MAP => []
 		];
 
-		foreach ($widgets as $w_index => $widget) {
-			foreach ($widget['fields'] as $f_index => $field) {
-				$ids[$field['type']][$field['value']][] = ['w' => $w_index, 'f' => $f_index];
+		foreach ($pages as $p_index => $page) {
+			foreach ($page['widgets'] as $w_index => $widget) {
+				foreach ($widget['fields'] as $f_index => $field) {
+					if (array_key_exists($field['type'], $ids)) {
+						$ids[$field['type']][$field['value']][] = ['p' => $p_index, 'w' => $w_index, 'f' => $f_index];
+					}
+				}
 			}
 		}
 
@@ -268,10 +286,10 @@ class CDashboardHelper {
 		}
 
 		foreach ($inaccessible_indexes as $index) {
-			unset($widgets[$index['w']]['fields'][$index['f']]);
+			unset($pages[$index['p']]['widgets'][$index['w']]['fields'][$index['f']]);
 		}
 
-		return $widgets;
+		return $pages;
 	}
 
 	/**
@@ -304,14 +322,16 @@ class CDashboardHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $widgets
+	 * @param array $pages
 	 *
 	 * @return bool
 	 */
-	public static function hasTimeSelector(array $widgets): bool {
-		foreach ($widgets as $widget) {
-			if (CWidgetConfig::usesTimeSelector($widget)) {
-				return true;
+	public static function hasTimeSelector(array $pages): bool {
+		foreach ($pages as $page) {
+			foreach ($page['widgets'] as $widget) {
+				if (CWidgetConfig::usesTimeSelector($widget['type'], $widget['fields'])) {
+					return true;
+				}
 			}
 		}
 
@@ -319,93 +339,110 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Validate widget input parameters.
+	 * Validate input parameters of dashboard pages.
 	 *
 	 * @static
 	 *
-	 * @var array  $widgets
-	 * @var string $widget[]['widgetid']       (optional)
-	 * @var array  $widget[]['pos']
-	 * @var int    $widget[]['pos']['x']
-	 * @var int    $widget[]['pos']['y']
-	 * @var int    $widget[]['pos']['width']
-	 * @var int    $widget[]['pos']['height']
-	 * @var string $widget[]['type']
-	 * @var string $widget[]['name']
-	 * @var string $widget[]['fields']         (optional) JSON object
+	 * @var array  $dashboard_pages
+	 * @var array  $dashboard_pages[]['widgets']
+	 * @var string $dashboard_pages[]['widgets'][]['widgetid']       (optional)
+	 * @var array  $dashboard_pages[]['widgets'][]['pos']
+	 * @var int    $dashboard_pages[]['widgets'][]['pos']['x']
+	 * @var int    $dashboard_pages[]['widgets'][]['pos']['y']
+	 * @var int    $dashboard_pages[]['widgets'][]['pos']['width']
+	 * @var int    $dashboard_pages[]['widgets'][]['pos']['height']
+	 * @var string $dashboard_pages[]['widgets'][]['type']
+	 * @var string $dashboard_pages[]['widgets'][]['name']
+	 * @var string $dashboard_pages[]['widgets'][]['fields']         (optional) JSON object
 	 *
 	 * @return array  Widgets and/or errors.
 	 */
-	public static function validateWidgets(array $widgets, string $templateid = null): array {
+	public static function validateDashboardPages(array $dashboard_pages, string $templateid = null): array {
 		$errors = [];
 
-		foreach ($widgets as $index => &$widget) {
-			$widget_errors = [];
+		foreach ($dashboard_pages as $dashboard_page_index => &$dashboard_page) {
+			$dashboard_page_errors = [];
 
-			if (!array_key_exists('pos', $widget)) {
-				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-					_s('the parameter "%1$s" is missing', 'pos')
-				);
-			}
-			else {
-				foreach (['x', 'y', 'width', 'height'] as $field) {
-					if (!is_array($widget['pos']) || !array_key_exists($field, $widget['pos'])) {
-						$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
-							_s('the parameter "%1$s" is missing', $field)
-						);
-					}
+			foreach (['name', 'display_period'] as $field) {
+				if (!array_key_exists($field, $dashboard_page)) {
+					$dashboard_page_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'pages['.$dashboard_page_index.']',
+						_s('the parameter "%1$s" is missing', $field)
+					);
 				}
 			}
 
-			if (!array_key_exists('type', $widget)) {
-				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-					_s('the parameter "%1$s" is missing', 'type')
-				);
-			}
-
-			if (!array_key_exists('name', $widget)) {
-				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-					_s('the parameter "%1$s" is missing', 'name')
-				);
-			}
-
-			if (!array_key_exists('view_mode', $widget)) {
-				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-					_s('the parameter "%1$s" is missing', 'view_mode')
-				);
-			}
-
-			if ($widget_errors) {
-				$errors = array_merge($errors, $widget_errors);
+			if ($dashboard_page_errors) {
+				$errors = array_merge($errors, $dashboard_page_errors);
 
 				break;
 			}
 
-			$widget_fields = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
-			$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget_fields, $templateid);
-			unset($widget['fields']);
+			if (!array_key_exists('widgets', $dashboard_page)) {
+				$dashboard_page['widgets'] = [];
+			}
 
-			if ($widget_errors = $widget['form']->validate()) {
-				if ($widget['name'] === '') {
-					$context = $this->hasInput('templateid')
-						? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-						: CWidgetConfig::CONTEXT_DASHBOARD;
+			foreach ($dashboard_page['widgets'] as $widget_index => &$widget) {
+				$widget_errors = [];
 
-					$widget_name = CWidgetConfig::getKnownWidgetTypes($context)[$widget['type']];
+				if (!array_key_exists('pos', $widget)) {
+					$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.',
+						'pages['.$dashboard_page_index.'][widgets]['.$widget_index.']',
+						_s('the parameter "%1$s" is missing', 'pos')
+					);
 				}
 				else {
-					$widget_name = $widget['name'];
+					foreach (['x', 'y', 'width', 'height'] as $field) {
+						if (!is_array($widget['pos']) || !array_key_exists($field, $widget['pos'])) {
+							$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.',
+								'pages['.$dashboard_page_index.'][widgets]['.$widget_index.'][pos]',
+								_s('the parameter "%1$s" is missing', $field)
+							);
+						}
+					}
 				}
 
-				foreach ($widget_errors as $error) {
-					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '.$error;
+				foreach (['type', 'name', 'view_mode'] as $field) {
+					if (!array_key_exists($field, $widget)) {
+						$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.',
+							'pages['.$dashboard_page_index.'][widgets]['.$widget_index.']',
+							_s('the parameter "%1$s" is missing', $field)
+						);
+					}
+				}
+
+				if ($widget_errors) {
+					$errors = array_merge($errors, $widget_errors);
+
+					break 2;
+				}
+
+				$widget_fields = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
+				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget_fields, $templateid);
+				unset($widget['fields']);
+
+				if ($widget_errors = $widget['form']->validate()) {
+					if ($widget['name'] === '') {
+						$context = $templateid !== null
+							? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+							: CWidgetConfig::CONTEXT_DASHBOARD;
+
+						$widget_name = CWidgetConfig::getKnownWidgetTypes($context)[$widget['type']];
+					}
+					else {
+						$widget_name = $widget['name'];
+					}
+
+					foreach ($widget_errors as $error) {
+						$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '.$error;
+					}
 				}
 			}
+			unset($widget);
 		}
-		unset($widget);
+		unset($dashboard_page);
 
 		return [
-			'widgets' => $widgets,
+			'dashboard_pages' => $dashboard_pages,
 			'errors' => $errors
 		];
 	}
@@ -423,18 +460,18 @@ class CDashboardHelper {
 	 */
 	public static function prepareForClone(array $dashboards, $templateid): array {
 		foreach ($dashboards as &$dashboard) {
-			// Remove dashboard id.
-			unset($dashboard['dashboardid']);
-			// Replace template id.
+			unset($dashboard['dashboardid'], $dashboard['uuid']);
+
 			$dashboard['templateid'] = $templateid;
 
-			if ($dashboard['widgets']) {
-				foreach ($dashboard['widgets'] as &$widget) {
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				unset($dashboard_page['dashboard_pageid']);
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					unset($widget['widgetid']);
+
 					$items = [];
 					$graphs = [];
-
-					// Remove widget id from array.
-					unset($widget['widgetid']);
 
 					foreach ($widget['fields'] as $field) {
 						switch ($field['type']) {
@@ -495,6 +532,7 @@ class CDashboardHelper {
 				}
 				unset ($widget);
 			}
+			unset($dashboard_page);
 		}
 		unset($dashboard);
 

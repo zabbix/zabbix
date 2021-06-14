@@ -1,13 +1,15 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:32:59Z'
+  version: '5.4'
+  date: '2021-05-11T08:04:12Z'
   groups:
     -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     -
-      template: Docker
-      name: Docker
+      uuid: c5fd214cdd0d4b3b8272e73b022ba5c2
+      template: 'Docker by Zabbix agent 2'
+      name: 'Docker by Zabbix agent 2'
       description: |
         Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         
@@ -17,13 +19,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Docker
-        -
-          name: 'Zabbix raw items'
       items:
         -
+          uuid: 1d77b27beba04822a67bdedac22ec522
           name: 'Docker: Architecture'
           type: DEPENDENT
           key: docker.architecture
@@ -31,9 +29,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -45,7 +40,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 32c441b73b90400fa0e6972798ae1f4c
           name: 'Docker: Cgroup driver'
           type: DEPENDENT
           key: docker.cgroup_driver
@@ -53,9 +53,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -67,25 +64,29 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 6edcd2fbe7c446738d323ce7f1c11810
           name: 'Docker: Get containers'
           key: docker.containers
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 75f55b1f18c54af6ad0b3045cb230bd3
           name: 'Docker: Containers paused'
           type: DEPENDENT
           key: docker.containers.paused
           delay: '0'
           history: 7d
           description: 'Total number of containers paused on this host'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -93,16 +94,18 @@ zabbix_export:
                 - $.ContainersPaused
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 976bf10901404fd290b6628af437e8e4
           name: 'Docker: Containers running'
           type: DEPENDENT
           key: docker.containers.running
           delay: '0'
           history: 7d
           description: 'Total number of containers running on this host'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -110,16 +113,18 @@ zabbix_export:
                 - $.ContainersRunning
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 40179a84ffd14742b9df87f48a2eaa90
           name: 'Docker: Containers stopped'
           type: DEPENDENT
           key: docker.containers.stopped
           delay: '0'
           history: 7d
           description: 'Total number of containers stopped on this host'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -127,16 +132,18 @@ zabbix_export:
                 - $.ContainersStopped
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: cacbbf17fd0144c79ecdcbf9e3ef9290
           name: 'Docker: Containers total'
           type: DEPENDENT
           key: docker.containers.total
           delay: '0'
           history: 7d
           description: 'Total number of containers on this host'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -144,16 +151,18 @@ zabbix_export:
                 - $.Containers
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 4d116791a88d4d4e8dd4a9013f9bc39f
           name: 'Docker: Containers size'
           type: DEPENDENT
           key: docker.containers_size
           delay: '0'
           history: 7d
           units: B
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -161,16 +170,18 @@ zabbix_export:
                 - '$.Containers[*].SizeRw.sum()'
           master_item:
             key: docker.data_usage
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: fcf42585b871488f91a92d04b0cc748d
           name: 'Docker: CPU CFS Period enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_period.enabled
           delay: '0'
           history: 7d
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -188,16 +199,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 54d3fa0099f24f75a6a414b7caf1b85a
           name: 'Docker: CPU CFS Quota enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_quota.enabled
           delay: '0'
           history: 7d
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -215,16 +228,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: ceddc2b06f4a4cb4acec3dc74c02ce3f
           name: 'Docker: CPU Set enabled'
           type: DEPENDENT
           key: docker.cpu_set.enabled
           delay: '0'
           history: 7d
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -242,16 +257,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 2ad923020baf48c5a43f6c875ad45561
           name: 'Docker: CPU Shares enabled'
           type: DEPENDENT
           key: docker.cpu_shares.enabled
           delay: '0'
           history: 7d
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -269,24 +286,28 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 4f7221691d494c60b40abb6dd5c14719
           name: 'Docker: Get data_usage'
           key: docker.data_usage
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 0a258c42f6aa4eeeb355fec491710764
           name: 'Docker: Debug enabled'
           type: DEPENDENT
           key: docker.debug.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -304,7 +325,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: edb61f5ce3504f57bf32ddf2e50e4e3d
           name: 'Docker: Default runtime'
           type: DEPENDENT
           key: docker.default_runtime
@@ -312,9 +338,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -326,7 +349,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 1ce2471ca651487288ad1aef9286da5f
           name: 'Docker: Storage driver'
           type: DEPENDENT
           key: docker.driver
@@ -337,9 +365,6 @@ zabbix_export:
           description: |
             Docker storage driver 
              https://docs.docker.com/storage/storagedriver/
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -351,16 +376,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 14a7686d3bd74533aa8406297d419dfd
           name: 'Docker: Goroutines'
           type: DEPENDENT
           key: docker.goroutines
           delay: '0'
           history: 7d
           description: 'Number of goroutines'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -368,25 +395,29 @@ zabbix_export:
                 - $.NGoroutines
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 8b2be6316b8d4d019443062f0809b579
           name: 'Docker: Get images'
           key: docker.images
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: ab4a4d92e4c04ff685b687cf14414b06
           name: 'Docker: Images available'
           type: DEPENDENT
           key: docker.images.top_level
           delay: '0'
           history: 7d
           description: 'Number of top-level images'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -394,16 +425,18 @@ zabbix_export:
                 - $.length()
           master_item:
             key: docker.images
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: d83337b0ea2c4f16be4b5b9c3a48755b
           name: 'Docker: Images total'
           type: DEPENDENT
           key: docker.images.total
           delay: '0'
           history: 7d
           description: 'Number of images with intermediate image layers'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -411,16 +444,18 @@ zabbix_export:
                 - $.Images
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: bf4f531b727c47f0aa30de14d4b41b49
           name: 'Docker: Images size'
           type: DEPENDENT
           key: docker.images_size
           delay: '0'
           history: 7d
           units: B
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -428,24 +463,28 @@ zabbix_export:
                 - '$.Images[*].Size.sum()'
           master_item:
             key: docker.data_usage
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 3d8265e0495d4cbe97535f281a957b3e
           name: 'Docker: Get info'
           key: docker.info
           history: '0'
           trends: '0'
           value_type: TEXT
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
+          uuid: 3545c86b7db9494c94dcda09386ac827
           name: 'Docker: IPv4 Forwarding enabled'
           type: DEPENDENT
           key: docker.ipv4_forwarding.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -463,15 +502,17 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: cb1e486a170b4d668a77d0918f22e51c
           name: 'Docker: Kernel memory enabled'
           type: DEPENDENT
           key: docker.kernel_mem.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -489,15 +530,17 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 77a61a63d6ed4583a0c39ce377b11d4f
           name: 'Docker: Kernel memory TCP enabled'
           type: DEPENDENT
           key: docker.kernel_mem_tcp.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -515,7 +558,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: d645713e25c74686a47cf859725e655f
           name: 'Docker: Kernel version'
           type: DEPENDENT
           key: docker.kernel_version
@@ -523,9 +571,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -537,16 +582,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 2f512e64ba414e86806f19c0be803a3e
           name: 'Docker: Layers size'
           type: DEPENDENT
           key: docker.layers_size
           delay: '0'
           history: 7d
           units: B
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -554,15 +601,17 @@ zabbix_export:
                 - $.LayersSize
           master_item:
             key: docker.data_usage
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 671cd65ddae046f5ba9b0f83241976ac
           name: 'Docker: Live restore enabled'
           type: DEPENDENT
           key: docker.live_restore.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -580,7 +629,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: be0cb2d07d12497b8b411e094fed6087
           name: 'Docker: Logging driver'
           type: DEPENDENT
           key: docker.logging_driver
@@ -588,9 +642,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -602,16 +653,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: e0da86d370a049e3a2d6a82e49ea1f37
           name: 'Docker: Memory total'
           type: DEPENDENT
           key: docker.mem.total
           delay: '0'
           history: 7d
           units: B
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -619,15 +672,17 @@ zabbix_export:
                 - $.MemTotal
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: b08c91f28e094c4faa3e004d3fb3057d
           name: 'Docker: Memory limit enabled'
           type: DEPENDENT
           key: docker.mem_limit.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -645,7 +700,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 812a6b9902a44dd7a803c7218555afe7
           name: 'Docker: Name'
           type: DEPENDENT
           key: docker.name
@@ -653,9 +713,6 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -663,9 +720,14 @@ zabbix_export:
                 - $.Name
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
           triggers:
             -
-              expression: '{nodata(30m)}=1'
+              uuid: 2c62bb4d95684e6984447027d117ff4d
+              expression: 'nodata(/Docker by Zabbix agent 2/docker.name,30m)=1'
               name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
@@ -673,16 +735,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Docker: Service is down'
-                  expression: '{Docker:docker.ping.last()}=0'
+                  expression: last(/Docker by Zabbix agent 2/docker.ping)=0
         -
+          uuid: 5e4999067e6948f893dc465f8e5a2b5f
           name: 'Docker: NCPU'
           type: DEPENDENT
           key: docker.ncpu
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -690,15 +750,17 @@ zabbix_export:
                 - $.NCPU
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: f64919a3a5dc4f429f2992eb7ae5223c
           name: 'Docker: NEvents listener'
           type: DEPENDENT
           key: docker.nevents_listener
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -706,16 +768,18 @@ zabbix_export:
                 - $.NEventsListener
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: ce025599e68d447f9a1f5c076502e2f2
           name: 'Docker: Nfd'
           type: DEPENDENT
           key: docker.nfd
           delay: '0'
           history: 7d
           description: 'Number of used File Descriptors'
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -723,15 +787,17 @@ zabbix_export:
                 - $.NFd
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: e164279251ce471abaae599bf1885bbb
           name: 'Docker: OomKill disabled'
           type: DEPENDENT
           key: docker.oomkill.disabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -749,7 +815,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 78a5af9aa6a741d4ac976d0949414b68
           name: 'Docker: Operating system'
           type: DEPENDENT
           key: docker.operating_system
@@ -757,9 +828,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -771,7 +839,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 3acc93aa0fe64696a5560adcb3dd5acc
           name: 'Docker: OS type'
           type: DEPENDENT
           key: docker.os_type
@@ -779,9 +852,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -793,15 +863,17 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 58ecaf4ae7f04316b6bf019cabadfd3e
           name: 'Docker: Pids limit enabled'
           type: DEPENDENT
           key: docker.pids_limit.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -817,13 +889,15 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 3c8f26e4b80f4356bde061ccddb95f2c
           name: 'Docker: Ping'
           key: docker.ping
           history: 7h
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -831,13 +905,19 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Docker
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: a4f00b4d25b54acfa61475c94651d8a5
+              expression: last(/Docker by Zabbix agent 2/docker.ping)=0
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
         -
+          uuid: 864eae0a62374f729143d6efc4f1655a
           name: 'Docker: Docker root dir'
           type: DEPENDENT
           key: docker.root_dir
@@ -845,9 +925,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -859,7 +936,12 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: a7e5441fe4d64848a7c5e374ea99ad54
           name: 'Docker: Server version'
           type: DEPENDENT
           key: docker.server_version
@@ -867,9 +949,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -881,22 +960,25 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: f5f4fb1337264ac2bec6b6505dfe180b
+              expression: '(last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2))=1 and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: fcbe64ee979a4787a4b0f06836b258bd
           name: 'Docker: Swap limit enabled'
           type: DEPENDENT
           key: docker.swap_limit.enabled
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Docker
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -914,16 +996,18 @@ zabbix_export:
                 - 1d
           master_item:
             key: docker.info
+          tags:
+            -
+              tag: Application
+              value: Docker
         -
+          uuid: 6c81479dba77465ebcd335a5f3d08e19
           name: 'Docker: Volumes size'
           type: DEPENDENT
           key: docker.volumes_size
           delay: '0'
           history: 7d
           units: B
-          applications:
-            -
-              name: Docker
           preprocessing:
             -
               type: JSONPATH
@@ -931,8 +1015,13 @@ zabbix_export:
                 - '$.Volumes[*].UsageData.Size.sum()'
           master_item:
             key: docker.data_usage
+          tags:
+            -
+              tag: Application
+              value: Docker
       discovery_rules:
         -
+          uuid: 6f379dce9d3440018deb2c2cbaa91c06
           name: 'Containers discovery'
           key: 'docker.containers.discovery[false]'
           delay: 15m
@@ -956,15 +1045,13 @@ zabbix_export:
             false - Returns only running containers
           item_prototypes:
             -
+              uuid: 2c5d0902f43343ef85a9067cf3d59cfd
               name: 'Container {#NAME}: Created'
               type: DEPENDENT
               key: 'docker.container_info.created["{#NAME}"]'
               delay: '0'
               history: 7d
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -976,7 +1063,12 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 1c481ac2b05e4b53b85b7fd37a39bc4a
               name: 'Container {#NAME}: Finished at'
               type: DEPENDENT
               key: 'docker.container_info.finished["{#NAME}"]'
@@ -984,9 +1076,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -998,7 +1087,12 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: ee9da156a6134760af1762236d08e566
               name: 'Container {#NAME}: Image'
               type: DEPENDENT
               key: 'docker.container_info.image["{#NAME}"]'
@@ -1006,9 +1100,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1020,15 +1111,17 @@ zabbix_export:
                     - 1d
               master_item:
                 key: docker.containers
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 72de0e4e056a4d3799d61cb3ac19a306
               name: 'Container {#NAME}: Restart count'
               type: DEPENDENT
               key: 'docker.container_info.restart_count["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1036,7 +1129,12 @@ zabbix_export:
                     - $.RestartCount
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 0b6ce9bd73244e79bc9c4e00f56c2465
               name: 'Container {#NAME}: Started at'
               type: DEPENDENT
               key: 'docker.container_info.started["{#NAME}"]'
@@ -1044,9 +1142,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1058,15 +1153,17 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: fd9d315125fb40738c00bab16c145255
               name: 'Container {#NAME}: Dead'
               type: DEPENDENT
               key: 'docker.container_info.state.dead["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1080,7 +1177,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: be3eed62681045aaa667a417a7383a58
               name: 'Container {#NAME}: Error'
               type: DEPENDENT
               key: 'docker.container_info.state.error["{#NAME}"]'
@@ -1088,9 +1190,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1102,22 +1201,25 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: ee70b91196494eccb54772b22051a456
+                  expression: '(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 65d5ac15043446658cd8e0d326b1bf04
               name: 'Container {#NAME}: Exit code'
               type: DEPENDENT
               key: 'docker.container_info.state.exitcode["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1129,15 +1231,17 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 69381dd6116f4b0d9d957dd1e768748b
               name: 'Container {#NAME}: OOMKilled'
               type: DEPENDENT
               key: 'docker.container_info.state.oomkilled["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1151,15 +1255,17 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 000375ca6899443cac7e02e1239d879e
               name: 'Container {#NAME}: Paused'
               type: DEPENDENT
               key: 'docker.container_info.state.paused["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1173,15 +1279,17 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 15dffc2d2aeb4a15954b624c7c273155
               name: 'Container {#NAME}: Pid'
               type: DEPENDENT
               key: 'docker.container_info.state.pid["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1193,15 +1301,17 @@ zabbix_export:
                     - 1d
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 38829fadf7f246c99c9776945022fac1
               name: 'Container {#NAME}: Restarting'
               type: DEPENDENT
               key: 'docker.container_info.state.restarting["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1215,15 +1325,17 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 6d8d5a7523f64968b72f4861e9ae867a
               name: 'Container {#NAME}: Running'
               type: DEPENDENT
               key: 'docker.container_info.state.running["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1237,7 +1349,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: c7f1d81836d54a528184c7d4be60b792
               name: 'Container {#NAME}: Status'
               type: DEPENDENT
               key: 'docker.container_info.state.status["{#NAME}"]'
@@ -1245,9 +1362,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1259,17 +1373,24 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'docker.container_info["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 743e2c9545de49c89472e343bf8d38da
               name: 'Container {#NAME}: Get info'
               key: 'docker.container_info["{#NAME}"]'
               history: '0'
               trends: '0'
               value_type: CHAR
               description: 'Return low-level information about a container'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Docker: Container {#NAME}'
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 92510799a44b4b93921d7b4d308ef10d
               name: 'Container {#NAME}: CPU kernelmode usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]'
@@ -1277,9 +1398,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1295,16 +1413,18 @@ zabbix_export:
                     - '1.0E-9'
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 4c71c95c86d2433da78b0cd3ba5d56fa
               name: 'Container {#NAME}: Throttled periods'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]'
               delay: '0'
               history: 7d
               description: 'Number of periods when the container hits its throttling limit'
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1312,7 +1432,12 @@ zabbix_export:
                     - $.cpu_stats.throttling_data.throttled_periods
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: ff834b708f764ce6b08fcfbc1dfacb60
               name: 'Container {#NAME}: Throttled time'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttled_time["{#NAME}"]'
@@ -1321,9 +1446,6 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: 'Aggregate time the container was throttled for in nanoseconds'
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1335,16 +1457,18 @@ zabbix_export:
                     - '1.0E-9'
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 151f2f36bfb2429b8c8e500067489694
               name: 'Container {#NAME}: Throttling periods'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]'
               delay: '0'
               history: 7d
               description: 'Number of periods with throttling active'
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1352,7 +1476,12 @@ zabbix_export:
                     - $.cpu_stats.throttling_data.periods
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 2c21d9b3968c43e68231ddc5b2d05808
               name: 'Container {#NAME}: CPU total usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.total.rate["{#NAME}"]'
@@ -1360,9 +1489,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1378,7 +1504,12 @@ zabbix_export:
                     - '1.0E-9'
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 801467fe7cbe48b8b05c5005680b934a
               name: 'Container {#NAME}: CPU usermode usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.user.rate["{#NAME}"]'
@@ -1386,9 +1517,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1404,16 +1532,18 @@ zabbix_export:
                     - '1.0E-9'
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: bd57aed03daa47e68acc4dc38a1697b7
               name: 'Container {#NAME}: Memory commit bytes'
               type: DEPENDENT
               key: 'docker.container_stats.memory.commit_bytes["{#NAME}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1421,16 +1551,18 @@ zabbix_export:
                     - $.memory_stats.commitbytes
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 1e110d4d78e74ca8b12a1923f73543f1
               name: 'Container {#NAME}: Memory commit peak bytes'
               type: DEPENDENT
               key: 'docker.container_stats.memory.commit_peak_bytes["{#NAME}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1438,16 +1570,18 @@ zabbix_export:
                     - $.memory_stats.commitpeakbytes
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: b463f79d6c0644a394c3c0ba8f1d29d1
               name: 'Container {#NAME}: Memory maximum usage'
               type: DEPENDENT
               key: 'docker.container_stats.memory.max_usage["{#NAME}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1455,16 +1589,18 @@ zabbix_export:
                     - $.memory_stats.max_usage
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 763c8878d2c74d069567cbcd1d53544c
               name: 'Container {#NAME}: Memory private working set'
               type: DEPENDENT
               key: 'docker.container_stats.memory.private_working_set["{#NAME}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1472,16 +1608,18 @@ zabbix_export:
                     - $.memory_stats.privateworkingset
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 6f39422b278b4a4398bfbd993f247fd0
               name: 'Container {#NAME}: Memory usage'
               type: DEPENDENT
               key: 'docker.container_stats.memory.usage["{#NAME}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1489,15 +1627,17 @@ zabbix_export:
                     - $.memory_stats.usage
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: a5999dfeccca44ca8679ef71876da773
               name: 'Container {#NAME}: Online CPUs'
               type: DEPENDENT
               key: 'docker.container_stats.online_cpus["{#NAME}"]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1505,17 +1645,24 @@ zabbix_export:
                     - $.cpu_stats.online_cpus
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 4192b5b8be2545568637b7121c1466c1
               name: 'Container {#NAME}: Get stats'
               key: 'docker.container_stats["{#NAME}"]'
               history: '0'
               trends: '0'
               value_type: CHAR
               description: 'Get container stats based on resource usage'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Docker: Container {#NAME}'
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 4ab3f13ab7714367b971eada3f01c611
               name: 'Container {#NAME}: Networks bytes received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_bytes["{#NAME}"]'
@@ -1523,9 +1670,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1539,16 +1683,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: cf4517565e3f4fc49e7d6d411302a732
               name: 'Container {#NAME}: Networks incoming packets dropped per second'
               type: DEPENDENT
               key: 'docker.networks.rx_dropped["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1562,16 +1708,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 9d139e59dc1b46d39832ca668d5a6ce1
               name: 'Container {#NAME}: Networks errors received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_errors["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1585,16 +1733,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 13fb8c2c3843481492af82c3308e1257
               name: 'Container {#NAME}: Networks packets received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_packets["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1608,7 +1758,12 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: da4bf99b26e540fdafc0ee99d50e1c6c
               name: 'Container {#NAME}: Networks bytes sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_bytes["{#NAME}"]'
@@ -1616,9 +1771,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1632,16 +1784,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 1f4d7848ecfd44ae958cc1bd64d61078
               name: 'Container {#NAME}: Networks outgoing packets dropped per second'
               type: DEPENDENT
               key: 'docker.networks.tx_dropped["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1655,16 +1809,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: bc7273bd3a7d4c9d9d6d6b3a019af947
               name: 'Container {#NAME}: Networks errors sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_errors["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1678,16 +1834,18 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
             -
+              uuid: 9191bd95da9a4ee9a7315d20de23c977
               name: 'Container {#NAME}: Networks packets sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_packets["{#NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Docker: Container {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1701,15 +1859,21 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
           trigger_prototypes:
             -
-              expression: '{Docker:docker.container_info.state.exitcode["{#NAME}"].last()}>0 and {Docker:docker.container_info.state.running["{#NAME}"].last()}=0'
+              uuid: db675ff608a14b12bcc02e6b500c557f
+              expression: 'last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0'
               name: 'Container {#NAME}: Container has been stopped with error code'
               opdata: 'Exit code: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
           graph_prototypes:
             -
+              uuid: 72e32a60dc064affb3bb6785bae50e37
               name: 'Container {#NAME}: CPU usage'
               type: STACKED
               graph_items:
@@ -1717,99 +1881,103 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.user.rate["{#NAME}"]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.cpu_usage.total.rate["{#NAME}"]'
             -
+              uuid: ef48f834b7d543169b21caff1e1d2ade
               name: 'Container {#NAME}: Memory usage'
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.memory.usage["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.container_stats.memory.max_usage["{#NAME}"]'
             -
+              uuid: 5cc619d6da2046928ad6d0c28a0e4186
               name: 'Container {#NAME}: Network packets'
               graph_items:
                 -
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_packets["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_packets["{#NAME}"]'
                 -
                   sortorder: '2'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_errors["{#NAME}"]'
                 -
                   sortorder: '3'
                   drawtype: BOLD_LINE
                   color: A54F10
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_errors["{#NAME}"]'
                 -
                   sortorder: '4'
                   drawtype: BOLD_LINE
                   color: FC6EA3
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_dropped["{#NAME}"]'
                 -
                   sortorder: '5'
                   drawtype: BOLD_LINE
                   color: 6C59DC
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_dropped["{#NAME}"]'
             -
+              uuid: 1952afdd7ab54a65b7f839fd6490f9ff
               name: 'Container {#NAME}: Network traffic'
               graph_items:
                 -
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.rx_bytes["{#NAME}"]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: Docker
+                    host: 'Docker by Zabbix agent 2'
                     key: 'docker.networks.tx_bytes["{#NAME}"]'
         -
+          uuid: 0b31468772c942cc8a401af2d33f17d2
           name: 'Images discovery'
           key: docker.images.discovery
           delay: 15m
@@ -1828,15 +1996,13 @@ zabbix_export:
           description: 'Discovery for images metrics'
           item_prototypes:
             -
+              uuid: 63b19204b1d0459b9969234a719dab93
               name: 'Image {#NAME}: Created'
               type: DEPENDENT
               key: 'docker.image.created["{#ID}"]'
               delay: '0'
               history: 7d
               units: unixtime
-              application_prototypes:
-                -
-                  name: 'Docker: Image {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1848,16 +2014,18 @@ zabbix_export:
                     - 1d
               master_item:
                 key: docker.images
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Image {#NAME}'
             -
+              uuid: 4eb812ba952e417185f6ac499d6cb85a
               name: 'Image {#NAME}: Size'
               type: DEPENDENT
               key: 'docker.image.size["{#ID}"]'
               delay: '0'
               history: 7d
               units: B
-              application_prototypes:
-                -
-                  name: 'Docker: Image {#NAME}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1865,6 +2033,10 @@ zabbix_export:
                     - '$[?(@.Id == "{#ID}")].Size.first()'
               master_item:
                 key: docker.images
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Image {#NAME}'
       macros:
         -
           macro: '{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}'
@@ -1884,199 +2056,209 @@ zabbix_export:
           description: 'Filter to exclude discovered images'
       dashboards:
         -
+          uuid: 7eb6472d07ac4c379e6b730b59a12507
           name: 'Docker overview'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Docker: Containers'
+                        host: 'Docker by Zabbix agent 2'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Docker: Containers'
-                    host: Docker
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Docker: Size'
+                        host: 'Docker by Zabbix agent 2'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Docker: Memory total'
+                        host: 'Docker by Zabbix agent 2'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Docker: Goroutines'
+                        host: 'Docker by Zabbix agent 2'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Docker: Images'
+                        host: 'Docker by Zabbix agent 2'
+      valuemaps:
+        -
+          uuid: c289195aa4dc47ab883fa95c9cb6fd07
+          name: 'Docker flag'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Docker: Size'
-                    host: Docker
+              value: '0'
+              newvalue: 'False'
             -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Docker: Memory total'
-                    host: Docker
+              value: '1'
+              newvalue: 'True'
+        -
+          uuid: 8effc3f81db14540996e2373dde6eca9
+          name: 'Service state'
+          mappings:
             -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '5'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Docker: Goroutines'
-                    host: Docker
+              value: '0'
+              newvalue: Down
             -
-              type: GRAPH_CLASSIC
-              'y': '10'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Docker: Images'
-                    host: Docker
+              value: '1'
+              newvalue: Up
   graphs:
     -
+      uuid: 5959831c9ec840f3af4ec7031f5213aa
       name: 'Docker: Containers'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.running
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.paused
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.stopped
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers.total
     -
+      uuid: b9131437fcc24587b47ef6dd5d51e15b
       name: 'Docker: Goroutines'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.goroutines
     -
+      uuid: 130ff603f0cd4ac4844817ccede8cfac
       name: 'Docker: Images'
       graph_items:
         -
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images.top_level
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images.total
     -
+      uuid: 5115b03abf71402db63c59b570e83dba
       name: 'Docker: Memory total'
       graph_items:
         -
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.mem.total
     -
+      uuid: 815866ae9f77447bbf15a1b91f7c7708
       name: 'Docker: Size'
       graph_items:
         -
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.images_size
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.layers_size
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.containers_size
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: Docker
+            host: 'Docker by Zabbix agent 2'
             key: docker.volumes_size
-  value_maps:
-    -
-      name: 'Docker flag'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

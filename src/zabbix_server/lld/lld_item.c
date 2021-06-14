@@ -24,6 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
@@ -73,9 +74,9 @@ typedef struct
 	unsigned char		allow_traps;
 	unsigned char		discover;
 	zbx_vector_ptr_t	lld_rows;
-	zbx_vector_ptr_t	applications;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	item_params;
+	zbx_vector_ptr_t	item_tags;
 }
 zbx_lld_item_prototype_t;
 
@@ -194,6 +195,8 @@ typedef struct
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
 	zbx_vector_ptr_t	item_params;
+	zbx_vector_ptr_t	item_tags;
+	zbx_vector_db_tag_ptr_t	override_tags;
 	unsigned char		status;
 	unsigned char		type;
 }
@@ -245,6 +248,25 @@ typedef struct
 }
 zbx_lld_item_param_t;
 
+#define ZBX_ITEM_TAG_FIELD_TAG		1
+#define ZBX_ITEM_TAG_FIELD_VALUE	2
+
+typedef struct
+{
+	zbx_uint64_t	item_tagid;
+	char		*tag;
+	char		*value;
+
+#define ZBX_FLAG_LLD_ITEM_TAG_UNSET				__UINT64_C(0x00)
+#define ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED			__UINT64_C(0x01)
+#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG			__UINT64_C(0x02)
+#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE			__UINT64_C(0x04)
+#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE				\
+		(ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG | ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE)
+	zbx_uint64_t	flags;
+}
+zbx_lld_item_tag_t;
+
 /* item index by prototype (parent) id and lld row */
 typedef struct
 {
@@ -254,35 +276,6 @@ typedef struct
 }
 zbx_lld_item_index_t;
 
-typedef struct
-{
-	zbx_uint64_t	application_prototypeid;
-	zbx_uint64_t	itemid;
-	char		*name;
-}
-zbx_lld_application_prototype_t;
-
-typedef struct
-{
-	zbx_uint64_t		applicationid;
-	zbx_uint64_t		application_prototypeid;
-	zbx_uint64_t		application_discoveryid;
-	int			lastcheck;
-	int			ts_delete;
-#define ZBX_FLAG_LLD_APPLICATION_UNSET			__UINT64_C(0x0000000000000000)
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERED		__UINT64_C(0x0000000000000001)
-#define ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME		__UINT64_C(0x0000000000000002)
-#define ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY		__UINT64_C(0x0000000100000000)
-#define ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY	__UINT64_C(0x0000000200000000)
-#define ZBX_FLAG_LLD_APPLICATION_REMOVE			__UINT64_C(0x0000000400000000)
-	zbx_uint64_t		flags;
-	char			*name;
-	char			*name_proto;
-	char			*name_orig;
-	const zbx_lld_row_t	*lld_row;
-}
-zbx_lld_application_t;
-
 /* reference to an item either by its id (existing items) or structure (new items) */
 typedef struct
 {
@@ -290,44 +283,6 @@ typedef struct
 	zbx_lld_item_t	*item;
 }
 zbx_lld_item_ref_t;
-
-/* reference to an application either by its id (existing applications) or structure (new applications) */
-typedef struct
-{
-	zbx_uint64_t		applicationid;
-	zbx_lld_application_t	*application;
-}
-zbx_lld_application_ref_t;
-
-/* item prototype-application link reference by application id (existing applications) */
-/* or application prototype structure (application prototypes)                         */
-typedef struct
-{
-	zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t			applicationid;
-}
-zbx_lld_item_application_ref_t;
-
-/* item-application link */
-typedef struct
-{
-	zbx_uint64_t			itemappid;
-	zbx_lld_item_ref_t		item_ref;
-	zbx_lld_application_ref_t	application_ref;
-#define ZBX_FLAG_LLD_ITEM_APPLICATION_UNSET		__UINT64_C(0x0000000000000000)
-#define ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED	__UINT64_C(0x0000000000000001)
-	zbx_uint64_t			flags;
-}
-zbx_lld_item_application_t;
-
-/* application index by prototypeid and lld row */
-typedef struct
-{
-	zbx_uint64_t		application_prototypeid;
-	const zbx_lld_row_t	*lld_row;
-	zbx_lld_application_t	*application;
-}
-zbx_lld_application_index_t;
 
 /* items index hashset support functions */
 static zbx_hash_t	lld_item_index_hash_func(const void *data)
@@ -351,58 +306,6 @@ static int	lld_item_index_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-/* application index hashset support functions */
-static zbx_hash_t	lld_application_index_hash_func(const void *data)
-{
-	zbx_lld_application_index_t	*application_index = (zbx_lld_application_index_t *)data;
-	zbx_hash_t			hash;
-
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&application_index->application_prototypeid,
-			sizeof(application_index->application_prototypeid), ZBX_DEFAULT_HASH_SEED);
-	return ZBX_DEFAULT_PTR_HASH_ALGO(&application_index->lld_row, sizeof(application_index->lld_row), hash);
-}
-
-static int	lld_application_index_compare_func(const void *d1, const void *d2)
-{
-	zbx_lld_application_index_t	*i1 = (zbx_lld_application_index_t *)d1;
-	zbx_lld_application_index_t	*i2 = (zbx_lld_application_index_t *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(i1->application_prototypeid, i2->application_prototypeid);
-	ZBX_RETURN_IF_NOT_EQUAL(i1->lld_row, i2->lld_row);
-
-	return 0;
-}
-
-/* comparison function for discovered application lookup by name */
-static int	lld_application_compare_name(const void *d1, const void *d2)
-{
-	const zbx_lld_application_t	*a1 = *(zbx_lld_application_t **)d1;
-	const zbx_lld_application_t	*a2 = *(zbx_lld_application_t **)d2;
-
-	if (0 == (a1->flags & a2->flags))
-		return -1;
-
-	if (NULL == a1->name || NULL == a2->name)
-		return -1;
-
-	return strcmp(a1->name, a2->name);
-}
-
-/* comparison function for discovered application lookup by original name name */
-static int	lld_application_compare_name_orig(const void *d1, const void *d2)
-{
-	const zbx_lld_application_t	*a1 = *(zbx_lld_application_t **)d1;
-	const zbx_lld_application_t	*a2 = *(zbx_lld_application_t **)d2;
-
-	if (0 == (a1->flags & a2->flags))
-		return -1;
-
-	if (NULL == a1->name_orig || NULL == a2->name_orig)
-		return -1;
-
-	return strcmp(a1->name_orig, a2->name_orig);
-}
-
 /* string pointer hashset (used to check for duplicate item keys) support functions */
 static zbx_hash_t	lld_items_keys_hash_func(const void *data)
 {
@@ -412,35 +315,6 @@ static zbx_hash_t	lld_items_keys_hash_func(const void *data)
 static int	lld_items_keys_compare_func(const void *d1, const void *d2)
 {
 	return ZBX_DEFAULT_STR_COMPARE_FUNC(d1, d2);
-}
-
-/* items - applications hashset support */
-static zbx_hash_t	lld_item_application_hash_func(const void *data)
-{
-	const zbx_lld_item_application_t	*item_application = (zbx_lld_item_application_t *)data;
-	zbx_hash_t				hash;
-
-	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->item_ref.itemid, sizeof(item_application->item_ref.itemid),
-				ZBX_DEFAULT_HASH_SEED);
-	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->item_ref.item, sizeof(item_application->item_ref.item), hash);
-
-	hash = ZBX_DEFAULT_HASH_ALGO(&item_application->application_ref.applicationid,
-			sizeof(item_application->application_ref.applicationid), hash);
-	return ZBX_DEFAULT_HASH_ALGO(&item_application->application_ref.application,
-			sizeof(item_application->application_ref.application), hash);
-}
-
-static int	lld_item_application_compare_func(const void *d1, const void *d2)
-{
-	const zbx_lld_item_application_t	*ia1 = (zbx_lld_item_application_t *)d1;
-	const zbx_lld_item_application_t	*ia2 = (zbx_lld_item_application_t *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.itemid, ia2->item_ref.itemid);
-	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.item, ia2->item_ref.item);
-	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.applicationid, ia2->application_ref.applicationid);
-	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.application, ia2->application_ref.application);
-
-	return 0;
 }
 
 static int	lld_item_preproc_sort_by_step(const void *d1, const void *d2)
@@ -461,18 +335,13 @@ static int	lld_item_param_sort_by_name(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	lld_application_prototype_free(zbx_lld_application_prototype_t *application_prototype)
+static int	lld_item_tag_sort_by_tag(const void *d1, const void *d2)
 {
-	zbx_free(application_prototype->name);
-	zbx_free(application_prototype);
-}
+	zbx_lld_item_tag_t	*it1 = *(zbx_lld_item_tag_t **)d1;
+	zbx_lld_item_tag_t	*it2 = *(zbx_lld_item_tag_t **)d2;
 
-static void	lld_application_free(zbx_lld_application_t *application)
-{
-	zbx_free(application->name_orig);
-	zbx_free(application->name_proto);
-	zbx_free(application->name);
-	zbx_free(application);
+	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
+	return 0;
 }
 
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
@@ -487,6 +356,13 @@ static void	lld_item_param_free(zbx_lld_item_param_t *param)
 	zbx_free(param->name);
 	zbx_free(param->value);
 	zbx_free(param);
+}
+
+static void	lld_item_tag_free(zbx_lld_item_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
 }
 
 static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
@@ -522,14 +398,14 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 
 	zbx_vector_ptr_destroy(&item_prototype->lld_rows);
 
-	zbx_vector_ptr_clear_ext(&item_prototype->applications, zbx_default_mem_free_func);
-	zbx_vector_ptr_destroy(&item_prototype->applications);
-
 	zbx_vector_ptr_clear_ext(&item_prototype->preproc_ops, (zbx_clean_func_t)lld_item_preproc_free);
 	zbx_vector_ptr_destroy(&item_prototype->preproc_ops);
 
 	zbx_vector_ptr_clear_ext(&item_prototype->item_params, (zbx_clean_func_t)lld_item_param_free);
 	zbx_vector_ptr_destroy(&item_prototype->item_params);
+
+	zbx_vector_ptr_clear_ext(&item_prototype->item_tags, (zbx_clean_func_t)lld_item_tag_free);
+	zbx_vector_ptr_destroy(&item_prototype->item_tags);
 
 	zbx_free(item_prototype);
 }
@@ -588,7 +464,11 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_vector_ptr_destroy(&item->preproc_ops);
 	zbx_vector_ptr_clear_ext(&item->item_params, (zbx_clean_func_t)lld_item_param_free);
 	zbx_vector_ptr_destroy(&item->item_params);
+	zbx_vector_ptr_clear_ext(&item->item_tags, (zbx_clean_func_t)lld_item_tag_free);
+	zbx_vector_ptr_destroy(&item->item_tags);
 	zbx_vector_ptr_destroy(&item->dependent_items);
+
+	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
 
 	zbx_free(item);
 }
@@ -610,6 +490,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	zbx_lld_item_t			*item, *master;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_lld_item_param_t		*item_param;
+	zbx_lld_item_tag_t		*item_tag;
 	const zbx_lld_item_prototype_t	*item_prototype;
 	zbx_uint64_t			db_valuemapid, db_interfaceid, itemid, master_itemid;
 	zbx_vector_uint64_t		parent_itemids;
@@ -802,6 +683,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		zbx_vector_ptr_create(&item->preproc_ops);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_create(&item->item_params);
+		zbx_vector_ptr_create(&item->item_tags);
+		zbx_vector_db_tag_ptr_create(&item->override_tags);
 
 		zbx_vector_ptr_append(items, item);
 	}
@@ -911,6 +794,40 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		zbx_vector_ptr_append(&item->item_params, item_param);
 	}
 	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select it.itemtagid,it.itemid,it.tag,it.value"
+			" from item_discovery id"
+				" join item_tag it"
+					" on id.itemid=it.itemid"
+			" where");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "id.parent_itemid", parent_itemids.values,
+			parent_itemids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item = (zbx_lld_item_t *)items->values[index];
+
+		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
+		item_tag->flags = ZBX_FLAG_LLD_ITEM_TAG_UNSET;
+		ZBX_STR2UINT64(item_tag->item_tagid, row[0]);
+		item_tag->tag = zbx_strdup(NULL, row[2]);
+		item_tag->value = zbx_strdup(NULL, row[3]);
+		zbx_vector_ptr_append(&item->item_tags, item_tag);
+	}
+	DBfree_result(result);
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&parent_itemids);
@@ -970,6 +887,45 @@ static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, ch
 		*error = zbx_strdcatf(*error, "Cannot %s item: parameter's %s \"%s\" is too long.\n",
 				(0 != itemid ? "update" : "create"),
 				(ZBX_ITEM_PARAMETER_FIELD_NAME != type ? "name" : "value"), param);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_validate_item_tag                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char **error)
+{
+	size_t	len;
+	if (SUCCEED != zbx_is_utf8(tag))
+	{
+		char	*tag_utf8;
+
+		tag_utf8 = zbx_strdup(NULL, tag);
+		zbx_replace_invalid_utf8(tag_utf8);
+		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != itemid ? "update" : "create"),
+				(ZBX_ITEM_TAG_FIELD_TAG != type ? "tag" : "value"), tag_utf8);
+		zbx_free(tag_utf8);
+		return FAIL;
+	}
+
+	len = zbx_strlen_utf8(tag);
+
+	if (ITEM_TAG_FIELD_LEN < len)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" is too long.\n",
+				(0 != itemid ? "update" : "create"),
+				(ZBX_ITEM_TAG_FIELD_TAG != type ? "tag" : "value"), tag);
+		return FAIL;
+	}
+	else if (0 == len && ZBX_ITEM_TAG_FIELD_TAG == type)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: empty tag name.\n", (0 != itemid ? "update" : "create"));
 		return FAIL;
 	}
 
@@ -1740,6 +1696,50 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		}
 	}
 
+	/* check item tags for new and updated discovered items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (j = 0; j < item->item_tags.values_num; j++)
+		{
+			zbx_lld_item_tag_t	*item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j], *tag_dup;
+			int			k;
+
+			if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
+					error) || SUCCEED != lld_validate_item_tag(item->itemid,
+					ZBX_ITEM_TAG_FIELD_VALUE, item_tag->value, error))
+			{
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				break;
+			}
+
+			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
+				continue;
+
+			/* check for duplicated tag */
+			for (k = 0; k < j; k++)
+			{
+				tag_dup = (zbx_lld_item_tag_t *)item->item_tags.values[k];
+
+				if (0 == strcmp(item_tag->tag, tag_dup->tag) &&
+						0 == strcmp(item_tag->value, tag_dup->value))
+				{
+					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					*error = zbx_strdcatf(*error, "Cannot create item tag: tag \"%s\","
+						"\"%s\" already exists.\n", item_tag->tag, item_tag->value);
+					break;
+				}
+			}
+
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+				break;
+		}
+	}
+
 	/* check preprocessing steps for new and updated discovered items */
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1911,69 +1911,15 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
-	char		*exp, *tmp, *e;
-	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r;
-	int		ret = FAIL;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() formula:%s", __func__, *data);
 
-	exp = (char *)zbx_malloc(NULL, exp_alloc);
-	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
+	ret = zbx_substitute_expression_lld_macros(data, ZBX_EVAL_CALC_EXPRESSION_LLD, jp_row, lld_macro_paths, error);
 
-	for (e = *data; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len); e += par_r + 1)
-	{
-		/* substitute LLD macros in the part of the string preceding function parameters */
-
-		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
-		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error,
-				max_error_len))
-		{
-			goto out;
-		}
-
-		tmp_offset = strlen(tmp);
-		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
-
-		tmp_alloc = tmp_offset + 1;
-		tmp_offset = 0;
-
-		/* substitute LLD macros in function parameters */
-
-		if (SUCCEED != substitute_function_lld_param(e + par_l + 1, par_r - (par_l + 1), 1,
-				&exp, &exp_alloc, &exp_offset, jp_row, lld_macro_paths, error, max_error_len))
-		{
-			goto out;
-		}
-
-		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
-	}
-
-	if (par_l > par_r)
-		goto out;
-
-	/* substitute LLD macros in the remaining part */
-
-	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
-	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error, max_error_len))
-		goto out;
-
-	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
-
-	ret = SUCCEED;
-out:
-	zbx_free(tmp);
-
-	if (SUCCEED == ret)
-	{
-		zbx_free(*data);
-		*data = exp;
-	}
-	else
-		zbx_free(exp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, *data);
 
 	return ret;
 }
@@ -2024,7 +1970,10 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->status = item_prototype->status;
 	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status, &discover);
+	zbx_vector_db_tag_ptr_create(&item->override_tags);
+
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
+			&item->status, &discover);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -2060,10 +2009,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
+		char	*errmsg = NULL;
 		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths,
-				err, sizeof(err))))
+				&errmsg)))
 		{
-			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", errmsg);
+			zbx_free(errmsg);
 		}
 	}
 	else
@@ -2185,6 +2136,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	zbx_vector_ptr_create(&item->preproc_ops);
 	zbx_vector_ptr_create(&item->dependent_items);
 	zbx_vector_ptr_create(&item->item_params);
+	zbx_vector_ptr_create(&item->item_tags);
 
 	if (SUCCEED != ret || ZBX_PROTOTYPE_NO_DISCOVER == discover)
 	{
@@ -2235,7 +2187,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	trends = item_prototype->trends;
 	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, NULL, &discover);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags, NULL,
+			&discover);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2301,7 +2254,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
+		char	*errmsg = NULL;
+
+		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, lld_macro_paths, &errmsg))
 		{
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
@@ -2314,7 +2269,10 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			}
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", err);
+		{
+			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", errmsg);
+			zbx_free(errmsg);
+		}
 	}
 	else
 	{
@@ -2956,6 +2914,123 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 				ipdst->value = buffer;
 				buffer = NULL;
 				ipdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE;
+			}
+			else
+				zbx_free(buffer);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_items_tags_make                                              *
+ *                                                                            *
+ * Purpose: updates existing items tags and create new based on item          *
+ *          prototypes                                                        *
+ *                                                                            *
+ * Parameters: item_prototypes - [IN] the item prototypes                     *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             items           - [IN/OUT] sorted list of items                *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
+		zbx_vector_ptr_t *items)
+{
+	int				i, j, index, item_tag_num;
+	zbx_lld_item_t			*item;
+	zbx_lld_item_prototype_t	*item_proto;
+	zbx_lld_item_tag_t		*itsrc, *itdst;
+	zbx_db_tag_t			*override_tags;
+	char				*buffer = NULL;
+	const char			*name, *value;
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_ptr_sort(&item->item_tags, lld_item_tag_sort_by_tag);
+		zbx_vector_db_tag_ptr_sort(&item->override_tags, zbx_db_tag_compare_func);
+
+		item_proto = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+
+		item_tag_num = MAX(item->item_tags.values_num,
+				item_proto->item_tags.values_num + item->override_tags.values_num);
+
+		for (j = 0; j < item_tag_num; j++)
+		{
+			if (j < item->item_tags.values_num &&
+					j >= item_proto->item_tags.values_num + item->override_tags.values_num)
+			{
+				itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+				itdst->flags &= ~ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
+				continue;
+			}
+
+			if (j >= item_proto->item_tags.values_num)
+			{
+				override_tags = item->override_tags.values[j - item_proto->item_tags.values_num];
+				name = override_tags->tag;
+				value = override_tags->value;
+			}
+			else
+			{
+				itsrc = (zbx_lld_item_tag_t *)item_proto->item_tags.values[j];
+				name = itsrc->tag;
+				value = itsrc->value;
+			}
+
+			if (j >= item->item_tags.values_num)
+			{
+				itdst = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
+				itdst->item_tagid = 0;
+				itdst->flags = ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED | ZBX_FLAG_LLD_ITEM_TAG_UPDATE;
+				itdst->tag = zbx_strdup(NULL, name);
+				itdst->value = zbx_strdup(NULL, value);
+
+				substitute_lld_macros(&itdst->tag, &item->lld_row->jp_row,
+						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+				substitute_lld_macros(&itdst->value, &item->lld_row->jp_row,
+						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+
+				zbx_vector_ptr_append(&item->item_tags, itdst);
+				continue;
+			}
+
+			itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+			itdst->flags |= ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
+
+			buffer = zbx_strdup(buffer, name);
+			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+
+			if (0 != strcmp(itdst->tag, buffer))
+			{
+				zbx_free(itdst->tag);
+				itdst->tag = buffer;
+				buffer = NULL;
+				itdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_NAME;
+			}
+			else
+				zbx_free(buffer);
+
+			buffer = zbx_strdup(buffer, value);
+			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+
+			if (0 != strcmp(itdst->value, buffer))
+			{
+				zbx_free(itdst->value);
+				itdst->value = buffer;
+				buffer = NULL;
+				itdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE;
 			}
 			else
 				zbx_free(buffer);
@@ -3947,32 +4022,60 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_applications_save                                            *
+ * Function: lld_items_tags_save                                              *
  *                                                                            *
- * Parameters: hostid                 - [IN] host id                          *
- *             applications           - [IN/OUT] applications to save         *
- *             application_prototypes - [IN] the application prototypes       *
- *             host_locked            - [IN/OUT] host record is locked        *
+ * Purpose: saves/updates/removes item tags                                   *
+ *                                                                            *
+ * Parameters: hostid      - [IN] parent host id                              *
+ *             items       - [IN] items                                       *
+ *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applications,
-		const zbx_vector_ptr_t *application_prototypes, int *host_locked)
+static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int *host_locked)
 {
-	int					ret = SUCCEED, i, new_applications = 0, new_discoveries = 0, index;
-	zbx_lld_application_t			*application;
-	const zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t				applicationid, application_discoveryid;
-	zbx_db_insert_t				db_insert, db_insert_discovery;
-	zbx_vector_uint64_t			del_applicationids, del_discoveryids;
-	char					*sql_a = NULL, *sql_ad = NULL, *name;
-	size_t					sql_a_alloc = 0, sql_a_offset = 0, sql_ad_alloc = 0, sql_ad_offset = 0;
+	int			ret = SUCCEED, i, j, new_tag_num = 0, update_tag_num = 0, delete_tag_num = 0;
+	zbx_lld_item_t		*item;
+	zbx_lld_item_tag_t	*item_tag;
+	zbx_vector_uint64_t	deleteids;
+	zbx_db_insert_t		db_insert;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == applications->values_num)
-		goto out;
+	zbx_vector_uint64_create(&deleteids);
 
-	if (0 == *host_locked)
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (j = 0; j < item->item_tags.values_num; j++)
+		{
+			item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+
+			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
+			{
+				zbx_vector_uint64_append(&deleteids, item_tag->item_tagid);
+				continue;
+			}
+
+			if (0 == item_tag->item_tagid)
+			{
+				new_tag_num++;
+				continue;
+			}
+
+			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE))
+				continue;
+
+			update_tag_num++;
+		}
+	}
+
+	if (0 == *host_locked && (0 != update_tag_num || 0 != new_tag_num || 0 != deleteids.values_num))
 	{
 		if (SUCCEED != DBlock_hostid(hostid))
 		{
@@ -3984,301 +4087,104 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 		*host_locked = 1;
 	}
 
-	zbx_vector_uint64_create(&del_applicationids);
-	zbx_vector_uint64_create(&del_discoveryids);
-
-	/* Count new applications and application discoveries.                      */
-	/* Note that an application might have been discovered by another lld rule. */
-	/* In this case the discovered items will be linked to this application and */
-	/* new application discovery record, linking the prototype to this          */
-	/* application, will be created.                                            */
-	for (i = 0; i < applications->values_num; i++)
+	if (0 != update_tag_num)
 	{
-		application = (zbx_lld_application_t *)applications->values[i];
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	}
 
-		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_REMOVE))
+	if (0 != new_tag_num)
+	{
+		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value",
+				NULL);
+	}
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			zbx_vector_uint64_append(&del_applicationids, application->applicationid);
-			continue;
+			char	delim = ' ';
+
+			item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+
+			if (0 == item_tag->item_tagid)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, item_tag->tag,
+						item_tag->value);
+				continue;
+			}
+
+			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE))
+				continue;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_tag set");
+
+			if (0 != (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG))
+			{
+				char	*tag_esc;
+
+				tag_esc = DBdyn_escape_string(item_tag->tag);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctag='%s'", delim, tag_esc);
+
+				zbx_free(tag_esc);
+				delim = ',';
+			}
+
+			if (0 != (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE))
+			{
+				char	*value_esc;
+
+				value_esc = DBdyn_escape_string(item_tag->value);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cvalue='%s'", delim, value_esc);
+
+				zbx_free(value_esc);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemtagid=" ZBX_FS_UI64 ";\n",
+					item_tag->item_tagid);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
-			continue;
-
-		if (0 == application->applicationid)
-			new_applications++;
-
-		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY))
-			new_discoveries++;
 	}
 
-	/* insert new applications, application discoveries and prepare a list of applications to be removed */
-
-	if (0 != new_applications)
+	if (0 != update_tag_num)
 	{
-		applicationid = DBget_maxid_num("applications", new_applications);
-		zbx_db_insert_prepare(&db_insert, "applications", "applicationid", "hostid", "name", "flags", NULL);
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+			DBexecute("%s", sql);
 	}
 
-	if (0 != new_discoveries)
+	if (0 != new_tag_num)
 	{
-		application_discoveryid = DBget_maxid_num("application_discovery", new_discoveries);
-		zbx_db_insert_prepare(&db_insert_discovery, "application_discovery", "application_discoveryid",
-				"applicationid", "application_prototypeid", "name", NULL);
-	}
-
-	for (i = 0; i < applications->values_num; i++)
-	{
-		application = (zbx_lld_application_t *)applications->values[i];
-
-		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY))
-		{
-			zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
-			continue;
-		}
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
-			continue;
-
-		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes,
-				&application->application_prototypeid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		application_prototype = (zbx_lld_application_prototype_t *)application_prototypes->values[index];
-
-		if (0 == application->applicationid)
-		{
-			application->applicationid = applicationid++;
-			zbx_db_insert_add_values(&db_insert, application->applicationid, hostid, application->name,
-					ZBX_FLAG_DISCOVERY_CREATED);
-		}
-
-		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
-		{
-			if (NULL == sql_a)
-				DBbegin_multiple_update(&sql_a, &sql_a_alloc, &sql_a_offset);
-			if (NULL == sql_ad)
-				DBbegin_multiple_update(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
-
-			name = DBdyn_escape_string(application->name);
-			zbx_snprintf_alloc(&sql_a, &sql_a_alloc, &sql_a_offset,
-					"update applications set name='%s'"
-					" where applicationid=" ZBX_FS_UI64 ";\n",
-					name, application->applicationid);
-			zbx_free(name);
-
-			name = DBdyn_escape_string(application_prototype->name);
-			zbx_snprintf_alloc(&sql_ad, &sql_ad_alloc, &sql_ad_offset,
-					"update application_discovery set name='%s'"
-					" where application_discoveryid=" ZBX_FS_UI64 ";\n",
-					name, application->application_discoveryid);
-			zbx_free(name);
-
-			DBexecute_overflowed_sql(&sql_a, &sql_a_alloc, &sql_a_offset);
-			DBexecute_overflowed_sql(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
-
-			continue;
-		}
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY))
-			continue;
-
-		application->application_discoveryid = application_discoveryid++;
-		zbx_db_insert_add_values(&db_insert_discovery, application->application_discoveryid,
-				application->applicationid, application->application_prototypeid,
-				application_prototype->name);
-	}
-
-	if (NULL != sql_a)
-	{
-		DBend_multiple_update(&sql_a, &sql_a_alloc, &sql_a_offset);
-
-		if (16 < sql_a_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql_a);
-	}
-
-	if (NULL != sql_ad)
-	{
-		DBend_multiple_update(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
-
-		if (16 < sql_ad_offset)
-			DBexecute("%s", sql_ad);
-	}
-
-	if (0 != del_applicationids.values_num)
-	{
-		sql_a_offset = 0;
-
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from applications where");
-		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "applicationid", del_applicationids.values,
-				del_applicationids.values_num);
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
-
-		DBexecute("%s", sql_a);
-	}
-
-	if (0 != del_discoveryids.values_num)
-	{
-		sql_ad_offset = 0;
-
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from application_discovery where");
-		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "application_discoveryid",
-				del_discoveryids.values, del_discoveryids.values_num);
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
-
-		DBexecute("%s", sql_ad);
-	}
-
-	zbx_free(sql_a);
-	zbx_free(sql_ad);
-
-	if (0 != new_applications)
-	{
+		zbx_db_insert_autoincrement(&db_insert, "itemtagid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
-
-		zbx_vector_ptr_sort(applications, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
-	if (0 != new_discoveries)
+	if (0 != deleteids.values_num)
 	{
-		zbx_db_insert_execute(&db_insert_discovery);
-		zbx_db_insert_clean(&db_insert_discovery);
-	}
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_tag where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemtagid", deleteids.values,
+				deleteids.values_num);
+		DBexecute("%s", sql);
 
-	zbx_vector_uint64_destroy(&del_discoveryids);
-	zbx_vector_uint64_destroy(&del_applicationids);
+		delete_tag_num = deleteids.values_num;
+	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&deleteids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __func__, new_tag_num,
+			update_tag_num, delete_tag_num);
 
 	return ret;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_item_application_validate                                    *
- *                                                                            *
- * Purpose: validates undiscovered item-application link to determine if it   *
- *          should be removed                                                 *
- *                                                                            *
- * Parameters: items_application - [IN] an item-application link to validate  *
- *             items             - [IN] the related items                     *
- *                                                                            *
- * Return value: SUCCEED - item-application link should not be removed        *
- *               FAIL    - item-application link should be removed            *
- *                                                                            *
- * Comments: Undiscovered item-application link must be removed if item was   *
- *           discovered.                                                      *
- *                                                                            *
- ******************************************************************************/
-static int	lld_item_application_validate(const zbx_lld_item_application_t *item_application,
-		const zbx_vector_ptr_t *items)
-{
-	int	index;
-
-	if (FAIL == (index = zbx_vector_ptr_bsearch(items, &item_application->item_ref.itemid,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-
-	return 0 != (((zbx_lld_item_t *)items->values[index])->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) ? FAIL : SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_items_applications_save                                      *
- *                                                                            *
- * Parameters: items_applications - [IN] item-application links               *
- *                                                                            *
- ******************************************************************************/
-static void	lld_items_applications_save(zbx_hashset_t *items_applications, const zbx_vector_ptr_t *items)
-{
-	zbx_hashset_iter_t		iter;
-	zbx_lld_item_application_t	*item_application;
-	zbx_vector_uint64_t		del_itemappids;
-	int				new_item_applications = 0;
-	zbx_uint64_t			itemappid, applicationid, itemid;
-	zbx_db_insert_t			db_insert;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == items_applications->num_data)
-		goto out;
-
-	zbx_vector_uint64_create(&del_itemappids);
-
-	/* count new item-application links */
-	zbx_hashset_iter_reset(items_applications, &iter);
-
-	while (NULL != (item_application = (zbx_lld_item_application_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (0 == item_application->itemappid)
-			new_item_applications++;
-	}
-
-	if (0 != new_item_applications)
-	{
-		itemappid = DBget_maxid_num("items_applications", new_item_applications);
-		zbx_db_insert_prepare(&db_insert, "items_applications", "itemappid", "applicationid", "itemid", NULL);
-	}
-
-	zbx_hashset_iter_reset(items_applications, &iter);
-
-	while (NULL != (item_application = (zbx_lld_item_application_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (0 != item_application->itemappid)
-		{
-			/* add for removal the old links that aren't discovered and can be removed */
-			if (0 == (item_application->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED) &&
-					FAIL == lld_item_application_validate(item_application, items))
-			{
-				zbx_vector_uint64_append(&del_itemappids, item_application->itemappid);
-			}
-
-			continue;
-		}
-
-		if (0 == (applicationid = item_application->application_ref.applicationid))
-			applicationid = item_application->application_ref.application->applicationid;
-
-		if (0 == (itemid = item_application->item_ref.itemid))
-			itemid = item_application->item_ref.item->itemid;
-
-		item_application->itemappid = itemappid++;
-		zbx_db_insert_add_values(&db_insert, item_application->itemappid, applicationid, itemid);
-	}
-
-	if (0 != new_item_applications)
-	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
-
-	/* remove deprecated links */
-	if (0 != del_itemappids.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items_applications where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemappid", del_itemappids.values,
-				del_itemappids.values_num);
-
-		DBexecute("%s", sql);
-
-		zbx_free(sql);
-	}
-
-	zbx_vector_uint64_destroy(&del_itemappids);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
 
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
 		int *ts_delete)
@@ -4291,191 +4197,6 @@ static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_f
 	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	*lastcheck = item->lastcheck;
 	*ts_delete = item->ts_delete;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_remove_lost_applications                                     *
- *                                                                            *
- * Purpose: updates application_discovery lastcheck and ts_delete fields,     *
- *          removes lost resources                                            *
- *                                                                            *
- ******************************************************************************/
-static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *applications,
-		int lifetime, int lastcheck)
-{
-	DB_RESULT			result;
-	DB_ROW				row;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t		del_applicationids, del_discoveryids, ts_discoveryids, lc_discoveryids;
-	zbx_vector_uint64_pair_t	discovery_applicationts;
-	int				i, index;
-	const zbx_lld_application_t	*application;
-	zbx_uint64_t			applicationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == applications->values_num)
-		goto out;
-
-	zbx_vector_uint64_create(&del_applicationids);
-	zbx_vector_uint64_create(&del_discoveryids);
-	zbx_vector_uint64_create(&ts_discoveryids);
-	zbx_vector_uint64_create(&lc_discoveryids);
-	zbx_vector_uint64_pair_create(&discovery_applicationts);
-
-	/* prepare application discovery update vector */
-	for (i = 0; i < applications->values_num; i++)
-	{
-		application = (const zbx_lld_application_t *)applications->values[i];
-
-		if (0 == application->applicationid)
-			continue;
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
-		{
-			int	ts_delete = lld_end_of_life(application->lastcheck, lifetime);
-
-			if (lastcheck > ts_delete)
-			{
-				zbx_vector_uint64_append(&del_applicationids, application->applicationid);
-				zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
-			}
-			else if (application->ts_delete != ts_delete)
-			{
-				zbx_uint64_pair_t	applicationts;
-
-				applicationts.first = application->application_discoveryid;
-				applicationts.second = ts_delete;
-				zbx_vector_uint64_pair_append(&discovery_applicationts, applicationts);
-			}
-		}
-		else
-		{
-			zbx_vector_uint64_append(&lc_discoveryids, application->application_discoveryid);
-			if (0 != application->ts_delete)
-				zbx_vector_uint64_append(&ts_discoveryids, application->application_discoveryid);
-		}
-	}
-
-	/* check if the applications are really 'lost' (not discovered by other discovery rules) */
-	if (0 != del_applicationids.values_num)
-	{
-		zbx_vector_uint64_sort(&del_applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select ad.applicationid from application_discovery ad,application_prototype ap"
-				" where ad.application_prototypeid=ap.application_prototypeid"
-					" and ap.itemid<>" ZBX_FS_UI64
-					" and",
-				lld_ruleid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ad.applicationid", del_applicationids.values,
-				del_applicationids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ad.applicationid desc");
-
-		result = DBselect("%s", sql);
-
-		sql_offset = 0;
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(applicationid, row[0]);
-
-			if (FAIL != (index = zbx_vector_uint64_bsearch(&del_applicationids, applicationid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				zbx_vector_uint64_remove(&del_applicationids, index);
-			}
-		}
-
-		DBfree_result(result);
-	}
-
-	if (0 == discovery_applicationts.values_num && 0 == del_applicationids.values_num &&
-			0 == del_discoveryids.values_num && 0 == ts_discoveryids.values_num &&
-			0 == lc_discoveryids.values_num)
-	{
-		goto clean;
-	}
-
-	/* remove lost applications and update application discovery table */
-
-	DBbegin();
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < discovery_applicationts.values_num; i++)
-	{
-		zbx_uint64_pair_t	*applicationts = &(discovery_applicationts.values[i]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update application_discovery"
-				" set ts_delete=%d"
-				" where application_discoveryid=" ZBX_FS_UI64 ";\n",
-				(int)applicationts->second, applicationts->first);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	if (0 != del_discoveryids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_discovery where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
-				del_discoveryids.values, del_discoveryids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	if (0 != ts_discoveryids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update application_discovery"
-				" set ts_delete=0 where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
-				ts_discoveryids.values, ts_discoveryids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	if (0 != lc_discoveryids.values_num)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update application_discovery"
-				" set lastcheck=%d where", lastcheck);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
-				lc_discoveryids.values, lc_discoveryids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	if (0 != del_applicationids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", del_applicationids.values,
-				del_applicationids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	DBcommit();
-clean:
-	zbx_free(sql);
-
-	zbx_vector_uint64_pair_destroy(&discovery_applicationts);
-	zbx_vector_uint64_destroy(&lc_discoveryids);
-	zbx_vector_uint64_destroy(&ts_discoveryids);
-	zbx_vector_uint64_destroy(&del_discoveryids);
-	zbx_vector_uint64_destroy(&del_applicationids);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
@@ -4525,795 +4246,6 @@ void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_application_prototypes_get                                   *
- *                                                                            *
- * Purpose: gets the discovery rule application prototypes from database      *
- *                                                                            *
- * Parameters: lld_ruleid             - [IN] the discovery rule id            *
- *             application_prototypes - [OUT] the applications prototypes     *
- *                                            defined for the discovery rule, *
- *                                            sorted by prototype id          *
- *                                                                            *
- ******************************************************************************/
-static void	lld_application_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *application_prototypes)
-{
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_lld_application_prototype_t	*application_prototype;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select application_prototypeid,name"
-			" from application_prototype"
-			" where itemid=" ZBX_FS_UI64,
-			lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		application_prototype = (zbx_lld_application_prototype_t *)zbx_malloc(NULL,
-				sizeof(zbx_lld_application_prototype_t));
-
-		ZBX_STR2UINT64(application_prototype->application_prototypeid, row[0]);
-		application_prototype->itemid = lld_ruleid;
-		application_prototype->name = zbx_strdup(NULL, row[1]);
-
-		zbx_vector_ptr_append(application_prototypes, application_prototype);
-	}
-	DBfree_result(result);
-
-	zbx_vector_ptr_sort(application_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, application_prototypes->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_item_application_prototypes_get                              *
- *                                                                            *
- * Purpose: gets the discovery rule item-application link prototypes from     *
- *          database                                                          *
- *                                                                            *
- * Parameters: item_prototypes        - [IN/OUT] item prototypes              *
- *             application_prototypes - [IN] the application prototypes       *
- *                                           defined for the discovery rule   *
- *                                                                            *
- ******************************************************************************/
-static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_ptr_t *application_prototypes)
-{
-	DB_RESULT			result;
-	DB_ROW				row;
-	int				i, index;
-	zbx_uint64_t			application_prototypeid, itemid;
-	zbx_vector_uint64_t		item_prototypeids;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_lld_item_application_ref_t	*item_application_prototype;
-	zbx_lld_item_prototype_t	*item_prototype;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&item_prototypeids);
-
-	/* get item prototype links to application prototypes */
-
-	for (i = 0; i < item_prototypes->values_num; i++)
-	{
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[i];
-
-		zbx_vector_uint64_append(&item_prototypeids, item_prototype->itemid);
-	}
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select application_prototypeid,itemid"
-			" from item_application_prototype"
-			" where");
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
-			item_prototypeids.values, item_prototypeids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(application_prototypeid, row[0]);
-
-		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes, &application_prototypeid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		item_application_prototype = (zbx_lld_item_application_ref_t *)zbx_malloc(NULL,
-				sizeof(zbx_lld_item_application_ref_t));
-
-		item_application_prototype->application_prototype = (zbx_lld_application_prototype_t *)application_prototypes->values[index];
-		item_application_prototype->applicationid = 0;
-
-		ZBX_STR2UINT64(itemid, row[1]);
-		index = zbx_vector_ptr_bsearch(item_prototypes, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
-
-		zbx_vector_ptr_append(&item_prototype->applications, item_application_prototype);
-	}
-	DBfree_result(result);
-
-	/* get item prototype links to real applications */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,itemid"
-			" from items_applications"
-			" where");
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
-			item_prototypeids.values, item_prototypeids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		item_application_prototype = (zbx_lld_item_application_ref_t *)zbx_malloc(NULL,
-				sizeof(zbx_lld_item_application_ref_t));
-
-		item_application_prototype->application_prototype = NULL;
-		ZBX_STR2UINT64(item_application_prototype->applicationid, row[0]);
-
-		ZBX_STR2UINT64(itemid, row[1]);
-		index = zbx_vector_ptr_bsearch(item_prototypes, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
-
-		zbx_vector_ptr_append(&item_prototype->applications, item_application_prototype);
-	}
-	DBfree_result(result);
-
-	zbx_free(sql);
-	zbx_vector_uint64_destroy(&item_prototypeids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_applications_get                                             *
- *                                                                            *
- * Purpose: gets applications previously discovered by the discovery rule     *
- *                                                                            *
- * Parameters: lld_ruleid   - [IN] the discovery rule id                      *
- *             applications - [OUT] the applications                          *
- *                                                                            *
- ******************************************************************************/
-static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *applications)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_lld_application_t	*application;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select a.applicationid,a.name,ap.application_prototypeid,ad.lastcheck,ad.ts_delete,ad.name,"
-				"ad.application_discoveryid"
-			" from applications a,application_discovery ad,application_prototype ap"
-			" where ap.itemid=" ZBX_FS_UI64
-				" and ad.application_prototypeid=ap.application_prototypeid"
-				" and a.applicationid=ad.applicationid",
-			lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
-
-		ZBX_STR2UINT64(application->applicationid, row[0]);
-		ZBX_STR2UINT64(application->application_prototypeid, row[2]);
-		ZBX_STR2UINT64(application->application_discoveryid, row[6]);
-		application->name = zbx_strdup(NULL, row[1]);
-		application->lastcheck = atoi(row[3]);
-		application->ts_delete = atoi(row[4]);
-		application->name_proto = zbx_strdup(NULL, row[5]);
-		application->name_orig = NULL;
-		application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
-		application->lld_row = NULL;
-
-		zbx_vector_ptr_append(applications, application);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d applications", __func__, applications->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_application_make                                             *
- *                                                                            *
- * Purpose: create a new application or mark an existing application as       *
- *          discovered based on prototype and lld row                         *
- *                                                                            *
- * Parameters: application_prototype - [IN] the application prototype         *
- *             lld_row               - [IN] the lld row                       *
- *             lld_macro_paths       - [IN] use json path to extract from     *
- *                                          lld_row                           *
- *             applications          - [IN/OUT] the applications              *
- *             applications_index    - [IN/OUT] the application index by      *
- *                                              prototype id and lld row      *
- *                                                                            *
- ******************************************************************************/
-static void	lld_application_make(const zbx_lld_application_prototype_t *application_prototype,
-		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *applications,
-		zbx_hashset_t *applications_index)
-{
-	zbx_lld_application_t		*application;
-	zbx_lld_application_index_t	*application_index, application_index_local;
-	struct zbx_json_parse		*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
-	char				*buffer = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), proto %s", __func__, application_prototype->name);
-
-	application_index_local.application_prototypeid = application_prototype->application_prototypeid;
-	application_index_local.lld_row = lld_row;
-
-	if (NULL == (application_index = (zbx_lld_application_index_t *)zbx_hashset_search(applications_index, &application_index_local)))
-	{
-		application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
-		application->applicationid = 0;
-		application->application_prototypeid = application_prototype->application_prototypeid;
-		application->application_discoveryid = 0;
-		application->ts_delete = 0;
-
-		application->name = zbx_strdup(NULL, application_prototype->name);
-		substitute_lld_macros(&application->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(application->name, ZBX_WHITESPACE);
-
-		application->name_proto = zbx_strdup(NULL, application_prototype->name);
-		application->name_orig = NULL;
-		application->flags = ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY;
-		application->lld_row = lld_row;
-
-		zbx_vector_ptr_append(applications, application);
-
-		application_index_local.application = application;
-		zbx_hashset_insert(applications_index, &application_index_local, sizeof(zbx_lld_application_index_t));
-
-		zabbix_log(LOG_LEVEL_TRACE, "%s(): created new application, proto %s, name %s", __func__,
-				application_prototype->name, application->name);
-	}
-	else
-	{
-		application = application_index->application;
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
-		{
-			buffer = zbx_strdup(NULL, application_prototype->name);
-			substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-			zbx_lrtrim(buffer, ZBX_WHITESPACE);
-
-			if (0 != strcmp(application->name, buffer))
-			{
-				application->name_orig = application->name;
-				application->name = buffer;
-				application->flags |= ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME;
-				zabbix_log(LOG_LEVEL_TRACE, "%s(): updated application name to %s", __func__,
-						application->name);
-			}
-			else
-				zbx_free(buffer);
-		}
-	}
-
-	application->flags |= ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_applications_make                                            *
- *                                                                            *
- * Purpose: makes new applications and marks old applications as discovered   *
- *          based on application prototypes and lld rows                      *
- *                                                                            *
- * Parameters: application_prototypes - [IN] the application prototypes       *
- *             lld_rows               - [IN] the lld rows                     *
- *             applications           - [IN/OUT] the applications             *
- *             applications_index     - [OUT] the application index by        *
- *                                            prototype id and lld row        *
- *                                                                            *
- ******************************************************************************/
-static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes,
-		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths,
-		zbx_vector_ptr_t *applications, zbx_hashset_t *applications_index)
-{
-	int				i, j;
-	zbx_lld_application_t		*application;
-	zbx_lld_row_t			*lld_row;
-	zbx_lld_application_index_t	application_index_local;
-	char				*buffer = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	/* index existing applications */
-
-	for (i = 0; i < applications->values_num; i++)
-	{
-		application = (zbx_lld_application_t *)applications->values[i];
-
-		for (j = 0; j < lld_rows->values_num; j++)
-		{
-			lld_row = (zbx_lld_row_t *)lld_rows->values[j];
-
-			buffer = zbx_strdup(buffer, application->name_proto);
-			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-			zbx_lrtrim(buffer, ZBX_WHITESPACE);
-
-			if (0 == strcmp(application->name, buffer))
-			{
-				application_index_local.application_prototypeid = application->application_prototypeid;
-				application_index_local.lld_row = lld_row;
-				application_index_local.application = application;
-				zbx_hashset_insert(applications_index, &application_index_local,
-						sizeof(application_index_local));
-
-				application->lld_row = lld_row;
-			}
-		}
-	}
-
-	zbx_free(buffer);
-
-	/* make the applications */
-	for (i = 0; i < application_prototypes->values_num; i++)
-	{
-		for (j = 0; j < lld_rows->values_num; j++)
-		{
-			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i],
-					(zbx_lld_row_t *)lld_rows->values[j], lld_macro_paths, applications,
-					applications_index);
-		}
-	}
-
-	zbx_vector_ptr_sort(applications, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d applications", __func__, applications->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_applications_validate                                        *
- *                                                                            *
- * Purpose: validates the discovered and renamed applications                 *
- *                                                                            *
- * Parameters: hostid             - [IN] host id                              *
- *             lld_ruleid         - [IN] the discovery rule id                *
- *             applications       - [IN/OUT] the applications                 *
- *             applications_index - [OUT] the application index by            *
- *                                        prototype id and lld row            *
- *             error              - [IN/OUT] the lld error message            *
- *                                                                            *
- ******************************************************************************/
-static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *applications,
-		zbx_hashset_t *applications_index, char **error)
-{
-	int				i, j, index;
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_lld_application_t		*application, *new_application, application_local;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_str_t		names_new, names_old;
-	zbx_lld_application_index_t	*application_index, application_index_local;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == applications->values_num)
-		goto out;
-
-	zbx_vector_str_create(&names_new);
-	zbx_vector_str_create(&names_old);
-
-	/* check for conflicting application names in the discovered applications */
-
-	for (i = 0; i < applications->values_num; i++)
-	{
-		application = (zbx_lld_application_t *)applications->values[i];
-
-		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
-			continue;
-
-		if (0 != application->applicationid && 0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
-			continue;
-
-		/* iterate in reverse order so existing applications would have more priority */
-		/* than new applications which have 0 applicationid and therefore are located */
-		/* at the beginning of applications vector which is sorted by applicationid   */
-		for (j = applications->values_num - 1; j > i; j--)
-		{
-			zbx_lld_application_t	*application_compare = (zbx_lld_application_t *)applications->values[j];
-
-			if (0 != strcmp(application->name, application_compare->name))
-				continue;
-
-			/* Applications with matching names are validated depending on their prototypes. */
-			/* If they are discovered by different prototypes we must fail with appropriate  */
-			/* lld error.                                                                    */
-			/* Otherwise we 'merge' application by updating index of the validated           */
-			/* validated application to point at the application with the same name.         */
-			/* In both cases the validated application is flagged as non-discovered.         */
-			application->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-
-			/* fail if application has different prototype */
-			if (application->application_prototypeid != application_compare->application_prototypeid)
-			{
-				*error = zbx_strdcatf(*error, "Cannot %s application:"
-						" application with the same name \"%s\" already exists.\n",
-						(0 != application->applicationid ? "update" : "create"),
-						application->name);
-
-				break;
-			}
-
-			/* update application index to use the matching application */
-
-			application_index_local.application_prototypeid = application->application_prototypeid;
-			application_index_local.lld_row = application->lld_row;
-
-			if (NULL == (application_index = (zbx_lld_application_index_t *)zbx_hashset_search(applications_index,
-					&application_index_local)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				break;
-			}
-
-			application_index->application = application_compare;
-			break;
-		}
-
-		/* Prepare name lists to resolve naming conflicts with applications */
-		/* discovered by other discovery rules:                             */
-		/*   names_new - to check if discovered/renamed application names   */
-		/*               don't match existing applications discovered by    */
-		/*               other discovery rules                              */
-		/*   names_old - to check if renamed applications were also         */
-		/*               discovered by other discovery rules                */
-		if (i == j)
-		{
-			zbx_vector_str_append(&names_new, application->name);
-
-			if (NULL != application->name_orig)
-				zbx_vector_str_append(&names_old, application->name_orig);
-		}
-	}
-
-	/* validate new/renamed application names against applications discovered */
-	/* by other discovery rules                                               */
-
-	if (0 != names_new.values_num)
-	{
-		zbx_vector_str_sort(&names_new, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select applicationid,name,flags"
-				" from applications"
-				" where hostid=" ZBX_FS_UI64
-					" and",
-				hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
-				(const char **)names_new.values, names_new.values_num);
-
-		result = DBselect("%s", sql);
-
-		application_local.flags = ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			application_local.name = row[1];
-
-			if (FAIL == (index = zbx_vector_ptr_search(applications, &application_local,
-					lld_application_compare_name)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			application = (zbx_lld_application_t *)applications->values[index];
-
-			/* only discovered applications can be 'shared' between discovery rules */
-			if (ZBX_FLAG_DISCOVERY_CREATED != atoi(row[2]))
-			{
-				/* conflicting application name, reset discovery flags */
-				application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
-
-				*error = zbx_strdcatf(*error, "Cannot create application:"
-						" non-discovered application"
-						" with the same name \"%s\" already exists.\n",
-						application->name);
-
-				continue;
-			}
-
-			if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
-			{
-				/* During discovery process the application was renamed to an */
-				/* application already discovered by another discovery rule.  */
-				/* In this case we must delete the old application and relink */
-				/* its items to the application we have found.                */
-
-				/* create a pseudo application to remove the renamed application */
-
-				new_application = (zbx_lld_application_t *)zbx_malloc(NULL,
-						sizeof(zbx_lld_application_t));
-
-				memset(new_application, 0, sizeof(zbx_lld_application_t));
-				new_application->applicationid = application->applicationid;
-				new_application->flags = ZBX_FLAG_LLD_APPLICATION_REMOVE;
-
-				zbx_vector_ptr_append(applications, new_application);
-
-				/* update application flags so that instead of renaming it a new */
-				/* discovery record is created                                   */
-
-				application->application_discoveryid = 0;
-				application->flags &= ~ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME;
-				application->flags |= ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY;
-			}
-
-			/* reuse application created by another discovery rule */
-			ZBX_STR2UINT64(application->applicationid, row[0]);
-		}
-		DBfree_result(result);
-	}
-
-	/* if an application shared with other discovery rule has been renamed we must */
-	/* create a new application with the new name instead of renaming the old one  */
-
-	if (0 != names_old.values_num)
-	{
-		sql_offset = 0;
-
-		zbx_vector_str_sort(&names_old, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select a.name"
-				" from applications a,application_discovery ad,application_prototype ap"
-				" where a.applicationid=ad.applicationid"
-					" and ad.application_prototypeid=ap.application_prototypeid"
-					" and a.hostid=" ZBX_FS_UI64
-					" and ap.itemid<>" ZBX_FS_UI64
-					" and",
-				hostid, lld_ruleid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "a.name",
-				(const char **)names_old.values, names_old.values_num);
-
-		result = DBselect("%s", sql);
-
-		application_local.flags = ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			application_local.name_orig = row[0];
-
-			if (FAIL == (index = zbx_vector_ptr_search(applications, &application_local,
-					lld_application_compare_name_orig)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			application = (zbx_lld_application_t *)applications->values[index];
-
-			/* add a pseudo application to remove the application discovery record */
-			/* of the shared application and current discovery rule                */
-			new_application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
-			memset(new_application, 0, sizeof(zbx_lld_application_t));
-			new_application->applicationid = application->applicationid;
-			new_application->application_prototypeid = application->application_prototypeid;
-			new_application->application_discoveryid = application->application_discoveryid;
-			new_application->flags = ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY;
-			zbx_vector_ptr_append(applications, new_application);
-
-			/* reset applicationid, application_discoveryid and flags             */
-			/* so a new application is created instead of renaming the shared one */
-			application->applicationid = 0;
-			application->application_discoveryid = 0;
-			application->flags = ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY |
-					ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
-		}
-		DBfree_result(result);
-	}
-
-	zbx_vector_str_destroy(&names_old);
-	zbx_vector_str_destroy(&names_new);
-
-	zbx_free(sql);
-
-	zbx_vector_ptr_sort(applications, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_items_applications_get                                       *
- *                                                                            *
- * Purpose: gets item-application links for the lld rule                      *
- *                                                                            *
- * Parameters: lld_rule           - [IN] the lld rule                         *
- *             items_applications - [OUT] the item-application links          *
- *                                                                            *
- ******************************************************************************/
-static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *items_applications)
-{
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_lld_item_application_t	item_application;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select ia.itemappid,ia.itemid,ia.applicationid"
-			" from items_applications ia,item_discovery id1,item_discovery id2"
-			" where id1.itemid=ia.itemid"
-				" and id1.parent_itemid=id2.itemid"
-				" and id2.parent_itemid=" ZBX_FS_UI64,
-			lld_ruleid);
-
-	item_application.application_ref.application = NULL;
-	item_application.item_ref.item = NULL;
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(item_application.itemappid, row[0]);
-		ZBX_STR2UINT64(item_application.item_ref.itemid, row[1]);
-		ZBX_STR2UINT64(item_application.application_ref.applicationid, row[2]);
-		item_application.flags = ZBX_FLAG_LLD_ITEM_APPLICATION_UNSET;
-
-		zbx_hashset_insert(items_applications, &item_application, sizeof(zbx_lld_item_application_t));
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d links", __func__, items_applications->num_data);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_items_applications_make                                      *
- *                                                                            *
- * Purpose: makes new item-application links and marks existing links as      *
- *          discovered based on item_prototypes applications links            *
- *                                                                            *
- * Parameters: item_prototypes    - [IN] the item prototypes                  *
- *             items              - [IN] the items                            *
- *             applications_index - [IN] the application index by             *
- *                                       prototype id and lld row             *
- *             items_applications - [IN/OUT] the item-application links       *
- *                                                                            *
- ******************************************************************************/
-static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *items,
-		zbx_hashset_t *applications_index, zbx_hashset_t *items_applications)
-{
-	int				i, j, index;
-	zbx_lld_item_application_t	*item_application, item_application_local;
-	zbx_lld_application_t		*application;
-	zbx_lld_item_prototype_t	*item_prototype;
-	zbx_lld_item_t			*item;
-	zbx_lld_item_application_ref_t	*itemapp_prototype;
-	zbx_lld_application_index_t	*application_index, application_index_local;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	item_application_local.itemappid = 0;
-	item_application_local.flags = ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED;
-
-	for (i = 0; i < items->values_num; i++)
-	{
-		item = (zbx_lld_item_t *)items->values[i];
-
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
-
-		/* if item is discovered its prototype must be in item_prototypes vector */
-		index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
-
-		application_index_local.lld_row = item->lld_row;
-
-		if (0 == (item_application_local.item_ref.itemid = item->itemid))
-			item_application_local.item_ref.item = item;
-		else
-			item_application_local.item_ref.item = NULL;
-
-		for (j = 0; j < item_prototype->applications.values_num; j++)
-		{
-			itemapp_prototype = (zbx_lld_item_application_ref_t *)item_prototype->applications.values[j];
-
-			if (NULL != itemapp_prototype->application_prototype)
-			{
-				application_index_local.application_prototypeid =
-						itemapp_prototype->application_prototype->application_prototypeid;
-
-				if (NULL == (application_index = (zbx_lld_application_index_t *)zbx_hashset_search(applications_index,
-						&application_index_local)))
-				{
-					continue;
-				}
-
-				application = application_index->application;
-
-				if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
-					continue;
-
-				if (0 == (item_application_local.application_ref.applicationid =
-						application->applicationid))
-				{
-					item_application_local.application_ref.application = application;
-				}
-				else
-					item_application_local.application_ref.application = NULL;
-			}
-			else
-			{
-				item_application_local.application_ref.application = NULL;
-				item_application_local.application_ref.applicationid = itemapp_prototype->applicationid;
-			}
-
-			if (NULL == (item_application = (zbx_lld_item_application_t *)zbx_hashset_search(items_applications,
-					&item_application_local)))
-			{
-				item_application = (zbx_lld_item_application_t *)zbx_hashset_insert(items_applications, &item_application_local,
-						sizeof(zbx_lld_item_application_t));
-			}
-
-			item_application->flags = ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED;
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d links", __func__, items_applications->num_data);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_validate_application_with_links                              *
- *                                                                            *
- * Purpose: mark applications with no links to item_prototypes not to be      *
- *          discovered                                                        *
- *                                                                            *
- * Parameters: applications       - [IN/OUT] the applications                 *
- *             items_applications - [IN] the item-application links           *
- *                                                                            *
- ******************************************************************************/
-static void	lld_validate_application_with_links(zbx_vector_ptr_t *applications, zbx_hashset_t *items_applications)
-{
-	zbx_lld_item_application_t	*link;
-	zbx_hashset_iter_t		iter;
-	int				i;
-
-	for (i = 0; i < applications->values_num; i++)
-	{
-		zbx_lld_application_t	*app = (zbx_lld_application_t *)applications->values[i];
-
-		if (0 != app->applicationid)
-			continue;
-
-		zbx_hashset_iter_reset(items_applications, &iter);
-
-		while (NULL != (link = (zbx_lld_item_application_t *)zbx_hashset_iter_next(&iter)))
-		{
-			if (app == link->application_ref.application
-					&& 0 != (link->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
-			{
-				break;
-			}
-		}
-
-		if (NULL == link)
-			app->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_item_prototypes_get                                          *
  *                                                                            *
  * Purpose: load discovery rule item prototypes                               *
@@ -5329,6 +4261,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	zbx_lld_item_prototype_t	*item_prototype;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_lld_item_param_t		*item_param;
+	zbx_lld_item_tag_t		*item_tag;
 	zbx_uint64_t			itemid;
 	int				index, i;
 
@@ -5400,9 +4333,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		ZBX_STR2UCHAR(item_prototype->discover, row[44]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
-		zbx_vector_ptr_create(&item_prototype->applications);
 		zbx_vector_ptr_create(&item_prototype->preproc_ops);
 		zbx_vector_ptr_create(&item_prototype->item_params);
+		zbx_vector_ptr_create(&item_prototype->item_tags);
 
 		zbx_vector_ptr_append(item_prototypes, item_prototype);
 	}
@@ -5485,6 +4418,41 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[i];
 		zbx_vector_ptr_sort(&item_prototype->item_params, lld_item_param_sort_by_name);
 	}
+
+	/* get item prototype tags */
+
+	result = DBselect(
+			"select it.itemid,it.tag,it.value"
+			" from item_tag it,item_discovery id"
+			" where it.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+
+		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
+		item_tag->tag = zbx_strdup(NULL, row[1]);
+		item_tag->value = zbx_strdup(NULL, row[2]);
+		zbx_vector_ptr_append(&item_prototype->item_tags, item_tag);
+	}
+	DBfree_result(result);
+
+	for (i = 0; i < item_prototypes->values_num; i++)
+	{
+		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[i];
+		zbx_vector_ptr_sort(&item_prototype->item_tags, lld_item_tag_sort_by_tag);
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, item_prototypes->values_num);
 }
@@ -5541,8 +4509,8 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
-	zbx_vector_ptr_t	applications, application_prototypes, items, item_prototypes, item_dependencies;
-	zbx_hashset_t		applications_index, items_index, items_applications;
+	zbx_vector_ptr_t	items, item_prototypes, item_dependencies;
+	zbx_hashset_t		items_index;
 	int			ret = SUCCEED, host_record_is_locked = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -5554,30 +4522,15 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	if (0 == item_prototypes.values_num)
 		goto out;
 
-	zbx_vector_ptr_create(&application_prototypes);
-
-	lld_application_prototypes_get(lld_ruleid, &application_prototypes);
-
-	zbx_vector_ptr_create(&applications);
-	zbx_hashset_create(&applications_index, application_prototypes.values_num * lld_rows->values_num,
-			lld_application_index_hash_func, lld_application_index_compare_func);
-
 	zbx_vector_ptr_create(&items);
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
-
-	zbx_hashset_create(&items_applications, 100, lld_item_application_hash_func, lld_item_application_compare_func);
-
-	lld_applications_get(lld_ruleid, &applications);
-	lld_applications_make(&application_prototypes, lld_rows, lld_macro_paths, &applications, &applications_index);
-	lld_applications_validate(hostid, lld_ruleid, &applications, &applications_index, error);
-
-	lld_item_application_prototypes_get(&item_prototypes, &application_prototypes);
 
 	lld_items_get(&item_prototypes, &items);
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 	lld_items_param_make(&item_prototypes, lld_macro_paths, &items);
+	lld_items_tags_make(&item_prototypes, lld_macro_paths, &items);
 
 	lld_link_dependent_items(&items, &items_index);
 
@@ -5586,20 +4539,13 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 
 	lld_items_validate(hostid, &items, &item_prototypes, &item_dependencies, error);
 
-	lld_items_applications_get(lld_ruleid, &items_applications);
-	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);
-	lld_validate_application_with_links(&applications, &items_applications);
-
 	DBbegin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_applications_save(hostid, &applications, &application_prototypes,
-					&host_record_is_locked))
+			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
 	{
-		lld_items_applications_save(&items_applications, &items);
-
 		if (ZBX_DB_OK != DBcommit())
 		{
 			ret = FAIL;
@@ -5615,9 +4561,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_remove_lost_objects("item_discovery", "itemid", &items, lifetime, lastcheck, DBdelete_items, get_item_info);
-	lld_remove_lost_applications(lld_ruleid, &applications, lifetime, lastcheck);
 clean:
-	zbx_hashset_destroy(&items_applications);
 	zbx_hashset_destroy(&items_index);
 
 	zbx_vector_ptr_clear_ext(&item_dependencies, zbx_ptr_free);
@@ -5625,14 +4569,6 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)lld_item_free);
 	zbx_vector_ptr_destroy(&items);
-
-	zbx_hashset_destroy(&applications_index);
-
-	zbx_vector_ptr_clear_ext(&applications, (zbx_clean_func_t)lld_application_free);
-	zbx_vector_ptr_destroy(&applications);
-
-	zbx_vector_ptr_clear_ext(&application_prototypes, (zbx_clean_func_t)lld_application_prototype_free);
-	zbx_vector_ptr_destroy(&application_prototypes);
 
 	zbx_vector_ptr_clear_ext(&item_prototypes, (zbx_clean_func_t)lld_item_prototype_free);
 out:

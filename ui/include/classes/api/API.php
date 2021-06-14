@@ -116,13 +116,6 @@ class API {
 	}
 
 	/**
-	 * @return CApplication
-	 */
-	public static function Application() {
-		return self::getApi('application');
-	}
-
-	/**
 	 * @return CAuditLog
 	 */
 	public static function AuditLog() {
@@ -340,24 +333,17 @@ class API {
 	}
 
 	/**
+	 * @return CReport
+	 */
+	public static function Report() {
+		return self::getApi('report');
+	}
+
+	/**
 	 * @return CRole
 	 */
 	public static function Role() {
 		return self::getApi('role');
-	}
-
-	/**
-	 * @return CScreen
-	 */
-	public static function Screen() {
-		return self::getApi('screen');
-	}
-
-	/**
-	 * @return CScreenItem
-	 */
-	public static function ScreenItem() {
-		return self::getApi('screenitem');
 	}
 
 	/**

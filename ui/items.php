@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js',
-	'class.tab-indicators.js'
+	'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -71,8 +71,8 @@ $fields = [
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
-											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+											ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
 											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 										]),
@@ -86,10 +86,7 @@ $fields = [
 										_('Trend storage period')
 									],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
-										'(isset({add}) || isset({update})) && isset({value_type})'.
-											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
-									],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
 									],
@@ -145,9 +142,7 @@ $fields = [
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
@@ -242,16 +237,17 @@ $fields = [
 	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
 											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
@@ -276,20 +272,23 @@ $fields = [
 										IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
 										null
 									],
+	'filter_evaltype' =>			[T_ZBX_INT, O_OPT, null,	IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
+	'filter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_inherited' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
@@ -304,9 +303,9 @@ $valid_input = check_fields($fields);
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-$subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
-	'subfilter_state', 'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-	'subfilter_history', 'subfilter_trends', 'subfilter_discovered'
+$subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+	'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history',
+	'subfilter_trends', 'subfilter_discovered'
 ];
 
 /*
@@ -354,7 +353,7 @@ $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 if (hasRequest('filter_set')) {
 	CProfile::updateArray($prefix.'items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
 	CProfile::updateArray($prefix.'items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::update($prefix.'items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter_valuemapids', getRequest('filter_valuemapids', []), PROFILE_TYPE_ID);
 	CProfile::update($prefix.'items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'items.filter_key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
@@ -369,11 +368,31 @@ if (hasRequest('filter_set')) {
 	CProfile::update($prefix.'items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'items.filter_discovered', getRequest('filter_discovered', -1), PROFILE_TYPE_INT);
 
+	// tags
+	$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+	foreach (getRequest('filter_tags', []) as $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			continue;
+		}
+		$filter_tags['tags'][] = $tag['tag'];
+		$filter_tags['values'][] = $tag['value'];
+		$filter_tags['operators'][] = $tag['operator'];
+	}
+	CProfile::update($prefix.'items.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+	CProfile::updateArray($prefix.'items.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+	unset($filter_tags);
+
 	// subfilters
 	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
 		CProfile::update($prefix.'items.'.$name, '', PROFILE_TYPE_STR);
 	}
+
+	// Subfilter tags.
+	CProfile::updateArray($prefix.'items.subfilter_tags.tag', [], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.subfilter_tags.value', [], PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -381,7 +400,6 @@ elseif (hasRequest('filter_rst')) {
 		CProfile::deleteIdx($prefix.'items.filter_hostids');
 	}
 	CProfile::deleteIdx($prefix.'items.filter_groupids');
-	CProfile::deleteIdx($prefix.'items.filter_application');
 	CProfile::deleteIdx($prefix.'items.filter_name');
 	CProfile::deleteIdx($prefix.'items.filter_type');
 	CProfile::deleteIdx($prefix.'items.filter_key');
@@ -395,12 +413,16 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx($prefix.'items.filter_inherited');
 	CProfile::deleteIdx($prefix.'items.filter_with_triggers');
 	CProfile::deleteIdx($prefix.'items.filter_discovered');
+	CProfile::deleteIdx($prefix.'items.filter.tags.tag');
+	CProfile::deleteIdx($prefix.'items.filter.tags.value');
+	CProfile::deleteIdx($prefix.'items.filter.tags.operator');
+	CProfile::deleteIdx($prefix.'items.filter.evaltype');
+	CProfile::deleteIdx($prefix.'items.filter_valuemapids');
 	DBend();
 }
 
 $_REQUEST['filter_groupids'] = CProfile::getArray($prefix.'items.filter_groupids', []);
 $_REQUEST['filter_hostids'] = CProfile::getArray($prefix.'items.filter_hostids', []);
-$_REQUEST['filter_application'] = CProfile::get($prefix.'items.filter_application', '');
 $_REQUEST['filter_name'] = CProfile::get($prefix.'items.filter_name', '');
 $_REQUEST['filter_type'] = CProfile::get($prefix.'items.filter_type', -1);
 $_REQUEST['filter_key'] = CProfile::get($prefix.'items.filter_key', '');
@@ -414,14 +436,31 @@ $_REQUEST['filter_state'] = CProfile::get($prefix.'items.filter_state', -1);
 $_REQUEST['filter_inherited'] = CProfile::get($prefix.'items.filter_inherited', -1);
 $_REQUEST['filter_discovered'] = CProfile::get($prefix.'items.filter_discovered', -1);
 $_REQUEST['filter_with_triggers'] = CProfile::get($prefix.'items.filter_with_triggers', -1);
+$_REQUEST['filter_valuemapids'] = CProfile::getArray($prefix.'items.filter_valuemapids', []);
 
 // subfilters
-foreach ($subfiltersList as $name) {
-	if (isset($_REQUEST['subfilter_set'])) {
+if (hasRequest('subfilter_set')) {
+	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = getRequest($name, []);
 		CProfile::update($prefix.'items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
 	}
-	else {
+
+	$subf_tags = [];
+	if (hasRequest('subfilter_tags')) {
+		foreach (getRequest('subfilter_tags', []) as $tag) {
+			if ($tag['tag'] !== null) {
+				$subf_tags[json_encode([$tag['tag'], $tag['value']])] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value'] ? $tag['value'] : ''
+				];
+			}
+		}
+	}
+	CProfile::updateArray($prefix.'items.subfilter_tags.tag', array_column($subf_tags, 'tag'), PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.subfilter_tags.value', array_column($subf_tags, 'value'), PROFILE_TYPE_STR);
+}
+else {
+	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
 		$subfilters_value = CProfile::get($prefix.'items.'.$name);
 		if (!zbx_empty($subfilters_value)) {
@@ -478,36 +517,25 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (hasRequest('add') || hasRequest('update')) {
-	$applications = getRequest('applications', []);
-	$application = reset($applications);
-	if ($application == 0) {
-		array_shift($applications);
-	}
-
 	DBstart();
 	$result = true;
 
-	if (!zbx_empty($_REQUEST['new_application'])) {
-		$new_appid = API::Application()->create([
-			'name' => $_REQUEST['new_application'],
-			'hostid' => getRequest('hostid')
-		]);
-		if ($new_appid) {
-			$new_appid = reset($new_appid['applicationids']);
-			$applications[$new_appid] = $new_appid;
-		}
-		else {
-			$result = false;
-		}
-	}
-
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+
+	$tags = getRequest('tags', []);
+	foreach ($tags as $key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($tags[$key]);
+		}
+		elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+			unset($tags[$key]);
+		}
+		else {
+			unset($tags[$key]['type']);
+		}
+	}
 
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
@@ -646,10 +674,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
-				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'tags' => $tags
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -700,6 +728,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item = prepareScriptItemFormData($script_item) + $item;
 			}
 
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				unset($item['valuemapid']);
+			}
+
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
@@ -712,8 +744,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 					'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 				],
-				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+				'selectTags' => ['tag', 'value'],
 				'itemids' => getRequest('itemid')
 			]);
 			$db_item = reset($db_items);
@@ -722,6 +754,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				if ($db_item['templateid'] == 0) {
+					$value_type = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
+
 					if ($db_item['name'] !== getRequest('name', '')) {
 						$item['name'] = getRequest('name', '');
 					}
@@ -737,13 +771,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
 						$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
 					}
-					if ($db_item['value_type'] != getRequest('value_type', ITEM_VALUE_TYPE_FLOAT)) {
-						$item['value_type'] = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
+					if ($db_item['value_type'] != $value_type) {
+						$item['value_type'] = $value_type;
 					}
 					if ($db_item['units'] !== getRequest('units', '')) {
 						$item['units'] = getRequest('units', '');
 					}
-					if (bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
+					if ($value_type != ITEM_VALUE_TYPE_LOG && $value_type != ITEM_VALUE_TYPE_TEXT
+							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
 						$item['valuemapid'] = getRequest('valuemapid', 0);
 					}
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
@@ -792,12 +827,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
 					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
-				}
-				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
-				natsort($db_applications);
-				natsort($applications);
-				if (array_values($db_applications) !== array_values($applications)) {
-					$item['applications'] = $applications;
 				}
 				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
 					$item['inventory_link'] = getRequest('inventory_link', 0);
@@ -879,6 +908,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['params'] !== getRequest('params', '')) {
 					$item['params'] = getRequest('params', '');
 				}
+			}
+
+			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+			if (array_values($db_item['tags']) !== array_values($tags)) {
+				$item['tags'] = $tags;
 			}
 
 			if ($item) {
@@ -1123,11 +1158,12 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 /*
  * Display
  */
-if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'update', 'clone'])) {
+if (getRequest('form') === 'create' || getRequest('form') === 'update'
+		|| (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$master_item_options = [];
 	$has_errors = false;
 
-	if (hasRequest('itemid')) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
@@ -1137,10 +1173,11 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 				'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
 				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
-			'selectHosts' => ['status', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHosts' => ['status', 'name', 'flags'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
@@ -1177,7 +1214,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status'],
+			'output' => ['hostid', 'name', 'status', 'flags'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);
@@ -1205,7 +1242,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 	}
 
-	$data = getItemFormData($item);
+	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
+	$data = getItemFormData($item, ['form' => $form_action]);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
@@ -1270,6 +1308,25 @@ else {
 	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// Filter and subfilter tags.
+	$filter_evaltype = CProfile::get($prefix.'items.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
+	$filter_tags = [];
+	foreach (CProfile::getArray($prefix.'items.filter.tags.tag', []) as $i => $tag) {
+		$filter_tags[] = [
+			'tag' => $tag,
+			'value' => CProfile::get($prefix.'items.filter.tags.value', null, $i),
+			'operator' => CProfile::get($prefix.'items.filter.tags.operator', null, $i)
+		];
+	}
+	$subfilter_tags = [];
+	foreach (CProfile::getArray($prefix.'items.subfilter_tags.tag', []) as $i => $tag) {
+		$val = CProfile::get($prefix.'items.subfilter_tags.value', '', $i);
+		$subfilter_tags[json_encode([$tag, $val])] = [
+			'tag' => $tag,
+			'value' => $val
+		];
+	}
+
 	if (count($filter_hostids) == 1) {
 		$hostid = reset($filter_hostids);
 	}
@@ -1297,10 +1354,12 @@ else {
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => ['triggerid'],
-		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
+		'selectTags' => ['tag', 'value'],
 		'sortfield' => $sortField,
+		'evaltype' => $filter_evaltype,
+		'tags' => $filter_tags,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1312,15 +1371,6 @@ else {
 		$options['groupids'] = $filter_groupids;
 	}
 
-	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['applicationids'] = array_keys(API::Application()->get([
-			'output' => [],
-			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
-			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-			'search' => ['name' => getRequest('filter_application')],
-			'preservekeys' => true
-		]));
-	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];
 	}
@@ -1337,6 +1387,20 @@ else {
 			&& $_REQUEST['filter_value_type'] != -1) {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
+	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
+		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
+
+		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
+			'output' => ['name'],
+			'valuemapids' => $_REQUEST['filter_valuemapids']
+		]), 'name'));
+
+		$options['filter']['valuemapid'] = array_column(API::ValueMap()->get([
+			'output' => ['valuemapid'],
+			'hostids' => $hostids,
+			'filter' => ['name' => $valuemap_names]
+		]), 'valuemapid');
+	}
 
 	/*
 	 * Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
@@ -1351,8 +1415,8 @@ else {
 		if ($filter_delay !== '') {
 			if ($filter_type == -1 && $filter_delay == 0) {
 				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
-					ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX
+					ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX
 				];
 
 				$options['filter']['delay'] = $filter_delay;
@@ -1406,6 +1470,17 @@ else {
 
 	$data['items'] = API::Item()->get($options);
 	$data['parent_templates'] = [];
+
+	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
+	if ($subfilter_tags) {
+		$item_tags = [];
+		foreach ($data['items'] as $item) {
+			foreach ($item['tags'] as $tag) {
+				$item_tags[json_encode([$tag['tag'], $tag['value']])] = true;
+			}
+		}
+		$subfilter_tags = array_intersect_key($subfilter_tags, $item_tags);
+	}
 
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
@@ -1479,30 +1554,11 @@ else {
 					|| ($trends !== '' && in_array($trends, getRequest('subfilter_trends')))),
 				'subfilter_interval' => (!getRequest('subfilter_interval')
 					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
-				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
+				'subfilter_tags' => (!$subfilter_tags
+					|| (bool) array_intersect_key($subfilter_tags, array_flip(array_map(function ($tag) {
+							return json_encode([$tag['tag'], $tag['value']]);
+						}, $item['tags']))))
 			];
-
-			if (!empty($_REQUEST['subfilter_apps'])) {
-				foreach ($item['applications'] as $application) {
-					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {
-						$item['subfilters']['subfilter_apps'] = true;
-						break;
-					}
-				}
-			}
-
-			if (!empty($item['applications'])) {
-				order_result($item['applications'], 'name');
-
-				$applications = [];
-				foreach ($item['applications'] as $application) {
-					$applications[] = $application['name'];
-				}
-				$item['applications_list'] = implode(', ', $applications);
-			}
-			else {
-				$item['applications_list'] = '';
-			}
 		}
 		unset($item);
 
@@ -1531,7 +1587,94 @@ else {
 		}
 	}
 
-	$data['main_filter'] = getItemFilterForm($data);
+	if ($data['context'] === 'host') {
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter_hostids,
+				'editable' => true
+			]), ['hostid' => 'id'])
+			: [];
+	}
+	else {
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter_hostids,
+				'editable' => true
+			]), ['templateid' => 'id'])
+			: [];
+	}
+
+	$data['filter_data'] = [
+		'groups' => hasRequest('filter_groupids')
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => getRequest('filter_groupids'),
+				'editable' => true
+			]), ['groupid' => 'id'])
+			: [],
+		'hosts' => $host_template_filter,
+		'filter_name' => getRequest('filter_name'),
+		'filter_key' => getRequest('filter_key'),
+		'filter_type' => getRequest('filter_type'),
+		'filter_snmp_oid' => getRequest('filter_snmp_oid'),
+		'filter_value_type' => getRequest('filter_value_type'),
+		'filter_delay' => getRequest('filter_delay'),
+		'filter_history' => getRequest('filter_history'),
+		'filter_trends' => getRequest('filter_trends'),
+		'filter_status' => getRequest('filter_status'),
+		'filter_inherited' => getRequest('filter_inherited'),
+		'filter_with_triggers' => getRequest('filter_with_triggers'),
+		'filter_valuemapids' => getRequest('filter_valuemapids'),
+		'filter_evaltype' => $filter_evaltype,
+		'filter_tags' => $filter_tags,
+		'subfilter_hosts' => getRequest('subfilter_hosts'),
+		'subfilter_types' => getRequest('subfilter_types'),
+		'subfilter_status' => getRequest('subfilter_status'),
+		'subfilter_value_types' => getRequest('subfilter_value_types'),
+		'subfilter_inherited' => getRequest('subfilter_inherited'),
+		'subfilter_with_triggers' => getRequest('subfilter_with_triggers'),
+		'subfilter_history' => getRequest('subfilter_history'),
+		'subfilter_trends' => getRequest('subfilter_trends'),
+		'subfilter_interval' => getRequest('subfilter_interval'),
+		'subfilter_tags' => $subfilter_tags
+	];
+	if ($data['context'] === 'host') {
+		$data['filter_data'] += [
+			'filter_state' => getRequest('filter_state'),
+			'filter_discovered' => getRequest('filter_discovered'),
+			'subfilter_state' => getRequest('subfilter_state'),
+			'subfilter_discovered' => getRequest('subfilter_discovered')
+		];
+	}
+	if ($host_template_filter) {
+		$data['filter_data']['filter_valuemapids'] = $data['filter_data']['filter_valuemapids']
+			? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'valuemapids' => $data['filter_data']['filter_valuemapids']
+			]), ['valuemapid' => 'id'])
+			: [];
+	}
+
+	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
+
+	if (!$data['filter_data']['filter_tags']) {
+		$data['filter_data']['filter_tags'] = [[
+			'tag' => '',
+			'value' => '',
+			'operator' => TAG_OPERATOR_LIKE
+		]];
+	}
+
+	// Replace hash keys by numeric index used in subfilter.
+	foreach ($data['filter_data']['subfilter_tags'] as $hash => $tag) {
+		$data['filter_data']['subfilter_tags'][$tag['num']] = [
+			'tag' => $tag['tag'],
+			'value' => $tag['value']
+		];
+		unset($data['filter_data']['subfilter_tags'][$hash]);
+	}
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {
@@ -1620,6 +1763,8 @@ else {
 	];
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();

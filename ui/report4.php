@@ -130,8 +130,8 @@ if ($media_types) {
 	$users = [];
 
 	$db_users = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
-		'sortfield' => 'alias'
+		'output' => ['userid', 'username', 'name', 'surname'],
+		'sortfield' => 'username'
 	]);
 
 	foreach ($db_users as $user_data) {

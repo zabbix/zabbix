@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup scripts
@@ -28,11 +29,15 @@ class testFormAdministrationScripts extends CWebTest {
 
 	private const ID_UPDATE = 200;	// Script for Update.
 
-	private const ID_CLONE = 201; // Script for Clone.
-	private const NAME_CLONE = 'Cloned Script for Clone';
-
 	private const ID_DELETE = 202;
 	private const NAME_DELETE = 'Script for Delete';
+
+	/**
+	 * Id of scripts that created for future cloning.
+	 *
+	 * @var integer
+	 */
+	protected static $scriptids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -40,9 +45,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	/**
@@ -89,11 +92,74 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max webhook',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
 						'Timeout' => '60s',
 						'Description' => 'Test description',
-						'User group' => 'Guests',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Templates',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max webhook 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Templates'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max webhook 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Templates',
 						'Required host permissions' => 'Write',
@@ -330,7 +396,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Script' => 'Webhook: empty name'
@@ -342,11 +408,45 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max script',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
 						'Execute on' => 'Zabbix server (proxy)',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
-						'User group' => 'Disabled',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max script 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max script 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
@@ -357,7 +457,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'Script',
@@ -381,6 +481,39 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max IPMI',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max IPMI 2',
+						'Scope' => 'Action operation',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max IPMI 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI command',
 						'Description' => 'Test description',
@@ -396,7 +529,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'IPMI',
@@ -414,13 +547,260 @@ class testFormAdministrationScripts extends CWebTest {
 						'Command' => ''
 					]
 				]
+			],
+			// SSH.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 2',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 4',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 5',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 6',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'SSH',
+						'Commands' => 'SSH empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'SSH empty command',
+						'Type' => 'SSH',
+						'Commands' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/username": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'SSH empty username',
+						'Type' => 'SSH',
+						'Commands' => 'SSH empty username',
+						'Username' => ''
+					]
+				]
+			],
+			// Telnet
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet 3',
+						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'Telnet',
+						'Commands' => 'Telnet empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Telnet empty command',
+						'Type' => 'Telnet',
+						'Commands' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/username": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Telnet empty username',
+						'Type' => 'Telnet',
+						'Commands' => 'Telnet empty username',
+						'Username' => ''
+					]
+				]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider getScriptsData
-	 * @backup-once scripts
+	 * @backupOnce scripts
 	 */
 	public function testFormAdministrationScripts_Create($data) {
 		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
@@ -447,7 +827,7 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		$this->page->login()->open($link);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -460,7 +840,7 @@ class testFormAdministrationScripts extends CWebTest {
 				unset($parameter);
 			}
 
-			$this->query('id:parameters_table')->asMultifieldTable()->one()->fill($data['Parameters']);
+			$this->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
 		// Check testing confirmation while configuring.
@@ -515,7 +895,7 @@ class testFormAdministrationScripts extends CWebTest {
 					unset($parameter);
 				}
 
-				$this->query('id:parameters_table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+				$this->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
 			}
 		}
 	}
@@ -529,7 +909,7 @@ class testFormAdministrationScripts extends CWebTest {
 	private function checkConfirmation($data, $form) {
 		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation') === false) {
 			$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
-			$this->assertFalse($form->query('id:testConfirmation')->one()->isEnabled());
+			$this->assertFalse($form->query('id:test-confirmation')->one()->isEnabled());
 		}
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
@@ -550,7 +930,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -577,35 +957,81 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
+		$this->query('id:script-form')->waitUntilReady()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
 	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
+		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'SSH_api_clone_1',
+				'type' => 2,
+				'scope' => 1,
+				'username' => 'SSH_username',
+				'password' => 'SSH_password',
+				'command' => 'test',
+				'port' => '80'
+			],
+			[
+				'name' => 'SSH_api_clone_2',
+				'type' => 2,
+				'authtype' => '1',
+				'username' => 'SSH_username',
+				'privatekey' => 'private_key',
+				'publickey' => 'public_key',
+				'command' => 'test'
+			],
+			[
+				'name' => 'TELNET_api_clone',
+				'type' => 3,
+				'username' => 'TELNET_username',
+				'password' => 'TELNET_password',
+				'command' => 'test'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $response);
+		self::$scriptids = $response['scriptids'];
+	}
+
+	/**
 	 * Function for checking script cloning with only changed name.
+	 *
+	 * @onBefore prepareScriptData
 	 */
 	public function testFormAdministrationScripts_Clone() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$values['Name'] = self::NAME_CLONE;
-		$this->query('button:Clone')->waitUntilReady()->one()->click();
-		$this->page->waitUntilReady();
+		// Added existing webhook to the list.
+		array_push(self::$scriptids, '201');
+		foreach (self::$scriptids as $scriptid) {
+			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
+			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+			$values = $form->getFields()->asValues();
+			$script_name = $values['Name'];
+			$this->query('button:Clone')->waitUntilReady()->one()->click();
+			$this->page->waitUntilReady();
 
-		$form->invalidate();
-		$form->fill(['Name' => self::NAME_CLONE]);
-		$form->submit();
+			$form->invalidate();
+			$form->fill(['Name' => 'Cloned_'.$script_name]);
+			$form->submit();
 
-		$this->assertMessage(TEST_GOOD, 'Script added');
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Script for Clone')));
+			$this->assertMessage(TEST_GOOD, 'Script added');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($script_name)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name)));
 
-		$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE));
-		$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
-		$cloned_values = $form->getFields()->asValues();
-		$this->assertEquals($values, $cloned_values);
+			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name));
+			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+			$cloned_values = $form->getFields()->asValues();
+			$this->assertEquals('Cloned_'.$script_name, $cloned_values['Name']);
+
+			// Field Name removed from arrays.
+			unset($cloned_values['Name']);
+			unset($values['Name']);
+			$this->assertEquals($values, $cloned_values);
+		}
 	}
 
 	/**

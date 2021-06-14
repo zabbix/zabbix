@@ -213,7 +213,8 @@ if (array_key_exists('render_html', $data)) {
 					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('form_row'))
+			->addClass('form_row')
+	)
 	->show();
 ?>
 <script type="text/javascript">
@@ -274,19 +275,14 @@ if (array_key_exists('render_html', $data)) {
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
-				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-				$(this)
-					.find('z-select')
-					.on('change', function() {
-						var num = this.id.match(/tags_(\d+)_operator/);
-
-						if (num !== null) {
-							$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-							);
-						}
-					});
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length - 1]);
 			});
+
+		// Init existing fields once loaded.
+		document.querySelectorAll('#tags_' + data.uniqid + ' .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 
 		// Input, radio and single checkboxes.
 		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'show_suppressed'].forEach((key) => {
@@ -304,19 +300,6 @@ if (array_key_exists('render_html', $data)) {
 		for (const value in data.severities) {
 			$('[name="severities[' + value + ']"]', container).attr('checked', true);
 		}
-
-		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$('#tags_' + data.uniqid + ' z-select')
-			.on('change', function() {
-				var num = this.id.match(/tags_(\d+)_operator/);
-
-				if (num !== null) {
-					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-					);
-				}
-			})
-			.trigger('change');
 
 		// Initialize src_url.
 		this.resetUnsavedState();

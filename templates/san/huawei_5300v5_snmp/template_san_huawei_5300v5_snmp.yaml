@@ -1,0 +1,1677 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T08:05:45Z'
+  groups:
+    -
+      uuid: 7c2cb727f85b492d88cd56e17127c64d
+      name: Templates/SAN
+  templates:
+    -
+      uuid: c5564dd58c394b969d5365cc5de3e7f8
+      template: 'Huawei OceanStor 5300 V5 SNMP'
+      name: 'Huawei OceanStor 5300 V5 SNMP'
+      description: |
+        The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+      groups:
+        -
+          name: Templates/SAN
+      items:
+        -
+          uuid: 86d978c810024643829d3192156e9e6c
+          name: 'OceanStor 5300 V5: Status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.34774.4.1.1.3.0
+          key: 'huawei.5300.v5[status]'
+          history: 7d
+          description: 'System running status.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Huawei
+        -
+          uuid: 04c8d7f53668449ea32c4ed611b71237
+          name: 'OceanStor 5300 V5: Capacity total'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.34774.4.1.1.5.0
+          key: 'huawei.5300.v5[totalCapacity]'
+          history: 7d
+          units: B
+          description: 'Total capacity of a device.'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          tags:
+            -
+              tag: Application
+              value: Huawei
+        -
+          uuid: ef77f126052b4f9e9cddafdab20577d1
+          name: 'OceanStor 5300 V5: Capacity used'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.34774.4.1.1.4.0
+          key: 'huawei.5300.v5[usedCapacity]'
+          history: 7d
+          units: B
+          description: 'Used capacity of a device.'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          tags:
+            -
+              tag: Application
+              value: Huawei
+        -
+          uuid: 0a2e129d84d14e88bf953f3a9ca76b46
+          name: 'OceanStor 5300 V5: Version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.34774.4.1.1.6.0
+          key: 'huawei.5300.v5[version]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The device version.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Huawei
+          triggers:
+            -
+              uuid: b6eb791cc14644dfb0a69a2cce150ab1
+              expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2))=1 and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0'
+              name: 'OceanStor 5300 V5: Storage version has been changed'
+              priority: INFO
+              description: 'OceanStor 5300 V5 version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: 6de9606d1f594546b76e79bbb72a8a56
+          name: 'BBU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.5.1.1,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.5.1.2]'
+          key: huawei.5300.bbu.discovery
+          delay: 1h
+          description: 'Discovery of BBU'
+          item_prototypes:
+            -
+              uuid: e9632c3596954729a8d49039ea787efd
+              name: 'BBU {#ID} on {#LOCATION}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.5.1.3.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"]'
+              history: 7d
+              description: |
+                Health status of a BBU. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'BBU {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: fb73cddd30164af8aa243bd3e2b2f803
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1'
+                  name: 'BBU {#ID} on {#LOCATION}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: a861b76edde842448f39afd9788fa852
+              name: 'BBU {#ID} on {#LOCATION}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.5.1.4.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"]'
+              history: 7d
+              description: |
+                Running status of a BBU. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'BBU {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 15d809b0be1c4d1da9158a83d303789c
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2'
+                  name: 'BBU {#ID} on {#LOCATION}: Running status is not Online'
+                  priority: AVERAGE
+        -
+          uuid: c676eae5d7c548e788f7addc2343389f
+          name: 'Controllers discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.2.1.1]'
+          key: huawei.5300.controllers.discovery
+          delay: 1h
+          description: 'Discovery of controllers'
+          item_prototypes:
+            -
+              uuid: f9023618aa2b4c23a81c8cc3793bac0d
+              name: 'Controller {#ID}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.8.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU usage of a controller {#ID}.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: a51b4e42efaa4924b6c2990c9c0abf30
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}'
+                  name: 'Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+            -
+              uuid: 99798c647f2344d2896b644f2bd7e1c0
+              name: 'Controller {#ID}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.2.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"]'
+              history: 7d
+              description: |
+                Controller health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 52cf517dd30146578b32fd1399ec81cc
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1'
+                  name: 'Controller {#ID}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: 42b61bf322fb495d94802c23f85f22b2
+              name: 'Controller {#ID}: Memory utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.9.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"]'
+              history: 7d
+              units: '%'
+              description: 'Memory usage of a controller {#ID}.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 8d4fe305737f41a595c1d2efb3e8a153
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}'
+                  name: 'Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME})'
+                  priority: AVERAGE
+            -
+              uuid: 4797e9608d2445e385ad9db6097feeeb
+              name: 'Controller {#ID}: Role'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.6.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoControllerRole, "{#ID}"]'
+              history: 7d
+              description: 'Controller role..'
+              valuemap:
+                name: 'Huawei storage: Controller role'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 8b8ec3f843e74533a43f24393004cc84
+                  expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2))=1'
+                  name: 'Controller {#ID}: Role has been changed'
+                  priority: WARNING
+                  manual_close: 'YES'
+            -
+              uuid: b9a0053b16c04cefbdfc320659d79754
+              name: 'Controller {#ID}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.3.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"]'
+              history: 7d
+              description: |
+                Controller running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 6ab64eb5e1c146838ad48b7b9b063587
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27'
+                  name: 'Controller {#ID}: Running status is not Online'
+                  priority: AVERAGE
+          graph_prototypes:
+            -
+              uuid: ac083f05484846e6a8c4799410e1f566
+              name: 'Controller {#ID}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"]'
+        -
+          uuid: 3a0b0a1fcdd9402cb67e93903049b070
+          name: 'Disks discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.1.1.1,{#MODEL},1.3.6.1.4.1.34774.4.1.23.5.1.1.12,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.1.1.4]'
+          key: huawei.5300.disks.discovery
+          delay: 1h
+          description: 'Discovery of disks'
+          item_prototypes:
+            -
+              uuid: 4952b2d54c3a4bb98e26f8221d2833a8
+              name: 'Disk {#MODEL} on {#LOCATION}: Health score'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.1.1.25.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoDiskHealthMark, "{#ID}"]'
+              history: 7d
+              description: 'Health score of a disk. If the value is 255, indicating invalid.'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#MODEL}'
+            -
+              uuid: d30c2d9d18d54af08c18bd35b5664a0d
+              name: 'Disk {#MODEL} on {#LOCATION}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.1.1.2.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"]'
+              history: 7d
+              description: |
+                Disk health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: fc1c8d30f09c49a3999e282bff6ea370
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1'
+                  name: 'Disk {#MODEL} on {#LOCATION}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: d5f1c54d524847ebae2015968e772d92
+              name: 'Disk {#MODEL} on {#LOCATION}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.1.1.3.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"]'
+              history: 7d
+              description: |
+                Disk running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#MODEL}'
+              trigger_prototypes:
+                -
+                  uuid: 53aaf06848a346f188799d1cbb5d948f
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27'
+                  name: 'Disk {#MODEL} on {#LOCATION}: Running status is not Online'
+                  priority: AVERAGE
+            -
+              uuid: 769abd2f1a8d43cda52c8021c20fe3c4
+              name: 'Disk {#MODEL} on {#LOCATION}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.1.1.11.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"]'
+              history: 7d
+              units: °C
+              description: 'Disk temperature.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#MODEL}'
+              trigger_prototypes:
+                -
+                  uuid: 906de152d3594f1d8cc15b4b717d6202
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
+                  name: 'Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME})'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+        -
+          uuid: 21e6235b6b314ce6a6392aafc9a3de07
+          name: 'Enclosure discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#NAME},1.3.6.1.4.1.34774.4.1.23.5.6.1.2]'
+          key: huawei.5300.enclosure.discovery
+          delay: 1h
+          description: 'Discovery of enclosures'
+          item_prototypes:
+            -
+              uuid: a2be3a03bccf48a0baa067d8ef83a3b1
+              name: 'Enclosure {#NAME}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.6.1.4.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"]'
+              history: 7d
+              description: |
+                Enclosure health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 9b8fb5b02b0b4158a2b564f47281f716
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1'
+                  name: 'Enclosure {#NAME}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: b96af65318d64932bc13e8e81155644c
+              name: 'Enclosure {#NAME}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.6.1.5.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"]'
+              history: 7d
+              description: |
+                Enclosure running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 3c430a2073ff42d9908490858c9c2817
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27'
+                  name: 'Enclosure {#NAME}: Running status is not Online'
+                  priority: AVERAGE
+            -
+              uuid: 37fa5a5f2d7d440dbb38781bddf5cd46
+              name: 'Enclosure {#NAME}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.6.1.8.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"]'
+              history: 7d
+              units: °C
+              description: 'Enclosure temperature.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 622fcc16c03e4ba4ad8371ea5c1c314f
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}'
+                  name: 'Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME})'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+        -
+          uuid: ae390e1c100d490ab4e878bac8951744
+          name: 'FANs discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.4.1.1,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.4.1.2]'
+          key: huawei.5300.fan.discovery
+          delay: 1h
+          description: 'Discovery of FANs'
+          item_prototypes:
+            -
+              uuid: c75f70a1c6d44a87aec0b27c3d9fbf5e
+              name: 'FAN {#ID} on {#LOCATION}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.4.1.3.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"]'
+              history: 7d
+              description: |
+                Health status of a fan. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'FAN {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: 1f41c20696d44eb29a1273718c9faf2f
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1'
+                  name: 'FAN {#ID} on {#LOCATION}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: 800d348ca4394215800c227b421e9bea
+              name: 'FAN {#ID} on {#LOCATION}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.4.1.4.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"]'
+              history: 7d
+              description: |
+                Operating status of a fan. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'FAN {#ID}'
+              trigger_prototypes:
+                -
+                  uuid: c225c9d853184d579d18c27f7e906fd2
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2'
+                  name: 'FAN {#ID} on {#LOCATION}: Running status is not Running'
+                  priority: AVERAGE
+        -
+          uuid: aeb30b2aec4842bfb0a9f946988783a2
+          name: 'LUNs discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#NAME},1.3.6.1.4.1.34774.4.1.19.9.4.1.2]'
+          key: huawei.5300.lun.discovery
+          delay: 1h
+          description: 'Discovery of LUNs'
+          item_prototypes:
+            -
+              uuid: d434317e77514a18907a400f68ad773e
+              name: 'LUN {#NAME}: Average total I/O latency'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.13.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"]'
+              history: 7d
+              units: '!ms'
+              description: 'Average I/O latency of the node in milliseconds.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: aae494cb840049fb83df354c13daaf53
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
+                  name: 'LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})'
+                  priority: WARNING
+            -
+              uuid: 75e6ce80f06c4b3b86a13de4aadf25d7
+              name: 'LUN {#NAME}: Average read I/O latency'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.15.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunAverageReadIOLatency, "{#NAME}"]'
+              history: 7d
+              units: '!ms'
+              description: 'Average read I/O response time in milliseconds.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: b639b6cc20524fe1a5c415a6218b5382
+              name: 'LUN {#NAME}: Average write I/O latency'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.16.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunAverageWriteIOLatency, "{#NAME}"]'
+              history: 7d
+              units: '!ms'
+              description: 'Average write I/O response time in milliseconds.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 6e2c299282f045cca7a07dedd30b5f89
+              name: 'LUN {#NAME}: Read operations per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.4.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunReadIOPS, "{#NAME}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Read IOPS of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 8e376b38196b4954895b10aefbdf65ba
+              name: 'LUN {#NAME}: Read traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.7.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunReadTraffic, "{#NAME}"]'
+              history: 7d
+              units: Bps
+              description: 'Current read bandwidth for the LUN.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 4d83d160c92845c9ac0f51f5f0158c3b
+              name: 'LUN {#NAME}: Total I/O per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.3.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunTotalIOPS, "{#NAME}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Current IOPS of the LUN.'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 1bbe8185981349dcb8a867955ff19c2f
+              name: 'LUN {#NAME}: Total traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.6.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunTotalTraffic, "{#NAME}"]'
+              history: 7d
+              units: Bps
+              description: 'Current total bandwidth for the LUN.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 1aed4e060c9743caa13d1ace2cee16f3
+              name: 'LUN {#NAME}: Write operations per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.5.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunWriteIOPS, "{#NAME}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Write IOPS of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 4a21edb8ea37437f8435565e04c5ce28
+              name: 'LUN {#NAME}: Write traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.4.1.8.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfLunWriteTraffic, "{#NAME}"]'
+              history: 7d
+              units: Bps
+              description: 'Current write bandwidth for the LUN.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: 4c85003e7f7441adb4490efcb03e477e
+              name: 'LUN {#NAME}: Capacity'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.19.9.4.1.5.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwStorageLunCapacity, "{#NAME}"]'
+              history: 7d
+              units: B
+              description: 'Capacity of the LUN.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+            -
+              uuid: f613af109f2846c88e845f626743232b
+              name: 'LUN {#NAME}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.19.9.4.1.11.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwStorageLunStatus, "{#NAME}"]'
+              history: 7d
+              description: 'Status of the LUN.'
+              valuemap:
+                name: 'Huawei storage: LUN status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 757eef04912d44b4b4f9e1abab54fb4d
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1'
+                  name: 'LUN {#NAME}: Status is not Normal'
+                  priority: AVERAGE
+          graph_prototypes:
+            -
+              uuid: 36d1eb7893f54db28afb1f4725aef1a1
+              name: 'LUN {#NAME}: LUN I/O'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunTotalIOPS, "{#NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunReadIOPS, "{#NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunWriteIOPS, "{#NAME}"]'
+            -
+              uuid: f86ef671d9454bb8878835ba1c96ba20
+              name: 'LUN {#NAME}: LUN I/O latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunAverageReadIOLatency, "{#NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunAverageWriteIOLatency, "{#NAME}"]'
+            -
+              uuid: eb10b5b56a964c2ba7870d2dc7cf787b
+              name: 'LUN {#NAME}: LUN traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunTotalTraffic, "{#NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunReadTraffic, "{#NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfLunWriteTraffic, "{#NAME}"]'
+        -
+          uuid: 6b934c21d8c54adf8b2e6d28e250537b
+          name: 'Nodes performance discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#NODE},1.3.6.1.4.1.34774.4.1.21.3.1.1]'
+          key: huawei.5300.nodes.discovery
+          delay: 1h
+          description: 'Discovery of nodes performance counters'
+          item_prototypes:
+            -
+              uuid: ac917a8a5b364f66a62c580cb6249c02
+              name: 'Node {#NODE}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.2.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU usage of the node {#NODE}.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+              trigger_prototypes:
+                -
+                  uuid: 8495a55d6549460d9b132675a39b818b
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}'
+                  name: 'Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+            -
+              uuid: 336022218b44497f84056fce4ed4d2bf
+              name: 'Node {#NODE}: Average I/O latency'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.4.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"]'
+              history: 7d
+              value_type: FLOAT
+              units: '!ms'
+              description: 'Average I/O latency of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+              trigger_prototypes:
+                -
+                  uuid: 8f54bfe029fe43c7a049c6a97c8598bf
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
+                  name: 'Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})'
+                  priority: WARNING
+            -
+              uuid: 3019a48ac4d34552a00c3344d04ec055
+              name: 'Node {#NODE}: Read operations per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.6.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeReadIOPS, "{#NODE}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Read IOPS of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+            -
+              uuid: e0c9807e30cc49c480f4862bf7228da8
+              name: 'Node {#NODE}: Read traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.9.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeReadTraffic, "{#NODE}"]'
+              history: 7d
+              units: Bps
+              description: 'Read bandwidth for the node.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+            -
+              uuid: 1c3d8562d32d4412b649738c05350c4d
+              name: 'Node {#NODE}: Total I/O per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.5.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeTotalIOPS, "{#NODE}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Total IOPS of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+            -
+              uuid: 604ab970767b4a4e80e5e2e29d30f9a1
+              name: 'Node {#NODE}: Total traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.8.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeTotalTraffic, "{#NODE}"]'
+              history: 7d
+              units: Bps
+              description: 'Total bandwidth for the node.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+            -
+              uuid: bd0c930ef95b4bb6838cac49dd38bf6f
+              name: 'Node {#NODE}: Write operations per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.7.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeWriteIOPS, "{#NODE}"]'
+              history: 7d
+              units: '!iops'
+              description: 'Write IOPS of the node.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+            -
+              uuid: 4f5105903075422cb6643dca913df933
+              name: 'Node {#NODE}: Write traffic per second'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.21.3.1.7.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwPerfNodeWriteTraffic, "{#NODE}"]'
+              history: 7d
+              units: Bps
+              description: 'Write bandwidth for the node.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
+          graph_prototypes:
+            -
+              uuid: 62f3a059a92a454eba1a71fb3a62b787
+              name: 'Node {#NODE}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"]'
+            -
+              uuid: 1061657e43594c139c49125c1710a10a
+              name: 'Node {#NODE}: Node I/O'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeTotalIOPS, "{#NODE}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeReadIOPS, "{#NODE}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeWriteIOPS, "{#NODE}"]'
+            -
+              uuid: 81b69fee1dde49e0b0fbe5c06077d289
+              name: 'Node {#NODE}: Node traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeTotalTraffic, "{#NODE}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeReadTraffic, "{#NODE}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwPerfNodeWriteTraffic, "{#NODE}"]'
+        -
+          uuid: 746fcf5132a54e0588713e6313d03e02
+          name: 'Storage pools discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#NAME},1.3.6.1.4.1.34774.4.1.23.4.2.1.2,{#THRESHOLD},1.3.6.1.4.1.34774.4.1.23.4.2.1.14]'
+          key: huawei.5300.pool.discovery
+          delay: 1h
+          description: 'Discovery of storage pools'
+          item_prototypes:
+            -
+              uuid: 07d22960999a4d8392b90280bf8d3389
+              name: 'Pool {#NAME}: Capacity free'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.4.2.1.9.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]'
+              history: 7d
+              units: B
+              description: 'Available capacity of a storage pool.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
+            -
+              uuid: a800b047bda64f528ad4d22698efaa7d
+              name: 'Pool {#NAME}: Capacity used percentage'
+              type: CALCULATED
+              key: 'huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]'
+              history: 7d
+              units: '%'
+              params: 'last(//huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"])/last(//huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"])*100'
+              description: 'Used capacity of a storage pool in percents.'
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
+              trigger_prototypes:
+                -
+                  uuid: 2ea46713fe664a64a851edca422257f8
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}'
+                  name: 'Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%)'
+                  priority: AVERAGE
+            -
+              uuid: 8a8bb086e75b4476af3686e5d28d8cfc
+              name: 'Pool {#NAME}: Health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.4.2.1.5.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"]'
+              history: 7d
+              description: |
+                Health status of a storage pool. For details, see definition of Enum Values (HEALTH_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Health status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 8089b48aafb4403fa3187164685f8ca3
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1'
+                  name: 'Pool {#NAME}: Health status is not Normal'
+                  priority: HIGH
+            -
+              uuid: a5e886744b82456e8a028f01d458307a
+              name: 'Pool {#NAME}: Running status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.4.2.1.6.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"]'
+              history: 7d
+              description: |
+                Operating status of a storage pool. For details, see definition of Enum Values (RUNNING_STATUS_E).
+                https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
+              valuemap:
+                name: 'Huawei storage: Running status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
+              trigger_prototypes:
+                -
+                  uuid: 5ff1d6b5d90040928b90908859c2e8cd
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27'
+                  name: 'Pool {#NAME}: Running status is not Online'
+                  priority: AVERAGE
+            -
+              uuid: 8e59b01ae52b403a8e0da860c909faa1
+              name: 'Pool {#NAME}: Capacity used'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.4.2.1.8.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]'
+              history: 7d
+              units: B
+              description: 'Used capacity of a storage pool.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
+            -
+              uuid: e82a9a0946814522a517694df270a400
+              name: 'Pool {#NAME}: Capacity total'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.34774.4.1.23.4.2.1.7.{#SNMPINDEX}'
+              key: 'huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"]'
+              history: 7d
+              units: B
+              description: 'Total capacity of a storage pool.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
+          graph_prototypes:
+            -
+              uuid: 6a2ef2bf36e44139b8550d7f1950669a
+              name: 'Pool {#NAME}: Capacity'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Huawei OceanStor 5300 V5 SNMP'
+                    key: 'huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$HUAWEI.5300.DISK.TEMP.MAX.TIME}'
+          value: 5m
+          description: 'The time during which temperature of disk may exceed the threshold.'
+        -
+          macro: '{$HUAWEI.5300.DISK.TEMP.MAX.WARN}'
+          value: '45'
+          description: 'Maximum temperature of disk. Can be used with {#MODEL} as context.'
+        -
+          macro: '{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}'
+          value: 5m
+          description: 'The time during which average I/O response time of LUN may exceed the threshold.'
+        -
+          macro: '{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
+          value: '100'
+          description: 'Maximum average I/O response time of LUN in milliseconds.'
+        -
+          macro: '{$HUAWEI.5300.MEM.MAX.TIME}'
+          value: 5m
+          description: 'The time during which memory usage may exceed the threshold.'
+        -
+          macro: '{$HUAWEI.5300.MEM.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of memory used'
+        -
+          macro: '{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}'
+          value: 5m
+          description: 'The time during which verage I/O latency of node may exceed the threshold.'
+        -
+          macro: '{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
+          value: '20'
+          description: 'Maximum average I/O latency of node in milliseconds.'
+        -
+          macro: '{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME}'
+          value: 5m
+          description: 'The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.'
+        -
+          macro: '{$HUAWEI.5300.TEMP.MAX.TIME}'
+          value: 3m
+          description: 'The time during which temperature of enclosure may exceed the threshold.'
+        -
+          macro: '{$HUAWEI.5300.TEMP.MAX.WARN}'
+          value: '35'
+          description: 'Maximum temperature of enclosure'
+      valuemaps:
+        -
+          uuid: b5c6d9d67da54531a918c93a9c98cec8
+          name: 'Huawei storage: Controller role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Normal
+            -
+              value: '1'
+              newvalue: Master
+            -
+              value: '2'
+              newvalue: Slave
+        -
+          uuid: b7f399070ee0419cac1722f80268ff1a
+          name: 'Huawei storage: Health status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Fault
+            -
+              value: '3'
+              newvalue: Pre-fail
+            -
+              value: '4'
+              newvalue: 'Partially broken'
+            -
+              value: '5'
+              newvalue: Degraded
+            -
+              value: '6'
+              newvalue: 'Bad sectors found'
+            -
+              value: '7'
+              newvalue: 'Bit errors found'
+            -
+              value: '8'
+              newvalue: Consistent
+            -
+              value: '9'
+              newvalue: Inconsistent
+            -
+              value: '10'
+              newvalue: Busy
+            -
+              value: '11'
+              newvalue: 'No input'
+            -
+              value: '12'
+              newvalue: 'Low battery'
+            -
+              value: '13'
+              newvalue: 'Single link fault'
+            -
+              value: '14'
+              newvalue: Invalid
+            -
+              value: '15'
+              newvalue: 'Write protect'
+        -
+          uuid: e361f6b8fe92430f86d0e3dc70118ba9
+          name: 'Huawei storage: LUN status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Faulty
+            -
+              value: '3'
+              newvalue: Unformatted
+            -
+              value: '4'
+              newvalue: Formatting
+        -
+          uuid: ae5093d843784258aa32437cde486574
+          name: 'Huawei storage: Running status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Running
+            -
+              value: '3'
+              newvalue: 'Not running'
+            -
+              value: '4'
+              newvalue: 'Not existed'
+            -
+              value: '5'
+              newvalue: 'Sleep in high temperature'
+            -
+              value: '6'
+              newvalue: Starting
+            -
+              value: '7'
+              newvalue: 'Power failure rotection'
+            -
+              value: '8'
+              newvalue: 'Spin down'
+            -
+              value: '9'
+              newvalue: Started
+            -
+              value: '10'
+              newvalue: 'Link Up'
+            -
+              value: '11'
+              newvalue: 'Link Down'
+            -
+              value: '12'
+              newvalue: 'Powering on'
+            -
+              value: '13'
+              newvalue: 'Powered off'
+            -
+              value: '14'
+              newvalue: Pre-copy
+            -
+              value: '15'
+              newvalue: Copyback
+            -
+              value: '16'
+              newvalue: Reconstruction
+            -
+              value: '17'
+              newvalue: Expansion
+            -
+              value: '18'
+              newvalue: Unformatted
+            -
+              value: '19'
+              newvalue: Formatting
+            -
+              value: '20'
+              newvalue: Unmapped
+            -
+              value: '21'
+              newvalue: 'Initial synchronizing'
+            -
+              value: '22'
+              newvalue: Consistent
+            -
+              value: '23'
+              newvalue: Synchronizing
+            -
+              value: '24'
+              newvalue: Synchronized
+            -
+              value: '25'
+              newvalue: Unsynchronized
+            -
+              value: '26'
+              newvalue: Split
+            -
+              value: '27'
+              newvalue: Online
+            -
+              value: '28'
+              newvalue: Offline
+            -
+              value: '29'
+              newvalue: Locked
+            -
+              value: '30'
+              newvalue: Enabled
+            -
+              value: '31'
+              newvalue: Disabled
+            -
+              value: '32'
+              newvalue: Balancing
+            -
+              value: '33'
+              newvalue: 'To be recovered'
+            -
+              value: '34'
+              newvalue: Interrupted
+            -
+              value: '35'
+              newvalue: Invalid
+            -
+              value: '36'
+              newvalue: 'Not start'
+            -
+              value: '37'
+              newvalue: Queuing
+            -
+              value: '38'
+              newvalue: Stopped
+            -
+              value: '39'
+              newvalue: Copying
+            -
+              value: '40'
+              newvalue: Completed
+            -
+              value: '41'
+              newvalue: Paused
+            -
+              value: '42'
+              newvalue: 'Reverse synchronizing'
+            -
+              value: '43'
+              newvalue: Activated
+            -
+              value: '44'
+              newvalue: Restore
+            -
+              value: '45'
+              newvalue: Inactive
+            -
+              value: '46'
+              newvalue: Idle
+            -
+              value: '47'
+              newvalue: 'Powering off'
+            -
+              value: '48'
+              newvalue: Charging
+            -
+              value: '49'
+              newvalue: 'Charging completed'
+            -
+              value: '50'
+              newvalue: Discharging
+            -
+              value: '51'
+              newvalue: Upgrading
+            -
+              value: '52'
+              newvalue: 'Power Lost'
+            -
+              value: '53'
+              newvalue: Initializing
+            -
+              value: '54'
+              newvalue: 'Apply change'
+            -
+              value: '55'
+              newvalue: 'Online disable'
+            -
+              value: '56'
+              newvalue: 'Offline disable'
+            -
+              value: '57'
+              newvalue: 'Online frozen'
+            -
+              value: '58'
+              newvalue: 'Offline frozen'
+            -
+              value: '59'
+              newvalue: Closed
+            -
+              value: '60'
+              newvalue: Removing
+            -
+              value: '61'
+              newvalue: 'In service'
+            -
+              value: '62'
+              newvalue: 'Out of service'
+            -
+              value: '63'
+              newvalue: 'Running normal'
+            -
+              value: '64'
+              newvalue: 'Running fail'
+            -
+              value: '65'
+              newvalue: 'Running success'
+            -
+              value: '66'
+              newvalue: 'Running success'
+            -
+              value: '67'
+              newvalue: 'Running failed'
+            -
+              value: '68'
+              newvalue: Waiting
+            -
+              value: '69'
+              newvalue: Canceling
+            -
+              value: '70'
+              newvalue: Canceled
+            -
+              value: '71'
+              newvalue: 'About to synchronize'
+            -
+              value: '72'
+              newvalue: 'Synchronizing data'
+            -
+              value: '73'
+              newvalue: 'Failed to synchronize'
+            -
+              value: '74'
+              newvalue: Fault
+            -
+              value: '75'
+              newvalue: Migrating
+            -
+              value: '76'
+              newvalue: Migrated
+            -
+              value: '77'
+              newvalue: Activating
+            -
+              value: '78'
+              newvalue: Deactivating
+            -
+              value: '79'
+              newvalue: 'Start failed'
+            -
+              value: '80'
+              newvalue: 'Stop failed'
+            -
+              value: '81'
+              newvalue: Decommissioning
+            -
+              value: '82'
+              newvalue: Decommissioned
+            -
+              value: '83'
+              newvalue: Recommissioning
+            -
+              value: '84'
+              newvalue: 'Replacing node'
+            -
+              value: '85'
+              newvalue: Scheduling
+            -
+              value: '86'
+              newvalue: Pausing
+            -
+              value: '87'
+              newvalue: Suspending
+            -
+              value: '88'
+              newvalue: Suspended
+            -
+              value: '89'
+              newvalue: Overload
+            -
+              value: '90'
+              newvalue: 'To be switch'
+            -
+              value: '91'
+              newvalue: Switching
+            -
+              value: '92'
+              newvalue: 'To be cleanup'
+            -
+              value: '93'
+              newvalue: 'Forced start'
+            -
+              value: '94'
+              newvalue: Error
+            -
+              value: '95'
+              newvalue: 'Job completed'
+            -
+              value: '96'
+              newvalue: 'Partition Migrating'
+            -
+              value: '97'
+              newvalue: Mount
+            -
+              value: '98'
+              newvalue: Umount
+            -
+              value: '99'
+              newvalue: INSTALLING
+            -
+              value: '100'
+              newvalue: 'To Be Synchronized'
+            -
+              value: '101'
+              newvalue: Connecting
+            -
+              value: '102'
+              newvalue: 'Service Switching'
+            -
+              value: '103'
+              newvalue: 'Power-on failed'
+            -
+              value: '104'
+              newvalue: REPAIRING
+            -
+              value: '105'
+              newvalue: abnormal
+            -
+              value: '106'
+              newvalue: Deleting
+            -
+              value: '107'
+              newvalue: Modifying
+            -
+              value: '108'
+              newvalue: 'Running(clearing data)'
+            -
+              value: '109'
+              newvalue: 'Running(synchronizing data)'
+  graphs:
+    -
+      uuid: 9401d60314c441a5a04d7a9709c6970e
+      name: 'OceanStor 5300 V5: Capacity'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Huawei OceanStor 5300 V5 SNMP'
+            key: 'huawei.5300.v5[totalCapacity]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Huawei OceanStor 5300 V5 SNMP'
+            key: 'huawei.5300.v5[usedCapacity]'

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CColorValidatorTest extends CValidatorTest {
 
-	public function validParamProvider() {
+	public function dataProviderValidParam() {
 		return [
 			[[
 				'empty' => true,
@@ -32,7 +34,7 @@ class CColorValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function validValuesProvider() {
+	public function dataProviderValidValues() {
 		return [
 			[[], '000000'],
 			[[], 'AAAAAA'],
@@ -43,7 +45,7 @@ class CColorValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider() {
+	public function dataProviderInvalidValues() {
 		return [
 			[
 				['messageEmpty' => 'Empty color'],
@@ -73,7 +75,7 @@ class CColorValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesWithObjectsProvider() {
+	public function dataProviderInvalidValuesWithObjects() {
 		return [
 			[
 				['messageEmpty' => 'Empty color for "%1$s"'],

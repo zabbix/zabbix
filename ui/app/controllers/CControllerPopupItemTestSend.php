@@ -69,7 +69,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
@@ -102,7 +102,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'valuemapid'			=> 'int32',
+			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
 			'not_supported'			=> 'in 1'
@@ -253,6 +253,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
+		$valuemap = ($this->getInput('valuemapid', 0) != 0)
+			? API::ValueMap()->get([
+				'output' => [],
+				'selectMappings' => ['type', 'newvalue', 'value'],
+				'valuemapids' => $this->getInput('valuemapid')
+			])[0]
+			: [];
+
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			// Get post data for particular item type.
@@ -285,10 +293,22 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
 			}
 
+			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
+				$item_test_data['host']['hostid'] = $this->getInput('hostid');
+			}
+
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
-			if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
+			/*
+			 * Server will turn off status code check if field value is empty. If field is not present, then server will
+			 * default to check if status code is 200.
+			 */
+			if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $item_test_data)) {
+				$item_test_data['status_codes'] = '';
+			}
+
+			if ($this->item_type != ITEM_TYPE_CALCULATED) {
 				unset($item_test_data['value_type']);
 			}
 
@@ -401,11 +421,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($this->getInput('valuemapid', 0)) {
-							$mapped_value = getMappedValue($result['result'], $this->getInput('valuemapid'));
-							if ($mapped_value !== false) {
-								$output['mapped_value'] = $mapped_value;
-							}
+						if ($valuemap) {
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],
+								$result['result'], $valuemap
+							);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

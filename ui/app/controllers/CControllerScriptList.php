@@ -32,7 +32,8 @@ class CControllerScriptList extends CController {
 			'uncheck' =>		'in 1',
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
-			'filter_name' =>	'string'
+			'filter_name' =>	'string',
+			'filter_scope' =>	'in '.implode(',', [-1, ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,13 +59,16 @@ class CControllerScriptList extends CController {
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.scripts.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.scripts.filter_scope', $this->getInput('filter_scope', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.scripts.filter_name');
+			CProfile::delete('web.scripts.filter_scope');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.scripts.filter_name', '')
+			'name' => CProfile::get('web.scripts.filter_name', ''),
+			'scope' => CProfile::get('web.scripts.filter_scope', -1)
 		];
 
 		$data = [
@@ -79,15 +83,21 @@ class CControllerScriptList extends CController {
 		// list of scripts
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['scripts'] = API::Script()->get([
-			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'],
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on',
+				'scope'
+			],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
+			'filter' => [
+				'scope' => ($filter['scope'] == -1) ? null : $filter['scope']
+			],
 			'editable' => true,
-			'limit' => $limit
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
 
-		// data sort and pager
+		// Data sort and pager.
 		order_result($data['scripts'], $sortField, $sortOrder);
 
 		$page_num = getRequest('page', 1);
@@ -96,18 +106,25 @@ class CControllerScriptList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		// find script host group name and user group name. set to '' if all host/user groups used.
 
+
+		/*
+		 * Find script host group name and user group name. Set to NULL if all host/user groups used. Find associated
+		 * actions in any of operations. Collect scriptids for action scope scripts.
+		 */
+		$action_scriptids = [];
 		$usrgrpids = [];
 		$groupids = [];
 
 		foreach ($data['scripts'] as &$script) {
+			$script['actions'] = [];
+
 			if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 				$script['command'] = '';
 			}
 
-			$script['userGroupName'] = null; // all user groups
-			$script['hostGroupName'] = null; // all host groups
+			$script['userGroupName'] = null;
+			$script['hostGroupName'] = null;
 
 			if ($script['usrgrpid'] != 0) {
 				$usrgrpids[] = $script['usrgrpid'];
@@ -116,8 +133,29 @@ class CControllerScriptList extends CController {
 			if ($script['groupid'] != 0) {
 				$groupids[] = $script['groupid'];
 			}
+
+			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+				$action_scriptids[$script['scriptid']] = true;
+			}
 		}
 		unset($script);
+
+		if ($action_scriptids) {
+			$script_actions = API::Script()->get([
+				'output' => [],
+				'scriptids' => array_keys($action_scriptids),
+				'selectActions' => ['actionid', 'name'],
+				'preservekeys' => true
+			]);
+
+			foreach ($data['scripts'] as $scriptid => &$script) {
+				if (array_key_exists($scriptid, $script_actions)) {
+					$script['actions'] = $script_actions[$scriptid]['actions'];
+					CArrayHelper::sort($script['actions'], ['name']);
+				}
+			}
+			unset($script);
+		}
 
 		if ($usrgrpids) {
 			$userGroups = API::UserGroup()->get([
@@ -150,6 +188,10 @@ class CControllerScriptList extends CController {
 			}
 			unset($script);
 		}
+
+		$data['config'] = [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));

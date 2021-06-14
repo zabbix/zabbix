@@ -138,10 +138,6 @@ jQuery(function($) {
 				sections = getMenuPopupMapElementImage(data);
 				break;
 
-			case 'refresh':
-				sections = getMenuPopupRefresh(data, $obj);
-				break;
-
 			case 'trigger':
 				sections = getMenuPopupTrigger(data, $obj);
 				break;
@@ -171,7 +167,7 @@ jQuery(function($) {
 				break;
 
 			case 'widget_actions':
-				sections = getMenuPopupWidgetActions(data, $obj);
+				sections = getMenuPopupWidgetActions(data);
 				break;
 
 			default:
@@ -215,6 +211,7 @@ jQuery(function($) {
 			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
+			case 'widget_actions':
 				return false;
 
 			default:
@@ -248,9 +245,21 @@ jQuery(function($) {
 			default:
 				// Should match the default algorithm used in $.menuPopup().
 				return {
-					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+					of: (['click', 'mouseup', 'mousedown'].includes(event.type) && event.originalEvent.detail)
+						? event
+						: event.target,
 					my: 'left top',
-					at: 'left bottom'
+					at: 'left bottom',
+					using: (pos, data) => {
+						let max_left = data.horizontal === 'left'
+							? document.querySelector('.wrapper').clientWidth
+							: document.querySelector('.wrapper').clientWidth - data.element.width;
+
+						pos.left = Math.max(0, Math.min(max_left, pos.left));
+
+						data.element.element[0].style.top = `${pos.top}px`;
+						data.element.element[0].style.left = `${pos.left}px`;
+					}
 				};
 		}
 	}
@@ -337,7 +346,8 @@ jQuery(function($) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
 						'id': data.values[i].id,
-						'name': data.values[i].name
+						'name': data.values[i].name,
+						'query': data.values[i].query
 					};
 
 					if (typeof data.values[i].prefix !== 'undefined') {
@@ -349,10 +359,9 @@ jQuery(function($) {
 
 			$('#' + data.parentId).multiSelect('addData', items);
 		}
-		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
-				&& typeof addPopupValues !== 'undefined') {
+		else if (typeof window.addPopupValues !== 'undefined') {
 			// execute function if they exist
-			addPopupValues(data);
+			window.addPopupValues(data);
 		}
 		else {
 			$('#' + data.parentId).val(data.values[0].name);

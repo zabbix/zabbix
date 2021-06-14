@@ -145,7 +145,6 @@ class ZBase {
 		require_once 'include/hostgroups.inc.php';
 		require_once 'include/hosts.inc.php';
 		require_once 'include/httptest.inc.php';
-		require_once 'include/ident.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
 		require_once 'include/maintenances.inc.php';
@@ -154,7 +153,6 @@ class ZBase {
 		require_once 'include/services.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
-		require_once 'include/valuemap.inc.php';
 	}
 
 	/**
@@ -202,12 +200,12 @@ class ZBase {
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, $_GET,
+					->setSelectedByAction($action_name, $_REQUEST,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
 				$this->component_registry->get('menu.user')
-					->setSelectedByAction($action_name, $_GET,
+					->setSelectedByAction($action_name, $_REQUEST,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
@@ -298,6 +296,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',
 			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/data',
 			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
@@ -653,7 +652,7 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
+	 * Set layout mode using URL parameters.
 	 */
 	private function setLayoutModeByUrl() {
 		if (hasRequest('kiosk')) {

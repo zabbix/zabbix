@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-19T10:51:56Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:42Z'
   groups:
     -
+      uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
   templates:
     -
+      uuid: 5c42de26643c4b43b23a11159df021ce
       template: 'Apache Cassandra by JMX'
       name: 'Apache Cassandra by JMX'
       description: |
@@ -21,11 +23,9 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: Cassandra
       items:
         -
+          uuid: 147ba5946b994324b1f6d88a8d3b6541
           name: 'Cluster: Name'
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ClusterName"]'
@@ -34,16 +34,18 @@ zabbix_export:
           value_type: CHAR
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 1bd80c1ce70045cbadf60ee06a09a989
           name: Version
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]'
@@ -52,23 +54,26 @@ zabbix_export:
           value_type: CHAR
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: 855abdc321c74b6baf672c67f6483c1c
+              expression: '(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2))=1 and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0'
               name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Cassandra version has changed. Ack to close.'
               manual_close: 'YES'
         -
+          uuid: b202aa02d0b74e8da321a2a19fe33880
           name: 'Compaction: Number of completed tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=CompletedTasks,type=Compaction","Value"]'
@@ -76,11 +81,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of completed compactions since server [re]start.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 7176e7e8241648d1b7e81a0b4d2d329c
           name: 'Commitlog: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=PendingTasks,type=CommitLog","Value"]'
@@ -88,11 +95,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of commit log messages written but yet to be fsync’d.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 6e4ad2b5249c465894b87006a38b9542
           name: 'Latency: Read median'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","50thPercentile"]'
@@ -102,16 +111,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency read from disk in milliseconds - median.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: a8b0499f15a74102b6ca486dee07e99b
           name: 'Latency: Read 75 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","75thPercentile"]'
@@ -121,16 +132,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency read from disk in milliseconds - p75.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 5e3a95a9119149889365691d932b8407
           name: 'Latency: Read 95 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","95thPercentile"]'
@@ -140,16 +153,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency read from disk in milliseconds - p95.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 70eebcf7274942eeae0a80911b7c9095
           name: 'Commitlog: Total size'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=TotalCommitLogSize,type=CommitLog","Value"]'
@@ -158,11 +173,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Current size, in bytes, used by all the commit log segments.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 24e44d0bf8254131a032406ffad86732
           name: 'Compaction: Total compactions completed'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=TotalCompactionsCompleted,type=Compaction","Count"]'
@@ -170,11 +187,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Throughput of completed compactions since server [re]start.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 31ccd8b50bcb412893e91accb853d755
           name: 'Latency: Write median'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","50thPercentile"]'
@@ -184,16 +203,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency write to disk in milliseconds - median.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 8f0aa624a54d45f5b6c8ead24694fc58
           name: 'Latency: Write 75 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","75thPercentile"]'
@@ -203,16 +224,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency write to disk in milliseconds - p75.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: cc084d0142a94262b585d6b4a7b06468
           name: 'Latency: Write 95 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","95thPercentile"]'
@@ -222,16 +245,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Latency write to disk in milliseconds - p95.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 934eb483047649449bfa221e3cc610d3
           name: 'KeyCache: Capacity'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Capacity","Value"]'
@@ -240,16 +265,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Cache capacity in bytes.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: c4f8435dfef0426682781711addbf075
           name: 'KeyCache: Entries'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Entries","Value"]'
@@ -257,11 +284,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total number of cache entries.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: b3351f07502d4cb8a16d4fa730a72a6a
           name: 'KeyCache: HitRate'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=HitRate","Value"]'
@@ -271,16 +300,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'All time cache hit rate.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '100'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 3980ae66ea1b415baa24078d26ebeaee
           name: 'KeyCache: Hits per second'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Hits","Count"]'
@@ -289,16 +320,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Rate of cache hits.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 6f6980f9267b4bef93e3a37153ef2184
           name: 'KeyCache: requests per second'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Requests","Count"]'
@@ -308,16 +341,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Rate of cache requests.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: f8fed6058d4b45a7afcaf5a057622c19
           name: 'KeyCache: Size'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Size","Value"]'
@@ -326,11 +361,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total size of occupied cache, in bytes.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 574ff464fe6b43cfb1d07e4ad1383c33
           name: 'Client connections: Native'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Client,name=connectedNativeClients","Value"]'
@@ -338,11 +375,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of clients connected to this nodes native protocol server.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 15d5bd0e534246a7922f8dbcc2a96a21
           name: 'Client connections: Trifts'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Client,name=connectedThriftClients","Value"]'
@@ -350,11 +389,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of connected to this nodes thrift clients.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 6c1cf4b7835d4c66ac1e42840199594c
           name: 'Latency: Client request read median'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","50thPercentile"]'
@@ -364,16 +405,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving data to clients in milliseconds - median.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: c0606810baad4e438f6d69508cf11581
           name: 'Latency: Client request read 75 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","75thPercentile"]'
@@ -383,16 +426,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving data to clients in milliseconds - p75.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 4ed583b0546c4897b9ff423e36097046
           name: 'Latency: Client request read 95 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","95thPercentile"]'
@@ -402,16 +447,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving data to clients in milliseconds - p95.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 4f68953ebaca4d089a11c78e04c9170f
           name: 'Client request: Read per second'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","Count"]'
@@ -421,16 +468,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'The number of client requests per second.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 72cdc0188682483d8c1d837f2c9c475b
           name: 'Latency: Client request write median'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","50thPercentile"]'
@@ -440,16 +489,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving write requests from clients in milliseconds - median.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: a63545e0bf8d4c87818fe719c299b508
           name: 'Latency: Client request write 75 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","75thPercentile"]'
@@ -459,16 +510,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving write requests from clients in milliseconds - p75.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 955f1f2615a14694bb20eedd07963ada
           name: 'Latency: Client request write 95 percentile'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","95thPercentile"]'
@@ -478,16 +531,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Total latency serving write requests from clients in milliseconds - p95.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: d914d6cd66ad48d09197a30819a386f9
           name: 'Client request: Write per second'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","Count"]'
@@ -497,16 +552,18 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'The number of local write requests per second.'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 30b3ba5b576045dabda9b3a0914a1dc6
           name: 'Client request: Write Timeouts'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Timeouts","Count"]'
@@ -514,11 +571,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of write requests timeouts encountered.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: e55942a9ef3c41e8993e8c8d849ff026
           name: 'Compaction: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"]'
@@ -526,24 +585,28 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Estimated number of compactions remaining to perform.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
           triggers:
             -
-              expression: '{min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.WARN}'
+              uuid: 885035b2fc804615a54bf2eaca19beee
+              expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}'
               name: 'Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m)'
               priority: WARNING
               dependencies:
                 -
                   name: 'Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)'
-                  expression: '{Apache Cassandra by JMX:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
+                  expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
             -
-              expression: '{min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
+              uuid: f6696c41e9d24144a1a95f74c94728ae
+              expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
               name: 'Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)'
               priority: AVERAGE
         -
+          uuid: f4686c81fe1b42c2bbe049ec421b4533
           name: 'Dropped messages: Write (Mutation)'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=MUTATION,name=Dropped","Count"]'
@@ -551,11 +614,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of dropped regular writes messages.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 2001c9fa67bc4ec4b693d289edc38cfa
           name: 'Dropped messages: Read'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=READ,name=Dropped","Count"]'
@@ -563,11 +628,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of dropped regular reads messages.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: b15aa6f290d14fd1bee094325c444e8b
           name: 'Storage: Errors'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"]'
@@ -575,16 +642,19 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of internal exceptions caught. Under normal exceptions this should be zero.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
           triggers:
             -
-              expression: '{min(5m)}>0'
+              uuid: c7980b33dc794a70a116bd12219f66c3
+              expression: 'min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"],5m)>0'
               name: 'Too many storage exceptions'
               priority: WARNING
         -
+          uuid: 31fabd5575074957946328b0257568c6
           name: 'Storage: Used (bytes)'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"]'
@@ -593,17 +663,20 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Size, in bytes, of the on disk data size this node manages.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
           triggers:
             -
-              expression: '{nodata(15m)}=1'
+              uuid: bda8e216175044ed829670b6bd272785
+              expression: 'nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1'
               name: 'Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
         -
+          uuid: 3e0332f3770046b5b3ba4216111f3b3f
           name: 'Storage: Hints'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=Storage,name=TotalHints","Count"]'
@@ -611,11 +684,13 @@ zabbix_export:
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           description: 'Number of hint messages written to this node since [re]start. Includes one entry for each host to be hinted per hint.'
-          applications:
-            -
-              name: Cassandra
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 6c9721f341904c5abb4d4a4637f6c80c
           name: 'Thread pool HintsDispatcher: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=CurrentlyBlockedTasks","Count"]'
@@ -624,12 +699,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            HintsDispatcher:	Performs hinted handoff.
-          applications:
-            -
-              name: Cassandra
+            HintsDispatcher:Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 0efbb0ab0e3244428f5e5917fa73437c
           name: 'Thread pool HintsDispatcher: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=PendingTasks","Value"]'
@@ -638,12 +715,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            HintsDispatcher:	Performs hinted handoff.
-          applications:
-            -
-              name: Cassandra
+            HintsDispatcher:Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 4eb4e405cc564c9c8a694f085b1905dd
           name: 'Thread pool HintsDispatcher: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=TotalBlockedTasks","Count"]'
@@ -652,12 +731,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            HintsDispatcher:	Performs hinted handoff.
-          applications:
-            -
-              name: Cassandra
+            HintsDispatcher:Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 7fd397d3d09a494fb0032d97c93dc462
           name: 'Thread pool MemtableFlushWriter: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=CurrentlyBlockedTasks","Count"]'
@@ -666,12 +747,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MemtableFlushWriter:	Writes memtables to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtableFlushWriter:Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: c0eaf8af68114b0eb1f16e7cb456a442
           name: 'Thread pool MemtableFlushWriter: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=PendingTasks","Value"]'
@@ -680,12 +763,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MemtableFlushWriter:	Writes memtables to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtableFlushWriter:Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 3e402261b410467cb177b3c02dd237f3
           name: 'Thread pool MemtableFlushWriter: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=TotalBlockedTasks","Count"]'
@@ -694,12 +779,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MemtableFlushWriter:	Writes memtables to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtableFlushWriter:Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 868e8d31c8424607a7f0aafd4eff46cf
           name: 'Thread pool MemtablePostFlush: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=CurrentlyBlockedTasks","Count"]'
@@ -708,12 +795,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MemtablePostFlush:	Cleans up commit log after memtable is written to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 9ddfd1f388ed4c3a9e81558e626f9525
           name: 'Thread pool MemtablePostFlush: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=PendingTasks","Value"]'
@@ -722,12 +811,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MemtablePostFlush:	Cleans up commit log after memtable is written to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: e00f5f7ac9904ea4981c44a506005d62
           name: 'Thread pool MemtablePostFlush: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=TotalBlockedTasks","Count"]'
@@ -736,12 +827,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MemtablePostFlush:	Cleans up commit log after memtable is written to disk.
-          applications:
-            -
-              name: Cassandra
+            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 480f3d158c764cd3877e0b04189eb60c
           name: 'Thread pool MigrationStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=CurrentlyBlockedTasks","Count"]'
@@ -750,12 +843,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MigrationStage:	Runs schema migrations.
-          applications:
-            -
-              name: Cassandra
+            MigrationStage:Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: f9b504b8b9f34f70a15691a16ee69e39
           name: 'Thread pool MigrationStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=PendingTasks","Value"]'
@@ -764,12 +859,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MigrationStage:	Runs schema migrations.
-          applications:
-            -
-              name: Cassandra
+            MigrationStage:Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 79bc07acfef846768a036243efd3d954
           name: 'Thread pool MigrationStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=TotalBlockedTasks","Count"]'
@@ -778,12 +875,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MigrationStage:	Runs schema migrations.
-          applications:
-            -
-              name: Cassandra
+            MigrationStage:Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 94360cbf59cc4978ab64872f9d0a9100
           name: 'Thread pool MiscStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=CurrentlyBlockedTasks","Count"]'
@@ -792,12 +891,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MiscStage:	Misceleneous tasks run here.
-          applications:
-            -
-              name: Cassandra
+            MiscStage:Misceleneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 0a0ee6e0a2de4da5acfa715959dbae9f
           name: 'Thread pool MiscStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=PendingTasks","Value"]'
@@ -806,12 +907,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MiscStage:	Misceleneous tasks run here.
-          applications:
-            -
-              name: Cassandra
+            MiscStage:Misceleneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 807494ed64b54f9a95961fa7031e7d7f
           name: 'Thread pool MiscStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=TotalBlockedTasks","Count"]'
@@ -820,12 +923,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MiscStage:	Misceleneous tasks run here.
-          applications:
-            -
-              name: Cassandra
+            MiscStage:Misceleneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 18b83c6b48164e1f9b8f9ae6058da276
           name: 'Thread pool SecondaryIndexManagement: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=CurrentlyBlockedTasks","Count"]'
@@ -834,12 +939,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            SecondaryIndexManagement:	Performs updates to secondary indexes.
-          applications:
-            -
-              name: Cassandra
+            SecondaryIndexManagement:Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 622728098a35433bb00b7ab1614665bc
           name: 'Thread pool SecondaryIndexManagement: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=PendingTasks","Value"]'
@@ -848,12 +955,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            SecondaryIndexManagement:	Performs updates to secondary indexes.
-          applications:
-            -
-              name: Cassandra
+            SecondaryIndexManagement:Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 0dbd7303e9a64bc581ef8c6619876d2b
           name: 'Thread pool SecondaryIndexManagement: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=TotalBlockedTasks","Count"]'
@@ -862,12 +971,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            SecondaryIndexManagement:	Performs updates to secondary indexes.
-          applications:
-            -
-              name: Cassandra
+            SecondaryIndexManagement:Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 1ff2b0f1c6a04cfca0d40a68c5a39476
           name: 'Thread pool CounterMutationStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=CurrentlyBlockedTasks","Count"]'
@@ -876,12 +987,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            CounterMutationStage:	Responsible for counter writes.
-          applications:
-            -
-              name: Cassandra
+            CounterMutationStage:Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: b0cc87b96d0e4f3c8ff2023665d90379
           name: 'Thread pool CounterMutationStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=PendingTasks","Value"]'
@@ -890,12 +1003,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            CounterMutationStage:	Responsible for counter writes.
-          applications:
-            -
-              name: Cassandra
+            CounterMutationStage:Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: ab2b8d88ecf54b028b88cd757581a419
           name: 'Thread pool CounterMutationStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=TotalBlockedTasks","Count"]'
@@ -904,12 +1019,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            CounterMutationStage:	Responsible for counter writes.
-          applications:
-            -
-              name: Cassandra
+            CounterMutationStage:Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: ef7d71b026ec4e948acf8d7469b21ee2
           name: 'Thread pool MutationStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=CurrentlyBlockedTasks","Count"]'
@@ -918,12 +1035,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MutationStage:	Responsible for writes (exclude materialized and counter writes).
-          applications:
-            -
-              name: Cassandra
+            MutationStage:Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: b2eb10fe498847c88b395013e4fb516c
           name: 'Thread pool.MutationStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=PendingTasks","Value"]'
@@ -932,12 +1051,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MutationStage:	Responsible for writes (exclude materialized and counter writes).
-          applications:
-            -
-              name: Cassandra
+            MutationStage:Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: c6e48ac0ece74e31803dd72310306330
           name: 'Thread pool MutationStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=TotalBlockedTasks","Count"]'
@@ -946,12 +1067,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MutationStage:	Responsible for writes (exclude materialized and counter writes).
-          applications:
-            -
-              name: Cassandra
+            MutationStage:Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: e588e58881b74123bfa6f2d5d948da93
           name: 'Thread pool ReadStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=CurrentlyBlockedTasks","Count"]'
@@ -960,12 +1083,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            ReadStage:	Local reads run on this thread pool.
-          applications:
-            -
-              name: Cassandra
+            ReadStage:Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 2770bde0ee834ddebcd773e265fa0aef
           name: 'Thread pool ReadStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=PendingTasks","Value"]'
@@ -974,12 +1099,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            ReadStage:	Local reads run on this thread pool.
-          applications:
-            -
-              name: Cassandra
+            ReadStage:Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 9d9b20c6994c40849048cb5d0fe407ad
           name: 'Thread pool ReadStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=TotalBlockedTasks","Count"]'
@@ -988,12 +1115,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            ReadStage:	Local reads run on this thread pool.
-          applications:
-            -
-              name: Cassandra
+            ReadStage:Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 49df0b39c6a944d5ab96a946b233c380
           name: 'Thread pool ViewMutationStage: Currently blocked task'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=CurrentlyBlockedTasks","Count"]'
@@ -1002,12 +1131,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            ViewMutationStage:	Responsible for materialized view writes.
-          applications:
-            -
-              name: Cassandra
+            ViewMutationStage:Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 967065e24d2c44be96687cd829ea928c
           name: 'Thread pool ViewMutationStage: Pending tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=PendingTasks","Value"]'
@@ -1016,12 +1147,14 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            ViewMutationStage:	Responsible for materialized view writes.
-          applications:
-            -
-              name: Cassandra
+            ViewMutationStage:Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: 5e6719076bbd46f78d3fb9b625a0cdda
           name: 'Thread pool ViewMutationStage: Total blocked tasks'
           type: JMX
           key: 'jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=TotalBlockedTasks","Count"]'
@@ -1030,50 +1163,57 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            ViewMutationStage:	Responsible for materialized view writes.
-          applications:
-            -
-              name: Cassandra
+            ViewMutationStage:Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
         -
+          uuid: f131a5faad964307aa860e3932ba781d
           name: 'Cluster: Nodes down'
           type: JMX
           key: 'jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"]'
           history: 7d
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
           triggers:
             -
-              expression: '{last()}>0'
+              uuid: 42b527f9cf4e444b82575f2ab48926c0
+              expression: 'last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"])>0'
               name: 'There are down nodes in cluster'
               priority: AVERAGE
         -
+          uuid: fb35aef03e254d98a3d29e8180a1a5a5
           name: 'Cluster: Nodes up'
           type: JMX
           key: 'jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"]'
           history: 7d
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
-          applications:
-            -
-              name: Cassandra
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Cassandra
       discovery_rules:
         -
+          uuid: 504e40d04a024249bfd4ac67891f8a21
           name: Tables
           type: JMX
           key: 'jmx.discovery[beans,"org.apache.cassandra.metrics:type=Table,keyspace=*,scope=*,name=ReadLatency"]'
@@ -1095,6 +1235,7 @@ zabbix_export:
           description: 'Info about keyspaces and tables'
           item_prototypes:
             -
+              uuid: 22c24ee8cfd34623b137c6cad5a2299d
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Bloom filter false ratio'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=BloomFilterFalseRatio","Value"]'
@@ -1103,11 +1244,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The ratio of Bloom filter false positives to total checks.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 417a27c1779a4d08b5673320b1542ad8
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Bytes flushed'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=BytesFlushed","Count"]'
@@ -1116,11 +1259,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The amount of data that was flushed since (re)start.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: b6623ca2ba0c4dd9ad2be5fa263896f5
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Col update time delta75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ColUpdateTimeDeltaHistogram","75thPercentile"]'
@@ -1130,16 +1275,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The column update time delta - p75.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 685e1bbe10044d9d9ae2b02357ba2934
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Col update time delta 95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ColUpdateTimeDeltaHistogram","95thPercentile"]'
@@ -1149,16 +1296,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The column update time delta - p95.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 71b3b14f8ce7414786fa0bcd471e8842
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Compaction bytes written'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=CompactionBytesWritten","Count"]'
@@ -1168,11 +1317,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The amount of data that was compacted since (re)start.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 9721c8cd9d0f415d9d5ddfeb417cee01
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Compression ratio'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=CompressionRatio","Value"]'
@@ -1181,11 +1332,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The compression ratio for all SSTables.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: b43134f2d2a043f2a61919467619efe2
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: KeyCache hit rate'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=KeyCacheHitRate","Value"]'
@@ -1194,11 +1347,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The key cache hit rate.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: b69ac0bb285a4e8fa82a98f4de2645d2
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Live disk space used'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=LiveDiskSpaceUsed","Count"]'
@@ -1207,11 +1362,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The disk space used by "live" SSTables (only counts in use files).'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: bf733ba7ab2045d38a88c6f0650ba1f2
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Live SS Table'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=LiveSSTableCount","Value"]'
@@ -1219,11 +1376,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Number of "live" (in use) SSTables.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: c447d219390a48f2bbbe0d19211472c8
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Max sartition size'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=MaxPartitionSize","Value"]'
@@ -1232,11 +1391,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The size of the largest compacted partition.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: bdf111fbca884f49a6cda263b8b07feb
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Mean partition size'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=MeanPartitionSize","Value"]'
@@ -1245,11 +1406,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The average size of compacted partition.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 1f44ed6c453d44fc811ae310701df4bf
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Pending compactions'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=PendingCompactions","Value"]'
@@ -1257,11 +1420,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of pending compactions.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 7e287e5459644536b9420263b4096dd1
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Pending flushes'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=PendingFlushes","Count"]'
@@ -1269,11 +1434,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of pending flushes.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 1d240e1fe4b245b0b1b2b30d42e5077e
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","75thPercentile"]'
@@ -1283,16 +1450,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Latency read from disk in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 38d31a8a16f04c39a64ee36940ae7eb8
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","95thPercentile"]'
@@ -1302,16 +1471,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Latency read from disk in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: fdec15a1f86b4943bbd72fb992dfce90
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Read per second'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","Count"]'
@@ -1321,16 +1492,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of client requests per second.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: a73d2b8f38184698a3ab7a4bb3742b4a
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Row cache hits'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheHit","Count"]'
@@ -1338,11 +1511,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of row cache hits.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 213ecd18728a40ffbdbeac07daf0e26f
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Out of row cache hits'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheHitOutOfRange","Count"]'
@@ -1350,11 +1525,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of row cache hits that do not satisfy the query filter and went to disk.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 32df58c8fa3a4ad3ba2e70fc056895ad
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Row cache misses'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheMiss","Count"]'
@@ -1362,11 +1539,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of table row cache misses.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 529e7683300b4fe9bb46e3f9ed8a9552
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Snapshots size'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SnapshotsSize","Value"]'
@@ -1375,11 +1554,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The disk space truly used by snapshots.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 53e4852850a74163ad797969d3366eb0
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables per read 75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SSTablesPerReadHistogram","75thPercentile"]'
@@ -1388,11 +1569,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of SSTable data files accessed per read - p75.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 187487b9d35444da989f9e0e3814798a
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables per read 95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SSTablesPerReadHistogram","95thPercentile"]'
@@ -1401,11 +1584,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of SSTable data files accessed per read - p95.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 592bde2f9eb24d7e80b45f3db965b2e0
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone scanned 75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TombstoneScannedHistogram","75thPercentile"]'
@@ -1414,11 +1599,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Number of tombstones scanned per read - p75.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 70fedfc2310e4eb19195da72c9ada63d
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone scanned 95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TombstoneScannedHistogram","95thPercentile"]'
@@ -1427,11 +1614,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Number of tombstones scanned per read - p95.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: a20ace3047bd4a238644dbc55d2f8fed
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Disk space used'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TotalDiskSpaceUsed","Count"]'
@@ -1440,11 +1629,13 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Disk space used.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: b599e354a5ee417cb056dea424a5792d
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Waiting on free memtable space 75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WaitingOnFreeMemtableSpace","75thPercentile"]'
@@ -1454,16 +1645,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The time spent waiting for free memtable space either on- or off-heap - p75.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: af19509867e54f19a64a4b66d054e0cf
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Waiting on free memtable space95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WaitingOnFreeMemtableSpace","95thPercentile"]'
@@ -1473,16 +1666,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The time spent waiting for free memtable space either on- or off-heap - p95.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 141b38b299e14068abc0c175ae4023e6
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 75 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","75thPercentile"]'
@@ -1492,16 +1687,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Latency write to disk in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: 8d79071ab7ad49c483efbb7503a4b308
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 95 percentile'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","95thPercentile"]'
@@ -1511,16 +1708,18 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'Latency write to disk in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
             -
+              uuid: c1a9748ab9824626b9a59c323aff9a3d
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Write per second'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","Count"]'
@@ -1530,17 +1729,19 @@ zabbix_export:
               username: '{$CASSANDRA.USER}'
               password: '{$CASSANDRA.PASSWORD}'
               description: 'The number of local write requests per second.'
-              application_prototypes:
-                -
-                  name: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cassandra table {#JMXKEYSPACE}.{#JMXSCOPE}'
           graph_prototypes:
             -
+              uuid: 5e293f31be1e46e2ac406afda9ba4d95
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Read\Write latency'
               graph_items:
                 -
@@ -1567,6 +1768,7 @@ zabbix_export:
                     host: 'Apache Cassandra by JMX'
                     key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","95thPercentile"]'
             -
+              uuid: 1db58a329f9c4306921fbeb6a089cfcf
               name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Requests rate'
               graph_items:
                 -
@@ -1604,6 +1806,7 @@ zabbix_export:
           value: zabbix
   graphs:
     -
+      uuid: 445735b15ac84e42b21dbe7c44dce812
       name: 'Client connections'
       graph_items:
         -
@@ -1620,6 +1823,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.metrics:type=Client,name=connectedThriftClients","Value"]'
     -
+      uuid: 2ce1833420ba4abc9bdea906d2c1238b
       name: 'Client requests rate'
       graph_items:
         -
@@ -1636,6 +1840,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","Count"]'
     -
+      uuid: c30ffc0f46304bf6aab699d39d8d6d4c
       name: 'Client requests Read\Write latency'
       graph_items:
         -
@@ -1676,6 +1881,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","95thPercentile"]'
     -
+      uuid: 5397e6b2349f45169b155e9a99b2b295
       name: 'Dropped Messages'
       graph_items:
         -
@@ -1692,6 +1898,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=MUTATION,name=Dropped","Count"]'
     -
+      uuid: f82e4d8e2f84434e90baff030d46d10e
       name: 'KeyCache Hit rate'
       graph_items:
         -
@@ -1708,6 +1915,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Requests","Count"]'
     -
+      uuid: 0f0f2544748d460b9d526573f7b11d70
       name: 'Nodes state'
       graph_items:
         -
@@ -1722,6 +1930,7 @@ zabbix_export:
             host: 'Apache Cassandra by JMX'
             key: 'jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"]'
     -
+      uuid: f499150da9ad4376ba528cd4be3af89a
       name: 'Tables Read\Write latency'
       graph_items:
         -

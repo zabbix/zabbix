@@ -45,7 +45,7 @@ class CControllerUserUnblock extends CController {
 		DBstart();
 
 		$users = API::User()->get([
-			'output' => ['alias', 'name', 'surname'],
+			'output' => ['username', 'name', 'surname'],
 			'userids' => $userids,
 			'editable' => true
 		]);
@@ -54,9 +54,10 @@ class CControllerUserUnblock extends CController {
 
 		if ($result) {
 			foreach ($users as $user) {
-				info('User '.$user['alias'].' unblocked');
+				info('User '.$user['username'].' unblocked');
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
-					'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']'
+					'Unblocked user username ['.$user['username'].'] name ['.$user['name'].'] surname ['.
+					$user['surname'].']'
 				);
 			}
 		}

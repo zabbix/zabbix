@@ -127,8 +127,7 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getLabel($name) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
-		$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		$labels = $this->findLabels($name);
 
 		if ($labels->isEmpty()) {
 			throw new Exception('Failed to find form label by name: "'.$name.'".');
@@ -147,6 +146,18 @@ class CFormElement extends CElement {
 		}
 
 		return $labels->first();
+	}
+
+	/**
+	 * Get label elements by text.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElementCollection
+	 */
+	protected function findLabels($name) {
+		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
+		return $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
 	}
 
 	/**
@@ -295,12 +306,16 @@ class CFormElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function submit() {
-		$buttons = $this->query('xpath:.//button[@type="submit"]')->all()
-				->filter(new CElementFilter(CElementFilter::VISIBLE));
+		$buttons = $this->query('xpath:.//button[@type="submit"]|.//input[@type="submit"]')->all();
+
+		if ($buttons->count() > 1) {
+			$buttons = $buttons->filter(new CElementFilter(CElementFilter::VISIBLE));
+		}
+
 		$submit = ($buttons->count() === 0) ? (new CNullElement()) : $buttons->first();
 
 		if ($submit->isValid()) {
-			$submit->click();
+			$submit->click(true);
 		}
 		else {
 			parent::submit();

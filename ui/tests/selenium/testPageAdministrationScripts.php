@@ -19,8 +19,18 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageAdministrationScripts extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	private $sqlHashScripts = '';
 	private $oldHashScripts = '';
@@ -81,23 +91,27 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Scripts deleted');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts'));
+		$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
 	}
 
 	/**
 	 * @dataProvider allScripts
-	 * @backup-once scripts
+	 * @backupOnce scripts
 	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Script deleted');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		if ($script['scriptid'] === '4') {
+			$this->zbxTestCheckTitle('Configuration of scripts');
+			$this->assertMessage(TEST_BAD, 'Cannot delete script');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		}
+		else {
+			$this->zbxTestCheckTitle('Configuration of scripts');
+			$this->assertMessage(TEST_GOOD, 'Script deleted');
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		}
 	}
 }

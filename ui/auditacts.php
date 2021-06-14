@@ -84,7 +84,7 @@ $userids = [];
 
 if ($data['filter_userids']) {
 	$data['users'] = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
+		'output' => ['userid', 'username', 'name', 'surname'],
 		'userids' => $data['filter_userids'],
 		'preservekeys' => true
 	]);
@@ -133,7 +133,7 @@ if (!$data['filter_userids'] || $data['users']) {
 	// Get users.
 	if (!$data['filter_userids']) {
 		$data['users'] = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
+			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => array_column($data['alerts'], 'userid'),
 			'preservekeys' => true
 		]);

@@ -75,7 +75,7 @@ function createFontSelect(string $name): CSelect {
 ?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('formDragHandler')
 			->toString()
 	?>
@@ -227,15 +227,31 @@ function createFontSelect(string $name): CSelect {
 									',{excludeids: [#{sysmapid}]}), null, this);'
 							)
 					], 'mapSelectRow')
-					->addRow(_('Application'), [
-						(new CTextBox('application'))
-							->setId('application')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->setId('application-select')
-							->addClass(ZBX_STYLE_BTN_GREY)
-					], 'application-select-row')
+					->addRow(_('Tags'),
+						(new CDiv([
+							(new CTable())
+								->setId('selement-tags')
+								->addRow(
+									(new CCol(
+										(new CRadioButtonList('evaltype', TAG_EVAL_TYPE_AND_OR))
+											->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+											->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+											->setModern(true)
+									))->setColSpan(4)
+								)
+								->addRow(
+									(new CCol(
+										(new CButton('tags_add', _('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('element-table-add')
+											->removeId()
+									))->setColSpan(3)
+								)
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'tags-select-row'
+					)
 					->addRow(_('Automatic icon selection'),
 						new CCheckBox('use_iconmap'),
 						'useIconMapRow'
@@ -329,7 +345,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map shape'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('shapeDragHandler')
 			->toString().
 		(new CForm())
@@ -482,7 +498,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapMassShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update shapes'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massShapeDragHandler')
 			->toString().
 		(new CForm())
@@ -606,7 +622,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update elements'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massDragHandler')
 			->toString()
 	?>
@@ -885,6 +901,10 @@ function createFontSelect(string $name): CSelect {
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate(['tag_field_name' => 'tags']); ?>
+</script>
+
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CCol([
@@ -917,10 +937,7 @@ function createFontSelect(string $name): CSelect {
 	 * @see init.js add.popup event
 	 */
 	function addPopupValues(data) {
-		if (data.object === 'name') {
-			jQuery('#application').val(data.values[0].name);
-		}
-		else if (data.object === 'linktrigger') {
+		if (data.object === 'linktrigger') {
 			ZABBIX.apps.map.object.linkForm.addNewTriggers(data.values);
 		}
 	}

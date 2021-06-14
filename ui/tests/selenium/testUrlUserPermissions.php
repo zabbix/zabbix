@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testUrlUserPermissions extends CLegacyWebTest {
 
@@ -123,56 +123,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_graphids%5B%5D=523&filter_set=1',
 				'title' =>	'Custom graphs',
 				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screenconf.php',
-				'title' =>	'Configuration of screens',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200001',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'header' =>	'Screens',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'screens.php?elementid=200000',
-				'title' =>	'Custom screens [refreshed every 30 sec.]',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'slideconf.php',
-				'title' =>	'Configuration of slide shows',
-				'header' =>	'Slide shows',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -371,16 +321,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'url' => 'hosts.php?groupid=0&form=Create+host',
 				'title' =>	'Configuration of hosts',
 				'header' => 'Hosts',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=application.list',
-				'title' =>	'Configuration of applications',
-				'header' => 'Applications',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -592,15 +532,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=valuemap.list',
-				'title' =>	'Configuration of value mapping',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=trigdisplay.edit',
 				'title' =>	'Configuration of trigger displaying options',
 				'users' => [
@@ -745,8 +676,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	}
 
 	/**
-	 * @on-before addGuestToDisabledGroup
-	 * @on-after removeGuestFromDisabledGroup
+	 * @onBefore addGuestToDisabledGroup
+	 * @onAfter removeGuestFromDisabledGroup
 	 *
 	 * @dataProvider data
 	 */

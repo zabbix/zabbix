@@ -159,7 +159,7 @@ class CMacroValue extends CInput {
 			]))
 				->addClass($dropdown_btn_class)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
-				->setAttribute('title', _('Change type'));
+				->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)

@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
@@ -192,7 +191,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 					'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-					'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls'
+					'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'tags', 'evaltype'
 				],
 				'selectShapes' => ['type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size', 'font_color',
 					'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color', 'background_color',
@@ -309,7 +308,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['users'] = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
+		'output' => ['userid', 'username', 'name', 'surname'],
 		'userids' => $userids,
 		'preservekeys' => true
 	]);

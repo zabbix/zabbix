@@ -31,7 +31,7 @@ class testUsers extends CAPITest {
 			// Check user password.
 			[
 				'user' => [
-					'alias' => 'API user create without password',
+					'username' => 'API user create without password',
 					'roleid' => 1,
 					'usrgrps' => [
 						['usrgrpid' => 7]
@@ -39,7 +39,7 @@ class testUsers extends CAPITest {
 				],
 				'Incorrect value for field "passwd": cannot be empty.'
 			],
-			// Check user alias.
+			// Check user username.
 			[
 				'user' => [
 					'passwd' => 'zabbix',
@@ -48,34 +48,34 @@ class testUsers extends CAPITest {
 						['usrgrpid' => 7]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "alias" is missing.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
 			],
 			[
 				'user' => [
-					'alias' => '',
+					'username' => '',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
 			[
 				'user' => [
-					'alias' => 'Admin',
+					'username' => 'Admin',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
 				],
-				'expected_error' => 'User with alias "Admin" already exists.'
+				'expected_error' => 'User with username "Admin" already exists.'
 			],
 			[
 				'user' => [
 					[
-						'alias' => 'API create users with the same names',
+						'username' => 'API create users with the same names',
 						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -83,7 +83,7 @@ class testUsers extends CAPITest {
 						]
 					],
 					[
-						'alias' => 'API create users with the same names',
+						'username' => 'API create users with the same names',
 						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -91,23 +91,25 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (alias)=(API create users with the same names) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (username)=(API create users with the same names)'.
+					' already exists.'
 			],
 			[
 				'user' => [
-					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm',
+					'username' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwert'.
+						'yuioplkjhgfdsazxcvbnm',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						'usrgrpid' => 7
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
+				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
 			],
 			// Check user group.
 			[
 				'user' => [
-					'alias' => 'User without group parameter',
+					'username' => 'User without group parameter',
 					'roleid' => 1,
 					'passwd' => 'zabbix'
 				],
@@ -115,7 +117,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User without group',
+					'username' => 'User without group',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -125,7 +127,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'Group unexpected parameter',
+					'username' => 'Group unexpected parameter',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -136,7 +138,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty group id',
+					'username' => 'User with empty group id',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -147,7 +149,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User group id not number',
+					'username' => 'User group id not number',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -158,7 +160,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User group id not valid',
+					'username' => 'User group id not valid',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -169,7 +171,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with nonexistent group id',
+					'username' => 'User with nonexistent group id',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -180,7 +182,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with two identical user group id',
+					'username' => 'User with two identical user group id',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -194,7 +196,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => 'API user create 1',
+						'username' => 'API user create 1',
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -207,7 +209,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => 'API user create 1',
+						'username' => 'API user create 1',
 						'roleid' => 'twenty_five',
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -221,7 +223,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => 'API user create 1',
+						'username' => 'API user create 1',
 						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -234,7 +236,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => '☺',
+						'username' => '☺',
 						'roleid' => 1,
 						'passwd' => '☺',
 						'usrgrps' => [
@@ -247,7 +249,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => 'УТФ Юзер',
+						'username' => 'УТФ Юзер',
 						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -260,7 +262,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'alias' => 'API user create with media',
+						'username' => 'API user create with media',
 						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
@@ -289,7 +291,7 @@ class testUsers extends CAPITest {
 			foreach ($result['result']['userids'] as $key => $id) {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $user[$key]['alias']);
+				$this->assertEquals($dbRowUser['username'], $user[$key]['username']);
 				$this->assertEquals($dbRowUser['name'], '');
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
@@ -326,7 +328,7 @@ class testUsers extends CAPITest {
 	*/
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
-			'alias' => 'API user create with multiple emails',
+			'username' => 'API user create with multiple emails',
 			'roleid' => 1,
 			'passwd' => 'zabbix',
 			'usrgrps' => [
@@ -355,34 +357,34 @@ class testUsers extends CAPITest {
 			// Check user id.
 			[
 				'user' => [[
-					'alias' => 'API user update without userid'
+					'username' => 'API user update without userid'
 				]],
 				'expected_error' => 'Invalid parameter "/1": the parameter "userid" is missing.'
 			],
 			[
 				'user' => [[
-					'alias' => 'API user update with empty userid',
+					'username' => 'API user update with empty userid',
 					'userid' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
 				'user' => [[
-					'alias' => 'API user update with nonexistent userid',
+					'username' => 'API user update with nonexistent userid',
 					'userid' => '1.1'
 				]],
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
 				'user' => [[
-					'alias' => 'API user update with nonexistent userid',
+					'username' => 'API user update with nonexistent userid',
 					'userid' => 'abc'
 				]],
 				'expected_error' => 'Invalid parameter "/1/userid": a number is expected.'
 			],
 			[
 				'user' => [[
-					'alias' => 'API user update with nonexistent userid',
+					'username' => 'API user update with nonexistent userid',
 					'userid' => '123456'
 				]],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -391,11 +393,11 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'API update users with the same id1'
+						'username' => 'API update users with the same id1'
 					],
 					[
 						'userid' => '9',
-						'alias' => 'API update users with the same id2'
+						'username' => 'API update users with the same id2'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (userid)=(9) already exists.'
@@ -408,53 +410,55 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
-			// Check user alias.
+			// Check user username.
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => ''
+					'username' => ''
 				]],
-				'expected_error' => 'Invalid parameter "/1/alias": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
 			],
 			[
 				'user' => [[
 					'userid' => '2',
-					'alias' => 'Try rename guest'
+					'username' => 'Try rename guest'
 				]],
 				'expected_error' => 'Cannot rename guest user.'
 			],
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'Admin'
+					'username' => 'Admin'
 				]],
-				'expected_error' => 'User with alias "Admin" already exists.'
+				'expected_error' => 'User with username "Admin" already exists.'
 			],
 			[
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'API update users with the same alias'
+						'username' => 'API update users with the same username'
 					],
 					[
 						'userid' => '10',
-						'alias' => 'API update users with the same alias'
+						'username' => 'API update users with the same username'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (alias)=(API update users with the same alias) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value'.
+					' (username)=(API update users with the same username) already exists.'
 			],
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm'
+					'username' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwert'.
+						'yuioplkjhgfdsazxcvbnm'
 				]],
-				'expected_error' => 'Invalid parameter "/1/alias": value is too long.'
+				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
 			],
 			// Check user group.
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User without group',
+					'username' => 'User without group',
 					'usrgrps' => [
 					]
 				]],
@@ -463,7 +467,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'Group unexpected parameter',
+					'username' => 'Group unexpected parameter',
 					'usrgrps' => [
 						['userid' => '1']
 					]
@@ -473,7 +477,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User with empty group id',
+					'username' => 'User with empty group id',
 					'usrgrps' => [
 						['usrgrpid' => '']
 					]
@@ -483,7 +487,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User group id not number',
+					'username' => 'User group id not number',
 					'usrgrps' => [
 						['usrgrpid' => 'abc']
 					]
@@ -493,7 +497,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User group id not valid',
+					'username' => 'User group id not valid',
 					'usrgrps' => [
 						['usrgrpid' => '1.1']
 					]
@@ -503,7 +507,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User with nonexistent group id',
+					'username' => 'User with nonexistent group id',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
 					]
@@ -513,7 +517,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '9',
-					'alias' => 'User with two identical user group id',
+					'username' => 'User with two identical user group id',
 					'usrgrps' => [
 						['usrgrpid' => '7'],
 						['usrgrpid' => '7']
@@ -525,7 +529,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'alias' => 'Try add user to group with disabled GUI access',
+					'username' => 'Try add user to group with disabled GUI access',
 					'usrgrps' => [
 						['usrgrpid' => '12']
 					]
@@ -535,7 +539,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'alias' => 'Try add user to a disabled group',
+					'username' => 'Try add user to a disabled group',
 					'usrgrps' => [
 						['usrgrpid' => '9']
 					]
@@ -546,7 +550,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'alias' => 'Try to change super-admin user type',
+					'username' => 'Try to change super-admin user type',
 					'roleid' => '2'
 				]],
 				'expected_error' => 'At least one active user must exist with role "Super admin role".'
@@ -556,7 +560,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'API user updated',
+						'username' => 'API user updated',
 						'passwd' => 'zabbix1',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -569,7 +573,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'УТФ Юзер обновлённ',
+						'username' => 'УТФ Юзер обновлённ',
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -582,7 +586,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'userid' => '9',
-						'alias' => 'API user update with media',
+						'username' => 'API user update with media',
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -618,7 +622,7 @@ class testUsers extends CAPITest {
 			foreach ($result['result']['userids'] as $key => $id) {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $users[$key]['alias']);
+				$this->assertEquals($dbRowUser['username'], $users[$key]['username']);
 				$this->assertEquals($dbRowUser['name'], '');
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
@@ -660,7 +664,7 @@ class testUsers extends CAPITest {
 			// Check readonly parameter.
 			[
 				'user' => [
-					'alias' => 'Unexpected parameter attempt_clock',
+					'username' => 'Unexpected parameter attempt_clock',
 					'passwd' => 'zabbix',
 					'attempt_clock' => '0',
 					'usrgrps' => [
@@ -671,7 +675,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'Unexpected parameter attempt_failed',
+					'username' => 'Unexpected parameter attempt_failed',
 					'passwd' => 'zabbix',
 					'attempt_failed' => '3',
 					'usrgrps' => [
@@ -682,7 +686,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'Unexpected parameter attempt_ip',
+					'username' => 'Unexpected parameter attempt_ip',
 					'passwd' => 'zabbix',
 					'attempt_ip' => '127.0.0.1',
 					'usrgrps' => [
@@ -694,7 +698,7 @@ class testUsers extends CAPITest {
 			// Check user properties, name and surname.
 			[
 				'user' => [
-					'alias' => 'User with long name',
+					'username' => 'User with long name',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -705,7 +709,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with long surname',
+					'username' => 'User with long surname',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -717,7 +721,7 @@ class testUsers extends CAPITest {
 			// Check user properties, autologin.
 			[
 				'user' => [
-					'alias' => 'User with invalid autologin',
+					'username' => 'User with invalid autologin',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -728,7 +732,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid autologin',
+					'username' => 'User with invalid autologin',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -739,7 +743,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid autologin',
+					'username' => 'User with invalid autologin',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -751,7 +755,7 @@ class testUsers extends CAPITest {
 			// Check user properties, autologout.
 			[
 				'user' => [
-					'alias' => 'User with invalid autologout',
+					'username' => 'User with invalid autologout',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -762,7 +766,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid autologout',
+					'username' => 'User with invalid autologout',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -773,7 +777,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid autologout',
+					'username' => 'User with invalid autologout',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -784,7 +788,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid autologout',
+					'username' => 'User with invalid autologout',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -795,7 +799,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with autologout and autologin together',
+					'username' => 'User with autologout and autologin together',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -809,7 +813,7 @@ class testUsers extends CAPITest {
 			// Check user properties, lang.
 			[
 				'user' => [
-					'alias' => 'User with empty lang',
+					'username' => 'User with empty lang',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -820,7 +824,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid lang',
+					'username' => 'User with invalid lang',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -834,7 +838,7 @@ class testUsers extends CAPITest {
 			// Check user properties, theme.
 			[
 				'user' => [
-					'alias' => 'User with empty theme',
+					'username' => 'User with empty theme',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -845,7 +849,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid theme',
+					'username' => 'User with invalid theme',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -856,7 +860,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid theme',
+					'username' => 'User with invalid theme',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -868,7 +872,7 @@ class testUsers extends CAPITest {
 			// Check user properties, type.
 			[
 				'user' => [
-					'alias' => 'User with empty roleid',
+					'username' => 'User with empty roleid',
 					'roleid' => '',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -879,7 +883,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid roleid',
+					'username' => 'User with invalid roleid',
 					'roleid' => 0,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -890,7 +894,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid roleid',
+					'username' => 'User with invalid roleid',
 					'roleid' => '1.1',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -902,7 +906,7 @@ class testUsers extends CAPITest {
 			// Check user properties, refresh.
 			[
 				'user' => [
-					'alias' => 'User with empty refresh',
+					'username' => 'User with empty refresh',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -913,7 +917,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid refresh',
+					'username' => 'User with invalid refresh',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -924,7 +928,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid refresh',
+					'username' => 'User with invalid refresh',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -936,7 +940,7 @@ class testUsers extends CAPITest {
 			// Check user properties, rows_per_page.
 			[
 				'user' => [
-					'alias' => 'User with empty rows_per_page',
+					'username' => 'User with empty rows_per_page',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -947,7 +951,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid rows_per_page',
+					'username' => 'User with invalid rows_per_page',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -958,7 +962,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid rows_per_page',
+					'username' => 'User with invalid rows_per_page',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -970,7 +974,7 @@ class testUsers extends CAPITest {
 			// Check user media, mediatypeid.
 			[
 				'user' => [
-					'alias' => 'User without medias properties',
+					'username' => 'User without medias properties',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -982,7 +986,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty mediatypeid',
+					'username' => 'User with empty mediatypeid',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -998,7 +1002,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid mediatypeid',
+					'username' => 'User with invalid mediatypeid',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1014,7 +1018,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with nonexistent media type id',
+					'username' => 'User with nonexistent media type id',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1032,7 +1036,7 @@ class testUsers extends CAPITest {
 			// Check user media, sendto.
 			[
 				'user' => [
-					'alias' => 'User without sendto',
+					'username' => 'User without sendto',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1048,7 +1052,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty sendto',
+					'username' => 'User with empty sendto',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1065,7 +1069,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty sendto',
+					'username' => 'User with empty sendto',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1082,7 +1086,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty sendto',
+					'username' => 'User with empty sendto',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1099,7 +1103,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty sendto',
+					'username' => 'User with empty sendto',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1116,7 +1120,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with empty second email',
+					'username' => 'User with empty second email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1133,7 +1137,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1150,7 +1154,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1167,7 +1171,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1184,7 +1188,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1201,7 +1205,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1218,7 +1222,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1235,7 +1239,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid email',
+					'username' => 'User with invalid email',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1253,7 +1257,7 @@ class testUsers extends CAPITest {
 			// Check user media, active.
 			[
 				'user' => [
-					'alias' => 'User with empty active',
+					'username' => 'User with empty active',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1271,7 +1275,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid active',
+					'username' => 'User with invalid active',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1289,7 +1293,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid active',
+					'username' => 'User with invalid active',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1308,7 +1312,7 @@ class testUsers extends CAPITest {
 			// Check user media, severity.
 			[
 				'user' => [
-					'alias' => 'User with empty severity',
+					'username' => 'User with empty severity',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1326,7 +1330,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid severity',
+					'username' => 'User with invalid severity',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1345,7 +1349,7 @@ class testUsers extends CAPITest {
 			// Check user media, period.
 			[
 				'user' => [
-					'alias' => 'User with empty period',
+					'username' => 'User with empty period',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1363,7 +1367,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with string period',
+					'username' => 'User with string period',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1381,7 +1385,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid period, without comma',
+					'username' => 'User with invalid period, without comma',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1399,7 +1403,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid period, with two comma',
+					'username' => 'User with invalid period, with two comma',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1417,7 +1421,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid period, 8 week days',
+					'username' => 'User with invalid period, 8 week days',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1435,7 +1439,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid period, zero week day',
+					'username' => 'User with invalid period, zero week day',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1453,7 +1457,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid time',
+					'username' => 'User with invalid time',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1471,7 +1475,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid time',
+					'username' => 'User with invalid time',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1489,7 +1493,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid time',
+					'username' => 'User with invalid time',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1507,7 +1511,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid time',
+					'username' => 'User with invalid time',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
@@ -1526,7 +1530,7 @@ class testUsers extends CAPITest {
 			// Successfully user update and create with all parameters.
 			[
 				'user' => [
-					'alias' => 'all-parameters',
+					'username' => 'all-parameters',
 					'roleid' => 3,
 					'passwd' => 'zabbix',
 					'usrgrps' => [['usrgrpid' => 7]],
@@ -1563,14 +1567,14 @@ class testUsers extends CAPITest {
 		foreach ($methods as $method) {
 			if ($method == 'user.update') {
 				$user['userid'] = '9';
-				$user['alias'] = 'updated-'.$user['alias'];
+				$user['username'] = 'updated-'.$user['username'];
 			}
 			$result = $this->call($method, $user, $expected_error);
 
 			if ($expected_error === null) {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($result['result']['userids'][0]));
 				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['alias'], $user['alias']);
+				$this->assertEquals($dbRowUser['username'], $user['username']);
 				$this->assertEquals($dbRowUser['name'], $user['name']);
 				$this->assertEquals($dbRowUser['surname'], $user['surname']);
 				$this->assertEquals($dbRowUser['autologin'], $user['autologin']);
@@ -1598,7 +1602,9 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowMedia['period'], $user['medias'][0]['period']);
 			}
 			else {
-				$this->assertEquals(0, CDBHelper::getCount('select * from users where alias='.zbx_dbstr($user['alias'])));
+				$this->assertEquals(0, CDBHelper::getCount('select * from users where username='.
+					zbx_dbstr($user['username'])
+				));
 			}
 		}
 	}
@@ -1646,16 +1652,6 @@ class testUsers extends CAPITest {
 				'user' => ['14'],
 				'expected_error' => 'User "api-user-map" is map "API map" owner.'
 			],
-			// Check if deleted users have a screen.
-			[
-				'user' => ['15'],
-				'expected_error' => 'User "api-user-screen" is screen "API screen" owner.'
-			],
-			// Check if deleted users have a slide show.
-			[
-				'user' => ['16'],
-				'expected_error' => 'User "api-user-slideshow" is slide show "API slide show" owner.'
-			],
 			// Check successfully delete of user.
 			[
 				'user' => ['10'],
@@ -1687,7 +1683,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => [
-							'alias' => 'API user create as zabbix admin',
+							'username' => 'API user create as zabbix admin',
 							'passwd' => 'zabbix',
 							'usrgrps' => [
 								['usrgrpid' => 7]
@@ -1700,7 +1696,7 @@ class testUsers extends CAPITest {
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => [
 							'userid' => '9',
-							'alias' => 'API user update as zabbix admin without permissions'
+							'username' => 'API user update as zabbix admin without permissions'
 						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -1714,7 +1710,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => [
-							'alias' => 'API user create as zabbix user',
+							'username' => 'API user create as zabbix user',
 							'passwd' => 'zabbix',
 							'usrgrps' => [
 								['usrgrpid' => 7]
@@ -1727,7 +1723,7 @@ class testUsers extends CAPITest {
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => [
 							'userid' => '9',
-							'alias' => 'API user update as zabbix user without permissions'
+							'username' => 'API user update as zabbix user without permissions'
 						],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -1756,7 +1752,7 @@ class testUsers extends CAPITest {
 				'params' =>
 					[
 						'userid' => '9',
-						'alias' => 'check authentication'
+						'username' => 'check authentication'
 					],
 				'auth' => '12345',
 				'id' => '1'
@@ -1796,7 +1792,7 @@ class testUsers extends CAPITest {
 			'params' =>
 				[
 					'userid' => '9',
-					'alias' => 'check authentication'
+					'username' => 'check authentication'
 				],
 			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
@@ -1808,7 +1804,7 @@ class testUsers extends CAPITest {
 		return [
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix',
 					'sessionid' => '123456'
 				],
@@ -1819,25 +1815,25 @@ class testUsers extends CAPITest {
 				'login' => [
 					'password' => 'zabbix'
 				],
-				'expected_error' => 'Invalid parameter "/": the parameter "user" is missing.'
+				'expected_error' => 'Invalid parameter "/": the parameter "username" is missing.'
 			],
 			[
 				'login' => [
-					'user' => '',
+					'username' => '',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Unknown user',
+					'username' => 'Unknown user',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => '!@#$%^&\\\'\"""\;:',
+					'username' => '!@#$%^&\\\'\"""\;:',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
@@ -1845,27 +1841,27 @@ class testUsers extends CAPITest {
 			// Check password
 			[
 				'login' => [
-					'user' => 'Admin'
+					'username' => 'Admin'
 				],
 				'expected_error' => 'Invalid parameter "/": the parameter "password" is missing.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => ''
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'wrong password'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => '!@#$%^&\\\'\"""\;:'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
@@ -1873,7 +1869,7 @@ class testUsers extends CAPITest {
 			// Check disabled user.
 			[
 				'login' => [
-					'user' => 'api-user-action',
+					'username' => 'api-user-action',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'No permissions for system access.'
@@ -1881,14 +1877,14 @@ class testUsers extends CAPITest {
 			// Successfully login.
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix'
 				],
 				'expected_error' => null
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix',
 					'userData' => true
 				],
@@ -1896,7 +1892,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'login' => [
-					'user' => 'guest',
+					'username' => 'guest',
 					'password' => ''
 				],
 				'expected_error' => null
@@ -1905,8 +1901,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 *
 	 * @dataProvider login_data
 	 */
@@ -2134,7 +2130,7 @@ class testUsers extends CAPITest {
 	public function testUsers_LoginBlocked() {
 		$this->disableAuthorization();
 		for ($i = 1; $i <= 6; $i++) {
-			$result = $this->call('user.login', ['user' => 'Admin', 'password' => 'attempt '.$i], true);
+			$result = $this->call('user.login', ['username' => 'Admin', 'password' => 'attempt '.$i], true);
 		}
 
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',

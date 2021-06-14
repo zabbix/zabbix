@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,7 +19,9 @@
 **/
 
 
-class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CApiTagHelperTest extends TestCase {
 
 	public static function provider() {
 		$sql_args = [2 => 'e', 'event_tag', 'eventid'];
@@ -357,8 +359,7 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 					' WHERE'.
 						' e.eventid=event_tag.eventid'.
 						' AND event_tag.tag=\'tag1\''.
-						' AND UPPER(event_tag.value)'.
-						' LIKE \'%VALUE%\' ESCAPE \'!\''.
+						' AND UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\''.
 				')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
@@ -366,8 +367,7 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 					' WHERE'.
 						' e.eventid=event_tag.eventid'.
 						' AND event_tag.tag=\'OS\''.
-						' AND UPPER(event_tag.value)'.
-						' LIKE \'%WIN%\' ESCAPE \'!\''.
+						' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\''.
 				')'
 			]
 		];

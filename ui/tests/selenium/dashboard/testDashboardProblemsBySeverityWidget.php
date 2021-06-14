@@ -23,8 +23,7 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
@@ -43,7 +42,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 */
 	// TODO: add wf.name in select and "order by" after fix ZBX-18271
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -564,7 +563,15 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		// Create dashboard
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Problems by severity update dashboard',
-			'widgets' => array_values($widgets)
+			'display_period' => 60,
+			'auto_start' => 1,
+			'pages' => [
+				[
+					'name' => 'Test Dashboard Page',
+					'display_period' => 1800,
+					'widgets' => array_values($widgets)
+				]
+			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
@@ -1316,7 +1323,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	}
 
 	/**
-	 * @on-before-once prepareUpdateData
+	 * @onBeforeOnce prepareUpdateData
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Update($data) {
@@ -1469,7 +1476,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Check that Dashboard has been saved
 			$this->checkDashboardMessage();
 			// Confirm that widget is not present on dashboard.
-			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
 			$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 					' WHERE w.name='.zbx_dbstr($name);

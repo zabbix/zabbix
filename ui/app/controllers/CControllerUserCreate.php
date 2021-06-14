@@ -28,7 +28,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$themes[] = THEME_DEFAULT;
 
 		$fields = [
-			'alias' =>			'required|db users.alias|not_empty',
+			'username' =>		'required|db users.username|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
 			'password1' =>		'required|string',
@@ -80,7 +80,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function doAction() {
 		$user = [];
 
-		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
+		$this->getInputs($user, ['username', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
 			'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');

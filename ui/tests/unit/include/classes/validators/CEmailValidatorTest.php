@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,12 +19,14 @@
 **/
 
 
-class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CEmailValidatorTest extends TestCase {
 
 	/**
 	 * An array of e-mails, results and error messages.
 	 */
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			// Valid e-mails.
 			['email@example.com', true, null],
@@ -66,7 +68,7 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 */
 	public function testValidateEmail($email, $expected, $error) {
 		$email_validator = new CEmailValidator();

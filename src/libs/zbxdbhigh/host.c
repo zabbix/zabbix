@@ -59,38 +59,6 @@ static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_screenitems_by_resource_types_ids                          *
- *                                                                            *
- * Description: gets a vector of screen item identifiers used with the        *
- *              specified resource types and identifiers                      *
- *                                                                            *
- * Parameters: screen_itemids - [OUT] the screen item identifiers             *
- *             types          - [IN] an array of resource types               *
- *             types_num      - [IN] the number of values in types array      *
- *             resourceids    - [IN] the resource identifiers                 *
- *                                                                            *
- ******************************************************************************/
-static void	DBget_screenitems_by_resource_types_ids(zbx_vector_uint64_t *screen_itemids, const zbx_uint64_t *types,
-		int types_num, const zbx_vector_uint64_t *resourceids)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct screenitemid from screens_items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourcetype", types, types_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", resourceids->values,
-			resourceids->values_num);
-
-	DBselect_uint64(sql, screen_itemids);
-
-	zbx_free(sql);
-
-	zbx_vector_uint64_sort(screen_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_profiles_by_source_idxs_values                             *
  *                                                                            *
  * Description: gets a vector of profile identifiers used with the specified  *
@@ -864,9 +832,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
 					" and",
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
@@ -1173,8 +1141,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_vector_uint64_t	profileids, screen_itemids;
-	zbx_uint64_t		resource_type = SCREEN_RESOURCE_GRAPH;
+	zbx_vector_uint64_t	profileids;
 	const char		*profile_idx =  "web.favorite.graphids";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, graphids->values_num);
@@ -1185,19 +1152,8 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&profileids);
-	zbx_vector_uint64_create(&screen_itemids);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	/* delete from screens_items */
-	DBget_screenitems_by_resource_types_ids(&screen_itemids, &resource_type, 1, graphids);
-	if (0 != screen_itemids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
-				screen_itemids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
@@ -1218,7 +1174,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 
 	DBexecute("%s", sql);
 
-	zbx_vector_uint64_destroy(&screen_itemids);
 	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
@@ -1340,9 +1295,8 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
-	zbx_vector_uint64_t	screen_itemids, profileids;
+	zbx_vector_uint64_t	profileids;
 	int			num;
-	zbx_uint64_t		resource_types[] = {SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH};
 	const char		*history_tables[] = {"history", "history_str", "history_uint", "history_log",
 				"history_text", "trends", "trends_uint"};
 	const char		*event_tables[] = {"events"};
@@ -1354,7 +1308,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
-	zbx_vector_uint64_create(&screen_itemids);
 	zbx_vector_uint64_create(&profileids);
 
 	do	/* add child items (auto-created and prototypes) */
@@ -1382,16 +1335,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	/* delete from screens_items */
-	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types, ARRSIZE(resource_types), itemids);
-	if (0 != screen_itemids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
-				screen_itemids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
 	if (0 != profileids.values_num)
@@ -1412,7 +1355,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBexecute("%s", sql);
 
 	zbx_vector_uint64_destroy(&profileids);
-	zbx_vector_uint64_destroy(&screen_itemids);
 
 	zbx_free(sql);
 out:
@@ -1477,91 +1419,6 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_application                                             *
- *                                                                            *
- * Purpose: delete application                                                *
- *                                                                            *
- * Parameters: applicationid - [IN] application identificator from database   *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	applicationid;
-	int		index;
-
-	if (0 == applicationids->values_num)
-		goto out;
-
-	/* don't delete applications used in web scenarios */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct applicationid"
-			" from httptest"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
-			applicationids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(applicationid, row[0]);
-
-		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_remove(applicationids, index);
-	}
-	DBfree_result(result);
-
-	if (0 == applicationids->values_num)
-		goto out;
-
-	/* don't delete applications with items assigned to them */
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct applicationid"
-			" from items_applications"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
-			applicationids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(applicationid, row[0]);
-
-		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_remove(applicationids, index);
-	}
-	DBfree_result(result);
-
-	if (0 == applicationids->values_num)
-		goto out;
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"applicationid", applicationids->values, applicationids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	DBexecute("%s", sql);
-out:
-	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -1876,189 +1733,6 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_template_applications                                   *
- *                                                                            *
- * Purpose: delete host applications that belong to an unlinked template      *
- *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- *           This function does not remove applications discovered by         *
- *           application prototypes.                                          *
- *           Use DBdelete_template_discovered_applications() for that.        *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		id;
-	zbx_vector_uint64_t	applicationids, apptemplateids;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&applicationids);
-	zbx_vector_uint64_create(&apptemplateids);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.application_templateid,t.applicationid"
-			" from application_template t,applications a,applications ta"
-			" where t.applicationid=a.applicationid"
-				" and t.templateid=ta.applicationid"
-				" and a.hostid=" ZBX_FS_UI64
-				" and a.flags=%d"
-				" and",
-			hostid, ZBX_FLAG_DISCOVERY_NORMAL);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(&apptemplateids, id);
-
-		ZBX_STR2UINT64(id, row[1]);
-		zbx_vector_uint64_append(&applicationids, id);
-	}
-	DBfree_result(result);
-
-	if (0 != apptemplateids.values_num)
-	{
-		zbx_vector_uint64_sort(&apptemplateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_template where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
-				apptemplateids.values, apptemplateids.values_num);
-
-		DBexecute("%s", sql);
-
-		DBdelete_applications(&applicationids);
-	}
-
-	zbx_vector_uint64_destroy(&apptemplateids);
-	zbx_vector_uint64_destroy(&applicationids);
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_template_discovered_applications                        *
- *                                                                            *
- * Purpose: delete host applications that belong to an unlinked template      *
- *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_template_discovered_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		id;
-	zbx_vector_uint64_t	applicationids, lld_ruleids;
-	int			index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&applicationids);
-	zbx_vector_uint64_create(&lld_ruleids);
-
-	/* get the discovery rules */
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid from items i"
-			" left join items ti"
-				" on i.templateid=ti.itemid"
-			" where i.hostid=" ZBX_FS_UI64
-				" and i.flags=%d"
-				" and",
-			hostid, ZBX_FLAG_DISCOVERY_RULE);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
-
-	DBselect_uint64(sql, &lld_ruleids);
-
-	if (0 == lld_ruleids.values_num)
-		goto out;
-
-	/* get the applications discovered by those rules */
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ad.applicationid"
-			" from application_discovery ad"
-			" left join application_prototype ap"
-				" on ap.application_prototypeid=ad.application_prototypeid"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", lld_ruleids.values, lld_ruleids.values_num);
-
-	zbx_vector_uint64_clear(&applicationids);
-	DBselect_uint64(sql, &applicationids);
-
-	if (0 == applicationids.values_num)
-		goto out;
-
-	/* check if the applications are not discovered by other discovery rules */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ad.applicationid"
-			" from application_discovery ad"
-			" left join application_prototype ap"
-				" on ad.application_prototypeid=ap.application_prototypeid"
-			" where not");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", lld_ruleids.values, lld_ruleids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ad.applicationid", applicationids.values,
-			applicationids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-
-		if (FAIL != (index = zbx_vector_uint64_bsearch(&applicationids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			zbx_vector_uint64_remove(&applicationids, index);
-	}
-	DBfree_result(result);
-
-	if (0 == applicationids.values_num)
-		goto out;
-
-	/* discovered applications must be always removed, that's why we are  */
-	/* doing it directly instead of using DBdelete_applications()         */
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids.values
-			, applicationids.values_num);
-	DBexecute("%s", sql);
-out:
-	zbx_vector_uint64_destroy(&lld_ruleids);
-	zbx_vector_uint64_destroy(&applicationids);
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBcopy_trigger_to_host                                           *
  *                                                                            *
  * Purpose: copy specified trigger to host                                    *
@@ -2087,21 +1761,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		const char *recovery_expression, unsigned char recovery_mode, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments, const char *url, unsigned char flags,
 		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
-		const char *opdata, unsigned char discover, const char *event_name)
+		const char *opdata, unsigned char discover, const char *event_name, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t	itemid,	h_triggerid, functionid;
-	char		*old_expression = NULL,
-			*new_expression = NULL,
-			*expression_esc = NULL,
-			*new_recovery_expression = NULL,
-			*recovery_expression_esc = NULL,
-			search[MAX_ID_LEN + 3],
-			replace[MAX_ID_LEN + 3],
-			*description_esc = NULL,
+	char		*description_esc = NULL,
 			*comments_esc = NULL,
 			*url_esc = NULL,
 			*function_esc = NULL,
@@ -2164,12 +1831,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
-		res = SUCCEED;
+		zbx_eval_context_t	ctx, ctx_r;
 
 		*new_triggerid = DBget_maxid("triggers");
 		*cur_triggerid = 0;
-		new_expression = zbx_strdup(NULL, expression);
-		new_recovery_expression = zbx_strdup(NULL, recovery_expression);
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
@@ -2191,6 +1856,19 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
+		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, expression,
+				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
+			goto out;
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode &&
+				(SUCCEED != (res = zbx_eval_parse_expression(&ctx_r, recovery_expression,
+						ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID,
+						error))))
+		{
+			zbx_eval_clear(&ctx);
+			goto out;
+		}
+
 		/* Loop: functions */
 		result = DBselect(
 				"select hi.itemid,tf.functionid,tf.name,tf.parameter,ti.key_"
@@ -2206,12 +1884,11 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		{
 			if (SUCCEED != DBis_null(row[0]))
 			{
+				zbx_uint64_t	old_functionid;
+
 				ZBX_STR2UINT64(itemid, row[0]);
 
 				functionid = DBget_maxid("functions");
-
-				zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
-				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
 
 				function_esc = DBdyn_escape_string(row[2]);
 				parameter_esc = DBdyn_escape_string(row[3]);
@@ -2224,52 +1901,62 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 						functionid, itemid, *new_triggerid,
 						function_esc, parameter_esc);
 
-				old_expression = new_expression;
-				new_expression = string_replace(new_expression, search, replace);
-				zbx_free(old_expression);
-
-				old_expression = new_recovery_expression;
-				new_recovery_expression = string_replace(new_recovery_expression, search, replace);
-				zbx_free(old_expression);
+				ZBX_DBROW2UINT64(old_functionid, row[1]);
+				zbx_eval_replace_functionid(&ctx, old_functionid, functionid);
+				if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+					zbx_eval_replace_functionid(&ctx_r, old_functionid, functionid);
 
 				zbx_free(parameter_esc);
 				zbx_free(function_esc);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Missing similar key '%s'"
-						" for host [" ZBX_FS_UI64 "]",
+				*error = zbx_dsprintf(*error, "Missing similar key '%s' for host [" ZBX_FS_UI64 "]",
 						row[4], hostid);
 				res = FAIL;
 			}
 		}
 		DBfree_result(result);
 
-		if (SUCCEED == res)
+		if (SUCCEED == (res = zbx_eval_validate_replaced_functionids(&ctx, error)) &&
+				TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
 		{
-			expression_esc = DBdyn_escape_field("triggers", "expression", new_expression);
-			recovery_expression_esc = DBdyn_escape_field("triggers", "recovery_expression",
-					new_recovery_expression);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update triggers"
-						" set expression='%s',recovery_expression='%s'"
-					" where triggerid=" ZBX_FS_UI64 ";\n",
-					expression_esc, recovery_expression_esc, *new_triggerid);
-
-			zbx_free(recovery_expression_esc);
-			zbx_free(expression_esc);
+			res = zbx_eval_validate_replaced_functionids(&ctx_r, error);
 		}
 
-		zbx_free(new_recovery_expression);
-		zbx_free(new_expression);
+		if (SUCCEED == res)
+		{
+			char	*new_expression = NULL, *esc;
+
+			zbx_eval_compose_expression(&ctx, &new_expression);
+			esc = DBdyn_escape_field("triggers", "expression", new_expression);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set expression='%s'", esc);
+			zbx_free(esc);
+			zbx_free(new_expression);
+
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+			{
+				zbx_eval_compose_expression(&ctx_r, &new_expression);
+				esc = DBdyn_escape_field("triggers", "recovery_expression", new_expression);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",recovery_expression='%s'", esc);
+				zbx_free(esc);
+				zbx_free(new_expression);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
+					*new_triggerid);
+		}
+
+		zbx_eval_clear(&ctx);
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode)
+			zbx_eval_clear(&ctx_r);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
-
+out:
 	zbx_free(sql);
 	zbx_free(correlation_tag_esc);
 	zbx_free(event_name_esc);
@@ -2623,15 +2310,8 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 	DBdelete_template_triggers(hostid, del_templateids);
 	DBdelete_template_host_prototypes(hostid, del_templateids);
 
-	/* Removing items will remove discovery rules and all application discovery records */
-	/* related to them. Because of that discovered applications must be removed before  */
-	/* removing items.                                                                  */
-	DBdelete_template_discovered_applications(hostid, del_templateids);
+	/* removing items will remove discovery rules related to them */
 	DBdelete_template_items(hostid, del_templateids);
-
-	/* normal applications must be removed after items are removed to cleanup */
-	/* unlinked applications                                                  */
-	DBdelete_template_applications(hostid, del_templateids);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -2651,291 +2331,6 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
-}
-
-typedef struct
-{
-	zbx_uint64_t		applicationid;
-	char			*name;
-	zbx_vector_uint64_t	templateids;
-}
-zbx_application_t;
-
-static void	zbx_application_clean(zbx_application_t *application)
-{
-	zbx_vector_uint64_destroy(&application->templateids);
-	zbx_free(application->name);
-	zbx_free(application);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_application_prototypes                           *
- *                                                                            *
- * Purpose: copy application prototypes from templates to host                *
- *                                                                            *
- * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Comments: The host items must be already copied.                           *
- *                                                                            *
- ******************************************************************************/
-static void	DBcopy_template_application_prototypes(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_db_insert_t	db_insert;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ap.application_prototypeid,ap.name,i_t.itemid"
-			" from application_prototype ap"
-			" left join items i"
-				" on ap.itemid=i.itemid"
-			" left join items i_t"
-				" on i_t.templateid=i.itemid"
-			" where i.flags=%d"
-				" and i_t.hostid=" ZBX_FS_UI64
-				" and",
-			ZBX_FLAG_DISCOVERY_RULE, hostid);
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
-
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	if (NULL == (row = DBfetch(result)))
-		goto out;
-
-	zbx_db_insert_prepare(&db_insert, "application_prototype", "application_prototypeid", "itemid", "templateid",
-			"name", NULL);
-	do
-	{
-		zbx_uint64_t	application_prototypeid, lld_ruleid;
-
-		ZBX_STR2UINT64(application_prototypeid, row[0]);
-		ZBX_STR2UINT64(lld_ruleid, row[2]);
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), lld_ruleid, application_prototypeid, row[1]);
-	}
-	while (NULL != (row = DBfetch(result)));
-
-	zbx_db_insert_autoincrement(&db_insert, "application_prototypeid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-out:
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_item_application_prototypes                      *
- *                                                                            *
- * Purpose: copy application prototypes from templates to host                *
- *                                                                            *
- * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Comments: The host items and application prototypes must be already copied.*
- *                                                                            *
- ******************************************************************************/
-static void	DBcopy_template_item_application_prototypes(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_db_insert_t	db_insert;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ap.application_prototypeid,i.itemid"
-			" from items i_ap,item_application_prototype iap"
-			" left join application_prototype ap"
-				" on ap.templateid=iap.application_prototypeid"
-			" left join items i_t"
-				" on i_t.itemid=iap.itemid"
-			" left join items i"
-				" on i.templateid=i_t.itemid"
-			" where i.hostid=" ZBX_FS_UI64
-				" and i_ap.itemid=ap.itemid"
-				" and i_ap.hostid=" ZBX_FS_UI64
-				" and",
-			hostid, hostid);
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i_t.hostid", templateids->values,
-			templateids->values_num);
-
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	if (NULL == (row = DBfetch(result)))
-		goto out;
-
-	zbx_db_insert_prepare(&db_insert, "item_application_prototype", "item_application_prototypeid",
-			"application_prototypeid", "itemid", NULL);
-
-	do
-	{
-		zbx_uint64_t	application_prototypeid, itemid;
-
-		ZBX_STR2UINT64(application_prototypeid, row[0]);
-		ZBX_STR2UINT64(itemid, row[1]);
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), application_prototypeid, itemid);
-	}
-	while (NULL != (row = DBfetch(result)));
-
-	zbx_db_insert_autoincrement(&db_insert, "item_application_prototypeid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-out:
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_applications                                     *
- *                                                                            *
- * Purpose: copy applications from templates to host                          *
- *                                                                            *
- * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- ******************************************************************************/
-static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_application_t	*application = NULL;
-	zbx_vector_ptr_t	applications;
-	int			i, j, new_applications = 0, new_application_templates = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&applications);
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,hostid,name"
-			" from applications"
-			" where hostid=" ZBX_FS_UI64
-				" or", hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids->values, templateids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		zbx_uint64_t	db_applicationid, db_hostid;
-
-		ZBX_STR2UINT64(db_applicationid, row[0]);
-		ZBX_STR2UINT64(db_hostid, row[1]);
-
-		for (i = 0; i < applications.values_num; i++)
-		{
-			application = (zbx_application_t *)applications.values[i];
-
-			if (0 == strcmp(application->name, row[2]))
-				break;
-		}
-
-		if (i == applications.values_num)
-		{
-			application = (zbx_application_t *)zbx_malloc(NULL, sizeof(zbx_application_t));
-
-			application->applicationid = 0;
-			application->name = zbx_strdup(NULL, row[2]);
-			zbx_vector_uint64_create(&application->templateids);
-
-			zbx_vector_ptr_append(&applications, application);
-		}
-
-		if (db_hostid == hostid)
-			application->applicationid = db_applicationid;
-		else
-			zbx_vector_uint64_append(&application->templateids, db_applicationid);
-	}
-	DBfree_result(result);
-
-	for (i = 0; i < applications.values_num; i++)
-	{
-		application = (zbx_application_t *)applications.values[i];
-
-		if (0 == application->applicationid)
-			new_applications++;
-
-		new_application_templates += application->templateids.values_num;
-	}
-
-	if (0 != new_applications)
-	{
-		zbx_uint64_t	applicationid;
-		zbx_db_insert_t	db_insert;
-
-		applicationid = DBget_maxid_num("applications", new_applications);
-
-		zbx_db_insert_prepare(&db_insert, "applications", "applicationid", "hostid", "name", NULL);
-
-		for (i = 0; i < applications.values_num; i++)
-		{
-			application = (zbx_application_t *)applications.values[i];
-
-			if (0 != application->applicationid)
-				continue;
-
-			zbx_db_insert_add_values(&db_insert, applicationid, hostid, application->name);
-
-			application->applicationid = applicationid++;
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
-
-	if (0 != new_application_templates)
-	{
-		zbx_uint64_t	application_templateid;
-		zbx_db_insert_t	db_insert;
-
-		application_templateid = DBget_maxid_num("application_template", new_application_templates);
-
-		zbx_db_insert_prepare(&db_insert,"application_template", "application_templateid", "applicationid",
-				"templateid", NULL);
-
-		for (i = 0; i < applications.values_num; i++)
-		{
-			application = (zbx_application_t *)applications.values[i];
-
-			for (j = 0; j < application->templateids.values_num; j++)
-			{
-				zbx_db_insert_add_values(&db_insert, application_templateid++,
-						application->applicationid, application->templateids.values[j]);
-			}
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
-
-	zbx_vector_ptr_clear_ext(&applications, (zbx_clean_func_t)zbx_application_clean);
-	zbx_vector_ptr_destroy(&applications);
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 typedef struct
@@ -3214,7 +2609,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover"
+				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover,h.custom_interfaces"
 				" from items i,host_discovery hd,hosts h"
 				" where i.itemid=hd.parent_itemid"
 					" and hd.hostid=h.hostid"
@@ -4841,6 +4236,7 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
+ *             error       - [IN] the error message                           *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -4849,7 +4245,7 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
+static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
@@ -4901,7 +4297,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[13]),	/* manual_close */
 				row[14],			/* opdata */
 				(unsigned char)atoi(row[15]),	/* discover */
-				row[16]);			/* event_name */
+				row[16],			/* event_name */
+				error);
 
 		if (0 != new_triggerid)				/* new trigger added */
 			zbx_vector_uint64_append(&new_triggerids, new_triggerid);
@@ -4918,6 +4315,9 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	zbx_vector_uint64_destroy(&cur_triggerids);
 	zbx_vector_uint64_destroy(&new_triggerids);
+
+	if (FAIL == res && NULL == *error)
+		*error = zbx_strdup(NULL, "unknown error while linking triggers");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -5277,6 +4677,14 @@ httpstep_t;
 
 typedef struct
 {
+	zbx_uint64_t		httptesttagid;
+	char			*tag;
+	char			*value;
+}
+httptesttag_t;
+
+typedef struct
+{
 	zbx_uint64_t		t_itemid;
 	zbx_uint64_t		h_itemid;
 	unsigned char		type;
@@ -5287,8 +4695,6 @@ typedef struct
 {
 	zbx_uint64_t		templateid;
 	zbx_uint64_t		httptestid;
-	zbx_uint64_t		t_applicationid;
-	zbx_uint64_t		h_applicationid;
 	char			*name;
 	char			*delay;
 	zbx_vector_ptr_t	fields;
@@ -5298,6 +4704,7 @@ typedef struct
 	char			*http_proxy;
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
+	zbx_vector_ptr_t	httptesttags;
 	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
@@ -5326,25 +4733,24 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	DB_ROW			row;
 	httptest_t		*httptest;
 	httpstep_t		*httpstep;
+	httptesttag_t		*httptesttag;
 	httpfield_t		*httpfield;
 	httptestitem_t		*httptestitem;
 	httpstepitem_t		*httpstepitem;
 	zbx_vector_uint64_t	httptestids;	/* the list of web scenarios which should be added to a host */
-	zbx_vector_uint64_t	applications;
 	zbx_vector_uint64_t	items;
-	zbx_uint64_t		httptestid, httpstepid, applicationid, itemid;
+	zbx_uint64_t		httptestid, httpstepid, itemid;
 	int			i, j, k;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&httptestids);
-	zbx_vector_uint64_create(&applications);
 	zbx_vector_uint64_create(&items);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.agent,t.authentication,"
+			"select t.httptestid,t.name,t.delay,t.status,t.agent,t.authentication,"
 				"t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
@@ -5361,30 +4767,27 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest = (httptest_t *)zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->httptestid, row[11]);
+		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 		zbx_vector_ptr_create(&httptest->fields);
+		zbx_vector_ptr_create(&httptest->httptesttags);
 
 		zbx_vector_ptr_append(httptests, httptest);
 
 		if (0 == httptest->httptestid)
 		{
 			httptest->name = zbx_strdup(NULL, row[1]);
-			ZBX_DBROW2UINT64(httptest->t_applicationid, row[2]);
-			httptest->delay = zbx_strdup(NULL, row[3]);
-			httptest->status = (unsigned char)atoi(row[4]);
-			httptest->agent = zbx_strdup(NULL, row[5]);
-			httptest->authentication = (unsigned char)atoi(row[6]);
-			httptest->http_user = zbx_strdup(NULL, row[7]);
-			httptest->http_password = zbx_strdup(NULL, row[8]);
-			httptest->http_proxy = zbx_strdup(NULL, row[9]);
-			httptest->retries = atoi(row[10]);
+			httptest->delay = zbx_strdup(NULL, row[2]);
+			httptest->status = (unsigned char)atoi(row[3]);
+			httptest->agent = zbx_strdup(NULL, row[4]);
+			httptest->authentication = (unsigned char)atoi(row[5]);
+			httptest->http_user = zbx_strdup(NULL, row[6]);
+			httptest->http_password = zbx_strdup(NULL, row[7]);
+			httptest->http_proxy = zbx_strdup(NULL, row[8]);
+			httptest->retries = atoi(row[9]);
 
 			zbx_vector_uint64_append(&httptestids, httptest->templateid);
-
-			if (0 != httptest->t_applicationid)
-				zbx_vector_uint64_append(&applications, httptest->t_applicationid);
 		}
 	}
 	DBfree_result(result);
@@ -5544,40 +4947,52 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			zbx_vector_ptr_append(&httpstep->fields, httpfield);
 		}
 		DBfree_result(result);
-	}
 
-	/* applications */
-	if (0 != applications.values_num)
-	{
-		zbx_vector_uint64_sort(&applications, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&applications, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		/* web scenario tags */
+		httptest = NULL;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t.applicationid,h.applicationid"
-				" from applications t"
-					" join applications h"
-						" on t.name=h.name"
-							" and h.hostid=" ZBX_FS_UI64
-				" where", hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.applicationid",
-				applications.values, applications.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select httptesttagid,httptestid,tag,value"
+				" from httptest_tag"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
+				httptestids.values, httptestids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by httptestid");
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(applicationid, row[0]);
+			ZBX_STR2UINT64(httptestid, row[1]);
 
-			for (i = 0; i < httptests->values_num; i++)
+			if (NULL == httptest || httptest->templateid != httptestid)
 			{
-				httptest = (httptest_t *)httptests->values[i];
+				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
+						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
 
-				if (httptest->t_applicationid == applicationid)
-					ZBX_STR2UINT64(httptest->h_applicationid, row[1]);
+				httptest = (httptest_t *)httptests->values[i];
 			}
+
+			httptesttag = (httptesttag_t *)zbx_malloc(NULL, sizeof(httptesttag_t));
+
+			ZBX_STR2UINT64(httptesttag->httptesttagid, row[0]);
+			httptesttag->tag = zbx_strdup(NULL, row[2]);
+			httptesttag->value = zbx_strdup(NULL, row[3]);
+
+			zbx_vector_ptr_append(&httptest->httptesttags, httptesttag);
 		}
 		DBfree_result(result);
+
+		for (i = 0; i < httptests->values_num; i++)
+		{
+			httptest = (httptest_t *)httptests->values[i];
+			zbx_vector_ptr_sort(&httptest->httptesttags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		}
 	}
 
 	/* web scenario items */
@@ -5739,7 +5154,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&items);
-	zbx_vector_uint64_destroy(&applications);
 	zbx_vector_uint64_destroy(&httptestids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -5760,12 +5174,13 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	httpstep_t	*httpstep;
 	httptestitem_t	*httptestitem;
 	httpstepitem_t	*httpstepitem;
+	httptesttag_t	*httptesttag;
 	zbx_uint64_t	httptestid = 0, httpstepid = 0, httptestitemid = 0, httpstepitemid = 0, httptestfieldid = 0,
-			httpstepfieldid = 0;
+			httpstepfieldid = 0, httptesttagid = 0;
 	int		i, j, k, num_httptests = 0, num_httpsteps = 0, num_httptestitems = 0, num_httpstepitems = 0,
-			num_httptestfields = 0, num_httpstepfields = 0;
+			num_httptestfields = 0, num_httpstepfields = 0, num_httptesttags = 0;
 	zbx_db_insert_t	db_insert_htest, db_insert_hstep, db_insert_htitem, db_insert_hsitem, db_insert_tfield,
-			db_insert_sfield;
+			db_insert_sfield, db_insert_httag;
 
 	if (0 == httptests->values_num)
 		return;
@@ -5780,6 +5195,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			num_httpsteps += httptest->httpsteps.values_num;
 			num_httptestitems += httptest->httptestitems.values_num;
 			num_httptestfields += httptest->fields.values_num;
+			num_httptesttags += httptest->httptesttags.values_num;
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -5795,9 +5211,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	{
 		httptestid = DBget_maxid_num("httptest", num_httptests);
 
-		zbx_db_insert_prepare(&db_insert_htest, "httptest", "httptestid", "name", "applicationid", "delay",
-				"status", "agent", "authentication", "http_user", "http_password", "http_proxy",
-				"retries", "hostid", "templateid", NULL);
+		zbx_db_insert_prepare(&db_insert_htest, "httptest", "httptestid", "name", "delay", "status", "agent",
+				"authentication", "http_user", "http_password", "http_proxy", "retries", "hostid",
+				"templateid", NULL);
 	}
 
 	if (httptests->values_num != num_httptests)
@@ -5844,6 +5260,14 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				"name", "value", NULL);
 	}
 
+	if (0 != num_httptesttags)
+	{
+		httptesttagid = DBget_maxid_num("httptest_tag", num_httptesttags);
+
+		zbx_db_insert_prepare(&db_insert_httag, "httptest_tag", "httptesttagid", "httptestid", "tag", "value",
+				NULL);
+	}
+
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < httptests->values_num; i++)
@@ -5855,10 +5279,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			httptest->httptestid = httptestid++;
 
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
-					httptest->h_applicationid, httptest->delay, (int)httptest->status,
-					httptest->agent, (int)httptest->authentication, httptest->http_user,
-					httptest->http_password, httptest->http_proxy, httptest->retries, hostid,
-					httptest->templateid);
+					httptest->delay, (int)httptest->status, httptest->agent,
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->fields.values_num; j++)
 			{
@@ -5912,6 +5335,16 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				httptestitemid++;
 			}
+
+			for (j = 0; j < httptest->httptesttags.values_num; j++)
+			{
+				httptesttag = (httptesttag_t *)httptest->httptesttags.values[j];
+
+				zbx_db_insert_add_values(&db_insert_httag, httptesttagid, httptest->httptestid,
+						httptesttag->tag, httptesttag->value);
+
+				httptesttagid++;
+			}
 		}
 		else
 		{
@@ -5959,6 +5392,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		zbx_db_insert_clean(&db_insert_sfield);
 	}
 
+	if (0 != num_httptesttags)
+	{
+		zbx_db_insert_execute(&db_insert_httag);
+		zbx_db_insert_clean(&db_insert_httag);
+	}
+
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
@@ -5978,6 +5417,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 	httptest_t	*httptest;
 	httpfield_t	*httpfield;
 	httpstep_t	*httpstep;
+	httptesttag_t	*httptesttag;
 	int		i, j, k;
 
 	for (i = 0; i < httptests->values_num; i++)
@@ -6002,6 +5442,18 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 		}
 
 		zbx_vector_ptr_destroy(&httptest->fields);
+
+		for (j = 0; j < httptest->httptesttags.values_num; j++)
+		{
+			httptesttag = (httptesttag_t *)httptest->httptesttags.values[j];
+
+			zbx_free(httptesttag->tag);
+			zbx_free(httptesttag->value);
+
+			zbx_free(httptesttag);
+		}
+
+		zbx_vector_ptr_destroy(&httptest->httptesttags);
 
 		for (j = 0; j < httptest->httpsteps.values_num; j++)
 		{
@@ -6144,12 +5596,9 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 				hosttemplateid++, hostid, lnk_templateids->values[i]);
 	}
 
-	DBcopy_template_applications(hostid, lnk_templateids);
 	DBcopy_template_items(hostid, lnk_templateids);
-	DBcopy_template_application_prototypes(hostid, lnk_templateids);
-	DBcopy_template_item_application_prototypes(hostid, lnk_templateids);
 	DBcopy_template_host_prototypes(hostid, lnk_templateids);
-	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
+	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids, error)))
 	{
 		DBcopy_template_graphs(hostid, lnk_templateids);
 		DBcopy_template_httptests(hostid, lnk_templateids);
@@ -6700,11 +6149,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	int			i;
-	zbx_vector_uint64_t	screen_itemids, selementids;
-	zbx_uint64_t		resource_types_delete[] = {SCREEN_RESOURCE_DATA_OVERVIEW,
-						SCREEN_RESOURCE_TRIGGER_OVERVIEW};
-	zbx_uint64_t		resource_types_update[] = {SCREEN_RESOURCE_HOST_INFO, SCREEN_RESOURCE_TRIGGER_INFO,
-						SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS};
+	zbx_vector_uint64_t	selementids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, groupids->values_num);
 
@@ -6718,7 +6163,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	zbx_vector_uint64_create(&screen_itemids);
 	zbx_vector_uint64_create(&selementids);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -6733,30 +6177,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	/* delete screens_items (host group is mandatory for this elements) */
-	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types_delete, ARRSIZE(resource_types_delete),
-			groupids);
-	if (0 != screen_itemids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from screens_items where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
-				screen_itemids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
-	/* update screens_items (host group isn't mandatory for this elements) */
-	zbx_vector_uint64_clear(&screen_itemids);
-	DBget_screenitems_by_resource_types_ids(&screen_itemids, resource_types_update, ARRSIZE(resource_types_update),
-			groupids);
-
-	if (0 != screen_itemids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update screens_items set resourceid=0 where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "screenitemid", screen_itemids.values,
-				screen_itemids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
 	/* groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
@@ -6767,7 +6187,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	DBexecute("%s", sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-	zbx_vector_uint64_destroy(&screen_itemids);
 
 	zbx_free(sql);
 out:

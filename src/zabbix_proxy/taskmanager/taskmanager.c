@@ -134,8 +134,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, NULL, ZBX_SCRIPT_CTX_HOST,
-			0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, 0 == alertid ? &info : NULL,
+			error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}

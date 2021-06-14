@@ -27,33 +27,21 @@ if ($data['clock']['critical_error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['clock']['critical_error']);
 
 	$output = [
-		'header' => $data['name'],
+		'name' => $data['name'],
 		'body' => $item->toString()
 	];
 }
 else {
-	$item = (new CClock());
-
-	if ($data['clock']['error'] !== null) {
-		$item->setError($data['clock']['error']);
-	}
-
-	if ($data['clock']['time'] !== null) {
-		$item->setTime($data['clock']['time']);
-	}
-
-	if ($data['clock']['time_zone_offset'] !== null) {
-		$item->setTimeZoneOffset($data['clock']['time_zone_offset']);
-	}
-
-	if ($data['clock']['time_zone_string'] !== null) {
-		$item->setTimeZoneString($data['clock']['time_zone_string']);
-	}
-
 	$output = [
-		'header' => $data['name'],
-		'body' => $item->toString(),
-		'script_inline' => $item->getScriptRun()
+		'name' => $data['name'],
+		'body' =>
+			(new CClock())
+				->setEnabled($data['clock']['is_enabled'])
+				->toString(),
+		'clock_data' => [
+			'time' => $data['clock']['time'],
+			'time_zone_offset' => $data['clock']['time_zone_offset']
+		]
 	];
 }
 

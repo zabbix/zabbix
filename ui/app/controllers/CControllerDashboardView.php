@@ -33,7 +33,8 @@ class CControllerDashboardView extends CController {
 			'new' => 'in 1',
 			'cancel' => 'in 1',
 			'from' => 'range_time',
-			'to' => 'range_time'
+			'to' => 'range_time',
+			'slideshow' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -86,8 +87,16 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
+		if ($this->hasInput('slideshow')) {
+			$dashboard['auto_start'] = '1';
+		}
+
+		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		$dashboard['can_view_reports'] = $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
+		$dashboard['can_create_reports'] = $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
+
 		$time_selector_options = [
-			'profileIdx' => 'web.dashbrd.filter',
+			'profileIdx' => 'web.dashboard.filter',
 			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -98,15 +107,13 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
-				? getTimeSelectorPeriod($time_selector_options)
-				: null,
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
-			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
+			'time_period' => getTimeSelectorPeriod($time_selector_options),
+			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
-		if (self::hasDynamicWidgets($dashboard['widgets'])) {
-			$hostid = $this->getInput('hostid', CProfile::get('web.dashbrd.hostid', 0));
+		if (self::hasDynamicWidgets($dashboard['pages'])) {
+			$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
 
 			$hosts = ($hostid != 0)
 				? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -145,19 +152,29 @@ class CControllerDashboardView extends CController {
 			$dashboard = [
 				'dashboardid' => null,
 				'name' => _('New dashboard'),
+				'display_period' => DB::getDefault('dashboard', 'display_period'),
+				'auto_start' => DB::getDefault('dashboard', 'auto_start'),
 				'editable' => true,
-				'widgets' => [],
+				'pages' => [
+					[
+						'dashboard_pageid' => null,
+						'name' => '',
+						'display_period' => 0,
+						'widgets' => []
+					]
+				],
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
-				]
+				],
+				'has_related_reports' => false
 			];
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name', 'private'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'output' => ['name', 'private', 'display_period', 'auto_start'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => [$this->getInput('source_dashboardid')]
@@ -167,9 +184,11 @@ class CControllerDashboardView extends CController {
 				$dashboard = [
 					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
+					'display_period' => $dashboards[0]['display_period'],
+					'auto_start' => $dashboards[0]['auto_start'],
 					'editable' => true,
-					'widgets' => CDashboardHelper::prepareWidgetsForGrid(
-						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['widgets']), null, true
+					'pages' => CDashboardHelper::preparePagesForGrid(
+						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
 					),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
@@ -179,7 +198,8 @@ class CControllerDashboardView extends CController {
 						'private' => $dashboards[0]['private'],
 						'users' => $dashboards[0]['users'],
 						'userGroups' => $dashboards[0]['userGroups']
-					]
+					],
+					'has_related_reports' => false
 				];
 			}
 			else {
@@ -190,9 +210,9 @@ class CControllerDashboardView extends CController {
 			// Getting existing dashboard.
 			$dashboardid = $this->hasInput('dashboardid')
 				? $this->getInput('dashboardid')
-				: CProfile::get('web.dashbrd.dashboardid');
+				: CProfile::get('web.dashboard.dashboardid');
 
-			if ($dashboardid === null && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+			if ($dashboardid === null && CProfile::get('web.dashboard.list_was_opened') != 1) {
 				// Get first available dashboard that user has read permissions.
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid'],
@@ -207,8 +227,8 @@ class CControllerDashboardView extends CController {
 
 			if ($dashboardid !== null) {
 				$dashboards = API::Dashboard()->get([
-					'output' => ['dashboardid', 'name', 'userid'],
-					'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+					'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
+					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 					'dashboardids' => [$dashboardid],
 					'preservekeys' => true
 				]);
@@ -217,13 +237,18 @@ class CControllerDashboardView extends CController {
 					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
-					$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'], null, true);
+					$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 					];
+					$dashboard['has_related_reports'] = (bool) API::Report()->get([
+						'output' => [],
+						'filter' => ['dashboardid' => $dashboard['dashboardid']],
+						'limit' => 1
+					]);
 
-					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
 				elseif ($this->hasInput('dashboardid')) {
 					$error = _('No permissions to referred object or it does not exist!');
@@ -234,26 +259,24 @@ class CControllerDashboardView extends CController {
 			}
 		}
 
-		if ($dashboard !== null) {
-			$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-		}
-
 		return [$dashboard, $error];
 	}
 
 	/**
 	 * Checks, if any of widgets has checked dynamic field.
 	 *
-	 * @param array $grid_widgets
+	 * @param array $grid_pages
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function hasDynamicWidgets($grid_widgets) {
-		foreach ($grid_widgets as $widget) {
-			if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
-				return true;
+	private static function hasDynamicWidgets($grid_pages) {
+		foreach ($grid_pages as $page) {
+			foreach ($page['widgets'] as $widget) {
+				if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
+					return true;
+				}
 			}
 		}
 

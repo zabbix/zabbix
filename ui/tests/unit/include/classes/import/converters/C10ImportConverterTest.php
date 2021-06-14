@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+use PHPUnit\Framework\TestCase;
 
 class C10ImportConverterTest extends CImportConverterTest {
 
@@ -2063,65 +2065,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						]
 					],
 					'background' => ''
-				]
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
-
-	}
-
-	public function testConvertScreens() {
-		$this->assertConvert(
-			$this->createExpectedResult([]),
-			$this->createSource()
-		);
-		$this->assertConvert(
-			$this->createExpectedResult(['screens' => '']),
-			$this->createSource(['screens' => ''])
-		);
-
-		$source = $this->createSource([
-			'screens' => [
-				[],
-				[
-					'screenitems' => ''
-				],
-				[
-					'screenitems' => [
-						// resource is exported as "0" if it's not used
-						[
-							'resourceid' => '0'
-						],
-						[
-							'resourceid' => [
-								'key_' => 'itemkey'
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'screens' => [
-				[],
-				[
-					'screen_items' => ''
-				],
-				[
-					'screen_items' => [
-						[
-							'resource' => '0',
-							'sort_triggers' => ''
-						],
-						[
-							'resource' => [
-								'key' => 'itemkey'
-							],
-							'sort_triggers' => ''
-						]
-					]
 				]
 			]
 		]);

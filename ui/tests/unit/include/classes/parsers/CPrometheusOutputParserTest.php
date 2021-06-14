@@ -19,12 +19,14 @@
 **/
 
 
-class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CPrometheusOutputParserTest extends TestCase {
 
 	/**
 	 * An array of Prometheus outputs and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			// success
 			[
@@ -140,7 +142,7 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

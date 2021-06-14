@@ -116,7 +116,8 @@ class testMap extends CAPITest {
 								'height' => '200',
 								'viewtype' => '0',
 								'use_iconmap' => '1',
-								'application' => '',
+								'evaltype' => TAG_EVAL_TYPE_AND_OR,
+								'tags' => [],
 								'urls' => [],
 								'elements' => [
 									['sysmapid' => '1']
@@ -180,7 +181,8 @@ class testMap extends CAPITest {
 								'height' => '200',
 								'viewtype' => '0',
 								'use_iconmap' => '1',
-								'application' => '',
+								'evaltype' => TAG_EVAL_TYPE_AND_OR,
+								'tags' => [],
 								'urls' => [],
 								'elements' => [
 									['sysmapid' => '1']
@@ -282,7 +284,8 @@ class testMap extends CAPITest {
 								'height' => '200',
 								'viewtype' => '0',
 								'use_iconmap' => '1',
-								'application' => '',
+								'evaltype' => TAG_EVAL_TYPE_AND_OR,
+								'tags' => [],
 								'urls' => [],
 								'elements' => [
 									['sysmapid' => '10008']

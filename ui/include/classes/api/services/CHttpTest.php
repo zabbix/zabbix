@@ -56,7 +56,6 @@ class CHttpTest extends CApiService {
 
 		$defOptions = [
 			'httptestids'    => null,
-			'applicationids' => null,
 			'hostids'        => null,
 			'groupids'       => null,
 			'templateids'    => null,
@@ -65,6 +64,8 @@ class CHttpTest extends CApiService {
 			'templated'      => null,
 			'monitored'      => null,
 			'nopermissions'  => null,
+			'evaltype'		=> TAG_EVAL_TYPE_AND_OR,
+			'tags'			=> null,
 			// filter
 			'filter'         => null,
 			'search'         => null,
@@ -77,6 +78,7 @@ class CHttpTest extends CApiService {
 			'expandStepName' => null,
 			'selectHosts'    => null,
 			'selectSteps'    => null,
+			'selectTags'	 => null,
 			'countOutput'    => false,
 			'groupCount'     => false,
 			'preservekeys'   => false,
@@ -134,6 +136,13 @@ class CHttpTest extends CApiService {
 			}
 		}
 
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'ht',
+				'httptest_tag', 'httptestid'
+			);
+		}
+
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -145,13 +154,6 @@ class CHttpTest extends CApiService {
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
-		}
-
-		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['where'][] = dbConditionId('ht.applicationid', $options['applicationids']);
 		}
 
 		// inherited
@@ -259,6 +261,8 @@ class CHttpTest extends CApiService {
 	 * @param $httptests
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create($httptests) {
 		$this->validateCreate($httptests);
@@ -271,15 +275,15 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * @param array $httpTests
+	 * @param array $httptests
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$httptests) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
+	protected function validateCreate(array &$httptests): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'uuid' =>				['type' => API_UUID],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
-			'applicationid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
@@ -323,8 +327,13 @@ class CHttpTest extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest_tag', 'value'), 'default' => DB::getDefault('httptest_tag', 'value')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -335,12 +344,52 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
+		$this->checkAndAddUuid($httptests);
 		$this->checkHostPermissions(array_keys($names_by_hostid));
 		$this->checkDuplicates($names_by_hostid);
-		$this->checkApplications($httptests, __FUNCTION__);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
 		$this->validateSteps($httptests, __FUNCTION__);
+	}
+
+	/**
+	 * Check that only httptests on templates have UUID. Add UUID to all httptests on templates, if it does not exists.
+	 *
+	 * @param array $httptests_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$httptests_to_create): void {
+		$db_templateids = API::Template()->get([
+			'output' => [],
+			'templateids' => array_column($httptests_to_create, 'hostid'),
+			'preservekeys' => true
+		]);
+
+		foreach ($httptests_to_create as $index => &$httptest) {
+			if (!array_key_exists($httptest['hostid'], $db_templateids) && array_key_exists('uuid', $httptest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
+
+			if (array_key_exists($httptest['hostid'], $db_templateids) && !array_key_exists('uuid', $httptest)) {
+				$httptest['uuid'] = generateUuidV4();
+			}
+		}
+		unset($httptest);
+
+		$db_uuid = DB::select('httptest', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($httptests_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -373,7 +422,6 @@ class CHttpTest extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
-			'applicationid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
@@ -418,6 +466,10 @@ class CHttpTest extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest_tag', 'value'), 'default' => DB::getDefault('httptest_tag', 'value')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
@@ -426,7 +478,7 @@ class CHttpTest extends CApiService {
 
 		// permissions
 		$db_httptests = $this->get([
-			'output' => ['httptestid', 'hostid', 'name', 'applicationid', 'delay', 'retries', 'agent', 'http_proxy',
+			'output' => ['httptestid', 'hostid', 'name', 'delay', 'retries', 'agent', 'http_proxy',
 				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
 			],
@@ -508,7 +560,6 @@ class CHttpTest extends CApiService {
 		if ($names_by_hostid) {
 			$this->checkDuplicates($names_by_hostid);
 		}
-		$this->checkApplications($httptests, __FUNCTION__, $db_httptests);
 		$this->validateAuthParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSslParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSteps($httptests, __FUNCTION__, $db_httptests);
@@ -657,67 +708,6 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Web scenario "%1$s" already exists.', $db_httptests[0]['name'])
 			);
-		}
-	}
-
-	/**
-	 * Check that application belongs to web scenario host.
-	 *
-	 * @param array  $httptests
-	 * @param string $method
-	 * @param array  $db_httptests
-	 *
-	 * @throws APIException  if application does not exists or belongs to another host.
-	 */
-	private function checkApplications(array $httptests, $method, array $db_httptests = null) {
-		$applicationids = [];
-
-		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
-					&& ($method === 'validateCreate'
-						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
-				$applicationids[$httptest['applicationid']] = true;
-			}
-		}
-
-		if (!$applicationids) {
-			return;
-		}
-
-		$db_applications = DB::select('applications', [
-			'output' => ['applicationid', 'hostid', 'name', 'flags'],
-			'applicationids' => array_keys($applicationids),
-			'preservekeys' => true
-		]);
-
-		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
-					&& ($method === 'validateCreate'
-						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
-				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
-					);
-				}
-
-				$db_application = $db_applications[$httptest['applicationid']];
-
-				if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a discovered application "%1$s" to a web scenario.', $db_application['name']
-					));
-				}
-
-				$hostid = ($method === 'validateCreate')
-					? $httptest['hostid']
-					: $db_httptests[$httptest['httptestid']]['hostid'];
-
-				if (bccomp($db_application['hostid'], $hostid) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('The web scenario application belongs to a different host than the web scenario host.')
-					);
-				}
-			}
 		}
 	}
 
@@ -932,6 +922,30 @@ class CHttpTest extends CApiService {
 				while ($dbHttpStep = DBfetch($dbHttpSteps)) {
 					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
 				}
+			}
+		}
+
+		// Adding web scenario tags.
+		if ($options['selectTags'] !== null) {
+			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
+				? (array) $options['selectTags']
+				: ['tag', 'value'];
+
+			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
+			$requested_output = array_flip($options['selectTags']);
+
+			$db_tags = DBselect(
+				'SELECT '.implode(',', array_merge($options['selectTags'], ['httptestid'])).
+				' FROM httptest_tag'.
+				' WHERE '.dbConditionInt('httptestid', $httpTestIds)
+			);
+
+			array_walk($result, function (&$http_test) {
+				$http_test['tags'] = [];
+			});
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$result[$db_tag['httptestid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
 			}
 		}
 

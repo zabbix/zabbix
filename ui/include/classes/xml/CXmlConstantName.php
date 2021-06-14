@@ -198,10 +198,20 @@ class CXmlConstantName {
 
 
 	// const MD5 = 'MD5'; // Duplicate.
-	const SHA = 'SHA';
+	const SHA = 'SHA'; // Used before version 5.4 as interface "authprotocol" invariant.
+	const SHA1 = 'SHA1';
+	const SHA224 = 'SHA224';
+	const SHA256 = 'SHA256';
+	const SHA384 = 'SHA384';
+	const SHA512 = 'SHA512';
 
 	const DES = 'DES';
-	const AES = 'AES';
+	const AES = 'AES'; // Used in version 5.2 as interface "privprotocol" invariant.
+	const AES128 = 'AES128';
+	const AES192 = 'AES192';
+	const AES256 = 'AES256';
+	const AES192C = 'AES192C';
+	const AES256C = 'AES256C';
 
 	const NOAUTHNOPRIV = 'NOAUTHNOPRIV';
 	const AUTHNOPRIV = 'AUTHNOPRIV';
@@ -336,4 +346,12 @@ class CXmlConstantName {
 	const DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE = 'ITEM_PROTOTYPE';
 	const DASHBOARD_WIDGET_FIELD_TYPE_GRAPH = 'GRAPH';
 	const DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE = 'GRAPH_PROTOTYPE';
+
+	// Constants for value map mapping type.
+	const MAPPING_EQUAL = 'EQUAL';
+	const MAPPING_GREATER_EQUAL = 'GREATER_OR_EQUAL';
+	const MAPPING_LESS_EQUAL = 'LESS_OR_EQUAL';
+	const MAPPING_IN_RANGE = 'IN_RANGE';
+	const MAPPING_REGEXP = 'REGEXP';
+	const MAPPING_DEFAULT = 'DEFAULT';
 }

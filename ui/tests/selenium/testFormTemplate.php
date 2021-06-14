@@ -37,7 +37,7 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -46,7 +46,7 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Test Template name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'group' => 'Linux servers',
 					'new_group' => 'Selenium new group',
 					'description' => 'template description',
@@ -57,10 +57,10 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Test Template" already exists.'
+						'Template "Selenium Test Template" already exists.'
 					]
 
 				]
@@ -69,10 +69,10 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Existing visible name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Test template with visible name" already exists.'
+						'Template with the same visible name "Selenium Test template with visible name" already exists.'
 					]
 
 				]
@@ -242,6 +242,11 @@ class testFormTemplate extends CLegacyWebTest {
 		$cloned_template_name = 'Cloned template';
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
+		// Check if template name present on page, if not, check on second page.
+		if ($this->query('link', $this->template_clone)->one(false)->isValid() === false) {
+			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
+		}
 		$this->zbxTestAssertElementPresentId('filter_name');
 		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
 		$this->zbxTestClickWait('clone');
@@ -253,15 +258,18 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
 		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_FullCloneTemplate() {
 		$cloned_template_name = 'Full cloned template';
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('templates.php?page=2');
 		$this->query('button:Reset')->one()->click();
+		// Check if template name present on page, if not, check on second page.
+		if ($this->query('link', $this->template_clone)->one(false)->isValid() === false) {
+			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
+		}
 		$this->zbxTestClickLinkTextWait($this->template_clone);
 		$this->zbxTestClickWait('full_clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
@@ -272,8 +280,6 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
 		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 

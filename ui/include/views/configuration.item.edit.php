@@ -742,7 +742,7 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setArgument('action', 'housekeeping.edit')
 				->getUrl()
 			))
-				->setAttribute('target', '_blank')
+				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
 	$keep_history_hint = (new CDiv(makeInformationIcon([
@@ -778,7 +778,7 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setArgument('action', 'housekeeping.edit')
 				->getUrl()
 			))
-				->setAttribute('target', '_blank')
+				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
 	$keep_trend_hint = (new CDiv(makeInformationIcon([
@@ -811,41 +811,32 @@ $form_list
 		'row_logtimefmt'
 	);
 
-if ($readonly) {
-	if ($data['valuemaps']) {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
-	}
-	else {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
-	}
-}
-else {
-	$valuemaps = $data['valuemaps'];
-	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
-}
-
-$valuemap_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue($data['valuemapid'])
-	->setFocusableElementId('label-valuemap')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setReadonly($readonly);
-
-foreach ($valuemaps as $valuemap) {
-	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
-}
-
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$valuemap_select = [$valuemap_select, '&nbsp;',
-		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'valuemap.list')
-			->getUrl()
-		))->setAttribute('target', '_blank')
-	];
+if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	$form_list->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'disabled' => $readonly,
+			'multiple' => false,
+			'data' => $data['valuemap'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_valuemap'
+	);
 }
 
 $form_list
-	->addRow(new CLabel(_('Show value'), 'label-valuemap'), $valuemap_select, 'row_valuemap')
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[
@@ -861,37 +852,6 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_trapper_hosts'
 	);
-
-// Add "New application" and list of applications to form list.
-if ($discovered_item) {
-	$form->addVar('new_application', '');
-	foreach ($data['db_applications'] as $db_application) {
-		foreach ($data['applications'] as $application) {
-			if ($db_application['applicationid'] == $application) {
-				$form->addVar('applications[]', $db_application['applicationid']);
-			}
-		}
-	}
-
-	$application_list_box = new CListBox('applications_names[]', $data['applications'], 6);
-	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-	}
-	$application_list_box->setEnabled(!$discovered_item);
-}
-else {
-	$form_list->addRow(new CLabel(_('New application'), 'new_application'), (new CSpan(
-		(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->addClass(ZBX_STYLE_FORM_NEW_GROUP));
-
-	$application_list_box = new CListBox('applications[]', $data['applications'], 6);
-	$application_list_box->addItem(0, '-'._('None').'-');
-	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-	}
-}
-
-$form_list->addRow(_('Applications'), $application_list_box);
 
 // Append populate host to form list.
 if ($discovered_item) {
@@ -941,6 +901,15 @@ $form_list
 // Append tabs to form.
 $itemTab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $form_list)
+	->addTab('tags-tab', _('Tags'),
+		new CPartial('configuration.tags.tab', [
+			'source' => 'item',
+			'tags' => $data['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags'],
+			'readonly' => $discovered_item
+		]),
+		TAB_INDICATOR_TAGS
+	)
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),

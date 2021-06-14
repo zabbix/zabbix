@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
  */
 class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 
-	const DISCOVERY_RULE_ID = 33800;			// 'Simple form test host' => 'testFormDiscoveryRule'
+	const DISCOVERY_RULE_ID = 133800;			// 'Simple form test host' => 'testFormDiscoveryRule'
 	const TEMPL_DISCOVERY_RULE_ID = 15011;	// 'testInheritanceDiscoveryRule'
 	const HOST_DISCOVERY_RULE_ID	 = 15016;	// 'Template inheritance test host -> testInheritanceDiscoveryRule'
 

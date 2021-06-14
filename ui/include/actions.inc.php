@@ -59,7 +59,6 @@ function condition_type2str($type) {
 		CONDITION_TYPE_DUPTIME => _('Uptime/Downtime'),
 		CONDITION_TYPE_DVALUE => _('Received value'),
 		CONDITION_TYPE_EVENT_ACKNOWLEDGED => _('Event acknowledged'),
-		CONDITION_TYPE_APPLICATION => _('Application'),
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
@@ -145,7 +144,6 @@ function actionConditionValueToString(array $actions) {
 				case CONDITION_TYPE_DSERVICE_PORT:
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
-				case CONDITION_TYPE_APPLICATION:
 				case CONDITION_TYPE_EVENT_TAG:
 				case CONDITION_TYPE_EVENT_TAG_VALUE:
 					$result[$i][$j] = $condition['value'];
@@ -371,6 +369,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 	$hostids = [];
 	$groupids = [];
 	$templateids = [];
+	$scriptids = [];
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = [];
@@ -414,6 +413,8 @@ function getActionOperationDescriptions(array $actions, $type) {
 								$groupids[$host_group['groupid']] = true;
 							}
 						}
+
+						$scriptids[$operation['opcommand']['scriptid']] = true;
 						break;
 
 					case OPERATION_TYPE_GROUP_ADD:
@@ -475,6 +476,8 @@ function getActionOperationDescriptions(array $actions, $type) {
 								$groupids[$host_group['groupid']] = true;
 							}
 						}
+
+						$scriptids[$operation['opcommand']['scriptid']] = true;
 						break;
 				}
 			}
@@ -487,6 +490,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 	$hosts = [];
 	$host_groups = [];
 	$templates = [];
+	$scripts = [];
 
 	if ($media_typeids) {
 		$media_types = API::Mediatype()->get([
@@ -500,7 +504,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		$fullnames = [];
 
 		$users = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
+			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => $userids
 		]);
 
@@ -537,6 +541,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 		$templates = API::Template()->get([
 			'output' => ['name'],
 			'templateids' => array_keys($templateids),
+			'preservekeys' => true
+		]);
+	}
+
+	if ($scriptids) {
+		$scripts = API::Script()->get([
+			'output' => ['name'],
+			'scriptids' => array_keys($scriptids),
+			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 			'preservekeys' => true
 		]);
 	}
@@ -592,13 +605,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_COMMAND:
+						$scriptid = $operation['opcommand']['scriptid'];
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
 								if ($host['hostid'] == 0) {
 									$result[$i][$j][] = [
-										bold(_('Run remote commands on current host')),
+										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
 										BR()
 									];
 								}
@@ -610,7 +625,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 							if ($host_list) {
 								order_result($host_list);
 
-								$result[$i][$j][] = bold(_('Run remote commands on hosts').': ');
+								$result[$i][$j][] = bold(
+									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+								);
 								$result[$i][$j][] = [implode(', ', $host_list), BR()];
 							}
 						}
@@ -626,7 +643,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 							order_result($host_group_list);
 
-							$result[$i][$j][] = bold(_('Run remote commands on host groups').': ');
+							$result[$i][$j][] = bold(
+								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+							);
 							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
 						}
 						break;
@@ -755,13 +774,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_COMMAND:
+						$scriptid = $operation['opcommand']['scriptid'];
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
 								if ($host['hostid'] == 0) {
 									$result[$i][$j][] = [
-										bold(_('Run remote commands on current host')),
+										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
 										BR()
 									];
 								}
@@ -773,7 +794,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 							if ($host_list) {
 								order_result($host_list);
 
-								$result[$i][$j][] = bold(_('Run remote commands on hosts').': ');
+								$result[$i][$j][] = bold(
+									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+								);
 								$result[$i][$j][] = [implode(', ', $host_list), BR()];
 							}
 						}
@@ -789,7 +812,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 							order_result($host_group_list);
 
-							$result[$i][$j][] = bold(_('Run remote commands on host groups').': ');
+							$result[$i][$j][] = bold(
+								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+							);
 							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
 						}
 						break;
@@ -799,102 +824,6 @@ function getActionOperationDescriptions(array $actions, $type) {
 						$result[$i][$j][] = bold(_('Notify all involved'));
 						break;
 				}
-			}
-		}
-	}
-
-	return $result;
-}
-
-/**
- * Gathers action operation script details and returns the HTML items representing action operation with hint.
- *
- * @param array  $operations                      Array of action operations.
- * @param string $operation['operationtype']      Action operation type.
- *                                                Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
- *                                                OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
- * @param string $operation['opcommand']['type']  Action operation command type.
- *                                                Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
- *                                                ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
- *                                                and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
- *
- * @return array  Returns an array of action operation hints.
- */
-function getActionOperationHints(array $operations) {
-	$result = [];
-	$scriptids = [];
-	$scripts = [];
-
-	foreach ($operations as $operation) {
-		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-			$scriptids[$operation['opcommand']['scriptid']] = true;
-		}
-	}
-
-	if ($scriptids) {
-		$scripts = API::Script()->get([
-			'output' => ['name'],
-			'scriptids' => array_keys($scriptids),
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($operations as $key => $operation) {
-		$result[$key] = [];
-
-		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-			switch ($operation['opcommand']['type']) {
-				case ZBX_SCRIPT_TYPE_IPMI:
-					$result[$key][] = [bold(_('Run IPMI command').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_SSH:
-					$result[$key][] = [bold(_('Run SSH commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_TELNET:
-					$result[$key][] = [bold(_('Run TELNET commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					else {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					break;
-
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					$scriptId = $operation['opcommand']['scriptid'];
-
-					if (isset($scripts[$scriptId])) {
-						$result[$key][] = [bold(_('Run global script').': '),
-							italic($scripts[$scriptId]['name'])
-						];
-					}
-					break;
-
-				default:
-					$result[$key][] = [bold(_('Run commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
 			}
 		}
 	}
@@ -914,7 +843,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_TRIGGER_NAME,
 		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_SEVERITY,
-		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_HOST_GROUP,
 		CONDITION_TYPE_SUPPRESSED,
@@ -941,10 +869,11 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_PROXY
 	];
 	$conditions[EVENT_SOURCE_INTERNAL] = [
-		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_EVENT_TYPE,
 		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_HOST_GROUP,
+		CONDITION_TYPE_EVENT_TAG,
+		CONDITION_TYPE_EVENT_TAG_VALUE,
 		CONDITION_TYPE_TEMPLATE
 	];
 
@@ -1187,11 +1116,6 @@ function get_operators_by_conditiontype($conditiontype) {
 	$operators[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = [
 		CONDITION_OPERATOR_EQUAL
 	];
-	$operators[CONDITION_TYPE_APPLICATION] = [
-		CONDITION_OPERATOR_EQUAL,
-		CONDITION_OPERATOR_LIKE,
-		CONDITION_OPERATOR_NOT_LIKE
-	];
 	$operators[CONDITION_TYPE_HOST_NAME] = [
 		CONDITION_OPERATOR_LIKE,
 		CONDITION_OPERATOR_NOT_LIKE,
@@ -1343,7 +1267,6 @@ function getEventsMessages(array $events) {
 
 		foreach ($event['acknowledges'] as $ack) {
 			if (($ack['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-				// Alias is mandatory for each user, so if alias is not returned, we don't have rights for this user.
 				$event_messages[] = [
 					'message' => $ack['message'],
 					'userid' => $ack['userid'],
@@ -1660,7 +1583,7 @@ function getEventUpdates(array $event) {
  * @param array  $actions['severities']  Severity change icon data.
  * @param array  $actions['actions']     Actions icon data.
  * @param array  $mediatypes             Mediatypes with maxattempts value and name.
- * @param array  $users                  User name, surname and alias.
+ * @param array  $users                  User name, surname and username.
  *
  * @return CCol|string
  */
@@ -1690,7 +1613,7 @@ function makeEventActionsIcons($eventid, $actions, $mediatypes, $users) {
  * @param array  $data['messages']               Array of messages.
  * @param string $data['messages'][]['message']  Message text.
  * @param string $data['messages'][]['clock']    Message creation time.
- * @param array  $users                          User name, surname and alias.
+ * @param array  $users                          User name, surname and username.
  *
  * @return CSpan|null
  */
@@ -1743,7 +1666,7 @@ function makeEventMessagesIcon(array $data, array $users) {
  * @param string $data['original_severity']             Severity before change.
  * @param string $data['current_severity']              Current severity.
  * @param int    $data['count']                         Total number of severity changes.
- * @param array  $users                                 User name, surname and alias.
+ * @param array  $users                                 User name, surname and username.
  *
  * @return CSpan|null
  */
@@ -1817,7 +1740,7 @@ function makeEventSeverityChangesIcon(array $data, array $users) {
  * @param int    $data['count']                     Number of actions.
  * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
  * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
- * @param array  $users                             User name, surname and alias.
+ * @param array  $users                             User name, surname and username.
  * @param array  $mediatypes                        Mediatypes with maxattempts value and name.
  * @param string $mediatypes[]['name']              Mediatype name.
  *
@@ -1906,7 +1829,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes) {
  * @param string $data['actions'][]['subject']        Message alert subject (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $data['actions'][]['p_eventid']      Problem eventid that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $data['actions'][]['acknowledgeid']  Problem update action that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param array  $users                               User name, surname and alias.
+ * @param array  $users                               User name, surname and username.
  * @param array  $mediatypes                          Mediatypes with maxattempts value.
  *
  * @return CTableInfo
@@ -1961,7 +1884,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  * @param array  $actions                   Array with all actions sorted by clock.
  * @param string $actions[]['clock']        Time, when action was performed.
  * @param string $actions[]['message']      Message sent by alert, or written by manual update, or remote command text.
- * @param array  $users                     User name, surname and alias.
+ * @param array  $users                     User name, surname and username.
  *
  * @return CTable
  */
@@ -1992,7 +1915,7 @@ function makeEventHistoryTable(array $actions, array $users) {
  * @param int    $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
  * @param string $action['alerttype']    Type of alert.
  * @param string $action['userid']       ID of message author, or alert receiver.
- * @param array  $users                  Array with user data - alias, name, surname.
+ * @param array  $users                  Array with user data - username, name, surname.
  *
  * @return string
  */
@@ -2016,7 +1939,7 @@ function makeActionTableUser(array $action, array $users) {
  * @param string $action['alerttype']    Type of alert.
  * @param array  $action['userid']       ID of message author, or alert receiver.
  * @param array  $action['sendto']       Receiver media address for automatic action.
- * @param array  $users                  Array with user data - alias, name, surname.
+ * @param array  $users                  Array with user data - username, name, surname.
  *
  * @return string
  */

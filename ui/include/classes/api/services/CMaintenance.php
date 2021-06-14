@@ -433,17 +433,19 @@ class CMaintenance extends CApiService {
 				'maintenanceid' => $maintenanceids[$mnum]
 			];
 		}
-		DB::insert('maintenances_windows', $insertWindows);
+		DB::insertBatch('maintenances_windows', $insertWindows);
 
 		$insertHosts = [];
 		$insertGroups = [];
 		$ins_tags = [];
-		foreach ($maintenances as $mnum => $maintenance) {
+		foreach ($maintenances as $mnum => &$maintenance) {
+			$maintenance['maintenanceid'] = $maintenanceids[$mnum];
+
 			if (array_key_exists('hostids', $maintenance)) {
 				foreach ($maintenance['hostids'] as $hostid) {
 					$insertHosts[] = [
 						'hostid' => $hostid,
-						'maintenanceid' => $maintenanceids[$mnum]
+						'maintenanceid' => $maintenance['maintenanceid']
 					];
 				}
 			}
@@ -452,7 +454,7 @@ class CMaintenance extends CApiService {
 				foreach ($maintenance['groupids'] as $groupid) {
 					$insertGroups[] = [
 						'groupid' => $groupid,
-						'maintenanceid' => $maintenanceids[$mnum]
+						'maintenanceid' => $maintenance['maintenanceid']
 					];
 				}
 			}
@@ -460,21 +462,21 @@ class CMaintenance extends CApiService {
 			if (array_key_exists('tags', $maintenance)) {
 				foreach ($maintenance['tags'] as $tag) {
 					$ins_tags[] = [
-						'maintenanceid' => $maintenanceids[$mnum]
+						'maintenanceid' => $maintenance['maintenanceid']
 					] + $tag;
 				}
 			}
-
-			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenanceids[$mnum],
-				$maintenance['name'], null, self::$userData['userid']
-			);
 		}
-		DB::insert('maintenances_hosts', $insertHosts);
-		DB::insert('maintenances_groups', $insertGroups);
+		unset($maintenance);
+
+		DB::insertBatch('maintenances_hosts', $insertHosts);
+		DB::insertBatch('maintenances_groups', $insertGroups);
 
 		if ($ins_tags) {
 			DB::insert('maintenance_tag', $ins_tags);
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -789,18 +791,6 @@ class CMaintenance extends CApiService {
 			if (array_key_exists('timeperiods', $maintenance)) {
 				$this->replaceTimePeriods($db_maintenances[$maintenance['maintenanceid']], $maintenance);
 			}
-
-			add_audit_ext(
-				AUDIT_ACTION_UPDATE,
-				AUDIT_RESOURCE_MAINTENANCE,
-				$maintenance['maintenanceid'],
-				array_key_exists('name', $maintenance)
-					? $maintenance['name']
-					: $db_maintenances[$maintenance['maintenanceid']]['name'],
-				'maintenances',
-				$db_maintenances[$maintenance['maintenanceid']],
-				$maintenance
-			);
 		}
 		DB::update('maintenances', $update_maintenances);
 
@@ -866,6 +856,8 @@ class CMaintenance extends CApiService {
 		}
 
 		$this->updateTags($maintenances, $db_maintenances);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -964,17 +956,15 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$maintenances = $this->get([
+		$db_maintenances = $this->get([
 			'output' => ['maintenanceid', 'name'],
 			'maintenanceids' => $maintenanceids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($maintenanceids as $maintenanceid) {
-			if (!array_key_exists($maintenanceid, $maintenances)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		if (array_diff_key(array_flip($maintenanceids), $db_maintenances)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		$timeperiodids = [];
@@ -1010,11 +1000,7 @@ class CMaintenance extends CApiService {
 		DB::delete('maintenances_groups', $midCond);
 		DB::delete('maintenances', $midCond);
 
-		foreach ($maintenances as $maintenanceid => $maintenance) {
-			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
-				null, self::$userData['userid']
-			);
-		}
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -1048,24 +1034,36 @@ class CMaintenance extends CApiService {
 
 		// selectGroups
 		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$groups = [];
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'hostgroupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$groups = API::HostGroup()->get([
+					'output' => $options['selectGroups'],
+					'hostgroupids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = [];
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
-			$groups = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'hosts');
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// Adding problem tags.

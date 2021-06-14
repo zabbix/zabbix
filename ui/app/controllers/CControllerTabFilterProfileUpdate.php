@@ -33,10 +33,6 @@ class CControllerTabFilterProfileUpdate extends CController {
 		CControllerProblem::FILTER_IDX => CControllerProblem::FILTER_FIELDS_DEFAULT
 	];
 
-	public function init() {
-		$this->disableSIDvalidation();
-	}
-
 	protected function checkPermissions() {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}

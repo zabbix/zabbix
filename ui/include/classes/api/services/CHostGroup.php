@@ -78,7 +78,6 @@ class CHostGroup extends CApiService {
 			'with_monitored_httptests'				=> null,
 			'with_graphs'							=> null,
 			'with_graph_prototypes'					=> null,
-			'with_applications'						=> null,
 			'editable'								=> false,
 			'nopermissions'							=> null,
 			// filter
@@ -293,12 +292,6 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		// with_applications
-		if ($options['with_applications'] !== null) {
-			$sub_sql_parts['from']['a'] = 'applications a';
-			$sub_sql_parts['where']['hg-a'] = 'hg.hostid=a.hostid';
-		}
-
 		if ($sub_sql_parts) {
 			$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sub_sql_parts['where']['g-hg'] = 'g.groupid=hg.groupid';
@@ -407,23 +400,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {
@@ -460,23 +470,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {
@@ -564,19 +591,6 @@ class CHostGroup extends CApiService {
 	 */
 	public function delete(array $groupids, $nopermissions = false) {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
-
-		// delete screens items
-		$resources = [
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-			SCREEN_RESOURCE_HOST_INFO,
-			SCREEN_RESOURCE_TRIGGER_INFO,
-			SCREEN_RESOURCE_TRIGGER_OVERVIEW,
-			SCREEN_RESOURCE_DATA_OVERVIEW
-		];
-		DB::delete('screens_items', [
-			'resourceid' => $groupids,
-			'resourcetype' => $resources
-		]);
 
 		// delete sysmap element
 		if (!empty($groupids)) {
@@ -705,7 +719,8 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
+			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
@@ -713,6 +728,35 @@ class CHostGroup extends CApiService {
 		}
 
 		$this->checkDuplicates(zbx_objectValues($groups, 'name'));
+		$this->checkAndAddUuid($groups);
+	}
+
+	/**
+	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 *
+	 * @param array $groups_to_create
+	 *
+	 * @throws APIException
+	 */
+	protected function checkAndAddUuid(array &$groups_to_create): void {
+		foreach ($groups_to_create as &$group) {
+			if (!array_key_exists('uuid', $group)) {
+				$group['uuid'] = generateUuidV4();
+			}
+		}
+		unset($group);
+
+		$db_uuid = DB::select('hstgrp', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
 	}
 
 	/**
@@ -1375,15 +1419,21 @@ class CHostGroup extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
@@ -1404,15 +1454,21 @@ class CHostGroup extends CApiService {
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
 			}
 			else {

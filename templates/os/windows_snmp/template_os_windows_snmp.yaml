@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:40Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:46Z'
   groups:
     -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
     -
+      uuid: f9a59315c8944853bb91c0a9ec3056d7
       template: 'Windows SNMP'
       name: 'Windows SNMP'
       description: |

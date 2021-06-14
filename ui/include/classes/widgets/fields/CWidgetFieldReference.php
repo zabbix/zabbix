@@ -39,22 +39,6 @@ class CWidgetFieldReference extends CWidgetField {
 	}
 
 	/**
-	 * JS script, that will call reference generation, if reference is not yet created.
-	 *
-	 * @param string $form_selector  jQuery context selector for the configuration form (with # or . character)
-	 *
-	 * @return string
-	 */
-	public function getJavascript($form_selector) {
-		return
-			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
-			'if (!reference_field.val().length) {'.
-				'var reference = jQuery(".dashbrd-grid-container").dashboardGrid("makeReference");'.
-				'reference_field.val(reference);'.
-			'}';
-	}
-
-	/**
 	 * Set field value.
 	 *
 	 * @param string $value  Reference value. Only numeric characters allowed.

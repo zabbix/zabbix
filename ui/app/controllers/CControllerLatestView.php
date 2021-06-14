@@ -35,12 +35,13 @@ class CControllerLatestView extends CControllerLatest {
 			// filter inputs
 			'filter_groupids' =>			'array_id',
 			'filter_hostids' =>				'array_id',
-			'filter_application' =>			'string',
 			'filter_select' =>				'string',
 			'filter_show_without_data' =>	'in 1',
 			'filter_show_details' =>		'in 1',
 			'filter_set' =>					'in 1',
 			'filter_rst' =>					'in 1',
+			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' =>				'array',
 
 			// table sorting inputs
 			'sort' =>						'in host,name,lastclock',
@@ -67,9 +68,6 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.latest.filter.application', trim($this->getInput('filter_application', '')),
-				PROFILE_TYPE_STR
-			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
 			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
 				PROFILE_TYPE_INT
@@ -77,14 +75,34 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
 				PROFILE_TYPE_INT
 			);
+
+			// tags
+			$evaltype = $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
+			CProfile::update('web.latest.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
+
+			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+			foreach ($this->getInput('filter_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+				$filter_tags['tags'][] = $tag['tag'];
+				$filter_tags['values'][] = $tag['value'];
+				$filter_tags['operators'][] = $tag['operator'];
+			}
+			CProfile::updateArray('web.latest.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');
 			CProfile::deleteIdx('web.latest.filter.hostids');
-			CProfile::delete('web.latest.filter.application');
 			CProfile::delete('web.latest.filter.select');
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
+			CProfile::deleteIdx('web.latest.filter.evaltype');
+			CProfile::deleteIdx('web.latest.filter.tags.tag');
+			CProfile::deleteIdx('web.latest.filter.tags.value');
+			CProfile::deleteIdx('web.latest.filter.tags.operator');
 		}
 
 		// Force-check "Show items without data" if there are no hosts selected.
@@ -94,11 +112,21 @@ class CControllerLatestView extends CControllerLatest {
 		$filter = [
 			'groupids' => CProfile::getArray('web.latest.filter.groupids'),
 			'hostids' => $filter_hostids,
-			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
 			'show_without_data' => $filter_show_without_data,
-			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
+			'show_details' => CProfile::get('web.latest.filter.show_details', 0),
+			'evaltype' => CProfile::get('web.latest.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'tags' => []
 		];
+
+		// Tags filters.
+		foreach (CProfile::getArray('web.latest.filter.tags.tag', []) as $i => $tag) {
+			$filter['tags'][] = [
+				'tag' => $tag,
+				'value' => CProfile::get('web.latest.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.latest.filter.tags.operator', null, $i)
+			];
+		}
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.latest.sortorder', ZBX_SORT_UP));
@@ -112,10 +140,11 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('action', 'latest.view.refresh')
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_hostids', $filter['hostids'])
-			->setArgument('filter_application', $filter['application'])
 			->setArgument('filter_select', $filter['select'])
 			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
 			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
+			->setArgument('filter_evaltype', $filter['evaltype'])
+			->setArgument('filter_tags', $filter['tags'])
 			->setArgument('sort', $sort_field)
 			->setArgument('sortorder', $sort_order)
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
@@ -123,10 +152,9 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
+		$paging = CPagerHelper::paginate($this->getInput('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
 
-		$this->extendData($prepared_data, $filter['show_without_data']);
-		$this->addCollapsedDataFromProfile($prepared_data);
+		$this->extendData($prepared_data);
 
 		// display
 		$data = [
@@ -143,8 +171,17 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			]
+			],
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
 		] + $prepared_data;
+
+		if (!$data['filter']['tags']) {
+			$data['filter']['tags'] = [[
+				'tag' => '',
+				'operator' => TAG_OPERATOR_LIKE,
+				'value' => ''
+			]];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));

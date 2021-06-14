@@ -21,14 +21,16 @@
 
 class CControllerDashboardUpdate extends CController {
 
-	private $widgets;
+	private $dashboard_pages;
 
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' => 'db dashboard.dashboardid',
-			'userid' => 'required|db dashboard.userid',
 			'name' => 'required|db dashboard.name|not_empty',
-			'widgets' => 'array',
+			'userid' => 'required|db dashboard.userid',
+			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
+			'pages' => 'array',
 			'sharing' => 'array'
 		];
 
@@ -37,11 +39,11 @@ class CControllerDashboardUpdate extends CController {
 		if ($ret) {
 			$sharing_errors = $this->validateSharing();
 			[
-				'widgets' => $this->widgets,
-				'errors' => $widgets_errors
-			] = CDashboardHelper::validateWidgets($this->getInput('widgets', []), null);
+				'dashboard_pages' => $this->dashboard_pages,
+				'errors' => $dashboard_pages_errors
+			] = CDashboardHelper::validateDashboardPages($this->getInput('pages', []), null);
 
-			$errors = array_merge($sharing_errors, $widgets_errors);
+			$errors = array_merge($sharing_errors, $dashboard_pages_errors);
 
 			foreach ($errors as $error) {
 				error($error);
@@ -61,63 +63,81 @@ class CControllerDashboardUpdate extends CController {
 
 	protected function checkPermissions() {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {
 		$data = [];
 
-		$dashboard = [
+		$save_dashboard = [
 			'name' => $this->getInput('name'),
 			'userid' => $this->getInput('userid', 0),
-			'widgets' => []
+			'display_period' => $this->getInput('display_period'),
+			'auto_start' => $this->getInput('auto_start'),
+			'pages' => []
 		];
 
 		if ($this->hasInput('dashboardid')) {
-			$dashboard['dashboardid'] = $this->getInput('dashboardid');
+			$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
+		}
+
+		foreach ($this->dashboard_pages as $dashboard_page) {
+			$save_dashboard_page = [
+				'name' => $dashboard_page['name'],
+				'display_period' => $dashboard_page['display_period'],
+				'widgets' => []
+			];
+
+			// Set dashboard_pageid if it exists and not cloning the dashboard.
+			if (array_key_exists('dashboardid', $save_dashboard)
+					&& array_key_exists('dashboard_pageid', $dashboard_page)) {
+				$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
+			}
+
+			foreach ($dashboard_page['widgets'] as $widget) {
+				$save_widget = [
+					'x' => $widget['pos']['x'],
+					'y' => $widget['pos']['y'],
+					'width' => $widget['pos']['width'],
+					'height' => $widget['pos']['height'],
+					'type' => $widget['type'],
+					'name' => $widget['name'],
+					'view_mode' => $widget['view_mode'],
+					'fields' => $widget['form']->fieldsToApi()
+				];
+
+				// Set widgetid if it exists and not cloning the dashboard.
+				if (array_key_exists('dashboardid', $save_dashboard) && array_key_exists('widgetid', $widget)) {
+					$save_widget['widgetid'] = $widget['widgetid'];
+				}
+
+				$save_dashboard_page['widgets'][] = $save_widget;
+			}
+
+			$save_dashboard['pages'][] = $save_dashboard_page;
 		}
 
 		if ($this->hasInput('sharing')) {
 			$sharing = $this->getInput('sharing');
 
-			$dashboard['private'] = $sharing['private'];
+			$save_dashboard['private'] = $sharing['private'];
 
 			if (array_key_exists('users', $sharing)) {
-				$dashboard['users'] = $sharing['users'];
+				$save_dashboard['users'] = $sharing['users'];
 			}
 
 			if (array_key_exists('userGroups', $sharing)) {
-				$dashboard['userGroups'] = $sharing['userGroups'];
+				$save_dashboard['userGroups'] = $sharing['userGroups'];
 			}
 		}
 
-		foreach ($this->widgets as $widget) {
-			$save_widget = [
-				'x' => $widget['pos']['x'],
-				'y' => $widget['pos']['y'],
-				'width' => $widget['pos']['width'],
-				'height' => $widget['pos']['height'],
-				'type' => $widget['type'],
-				'name' => $widget['name'],
-				'view_mode' => $widget['view_mode'],
-				'fields' => $widget['form']->fieldsToApi()
-			];
-
-			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
-					&& array_key_exists('dashboardid', $dashboard)) {
-				$save_widget['widgetid'] = $widget['widgetid'];
-			}
-
-			$dashboard['widgets'][] = $save_widget;
-		}
-
-		if (array_key_exists('dashboardid', $dashboard)) {
-			$result = API::Dashboard()->update($dashboard);
+		if (array_key_exists('dashboardid', $save_dashboard)) {
+			$result = API::Dashboard()->update($save_dashboard);
 			$message = _('Dashboard updated');
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
-			$result = API::Dashboard()->create($dashboard);
+			$result = API::Dashboard()->create($save_dashboard);
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');
 		}

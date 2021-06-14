@@ -25,8 +25,10 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
+require_once dirname(__FILE__).'/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
 require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
+require_once dirname(__FILE__).'/helpers/CDateTimeHelper.php';
 
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
@@ -61,9 +63,9 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected $case_callbacks = [];
 	// Callbacks that should be executed at the test suite level.
 	protected static $suite_callbacks = [
-		'after-once' => [],
-		'before-each' => [],
-		'after-each' => [],
+		'afterOnce' => [],
+		'beforeEach' => [],
+		'afterEach' => [],
 		'after' => []
 	];
 	// Instances counter to keep track of test count.
@@ -199,6 +201,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 		// Test suite level annotations.
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
+		// Data sources are processed before the backups.
+		$data_source = $this->getAnnotationTokensByName($class_annotations, 'dataSource');
+		if ($data_source) {
+			CDataHelper::load($data_source);
+		}
+
 		// Backup performed before test suite execution.
 		$suite_backup = $this->getAnnotationTokensByName($class_annotations, 'backup');
 
@@ -210,7 +218,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		self::$skip_suite = false;
 
 		// Callbacks to be performed before test suite execution.
-		$callbacks = $this->getAnnotationTokensByName($class_annotations, 'on-before');
+		$callbacks = $this->getAnnotationTokensByName($class_annotations, 'onBefore');
 		if (!self::executeCallbacks($this, $callbacks)) {
 			self::markTestSuiteSkipped();
 			throw new Exception(implode("\n", static::$warnings));
@@ -219,9 +227,9 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Store callback to be executed later.
-		self::$suite_callbacks = ['after-once' => []];
-		foreach (['before-each', 'after-each', 'after'] as $key) {
-			self::$suite_callbacks[$key] = $this->getAnnotationTokensByName($class_annotations, 'on-'.$key);
+		self::$suite_callbacks = ['afterOnce' => []];
+		foreach (['beforeEach', 'afterEach', 'after'] as $key) {
+			self::$suite_callbacks[$key] = $this->getAnnotationTokensByName($class_annotations, 'on'.ucfirst($key));
 		}
 	}
 
@@ -256,8 +264,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 				self::$case_backup_once = null;
 			}
 
-			self::executeCallbacks($this, self::$suite_callbacks['after-once']);
-			self::$suite_callbacks['after-once'] = [];
+			self::executeCallbacks($this, self::$suite_callbacks['afterOnce']);
+			self::$suite_callbacks['afterOnce'] = [];
 		}
 
 		// Class name change is used to determine suite change.
@@ -267,12 +275,18 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Execute callbacks that should be executed before every test case.
-		self::executeCallbacks($this, self::$suite_callbacks['before-each'], true);
+		self::executeCallbacks($this, self::$suite_callbacks['beforeEach'], true);
 
 		// Test case level annotations.
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 
 		if ($method_annotations !== null) {
+			// Data sources are processed before the backups.
+			$data_source = $this->getAnnotationTokensByName($method_annotations, 'dataSource');
+			if ($data_source) {
+				CDataHelper::load($data_source);
+			}
+
 			// Backup performed before every test case execution.
 			$case_backup = $this->getAnnotationTokensByName($method_annotations, 'backup');
 
@@ -284,7 +298,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			if (self::$last_test_case !== $case_name) {
 				if (array_key_exists($case_name, self::$test_data_sets)) {
 					// Check for data data set limit.
-					$limit = $this->getAnnotationTokensByName($method_annotations, 'data-limit');
+					$limit = $this->getAnnotationTokensByName($method_annotations, 'dataLimit');
 
 					if (count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1
 							&& count(self::$test_data_sets[$case_name]) > $limit[0]) {
@@ -295,7 +309,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 				}
 
 				// Backup performed once before first test case execution.
-				$case_backup_once = $this->getAnnotationTokensByName($method_annotations, 'backup-once');
+				$case_backup_once = $this->getAnnotationTokensByName($method_annotations, 'backupOnce');
 
 				if ($case_backup_once) {
 					self::$case_backup_once = $case_backup_once;
@@ -303,19 +317,19 @@ class CTest extends PHPUnit_Framework_TestCase {
 				}
 
 				// Execute callbacks that should be executed once for multiple test cases.
-				self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before-once'), true);
+				self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'onBeforeOnce'), true);
 
 				// Store callback to be executed after test case is executed for all data sets.
-				self::$suite_callbacks['after-once'] = $this->getAnnotationTokensByName($method_annotations,
-						'on-after-once'
+				self::$suite_callbacks['afterOnce'] = $this->getAnnotationTokensByName($method_annotations,
+						'onAfterOnce'
 				);
 			}
 
 			// Execute callbacks that should be executed before specific test case.
-			self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before'), true);
+			self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'onBefore'), true);
 
 			// Store callback to be executed after test case.
-			$this->case_callbacks = $this->getAnnotationTokensByName($method_annotations, 'on-after');
+			$this->case_callbacks = $this->getAnnotationTokensByName($method_annotations, 'onAfter');
 		}
 
 		self::$last_test_case = $case_name;
@@ -347,7 +361,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		self::executeCallbacks($this, $this->case_callbacks);
 
 		// Execute callbacks that should be executed after every test case.
-		self::executeCallbacks($this, self::$suite_callbacks['after-each']);
+		self::executeCallbacks($this, self::$suite_callbacks['afterEach']);
 
 		DBclose();
 
@@ -368,7 +382,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	public static function onAfterTestSuite() {
 		global $DB;
 
-		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['after-once']
+		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
 
 			// Nothing to do after test suite.
@@ -390,7 +404,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		$context = get_called_class();
-		self::executeCallbacks($context, self::$suite_callbacks['after-once']);
+		self::executeCallbacks($context, self::$suite_callbacks['afterOnce']);
 		self::executeCallbacks($context, self::$suite_callbacks['after']);
 
 		DBclose();

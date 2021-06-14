@@ -1,0 +1,184 @@
+---
+test case: Daily reports for day
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 14:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-05 12:00:00 +02:00
+    - 2021-03-06 12:00:00 +02:00
+    - 2021-03-07 12:00:00 +02:00
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-09 12:00:00 +02:00
+    - 2021-03-10 12:00:00 +02:00
+    - 2021-03-11 12:00:00 +02:00
+    - 2021-03-12 12:00:00 +02:00
+---
+test case: Weekly reports every day
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 14:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_WEEKLY
+  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-05 12:00:00 +02:00
+    - 2021-03-06 12:00:00 +02:00
+    - 2021-03-07 12:00:00 +02:00
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-09 12:00:00 +02:00
+    - 2021-03-10 12:00:00 +02:00
+    - 2021-03-11 12:00:00 +02:00
+    - 2021-03-12 12:00:00 +02:00
+---
+test case: Weekly reports on workdays
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 14:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_WEEKLY
+  weekdays: [0, 1, 2, 3, 4]
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-05 12:00:00 +02:00
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-09 12:00:00 +02:00
+    - 2021-03-10 12:00:00 +02:00
+    - 2021-03-11 12:00:00 +02:00
+    - 2021-03-12 12:00:00 +02:00
+    - 2021-03-15 12:00:00 +02:00
+---
+test case: Weekly reports on mondays
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_WEEKLY
+  weekdays: [0]
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-15 12:00:00 +02:00
+---
+test case: Monthly reports
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_MONTHLY
+  weekdays: []
+  start_time: 8:30:00
+out:
+  reports:
+    - 2021-04-01 8:30:00 +03:00
+    - 2021-05-01 8:30:00 +03:00
+    - 2021-06-01 8:30:00 +03:00
+---
+test case: Yearly reports
+in:
+  timezone: :Europe/Riga
+  now: 2010-03-04 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_YEARLY
+  weekdays: []
+  start_time: 8:30:00
+out:
+  reports:
+    - 2011-01-01 8:30:00 +02:00
+    - 2012-01-01 8:30:00 +02:00
+    - 2013-01-01 8:30:00 +02:00
+---
+test case: Daily reports for day (same day)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 08:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-04 12:00:00 +02:00
+    - 2021-03-05 12:00:00 +02:00
+    - 2021-03-06 12:00:00 +02:00
+    - 2021-03-07 12:00:00 +02:00
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-09 12:00:00 +02:00
+    - 2021-03-10 12:00:00 +02:00
+    - 2021-03-11 12:00:00 +02:00
+    - 2021-03-12 12:00:00 +02:00
+---
+test case: Daily reports for day (next day)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-04 16:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 12:00:00
+out:
+  reports:
+    - 2021-03-05 12:00:00 +02:00
+    - 2021-03-06 12:00:00 +02:00
+    - 2021-03-07 12:00:00 +02:00
+    - 2021-03-08 12:00:00 +02:00
+    - 2021-03-09 12:00:00 +02:00
+    - 2021-03-10 12:00:00 +02:00
+    - 2021-03-11 12:00:00 +02:00
+    - 2021-03-12 12:00:00 +02:00
+---
+test case: Daily reports for day (2)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-12 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 11:00:00
+out:
+  reports:
+    - 2021-03-12 11:00:00 +02:00
+    - 2021-03-13 11:00:00 +02:00
+    - 2021-03-14 11:00:00 +02:00
+    - 2021-03-15 11:00:00 +02:00
+---
+test case: Daily reports for day (3)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-25 15:17:24 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 00:00:00
+out:
+  reports:
+    - 2021-03-26 00:00:00 +02:00
+    - 2021-03-27 00:00:00 +02:00
+    - 2021-03-28 00:00:00 +02:00
+---
+test case: Daily reports for day (4)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-12 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 10:00:00
+out:
+  reports:
+    - 2021-03-13 10:00:00 +02:00
+    - 2021-03-14 10:00:00 +02:00
+    - 2021-03-15 10:00:00 +02:00
+---
+test case: Daily reports for day (5)
+in:
+  timezone: :Etc/UTC
+  now: 2021-03-12 00:00:00 +0:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: []
+  start_time: 10:00:00
+out:
+  reports:
+    - 2021-03-12 10:00:00 +0:00
+    - 2021-03-13 10:00:00 +0:00
+    - 2021-03-14 10:00:00 +0:00
+    - 2021-03-15 10:00:00 +0:00
+...
+

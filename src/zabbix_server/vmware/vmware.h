@@ -95,6 +95,15 @@ typedef struct
 }
 zbx_vmware_perf_entity_t;
 
+typedef struct
+{
+	zbx_uint64_t	partitionid;
+	char		*diskname;
+}
+zbx_vmware_diskextent_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_diskextent, zbx_vmware_diskextent_t *)
+
 #define ZBX_VMWARE_DS_NONE		0
 #define ZBX_VMWARE_DS_MOUNTED		1
 #define ZBX_VMWARE_DS_ACCESSIBLE	2
@@ -113,11 +122,32 @@ typedef struct
 	zbx_uint64_t			free_space;
 	zbx_uint64_t			uncommitted;
 	zbx_vector_str_uint64_pair_t	hv_uuids_access;
+	zbx_vector_vmware_diskextent_t	diskextents;
 }
 zbx_vmware_datastore_t;
 
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
+
+typedef struct
+{
+	zbx_uint64_t	partitionid;
+	int		multipath_total;
+	int		multipath_active;
+}
+zbx_vmware_hvdisk_t;
+
+ZBX_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t)
+
+typedef struct
+{
+	char				*name;
+	zbx_vector_vmware_hvdisk_t	hvdisks;
+}
+zbx_vmware_dsname_t;
+
+int	vmware_dsname_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_dsname, zbx_vmware_dsname_t *)
 
 typedef struct
 {
@@ -162,16 +192,16 @@ zbx_vmware_vm_t;
 /* the vmware hypervisor data */
 typedef struct
 {
-	char			*uuid;
-	char			*id;
-	char			*clusterid;
-	char			*datacenter_name;
-	char			*parent_name;
-	char			*parent_type;
-	char			*ip;
-	char			**props;
-	zbx_vector_str_t	ds_names;
-	zbx_vector_ptr_t	vms;
+	char				*uuid;
+	char				*id;
+	char				*clusterid;
+	char				*datacenter_name;
+	char				*parent_name;
+	char				*parent_type;
+	char				*ip;
+	char				**props;
+	zbx_vector_vmware_dsname_t	dsnames;
+	zbx_vector_ptr_t		vms;
 }
 zbx_vmware_hv_t;
 
@@ -350,8 +380,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_GUESTHOSTNAME			17
 #define ZBX_VMWARE_VMPROP_GUESTFAMILY			18
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
+#define ZBX_VMWARE_VMPROP_FOLDER			20
 
-#define ZBX_VMWARE_VMPROPS_NUM				20
+#define ZBX_VMWARE_VMPROPS_NUM				21
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
@@ -362,6 +393,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DS		"Datastore"
+#define ZBX_VMWARE_SOAP_HV		"HostSystem"
+#define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

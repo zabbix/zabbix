@@ -42,8 +42,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
-		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
+		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
 		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
@@ -100,7 +100,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @var array
 	 */
 	protected $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
+		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
 		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
 	];
 
@@ -543,12 +543,6 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 				break;
 
-			case ITEM_TYPE_AGGREGATE:
-				$data += [
-					'key' => $input['key']
-				];
-				break;
-
 			case ITEM_TYPE_EXTERNAL:
 				$data += [
 					'key' => $input['key']
@@ -723,8 +717,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				'authpassphrase' => '',
 				'privpassphrase' => '',
-				'authprotocol' => ITEM_AUTHPROTOCOL_MD5,
-				'privprotocol' => ITEM_PRIVPROTOCOL_DES,
+				'authprotocol' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
+				'privprotocol' => ITEM_SNMPV3_PRIVPROTOCOL_DES,
 				'contextname' => ''
 			]
 		];
@@ -1072,12 +1066,15 @@ abstract class CControllerPopupItemTest extends CController {
 			return $formula;
 		}
 
-		$expression_data = new CTriggerExpression([
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => ($this->preproc_item instanceof CItemPrototype),
 			'calculated' => true,
-			'lldmacros' => ($this->preproc_item instanceof CItemPrototype)
+			'host_macro' => true,
+			'empty_host' => true
 		]);
 
-		if (($result = $expression_data->parse($formula)) === false) {
+		if ($expression_parser->parse($formula) != CParser::PARSE_SUCCESS) {
 			// Cannot parse a calculated item formula. Return as is.
 			return $formula;
 		}
@@ -1085,29 +1082,61 @@ abstract class CControllerPopupItemTest extends CController {
 		$expression = [];
 		$pos_left = 0;
 
-		foreach ($result->getTokens() as $token) {
+		$tokens = $expression_parser->getResult()->getTokensOfTypes([
+			CExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+			CExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
+			CExpressionParserResult::TOKEN_TYPE_STRING,
+			CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+		]);
+		foreach ($tokens as $token) {
 			switch ($token['type']) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+				case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+				case CExpressionParserResult::TOKEN_TYPE_LLD_MACRO:
 					if ($pos_left != $token['pos']) {
 						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
 					}
 					$pos_left = $token['pos'] + $token['length'];
-					break;
-			}
 
-			switch ($token['type']) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-					$expression[] = array_key_exists($token['value'], $macros_posted)
-						? CTriggerExpression::quoteString($macros_posted[$token['value']], false)
-						: $token['value'];
+					$expression[] = array_key_exists($token['match'], $macros_posted)
+						? CExpressionParser::quoteString($macros_posted[$token['match']], false)
+						: $token['match'];
 					break;
 
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					$string = strtr($token['data']['string'], $macros_posted);
-					$expression[] = CTriggerExpression::quoteString($string, false, true);
+				case CExpressionParserResult::TOKEN_TYPE_STRING:
+					if ($pos_left != $token['pos']) {
+						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
+					}
+					$pos_left = $token['pos'] + $token['length'];
+
+					$string = strtr(CExpressionParser::unquoteString($token['match']), $macros_posted);
+					$expression[] = CExpressionParser::quoteString($string, false, true);
+					break;
+
+				case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
+					foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
+						switch ($filter_token['type']) {
+							case CFilterParser::TOKEN_TYPE_USER_MACRO:
+							case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+								if ($pos_left != $filter_token['pos']) {
+									$expression[] = substr($formula, $pos_left, $filter_token['pos'] - $pos_left);
+								}
+								$pos_left = $filter_token['pos'] + $filter_token['length'];
+
+								$string = strtr($filter_token['match'], $macros_posted);
+								$expression[] = CFilterParser::quoteString($string);
+								break;
+
+							case CFilterParser::TOKEN_TYPE_STRING:
+								if ($pos_left != $filter_token['pos']) {
+									$expression[] = substr($formula, $pos_left, $filter_token['pos'] - $pos_left);
+								}
+								$pos_left = $filter_token['pos'] + $filter_token['length'];
+
+								$string = strtr(CFilterParser::unquoteString($filter_token['match']), $macros_posted);
+								$expression[] = CFilterParser::quoteString($string);
+								break;
+						}
+					}
 					break;
 			}
 		}

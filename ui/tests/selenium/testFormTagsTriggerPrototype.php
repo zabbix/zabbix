@@ -27,8 +27,8 @@ class testFormTagsTriggerPrototype extends testFormTags {
 
 	public $update_name = 'Trigger prototype with tags for updating';
 	public $clone_name = 'Trigger prototype with tags for cloning';
-	public $link = 'trigger_prototypes.php?parent_discoveryid=33800&context=host';
-	public $saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid=33800&triggerid=';
+	public $link = 'trigger_prototypes.php?parent_discoveryid=133800&context=host';
+	public $saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid=133800&triggerid=';
 	public $new_name = 'Cloned Trigger prototype {#KEY}';
 
 	/**
@@ -37,7 +37,7 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormTagsTriggerPrototype_Create($data) {
-		$expression = '{Simple form test host:item-prototype-form1.last()}=0';
+		$expression = 'last(/Simple form test host/item-prototype-form1)=0';
 		$this->checkTagsCreate($data, 'trigger prototype', $expression);
 	}
 

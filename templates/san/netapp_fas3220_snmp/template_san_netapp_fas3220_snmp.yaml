@@ -1,11 +1,13 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-13T15:34:13Z'
+  date: '2021-05-11T08:05:46Z'
   groups:
     -
+      uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
   templates:
     -
+      uuid: e118ab11c1ec4f9cbe21dfce1441c0f6
       template: 'NetApp FAS3220 SNMP'
       name: 'NetApp FAS3220 SNMP'
       description: |
@@ -23,30 +25,26 @@ zabbix_export:
       groups:
         -
           name: Templates/SAN
-      applications:
-        -
-          name: CPU
-        -
-          name: 'NetApp FAS3220'
-        -
-          name: 'Network interfaces'
       items:
         -
+          uuid: 4239eba959f14e0ebc44a0fa7d124042
           name: 'NetApp FAS3220: Failed disks count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.6.4.7.0
           key: 'fas3220.disk[diskFailedCount]'
           history: 7d
           description: 'The number of disks that are currently broken.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
+          uuid: 980e2c347d254c4d88d918b2171679bb
           name: 'NetApp FAS3220: Failed disks message'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.6.4.10.0
@@ -55,15 +53,17 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'If diskFailedCount is non-zero, this is a string describing the failed disk or disks. Each failed disk is described.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
+          uuid: 7b6d8c8272714343bd420a32c6763c9e
           name: 'NetApp FAS3220: Product firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.6.0
@@ -72,15 +72,17 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version string for the firmware running on this platform.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
+          uuid: 3f0418935b9d40e98d129f280ba5ba6b
           name: 'NetApp FAS3220: Product version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.2.0
@@ -89,16 +91,18 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version string for the software running on this platform.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
       discovery_rules:
         -
+          uuid: c999a3f338934982aa4359d9f0a8df30
           name: 'Cluster metrics discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.25.2.1.1]'
@@ -107,21 +111,24 @@ zabbix_export:
           description: 'Discovery of Cluster metrics per node'
           item_prototypes:
             -
+              uuid: 2363873641874c50b70bf170e05ea10e
               name: 'Node {#NODE.NAME}: Failed FAN count'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.19.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"]'
               history: 7d
               description: 'Count of the number of chassis fans that are not operating within the recommended RPM range.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
+              uuid: ac1d666db8c0495c860a59d98caeb4ab
               name: 'Node {#NODE.NAME}: Failed FAN messgae'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.20.{#SNMPINDEX}'
@@ -130,30 +137,34 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Text message describing current condition of chassis fans. This is useful only if envFailedFanCount is not zero.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
+              uuid: ad74f96ff33249e1937c2702c4bbce94
               name: 'Node {#NODE.NAME}: Degraded power supplies count'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.21.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"]'
               history: 7d
               description: 'Count of the number of power supplies that are in degraded mode.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
+              uuid: 343e02ff8f9f417292a2bb548db355ee
               name: 'Node {#NODE.NAME}: Degraded power supplies message'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.22.{#SNMPINDEX}'
@@ -162,45 +173,47 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Text message describing the state of any power supplies that are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
+              uuid: 73853db2e6924c8395aac1655fab24b4
               name: 'Node {#NODE.NAME}: Over-temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.18.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"]'
               history: 7d
               description: 'An indication of whether the hardware is currently operating outside of its recommended temperature range. The hardware will shutdown if the temperature exceeds critical thresholds.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}=2'
+                  uuid: e03547e4ede74580909ed57c7f53dac1
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"])=2'
                   name: 'Node {#NODE.NAME}: Temperature is over than recommended'
                   priority: HIGH
                   description: 'The hardware will shutdown if the temperature exceeds critical thresholds.'
             -
+              uuid: c6663dc780f14fd4bb01a108d0d2c6b0
               name: 'Node {#NODE.NAME}: Health'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.11.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeHealth, "{#NODE.NAME}"]'
               history: 7d
               description: 'Whether or not the node can communicate with the cluster.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -208,13 +221,19 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}=0'
+                  uuid: 0c331366ac9d4398bfc815c3cb241e7c
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeHealth, "{#NODE.NAME}"])=0'
                   name: 'Node {#NODE.NAME}: Node can not communicate with the cluster'
                   priority: HIGH
                   manual_close: 'YES'
             -
+              uuid: b8c922cbd60e4432822268c2a642fd95
               name: 'Node {#NODE.NAME}: Location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.3.{#SNMPINDEX}'
@@ -223,15 +242,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Location. Same as sysLocation for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
+              uuid: eae21d81e97a47dfa80701fb343294b4
               name: 'Node {#NODE.NAME}: Model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.4.{#SNMPINDEX}'
@@ -240,15 +261,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Model. Same as productModel for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
+              uuid: cd00e7ff616f4b69a94af9e9494b060e
               name: 'Node {#NODE.NAME}: NVRAM battery status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.17.{#SNMPINDEX}'
@@ -267,9 +290,6 @@ zabbix_export:
                 unknown(7),
                 overCharged(8),
                 fullyCharged(9).
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               valuemap:
                 name: 'FAS3220 NVRAM battery status'
               preprocessing:
@@ -277,13 +297,19 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  uuid: 567a28dd5b364aea84a43438aee24c5c
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"])<>1'
                   name: 'Node {#NODE.NAME}: NVRAM battery status is not OK'
                   priority: AVERAGE
                   manual_close: 'YES'
             -
+              uuid: 4fc5f0cdd87147d59fe8d073e361c2d8
               name: 'Node {#NODE.NAME}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.5.{#SNMPINDEX}'
@@ -292,15 +318,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Serial Number. Same as productSerialNum for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
+              uuid: 8ed05a8e28bd4b87b2b5981b45ec9fbe
               name: 'Node {#NODE.NAME}: Uptime'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.7.{#SNMPINDEX}'
@@ -308,33 +336,38 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Node uptime. Same as sysUpTime for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.01'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
-                  expression: '{last()}<10m'
+                  uuid: 6040422dc0b34863a90af558d72956ee
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m'
                   name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
           trigger_prototypes:
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}'
+              uuid: 64a737bc63b1463eb533d2a187c6b58a
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])'
               name: 'Node {#NODE.NAME}: Degraded power supplies count is more than zero'
               priority: AVERAGE
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}'
+              uuid: 36b7326a738e41b7be3e0a478bc9f858
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])'
               name: 'Node {#NODE.NAME}: Failed FAN count is over than zero'
               priority: HIGH
               description: '{{ITEM.VALUE2}.regsub("(.*)", \1)}'
         -
+          uuid: e0b97a8434f94d0ba14023cc434a8926
           name: 'CPU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.2.1.14.1.1]'
@@ -343,6 +376,7 @@ zabbix_export:
           description: 'Discovery of CPU metrics per node'
           item_prototypes:
             -
+              uuid: 0cf9871cac314b0fb92710144acf3f66
               name: 'Node {#NODE.NAME}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.2.1.14.1.4.{#SNMPINDEX}'
@@ -351,18 +385,21 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'The average, over the last minute, of the percentage of time that this processor was not idle.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE.NAME} CPU'
+                  tag: Application
+                  value: 'Node {#NODE.NAME} CPU'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  uuid: adb98d2d2f13435bbe1897208bb86989
+                  expression: 'min(/NetApp FAS3220 SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
           graph_prototypes:
             -
+              uuid: 5e87cb453b3f41138d75783eabeeb17b
               name: 'Node {#NODE.NAME}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -374,6 +411,7 @@ zabbix_export:
                     host: 'NetApp FAS3220 SNMP'
                     key: 'fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"]'
         -
+          uuid: b6dcacd213ce436aabb6c33d236fc077
           name: 'Filesystems discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#FSNAME},1.3.6.1.4.1.789.1.5.4.1.2,{#FSTYPE},1.3.6.1.4.1.789.1.5.4.1.23,{#VSERVER},1.3.6.1.4.1.789.1.5.4.1.34]'
@@ -403,6 +441,7 @@ zabbix_export:
           description: 'Filesystems discovery with filter.'
           item_prototypes:
             -
+              uuid: 4f77d54089e34da8bf5b50033e3e2ca3
               name: '{#VSERVER}{#FSNAME}: Total space available'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.31.{#SNMPINDEX}'
@@ -410,20 +449,23 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total disk space that is free for use on {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  expression: '{min({$FAS3220.FS.TIME:"{#FSNAME}"})}<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
+                  uuid: 6ab014a44ad84966a97125c478b10789
+                  expression: 'min(/NetApp FAS3220 SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
             -
+              uuid: be517380be12421c867ed48e16fe5c4e
               name: '{#VSERVER}{#FSNAME}: Total space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.29.{#SNMPINDEX}'
@@ -431,15 +473,17 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total capacity in Bytes for {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
+              uuid: d4989438446a4d228b83b0b22c11af90
               name: '{#VSERVER}{#FSNAME}: Total space used'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.30.{#SNMPINDEX}'
@@ -447,15 +491,17 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total disk space that is in use on {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
+              uuid: 74868589894f468fa5daada73c042aca
               name: '{#VSERVER}{#FSNAME}: Saved by compression percents'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.38.{#SNMPINDEX}'
@@ -464,10 +510,12 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
+              uuid: 6fd01f706f8f4088b91cd6aad58a65ce
               name: '{#VSERVER}{#FSNAME}: Saved by deduplication percents'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.40.{#SNMPINDEX}'
@@ -476,10 +524,12 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
+              uuid: b74fafe10c844feda4e72346b2fe88f6
               name: '{#VSERVER}{#FSNAME}: Used space percents'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.5.4.1.6.{#SNMPINDEX}'
@@ -487,16 +537,19 @@ zabbix_export:
               history: 7d
               units: '%'
               description: 'The percentage of disk space currently in use on {#FSNAME}.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
-                  expression: '{max({$FAS3220.FS.TIME:"{#FSNAME}"})}>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
+                  uuid: 712d9096c8064ef19005c4989794db45
+                  expression: 'max(/NetApp FAS3220 SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
                   name: '{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})'
                   priority: HIGH
           graph_prototypes:
             -
+              uuid: 938f484a19454b8d9c80be5dbc1887df
               name: '{#VSERVER}{#FSNAME}: Free space'
               type: STACKED
               graph_items:
@@ -531,6 +584,7 @@ zabbix_export:
                   status: ENABLED
                   discover: NO_DISCOVER
         -
+          uuid: e06a66c956164722a289cb8832341451
           name: 'HA discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.21.2.1.1,{#PARTNER.NAME},1.3.6.1.4.1.789.1.21.2.1.8]'
@@ -539,6 +593,7 @@ zabbix_export:
           description: 'Discovery of high availability metrics per node'
           item_prototypes:
             -
+              uuid: a6d4f2976de841108b53be013376549b
               name: 'Node {#NODE.NAME}: Cannot takeover cause'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.21.2.1.5.{#SNMPINDEX}'
@@ -566,9 +621,6 @@ zabbix_export:
                   alreadyInTakenoverMode(17),
                   nvramLogUnsynchronized(18),
                   stateofBackupMailboxIsDoubtful(19).
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} HA'
               valuemap:
                 name: 'FAS3220 HA cannot takeover cause'
               preprocessing:
@@ -576,9 +628,14 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
-                  expression: '{last()}<>1'
+                  uuid: 798e093f3c9941e6a2d7edc24dd22835
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1'
                   name: 'Node {#NODE.NAME}: Node cannot takeover it''s HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}'
                   priority: HIGH
                   description: |
@@ -602,15 +659,13 @@ zabbix_export:
                       nvramLogUnsynchronized(18),
                       stateofBackupMailboxIsDoubtful(19).
             -
+              uuid: 70624f45000443999b416d5806ead949
               name: 'Node {#NODE.NAME}: HA settings'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.21.2.1.3.{#SNMPINDEX}'
               key: 'fas3220.ha[haSettings, "{#NODE.NAME}"]'
               history: 7d
               description: 'High Availability configuration settings. The value notConfigured(1) indicates that the HA is not licensed. The thisNodeDead(5) setting indicates that this node has been takenover.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} HA'
               valuemap:
                 name: 'FAS3220 HA settings'
               preprocessing:
@@ -618,18 +673,25 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
-                  expression: '{last()}=1'
+                  uuid: f4ee8e2a63e8471598b6aad929151404
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=1'
                   name: 'Node {#NODE.NAME}: HA is not licensed'
                   priority: AVERAGE
                   description: 'The value notConfigured(1) indicates that the HA is not licensed.'
                 -
-                  expression: '{last()}=5'
+                  uuid: db2c37150e1649fba89898459150ada8
+                  expression: 'last(/NetApp FAS3220 SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5'
                   name: 'Node {#NODE.NAME}: Node has been taken over'
                   priority: HIGH
                   description: 'The thisNodeDead(5) setting indicates that this node has been takenover.'
         -
+          uuid: 0984cb890ec64f748e6bc5531bf80112
           name: 'Network ports discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.789.1.22.2.1.2,{#NODE},1.3.6.1.4.1.789.1.22.2.1.1,{#TYPE},1.3.6.1.4.1.789.1.22.2.1.15,{#ROLE},1.3.6.1.4.1.789.1.22.2.1.3,{#IFDESCR},1.3.6.1.4.1.789.1.22.1.2.1.2]'
@@ -668,40 +730,43 @@ zabbix_export:
           description: 'Network interfaces discovery with filter.'
           item_prototypes:
             -
+              uuid: abbab9f31f7a4e07a2e5f3fcb2150677
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.28.{#IFSNMPINDEX}'
               key: 'fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
+              description: 'The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: 6f8c273e8efa40e3888716c7cad79f3f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.29.{#IFSNMPINDEX}'
               key: 'fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
+              description: 'The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: 6fa2bb39354e4024805a82acf4feab29
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.25.{#IFSNMPINDEX}'
@@ -709,9 +774,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'The total number of octets received on the interface, including framing characters.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -721,41 +783,48 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: b414bb327e744c4b932263502da396c1
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.34.{#IFSNMPINDEX}'
               key: 'fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
+              description: 'The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: baf565d001c044f8b8b5ea5caf09ea60
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.35.{#IFSNMPINDEX}'
               key: 'fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of outbound packets that could not be transmitted because of errors.
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
+              description: 'The number of outbound packets that could not be transmitted because of errors.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: cd474bb9b7b741e8a19654f9e2a67890
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits sent'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.1.2.1.31.{#IFSNMPINDEX}'
@@ -763,9 +832,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'The total number of octets transmitted out of the interface, including framing characters.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -775,7 +841,12 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: fc759bc9f1fd479498157c5ded9d1123
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.32.{#SNMPINDEX}'
@@ -784,15 +855,17 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'The list of reasons why the port is marked as degraded.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: d50375f621464117afa5c469d06aa3a6
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.30.{#SNMPINDEX}'
@@ -800,9 +873,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The health status of the port.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port health'
               preprocessing:
@@ -810,16 +880,18 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: 13b38a463e7a49058ca6907a9430d49f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.4.{#SNMPINDEX}'
               key: 'fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'The link-state of the port. Normally it is either UP(2) or DOWN(3).'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port link state'
               preprocessing:
@@ -827,16 +899,18 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: ba18b4cebd7547c1bd6f92bd9e0ca791
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Role'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.3.{#SNMPINDEX}'
               key: 'fas3220.net.port[netportRole, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'Role of the port. A port must have one of the following roles: cluster(1), data(2), mgmt(3), intercluster(4), cluster-mgmt(5) or undef(0). The cluster port is used to communicate to other node(s) in the cluster. The data port services clients'' requests. It is where all the file requests come in. The management port is used by administrator to manage resources within a node. The intercluster port is used to communicate to other cluster. The cluster-mgmt port is used to manage resources within the cluster. The undef role is for the port that has not yet been assigned a role.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port role'
               preprocessing:
@@ -844,16 +918,18 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: 7e8816bdb15e4f1ab60c2c1b9706a34f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}'
               key: 'fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'The speed that appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port speed'
               preprocessing:
@@ -861,16 +937,18 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
+              uuid: ea7cd0c80dae43e3bfd871b8ce1c541b
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.14.{#SNMPINDEX}'
               key: 'fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'Indicates whether the port status is set ''UP'' by an administrator.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port UP by administrator'
               preprocessing:
@@ -878,33 +956,41 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
           trigger_prototypes:
             -
+              uuid: 9ea5b5b667df4bd1943892150c9f2fda
               expression: |
-                {NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                {NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                max(/NetApp FAS3220 SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/NetApp FAS3220 SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
               manual_close: 'YES'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"].last()}<>2 and {NetApp FAS3220 SNMP:fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"].last()}=1'
+              uuid: 2c7730f4606a4833bc729c108349d7b4
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1'
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down'
               priority: AVERAGE
               description: 'Link state is not UP and the port status is set ''UP'' by an administrator.'
               manual_close: 'YES'
             -
-              expression: '{NetApp FAS3220 SNMP:fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"].last()}<>0 and {NetApp FAS3220 SNMP:fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"].strlen()}>0'
+              uuid: a95e60addfe04055bb15138dd9d1f37f
+              expression: 'last(/NetApp FAS3220 SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0'
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy'
               priority: INFO
               description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
           graph_prototypes:
             -
+              uuid: 252ef20da69f43fd90afd5a560fdbd1e
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Network traffic'
               graph_items:
                 -
@@ -1098,206 +1184,216 @@ zabbix_export:
         -
           macro: '{$IF.UTIL.MAX}'
           value: '95'
+      valuemaps:
+        -
+          uuid: e078162b11ff49f59c3ab6d905f88f2c
+          name: 'FAS3220 HA cannot takeover cause'
+          mappings:
+            -
+              value: '1'
+              newvalue: OK
+            -
+              value: '2'
+              newvalue: 'Unknown reason'
+            -
+              value: '3'
+              newvalue: 'Disabled by operator'
+            -
+              value: '4'
+              newvalue: 'Interconnect offline'
+            -
+              value: '5'
+              newvalue: 'Disabled by partner'
+            -
+              value: '6'
+              newvalue: 'Takeover failed'
+            -
+              value: '7'
+              newvalue: 'Mailbox is in degraded state'
+            -
+              value: '8'
+              newvalue: 'Partner mailbox is in uninitialised state'
+            -
+              value: '9'
+              newvalue: 'Mailbox version mismatch'
+            -
+              value: '10'
+              newvalue: 'NVRAM size mismatch'
+            -
+              value: '11'
+              newvalue: 'Kernel version mismatch'
+            -
+              value: '12'
+              newvalue: 'Partner is in booting stage'
+            -
+              value: '13'
+              newvalue: 'Disk shelf is too hot'
+            -
+              value: '14'
+              newvalue: 'Partner is performing revert'
+            -
+              value: '15'
+              newvalue: 'Node is performing revert'
+            -
+              value: '16'
+              newvalue: 'Same time partner is also trying to take us over'
+            -
+              value: '17'
+              newvalue: 'Already in takenover mode'
+            -
+              value: '18'
+              newvalue: 'NVRAM log unsynchronized'
+            -
+              value: '19'
+              newvalue: 'State of backup mailbox is doubtful'
+        -
+          uuid: d6993f0258dd4978a85aa5c141f1706e
+          name: 'FAS3220 HA settings'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not configured'
+            -
+              value: '2'
+              newvalue: Enabled
+            -
+              value: '3'
+              newvalue: Disabled
+            -
+              value: '4'
+              newvalue: 'Takeover by partner disabled'
+            -
+              value: '5'
+              newvalue: 'This node dead'
+        -
+          uuid: 1fe2bf70bd63468584708a9d09eb42a1
+          name: 'FAS3220 NVRAM battery status'
+          mappings:
+            -
+              value: '1'
+              newvalue: OK
+            -
+              value: '2'
+              newvalue: 'Partially discharged'
+            -
+              value: '3'
+              newvalue: 'Fully discharged'
+            -
+              value: '4'
+              newvalue: 'Not present'
+            -
+              value: '5'
+              newvalue: 'Near end of life'
+            -
+              value: '6'
+              newvalue: 'At end of life'
+            -
+              value: '7'
+              newvalue: Unknown
+            -
+              value: '8'
+              newvalue: Overcharged
+            -
+              value: '9'
+              newvalue: 'Fully charged'
+        -
+          uuid: ee5e67c90bca4ded84df2d82589bc2fb
+          name: 'FAS3220 Port health'
+          mappings:
+            -
+              value: '0'
+              newvalue: Healthy
+            -
+              value: '1'
+              newvalue: Degraded
+        -
+          uuid: bd6ea858292c414d9bfd435631001ef5
+          name: 'FAS3220 Port link state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: 'Off'
+            -
+              value: '2'
+              newvalue: UP
+            -
+              value: '3'
+              newvalue: DOWN
+        -
+          uuid: c598c387157d4450b5bf8f68e6e794a4
+          name: 'FAS3220 Port role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: Cluster
+            -
+              value: '2'
+              newvalue: Data
+            -
+              value: '3'
+              newvalue: Node-MGMT
+            -
+              value: '4'
+              newvalue: Intercluster
+            -
+              value: '5'
+              newvalue: Cluster-MGMT
+        -
+          uuid: 6b0fec10a0eb4c70a8982419c6e635b9
+          name: 'FAS3220 Port speed'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: Auto
+            -
+              value: '2'
+              newvalue: '10 Mb/s'
+            -
+              value: '3'
+              newvalue: '100 Mb/s'
+            -
+              value: '4'
+              newvalue: '10 Gb/s'
+            -
+              value: '5'
+              newvalue: '100 Gb/s'
+        -
+          uuid: c50cdd6dbe19482abdb870c12e7c7b8d
+          name: 'FAS3220 Port UP by administrator'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+        -
+          uuid: a84db909cb1841c688acc6b4b1b28af4
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
-      expression: '{NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}>0 and {NetApp FAS3220 SNMP:fas3220.disk[diskFailedMessage].diff()}=1'
+      uuid: 3e2d95918f364248ae07a2e436a986a0
+      expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])>0 and (last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#2))=1'
       recovery_mode: RECOVERY_EXPRESSION
-      recovery_expression: '{NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}=0'
+      recovery_expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])=0'
       name: 'NetApp FAS3220: Number of failed disks has changed'
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: WARNING
       description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
       type: MULTIPLE
-  value_maps:
-    -
-      name: 'FAS3220 HA cannot takeover cause'
-      mappings:
-        -
-          value: '1'
-          newvalue: OK
-        -
-          value: '2'
-          newvalue: 'Unknown reason'
-        -
-          value: '3'
-          newvalue: 'Disabled by operator'
-        -
-          value: '4'
-          newvalue: 'Interconnect offline'
-        -
-          value: '5'
-          newvalue: 'Disabled by partner'
-        -
-          value: '6'
-          newvalue: 'Takeover failed'
-        -
-          value: '7'
-          newvalue: 'Mailbox is in degraded state'
-        -
-          value: '8'
-          newvalue: 'Partner mailbox is in uninitialised state'
-        -
-          value: '9'
-          newvalue: 'Mailbox version mismatch'
-        -
-          value: '10'
-          newvalue: 'NVRAM size mismatch'
-        -
-          value: '11'
-          newvalue: 'Kernel version mismatch'
-        -
-          value: '12'
-          newvalue: 'Partner is in booting stage'
-        -
-          value: '13'
-          newvalue: 'Disk shelf is too hot'
-        -
-          value: '14'
-          newvalue: 'Partner is performing revert'
-        -
-          value: '15'
-          newvalue: 'Node is performing revert'
-        -
-          value: '16'
-          newvalue: 'Same time partner is also trying to take us over'
-        -
-          value: '17'
-          newvalue: 'Already in takenover mode'
-        -
-          value: '18'
-          newvalue: 'NVRAM log unsynchronized'
-        -
-          value: '19'
-          newvalue: 'State of backup mailbox is doubtful'
-    -
-      name: 'FAS3220 HA settings'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Not configured'
-        -
-          value: '2'
-          newvalue: Enabled
-        -
-          value: '3'
-          newvalue: Disabled
-        -
-          value: '4'
-          newvalue: 'Takeover by partner disabled'
-        -
-          value: '5'
-          newvalue: 'This node dead'
-    -
-      name: 'FAS3220 NVRAM battery status'
-      mappings:
-        -
-          value: '1'
-          newvalue: OK
-        -
-          value: '2'
-          newvalue: 'Partially discharged'
-        -
-          value: '3'
-          newvalue: 'Fully discharged'
-        -
-          value: '4'
-          newvalue: 'Not present'
-        -
-          value: '5'
-          newvalue: 'Near end of life'
-        -
-          value: '6'
-          newvalue: 'At end of life'
-        -
-          value: '7'
-          newvalue: Unknown
-        -
-          value: '8'
-          newvalue: Overcharged
-        -
-          value: '9'
-          newvalue: 'Fully charged'
-    -
-      name: 'FAS3220 Port health'
-      mappings:
-        -
-          value: '0'
-          newvalue: Healthy
-        -
-          value: '1'
-          newvalue: Degraded
-    -
-      name: 'FAS3220 Port link state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: 'Off'
-        -
-          value: '2'
-          newvalue: UP
-        -
-          value: '3'
-          newvalue: DOWN
-    -
-      name: 'FAS3220 Port role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: Cluster
-        -
-          value: '2'
-          newvalue: Data
-        -
-          value: '3'
-          newvalue: Node-MGMT
-        -
-          value: '4'
-          newvalue: Intercluster
-        -
-          value: '5'
-          newvalue: Cluster-MGMT
-    -
-      name: 'FAS3220 Port speed'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: Auto
-        -
-          value: '2'
-          newvalue: '10 Mb/s'
-        -
-          value: '3'
-          newvalue: '100 Mb/s'
-        -
-          value: '4'
-          newvalue: '10 Gb/s'
-        -
-          value: '5'
-          newvalue: '100 Gb/s'
-    -
-      name: 'FAS3220 Port UP by administrator'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

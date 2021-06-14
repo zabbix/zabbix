@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:07Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:15Z'
   groups:
     -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
+      uuid: 8e5236f799b347a8ae90a979198be85e
       template: 'Squid SNMP'
       name: 'Squid SNMP'
       description: |
@@ -17,18 +19,13 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Squid
       items:
         -
+          uuid: 86cc718ce21b4ff9b0a09479ae3fc130
           name: 'Squid: Service ping'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]'
           history: 7d
-          applications:
-            -
-              name: Squid
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -36,13 +33,19 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Squid
           triggers:
             -
-              expression: '{last()}=0'
+              uuid: 7e0f0a9e8a9d4f6193946e4f8cd4a2e3
+              expression: 'last(/Squid SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0'
               name: 'Squid: Port {$SQUID.HTTP.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
         -
+          uuid: 6d7f0f6b0f89462e96e86940b779eb69
           name: 'Squid: CPU usage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.5.0
@@ -51,10 +54,12 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The percentage use of the CPU'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 960b137ab773492ab3073e108575e4fc
           name: 'Squid: File descriptor count - current used'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.12.0
@@ -62,10 +67,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of file descriptors in use'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 37b45201f8444583b01e0df5af2bc14e
           name: 'Squid: File descriptor count - current maximum'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.13.0
@@ -73,10 +80,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Highest number of file descriptors in use'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 910afdc20767408f90d1bc5b7a9fd6a4
           name: 'Squid: Objects LRU expiration age'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.8.0
@@ -85,15 +94,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Storage LRU Expiration Age'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 26b8b1a25dc74099b61813905477b414
           name: 'Squid: File descriptor count - current reserved'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.11.0
@@ -101,10 +112,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Reserved number of file descriptors'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 35f3009401b6449d95988d9ee7a621a7
           name: 'Squid: Cache swap current size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.14.0
@@ -113,15 +126,17 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Storage Swap Size'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1048576'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 0789a0fa3e3b42a08a5e5bf8d0307970
           name: 'Squid: Objects unlinkd requests'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.9.0
@@ -129,10 +144,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Requests given to unlinkd'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 6bc024be663b466ca677941130e11f50
           name: 'Squid: File descriptor count - current available'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.10.0
@@ -140,15 +157,18 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Available number of file descriptors'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
           triggers:
             -
-              expression: '{last()}<{$SQUID.FILE.DESC.WARN.MIN}'
+              uuid: 40c41c87e46443f886506da5e580657e
+              expression: 'last(/Squid SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
               name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
         -
+          uuid: 1aecf10756f949999c8f3fe5ce9c2a32
           name: 'Squid: DNS server replies per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.3.2.0
@@ -156,15 +176,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of external dns server replies'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: e5f647c77bdb498e9cc286795bc4077c
           name: 'Squid: DNS server requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.3.1.0
@@ -172,15 +194,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of external dns server requests'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 3f4366896dd84b8ab78d6e3dc8a6ab63
           name: 'Squid: DNS service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.8.5
@@ -189,15 +213,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'DNS service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 99448052f1a34e15a5c042124db7b651
           name: 'Squid: DNS service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.8.60
@@ -206,15 +232,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'DNS service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 0aea1fe702004d65919fc010c971c3b5
           name: 'Squid: FQDN cache hits per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.3.0
@@ -222,15 +250,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of FQDN Cache hits'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 2dea9b707b844d32b65a2d479ddb7d72
           name: 'Squid: FQDN cache misses per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.6.0
@@ -238,15 +268,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of FQDN Cache misses'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 1dad3f381c174b869c73f55cd831b40a
           name: 'Squid: FQDN cache requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.2.0
@@ -254,15 +286,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of FQDN Cache requests'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 633a70cd41c44f2c895148a7ae394acd
           name: 'Squid: HTTP all service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.2.5
@@ -271,15 +305,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP all service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: d3aa021743134d97af9dd8840b0ef692
           name: 'Squid: HTTP all service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.2.60
@@ -288,15 +324,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP all service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 7f5bd8f89ea0495ea87c294fb8c606dd
           name: 'Squid: HTTP Errors sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.3.0
@@ -304,15 +342,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of HTTP Errors sent to clients'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 0c4fd7c154a44442a3cec82ba4026b7d
           name: 'Squid: HTTP miss service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.5.5
@@ -321,15 +361,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP hit service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: a642c99d6c3f4f5e8ec218459fd76f04
           name: 'Squid: HTTP hit service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.5.60
@@ -338,15 +380,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP hit service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: adfe3e2fc775400991d2ea2f06218daf
           name: 'Squid: HTTP Hits sent from cache per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.2.0
@@ -354,15 +398,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of HTTP Hits sent to clients from cache'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: f2366a6008cb4dc7856904ea5c6631dd
           name: 'Squid: HTTP traffic received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.4.0
@@ -371,9 +417,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of HTTP traffic received from clients'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
@@ -383,7 +426,12 @@ zabbix_export:
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: f8fa271a272442369b6cbc4fb1a2decc
           name: 'Squid: HTTP miss service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.3.5
@@ -392,15 +440,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP miss service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 23e5a3bd6e9a4c50a7d54336a6afc1e1
           name: 'Squid: HTTP miss service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.3.60
@@ -409,15 +459,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'HTTP miss service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: ff6b7946363d44bba5721c82c8f84df7
           name: 'Squid: HTTP traffic sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.5.0
@@ -426,9 +478,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of HTTP traffic sent to clients'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
@@ -438,7 +487,12 @@ zabbix_export:
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: bde307ead15d48859a97e35e52327d50
           name: 'Squid: ICP traffic received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.9.0
@@ -447,9 +501,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of ICP traffic received'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
@@ -459,7 +510,12 @@ zabbix_export:
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 7234b612b50a45e0a1bb69654e2e784d
           name: 'Squid: ICP traffic transmitted per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.8.0
@@ -468,9 +524,6 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Number of ICP traffic transmitted'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
@@ -480,7 +533,12 @@ zabbix_export:
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 9ee83c13fa6d41dfb8bfea91c02341b9
           name: 'Squid: ICP messages received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.7.0
@@ -488,15 +546,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of ICP messages received'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: dee7d8cf211b4ad0a645a8d6d4f24c31
           name: 'Squid: ICP messages sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.6.0
@@ -504,15 +564,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of ICP messages sent'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: cb9d0c300beb47568e99ff7966e1b10e
           name: 'Squid: ICP query service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.6.5
@@ -521,15 +583,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'ICP query service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 9130a0bc53144fe992b701aa9159ff70
           name: 'Squid: ICP query service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.6.60
@@ -538,15 +602,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'ICP query service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 35a7585432b3467585ff98b23e610d82
           name: 'Squid: ICP reply service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.7.5
@@ -555,15 +621,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'ICP reply service time per 5 minutes'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 94eab55af41a465196588d08acbacb56
           name: 'Squid: ICP reply service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.7.60
@@ -572,15 +640,17 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'ICP reply service time per hour'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: c5409583483e4024aabaab500bcb637a
           name: 'Squid: IP cache hits per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.3.0
@@ -588,15 +658,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of IP Cache hits'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 8e474d2fd410472bb03024d2a2361b5d
           name: 'Squid: IP cache misses per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.6.0
@@ -604,15 +676,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of IP Cache misses'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: dc837a887c3c463a9011d923dbbfbc0f
           name: 'Squid: IP cache requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.2.0
@@ -620,15 +694,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of IP Cache requests'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 70786920f94f41eeb0fc525c2e6431cf
           name: 'Squid: Memory maximum resident size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.6.0
@@ -637,15 +713,17 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Maximum Resident Size'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: d84c3a3633784f77bf9375bf59da490b
           name: 'Squid: Memory maximum cache size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.1.0
@@ -654,15 +732,17 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The value of the cache_mem parameter'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1048576'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: c14fe87f87ca48f39bbe765db60e0a41
           name: 'Squid: Memory cache usage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.3.0
@@ -671,15 +751,17 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Total accounted memory'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 387bbd61d3bd469baa6c560afe8a18ae
           name: 'Squid: Objects count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.7.0
@@ -687,10 +769,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of objects stored by the cache'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 1e648a20db904e92ae4ec0c3f9037a99
           name: 'Squid: HTTP requests received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.1.0
@@ -698,15 +782,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of HTTP requests received'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 31f3e3bb57d645ff8df6b9b8d1b70a49
           name: 'Squid: Byte hit ratio per 1 minute'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.1
@@ -714,10 +800,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: e19775b9c83648d58655a1130c5771e4
           name: 'Squid: Byte hit ratio per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.5
@@ -725,10 +813,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: ffb3fc17631f4cd6b55ed6eefd2e6cea
           name: 'Squid: Byte hit ratio per 1 hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.60
@@ -736,10 +826,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: a4ba5af69dd64fd8acf707ee1eaaeb32
           name: 'Squid: Request hit ratio per 1 minute'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.1
@@ -747,10 +839,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: b5ae7935e9be40e18c3020820a7865c7
           name: 'Squid: Request hit ratio per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.5
@@ -758,10 +852,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: b09f7a1d9dc340b88106016586099dba
           name: 'Squid: Request hit ratio per 1 hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.60
@@ -769,10 +865,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Byte Hit Ratios'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 69e4fb088c6949ac94eabcb892df46ab
           name: 'Squid: Cache swap high water mark'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.3.0
@@ -781,10 +879,12 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Cache Swap High Water Mark'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 221e583d7cf2455b9d848462de4b1e9a
           name: 'Squid: Cache swap low water mark'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.4.0
@@ -793,10 +893,12 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Cache Swap Low Water Mark'
-          applications:
+          tags:
             -
-              name: Squid
+              tag: Application
+              value: Squid
         -
+          uuid: 215aefddd30e41aea54e30678f290215
           name: 'Squid: Cache swap directory size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.2.0
@@ -805,15 +907,17 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The total of the cache_dir space allocated'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1048576'
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 38ad99f9b30c4d729030ceab6575f4f5
           name: 'Squid: Sys page faults per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.1.0
@@ -821,15 +925,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Page faults with physical I/O'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: Squid
         -
+          uuid: 67460731d9c94166870874239c9a60da
           name: 'Squid: Uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.1.3.0
@@ -838,22 +944,25 @@ zabbix_export:
           history: 7d
           units: s
           description: 'The Uptime of the cache in timeticks (in hundredths of a second) with preprocessing'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Squid
           triggers:
             -
-              expression: '{last()}<10m'
+              uuid: 89efc9400197427fa718395286dd3583
+              expression: 'last(/Squid SNMP/squid[cacheUptime])<10m'
               name: 'Squid: Squid has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
+          uuid: d7c7f0faa1f64745be774e30e6f0b68f
           name: 'Squid: Version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.3.0
@@ -862,17 +971,19 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Cache Software Version'
-          applications:
-            -
-              name: Squid
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Squid
           triggers:
             -
-              expression: '{diff()}=1 and {strlen()}>0'
+              uuid: c5991152d2da4df7ae0d978233c5a859
+              expression: '(last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2))=1 and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
               priority: INFO
               description: 'Squid version has changed. Ack to close.'
@@ -881,7 +992,7 @@ zabbix_export:
         -
           macro: '{$SQUID.FILE.DESC.WARN.MIN}'
           value: '100'
-          description: 'The threshold for minimum number of avaliable file descriptors'
+          description: 'The threshold for minimum number of available file descriptors'
         -
           macro: '{$SQUID.HTTP.PORT}'
           value: '3128'
@@ -889,7 +1000,7 @@ zabbix_export:
         -
           macro: '{$SQUID.PAGE.FAULT.WARN}'
           value: '90'
-          description: 'The threshold for sys page faults rate in percent of recieved HTTP requests'
+          description: 'The threshold for sys page faults rate in percent of received HTTP requests'
         -
           macro: '{$SQUID.SNMP.COMMUNITY}'
           value: public
@@ -898,23 +1009,38 @@ zabbix_export:
           macro: '{$SQUID.SNMP.PORT}'
           value: '3401'
           description: 'snmp_port configured in squid.conf (Default: 3401)'
+      valuemaps:
+        -
+          uuid: 1bd791d250e441aeb1c73e499d96e98e
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
-      expression: '{Squid SNMP:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}'
-      name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests)'
+      uuid: 89a1cfe0f02f4da880f197c2e5605db8
+      expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
+      name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
     -
-      expression: '{Squid SNMP:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100'
+      uuid: 5676f1e02dc7413fb1a34543ccaf1384
+      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapHighWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: HIGH
     -
-      expression: '{Squid SNMP:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100'
+      uuid: 2cf87472ebf74239bb782580448f696c
+      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapLowWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: WARNING
   graphs:
     -
+      uuid: d8bb2c1dac8a4cb5999d29227a8510e6
       name: 'Squid: DNS lookup statistics'
       graph_items:
         -
@@ -929,6 +1055,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheDnsReplies]'
     -
+      uuid: e301cc76e0ff4e22bc66a46b19230c33
       name: 'Squid: Domain name (FQDN) cache ctatistics'
       graph_items:
         -
@@ -949,6 +1076,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheFqdnMisses]'
     -
+      uuid: 22556883f0a04b6999013d1a5ce58382
       name: 'Squid: File descriptor usage'
       graph_items:
         -
@@ -969,6 +1097,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheCurrentResFileDescrCnt]'
     -
+      uuid: 647af850b9914d7b803c7f509f4c4f71
       name: 'Squid: HTTP Traffic'
       graph_items:
         -
@@ -983,6 +1112,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheHttpOutKb]'
     -
+      uuid: c3d9ac16b3e24067b1041b93ee8aaebe
       name: 'Squid: IP address cache statistics'
       graph_items:
         -
@@ -1003,6 +1133,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheIpMisses]'
     -
+      uuid: 7b9f0d0f6558432b83375e2fcd082812
       name: 'Squid: Memory'
       graph_items:
         -
@@ -1023,6 +1154,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheMemUsage]'
     -
+      uuid: d4b916fb3ea14e55b3e9799b85d8e40b
       name: 'Squid: Objects cache statistics'
       graph_items:
         -
@@ -1037,6 +1169,7 @@ zabbix_export:
             host: 'Squid SNMP'
             key: 'squid[cacheCurrentUnlinkRequests]'
     -
+      uuid: af823298924d47b09e17eeff093da448
       name: 'Squid: Service timing statistics'
       graph_items:
         -
@@ -1110,13 +1243,3 @@ zabbix_export:
           item:
             host: 'Squid SNMP'
             key: 'squid[cacheDnsSvcTime.60]'
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

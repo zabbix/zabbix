@@ -47,6 +47,16 @@ class CDiscoveryRule extends CItemGeneral {
 		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON
 	];
 
+	/**
+	 * Define a set of supported item types.
+	 *
+	 * @var array
+	 */
+	const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+	];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -97,7 +107,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectHostPrototypes'			=> null,
-			'selectApplicationPrototypes'	=> null,
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
@@ -1152,6 +1161,17 @@ class CDiscoveryRule extends CItemGeneral {
 												'trends' => $operation['optrends']['trends']
 											];
 										}
+
+										if (array_key_exists('optag', $operation)) {
+											foreach ($operation['optag'] as $tag) {
+												$optag[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'tag' => $tag['tag'],
+													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
+												];
+											}
+										}
 										break;
 
 									case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
@@ -1643,7 +1663,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 							switch ($operation['operationobject']) {
 								case OPERATION_OBJECT_ITEM_PROTOTYPE:
-									foreach (['opseverity', 'optag', 'optemplate', 'opinventory'] as $field) {
+									foreach (['opseverity', 'optemplate', 'opinventory'] as $field) {
 										if (array_key_exists($field, $operation)) {
 											self::exception(ZBX_API_ERROR_PARAMETERS,
 												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
@@ -1657,10 +1677,11 @@ class CDiscoveryRule extends CItemGeneral {
 											&& !array_key_exists('opperiod', $operation)
 											&& !array_key_exists('ophistory', $operation)
 											&& !array_key_exists('optrends', $operation)
+											&& !array_key_exists('optag', $operation)
 											&& !array_key_exists('opdiscover', $operation)) {
 										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, opperiod, ophistory, optrends'
+												'opstatus, opdiscover, opperiod, ophistory, optrends, optag'
 											)
 										));
 									}
@@ -2199,15 +2220,31 @@ class CDiscoveryRule extends CItemGeneral {
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 				'allow_traps', 'discover', 'parameters'
 			],
-			'selectApplications' => ['applicationid'],
-			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
+			'selectValueMap' => ['name'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
 		$new_itemids = [];
 		$itemkey_to_id = [];
 		$create_items = [];
+		$src_valuemap_names = [];
+		$valuemap_map = [];
+
+		foreach ($item_prototypes as $item_prototype) {
+			if ($item_prototype['valuemap']) {
+				$src_valuemap_names[] = $item_prototype['valuemap']['name'];
+			}
+		}
+
+		if ($src_valuemap_names) {
+			$valuemap_map = array_column(API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'hostids' => $dstHost['hostid'],
+				'filter' => ['name' => $src_valuemap_names]
+			]), 'valuemapid', 'name');
+		}
 
 		if ($item_prototypes) {
 			$create_order = [];
@@ -2294,6 +2331,12 @@ class CDiscoveryRule extends CItemGeneral {
 				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
 				$item_prototype['hostid'] = $dstDiscovery['hostid'];
 
+				if ($item_prototype['valuemapid'] != 0) {
+					$item_prototype['valuemapid'] = array_key_exists($item_prototype['valuemap']['name'], $valuemap_map)
+						? $valuemap_map[$item_prototype['valuemap']['name']]
+						: 0;
+				}
+
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 					// find a matching interface
@@ -2310,12 +2353,6 @@ class CDiscoveryRule extends CItemGeneral {
 						));
 					}
 				}
-
-				// add new applications
-				$item_prototype['applications'] = get_same_applications_for_host(
-					zbx_objectValues($item_prototype['applications'], 'applicationid'),
-					$dstHost['hostid']
-				);
 
 				if (!$item_prototype['preprocessing']) {
 					unset($item_prototype['preprocessing']);
@@ -2584,13 +2621,19 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding items
 		if (!is_null($options['selectItems'])) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$items = [];
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
-				$items = API::ItemPrototype()->get([
-					'output' => $options['selectItems'],
-					'itemids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$items = API::ItemPrototype()->get([
+						'output' => $options['selectItems'],
+						'itemids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
@@ -2611,6 +2654,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,f.triggerid'.
@@ -2623,11 +2667,16 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
 				}
 
-				$triggers = API::TriggerPrototype()->get([
-					'output' => $options['selectTriggers'],
-					'triggerids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$triggers = API::TriggerPrototype()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
@@ -2649,6 +2698,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,gi.graphid'.
@@ -2661,11 +2711,16 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
 				}
 
-				$graphs = API::GraphPrototype()->get([
-					'output' => $options['selectGraphs'],
-					'graphids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::GraphPrototype()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
@@ -2687,13 +2742,19 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding hosts
 		if ($options['selectHostPrototypes'] !== null) {
 			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
+				$hostPrototypes = [];
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
-				$hostPrototypes = API::HostPrototype()->get([
-					'output' => $options['selectHostPrototypes'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hostPrototypes = API::HostPrototype()->get([
+						'output' => $options['selectHostPrototypes'],
+						'hostids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
 			}
 			else {
@@ -2713,24 +2774,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		if ($options['selectApplicationPrototypes'] !== null
-				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
-				'application_prototype'
-			);
-
-			$application_prototypes = API::getApiService()->select('application_prototype', [
-				'output' => $options['selectApplicationPrototypes'],
-				'filter' => ['application_prototypeid' => $relation_map->getRelatedIds()],
-				'limit' => $options['limitSelects'],
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
-				$options['limitSelects']
-			);
-		}
-
 		if ($options['selectFilter'] !== null) {
 			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
 			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
@@ -2746,11 +2789,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('item_condition', [
+				$conditions = DB::select('item_condition', [
 					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
 					'filter' => ['itemid' => $itemIds],
 					'preservekeys' => true,
-					'sortfield' => 'item_conditionid'
+					'sortfield' => ['item_conditionid']
 				]);
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
@@ -2840,11 +2883,11 @@ class CDiscoveryRule extends CItemGeneral {
 				'preservekeys' => true
 			]);
 
-			if ($filter_requested) {
-				$conditions = API::getApiService()->select('lld_override_condition', [
+			if ($filter_requested && $overrides) {
+				$conditions = DB::select('lld_override_condition', [
 					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
 					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => 'lld_override_conditionid',
+					'sortfield' => ['lld_override_conditionid'],
 					'preservekeys' => true
 				]);
 
@@ -2901,156 +2944,160 @@ class CDiscoveryRule extends CItemGeneral {
 				unset($override);
 			}
 
-			if ($operations_requested) {
-				$operations = API::getApiService()->select('lld_override_operation', [
+			if ($operations_requested && $overrides) {
+				$operations = DB::select('lld_override_operation', [
 					'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
 					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => 'lld_override_operationid',
+					'sortfield' => ['lld_override_operationid'],
 					'preservekeys' => true
 				]);
 
-				$opdiscover = DB::select('lld_override_opdiscover', [
-					'output' => ['lld_override_operationid', 'discover'],
-					'filter' => ['lld_override_operationid' => array_keys($operations)]
-				]);
+				if ($operations) {
+					$opdiscover = DB::select('lld_override_opdiscover', [
+						'output' => ['lld_override_operationid', 'discover'],
+						'filter' => ['lld_override_operationid' => array_keys($operations)]
+					]);
 
-				$item_prototype_objectids = [];
-				$trigger_prototype_objectids = [];
-				$host_prototype_objectids = [];
+					$item_prototype_objectids = [];
+					$trigger_prototype_objectids = [];
+					$host_prototype_objectids = [];
 
-				foreach ($operations as $operation) {
-					switch ($operation['operationobject']) {
-						case OPERATION_OBJECT_ITEM_PROTOTYPE:
-							$item_prototype_objectids[$operation['lld_override_operationid']] = true;
-							break;
+					foreach ($operations as $operation) {
+						switch ($operation['operationobject']) {
+							case OPERATION_OBJECT_ITEM_PROTOTYPE:
+								$item_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
 
-						case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-							$trigger_prototype_objectids[$operation['lld_override_operationid']] = true;
-							break;
+							case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+								$trigger_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
 
-						case OPERATION_OBJECT_HOST_PROTOTYPE:
-							$host_prototype_objectids[$operation['lld_override_operationid']] = true;
-							break;
+							case OPERATION_OBJECT_HOST_PROTOTYPE:
+								$host_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
+						}
 					}
-				}
 
-				if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-					$opstatus = DB::select('lld_override_opstatus', [
-						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys(
-							$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
-						)]
-					]);
-				}
-
-				if ($item_prototype_objectids) {
-					$ophistory = DB::select('lld_override_ophistory', [
-						'output' => ['lld_override_operationid', 'history'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-					]);
-					$optrends = DB::select('lld_override_optrends', [
-						'output' => ['lld_override_operationid', 'trends'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-					]);
-					$opperiod = DB::select('lld_override_opperiod', [
-						'output' => ['lld_override_operationid', 'delay'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-					]);
-				}
-
-				if ($trigger_prototype_objectids) {
-					$opseverity = DB::select('lld_override_opseverity', [
-						'output' => ['lld_override_operationid', 'severity'],
-						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
-					]);
-				}
-
-				if ($trigger_prototype_objectids || $host_prototype_objectids) {
-					$optag = DB::select('lld_override_optag', [
-						'output' => ['lld_override_operationid', 'tag', 'value'],
-						'filter' => ['lld_override_operationid' => array_keys(
-							$trigger_prototype_objectids + $host_prototype_objectids
-						)]
-					]);
-				}
-
-				if ($host_prototype_objectids) {
-					$optemplate = DB::select('lld_override_optemplate', [
-						'output' => ['lld_override_operationid', 'templateid'],
-						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
-					]);
-					$opinventory = DB::select('lld_override_opinventory', [
-						'output' => ['lld_override_operationid', 'inventory_mode'],
-						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
-					]);
-				}
-
-				foreach ($operations as &$operation) {
 					if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-						foreach ($opstatus as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['opstatus']['status'] = $row['status'];
-							}
-						}
-					}
-
-					foreach ($opdiscover as $row) {
-						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-							$operation['opdiscover']['discover'] = $row['discover'];
-						}
+						$opstatus = DB::select('lld_override_opstatus', [
+							'output' => ['lld_override_operationid', 'status'],
+							'filter' => ['lld_override_operationid' => array_keys(
+								$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
+							)]
+						]);
 					}
 
 					if ($item_prototype_objectids) {
-						foreach ($ophistory as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['ophistory']['history'] = $row['history'];
-							}
-						}
-
-						foreach ($optrends as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['optrends']['trends'] = $row['trends'];
-							}
-						}
-
-						foreach ($opperiod as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['opperiod']['delay'] = $row['delay'];
-							}
-						}
+						$ophistory = DB::select('lld_override_ophistory', [
+							'output' => ['lld_override_operationid', 'history'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
+						$optrends = DB::select('lld_override_optrends', [
+							'output' => ['lld_override_operationid', 'trends'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
+						$opperiod = DB::select('lld_override_opperiod', [
+							'output' => ['lld_override_operationid', 'delay'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
 					}
 
 					if ($trigger_prototype_objectids) {
-						foreach ($opseverity as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['opseverity']['severity'] = $row['severity'];
-							}
-						}
+						$opseverity = DB::select('lld_override_opseverity', [
+							'output' => ['lld_override_operationid', 'severity'],
+							'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+						]);
 					}
 
-					if ($trigger_prototype_objectids || $host_prototype_objectids) {
-						foreach ($optag as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
-							}
-						}
+					if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
+						$optag = DB::select('lld_override_optag', [
+							'output' => ['lld_override_operationid', 'tag', 'value'],
+							'filter' => ['lld_override_operationid' => array_keys(
+								$trigger_prototype_objectids + $host_prototype_objectids + $item_prototype_objectids
+							)]
+						]);
 					}
 
 					if ($host_prototype_objectids) {
-						foreach ($optemplate as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['optemplate'][] = ['templateid' => $row['templateid']];
+						$optemplate = DB::select('lld_override_optemplate', [
+							'output' => ['lld_override_operationid', 'templateid'],
+							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+						]);
+						$opinventory = DB::select('lld_override_opinventory', [
+							'output' => ['lld_override_operationid', 'inventory_mode'],
+							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+						]);
+					}
+
+					foreach ($operations as &$operation) {
+						$lld_override_operationid = $operation['lld_override_operationid'];
+
+						if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
+							foreach ($opstatus as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opstatus']['status'] = $row['status'];
+								}
 							}
 						}
 
-						foreach ($opinventory as $row) {
-							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
-								$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
+						foreach ($opdiscover as $row) {
+							if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+								$operation['opdiscover']['discover'] = $row['discover'];
+							}
+						}
+
+						if ($item_prototype_objectids) {
+							foreach ($ophistory as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['ophistory']['history'] = $row['history'];
+								}
+							}
+
+							foreach ($optrends as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optrends']['trends'] = $row['trends'];
+								}
+							}
+
+							foreach ($opperiod as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opperiod']['delay'] = $row['delay'];
+								}
+							}
+						}
+
+						if ($trigger_prototype_objectids) {
+							foreach ($opseverity as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opseverity']['severity'] = $row['severity'];
+								}
+							}
+						}
+
+						if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
+							foreach ($optag as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
+								}
+							}
+						}
+
+						if ($host_prototype_objectids) {
+							foreach ($optemplate as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optemplate'][] = ['templateid' => $row['templateid']];
+								}
+							}
+
+							foreach ($opinventory as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
+								}
 							}
 						}
 					}
+					unset($operation);
 				}
-				unset($operation);
 
 				$relation_map = $this->createRelationMap($operations, 'lld_overrideid', 'lld_override_operationid');
 

@@ -25,7 +25,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormUserProfile extends CLegacyWebTest {
 
 	public function testFormUserProfile_SimpleUpdate() {
-		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
+		$sqlHashUsers = 'select userid,username,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -40,7 +40,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 
 	public function testFormUserProfile_Cancel() {
-		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
+		$sqlHashUsers = 'select userid,username,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -116,7 +116,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 
 	public function testFormUserProfile_ThemeChange() {
-		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
+		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
@@ -125,7 +125,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('Global view');
 
-		$row = DBfetch(DBselect("select theme from users where alias='".PHPUNIT_LOGIN_NAME."'"));
+		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals('blue-theme', $row['theme']);
 
 		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
@@ -214,7 +214,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckHeader('Global view');
-				$row = DBfetch(DBselect("select refresh from users where alias='".PHPUNIT_LOGIN_NAME."'"));
+				$row = DBfetch(DBselect("select refresh from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
 				break;
 			case TEST_BAD:
@@ -322,7 +322,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckHeader('Global view');
-				$row = DBfetch(DBselect("select autologout from users where alias='".PHPUNIT_LOGIN_NAME."'"));
+				$row = DBfetch(DBselect("select autologout from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
 				break;
 			case TEST_BAD:

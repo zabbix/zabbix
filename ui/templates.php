@@ -22,13 +22,12 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
-require_once dirname(__FILE__).'/include/ident.inc.php';
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js',
-	'class.tab-indicators.js'
+	'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -48,6 +47,7 @@ $fields = [
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
+	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -207,12 +207,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($templateId == 0) {
 			$messageSuccess = _('Template added');
 			$messageFailed = _('Cannot add template');
-			$auditAction = AUDIT_ACTION_ADD;
 		}
 		else {
 			$messageSuccess = _('Template updated');
 			$messageFailed = _('Cannot update template');
-			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 
 		// Add new group.
@@ -274,16 +272,57 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = API::Template()->update($template);
 
-			if (!$result) {
+			if ($result) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
+			}
+			else {
 				throw new Exception();
 			}
 		}
 
+		$valuemaps = getRequest('valuemaps', []);
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
+
+		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
+			foreach ($valuemaps as &$valuemap) {
+				unset($valuemap['valuemapid']);
+			}
+			unset($valuemap);
+		}
+		else if (hasRequest('update')) {
+			$del_valuemapids = API::ValueMap()->get([
+				'output' => [],
+				'hostids' => $templateId,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap)) {
+				$upd_valuemaps[] = $valuemap;
+				unset($del_valuemapids[$valuemap['valuemapid']]);
+			}
+			else {
+				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
+			}
+		}
+
+		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
+			throw new Exception();
+		}
+
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
-			if (!copyApplications($cloneTemplateId, $templateId)) {
-				throw new Exception();
-			}
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -346,7 +385,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$db_template_dashboards = API::TemplateDashboard()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
-				'selectWidgets' => API_OUTPUT_EXTEND,
+				'selectPages' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			]);
 
@@ -357,10 +396,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					throw new Exception();
 				}
 			}
-		}
-
-		if ($result) {
-			add_audit_ext($auditAction, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
@@ -457,7 +492,8 @@ if (hasRequest('form')) {
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
-		'macros' => $macros
+		'macros' => $macros,
+		'valuemaps' => array_values(getRequest('valuemaps', []))
 	];
 
 	if ($data['templateid'] != 0) {
@@ -467,6 +503,7 @@ if (hasRequest('form')) {
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
@@ -478,6 +515,8 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
+			order_result($data['dbTemplate']['valuemaps'], 'name');
+			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}
 
@@ -733,7 +772,6 @@ else {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,

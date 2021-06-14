@@ -356,11 +356,12 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
  */
 function copyHttpTests($srcHostId, $dstHostId) {
 	$httpTests = API::HttpTest()->get([
-		'output' => ['name', 'applicationid', 'delay', 'status', 'variables', 'agent', 'authentication',
+		'output' => ['name', 'delay', 'status', 'variables', 'agent', 'authentication',
 			'http_user', 'http_password', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
 			'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
 		],
 		'hostids' => $srcHostId,
+		'selectTags' => ['tag', 'value'],
 		'selectSteps' => ['name', 'no', 'url', 'query_fields', 'timeout', 'posts', 'required', 'status_codes',
 			'variables', 'follow_redirects', 'retrieve_mode', 'headers'
 		],
@@ -371,27 +372,8 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		return true;
 	}
 
-	// get destination application IDs
-	$srcApplicationIds = [];
-	foreach ($httpTests as $httpTest) {
-		if ($httpTest['applicationid'] != 0) {
-			$srcApplicationIds[] = $httpTest['applicationid'];
-		}
-	}
-
-	if ($srcApplicationIds) {
-		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
-	}
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['hostid'] = $dstHostId;
-
-		if (isset($dstApplicationIds[$httpTest['applicationid']])) {
-			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
-		}
-		else {
-			unset($httpTest['applicationid']);
-		}
 
 		unset($httpTest['httptestid']);
 	}
@@ -450,4 +432,91 @@ function userAgents() {
 			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => 'Googlebot 2.1'
 		]
 	];
+}
+
+/**
+ * Get direct or inherited tags for web scenario edit form.
+ *
+ * @param array  $data
+ * @param string $data['templates'][<templateid>]['hostid']
+ * @param string $data['templates'][<templateid>]['name']
+ * @param int    $data['templates'][<templateid>]['permission']
+ * @param string $data['hostid']
+ * @param array  $data['tags']
+ * @param string $data['tags'][]['tag']
+ * @param string $data['tags'][]['value']
+ * @param int    $data['show_inherited_tags']
+ *
+ * @return array
+ */
+function getHttpTestTags(array $data): array {
+	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
+
+	if ($data['show_inherited_tags']) {
+		$db_templates = $data['templates']
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($data['templates']),
+				'preservekeys' => true
+			])
+			: [];
+
+		$inherited_tags = [];
+
+		// Make list of template tags.
+		foreach ($data['templates'] as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $inherited_tags)
+							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
+					}
+				}
+			}
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+
+		// Overwrite and attach host level tags.
+		if ($db_hosts) {
+			foreach ($db_hosts[0]['tags'] as $tag) {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+			}
+		}
+
+		// Overwrite and attach http test's own tags.
+		foreach ($data['tags'] as $tag) {
+			if (array_key_exists($tag['tag'], $inherited_tags)
+					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+			else {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+		}
+
+		$tags = [];
+		foreach ($inherited_tags as $tag) {
+			foreach ($tag as $value) {
+				$tags[] = $value;
+			}
+		}
+	}
+
+	return $tags;
 }

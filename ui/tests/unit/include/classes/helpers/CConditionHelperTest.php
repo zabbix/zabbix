@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
-class CConditionHelperTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public function testGetFormulaProvider() {
+class CConditionHelperTest extends TestCase {
+
+	public function dataProviderGetFormula() {
 		return [
 			[
 				[], CONDITION_EVAL_TYPE_AND, ''
@@ -174,7 +176,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testGetFormulaProvider
+	 * @dataProvider dataProviderGetFormula
 	 *
 	 * @param array $conditions
 	 * @param $evaltype
@@ -186,7 +188,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedFormula, $formula);
 	}
 
-	public function testGetFormulaIdsProvider() {
+	public function dataProviderGetFormulaIds() {
 		return [
 			['', []],
 			['1', [1 => 'A']],
@@ -197,7 +199,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testGetFormulaIdsProvider
+	 * @dataProvider dataProviderGetFormulaIds
 	 *
 	 * @param $formula
 	 * @param array $expectedIds
@@ -208,7 +210,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($ids, $expectedIds);
 	}
 
-	public function testReplaceNumericIdsProvider() {
+	public function dataProviderReplaceNumericIds() {
 		return [
 			[
 				'', [], ''
@@ -229,7 +231,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testReplaceNumericIdsProvider
+	 * @dataProvider dataProviderReplaceNumericIds
 	 *
 	 * @param $formula
 	 * @param array $ids
@@ -241,7 +243,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedFormula, $generatedFormula);
 	}
 
-	public function testReplaceLetterIdsProvider() {
+	public function dataProviderReplaceLetterIds() {
 		return [
 			[
 				'', [], ''
@@ -265,7 +267,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testReplaceLetterIdsProvider
+	 * @dataProvider dataProviderReplaceLetterIds
 	 *
 	 * @param $formula
 	 * @param array $ids
@@ -278,7 +280,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testSortConditionsByFormulaIdProvider
+	 * @dataProvider dataProviderSortConditionsByFormulaId
 	 *
 	 * @param array $conditions
 	 * @param array $expectedConditions
@@ -292,7 +294,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @return array
 	 */
-	public function testSortConditionsByFormulaIdProvider() {
+	public function dataProviderSortConditionsByFormulaId() {
 		return [
 			[
 				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']],
@@ -314,7 +316,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testGetNextFormulaIdProvider
+	 * @dataProvider dataProviderGetNextFormulaId
 	 *
 	 * @param array $formulaIds
 	 * @param string $expectedFormulaId
@@ -328,7 +330,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @return array
 	 */
-	public function testGetNextFormulaIdProvider() {
+	public function dataProviderGetNextFormulaId() {
 		return [
 			[
 				[], 'A'

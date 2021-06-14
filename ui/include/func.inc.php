@@ -1251,7 +1251,7 @@ function zbx_str2links($text) {
 				if ($pos != $start) {
 					$result[] = mb_substr($line, $start, $pos - $start);
 				}
-				$result[] = new CLink(CHTML::encode($match), $match);
+				$result[] = new CLink(CHtml::encode($match), $match);
 				$start = $pos + mb_strlen($match);
 			}
 		}
@@ -1510,7 +1510,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			$data = [
 				'header' => _('Access denied'),
 				'messages' => [
-					_s('You are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_s('You are logged in as "%1$s".',
+						CWebUser::$data['username']).' '._('You have no permissions to access this page.'
+					),
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => []
@@ -2545,4 +2547,56 @@ function relativeDateToText($from, $to) {
 	}
 
 	return $from.' – '.$to;
+}
+
+/**
+ * Get human readable time period.
+ *
+ * @param int $seconds
+ *
+ * @return string
+ */
+function secondsToPeriod(int $seconds): string {
+	$hours = floor($seconds / 3600);
+	$seconds -= $hours * 3600;
+
+	$minutes = floor($seconds / 60);
+	$seconds -= $minutes * 60;
+
+	$period = ($hours > 0) ? _n('%1$s hour', '%1$s hours', $hours) : '';
+
+	if ($minutes > 0) {
+		if ($period !== '') {
+			$period .= ', ';
+		}
+		$period .= _n('%1$s minute', '%1$s minutes', $minutes);
+	}
+
+	if ($seconds > 0 || $period === '') {
+		if ($period !== '') {
+			$period .= ', ';
+		}
+		$period .= _n('%1$s second', '%1$s seconds', $seconds);
+	}
+
+	return $period;
+}
+
+/**
+ * Generates UUID version 4.
+ *
+ * @param string $seed   String to be hashed as md5 and used as UUID body.
+ *
+ * @return string
+ */
+function generateUuidV4($seed = '') {
+	$data = ($seed === '') ? random_bytes(16) : hex2bin(md5($seed));
+
+	// Set head of 7th byte to 0100 (0100xxxx)
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+
+	// Set head of 9th byte to 10 (10xxxxxx)
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+	return bin2hex($data);
 }

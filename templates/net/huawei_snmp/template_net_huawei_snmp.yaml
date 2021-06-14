@@ -1,11 +1,13 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:07:35Z'
+  version: '5.4'
+  date: '2021-05-11T08:05:04Z'
   groups:
     -
+      uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
+      uuid: ad4c3dad4b7b492685d1fd3bd3a664f9
       template: 'Huawei VRP SNMP'
       name: 'Huawei VRP SNMP'
       description: |
@@ -26,19 +28,9 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: Temperature
       discovery_rules:
         -
+          uuid: 40ceaa1bc97342c18e6af3e0b931a08b
           name: 'FAN Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2011.5.25.31.1.1.10.1.1]'
@@ -46,6 +38,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             -
+              uuid: dfd00d1c27034d1b8f800939e33e8ddb
               name: '#{#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{#SNMPINDEX}'
@@ -54,19 +47,22 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: HUAWEI-ENTITY-EXTENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
-                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  uuid: ba459f7ce17a4f71a46fa1a0337f0f89
+                  expression: 'count(/Huawei VRP SNMP/sensor.fan.status[hwEntityFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
         -
+          uuid: df877d1d7c9f44b5917b47aa474bbd2f
           name: 'Entity Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -80,6 +76,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             -
+              uuid: c25af879114744fda58fb8516a0c171a
               name: '{#ENT_NAME}: Hardware model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
@@ -89,15 +86,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
         -
+          uuid: 597d528e3de944a5807ff37a97763a7e
           name: 'MPU Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
@@ -112,6 +111,7 @@ zabbix_export:
           description: 'http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234. Filter limits results to Main Processing Units'
           item_prototypes:
             -
+              uuid: 29549c71091a44108377a90eb9afff25
               name: '{#ENT_NAME}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.{#SNMPINDEX}'
@@ -122,22 +122,25 @@ zabbix_export:
               description: |
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The temperature for the {#SNMPVALUE}.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  uuid: d28db9267b9d488f8f359dd7d14d2ac1
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                   name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  uuid: c54c36491adf4a488d11f2538b337129
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
                   name: '{#ENT_NAME}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -145,16 +148,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: '{Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
-                      recovery_expression: '{Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                      expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                      recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  uuid: 7b2cffb3ad47440d8b79b39958794ed9
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
                   name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
             -
+              uuid: 6fae73ea06ff4e99956085fb807d75ae
               name: '{#ENT_NAME}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{#SNMPINDEX}'
@@ -166,17 +171,20 @@ zabbix_export:
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The CPU usage for this entity. Generally, the CPU usage will calculate the overall CPU usage on the entity, and itis not sensible with the number of CPU on the entity.
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  uuid: 66bfe7805cae4447a32a6e5877e1231b
+                  expression: 'min(/Huawei VRP SNMP/system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#ENT_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
             -
+              uuid: d7e128d526c14d1bb5519090104f0e04
               name: '{#ENT_NAME}: Hardware serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
@@ -186,22 +194,25 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: e379ca4d50a3434e82841e8884a84656
+                  expression: '(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
             -
+              uuid: 110646e0177f4fbe840f6ba2d1d2afc4
               name: '{#ENT_NAME}: Hardware version(revision)'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
@@ -211,15 +222,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
+              uuid: 4472c8f94cd241468c851283f9854730
               name: '{#ENT_NAME}: Operating system'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}'
@@ -229,22 +242,25 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
-                  expression: '{diff()}=1 and {strlen()}>0'
+                  uuid: 698067d647424c96addeb3c9f960dd07
+                  expression: '(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
                   manual_close: 'YES'
             -
+              uuid: 6215b7e957884516a350f8a7038c7d3e
               name: '{#ENT_NAME}: Memory utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.{#SNMPINDEX}'
@@ -256,17 +272,20 @@ zabbix_export:
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The memory usage for the entity. This object indicates what percent of memory are used.
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '{#ENT_NAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  uuid: 2d93533c7cc74dc9a85e280605e21e7d
+                  expression: 'min(/Huawei VRP SNMP/vm.memory.util[hwEntityMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
             -
+              uuid: 29cf1159b56b4cf086a980609efaf046
               name: '{#ENT_NAME}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -278,6 +297,7 @@ zabbix_export:
                     host: 'Huawei VRP SNMP'
                     key: 'system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}]'
             -
+              uuid: ff65fc169cd343bbb866033bccd51abf
               name: '{#ENT_NAME}: Memory utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -307,13 +327,14 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
-  value_maps:
-    -
-      name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: normal
-        -
-          value: '2'
-          newvalue: abnormal
+          uuid: 5d3f20a830b34f668c5f3ece41a039cd
+          name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: abnormal

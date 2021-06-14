@@ -209,7 +209,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger1');
-		$this->zbxTestInputType('expression', '{Inheritance test template:key-item-inheritance-test.last(0)}=0');
+		$this->zbxTestInputType('expression', 'last(/Inheritance test template/key-item-inheritance-test,#1)=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'zabbix.php');
@@ -228,7 +228,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Test LLD trigger1');
 
 		$this->zbxTestAssertElementValue('description', 'Test LLD trigger1');
-		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:key-item-inheritance-test.last(0)}=0');
+		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/key-item-inheritance-test,#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
@@ -366,7 +366,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('history', '54d');
 		$this->zbxTestInputType('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
-		$this->zbxTestDropdownSelect('valuemapid', 'APC Battery Status');
+		$this->query('id:item-prototype-form')->asForm()->one()->getField('Value mapping')->fill('Template value mapping');
 		$this->zbxTestCheckboxSelect('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
@@ -397,7 +397,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestDropdownAssertSelected('valuemapid', 'APC Battery Status');
+		$this->assertEquals(['Template value mapping'], $this->query('id:item-prototype-form')->asForm()->one()->
+				getField('Value mapping')->getValue());
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
@@ -419,7 +420,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
 		$this->zbxTestInputTypeByXpath("//input[@name='description']", 'Test LLD trigger');
-		$this->zbxTestInputType('expression', '{Inheritance test template:item-discovery-prototype.last(0)}=0');
+		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype,#1)=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'zabbix.php');
@@ -449,7 +450,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('description'));
 		$getName = $this->zbxTestGetValue("//input[@name='description']");
 		$this->assertEquals($getName, 'Test LLD trigger');
-		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:item-discovery-prototype.last(0)}=0');
+		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype,#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');

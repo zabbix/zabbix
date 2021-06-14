@@ -21,23 +21,25 @@
 
 class CControllerTemplateDashboardUpdate extends CController {
 
-	private $widgets;
+	private $dashboard_pages;
 
 	protected function checkInput() {
 		$fields = [
 			'templateid' => 'required|db dashboard.templateid',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'name' => 'required|db dashboard.name|not_empty',
-			'widgets' => 'array'
+			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
+			'pages' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
 			[
-				'widgets' => $this->widgets,
+				'dashboard_pages' => $this->dashboard_pages,
 				'errors' => $errors
-			] = CDashboardHelper::validateWidgets($this->getInput('widgets', []), $this->getInput('templateid'));
+			] = CDashboardHelper::validateDashboardPages($this->getInput('pages', []), $this->getInput('templateid'));
 
 			foreach ($errors as $error) {
 				error($error);
@@ -76,44 +78,60 @@ class CControllerTemplateDashboardUpdate extends CController {
 	protected function doAction() {
 		$data = [];
 
-		$dashboard = [
+		$save_dashboard = [
 			'name' => $this->getInput('name'),
-			'widgets' => []
+			'display_period' => $this->getInput('display_period'),
+			'auto_start' => $this->getInput('auto_start'),
+			'pages' => []
 		];
 
 		if ($this->hasInput('dashboardid')) {
-			$dashboard['dashboardid'] = $this->getInput('dashboardid');
+			$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
 		}
 		else {
-			$dashboard['templateid'] = $this->getInput('templateid');
+			$save_dashboard['templateid'] = $this->getInput('templateid');
 		}
 
-		foreach ($this->widgets as $widget) {
-			$save_widget = [
-				'x' => $widget['pos']['x'],
-				'y' => $widget['pos']['y'],
-				'width' => $widget['pos']['width'],
-				'height' => $widget['pos']['height'],
-				'type' => $widget['type'],
-				'name' => $widget['name'],
-				'view_mode' => $widget['view_mode'],
-				'fields' => $widget['form']->fieldsToApi()
+		foreach ($this->dashboard_pages as $dashboard_page) {
+			$save_dashboard_page = [
+				'name' => $dashboard_page['name'],
+				'display_period' => $dashboard_page['display_period'],
+				'widgets' => []
 			];
 
-			if (array_key_exists('widgetid', $widget)) {
-				$save_widget['widgetid'] = $widget['widgetid'];
+			if (array_key_exists('dashboard_pageid', $dashboard_page)) {
+				$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
 			}
 
-			$dashboard['widgets'][] = $save_widget;
+			foreach ($dashboard_page['widgets'] as $widget) {
+				$save_widget = [
+					'x' => $widget['pos']['x'],
+					'y' => $widget['pos']['y'],
+					'width' => $widget['pos']['width'],
+					'height' => $widget['pos']['height'],
+					'type' => $widget['type'],
+					'name' => $widget['name'],
+					'view_mode' => $widget['view_mode'],
+					'fields' => $widget['form']->fieldsToApi()
+				];
+
+				if (array_key_exists('widgetid', $widget)) {
+					$save_widget['widgetid'] = $widget['widgetid'];
+				}
+
+				$save_dashboard_page['widgets'][] = $save_widget;
+			}
+
+			$save_dashboard['pages'][] = $save_dashboard_page;
 		}
 
 		if ($this->hasInput('dashboardid')) {
-			$result = API::TemplateDashboard()->update($dashboard);
+			$result = API::TemplateDashboard()->update($save_dashboard);
 			$message = _('Dashboard updated');
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
-			$result = API::TemplateDashboard()->create($dashboard);
+			$result = API::TemplateDashboard()->create($save_dashboard);
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');
 		}

@@ -230,12 +230,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		}
 
-		$this->zbxTestTextPresent('Application');
-
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
+		$this->zbxTestTextNotPresent(['Application', 'New application']);
 
 		$this->zbxTestTextPresent('Update interval');
 		$this->zbxTestAssertVisibleId('delay');
@@ -473,43 +468,6 @@ class testFormWeb extends CLegacyWebTest {
 					'name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
 					'add_step' => [
 						['step' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop']
-					]
-				]
-			],
-			// Application -numbers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application numbers only',
-					'new_application' => '1234567890',
-					'add_step' => [
-						['step' => 'Application numbers only']
-					]
-				]
-			],
-			// Application -symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application symbols only',
-					'new_application' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => [
-						['step' => 'Application symbols only']
-					]
-				]
-			],
-			// Application -max length
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application max length',
-					'new_application' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => [
-						['step' => 'Application max length']
 					]
 				]
 			],
@@ -1430,11 +1388,6 @@ class testFormWeb extends CLegacyWebTest {
 		}
 		$name = $this->zbxTestGetValue("//input[@id='name']");
 
-		if (isset($data['new_application'])) {
-			$this->zbxTestInputType('new_application', $data['new_application']);
-		}
-		$new_application = $this->zbxTestGetValue("//input[@id='new_application']");
-
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
@@ -1575,7 +1528,7 @@ class testFormWeb extends CLegacyWebTest {
 				$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 				$this->zbxTestInputType('description', $trigger);
-				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
+				$expressionTrigger = 'last(/'.$this->host.'/'.$trigger.')=0';
 				$this->zbxTestInputTypeWait('expression', $expressionTrigger);
 				$this->zbxTestClickWait('add');
 

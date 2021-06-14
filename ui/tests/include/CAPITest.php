@@ -111,11 +111,11 @@ class CAPITest extends CTest {
 	/**
 	 * Authorize as user.
 	 *
-	 * @param string $user        username to be used for authorization.
-	 * @param string $password    password.
+	 * @param string $username
+	 * @param string $password
 	 */
-	public function authorize($user, $password) {
-		CAPIHelper::authorize($user, $password);
+	public function authorize(string $username, string $password) {
+		CAPIHelper::authorize($username, $password);
 	}
 
 	/**

@@ -24,10 +24,9 @@
  */
 class CControllerTimeSelectorUpdate extends CController {
 
-	public static $profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.charts.filter', 'web.httpdetails.filter',
-		'web.problem.filter', 'web.auditlog.filter', 'web.slides.filter', 'web.auditacts.filter',
-		'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter', CControllerHost::FILTER_IDX,
-		CControllerProblem::FILTER_IDX
+	public static $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
+		'web.problem.filter', 'web.auditlog.filter', 'web.auditacts.filter', 'web.item.graph.filter',
+		'web.toptriggers.filter', 'web.avail_report.filter', CControllerHost::FILTER_IDX, CControllerProblem::FILTER_IDX
 	];
 
 	/**
@@ -38,8 +37,6 @@ class CControllerTimeSelectorUpdate extends CController {
 	private $data = [];
 
 	public function init() {
-		$this->disableSIDvalidation();
-
 		$this->range_time_parser = new CRangeTimeParser();
 	}
 

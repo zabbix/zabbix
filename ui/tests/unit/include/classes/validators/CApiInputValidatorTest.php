@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
-class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public function setUp() {
+class CApiInputValidatorTest extends TestCase {
+
+	protected function setUp(): void {
 		$settings = $this->createMock(CSettings::class);
 		$settings->method('get')
 			->will($this->returnValue([
@@ -43,21 +45,75 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 		return [
 			[
 				['type' => API_CALC_FORMULA],
-				'last(agent.ping) = 1 or "text" = {$MACRO}',
+				'last(//agent.ping) = 1 or "text" = {$MACRO}',
 				'/1/formula',
-				'last(agent.ping) = 1 or "text" = {$MACRO}'
-			],
-			[
-				['type' => API_CALC_FORMULA],
-				'last(agent.ping) = 1 or "text" = {#LLD}',
-				'/1/formula',
-				'Invalid parameter "/1/formula": incorrect calculated item formula starting from " {#LLD}".'
+				'last(//agent.ping) = 1 or "text" = {$MACRO}'
 			],
 			[
 				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
-				'last(agent.ping) = 1 or "text" = {#LLD}',
+				'last(//agent.ping) = 1 or "text" = {#LLD}',
 				'/1/formula',
-				'last(agent.ping) = 1 or "text" = {#LLD}'
+				'last(//agent.ping) = 1 or "text" = {#LLD}'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)',
+				'/1/formula',
+				'Invalid parameter "/1/formula": invalid first parameter in function "sum".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'10+sum(/host/*?[tag="test:1" and group="test-hosts"],1m)',
+				'/1/formula',
+				'Invalid parameter "/1/formula": invalid first parameter in function "sum".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, 33))))))))))))))))))))))))))))))))',
+				'/1/formula',
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, 33))))))))))))))))))))))))))))))))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect expression starting from "sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])) + last_foreach(/host/key)',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect usage of function "last_foreach".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'avg(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect usage of function "last_foreach".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(//agent.ping) = 1 or "text" = {#LLD}',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect expression starting from "{#LLD}".'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, max(33, 1)))))))))))))))))))))))))))))))))',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect expression starting from "max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, max(33, 1)))))))))))))))))))))))))))))))))".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
@@ -1345,6 +1401,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/": cannot be empty.'
 			],
 			[
+				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
+				[[], [], []],
+				'/',
+				'Invalid parameter "/": value is too long.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 3, 'fields' => []],
+				[[], [], []],
+				'/',
+				[[], [], []]
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => []],
 				['000' => []],
 				'/',
@@ -2025,65 +2093,76 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'8388608T'
 			],
 			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system',
-				'/1/name',
-				'Detect operating system'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'folder1/folder2\/',
-				'/1/name',
-				'folder1/folder2\/'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system+',
-				'/1/name',
-				'Invalid parameter "/1/name": value is too long.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'',
-				'/1/name',
-				'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/b/c/',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/'.'/c',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				[],
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				true,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				null,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
-				// broken UTF-8 byte sequence
-				'Detect '."\xd1".'perating system',
-				'/1/name',
-				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/'.'/folder2',
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'',
+				'/1/menu_path',
+				''
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/',
+				'/1/menu_path',
+				'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/\/'.'/',
+				'/1/menu_path',
+				'/folder1/\/'.'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/',
+				'/1/menu_path',
+				'folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1',
+				'/1/menu_path',
+				'/folder1'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/',
+				'/1/menu_path',
+				'/folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2',
+				'/1/menu_path',
+				'/folder1/folder2'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2/',
+				'/1/menu_path',
+				'/folder1/folder2/'
 			],
 			[
 				['type' => API_USER_MACRO, 'length' => 8],
@@ -3510,45 +3589,45 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
 				'Invalid parameter "/1/expression": value is too long.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last() = 0',
+				'last(/host/item = 0',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+				'Invalid parameter "/1/expression": incorrect expression starting from "last(/host/item = 0".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
 				'9 and 1',
 				'/1/expression',
-				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+				'Invalid parameter "/1/expression": trigger expression must contain at least one /host/key reference.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+				'Invalid parameter "/1/expression": incorrect expression starting from "{#LLD_MACRO}".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {#LLD_MACRO}'
+				'last(/host/item) = {#LLD_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
-				'{host:item.last()} = 0'
+				'last(/host/item) = 0'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {$USER_MACRO}',
+				'last(/host/item) = {$USER_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {$USER_MACRO}'
+				'last(/host/item) = {$USER_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3584,7 +3663,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_EVENT_NAME],
 				'event name {?{host:item.last() = 0}',
 				'/1/event_name',
-				'Invalid parameter "/1/event_name": incorrect syntax near "{host:item.last() = 0}".'
+				'Invalid parameter "/1/event_name": incorrect expression starting from "{host:item.last() = 0}".'
 			],
 			[
 				['type' => API_EVENT_NAME],
@@ -3594,21 +3673,351 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = 0}',
+				'event name {?last(/host/item) = 0}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = 0}'
+				'event name {?last(/host/item) = 0}'
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'event name {?last(/host/item) = {$USER_MACRO}}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = {$USER_MACRO}}'
+				'event name {?last(/host/item) = {$USER_MACRO}}'
 			],
 			[
 				['type' => API_EVENT_NAME],
 				'',
 				'/1/event_name',
 				''
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				[],
+				'/params',
+				[]
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				1,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
+				1
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				true,
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'23',
+				'/id',
+				'23'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				null,
+				'/id',
+				null
+			],
+			[
+				['type' => API_DATE],
+				null,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'',
+				'/1/date',
+				''
+			],
+			[
+				['type' => API_DATE, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/date',
+				'Invalid parameter "/1/date": cannot be empty.'
+			],
+			[
+				['type' => API_DATE],
+				[],
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				true,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				false,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'aaa',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'123',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				456,
+				'/1/date',
+				'Invalid parameter "/1/date": a character string is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'01-01-2000',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'01-2000-01',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-99-01',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-01-99',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'2000-01-31',
+				'/1/date',
+				'2000-01-31'
+			],
+			[
+				['type' => API_DATE],
+				'2000-02-29',
+				'/1/date',
+				'2000-02-29'
+			],
+			[
+				['type' => API_DATE],
+				'2001-02-29',
+				'/1/date',
+				'Invalid parameter "/1/date": a date in YYYY-MM-DD format is expected.'
+			],
+			[
+				['type' => API_DATE],
+				'1900-01-01',
+				'/1/date',
+				'Invalid parameter "/1/date": value must be between "1970-01-01" and "2038-01-18".'
+			],
+			[
+				['type' => API_DATE],
+				'1970-01-01',
+				'/1/date',
+				'1970-01-01'
+			],
+			[
+				['type' => API_DATE],
+				'2100-01-01',
+				'/1/date',
+				'Invalid parameter "/1/date": value must be between "1970-01-01" and "2038-01-18".'
+			],
+			[
+				['type' => API_DATE],
+				'2038-01-18',
+				'/1/date',
+				'2038-01-18'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				null,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'',
+				'/1/numeric_ranges',
+				''
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": cannot be empty.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'length' => 5],
+				'12-15',
+				'/1/numeric_ranges',
+				'12-15'
+			],
+			[
+				['type' => API_NUMERIC_RANGES, 'length' => 5],
+				'12-150',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": value is too long.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				[],
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				true,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				false,
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'aaa',
+				'/1/numeric_ranges',
+				'Invalid parameter "/1/numeric_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'123',
+				'/1/numeric_ranges',
+				'123'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'-5',
+				'/1/numeric_ranges',
+				'-5'
+			],
+			[
+				['type' => API_NUMERIC_RANGES],
+				'20.0-30.0000',
+				'/1/numeric_ranges',
+				'20.0-30.0000'
+			],
+			[
+				['type' => API_UUID],
+				null,
+				'/uuid',
+				'Invalid parameter "/uuid": a character string is expected.'
+			],
+			[
+				['type' => API_UUID],
+				[],
+				'/uuid',
+				'Invalid parameter "/uuid": a character string is expected.'
+			],
+			[
+				['type' => API_UUID],
+				'',
+				'/uuid',
+				'Invalid parameter "/uuid": cannot be empty.'
+			],
+			[
+				['type' => API_UUID],
+				1,
+				'/uuid',
+				'Invalid parameter "/uuid": a character string is expected.'
+			],
+			[
+				['type' => API_UUID],
+				true,
+				'/uuid',
+				'Invalid parameter "/uuid": a character string is expected.'
+			],
+			[
+				['type' => API_UUID],
+				'23',
+				'/uuid',
+				'Invalid parameter "/uuid": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID],
+				'1234567890123456789012345678901234567890',
+				'/uuid',
+				'Invalid parameter "/uuid": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID],
+				'12345678901234567890123456789012',
+				'/uuid',
+				'Invalid parameter "/uuid": UUIDv4 is expected.'
+			],
+			[
+				['type' => API_UUID],
+				'2fdcb2e2995040b2bba202067f730136',
+				'/uuid',
+				'2fdcb2e2995040b2bba202067f730136'
+			],
+			[
+				['type' => API_UUID],
+				'2fdcb2e2-9950-40b2-bba2-02067f730136',
+				'/uuid',
+				'Invalid parameter "/uuid": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID],
+				'2fdcb2e2995080b2bba202067f730136',
+				'/uuid',
+				'Invalid parameter "/uuid": UUIDv4 is expected.'
 			]
 		];
 	}

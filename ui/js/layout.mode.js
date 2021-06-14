@@ -32,15 +32,28 @@ jQuery(function($) {
 			});
 		});
 
-		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
-			$(window).on('mousemove keyup scroll', function() {
-				clearTimeout($layout_mode_btn.data('timer'));
-				$layout_mode_btn
-					.removeClass('hidden')
-					.data('timer', setTimeout(function() {
-						$layout_mode_btn.addClass('hidden');
-					}, 2000));
-			}).trigger('mousemove');
+		const header_kioskmode_controls = document.querySelector('.header-kioskmode-controls');
+
+		if (header_kioskmode_controls !== null) {
+			let timeout_id = null;
+
+			const show_header_kioskmode_controls = () => {
+				if (timeout_id !== null) {
+					clearTimeout(timeout_id);
+				}
+
+				header_kioskmode_controls.classList.remove('hidden');
+
+				timeout_id = setTimeout(() => {
+					header_kioskmode_controls.classList.add('hidden');
+				}, 2000);
+			};
+
+			for (const event_name of ['mousemove', 'mousedown', 'keydown', 'wheel']) {
+				window.addEventListener(event_name, show_header_kioskmode_controls);
+			}
+
+			show_header_kioskmode_controls();
 		}
 	}
 });

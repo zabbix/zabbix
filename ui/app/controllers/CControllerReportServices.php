@@ -108,7 +108,7 @@ class CControllerReportServices extends CController {
 
 			case 'daily':
 				$from = 1;
-				$to = DAY_IN_YEAR;
+				$to = DAY_IN_YEAR + date('L', mktime(0, 0, 0, 1, 1, $data['year']));
 
 				function get_time($year, $d) {
 					return mktime(0, 0, 0, 1, $d, $year);

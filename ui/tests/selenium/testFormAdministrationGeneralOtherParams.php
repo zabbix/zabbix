@@ -99,8 +99,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	 */
 	public function testFormAdministrationGeneralOtherParams_CheckLayout() {
 		$this->page->login()->open($this->config_link);
-		$this->assertPageTitle('Other configuration parameters');
-		$this->assertPageHeader('Other configuration parameters');
+		$this->page->assertTitle('Other configuration parameters');
+		$this->page->assertHeader('Other configuration parameters');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		foreach (['Authorization', 'Security', 'Communication with Zabbix server'] as $header) {

@@ -96,7 +96,7 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
-	int	 	type;		/* flags: see AR_* above */
+	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
 AGENT_RESULT;

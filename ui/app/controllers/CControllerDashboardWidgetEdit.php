@@ -30,7 +30,9 @@ class CControllerDashboardWidgetEdit extends CController {
 			'name' => 'string',
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
 			'prev_type' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'unique_id' => 'string',
+			'dashboard_page_unique_id' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,11 +71,11 @@ class CControllerDashboardWidgetEdit extends CController {
 			$type = $this->getInput('type');
 
 			if (!array_key_exists($type, $known_widget_types) || $this->getInput('prev_type', $type) !== $type) {
-				CProfile::update('web.dashbrd.last_widget_type', $type, PROFILE_TYPE_STR);
+				CProfile::update('web.dashboard.last_widget_type', $type, PROFILE_TYPE_STR);
 			}
 		}
 		else {
-			$type = CProfile::get('web.dashbrd.last_widget_type');
+			$type = CProfile::get('web.dashboard.last_widget_type');
 			if (!array_key_exists($type, $known_widget_types)) {
 				$type = array_keys($known_widget_types)[0];
 			}
@@ -96,12 +98,13 @@ class CControllerDashboardWidgetEdit extends CController {
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
 				'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
-				'fields' => $form->getFields(),
-				'options' => [
-					'stick_to_top' => CWidgetConfig::getDialogueStickToTop($type)
-				]
+				'fields' => $form->getFields()
 			],
 			'templateid' => $templateid,
+			'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
+			'dashboard_page_unique_id' => $this->hasInput('dashboard_page_unique_id')
+				? $this->getInput('dashboard_page_unique_id')
+				: null,
 			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)
 		]));

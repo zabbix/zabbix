@@ -46,6 +46,8 @@
 #	define ZBX_HOST_TLS_OFFSET	0
 #endif
 
+#define ZBX_DBSYNC_TRIGGER_ERROR	0x80
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbsync_preproc_row_func_t                                    *
@@ -134,6 +136,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync);

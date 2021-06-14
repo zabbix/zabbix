@@ -42,7 +42,7 @@ class CWidgetFormMap extends CWidgetForm {
 			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree')
 		]))
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
-			->setAction('updateWidgetConfigDialogue()')
+			->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			->setModern(true);
 
 		if (array_key_exists('source_type', $this->data)) {
@@ -54,7 +54,7 @@ class CWidgetFormMap extends CWidgetForm {
 		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			// Select filter widget field.
 			$field_filter_widget = (new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'),
-				'type', 'navtree'
+				WIDGET_NAV_TREE
 			))
 				->setDefault('')
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);

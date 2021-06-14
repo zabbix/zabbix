@@ -105,6 +105,9 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param array    $custom    Custom values for filling into settings form
 	 */
 	public function resetConfiguration($form, $default, $action, $other = false, $custom = null) {
+		if (CTestArrayHelper::get($default, 'Default time zone')) {
+			$default['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($default['Default time zone']);
+		}
 		$form->query('button:Reset defaults')->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->one()->query('button', $action)->one()->click();
 		switch ($action) {
@@ -151,6 +154,9 @@ class testFormAdministrationGeneral extends CWebTest {
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults', $other);
 		// Fill form with new data.
+		if (CTestArrayHelper::get($data, 'fields.Default time zone')) {
+			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
+		}
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -166,6 +172,9 @@ class testFormAdministrationGeneral extends CWebTest {
 			$data['fields']['Login attempts'] = '3';
 		}
 		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
+			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
+		}
 		$form->checkValue($values);
 		// Check saved configuration in database.
 		$config = CDBHelper::getRow('SELECT * FROM config');
