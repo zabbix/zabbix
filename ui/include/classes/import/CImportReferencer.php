@@ -1438,7 +1438,7 @@ class CImportReferencer {
 					' JOIN host_discovery hd ON hp.hostid=hd.hostid'.
 					' JOIN items dr ON hd.parent_itemid=dr.itemid'.
 					' JOIN hosts h on dr.hostid=h.hostid'.
-				' WHERE ('.implode(' OR ', $sql_where).')'
+				' WHERE '.implode(' OR ', $sql_where)
 			);
 			while ($db_host_prototype = DBfetch($db_host_prototypes)) {
 				$this->db_host_prototypes[$db_host_prototype['hostid']] = [
