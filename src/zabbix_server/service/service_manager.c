@@ -1356,12 +1356,12 @@ static void	zbx_serviceman_sigusr_handler(int flags)
 
 	if (1 == service_cache_reload_requested)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "service manager cache reloading is already in progress");
 	}
 	else
 	{
 		service_cache_reload_requested = 1;
-		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service cache");
+		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
 	}
 }
 

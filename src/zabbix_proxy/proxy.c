@@ -100,7 +100,6 @@ const char	*help_message[] = {
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
 	"                                 section (historycache, preprocessing, locks) or",
 	"                                 everything if section is not specified",
-	"      " ZBX_SERVICE_CACHE_RELOAD "       Reload service cache",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",

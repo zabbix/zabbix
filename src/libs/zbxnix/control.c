@@ -219,8 +219,7 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		scope = 0;
 		data = 0;
 	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
-			0 == strcmp(opt, ZBX_SERVICE_CACHE_RELOAD))
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SERVICE_CACHE_RELOAD))
 	{
 		command = ZBX_RTC_SERVICE_CACHE_RELOAD;
 		scope = 0;
