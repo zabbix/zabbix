@@ -41,7 +41,7 @@ static int	housekeep_problems_without_triggers(void)
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	ids;
-	int			deleted;
+	int			deleted = 0;
 
 	zbx_vector_uint64_create(&ids);
 
