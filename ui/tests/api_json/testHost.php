@@ -75,4 +75,62 @@ class testHost extends CAPITest {
 			}
 		}
 	}
+
+	public static function host_select_tags() {
+		return [
+			'Get host with extend tags' => [
+				'params' => [
+					'selectTags' => 'extend',
+				],
+				'expected_error' => null,
+			],
+			'Get host with string tag' => [
+				'params' => [
+					'selectTags' => 'tag',
+				],
+				'expected_error' => 'Invalid parameter "/": an array is expected.',
+			],
+			'Get host with non-existing tag field' => [
+				'params' => [
+					'selectTags' => ['_nonexist'],
+				],
+				'expected_error' => 'applyQueryOutputOptions: field "host_tag._nonexist" does not exist.',
+			],
+			'Get host tag excluding value field' => [
+				'params' => [
+					'hostids' => [112233],
+					'selectTags' => ['tag'],
+				],
+				'expected_error' => null,
+			],
+			'Get host tag with value' => [
+				'params' => [
+					'hostids' => [112233],
+					'selectTags' => ['tag', 'value'],
+				],
+				'expected_error' => null,
+			],
+		];
+	}
+
+	/**
+	* @dataProvider host_select_tags
+	*/
+	public function testHost_SelectTags($params, $expected_error) {
+		$result = $this->call('host.get', $params, $expected_error);
+
+		if ($expected_error === null && array_key_exists('hostids', $params)) {
+			foreach ($result['result'] as $id => $host) {
+				if ($id === '112233') {
+					$tags = $result[$id]['tags'][0];
+					if ($params['selectTags'] === ['tag']) {
+						$this->assertEquals($tags, ['tag' => 'b', 'hostid' => '112233']);
+					}
+					elseif ($params['selectTags'] === ['tag', 'value']) {
+						$this->assertEquals($tags, ['tag' => 'b', 'value' => 'b', 'hostid' => '112233']);
+					}
+				}
+			}
+		}
+	}
 }

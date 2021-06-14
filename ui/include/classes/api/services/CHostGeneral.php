@@ -961,6 +961,8 @@ abstract class CHostGeneral extends CHostBase {
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
 				$options['selectTags'] = ['tag', 'value'];
+			} else {
+				$this->validateSelectTags($options['selectTags']);
 			}
 
 			$tags_options = [
@@ -975,10 +977,15 @@ abstract class CHostGeneral extends CHostBase {
 			unset($host);
 
 			while ($tag = DBfetch($tags)) {
-				$result[$tag['hostid']]['tags'][] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
+				$result_tag = [];
+
+				foreach($tags_options['output'] as $field) {
+					if (array_key_exists($field, $tag)) {
+						$result_tag[$field] = $tag[$field];
+					}
+				}
+
+				$result[$tag['hostid']]['tags'][] = $result_tag;
 			}
 		}
 
@@ -1078,6 +1085,31 @@ abstract class CHostGeneral extends CHostBase {
 		$host = array_intersect_key($host, $api_input_rules['fields']);
 
 		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Validates selectTags input
+	 *
+	 * @param null|mixed $tags
+	 *
+	 * @return void
+	 */
+	protected function validateSelectTags($tags = null) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'tags'		=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]]
+		]];
+
+		// Keep values only for fields with defined validation rules.
+		if (is_array($tags)) {
+			$tags = array_intersect_key($tags, $api_input_rules['fields']);
+		}
+
+		if (!CApiInputValidator::validate($api_input_rules, $tags, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
