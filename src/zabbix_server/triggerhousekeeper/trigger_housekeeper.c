@@ -47,9 +47,10 @@ static int	housekeep_problems_without_triggers(void)
 
 	result = DBselect("select eventid"
 			" from problem"
-			" where source=0"
-				" and object=0"
-				" and not exists (select NULL from triggers where triggerid=objectid)");
+			" where source=%d"
+				" and object=%d"
+				" and not exists (select NULL from triggers where triggerid=objectid)",
+				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
 	while (NULL != (row = DBfetch(result)))
 	{
