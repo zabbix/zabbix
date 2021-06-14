@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: f895df5b37494f668cde1a2388d7af8b
-      template: 'Mac OS X'
-      name: 'Mac OS X'
+      template: macOS
+      name: macOS
       templates:
         -
           name: 'Zabbix agent'
@@ -31,7 +31,7 @@ zabbix_export:
           triggers:
             -
               uuid: 933b14ead0974a9c96d36c833da90ebb
-              expression: 'last(/Mac OS X/kernel.maxfiles)<1024'
+              expression: 'last(/macOS/kernel.maxfiles)<1024'
               name: 'Configured max number of opened files is too low on {HOST.NAME}'
               priority: INFO
         -
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0e89b2e0cad948c0b81bc223d2ed673c
-              expression: 'last(/Mac OS X/kernel.maxproc)<256'
+              expression: 'last(/macOS/kernel.maxproc)<256'
               name: 'Configured max number of processes is too low on {HOST.NAME}'
               priority: INFO
         -
@@ -120,7 +120,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3cf40421e61b41bab7697bbf9a2649d6
-              expression: 'avg(/Mac OS X/system.cpu.load[percpu,avg1],5m)>5'
+              expression: 'avg(/macOS/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
         -
@@ -171,7 +171,7 @@ zabbix_export:
           triggers:
             -
               uuid: ffb713a281a543879e4196e4207bdd62
-              expression: '(last(/Mac OS X/system.hostname,#1)<>last(/Mac OS X/system.hostname,#2))>0'
+              expression: '(last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2))>0'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -207,7 +207,7 @@ zabbix_export:
           triggers:
             -
               uuid: 55d8650af70d4aeea56345985e454df9
-              expression: '(last(/Mac OS X/system.uname,#1)<>last(/Mac OS X/system.uname,#2))>0'
+              expression: '(last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2))>0'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -227,7 +227,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1f0cc03186cc4bb98483927f425df8e9
-              expression: 'change(/Mac OS X/system.uptime)<0'
+              expression: 'change(/macOS/system.uptime)<0'
               name: '{HOST.NAME} has just been restarted'
               priority: INFO
         -
@@ -256,7 +256,7 @@ zabbix_export:
           triggers:
             -
               uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
-              expression: '(last(/Mac OS X/vfs.file.cksum[/etc/passwd],#1)<>last(/Mac OS X/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: '(last(/macOS/vfs.file.cksum[/etc/passwd],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd],#2))>0'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
@@ -273,7 +273,7 @@ zabbix_export:
           triggers:
             -
               uuid: c38dfc1b95d1463585d378f60d6a689a
-              expression: 'last(/Mac OS X/vm.memory.size[available])<20M'
+              expression: 'last(/macOS/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
         -
@@ -315,7 +315,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 91cccd7935854a47bf4ca184b1d4d09a
-                  expression: 'last(/Mac OS X/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: 'Free inodes is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -
@@ -342,7 +342,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 673dbc5aec474abda3a3b392d31b6c11
-                  expression: 'last(/Mac OS X/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: 'Free disk space is less than 20% on volume {#FSNAME}'
                   priority: WARNING
             -
@@ -381,13 +381,13 @@ zabbix_export:
                   color: C80000
                   type: GRAPH_SUM
                   item:
-                    host: 'Mac OS X'
+                    host: macOS
                     key: 'vfs.fs.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: 00C800
                   item:
-                    host: 'Mac OS X'
+                    host: macOS
                     key: 'vfs.fs.size[{#FSNAME},free]'
       dashboards:
         -
@@ -410,7 +410,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'CPU load'
-                        host: 'Mac OS X'
+                        host: macOS
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -426,7 +426,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Memory usage'
-                        host: 'Mac OS X'
+                        host: macOS
   graphs:
     -
       uuid: f0e648fb4c5345748b11a7bdb05f6526
@@ -436,19 +436,19 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg1]'
         -
           sortorder: '1'
           color: '000099'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg5]'
         -
           sortorder: '2'
           color: '990000'
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'system.cpu.load[percpu,avg15]'
     -
       uuid: 5c942cb1fe5b440aa9428d45ee85e09c
@@ -456,14 +456,14 @@ zabbix_export:
       ymin_type_1: FIXED
       ymax_type_1: ITEM
       ymax_item_1:
-        host: 'Mac OS X'
+        host: macOS
         key: 'vm.memory.size[total]'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 00C800
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'vm.memory.size[available]'
     -
       uuid: 5c4b08f992c541dbb02835bbd4f0a55e
@@ -474,12 +474,12 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 00AA00
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'net.if.in[en0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 3333FF
           item:
-            host: 'Mac OS X'
+            host: macOS
             key: 'net.if.out[en0]'
