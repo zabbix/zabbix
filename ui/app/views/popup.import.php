@@ -25,10 +25,6 @@
 
 $rules_table = new CTable();
 
-$header_update = null;
-$header_create = null;
-$header_detete = null;
-
 $titles = [
 	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
@@ -49,6 +45,28 @@ if ($data['user']['type'] == USER_TYPE_SUPER_ADMIN) {
 	$titles['mediaTypes'] = _('Media types');
 }
 
+$col_update = false;
+$col_create = false;
+$col_delete = false;
+
+foreach ($titles as $key => $title) {
+	if (!array_key_exists($key, $data['rules'])) {
+		continue;
+	}
+
+	if (array_key_exists('updateExisting', $data['rules'][$key])) {
+		$col_update = true;
+	}
+
+	if (array_key_exists('createMissing', $data['rules'][$key])) {
+		$col_create = true;
+	}
+
+	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
+		$col_delete = true;
+	}
+}
+
 foreach ($titles as $key => $title) {
 	if (!array_key_exists($key, $data['rules'])) {
 		continue;
@@ -65,15 +83,11 @@ foreach ($titles as $key => $title) {
 		if ($key === 'images') {
 			$checkbox_update->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
 		}
-
-		$header_update = _('Update existing');
 	}
 
 	if (array_key_exists('createMissing', $data['rules'][$key])) {
 		$checkbox_create = (new CCheckBox('rules['.$key.'][createMissing]'))
 			->setChecked($data['rules'][$key]['createMissing']);
-
-		$header_create = _('Create new');
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
@@ -86,8 +100,6 @@ foreach ($titles as $key => $title) {
 				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
 			).')');
 		}
-
-		$header_detete = _('Delete missing');
 	}
 
 	switch ($key) {
@@ -116,13 +128,18 @@ foreach ($titles as $key => $title) {
 
 	$rules_table->addRow([
 		$title,
-		(new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER),
-		(new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER),
-		(new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER)
+		$col_update ? (new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER) : null,
+		$col_create ? (new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER) : null,
+		$col_delete ? (new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER) : null
 	]);
 }
 
-$rules_table->setHeader(['', $header_update, $header_create, $header_detete]);
+$rules_table->setHeader([
+	'',
+	$col_update ? _('Update existing') : null,
+	$col_create ? _('Create new') : null,
+	$col_delete ? _('Delete missing') : null
+]);
 
 $form_list = (new CFormList())
 	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
