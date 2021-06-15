@@ -18,17 +18,17 @@
 **/
 
 
-const WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
-const WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
-const WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
-const WIDGET_PLACEHOLDER_STATE_KIOSK_MODE = 3;
-const WIDGET_PLACEHOLDER_STATE_READONLY = 4;
-
 const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
+
+const WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
+const WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
+const WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
+
+const WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widget';
 
 /**
  * New widget placeholder class.
@@ -94,6 +94,8 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 				link.textContent = t('Add a new widget');
 				link.href = 'javascript:void(0)';
 
+				link.addEventListener('click', () => this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET));
+
 				this._placeholder_box_label_wrap.appendChild(link);
 
 				break;
@@ -106,18 +108,6 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 
 			case WIDGET_PLACEHOLDER_STATE_POSITIONING:
 				this._placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
-
-				break;
-
-			case WIDGET_PLACEHOLDER_STATE_KIOSK_MODE:
-				this._placeholder_box_label_wrap.textContent = t('Cannot add widgets in kiosk mode');
-				this._target.classList.add('disabled');
-
-				break;
-
-			case WIDGET_PLACEHOLDER_STATE_READONLY:
-				this._placeholder_box_label_wrap.textContent = t('You do not have permissions to edit dashboard');
-				this._target.classList.add('disabled');
 
 				break;
 		}

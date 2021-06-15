@@ -121,8 +121,8 @@ class testAction extends CAPITest {
 	}
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 *
 	 * @dataProvider getActionUserPermissionsData
 	 */

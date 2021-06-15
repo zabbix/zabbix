@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
- * @on-before prepareUpdateData
+ * @onBefore prepareUpdateData
  */
 class testFormHost extends CWebTest {
 

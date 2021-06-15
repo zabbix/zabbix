@@ -3010,15 +3010,12 @@ $form-icon-btn: (
 				content: "";
 			}
 		}
-	}
 
-	.menu-popup-item-disabled {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		color: $font-alt-color;
-		border: 0;
-		cursor: default;
+		&.disabled {
+			background-color: transparent;
+			color: $font-alt-color;
+			opacity: 1;
+		}
 	}
 
 	h3 {

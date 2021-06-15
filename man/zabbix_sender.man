@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2020\-02\-29" Zabbix
+.TH ZABBIX_SENDER 1 "2021\-06\-01" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -46,6 +46,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .B \-s
 .I host
 .B \-k
@@ -61,6 +63,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .RB [ \-T ]
@@ -79,6 +83,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-k
@@ -96,6 +102,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .RB [ \-T ]
@@ -112,6 +120,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .B \-s
 .I host
 .B \-\-tls\-connect
@@ -145,6 +155,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -181,6 +193,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -216,6 +230,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -250,6 +266,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .B \-s
 .I host
 .B \-\-tls\-connect
@@ -275,6 +293,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -303,6 +323,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -330,6 +352,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
+.RB [ \-t
+.IR timeout ]
 .RB [ \-s
 .IR host ]
 .B \-\-tls\-connect
@@ -378,6 +402,8 @@ When used together with \fB\-\-config\fR, overrides the port entries of \fBServe
 .IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
 Specify source IP address.
 When used together with \fB\-\-config\fR, overrides \fBSourceIP\fR parameter specified in agentd configuration file.
+.IP "\fB\-t\fR, \fB\-\-timeout\fR \fIseconds\fR"
+Specify timeout. Valid range: 1\-300 seconds (default: 60)
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\fR"
 Specify host name the item belongs to (as registered in Zabbix frontend).
 Host IP address and DNS name will not work.

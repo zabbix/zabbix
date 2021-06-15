@@ -58,6 +58,22 @@ class CExpressionValidatorTest extends TestCase {
 			['min(sum_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(sum_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
+			// User macros.
+			['find(/host/key, {$PERIOD}:{$TIMESHIFT})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, {$PERIOD}:{$TIMESHIFT})', [], ['rc' => false, 'error' => 'invalid second parameter in function "find"']],
+			['find(/host/key, 1d, {$OP})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, {$OP})', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+			['find(/host/key, 1d, "{$OP}")', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, "{$OP}")', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+
+			// LLD macros.
+			['find(/host/key, {#PERIOD}:{#TIMESHIFT})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, {#PERIOD}:{#TIMESHIFT})', [], ['rc' => false, 'error' => 'invalid second parameter in function "find"']],
+			['find(/host/key, 1d, {#OP})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, {#OP})', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+			['find(/host/key, 1d, "{#OP}")', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['find(/host/key, 1d, "{#OP}")', [], ['rc' => false, 'error' => 'invalid third parameter in function "find"']],
+
 			// Unknown function in trigger expression.
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
@@ -116,6 +132,7 @@ class CExpressionValidatorTest extends TestCase {
 	 */
 	public function testExpressionValidator(string $source, array $options, array $expected) {
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => true
 		] + $options);
 		$expression_validator = new CExpressionValidator($options);
