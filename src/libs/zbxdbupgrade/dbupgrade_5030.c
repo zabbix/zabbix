@@ -3121,7 +3121,7 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		if (0 > scr_item->x)
 		{
 			scr_item->x = 0;
-			zabbix_log(LOG_LEVEL_WARNING, "warning: x is negative, set to 0 for item" ZBX_FS_UI64,
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is negative, set to 0 for item " ZBX_FS_UI64,
 					scr_item->screenitemid);
 		}
 
@@ -3135,7 +3135,7 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		if (0 > scr_item->y)
 		{
 			scr_item->y = 0;
-			zabbix_log(LOG_LEVEL_WARNING, "warning: y is negative, set to 0 for item" ZBX_FS_UI64,
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is negative, set to 0 for item " ZBX_FS_UI64,
 					scr_item->screenitemid);
 		}
 
