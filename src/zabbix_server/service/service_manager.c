@@ -1543,16 +1543,16 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			int	updated = 0, revision = time(NULL);
 
+			service_cache_reload_requested = 0;
+
 			DBbegin();
 			sync_services(&service_manager, &updated, revision);
 			sync_service_problem_tags(&service_manager, &updated, revision);
 			sync_services_links(&service_manager, &updated, revision);
 
-			if (0 == time_flush || 1 == service_cache_reload_requested)
-			{
+			/* load service problems once during startup */
+			if (0 == time_flush)
 				sync_service_problems(&service_manager.services, &service_manager.service_problems_index);
-				service_cache_reload_requested = 0;
-			}
 
 			DBcommit();
 
