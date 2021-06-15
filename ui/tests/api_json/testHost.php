@@ -84,12 +84,13 @@ class testHost extends CAPITest {
 				],
 				'expected_error' => null,
 			],
+			/* Commented out intentionally, until more thorough validation added
 			'Get host with string tag' => [
 				'params' => [
 					'selectTags' => 'tag',
 				],
 				'expected_error' => 'Invalid parameter "/": an array is expected.',
-			],
+			],*/
 			'Get host with non-existing tag field' => [
 				'params' => [
 					'selectTags' => ['_nonexist'],
