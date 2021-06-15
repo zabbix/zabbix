@@ -583,6 +583,8 @@ FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
 FIELD		|dbversion_status	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|passwd_min_length	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
+FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1858,4 +1860,4 @@ INDEX		|1		|reportid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5040000	|5040000
+ROW		|5050001	|5050001

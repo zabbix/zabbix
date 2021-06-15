@@ -2748,6 +2748,18 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
 				'default' => ''
+			],
+			'passwd_min_length' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '8'
+			],
+			'passwd_check_rules' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '8'
 			]
 		]
 	],
