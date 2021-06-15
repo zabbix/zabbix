@@ -29,6 +29,8 @@ class CHistFunctionValidator extends CValidator {
 	 *
 	 * Supported options:
 	 *   'parameters' => []      Definition of parameters of known history functions.
+	 *   'usermacros' => false   Enable user macros usage in function parameters.
+	 *   'lldmacros' => false    Enable low-level discovery macros usage in function parameters.
 	 *   'calculated' => false   Validate history function as part of calculated item formula.
 	 *   'aggregating' => false  Validate as aggregating history function.
 	 *
@@ -36,6 +38,8 @@ class CHistFunctionValidator extends CValidator {
 	 */
 	private $options = [
 		'parameters' => [],
+		'usermacros' => false,
+		'lldmacros' => false,
 		'calculated' => false,
 		'aggregating' => false
 	];
@@ -107,19 +111,20 @@ class CHistFunctionValidator extends CValidator {
 
 			switch ($param['type']) {
 				case CHistFunctionParser::PARAM_TYPE_PERIOD:
-					if (self::hasMacros($param['data']['sec_num']) && $param['data']['time_shift'] === '') {
+					if (self::hasMacros($param['data']['sec_num'], $this->options)
+							&& $param['data']['time_shift'] === '') {
 						continue 2;
 					}
 					break;
 
 				case CHistFunctionParser::PARAM_TYPE_QUOTED:
-					if (self::hasMacros(CHistFunctionParser::unquoteParam($param['match']))) {
+					if (self::hasMacros(CHistFunctionParser::unquoteParam($param['match']), $this->options)) {
 						continue 2;
 					}
 					break;
 
 				case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
-					if (self::hasMacros($param['match'])) {
+					if (self::hasMacros($param['match'], $this->options)) {
 						continue 2;
 					}
 					break;
@@ -143,13 +148,36 @@ class CHistFunctionValidator extends CValidator {
 	 * Loose check if string value contains macros.
 	 *
 	 * @param string $value
+	 * @param array  $options
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function hasMacros(string $value): bool {
-		return (strpos($value, '{') !== false);
+	private static function hasMacros(string $value, array $options): bool {
+		if (!$options['usermacros'] && !$options['lldmacros']) {
+			return false;
+		}
+
+		$macro_parsers = [];
+
+		if ($options['usermacros']) {
+			$macro_parsers[] = new CUserMacroParser();
+		}
+		if ($options['lldmacros']) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		for ($pos = strpos($value, '{'); $pos !== false; $pos = strpos($value, '{', $pos + 1)) {
+			foreach ($macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($value, $pos) != CParser::PARSE_FAIL) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -187,7 +215,8 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
-					if (!self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $rule['mode'])) {
+					if (!self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $rule['mode'],
+							$options)) {
 						return false;
 					}
 
@@ -278,15 +307,16 @@ class CHistFunctionValidator extends CValidator {
 	 * @param string $sec_num
 	 * @param string $time_shift
 	 * @param int    $mode
+	 * @param array  $options
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function validatePeriod(string $sec_num, string $time_shift, int $mode): bool {
+	private static function validatePeriod(string $sec_num, string $time_shift, int $mode, array $options): bool {
 		switch ($mode) {
 			case CHistFunctionData::PERIOD_MODE_DEFAULT:
-				if ($sec_num === '' || self::hasMacros($sec_num)) {
+				if ($sec_num === '' || self::hasMacros($sec_num, $options)) {
 					return true;
 				}
 
@@ -328,7 +358,7 @@ class CHistFunctionValidator extends CValidator {
 					return false;
 				}
 
-				if (self::hasMacros($sec_num)) {
+				if (self::hasMacros($sec_num, $options)) {
 					return true;
 				}
 

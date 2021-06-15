@@ -345,6 +345,7 @@ class CApiInputValidator {
 		}
 
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
 			'calculated' => true,
 			'host_macro' => true,
@@ -356,7 +357,11 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_validator = new CExpressionValidator(['calculated' => true]);
+		$expression_validator = new CExpressionValidator([
+			'usermacros' => true,
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'calculated' => true
+		]);
 
 		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());
@@ -2097,6 +2102,7 @@ class CApiInputValidator {
 		}
 
 		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
@@ -2105,7 +2111,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_validator = new CExpressionValidator();
+		$expression_validator = new CExpressionValidator([
+			'usermacros' => true,
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+		]);
 
 		if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_validator->getError());

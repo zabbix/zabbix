@@ -1,5 +1,5 @@
 
-# Docker
+# Docker by Zabbix agent 2
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.4 and higher
 The template to monitor Docker engine by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Docker` — collects metrics by polling zabbix-agent2.
+Template `Docker by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 
 

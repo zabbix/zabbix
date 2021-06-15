@@ -385,7 +385,8 @@ class CGraph extends CGraphGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'hostids' => $chdHost['hostid']
+				'hostids' => $chdHost['hostid'],
+				'nopermissions' => true
 			]);
 
 			if ($chdGraph = reset($chdGraphs)) {
