@@ -603,6 +603,7 @@ class CTemplate extends CHostGeneral {
 		foreach ($templates as &$template) {
 			unset($template['macros']);
 		}
+		unset($template);
 
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
