@@ -50,20 +50,10 @@ $col_create = false;
 $col_delete = false;
 
 foreach ($titles as $key => $title) {
-	if (!array_key_exists($key, $data['rules'])) {
-		continue;
-	}
-
-	if (array_key_exists('updateExisting', $data['rules'][$key])) {
-		$col_update = true;
-	}
-
-	if (array_key_exists('createMissing', $data['rules'][$key])) {
-		$col_create = true;
-	}
-
-	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
-		$col_delete = true;
+	if (array_key_exists($key, $data['rules'])) {
+		$col_update = ($col_update || array_key_exists('updateExisting', $data['rules'][$key]));
+		$col_create = ($col_create || array_key_exists('createMissing', $data['rules'][$key]));
+		$col_delete = ($col_delete || array_key_exists('deleteMissing', $data['rules'][$key]));
 	}
 }
 
