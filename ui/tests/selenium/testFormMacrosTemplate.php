@@ -606,7 +606,7 @@ class testFormMacrosTemplate extends testFormMacros {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update template',
-					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/path:key".'
 				]
 			],
 			[
