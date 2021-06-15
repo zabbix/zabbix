@@ -5878,6 +5878,25 @@ svg {
 .icon-user-group::before {
   background-position: -339px -8px; }
 
+.icon-help-hint {
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+  margin: 0 0 0 5px;
+  border-radius: 50%;
+  background-color: #768d99;
+  position: relative;
+  vertical-align: middle;
+  top: -2px;
+  /* TODO VM: should not me here! */ }
+  .icon-help-hint::after {
+    content: '?';
+    position: relative;
+    top: -6px;
+    left: -4px;
+    font-size: 10px;
+    color: #ffffff; }
+
 #expressions_list .ui-sortable-helper {
   display: table; }
 
@@ -6396,3 +6415,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     margin-left: 5px;
     overflow: auto;
     border: 1px dashed #acbbc2; }
+
+.password-requirements-list li {
+  margin-left: 1em; }
+  .password-requirements-list li::before {
+    content: '\2013';
+    float: left;
+    margin-left: -1em; }

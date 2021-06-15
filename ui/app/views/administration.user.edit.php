@@ -113,8 +113,61 @@ if ($data['change_password']) {
 		$password1->setAttribute('autofocus', 'autofocus');
 	}
 
+	// TODO VM: get global settings here.
+	$data['password_requirements'] = [
+		'length' => 8,
+		'flags' => 0xff
+	];
+
+	$password_requirements = [];
+
+	if ($data['password_requirements']['length'] > 1) {
+		// TODO VM: maximum allowed "minimum length" should be at most 70.
+		$password_requirements[] = _n('must be at least %1$s character long', 'must be at least %1$s characters long',
+			$data['password_requirements']['length']
+		);
+	}
+
+	// TODO VM: replace by define.
+	if ($data['password_requirements']['flags'] & 0x01) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one lowercase and one uppercase Latin letter'),
+			' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
+			(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	// TODO VM: replace by define.
+	if ($data['password_requirements']['flags'] & 0x02) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one digit'),
+			' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	// TODO VM: replace by define.
+	if ($data['password_requirements']['flags'] & 0x04) {
+		$password_requirements[] = new CListItem([
+			_('must contain at least one special character'),
+			' (', (new CSpan(' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+		]);
+	}
+
+	// TODO VM: replace by define.
+	if ($data['password_requirements']['flags'] & 0x08) {
+		$password_requirements[] = _('must not contain user\'s name, surname or username');
+		$password_requirements[] = _('must not be one of common or context-specific passwords');
+	}
+
+	$password_hint_icon = $password_requirements
+		? makeHelpIcon([
+			_('Password requirements:'),
+			(new CList($password_requirements))->addClass('password-requirements-list')
+		])
+		: null;
+
 	$user_form_list
-		->addRow((new CLabel(_('Password'), 'password1'))->setAsteriskMark(), [
+		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
 			// Hidden dummy login field for protection against chrome error when password autocomplete.
 			(new CInput('text', null, null))
 				->setAttribute('tabindex', '-1')
