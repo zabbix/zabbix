@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-11T13:20:27Z</date>
+   <date>2021-06-15T13:46:12Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -332,7 +332,7 @@ return JSON.stringify(result);
                <history>7d</history>
                <status>ENABLED</status>
                <description>The availability of Redfish API on the server.&#13;
-Possible value:&#13;
+Possible values:&#13;
   0 unavailable&#13;
   1 available</description>
                <applications>
@@ -376,7 +376,7 @@ Possible value:&#13;
                      <authtype>BASIC</authtype>
                      <username>{$API.USER}</username>
                      <password>{$API.PASSWORD}</password>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Zabbix raw items</name>
@@ -546,7 +546,7 @@ return JSON.stringify(result);
                      <authtype>BASIC</authtype>
                      <username>{$API.USER}</username>
                      <password>{$API.PASSWORD}</password>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Zabbix raw items</name>
@@ -757,7 +757,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Fans</name>
@@ -928,7 +928,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Network interfaces</name>
@@ -1007,7 +1007,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The known state of the Resource, such as, enabled. Possible value: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
+                     <description>The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
                      <applications>
                         <application>
                            <name>Network interfaces</name>
@@ -1036,7 +1036,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the link between this port and its link partner. Possible value: Down, Up, null.</description>
+                     <description>The status of the link between this port and its link partner. Possible values: Down, Up, null.</description>
                      <applications>
                         <application>
                            <name>Network interfaces</name>
@@ -1222,7 +1222,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The type of media contained in this drive. Possible value: HDD, SSD, SMR, null.</description>
+                     <description>The type of media contained in this drive. Possible values: HDD, SSD, SMR, null.</description>
                      <applications>
                         <application>
                            <name>Physical disks</name>
@@ -1251,7 +1251,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The model number for the drive.</description>
+                     <description>The model number of the drive.</description>
                      <applications>
                         <application>
                            <name>Physical disks</name>
@@ -1280,7 +1280,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The serial number for this drive.</description>
+                     <description>The serial number of this drive.</description>
                      <applications>
                         <application>
                            <name>Physical disks</name>
@@ -1347,7 +1347,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Physical disks</name>
@@ -1538,7 +1538,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Power supply</name>
@@ -1723,7 +1723,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Temperature</name>
@@ -1933,7 +1933,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The RAID type of this volume. Possible value: RAID0, RAID1, RAID3, RAID4, RAID5, RAID6, RAID10, RAID01, RAID6TP, RAID1E, RAID50, RAID60, RAID00, RAID10E, RAID1Triple, RAID10Triple.</description>
+                     <description>The RAID type of this volume. Possible values: RAID0, RAID1, RAID3, RAID4, RAID5, RAID6, RAID10, RAID01, RAID6TP, RAID1E, RAID50, RAID60, RAID00, RAID10E, RAID1Triple, RAID10Triple.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
@@ -1962,7 +1962,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>Indicates the read cache policy setting for the Volume. Possible value: ReadAhead, AdaptiveReadAhead, Off.</description>
+                     <description>Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
@@ -2020,7 +2020,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The known state of the Resource, such as, enabled. Possible value: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
+                     <description>The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
@@ -2049,7 +2049,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The status of the job. Possible value: OK, Warning, Critical.</description>
+                     <description>The status of the job. Possible values: OK, Warning, Critical.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
@@ -2100,7 +2100,7 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>Indicates the write cache policy setting for the Volume. Possible value: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</description>
+                     <description>Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
