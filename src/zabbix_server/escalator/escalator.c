@@ -1142,7 +1142,13 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			}
 		}
 		else
-			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
+		{
+			if (FAIL == get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+					sizeof(error)))
+			{
+				zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
+			}
+		}
 
 		/* substitute macros in script body and webhook parameters */
 
