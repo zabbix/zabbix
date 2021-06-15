@@ -26,8 +26,8 @@ void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size
 {
 	static zbx_ipc_socket_t	socket;
 
-	/* each process has a permanent connection to availability manager */
-	if (0 == socket.fd)
+	/* each process has a permanent connection to service manager */
+	if (FAIL == zbx_ipc_socket_connected(&socket))
 	{
 		char	*error = NULL;
 
