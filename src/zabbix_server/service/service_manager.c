@@ -1350,7 +1350,10 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 
 		/*  skip problem or recovery if trigger and it's associated problems are already deleted */
 		if (NULL != (zbx_hashset_search(&service_manager->deleted_eventids, &event->eventid)))
+		{
+			event_free(event);
 			continue;
+		}
 
 		switch (event->value)
 		{
