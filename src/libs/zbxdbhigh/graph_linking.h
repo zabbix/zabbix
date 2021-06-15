@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRIGGER_LINKING_H
-#define ZABBIX_TRIGGER_LINKING_H
+#ifndef ZABBIX_GRAPH_LINKING_H
+#define ZABBIX_GRAPH_LINKING_H
 
 #include "log.h"
 #include "common.h"
 #include "zbxalgo.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
-int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error);
+int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
 
 #endif

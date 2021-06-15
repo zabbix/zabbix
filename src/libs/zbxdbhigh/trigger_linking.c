@@ -22,8 +22,8 @@
 
 typedef struct
 {
-	zbx_uint64_t	*new_triggerid;
-	zbx_uint64_t	*cur_triggerid;
+  //	zbx_uint64_t	*new_triggerid;
+  //	zbx_uint64_t	*cur_triggerid;
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	triggerid;
 	char		*description;
@@ -78,20 +78,20 @@ typedef struct
 	char		*event_name_orig;
 	char		*event_name;
 
-#define ZBX_FLAG_LINK_FUNCTION_UNSET			__UINT64_C(0x00)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS		__UINT64_C(0x01)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE	__UINT64_C(0x02)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE	__UINT64_C(0x04)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA		__UINT64_C(0x10)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER		__UINT64_C(0x20)
-#define ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME	__UINT64_C(0x40)
+#define ZBX_FLAG_LINK_TRIGGER_UNSET			__UINT64_C(0x00)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS		__UINT64_C(0x01)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x02)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x04)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x10)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x20)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME	__UINT64_C(0x40)
 
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE                                                                    \
-	(ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS | ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE |            \
-	ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE | ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE |   \
-	ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA | ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER |                 \
-	ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE                                                                  \
+	(ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS | ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE |            \
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |   \
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |                 \
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME)
 
 	zbx_uint64_t	update_flags;
 }
@@ -131,10 +131,10 @@ static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 		zbx_free(trigger_entry->expression);
 		zbx_free(trigger_entry->recovery_expression);
 		zbx_free(trigger_entry->opdata_orig);
-		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA))
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
 			zbx_free(trigger_entry->opdata);
 		zbx_free(trigger_entry->event_name_orig);
-		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME))
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
 			zbx_free(trigger_entry->event_name);
 	}
 
@@ -753,49 +753,49 @@ static int	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 	if (trigger_copy->flags != main_found->flags_orig)
 	{
 		main_found->flags = trigger_copy->flags;
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS;
 		res = SUCCEED;
 	}
 
 	if (trigger_copy->recovery_mode != main_found->recovery_mode_orig)
 	{
 		main_found->recovery_mode = trigger_copy->recovery_mode;
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE;
 		res = SUCCEED;
 	}
 
 	if (trigger_copy->correlation_mode != main_found->correlation_mode_orig)
 	{
 		main_found->correlation_mode = trigger_copy->correlation_mode;
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE;
 		res = SUCCEED;
 	}
 
 	if (trigger_copy->manual_close != main_found->manual_close_orig)
 	{
 		main_found->manual_close = trigger_copy->manual_close;
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE;
 		res = SUCCEED;
 	}
 
 	if (0 != strcmp(trigger_copy->opdata, main_found->opdata_orig))
 	{
 		main_found->opdata = zbx_strdup(NULL, trigger_copy->opdata);
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA;
 		res = SUCCEED;
 	}
 
 	if (trigger_copy->discover != main_found->discover_orig)
 	{
 		main_found->discover = trigger_copy->discover;
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER;
 		res = SUCCEED;
 	}
 
 	if (0 != strcmp(trigger_copy->event_name, main_found->event_name_orig))
 	{
 		main_found->event_name = zbx_strdup(NULL, trigger_copy->event_name);
-		main_found->update_flags |= ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME;
 		res = SUCCEED;
 	}
 
@@ -822,34 +822,34 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_FLAGS))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_RECOVERY_MODE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
 						found->recovery_mode);
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_CORRELATION_MODE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_mode=%d", d,
 						found->correlation_mode);
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_MANUAL_CLOSE))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
 						found->manual_close);
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_OPDATA))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
 			{
 				char	*opdata_esc = DBdyn_escape_string(found->opdata);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
@@ -857,13 +857,13 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_DISCOVER))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, found->discover);
 				d = ",";
 			}
 
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_FUNCTION_UPDATE_EVENT_NAME))
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
 			{
 				char	*event_name_esc = DBdyn_escape_string(found->event_name);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
@@ -892,7 +892,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 }
 
 static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert_templateid_triggerids,
-		zbx_hashset_t *zbx_insert_triggers_funcs)
+				     zbx_hashset_t *zbx_insert_triggers_funcs, int *funcs_insert_count)
 {
 	int		res = SUCCEED;
 	char		*sql = NULL;
@@ -956,6 +956,8 @@ static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *inser
 
 				zbx_hashset_insert(zbx_insert_triggers_funcs, &local_temp_t, sizeof(local_temp_t));
 			}
+
+			(*funcs_insert_count)++;
 		}
 		else
 			res = FAIL;
@@ -966,9 +968,10 @@ static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *inser
 }
 
 static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_copies_insert,
-		zbx_hashset_t *zbx_insert_triggers_funcs, zbx_vector_uint64_t *new_triggerids, char **error)
+		zbx_hashset_t *zbx_insert_triggers_funcs, zbx_vector_uint64_t *new_triggerids, char **error,
+		int *funcs_insert_count)
 {
-	int				i, j, res = FAIL;
+	int				i, j, res;
 	char				*sql_update_triggers_expr = NULL;
 	size_t				sql_update_triggers_expr_alloc = 512, sql_update_triggers_expr_offset = 0;
 	zbx_uint64_t			triggerid, functionid;
@@ -986,7 +989,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			"parameter", NULL);
 
 	triggerid = DBget_maxid_num("triggers", trigger_copies_insert->values_num);
-	functionid = DBget_maxid_num("functions", zbx_insert_triggers_funcs->num_data);
+	functionid = DBget_maxid_num("functions", *funcs_insert_count);
 
 	for (i = 0; i < trigger_copies_insert->values_num; i++)
 	{
@@ -1091,16 +1094,17 @@ func_out:
 		triggerid++;
 	}
 
-	zbx_db_insert_execute(&db_insert);
+	res = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_db_insert_execute(&db_insert_funcs);
+	if (SUCCEED == res)
+		res = zbx_db_insert_execute(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
 	DBend_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
 			&sql_update_triggers_expr_offset);
 
-	if (sql_update_triggers_expr_offset > 16)	/* In ORACLE always present begin..end; */
+	if (SUCCEED == res && 16 < sql_update_triggers_expr_offset)	/* In ORACLE always present begin..end; */
 	{
 		if (ZBX_DB_OK > DBexecute("%s", sql_update_triggers_expr))
 			res = FAIL;
@@ -1112,8 +1116,8 @@ func_out:
 
 static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hashset_t *host_triggers_descriptions,
 		zbx_hashset_t *zbx_host_triggers_main_data, zbx_hashset_t *zbx_templates_triggers_funcs,
-		zbx_hashset_t *zbx_host_triggers_funcs, int *upd_triggers, int *ins_triggers,
-		zbx_vector_uint64_t *cur_triggerids, zbx_vector_trigger_copies_insert_t *trigger_copies_insert,
+		zbx_hashset_t *zbx_host_triggers_funcs, int *upd_triggers, zbx_vector_uint64_t *cur_triggerids,
+		zbx_vector_trigger_copies_insert_t *trigger_copies_insert,
 		zbx_vector_uint64_t *insert_templateid_triggerids)
 {
 	int					j, found_descriptions_match = FAIL;
@@ -1155,7 +1159,6 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 
 		/* save data for trigger */
 		zabbix_log(LOG_LEVEL_INFORMATION, "INSERTING TRIGGER, SAVE DATA");
-		(*ins_triggers)++;
 
 		trigger_copy_insert = (zbx_trigger_copy_t *)zbx_malloc(NULL, sizeof(zbx_trigger_copy_t));
 		trigger_copy_insert->description = zbx_strdup(NULL, trigger_copy_template->description);
@@ -1212,7 +1215,7 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
  ******************************************************************************/
 int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error)
 {
-	int					i, upd_triggers = 0, ins_triggers = 0, res = SUCCEED;
+	int					i, upd_triggers = 0, funcs_insert_count = 0, res = SUCCEED;
 	zbx_vector_uint64_t			new_triggerids, cur_triggerids;
 	zbx_vector_trigger_copies_templates_t	trigger_copies_templates;
 	zbx_vector_trigger_copies_insert_t	trigger_copies_insert;
@@ -1268,19 +1271,19 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 	{
 		process_triggers(trigger_copies_templates.values[i], &host_triggers_descriptions,
 				&zbx_host_triggers_main_data, &zbx_templates_triggers_funcs, &zbx_host_triggers_funcs,
-				&upd_triggers, &ins_triggers, &cur_triggerids, &trigger_copies_insert,
+				&upd_triggers, &cur_triggerids, &trigger_copies_insert,
 				&insert_templateid_triggerids);
 	}
 
-	get_funcs_for_insert(hostid, &insert_templateid_triggerids, &zbx_insert_triggers_funcs);
+	get_funcs_for_insert(hostid, &insert_templateid_triggerids, &zbx_insert_triggers_funcs, &funcs_insert_count);
 
 	if (0 < upd_triggers)
 		res = execute_triggers_updates(&zbx_host_triggers_main_data);
 
-	if (0 < ins_triggers)
+	if (SUCCEED == res && 0 < trigger_copies_insert.values_num)
 	{
 		res = execute_triggers_inserts(&trigger_copies_insert, &zbx_insert_triggers_funcs,
-				&new_triggerids, error);
+					       &new_triggerids, error, &funcs_insert_count);
 	}
 
 	if (SUCCEED == res)

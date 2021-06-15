@@ -24,6 +24,8 @@ libzbxdbhigh_a_SOURCES = \
 	trigger.c \
 	trigger_linking.c \
 	trigger_linking.h \
+	graph_linking.c \
+	graph_linking.h \
 	tag.c \
 	lld_override.c \
 	mediatype.c
