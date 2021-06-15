@@ -25,6 +25,21 @@
 #include "zbxserver.h"
 #include "template.h"
 #include "trigger_linking.h"
+#include "../zbxalgo/vectorimpl.h"
+
+typedef struct _zbx_template_graph_valid_t zbx_template_graph_valid_t;
+ZBX_PTR_VECTOR_DECL(graph_valid_ptr, zbx_template_graph_valid_t *);
+
+struct _zbx_template_graph_valid_t
+{
+	zbx_uint64_t		tgraphid;
+	zbx_uint64_t		hgraphid;
+	char			*name;
+	zbx_vector_str_t	tkeys;
+	zbx_vector_str_t	hkeys;
+};
+
+ZBX_PTR_VECTOR_IMPL(graph_valid_ptr, zbx_template_graph_valid_t *);
 
 static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 {
@@ -601,6 +616,16 @@ clean:
 	return res;
 }
 
+static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
+{
+	zbx_vector_str_clear_ext(&graph->tkeys, zbx_str_free);
+	zbx_vector_str_clear_ext(&graph->hkeys, zbx_str_free);
+	zbx_vector_str_destroy(&graph->tkeys);
+	zbx_vector_str_destroy(&graph->hkeys);
+	zbx_free(graph->name);
+	zbx_free(graph);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: validate_host                                                    *
@@ -617,20 +642,19 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
+
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
-	DB_RESULT	tresult;
-	DB_RESULT	hresult;
-	DB_ROW		trow;
-	DB_ROW		hrow;
-	char		*sql = NULL, *name_esc;
-	size_t		sql_alloc = 256, sql_offset;
-	ZBX_GRAPH_ITEMS	*gitems = NULL, *chd_gitems = NULL;
-	size_t		gitems_alloc = 0, gitems_num = 0,
-			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	int		ret = SUCCEED, i;
-	zbx_uint64_t	graphid, interfaceids[INTERFACE_TYPE_COUNT];
-	unsigned char	t_flags, h_flags, type;
+	int				ret = SUCCEED, i, j;
+	char				*sql = NULL;
+	unsigned char			t_flags, h_flags, type;
+	DB_RESULT			tresult;
+	DB_ROW				trow;
+	size_t				sql_alloc = 256, sql_offset;
+	zbx_uint64_t			graphid, interfaceids[INTERFACE_TYPE_COUNT];
+	zbx_vector_graph_valid_ptr_t	graphs;
+	zbx_vector_uint64_t		graphids;
+	zbx_template_graph_valid_t	*graph;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -640,88 +664,117 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	if (SUCCEED != (ret = validate_httptests(hostid, templateids, error, max_error_len)))
 		goto out;
 
+	zbx_vector_graph_valid_ptr_create(&graphs);
+	zbx_vector_uint64_create(&graphids);
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct g.graphid,g.name,g.flags"
-			" from graphs g,graphs_items gi,items i"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and");
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct g.graphid,g.name,g.flags,g2.graphid,g2.flags"
+			" from graphs_items gi,items i,graphs g"
+			" join graphs g2 on g2.name=g.name and g2.templateid is null"
+			" join graphs_items gi2 on gi2.graphid=g2.graphid"
+			" join items i2 on i2.itemid=gi2.itemid and i2.hostid=" ZBX_FS_UI64
+			" where g.graphid=gi.graphid and gi.itemid=i.itemid and ",
+			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
 
 	tresult = DBselect("%s", sql);
 
-	while (SUCCEED == ret && NULL != (trow = DBfetch(tresult)))
+	while (NULL != (trow = DBfetch(tresult)))
 	{
-		ZBX_STR2UINT64(graphid, trow[0]);
 		t_flags = (unsigned char)atoi(trow[2]);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select 0,0,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-					"gi.type,i.flags"
-				" from graphs_items gi,items i"
-				" where gi.itemid=i.itemid"
-					" and gi.graphid=" ZBX_FS_UI64
-				" order by i.key_",
-				graphid);
-
-		DBget_graphitems(sql, &gitems, &gitems_alloc, &gitems_num);
-
-		name_esc = DBdyn_escape_string(trow[1]);
-
-		hresult = DBselect(
-				"select distinct g.graphid,g.flags"
-				" from graphs g,graphs_items gi,items i"
-				" where g.graphid=gi.graphid"
-					" and gi.itemid=i.itemid"
-					" and i.hostid=" ZBX_FS_UI64
-					" and g.name='%s'"
-					" and g.templateid is null",
-				hostid, name_esc);
-
-		zbx_free(name_esc);
-
-		/* compare graphs */
-		while (NULL != (hrow = DBfetch(hresult)))
+		h_flags = (unsigned char)atoi(trow[4]);
+		if (t_flags != h_flags)
 		{
-			ZBX_STR2UINT64(graphid, hrow[0]);
-			h_flags = (unsigned char)atoi(hrow[1]);
+			ret = FAIL;
+			zbx_snprintf(error, max_error_len,
+					"graph prototype and real graph \"%s\" have the same name", trow[1]);
+			break;
+		}
 
-			if (t_flags != h_flags)
+		graph = (zbx_template_graph_valid_t *)zbx_malloc(NULL, sizeof(zbx_template_graph_valid_t));
+
+		ZBX_STR2UINT64(graph->tgraphid, trow[0]);
+		ZBX_STR2UINT64(graph->hgraphid, trow[3]);
+
+		zbx_vector_uint64_append(&graphids, graph->tgraphid);
+		zbx_vector_uint64_append(&graphids, graph->hgraphid);
+
+		graph->name = zbx_strdup(NULL, trow[1]);
+
+		zbx_vector_str_create(&graph->hkeys);
+		zbx_vector_str_create(&graph->tkeys);
+
+		zbx_vector_graph_valid_ptr_append(&graphs, graph);
+	}
+
+	DBfree_result(tresult);
+	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select gi.graphid,i.key_"
+			" from items i,graphs_items gi"
+			" where gi.itemid=i.itemid"
+			" and ");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.graphid", graphids.values, graphids.values_num);
+
+	tresult = DBselect("%s", sql);
+
+	while (NULL != (trow = DBfetch(tresult)))
+	{
+		char	*itemkey;
+
+		ZBX_STR2UINT64(graphid, trow[0]);
+		itemkey = zbx_strdup(NULL, trow[1]);
+
+		for (i = 0; i < graphs.values_num; i++)
+		{
+			graph = (zbx_template_graph_valid_t *)graphs.values[i];
+
+			if (graphid == graph->tgraphid)
+				zbx_vector_str_append(&graph->tkeys, itemkey);
+			else if (graphid == graph->hgraphid)
+				zbx_vector_str_append(&graph->hkeys, itemkey);
+		}
+	}
+	DBfree_result(tresult);
+
+	for (i = 0; i < graphs.values_num; i++)
+	{
+		graph = (zbx_template_graph_valid_t *)graphs.values[i];
+
+		if (graph->tkeys.values_num != graph->hkeys.values_num )
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_vector_str_sort(&graph->tkeys, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_str_sort(&graph->hkeys, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (j = 0; j < graph->tkeys.values_num; j++)
+		{
+			if (0 != strcmp(graph->tkeys.values[j], graph->hkeys.values[j]))
 			{
 				ret = FAIL;
-				zbx_snprintf(error, max_error_len,
-						"graph prototype and real graph \"%s\" have the same name", trow[1]);
-				break;
-			}
-
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
-						"gi.yaxisside,gi.calc_fnc,gi.type,i.flags"
-					" from graphs_items gi,items i"
-					" where gi.itemid=i.itemid"
-						" and gi.graphid=" ZBX_FS_UI64
-					" order by i.key_",
-					graphid);
-
-			DBget_graphitems(sql, &chd_gitems, &chd_gitems_alloc, &chd_gitems_num);
-
-			if (SUCCEED != DBcmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
-			{
-				ret = FAIL;
-				zbx_snprintf(error, max_error_len,
-						"graph \"%s\" already exists on the host (items are not identical)",
-						trow[1]);
 				break;
 			}
 		}
-		DBfree_result(hresult);
+
+		if (FAIL == ret)
+			break;
 	}
-	DBfree_result(tresult);
+
+	if (FAIL == ret)
+	{
+		graph = (zbx_template_graph_valid_t *)graphs.values[i];
+
+		zbx_snprintf(error, max_error_len, "graph \"%s\" already exists on the host (items are not identical)",
+				graph->name);
+	}
 
 	if (SUCCEED == ret)
 	{
@@ -812,8 +865,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	}
 
 	zbx_free(sql);
-	zbx_free(gitems);
-	zbx_free(chd_gitems);
+
+	zbx_vector_graph_valid_ptr_clear_ext(&graphs, zbx_graph_valid_free);
+	zbx_vector_graph_valid_ptr_destroy(&graphs);
+	zbx_vector_uint64_destroy(&graphids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
