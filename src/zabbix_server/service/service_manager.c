@@ -956,8 +956,11 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 	if (0 != service_problems_new->values_num)
 	{
-		zbx_db_insert_t	db_insert;
-		zbx_uint64_t	service_problemid;
+		zbx_db_insert_t		db_insert;
+		zbx_uint64_t		service_problemid;
+		zbx_vector_uint64_t	ids;
+
+		zbx_vector_uint64_create(&ids);
 
 		service_problemid = DBget_maxid_num("service_problem", service_problems_new->values_num);
 
@@ -965,18 +968,35 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 				"severity", NULL);
 
 		zbx_vector_ptr_sort(service_problems_new, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		for (i = 0; i < service_problems_new->values_num; i++)
+		{
+			zbx_service_problem_t	*service_problem;
+
+			service_problem = (zbx_service_problem_t *)service_problems_new->values[i];
+			zbx_vector_uint64_append(&ids, service_problem->eventid);
+		}
+
+		DBlock_ids("problem", "eventid", &ids);
 
 		for (i = 0; i < service_problems_new->values_num; i++)
 		{
 			zbx_service_problem_t	*service_problem;
 
 			service_problem = (zbx_service_problem_t *)service_problems_new->values[i];
+
+			if (FAIL == zbx_vector_uint64_bsearch(&ids, service_problem->eventid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
+
 			service_problem->service_problemid = service_problemid++;
 			zbx_db_insert_add_values(&db_insert, service_problem->service_problemid,
 					service_problem->eventid, service_problem->serviceid,
 					service_problem->severity);
 		}
 
+		zbx_vector_uint64_destroy(&ids);
 		ret = zbx_db_insert_execute(&db_insert);
 
 		zbx_db_insert_clean(&db_insert);
