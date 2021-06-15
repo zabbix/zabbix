@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 09fb25d089f7467f860895f6e71d3fa2
-      template: 'Ceph by Zabbix Agent2'
-      name: 'Ceph by Zabbix Agent2'
+      template: 'Ceph by Zabbix agent 2'
+      name: 'Ceph by Zabbix agent 2'
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph
         
@@ -57,7 +57,7 @@ zabbix_export:
           triggers:
             -
               uuid: 716f166b3943443aba70a4faed882ffb
-              expression: '(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix Agent2/ceph.min_mon_release_name))>0'
+              expression: '(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
@@ -586,22 +586,22 @@ zabbix_export:
           triggers:
             -
               uuid: 6ab06350bd8b426681f1b8bddde76a13
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
               name: 'Ceph: Cluster in ERROR state'
               priority: AVERAGE
               manual_close: 'YES'
             -
               uuid: 8b6ba1a7ae014e80a5287ffd13b5d8aa
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=1'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=1'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=0'
+              recovery_expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=0'
               name: 'Ceph: Cluster in WARNING state'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Ceph: Cluster in ERROR state'
-                  expression: 'last(/Ceph by Zabbix Agent2/ceph.overall_status)=2'
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.overall_status)=2'
         -
           uuid: 9b073153d7474b0abfccb1844d0e6981
           name: 'Ceph: Number of Placement Groups in Active state'
@@ -887,7 +887,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9ffc9a5c3d1c47d288c665c8be7d2fbb
-              expression: 'last(/Ceph by Zabbix Agent2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
@@ -1215,7 +1215,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 21535bb935b44b3aa073542db3cc7827
-                  expression: 'last(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},up]) = 0'
+                  expression: 'last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0'
                   name: 'Ceph: OSD osd.{#OSDNAME} is down'
                   priority: AVERAGE
                   description: |
@@ -1224,16 +1224,16 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: cd04e8d542a04bdf89abad7ee4719e75
-              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_nearfull_ratio)*100'
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100'
               name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
               priority: WARNING
               dependencies:
                 -
                   name: 'Ceph: OSD osd.{#OSDNAME} is full'
-                  expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
+                  expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
             -
               uuid: 5d7a028166584c29b959914ce904a713
-              expression: 'min(/Ceph by Zabbix Agent2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix Agent2/ceph.osd_full_ratio)*100'
+              expression: 'min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100'
               name: 'Ceph: OSD osd.{#OSDNAME} is full'
               priority: AVERAGE
           graph_prototypes:
@@ -1244,13 +1244,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_apply]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.osd[{#OSDNAME},latency_commit]'
         -
           uuid: fb6b4d27f46e4160ad978244aa845d0e
@@ -1465,13 +1465,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
             -
               uuid: 7870932ea335481db1c23224dfb33f60
@@ -1480,13 +1480,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
             -
               uuid: 3da48042fdaa4c01825c3eea7ab5af6b
@@ -1495,19 +1495,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",bytes_used]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",max_avail]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Ceph by Zabbix Agent2'
+                    host: 'Ceph by Zabbix agent 2'
                     key: 'ceph.pool["{#POOLNAME}",stored_raw]'
       macros:
         -
@@ -1551,13 +1551,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_bytes.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_bytes.rate
     -
       uuid: 4191a30a9a7c4e5aa48d96238ca8f20c
@@ -1566,13 +1566,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.wr_ops.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.rd_ops.rate
     -
       uuid: 515e2c5239f94ee7a52ecdb834079e06
@@ -1583,14 +1583,14 @@ zabbix_export:
           drawtype: FILLED_REGION
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_used_bytes
         -
           sortorder: '1'
           drawtype: FILLED_REGION
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.total_avail_bytes
     -
       uuid: 8714a8cf50bd43c2b54e410a439d320b
@@ -1600,38 +1600,38 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_commit.min
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.avg
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.max
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_latency_apply.min
     -
       uuid: 716d959b255a47779b9aaf376be8ba03
@@ -1641,17 +1641,17 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Ceph by Zabbix Agent2'
+            host: 'Ceph by Zabbix agent 2'
             key: ceph.osd_fill.min

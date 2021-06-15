@@ -1057,7 +1057,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	/**
-	 * @on-before-once prepareUpdateData
+	 * @onBeforeOnce prepareUpdateData
 	 *
 	 * @dataProvider getUpdateVaultMacrosData
 	 */

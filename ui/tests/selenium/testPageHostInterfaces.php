@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
- * @on-before prepareInterfacesData
+ * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
 
