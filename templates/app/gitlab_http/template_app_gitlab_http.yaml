@@ -390,7 +390,7 @@ zabbix_export:
               priority: HIGH
               description: 'The application server is not running or Rails Controllers are deadlocked.'
         -
-          uuid: 654e7209aaee4995b06a45128bb38d35
+          uuid: 7ef7142babfd4bc2b5b25be541c0511f
           name: 'GitLab: Pipelines: Auto DevOps pipelines, total'
           type: DEPENDENT
           key: gitlab.pipeline.auto_devops_completed.total
@@ -410,7 +410,7 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: b54d2867dd63496f84c0641c21f680fc
+          uuid: 0ffa0a5c108644508252a03469e4f394
           name: 'GitLab: Pipelines: Auto DevOps pipelines, failed'
           type: DEPENDENT
           key: gitlab.pipeline.auto_devops_completed_total.failed
@@ -430,7 +430,7 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 2ff54bd72aa44d5bb7a9fc705710b3ff
+          uuid: f4265a3167a245c4998958106f6ee265
           name: 'GitLab: Pipelines: Created, total'
           type: DEPENDENT
           key: gitlab.pipeline.created_total
@@ -450,7 +450,7 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: b104e3f5a0e34d09b166e129ffc37c61
+          uuid: 23cb22f8f81e461c86f72a92cdfde7a5
           name: 'GitLab: Pipelines: CI/CD creation duration'
           type: DEPENDENT
           key: gitlab.pipeline.pipeline_creation
@@ -472,7 +472,7 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 348641045a944c3284edb3f47b83b5b0
+          uuid: 91c3acbb82524244a1ac400587641ffa
           name: 'GitLab: Pipelines: Pipelines: CI/CD creation count'
           type: DEPENDENT
           key: gitlab.pipeline.pipeline_creation.count
@@ -493,7 +493,7 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 372c36ac4c9941209e3b4f859e2d84f4
+          uuid: c80453c338814951a9e97d9f37e7d68f
           name: 'GitLab: Pipelines: Processing events, total'
           type: DEPENDENT
           key: gitlab.pipeline.processing_events_total
