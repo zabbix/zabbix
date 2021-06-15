@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-06-08T09:26:17Z'
+  date: '2021-06-15T14:01:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -390,10 +390,10 @@ zabbix_export:
               priority: HIGH
               description: 'The application server is not running or Rails Controllers are deadlocked.'
         -
-          uuid: 7ef7142babfd4bc2b5b25be541c0511f
+          uuid: 654e7209aaee4995b06a45128bb38d35
           name: 'GitLab: Pipelines: Auto DevOps pipelines, total'
           type: DEPENDENT
-          key: gitlab.pipeine.auto_devops_completed.total
+          key: gitlab.pipeline.auto_devops_completed.total
           delay: '0'
           history: 7d
           description: 'Counter of completed Auto DevOps pipelines.'
@@ -410,10 +410,10 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 0ffa0a5c108644508252a03469e4f394
+          uuid: b54d2867dd63496f84c0641c21f680fc
           name: 'GitLab: Pipelines: Auto DevOps pipelines, failed'
           type: DEPENDENT
-          key: gitlab.pipeine.auto_devops_completed_total.failed
+          key: gitlab.pipeline.auto_devops_completed_total.failed
           delay: '0'
           history: 7d
           description: 'Counter of completed Auto DevOps pipelines with status "failed".'
@@ -430,10 +430,10 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: f4265a3167a245c4998958106f6ee265
+          uuid: 2ff54bd72aa44d5bb7a9fc705710b3ff
           name: 'GitLab: Pipelines: Created, total'
           type: DEPENDENT
-          key: gitlab.pipeine.created_total
+          key: gitlab.pipeline.created_total
           delay: '0'
           history: 7d
           description: 'Counter of pipelines created.'
@@ -450,12 +450,13 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 23cb22f8f81e461c86f72a92cdfde7a5
+          uuid: b104e3f5a0e34d09b166e129ffc37c61
           name: 'GitLab: Pipelines: CI/CD creation duration'
           type: DEPENDENT
-          key: gitlab.pipeine.pipeline_creation
+          key: gitlab.pipeline.pipeline_creation
           delay: '0'
           history: 7d
+          value_type: FLOAT
           units: s
           description: 'The sum of the time in seconds it takes to create a CI/CD pipeline.'
           preprocessing:
@@ -471,12 +472,13 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: 91c3acbb82524244a1ac400587641ffa
+          uuid: 348641045a944c3284edb3f47b83b5b0
           name: 'GitLab: Pipelines: Pipelines: CI/CD creation count'
           type: DEPENDENT
-          key: gitlab.pipeine.pipeline_creation.count
+          key: gitlab.pipeline.pipeline_creation.count
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'The count of the time it takes to create a CI/CD pipeline.'
           preprocessing:
             -
@@ -491,10 +493,10 @@ zabbix_export:
               tag: Application
               value: GitLab
         -
-          uuid: c80453c338814951a9e97d9f37e7d68f
+          uuid: 372c36ac4c9941209e3b4f859e2d84f4
           name: 'GitLab: Pipelines: Processing events, total'
           type: DEPENDENT
-          key: gitlab.pipeine.processing_events_total
+          key: gitlab.pipeline.processing_events_total
           delay: '0'
           history: 7d
           description: 'Total amount of pipeline processing events.'
