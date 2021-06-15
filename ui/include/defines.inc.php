@@ -135,6 +135,13 @@ define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
 
+// password policy
+define('PASSWD_CHECK_LENGTH', 0x0);
+define('PASSWD_CHECK_CASE', 0x01);
+define('PASSWD_CHECK_DIGITS', 0x02);
+define('PASSWD_CHECK_SPECIAL', 0x04);
+define('PASSWD_CHECK_SIMPLE', 0x08);
+
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
