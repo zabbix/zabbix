@@ -1434,6 +1434,20 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 	zbx_hashset_destroy(&service_manager->deleted_eventids);
 }
 
+static void	service_manager_trace(zbx_service_manager_t *service_manager)
+{
+
+	zabbix_log(LOG_LEVEL_TRACE, "problem events  : %d (%d slots)",
+					service_manager->problem_events.num_data,
+					service_manager->problem_events.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "recovery events  : %d (%d slots)",
+					service_manager->recovery_events.num_data,
+					service_manager->recovery_events.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "deleted events  : %d (%d slots)",
+			service_manager->deleted_eventids.num_data, service_manager->deleted_eventids.num_slots);
+
+}
+
 static void	recalculate_services(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_iter_t	iter;
@@ -1592,6 +1606,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 			time_flush = time_now;
 			time_now = zbx_time();
+
+			service_manager_trace(&service_manager);
 		}
 
 		if (ZBX_PROBLEM_CLEANUP_FREQUENCY < time_now - time_cleanup)
