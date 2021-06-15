@@ -537,7 +537,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
 			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
 			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
-			'selectMacros' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
 			'hostids' => array_column($host_prototypes, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -551,11 +550,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		foreach ($db_host_prototypes as &$db_host_prototype) {
-			$db_host_prototype['macros'] = array_column($db_host_prototype['macros'], null, 'hostmacroid');
-		}
-		unset($db_host_prototype);
-
+		$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
 		$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
 
 		$hosts_by_ruleid = [];
@@ -1075,12 +1070,13 @@ class CHostPrototype extends CHostBase {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 		]);
+
+		$hostPrototypes = $this->getHostMacros($hostPrototypes);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
 			// merge group links into group prototypes

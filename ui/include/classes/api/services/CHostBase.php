@@ -451,6 +451,35 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
+	 * Adding "macros" to the each host object.
+	 *
+	 * @param array  $db_hosts
+	 *
+	 * @return array
+	 */
+	protected function getHostMacros(array $db_hosts): array {
+		foreach ($db_hosts as &$db_host) {
+			$db_host['macros'] = [];
+		}
+		unset($db_host);
+
+		$options = [
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description'],
+			'filter' => ['hostid' => array_keys($db_hosts)]
+		];
+		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+		while ($db_macro = DBfetch($db_macros)) {
+			$hostid = $db_macro['hostid'];
+			unset($db_macro['hostid']);
+
+			$db_hosts[$hostid]['macros'][$db_macro['hostmacroid']] = $db_macro;
+		}
+
+		return $db_hosts;
+	}
+
+	/**
 	 * Checks user macros for host.update, template.update and hostprototype.update methods.
 	 *
 	 * @param array  $hosts
@@ -624,10 +653,11 @@ abstract class CHostBase extends CApiService {
 
 		// adding macros
 		if ($options['selectMacros'] !== null && $options['selectMacros'] !== API_OUTPUT_COUNT) {
-			$macros = API::getApiService()->select('hostmacro', [
+			$macros = API::UserMacro()->get([
 				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
+				'hostids' => $hostids,
+				'preservekeys' => true,
+				'nopermissions' => true
 			]);
 
 			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');

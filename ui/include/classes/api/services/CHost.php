@@ -2082,7 +2082,6 @@ class CHost extends CHostGeneral {
 
 		$db_hosts = $this->get([
 			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
-			'selectMacros' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -2151,11 +2150,7 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		foreach ($db_hosts as &$db_host) {
-			$db_host['macros'] = array_column($db_host['macros'], null, 'hostmacroid');
-		}
-		unset($db_host);
-
+		$db_hosts = $this->getHostMacros($db_hosts);
 		$hosts = $this->validateHostMacros($hosts, $db_hosts);
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');

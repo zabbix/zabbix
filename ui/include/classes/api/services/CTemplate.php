@@ -649,7 +649,6 @@ class CTemplate extends CHostGeneral {
 
 		$db_templates = $this->get([
 			'output' => ['templateid'],
-			'selectMacros' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -685,11 +684,7 @@ class CTemplate extends CHostGeneral {
 		}
 		unset($template);
 
-		foreach ($db_templates as &$db_template) {
-			$db_template['macros'] = array_column($db_template['macros'], null, 'hostmacroid');
-		}
-		unset($db_template);
-
+		$db_templates = $this->getHostMacros($db_templates);
 		$templates = $this->validateHostMacros($templates, $db_templates);
 	}
 
