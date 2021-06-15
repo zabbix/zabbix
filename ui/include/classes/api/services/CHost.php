@@ -1864,9 +1864,8 @@ class CHost extends CHostGeneral {
 		$host_db_fields = ['host' => null];
 
 		$groupids = [];
-		$index = 1;
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $index => &$host) {
 			// Validate mandatory fields.
 			if (!check_db_fields($host_db_fields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1918,11 +1917,10 @@ class CHost extends CHostGeneral {
 			}
 
 			if (array_key_exists('macros', $host)) {
-				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.$index.'/macros', $error)) {
+				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.($index + 1).'/macros', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
-			$index++;
 		}
 		unset($host);
 
@@ -2102,9 +2100,8 @@ class CHost extends CHostGeneral {
 		}
 
 		$host_db_fields = ['hostid' => null];
-		$index = 1;
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $index => &$host) {
 			// Validate mandatory fields.
 			if (!check_db_fields($host_db_fields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -2147,11 +2144,10 @@ class CHost extends CHostGeneral {
 			// Permissions to host groups is validated in massUpdate().
 
 			if (array_key_exists('macros', $host)) {
-				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.$index.'/macros', $error)) {
+				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.($index + 1).'/macros', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
-			$index++;
 		}
 		unset($host);
 

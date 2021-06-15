@@ -4315,7 +4315,7 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-					'name'	=> ['type' => API_STRING_UTF8],
+					'name'	=> ['type' => API_STRING_UTF8]
 				]],
 				[
 					['name' => 'app1'],

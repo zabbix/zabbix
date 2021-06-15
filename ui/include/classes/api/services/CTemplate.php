@@ -456,7 +456,8 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if (array_key_exists('macros', $template)) {
-				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.$index.'/macros', $error)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -676,7 +677,8 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if (array_key_exists('macros', $template)) {
-				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.$index.'/macros', $error)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}

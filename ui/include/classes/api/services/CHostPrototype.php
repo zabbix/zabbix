@@ -561,7 +561,7 @@ class CHostPrototype extends CHostBase {
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
 
-		foreach ($host_prototypes as $index => &$host_prototype) {
+		foreach ($host_prototypes as &$host_prototype) {
 			$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
 			$host_prototype['ruleid'] = $db_host_prototype['discoveryRule']['itemid'];
 
