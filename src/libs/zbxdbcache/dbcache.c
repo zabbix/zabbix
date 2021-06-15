@@ -605,7 +605,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
-	result = DBselect("%s", sql);
+	result = DBselect("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -930,6 +930,17 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	zbx_trend_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_TREND	*p1 = (const ZBX_DC_TREND *)d1;
+	const ZBX_DC_TREND	*p2 = (const ZBX_DC_TREND *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->clock, p2->clock);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBmass_update_trends                                             *
@@ -950,6 +961,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 	{
 		trends_tmp = (ZBX_DC_TREND *)zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
 		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
+		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
 			DBflush_trends(trends_tmp, &trends_num, trends_diff);
@@ -1531,6 +1543,9 @@ static void	DCsync_trends(void)
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS) && 0 != trends_num)
 		DCexport_all_trends(trends, trends_num);
+
+	if (0 < trends_num)
+		qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 	DBbegin();
 
@@ -4047,17 +4062,40 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		item_value = &values[i];
 
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		/* a record with metadata and no value can be dropped if  */
+		/* the metadata update is copied to the last queued value */
+		if (NULL != (item = hc_get_item(item_value->itemid)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
-			UNLOCK_CACHE;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-			sleep(1);
-
-			LOCK_CACHE;
+			/* skip metadata updates when only one value is queued, */
+			/* because the item might be already being processed    */
+			if (item->head != item->tail)
+			{
+				item->head->lastlogsize = item_value->lastlogsize;
+				item->head->mtime = item_value->mtime;
+				item->head->flags |= ZBX_DC_FLAG_META;
+				continue;
+			}
 		}
 
-		if (NULL == (item = hc_get_item(item_value->itemid)))
+		if (SUCCEED != hc_clone_history_data(&data, item_value))
+		{
+			do
+			{
+				UNLOCK_CACHE;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+				sleep(1);
+
+				LOCK_CACHE;
+			}
+			while (SUCCEED != hc_clone_history_data(&data, item_value));
+
+			item = hc_get_item(item_value->itemid);
+		}
+
+		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);

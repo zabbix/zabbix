@@ -125,7 +125,7 @@ $servicesChildTable = (new CTable())
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
 foreach ($this->data['children'] as $child) {
 	$childrenLink = (new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']))
-		->setAttribute('target', '_blank');
+		->setTarget('_blank');
 
 	$servicesChildTable->addRow(
 		(new CRow([

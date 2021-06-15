@@ -39,7 +39,7 @@ else {
 				->setArgument('action', 'macros.edit')
 				->getUrl()
 			))
-			->setAttribute('target', '_blank');
+			->setTarget('_blank');
 		$link = [' (', $link, ')'];
 	}
 
@@ -138,7 +138,7 @@ else {
 					'templates.php?form=update&templateid='.$macro['template']['templateid'])
 				)
 					->addClass('unknown')
-					->setAttribute('target', '_blank');
+					->setTarget('_blank');
 			}
 			else {
 				$link = new CSpan(CHtml::encode($macro['template']['name']));

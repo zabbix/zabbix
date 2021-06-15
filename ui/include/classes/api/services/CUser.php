@@ -1470,12 +1470,18 @@ class CUser extends CApiService {
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
+			$mediaTypes = [];
 			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
-			$mediaTypes = API::Mediatype()->get([
-				'output' => $options['selectMediatypes'],
-				'mediatypeids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$mediaTypes = API::Mediatype()->get([
+					'output' => $options['selectMediatypes'],
+					'mediatypeids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 

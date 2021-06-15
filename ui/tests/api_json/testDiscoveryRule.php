@@ -61,6 +61,21 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '30s'
 				],
 				'expected_error' => 'Item with key "apilldrule4" already exists on "API Host".'
+			],
+			'Test  LLD rule with unsupported item type' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule with unsupported item type',
+					'key_' => 'api_lld_rule_with_unsupported_item_type',
+					'hostid' => '50009',
+					'type' => '100',
+					'interfaceid' => '50022',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
+					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+				]).'.'
 			]
 		];
 
@@ -68,19 +83,94 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public static function discoveryrule_create_data_valid() {
-		return [
-			'Test valid LLD rule with default properties' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule default',
-					'key_' => 'apilldruledefault',
+		$valid_item_types = [
+			ITEM_TYPE_ZABBIX => '50022',
+			ITEM_TYPE_TRAPPER => null,
+			ITEM_TYPE_SIMPLE => '50022',
+			ITEM_TYPE_INTERNAL => null,
+			ITEM_TYPE_ZABBIX_ACTIVE => null,
+			ITEM_TYPE_EXTERNAL => '50022',
+			ITEM_TYPE_DB_MONITOR => null,
+			ITEM_TYPE_IPMI => '50031',
+			ITEM_TYPE_SSH => '50022',
+			ITEM_TYPE_TELNET => '50022',
+			ITEM_TYPE_JMX => '50030',
+			ITEM_TYPE_DEPENDENT => null,
+			ITEM_TYPE_HTTPAGENT => '50022',
+			ITEM_TYPE_SNMP => '50029'
+		];
+
+		$item_type_tests = [];
+		foreach ($valid_item_types as $type => $interfaceid) {
+			switch ($type) {
+				case ITEM_TYPE_IPMI:
+					$params = [
+						'ipmi_sensor' => '1.2.3'
+					];
+					break;
+
+				case ITEM_TYPE_TRAPPER:
+					$params = [
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_TELNET:
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => '150151',
+						'delay' => '0'
+					];
+					break;
+
+				case ITEM_TYPE_JMX:
+					$params = [
+						'username' => 'username',
+						'password' => 'password'
+					];
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$params = [
+						'url' => 'http://0.0.0.0'
+					];
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$params = [
+						'snmp_oid' => '1.2.3'
+					];
+					break;
+
+				default:
+					$params = [];
+					break;
+			}
+
+			if ($interfaceid) {
+				$params['interfaceid'] = $interfaceid;
+			}
+
+			$item_type_tests['Test valid LLD rule with item type '.$type] = [
+				'discoveryrule' => $params + [
+					'name' => 'API LLD rule of type '.$type,
+					'key_' => 'api_lld_rule_of_type_'.$type,
 					'hostid' => '50009',
-					'type' => '0',
-					'interfaceid' => '50022',
+					'type' => (string) $type,
 					'delay' => '30s'
 				],
 				'expected_error' => null
-			]
-		];
+			];
+		}
+
+		return $item_type_tests;
 
 		// TODO: add other properties, multiple rules, duplicates etc.
 	}

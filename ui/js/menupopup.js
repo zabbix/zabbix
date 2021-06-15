@@ -1536,6 +1536,10 @@ jQuery(function($) {
 				if ('target' in options) {
 					link.attr('target', options.target);
 				}
+
+				if ('rel' in options) {
+					link.attr('rel', options.rel);
+				}
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {

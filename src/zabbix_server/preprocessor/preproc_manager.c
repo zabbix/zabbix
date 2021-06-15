@@ -1113,6 +1113,80 @@ static void	preprocessor_flush_test_result(zbx_preprocessing_manager_t *manager,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static	void	preprocessor_get_items_totals(zbx_preprocessing_manager_t *manager, int *total, int *queued,
+		int *processing, int *done, int *pending)
+{
+#define ZBX_MAX_REQUEST_STATE_PRINT_LIMIT	25
+
+	zbx_preproc_item_stats_t	*item;
+	zbx_list_iterator_t		iterator;
+	zbx_preprocessing_request_t	*request;
+	zbx_hashset_t			items;
+
+	*total = 0;
+	*queued = 0;
+	*processing = 0;
+	*done = 0;
+	*pending = 0;
+
+	zbx_hashset_create(&items, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
+	{
+		zbx_list_iterator_peek(&iterator, (void **)&request);
+
+		if (NULL == (item = zbx_hashset_search(&items, &request->value.itemid)))
+		{
+			zbx_preproc_item_stats_t	item_local = {.itemid = request->value.itemid};
+
+			item = zbx_hashset_insert(&items, &item_local, sizeof(item_local));
+		}
+
+		switch(request->state)
+		{
+			case REQUEST_STATE_QUEUED:
+				if (*queued < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "oldest queued itemid: " ZBX_FS_UI64
+							" values:%d pos:%d", item->itemid, item->values_num, *total);
+				}
+				(*queued)++;
+				break;
+			case REQUEST_STATE_PROCESSING:
+				if (*processing < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "oldest processing itemid: " ZBX_FS_UI64
+							" values:%d pos:%d", item->itemid, item->values_num, *total);
+				}
+				(*processing)++;
+				break;
+			case REQUEST_STATE_DONE:
+				if (*done < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "oldest done itemid: " ZBX_FS_UI64
+							" values:%d pos:%d", item->itemid, item->values_num, *total);
+				}
+				(*done)++;
+				break;
+			case REQUEST_STATE_PENDING:
+				if (*pending < ZBX_MAX_REQUEST_STATE_PRINT_LIMIT)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "oldest pending itemid: " ZBX_FS_UI64
+							" values:%d pos:%d", item->itemid, item->values_num, *total);
+				}
+				(*pending)++;
+				break;
+		}
+
+		item->values_num++;
+		(*total)++;
+	}
+
+	zbx_hashset_destroy(&items);
+#undef ZBX_MAX_REQUEST_STATE_PRINT_LIMIT
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_get_diag_stats                                      *
@@ -1127,10 +1201,13 @@ static void	preprocessor_get_diag_stats(zbx_preprocessing_manager_t *manager, zb
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
+	int		total, queued, processing, done, pending;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	data_len = zbx_preprocessor_pack_diag_stats(&data, manager->queued_num, manager->preproc_num);
+	preprocessor_get_items_totals(manager, &total, &queued, &processing, &done, &pending);
+
+	data_len = zbx_preprocessor_pack_diag_stats(&data, total, queued, processing, done, pending);
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 	zbx_free(data);
 
@@ -1152,6 +1229,34 @@ static int	preproc_sort_item_by_values_desc(const void *d1, const void *d2)
 	return i2->values_num - i1->values_num;
 }
 
+static	void	preprocessor_get_items_view(zbx_preprocessing_manager_t *manager, zbx_hashset_t *items,
+		zbx_vector_ptr_t *view)
+{
+	zbx_preproc_item_stats_t	*item;
+	zbx_list_iterator_t		iterator;
+	zbx_preprocessing_request_t	*request;
+
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
+	{
+		zbx_list_iterator_peek(&iterator, (void **)&request);
+
+		if (NULL == (item = zbx_hashset_search(items, &request->value.itemid)))
+		{
+			zbx_preproc_item_stats_t	item_local = {.itemid = request->value.itemid};
+
+			item = zbx_hashset_insert(items, &item_local, sizeof(item_local));
+			zbx_vector_ptr_append(view, item);
+		}
+		/* There might be processed, but not yet flushed items at the start of queue with    */
+		/* freed preprocessing steps and steps_num being zero. Because of that keep updating */
+		/* items steps_num to have preprocessing steps of last queued item.                  */
+		item->steps_num = request->steps_num;
+		item->values_num++;
+	}
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_get_top_items                                       *
@@ -1166,15 +1271,11 @@ static int	preproc_sort_item_by_values_desc(const void *d1, const void *d2)
 static void	preprocessor_get_top_items(zbx_preprocessing_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_ipc_message_t *message)
 {
-	int				limit;
-	unsigned char			*data;
-	zbx_uint32_t			data_len;
-	zbx_hashset_t			items;
-	zbx_vector_ptr_t		view;
-	zbx_list_iterator_t		iterator;
-	zbx_preprocessing_request_t	*request;
-	zbx_preproc_item_stats_t	*item;
-	int				items_num;
+	int			limit;
+	unsigned char		*data;
+	zbx_uint32_t		data_len;
+	zbx_hashset_t		items;
+	zbx_vector_ptr_t	view;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1183,32 +1284,61 @@ static void	preprocessor_get_top_items(zbx_preprocessing_manager_t *manager, zbx
 	zbx_hashset_create(&items, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_ptr_create(&view);
 
-	zbx_list_iterator_init(&manager->queue, &iterator);
-	while (SUCCEED == zbx_list_iterator_next(&iterator))
-	{
-		zbx_list_iterator_peek(&iterator, (void **)&request);
-
-		if (NULL == (item = zbx_hashset_search(&items, &request->value.itemid)))
-		{
-			zbx_preproc_item_stats_t	item_local = {.itemid = request->value.itemid};
-
-			item = zbx_hashset_insert(&items, &item_local, sizeof(item_local));
-			zbx_vector_ptr_append(&view, item);
-		}
-		/* There might be processed, but not yet flushed items at the start of queue with    */
-		/* freed preprocessing steps and steps_num being zero. Because of that keep updating */
-		/* items steps_num to have preprocessing steps of last queued item.                  */
-		item->steps_num = request->steps_num;
-		item->values_num++;
-	}
+	preprocessor_get_items_view(manager, &items, &view);
 
 	zbx_vector_ptr_sort(&view, preproc_sort_item_by_values_desc);
-	items_num = MIN(limit, view.values_num);
 
-	data_len = zbx_preprocessor_pack_top_items_result(&data, (zbx_preproc_item_stats_t **)view.values, items_num);
+	data_len = zbx_preprocessor_pack_top_items_result(&data, (zbx_preproc_item_stats_t **)view.values,
+			MIN(limit, view.values_num));
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT, data, data_len);
 	zbx_free(data);
 
+	zbx_vector_ptr_destroy(&view);
+	zbx_hashset_destroy(&items);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	preprocessor_get_oldest_preproc_items(zbx_preprocessing_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message)
+{
+	int			limit, i;
+	unsigned char		*data;
+	zbx_uint32_t		data_len;
+	zbx_hashset_t		items;
+	zbx_vector_ptr_t	view, view_preproc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_preprocessor_unpack_top_request(&limit, message->data);
+
+	zbx_hashset_create(&items, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_ptr_create(&view);
+	zbx_vector_ptr_create(&view_preproc);
+	zbx_vector_ptr_reserve(&view_preproc, limit);
+
+	preprocessor_get_items_view(manager, &items, &view);
+
+	for (i = 0; i < view.values_num && 0 < limit; i++)
+	{
+		zbx_preproc_item_stats_t	*item;
+
+		item = (zbx_preproc_item_stats_t *)view.values[i];
+
+		/* only items with preprocessing can slow down queue */
+		if (0 == item->steps_num)
+			continue;
+
+		zbx_vector_ptr_append(&view_preproc, item);
+		limit--;
+	}
+
+	data_len = zbx_preprocessor_pack_top_items_result(&data, (zbx_preproc_item_stats_t **)view_preproc.values,
+			MIN(limit, view_preproc.values_num));
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT, data, data_len);
+	zbx_free(data);
+
+	zbx_vector_ptr_destroy(&view_preproc);
 	zbx_vector_ptr_destroy(&view);
 	zbx_hashset_destroy(&items);
 
@@ -1411,6 +1541,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_ITEMS:
 					preprocessor_get_top_items(&manager, client, message);
+					break;
+				case ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS:
+					preprocessor_get_oldest_preproc_items(&manager, client, message);
 					break;
 			}
 

@@ -109,12 +109,12 @@ foreach ($data['dependencies'] as $dependency) {
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$description = (new CLink($dependency_description,
 			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
-		))->setAttribute('target', '_blank');
+		))->setTarget('_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($dependency_description,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
-		))->setAttribute('target', '_blank');
+		))->setTarget('_blank');
 	}
 
 	$dependencies_table->addRow(

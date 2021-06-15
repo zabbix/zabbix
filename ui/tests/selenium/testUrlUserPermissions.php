@@ -21,8 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
- * @on-before removeGuestFromDisabledGroup
- * @on-after addGuestToDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup
+ * @onAfter addGuestToDisabledGroup
  */
 class testUrlUserPermissions extends CLegacyWebTest {
 
@@ -772,8 +772,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	}
 
 	/**
-	 * @on-before addGuestToDisabledGroup
-	 * @on-after removeGuestFromDisabledGroup
+	 * @onBefore addGuestToDisabledGroup
+	 * @onAfter removeGuestFromDisabledGroup
 	 *
 	 * @dataProvider data
 	 */

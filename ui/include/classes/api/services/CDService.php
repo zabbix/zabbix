@@ -211,6 +211,7 @@ class CDService extends CApiService {
 
 		// select_drules
 		if ($options['selectDRules'] !== null && $options['selectDRules'] != API_OUTPUT_COUNT) {
+			$drules = [];
 			$relationMap = new CRelationMap();
 			// discovered items
 			$dbRules = DBselect(
@@ -223,14 +224,19 @@ class CDService extends CApiService {
 				$relationMap->addRelation($rule['dserviceid'], $rule['druleid']);
 			}
 
-			$drules = API::DRule()->get([
-				'output' => $options['selectDRules'],
-				'druleids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			if (!is_null($options['limitSelects'])) {
-				order_result($drules, 'name');
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$drules = API::DRule()->get([
+					'output' => $options['selectDRules'],
+					'druleids' => $related_ids,
+					'preservekeys' => true
+				]);
+				if (!is_null($options['limitSelects'])) {
+					order_result($drules, 'name');
+				}
 			}
+
 			$result = $relationMap->mapMany($result, $drules, 'drules');
 		}
 

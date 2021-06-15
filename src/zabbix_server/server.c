@@ -311,7 +311,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
@@ -1162,10 +1162,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	DBcheck_character_set();
 
-	if (SUCCEED == DBcheck_double_type())
-		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_ENABLED;
-	else
+	if (SUCCEED != DBcheck_double_type())
+	{
+		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
+		ZBX_DOUBLE_EPSILON = 0.000001;
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+	}
 
 	DBcheck_capabilities();
 

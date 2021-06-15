@@ -107,6 +107,7 @@ $data = [
 	'profileIdx' => 'web.item.graph.filter',
 	'profileIdx2' => 0,
 	'filter_task' => getRequest('filter_rst') ? FILTER_TASK_SHOW : getRequest('filter_task', FILTER_TASK_SHOW),
+	'mark_color' => getRequest('mark_color', MARK_COLOR_RED),
 	'filter' => getRequest('filter_rst') ? '' : getRequest('filter', ''),
 	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];

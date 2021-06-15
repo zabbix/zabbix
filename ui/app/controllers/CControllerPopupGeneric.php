@@ -590,7 +590,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['templated_hosts'] = 1;
 			$group_options['templated_hosts'] = 1;
 		}
-		elseif ($this->source_table !== 'templates') {
+		elseif ($this->source_table !== 'templates' && $this->source_table !== 'host_templates') {
 			$group_options['with_hosts_and_templates'] = 1;
 		}
 
@@ -620,7 +620,7 @@ class CControllerPopupGeneric extends CController {
 				? API::HostGroup()->get([
 					'output' => ['name', 'groupid'],
 					'groupids' => $this->groupids
-				] + $group_options)
+				])
 				: [];
 
 			$filter['groups'] = [

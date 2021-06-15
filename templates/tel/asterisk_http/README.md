@@ -19,7 +19,8 @@ This template was tested on:
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and
- create Asterisk Manager user with system and command write permissions within your Asterisk instance.  
+ create Asterisk Manager user with system and command write permissions within your Asterisk instance. Disable the PJSIP driver
+ if you do not use PJSIP or do not have PJSIP endpoints.  
 Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status.
 Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.  
 If there are errors, increase the logging to debug level and see the Zabbix server log.
@@ -37,7 +38,10 @@ No specific Zabbix configuration is required.
 |{$AMI.QUEUE_CALLERS.MAX.WARN} |<p>The maximum number of callers in a queue for trigger expression.</p> |`10` |
 |{$AMI.RESPONSE_TIME.MAX.WARN} |<p>The Asterisk Manager API page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$AMI.SECRET} |<p>The Asterisk Manager secret.</p> |`zabbix` |
-|{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN} |<p>The maximum number of busy channels for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN} |<p>The maximum number of busy channels of a trunk for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} |<p>The total maximum number of busy channels of IAX trunks for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} |<p>The total maximum number of busy channels of PJSIP trunks for trigger expression.</p> |`28` |
+|{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} |<p>The total maximum number of busy channels of SIP trunks for trigger expression.</p> |`28` |
 |{$AMI.TRUNK_REGEXP} |<p>The regexp for the identification of trunk peers.</p> |`trunk` |
 |{$AMI.URL} |<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p> |`http://asterisk:8088/asterisk/rawman` |
 |{$AMI.USERNAME} |<p>The Asterisk Manager name.</p> |`zabbix` |
@@ -74,13 +78,16 @@ There are no template links in this template.
 |Asterisk |Asterisk: SIP unmonitored online |<p>The number of unmonitored online SIP peers.</p> |DEPENDENT |asterisk.sip.unmonitored_online<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.unmonitored_online`</p> |
 |Asterisk |Asterisk: SIP unmonitored offline |<p>The number of unmonitored offline SIP peers.</p> |DEPENDENT |asterisk.sip.unmonitored_offline<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.unmonitored_offline`</p> |
 |Asterisk |Asterisk: SIP peers |<p>The total number of SIP peers.</p> |DEPENDENT |asterisk.sip.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.total`</p> |
+|Asterisk |Asterisk: SIP trunks active channels |<p>The total number of SIP trunks active channels.</p> |DEPENDENT |asterisk.sip.active_channels<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.active_channels`</p> |
 |Asterisk |Asterisk: IAX online peers |<p>The number of online IAX peers.</p> |DEPENDENT |asterisk.iax.online<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.online`</p> |
 |Asterisk |Asterisk: IAX offline peers |<p>The number of offline IAX peers.</p> |DEPENDENT |asterisk.iax.offline<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.offline`</p> |
 |Asterisk |Asterisk: IAX unmonitored peers |<p>The number of unmonitored IAX peers.</p> |DEPENDENT |asterisk.iax.unmonitored<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.unmonitored`</p> |
 |Asterisk |Asterisk: IAX peers |<p>The total number of IAX peers.</p> |DEPENDENT |asterisk.iax.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.total`</p> |
+|Asterisk |Asterisk: IAX trunks active channels |<p>The total number of IAX trunks active channels.</p> |DEPENDENT |asterisk.iax.active_channels<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.active_channels`</p> |
 |Asterisk |Asterisk: PJSIP available endpoints |<p>The number of available PJSIP peers.</p> |DEPENDENT |asterisk.pjsip.available<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.available`</p> |
 |Asterisk |Asterisk: PJSIP unavailable endpoints |<p>The number of unavailable PJSIP peers.</p> |DEPENDENT |asterisk.pjsip.unavailable<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.unavailable`</p> |
 |Asterisk |Asterisk: PJSIP endpoints |<p>The total number of PJSIP peers.</p> |DEPENDENT |asterisk.pjsip.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.total`</p> |
+|Asterisk |Asterisk: PJSIP trunks active channels |<p>The total number of PJSIP trunks active channels.</p> |DEPENDENT |asterisk.pjsip.active_channels<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.active_channels`</p> |
 |Asterisk |SIP trunk "{#OBJECTNAME}": Status |<p>SIP trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p> |DEPENDENT |asterisk.sip.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Asterisk |SIP trunk "{#OBJECTNAME}": Active channels |<p>The total number of active SIP trunk channels.</p> |DEPENDENT |asterisk.sip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()`</p> |
 |Asterisk |IAX trunk "{#OBJECTNAME}": Status |<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p> |DEPENDENT |asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -89,8 +96,8 @@ There are no template links in this template.
 |Asterisk |PJSIP trunk "{#OBJECTNAME}": Active channels |<p>The total number of active PJSIP trunk channels.</p> |DEPENDENT |asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()`</p> |
 |Asterisk |"{#QUEUE}": Logged in |<p>The number of queue members.</p> |DEPENDENT |asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</p> |
 |Asterisk |"{#QUEUE}": Available |<p>The number of available queue members.</p> |DEPENDENT |asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</p> |
-|Asterisk |"{#QUEUE}": Callers |<p>The number incoming  calls in queue.</p> |DEPENDENT |asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p> |
-|Zabbix_raw_items |Asterisk: Get stats |<p>Asterisk system information in JSON format.</p> |HTTP_AGENT |asterisk.get_stats<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Asterisk |"{#QUEUE}": Callers |<p>The number incoming calls in queue.</p> |DEPENDENT |asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p> |
+|Zabbix_raw_items |Asterisk: Get stats |<p>Asterisk system information in JSON format.</p> |HTTP_AGENT |asterisk.get_stats<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
@@ -102,6 +109,9 @@ There are no template links in this template.
 |Asterisk: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Asterisk: Failed to fetch AMI page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:asterisk.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
 |Asterisk: has been reloaded (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime_reload.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m) |<p>The SIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}` |WARNING | |
+|Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m) |<p>The IAX trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.iax.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}` |WARNING | |
+|Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m) |<p>The PJSIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.pjsip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}` |WARNING | |
 |SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |
 |SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The SIP trunk may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.active_channels[{#OBJECTNAME}].min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
 |IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |
