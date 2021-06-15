@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  * @backup items, interface
  *
  * TODO: This annotation should be removed after ZBX-19257 is fixed.
- * @ignore-browser-errors
+ * @ignoreBrowserErrors
  */
 class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 
@@ -283,7 +283,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 	}
 
 	/**
-	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
+	 * @onBeforeOnce prepareItemPrototypesData, prepareInterfaceData
 	 *
 	 * @dataProvider getCommonChangeData
 	 * @dataProvider getItemPrototypesChangeData
@@ -475,7 +475,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 	}
 
 	/**
-	 * @on-before-once prepareItemPrototypeTagsPreprocessingData
+	 * @onBeforeOnce prepareItemPrototypeTagsPreprocessingData
 	 */
 	public function testPageMassUpdateItemPrototypes_Cancel() {
 		$this->executeMassUpdateCancel(true);
