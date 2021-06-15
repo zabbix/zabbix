@@ -34,6 +34,10 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern int		CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
+/* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
+#define ZBX_PROBLEM_CLEANUP_AGE		(SEC_PER_HOUR * 2)
+#define ZBX_PROBLEM_CLEANUP_FREQUENCY	SEC_PER_HOUR
+
 static volatile sig_atomic_t	service_cache_reload_requested;
 
 typedef struct
@@ -123,6 +127,7 @@ typedef struct
 	zbx_hashset_t	service_problems_index;
 	zbx_hashset_t	problem_events;
 	zbx_hashset_t	recovery_events;
+	zbx_hashset_t	deleted_eventids;
 
 }
 zbx_service_manager_t;
@@ -1257,7 +1262,13 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 
 	for (i = 0; i < eventids->values_num; i++)
 	{
-		zbx_event_t	*event, event_local = {.eventid = eventids->values[i]}, **ptr;
+		zbx_event_t		*event, event_local = {.eventid = eventids->values[i]}, **ptr;
+		zbx_uint64_pair_t	pair;
+
+		pair.first = eventids->values[i];
+		pair.second = now;
+
+		zbx_hashset_insert(&service_manager->deleted_eventids, &pair, sizeof(pair));
 
 		event = &event_local;
 
@@ -1316,6 +1327,10 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 		zbx_event_t	*event, **ptr;
 
 		event = events->values[i];
+
+		/*  skip problem or recovery if trigger and it's associated problems are already deleted */
+		if (NULL != (zbx_hashset_search(&service_manager->deleted_eventids, &event->eventid)))
+			continue;
 
 		switch (event->value)
 		{
@@ -1398,13 +1413,14 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_problems_index_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_hashset_create_ext(&service_manager->services_links, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_hashset_create(&service_manager->services_links, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_diffs, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_diff_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create(&service_manager->deleted_eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 static void	service_manager_free(zbx_service_manager_t *service_manager)
@@ -1415,6 +1431,7 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 	zbx_hashset_destroy(&service_manager->services);
 	zbx_hashset_destroy(&service_manager->problem_events);
 	zbx_hashset_destroy(&service_manager->recovery_events);
+	zbx_hashset_destroy(&service_manager->deleted_eventids);
 }
 
 static void	recalculate_services(zbx_service_manager_t *service_manager)
@@ -1461,6 +1478,20 @@ static void	recalculate_services(zbx_service_manager_t *service_manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int now)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_pair_t	*pair;
+
+	zbx_hashset_iter_reset(&service_manager->deleted_eventids, &iter);
+	while (NULL != (pair = (zbx_uint64_pair_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_PROBLEM_CLEANUP_AGE < now - (int)pair->second)
+			zbx_hashset_iter_remove(&iter);
+	}
+}
+
 static void	zbx_serviceman_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags))
@@ -1484,7 +1515,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	int			ret, processed_num = 0;
-	double			time_stat, time_idle = 0, time_now, time_flush = 0, sec;
+	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -1518,7 +1549,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	service_manager_init(&service_manager);
 
 	DBbegin();
-	db_get_events(&service_manager.problem_events);	/* TODO: housekeeping, get events before history syncer starts to recover */
+	db_get_events(&service_manager.problem_events);
 	DBcommit();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
@@ -1560,6 +1591,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				recalculate_services(&service_manager);
 
 			time_flush = time_now;
+			time_now = zbx_time();
+		}
+
+		if (ZBX_PROBLEM_CLEANUP_FREQUENCY < time_now - time_cleanup)
+		{
+			cleanup_deleted_problems(&service_manager, time_now);
+
+			time_cleanup = time_now;
 			time_now = zbx_time();
 		}
 

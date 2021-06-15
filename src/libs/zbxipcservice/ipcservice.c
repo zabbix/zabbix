@@ -1340,7 +1340,7 @@ out:
  ******************************************************************************/
 int	zbx_ipc_socket_connected(const zbx_ipc_socket_t *csocket)
 {
-	return 0 < csocket->fd ? FAIL : SUCCEED;
+	return 0 < csocket->fd ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
