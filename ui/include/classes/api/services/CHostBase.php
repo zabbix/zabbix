@@ -584,7 +584,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array  $hosts[]['templateid|hostid']
 	 * @param array  $hosts[]['macros']             (optional)
 	 * @param array  $db_hosts
-	 * @param array  $db_hosts[<hostid>]['macros']
+	 * @param array  $db_hosts[<hostid>]['macros']  An array of host macros indexed by hostmacroid.
 	 */
 	protected function updateHostMacros(array $hosts, array $db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
@@ -592,11 +592,6 @@ abstract class CHostBase extends CApiService {
 		$ins_hostmacros = [];
 		$upd_hostmacros = [];
 		$del_hostmacroids = [];
-
-		foreach ($db_hosts as &$db_host) {
-			$db_host['macros'] = array_column($db_host['macros'], null, 'hostmacroid');
-		}
-		unset($db_host);
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('macros', $host)) {
