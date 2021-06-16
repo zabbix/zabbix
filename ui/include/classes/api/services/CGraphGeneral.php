@@ -75,20 +75,20 @@ abstract class CGraphGeneral extends CApiService {
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
 
 			// validate items on set or pass existing items from DB
-			if (isset($graph['gitems'])) {
-				foreach ($graph['gitems'] as $item) {
-					if (isset($item['gitemid']) && !$item['gitemid']) {
+			if (array_key_exists('gitems', $graph)) {
+				foreach ($graph['gitems'] as $graph_item) {
+					if (array_key_exists('gitemid', $graph_item) && !$graph_item['gitemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "gitemid" field for item.'));
 					}
 
-					if (isset($item['gitemid']) && $item['gitemid']) {
+					if (array_key_exists('gitemid', $graph_item) && $graph_item['gitemid']) {
 						$validGraphItemIds = [];
 
-						foreach ($dbGraphs[$graph['graphid']]['gitems'] as $dbItem) {
-							$validGraphItemIds[$dbItem['gitemid']] = $dbItem['gitemid'];
+						foreach ($dbGraphs[$graph['graphid']]['gitems'] as $db_graph_item) {
+							$validGraphItemIds[$db_graph_item['gitemid']] = $db_graph_item['gitemid'];
 						}
 
-						if (!in_array($item['gitemid'], $validGraphItemIds)) {
+						if (!in_array($graph_item['gitemid'], $validGraphItemIds)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_('No permissions to referred object or it does not exist!')
 							);
@@ -104,7 +104,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		$this->validateUpdate($graphs, $dbGraphs);
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
@@ -128,10 +128,11 @@ abstract class CGraphGeneral extends CApiService {
 					$graph['ymax_itemid'] = null;
 				}
 			}
-
-			$this->updateReal($graph, $dbGraphs[$graph['graphid']]);
-			$this->inherit($graph);
 		}
+		unset($graph);
+
+		$this->updateReal($graphs);
+		$this->inherit($graphs);
 
 		return ['graphids' => $graphIds];
 	}
@@ -145,7 +146,6 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	public function create(array $graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphids = [];
 
 		// set default parameters
 		foreach ($graphs as &$graph) {
@@ -163,102 +163,117 @@ abstract class CGraphGeneral extends CApiService {
 
 		$this->validateCreate($graphs);
 
-		foreach ($graphs as $graph) {
-			$graph['graphid'] = $this->createReal($graph);
+		$this->createReal($graphs);
+		$this->inherit($graphs);
 
-			$this->inherit($graph);
-
-			$graphids[] = $graph['graphid'];
-		}
-
-		return ['graphids' => $graphids];
+		return ['graphids' => array_column($graphs, 'graphid')];
 	}
 
 	/**
-	 * Creates a new graph and returns it's ID.
+	 * Creates new graphs.
 	 *
-	 * @param $graph
-	 *
-	 * @return mixed
+	 * @param array $graphs
 	 */
-	protected function createReal($graph) {
-		$graphids = DB::insert('graphs', [$graph]);
-		$graphid = reset($graphids);
-		$sort_order = 0;
+	protected function createReal(array &$graphs) {
+		$graphids = DB::insert('graphs', $graphs);
+		$graph_items = [];
 
-		foreach ($graph['gitems'] as &$gitem) {
-			$gitem['graphid'] = $graphid;
+		// Collect graph_items to insert.
+		foreach ($graphs as $key => $graph) {
+			$sort_order = 0;
 
-			if (!array_key_exists('sortorder', $gitem)) {
-				$gitem['sortorder'] = $sort_order;
+			foreach ($graph['gitems'] as $graph_item) {
+				$graph_item['graphid'] = $graphids[$key];
+
+				if (!array_key_exists('sortorder', $graph_item)) {
+					$graph_item['sortorder'] = $sort_order;
+				}
+
+				$graph_items[] = $graph_item;
+
+				$sort_order++;
 			}
-
-			$sort_order++;
 		}
-		unset($gitem);
 
-		DB::insert('graphs_items', $graph['gitems']);
+		$graphs_itemsids = DB::insert('graphs_items', $graph_items);
 
-		return $graphid;
+		// Set id for graphs and graph items.
+		$i = 0;
+		foreach ($graphs as $key => &$graph) {
+			$graph['graphid'] = $graphids[$key];
+
+			foreach ($graph['gitems'] as &$graph_item) {
+				$graph_item['gitemid'] = $graphs_itemsids[$i++];
+			}
+			unset($graph_item);
+		}
+		unset($graph);
 	}
 
 	/**
-	 * Updates the graph if $graph differs from $dbGraph.
+	 * Updates the graphs.
 	 *
-	 * @param array $graph
-	 * @param array $dbGraph
+	 * @param array $graphs
 	 *
 	 * @return string
 	 */
-	protected function updateReal(array $graph, array $dbGraph) {
-		$dbGitems = zbx_toHash($dbGraph['gitems'], 'gitemid');
-		$dbGitemIds = zbx_toHash(zbx_objectValues($dbGitems, 'gitemid'));
+	protected function updateReal(array $graphs) {
+		$data = [];
+		foreach ($graphs as $graph) {
+			unset($graph['gitems']);
 
-		// update the graph if it's modified
-		if (DB::recordModified('graphs', $dbGraph, $graph)) {
-			DB::updateByPk($this->tableName(), $graph['graphid'], $graph);
+			$data[] = ['values' => $graph, 'where' => ['graphid' => $graph['graphid']]];
 		}
+		DB::update('graphs', $data);
 
-		// delete remaining items only if new items or items that require update are set
-		if ($graph['gitems']) {
-			$insertGitems = [];
-			$deleteGitemIds = $dbGitemIds;
+		$db_graph_items = API::GraphItem()->get([
+			'output' => ['gitemid'],
+			'graphids' => array_column($graphs, 'graphid'),
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		$ins_graph_items = [];
+		$upd_graph_items = [];
+		$del_graph_items = $db_graph_items;
+		foreach ($graphs as $graph) {
 			$sort_order = 0;
 
-			foreach ($graph['gitems'] as $gitem) {
-				// updating an existing item
-				if (!empty($gitem['gitemid']) && isset($dbGitemIds[$gitem['gitemid']])) {
-					if (DB::recordModified('graphs_items', $dbGitems[$gitem['gitemid']], $gitem)) {
-						DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
-					}
+			foreach ($graph['gitems'] as $graph_item) {
+				// Update an existing item.
+				if (array_key_exists('gitemid', $graph_item)
+						&& array_key_exists($graph_item['gitemid'], $db_graph_items)) {
+					unset($graph_item['graphid']);
+					$upd_graph_items[] = ['values' => $graph_item, 'where' => ['gitemid' => $graph_item['gitemid']]];
 
-					// remove this graph item from the collection so it won't get deleted
-					unset($deleteGitemIds[$gitem['gitemid']]);
+					unset($del_graph_items[$graph_item['gitemid']]);
 				}
-				// adding a new item
+				// Adding a new item.
 				else {
-					$gitem['graphid'] = $graph['graphid'];
+					$graph_item['graphid'] = $graph['graphid'];
 
-					if (!array_key_exists('sortorder', $gitem)) {
-						$gitem['sortorder'] = $sort_order;
+					if (!array_key_exists('sortorder', $graph_item)) {
+						$graph_item['sortorder'] = $sort_order;
 					}
+
+					$ins_graph_items[] = $graph_item;
 
 					$sort_order++;
-
-					$insertGitems[] = $gitem;
 				}
-			}
-
-			if ($deleteGitemIds) {
-				DB::delete('graphs_items', ['gitemid' => $deleteGitemIds]);
-			}
-
-			if ($insertGitems) {
-				DB::insert('graphs_items', $insertGitems);
 			}
 		}
 
-		return $graph['graphid'];
+		if ($ins_graph_items) {
+			DB::insert('graphs_items', $ins_graph_items);
+		}
+
+		if ($upd_graph_items) {
+			DB::update('graphs_items', $upd_graph_items);
+		}
+
+		if ($del_graph_items) {
+			DB::delete('graphs_items', ['gitemid' => array_keys($del_graph_items)]);
+		}
 	}
 
 	/**
@@ -849,5 +864,508 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
+	 *
+	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
+	 *                             "gitems" property.
+	 * @param array|null $hostids  An array of hosts to inherit to; if set to null, the graphs will be inherited to all
+	 *                             linked hosts or templates.
+	 * @throws APIException
+	 */
+	protected function inherit(array $graphs, array $hostids = null): void {
+		$graphs = zbx_toHash($graphs, 'graphid');
+
+		if ($hostids === null) {
+			/*
+			 * Since the graph of template can have items only of this template, it's enough to find template of the
+			 * graph by one of the graph items. Therefore we collect here only first items of graphs.
+			 */
+			$graphids_first_itemids = [];
+
+			foreach ($graphs as $graphid => $graph) {
+				$graphids_first_itemids[$graphid] = reset($graph['gitems'])['itemid'];
+			}
+
+			/*
+			 * From the passed graphs we are able to inherit only those, which are template graphs and templates of
+			 * which are linked at least to one host. There we try to find the graphs items which meet these conditions.
+			 */
+			$itemids_of_templates_linked_to_hosts = DBfetchColumn(
+				DBselect(
+					'SELECT i.itemid'.
+					' FROM items i,hosts h,hosts_templates ht'.
+					' WHERE h.hostid=i.hostid'.
+						' AND ht.templateid=i.hostid'.
+						' AND '.dbConditionId('i.itemid', $graphids_first_itemids).
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+					' GROUP BY i.itemid'
+				),
+				'itemid'
+			);
+
+			// Based on the found items, we leave only graphs that is possible to inherit.
+			$graphs = array_intersect_key($graphs,
+				array_intersect($graphids_first_itemids, $itemids_of_templates_linked_to_hosts)
+			);
+
+			if (!$graphs) {
+				return;
+			}
+		}
+
+		$graphids = [];
+		$same_name_graphs = [];
+		$itemids = [];
+
+		foreach ($graphs as $graphid => $graph) {
+			$graphids[] = $graphid;
+			$same_name_graphs[$graph['name']][$graphid] = true;
+
+			if ($graph['ymin_itemid'] > 0) {
+				$itemids[$graph['ymin_itemid']] = true;
+			}
+
+			if ($graph['ymax_itemid'] > 0) {
+				$itemids[$graph['ymax_itemid']] = true;
+			}
+
+			foreach ($graph['gitems'] as $gitem) {
+				$itemids[$gitem['itemid']] = true;
+			}
+		}
+
+		$itemids = array_keys($itemids);
+
+		$items_templateids = [];
+		$itemids_templateids = [];
+		$templateids = [];
+
+		$db_templates = DBselect(
+			'SELECT i.hostid AS templateid,i.itemid,i.key_'.
+			' FROM items i'.
+			' WHERE '.dbConditionId('i.itemid', $itemids)
+		);
+
+		$itemids = [];
+
+		while ($data = DBfetch($db_templates)) {
+			$items_templateids[$data['key_']][$data['itemid']] = $data['templateid'];
+			$itemids_templateids[$data['itemid']] = $data['templateid'];
+			$templateids[$data['templateid']] = true;
+			$itemids[] = $data['itemid'];
+		}
+
+		$templateids = array_keys($templateids);
+
+		$templateids_hosts = [];
+		$hostids_condition = ($hostids === null) ? '' : ' AND '.dbConditionId('ht.hostid', $hostids);
+		$hostids = [];
+
+		$db_hosts = DBselect(
+			'SELECT ht.templateid,ht.hostid'.
+			' FROM hosts_templates ht,hosts h'.
+			' WHERE ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.templateid', $templateids).
+				$hostids_condition
+		);
+
+		while ($data = DBfetch($db_hosts)) {
+			$templateids_hosts[$data['templateid']][$data['hostid']] = true;
+			$hostids[$data['hostid']] = true;
+		}
+
+		foreach ($same_name_graphs as $name => $_graphs) {
+			if (count($_graphs) > 1) {
+				$_graphids = [];
+				$_templateids =[];
+
+				foreach (array_keys($_graphs) as $graphid) {
+					$itemid = reset($graphs[$graphid]['gitems'])['itemid'];
+					$templateid = $itemids_templateids[$itemid];
+					$_graphids[] = $templateid;
+					$_templateids[] = $templateid;
+				}
+
+				$_templateids_count = count($_templateids);
+				for ($i = 0; $i < ($_templateids_count - 1); $i++) {
+					for ($j = $i + 1; $j < $_templateids_count; $j++) {
+						$same_hosts = array_intersect_key($templateids_hosts[$_templateids[$i]],
+							$templateids_hosts[$_templateids[$j]]
+						);
+
+						if ($same_hosts) {
+							$hosts = API::Host()->get([
+								'output' => ['host'],
+								'hostids' => key($same_hosts),
+								'nopermissions' => true,
+								'preservekeys' => true,
+								'templated_hosts' => true
+							]);
+
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Graph "%1$s" already exists on "%2$s".', $name, $hosts[key($same_hosts)]['host'])
+							);
+						}
+					}
+				}
+			}
+		}
+
+		$hostids = array_keys($hostids);
+
+		$items_hostids = [];
+		$db_items = DBselect(
+			'SELECT dest.itemid,src.key_,dest.hostid'.
+			' FROM items dest,items src'.
+			' WHERE dest.key_=src.key_'.
+				' AND '.dbConditionId('dest.hostid', $hostids).
+				' AND '.dbConditionId('src.itemid', $itemids)
+		);
+
+		while ($item = DBfetch($db_items)) {
+			$items_hostids[$item['key_']][$item['itemid']] = $item['hostid'];
+		}
+
+		$hosts_names = [];
+		$db_hosts = DBselect('SELECT h.hostid,h.host FROM hosts h WHERE '.dbConditionId('h.hostid', $hostids));
+
+		while ($host = DBfetch($db_hosts)) {
+			$hosts_names[$host['hostid']] = $host['host'];
+		}
+
+		/*
+		 * In case when all equivalent items to graphs templates items exists on all hosts, to which they are linked,
+		 * there will be collected relations between template items and these equivalents on hosts.
+		 */
+		$template_itemids_hostids_itemids = [];
+
+		foreach ($items_templateids as $key => $_itemids_templateids) {
+			foreach ($_itemids_templateids as $template_itemid => $templateid) {
+				foreach ($items_hostids[$key] as $host_itemid => $hostid) {
+					if (array_key_exists($hostid, $templateids_hosts[$templateid])) {
+						$template_itemids_hostids_itemids[$template_itemid][$hostid] = $host_itemid;
+					}
+				}
+			}
+		}
+
+		$child_graphs_to_add = [];
+		$child_graphs_to_update = [];
+
+		/*
+		 * Since the inherit() method called either when graphs are only created (called from create() or
+		 * syncTemplates() methods) or when only updated (called from update() method), the child graphs will be only
+		 * found when graph was updated.
+		 */
+		$child_graphs = $this->get([
+			'output' => ['graphid', 'name', 'templateid'],
+			'selectItems' => ['hostid'],
+			'hostids' => $hostids,
+			'filter' => ['templateid' => $graphids],
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		// Graphs data collection to inherit in case when inherit() method was called from update() API method.
+		if ($child_graphs) {
+			$graphs_child_graphs = [];
+			$child_graphs_hostids = [];
+
+			foreach ($child_graphs as $child_graphid => $child_graph) {
+				$graphs_child_graphs[$child_graph['templateid']][$child_graphid] = $child_graph;
+
+				/*
+				 * Since graph on template can have only items of this template, the hostid also will be the same for
+				 * all child graph items.
+				 */
+				$child_graphs_hostids[$child_graphid] = reset($child_graph['items'])['hostid'];
+			}
+
+			$graphs_changed_names_child_graphids = [];
+
+			foreach ($graphs as $graphid => $graph) {
+				foreach ($graphs_child_graphs[$graphid] as $child_graphid => $child_graph) {
+					/*
+					 * If template graph name was changed, we collect all that names to check whether graphs with the
+					 * same name already exists on child hosts/templates.
+					 */
+					if ($graph['name'] !== $child_graph['name']) {
+						$graphs_changed_names_child_graphids[$graph['name']][] = $child_graphid;
+					}
+
+					$child_graph_hostid = reset($child_graph['items'])['hostid'];
+					$child_graph_to_update = ['graphid' => $child_graphid, 'templateid' => $graphid] + $graph;
+
+					if ($graph['ymin_itemid'] != 0) {
+						$child_graph_to_update['ymin_itemid'] =
+							$template_itemids_hostids_itemids[$graph['ymin_itemid']][$child_graph_hostid];
+					}
+
+					if ($graph['ymax_itemid'] != 0) {
+						$child_graph_to_update['ymax_itemid'] =
+							$template_itemids_hostids_itemids[$graph['ymax_itemid']][$child_graph_hostid];
+					}
+
+					foreach ($child_graph_to_update['gitems'] as &$gitem) {
+						$gitem['itemid'] = $template_itemids_hostids_itemids[$gitem['itemid']][$child_graph_hostid];
+					}
+					unset($gitem);
+
+					$child_graphs_to_update[$child_graphid] = $child_graph_to_update;
+				}
+			}
+
+			if ($graphs_changed_names_child_graphids) {
+				$possible_duplicate_name_hostids = [];
+				$db_possible_duplicate_name_graphs = DBselect(
+					'SELECT g.name,i.hostid'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid AND gi.itemid=i.itemid'.
+						' AND '.dbConditionString('g.name', array_keys($graphs_changed_names_child_graphids)).
+						' AND '.dbConditionId('i.hostid', $hostids).
+					' GROUP BY g.name,i.hostid'
+				);
+
+				while ($row = DBfetch($db_possible_duplicate_name_graphs)) {
+					$possible_duplicate_name_hostids[$row['name']][] = $row['hostid'];
+				}
+
+				if ($possible_duplicate_name_hostids) {
+					foreach ($graphs_changed_names_child_graphids as $name => $child_graphids) {
+						if (array_key_exists($name, $possible_duplicate_name_hostids)) {
+							foreach ($child_graphids as $child_graphid) {
+								$duplicate_name_hostid = array_intersect($possible_duplicate_name_hostids[$name],
+									[$child_graphs_hostids[$child_graphid]]
+								);
+								$duplicate_name_hostid = reset($duplicate_name_hostid);
+
+								if ($duplicate_name_hostid) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Graph "%1$s" already exists on "%2$s".', $name,
+											$hosts_names[$duplicate_name_hostid]
+										)
+									);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/*
+		 * Graphs data collection to inherit in case when inherit() method was called from create() or syncTemplates()
+		 * API method.
+		 */
+		else {
+			$graphids_names = [];
+			$graphs_names_required_hosts = [];
+			$hostids_graph_names_parent_graphids = [];
+			$hostids_graphs = [];
+
+			foreach ($graphs as $graphid => $graph) {
+				$graphids_names[$graphid] = $graph['name'];
+
+				$itemid = reset($graph['gitems'])['itemid'];
+				$templateid = $itemids_templateids[$itemid];
+
+				if (!array_key_exists($graph['name'], $graphs_names_required_hosts)) {
+					$graphs_names_required_hosts[$graph['name']] = [];
+				}
+
+				$graphs_names_required_hosts[$graph['name']] += $templateids_hosts[$templateid];
+
+				foreach (array_keys($templateids_hosts[$templateid]) as $hostid) {
+					$hostids_graph_names_parent_graphids[$hostid][$graph['name']] = $graphid;
+					$hostids_graphs[$hostid][$graphid] = true;
+				}
+			}
+
+			$possible_same_name_hosts_graphs = $this->get([
+				'output' => ['graphid', 'name', 'templateid', 'flags'],
+				'selectGraphItems' => ['gitemid', 'graphid', 'itemid'],
+				'selectItems' => ['hostid'],
+				'hostids' => $hostids,
+				'filter' => ['name' => $graphids_names],
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+
+			$parent_graphids_updated_hosts = [];
+
+			foreach ($possible_same_name_hosts_graphs as $graphid => $graph) {
+				$graph_hostids = array_unique(array_column($graph['items'], 'hostid'));
+				$required_hostids = array_intersect($graph_hostids,
+					array_keys($graphs_names_required_hosts[$graph['name']])
+				);
+
+				if (!$required_hostids) {
+					continue;
+				}
+
+				if (count($graph_hostids) > 1) {
+					$hostid = reset($required_hostids);
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $graph['name'],
+							$hosts_names[reset($required_hostids)]
+						)
+					);
+				}
+
+				$hostid = reset($graph_hostids);
+
+				$parent_graphid = $hostids_graph_names_parent_graphids[$hostid][$graph['name']];
+				$parent_graph = $graphs[$parent_graphid];
+
+				if ($graph['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Graph "%1$s" already exists on "%2$s" (inherited from another template).',
+						$graph['name'], $hosts_names[$hostid]
+					));
+				}
+				elseif  ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Graph with same name but other type exist.')
+					);
+				}
+
+				if (count($graph['gitems']) === count($parent_graph['gitems'])) {
+					$gitems_itemids = array_column($graph['gitems'], 'itemid');
+					$child_graph_to_update = [];
+
+					foreach ($parent_graph['gitems'] as $parent_gitem) {
+						$index = array_search($template_itemids_hostids_itemids[$parent_gitem['itemid']][$hostid],
+							$gitems_itemids
+						);
+
+						if ($index === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Graph "%1$s" already exists on "%2$s" (items are not identical).',
+									$parent_graph['name'], $hosts_names[$hostid]
+								)
+							);
+						}
+
+						unset($gitems_itemids[$index]);
+
+						$parent_gitem['itemid'] = $template_itemids_hostids_itemids[$parent_gitem['itemid']][$hostid];
+						$child_graph_to_update['gitems'][] = $parent_gitem;
+					}
+
+					$child_graph_to_update = ['graphid' => $graphid, 'templateid' => $parent_graphid,
+						'gitems' => $child_graph_to_update['gitems']
+					] + $parent_graph;
+
+					if ($parent_graph['ymin_itemid'] != 0) {
+						$child_graph_to_update['ymin_itemid'] =
+							$template_itemids_hostids_itemids[$parent_graph['ymin_itemid']][$hostid];
+					}
+
+					if ($parent_graph['ymax_itemid'] != 0) {
+						$child_graph_to_update['ymax_itemid'] =
+							$template_itemids_hostids_itemids[$parent_graph['ymax_itemid']][$hostid];
+					}
+
+					$child_graphs_to_update[] = $child_graph_to_update;
+
+					$parent_graphids_updated_hosts[$parent_graphid][$hostid] = true;
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $parent_graph['name'],
+							$hosts_names[$hostid]
+						)
+					);
+				}
+			}
+
+			foreach ($graphs as $graphid => $graph) {
+				$itemid = reset($graph['gitems'])['itemid'];
+				$templateid = $itemids_templateids[$itemid];
+
+				$hosts_to_create_graph = array_diff_key($templateids_hosts[$templateid],
+					array_key_exists($graphid, $parent_graphids_updated_hosts)
+						? $parent_graphids_updated_hosts[$graphid]
+						: []
+				);
+
+				foreach (array_keys($hosts_to_create_graph) as $hostid) {
+					$child_graph_to_add = ['templateid' => $graphid] + array_diff_key($graph, ['graphid' => true]);
+
+					if ($graph['ymin_itemid'] != 0) {
+						$child_graph_to_add['ymin_itemid'] =
+							$template_itemids_hostids_itemids[$graph['ymin_itemid']][$hostid];
+					}
+
+					if ($graph['ymax_itemid'] != 0) {
+						$child_graph_to_add['ymax_itemid'] =
+							$template_itemids_hostids_itemids[$graph['ymax_itemid']][$hostid];
+					}
+
+					foreach ($child_graph_to_add['gitems'] as &$gitem) {
+						$gitem['itemid'] = $template_itemids_hostids_itemids[$gitem['itemid']][$hostid];
+					}
+					unset($gitem);
+
+					$child_graphs_to_add[] = $child_graph_to_add;
+				}
+			}
+		}
+
+		if ($child_graphs_to_add) {
+			$this->createReal($child_graphs_to_add);
+			$child_graphs_to_add = zbx_toHash($child_graphs_to_add, 'graphid');
+		}
+
+		if ($child_graphs_to_update) {
+			$this->updateReal($child_graphs_to_update);
+		}
+
+		$this->inherit($child_graphs_to_add + $child_graphs_to_update);
+	}
+
+	/**
+	 * Inherit template graphs from template to host.
+	 *
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
+	public function syncTemplates($data) {
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
+
+		$dbLinks = DBSelect(
+			'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionInt('ht.hostid', $data['hostids']).
+				' AND '.dbConditionInt('ht.templateid', $data['templateids'])
+		);
+		$linkage = [];
+		while ($link = DBfetch($dbLinks)) {
+			$linkage[$link['templateid']][$link['hostid']] = 1;
+		}
+
+		$graphs = $this->get([
+			'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid',
+				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
+				'percent_right', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid', 'flags', 'discover'
+			],
+			'selectGraphItems' => ['gitemid', 'graphid', 'itemid', 'drawtype', 'sortorder', 'color', 'yaxisside',
+				'calc_fnc', 'type'
+			],
+			'selectHosts' => ['hostid'],
+			'hostids' => $data['templateids'],
+			'preservekeys' => true
+		]);
+
+		if ($graphs) {
+			$this->inherit($graphs, $data['hostids']);
+		}
+
+		return true;
 	}
 }
