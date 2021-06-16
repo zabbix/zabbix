@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-15T13:46:12Z</date>
+   <date>2021-06-16T19:23:02Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Server DELL PowerEdge R820 by HTTP</template>
          <name>Template Server DELL PowerEdge R820 by HTTP</name>
-         <description>Template for DELL PowerEdge R820 servers with iDRAC version 7 and later and Redfish API enabled.&#13;
+         <description>Template for DELL PowerEdge R820 servers with iDRAC 8/9 firmware 4.32 and later and Redfish API enabled.&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -1925,15 +1925,15 @@ return JSON.stringify(result);
                      <url>{$API.URL}{#ODATA}</url>
                   </item_prototype>
                   <item_prototype>
-                     <name>Dell R820: {#DISK_NAME} Layout type</name>
+                     <name>Dell R820: {#DISK_NAME} RAID status</name>
                      <type>DEPENDENT</type>
-                     <key>dell.server.hw.virtualdisk.layout[{#DISK_NAME}]</key>
+                     <key>dell.server.hw.virtualdisk.raidstatus[{#DISK_NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
-                     <description>The RAID type of this volume. Possible values: RAID0, RAID1, RAID3, RAID4, RAID5, RAID6, RAID10, RAID01, RAID6TP, RAID1E, RAID50, RAID60, RAID00, RAID10E, RAID1Triple, RAID10Triple.</description>
+                     <description>This property represents the RAID specific status. Possible values: Blocked, Degraded, Failed, Foreign, Offline, Online, Ready, Unknown, null.</description>
                      <applications>
                         <application>
                            <name>Virtual disks</name>
@@ -1942,7 +1942,7 @@ return JSON.stringify(result);
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.RAIDType</params>
+                           <params>$.Oem.Dell.DellVirtualDisk.RaidStatus</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1971,7 +1971,7 @@ return JSON.stringify(result);
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.ReadCachePolicy</params>
+                           <params>$.Oem.Dell.DellVirtualDisk.ReadCachePolicy</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2109,7 +2109,7 @@ return JSON.stringify(result);
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.WriteCachePolicy</params>
+                           <params>$.Oem.Dell.DellVirtualDisk.WriteCachePolicy</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>

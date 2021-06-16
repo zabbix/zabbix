@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later with Redfish API enabled via Zabbix HTTP agent that works without any external scripts.
+This is a template for monitoring DELL PowerEdge R820 servers with iDRAC 8/9 firmware 4.32 and later with Redfish API enabled via Zabbix HTTP agent that works without any external scripts.
 
 ## Setup
 
@@ -76,11 +76,11 @@ There are no template links in this template.
 |Temperature |Dell R820: {#SENSOR_NAME} Value |<p>The sensor value.</p> |DEPENDENT |dell.server.sensor.temp.value[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Reading`</p> |
 |Temperature |Dell R820: {#SENSOR_NAME} Status |<p>The status of the job. Possible values: OK, Warning, Critical.</p> |DEPENDENT |dell.server.sensor.temp.status[{#SENSOR_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Status |<p>The status of the job. Possible values: OK, Warning, Critical.</p> |DEPENDENT |dell.server.hw.virtualdisk.status[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.Health`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Virtual_disks |Dell R820: {#DISK_NAME} Layout type |<p>The RAID type of this volume. Possible values: RAID0, RAID1, RAID3, RAID4, RAID5, RAID6, RAID10, RAID01, RAID6TP, RAID1E, RAID50, RAID60, RAID00, RAID10E, RAID1Triple, RAID10Triple.</p> |DEPENDENT |dell.server.hw.virtualdisk.layout[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.RAIDType`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Virtual_disks |Dell R820: {#DISK_NAME} RAID status |<p>This property represents the RAID specific status. Possible values: Blocked, Degraded, Failed, Foreign, Offline, Online, Ready, Unknown, null.</p> |DEPENDENT |dell.server.hw.virtualdisk.raidstatus[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Oem.Dell.DellVirtualDisk.RaidStatus`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Size |<p>The size in bytes of this Volume.</p> |DEPENDENT |dell.server.hw.virtualdisk.size[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.CapacityBytes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Virtual_disks |Dell R820: {#DISK_NAME} Current state |<p>The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.</p> |DEPENDENT |dell.server.hw.virtualdisk.state[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Status.State`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Virtual_disks |Dell R820: {#DISK_NAME} Read policy |<p>Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.</p> |DEPENDENT |dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ReadCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Virtual_disks |Dell R820: {#DISK_NAME} Write policy |<p>Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</p> |DEPENDENT |dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.WriteCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Virtual_disks |Dell R820: {#DISK_NAME} Read policy |<p>Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.</p> |DEPENDENT |dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Oem.Dell.DellVirtualDisk.ReadCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Virtual_disks |Dell R820: {#DISK_NAME} Write policy |<p>Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.</p> |DEPENDENT |dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Oem.Dell.DellVirtualDisk.WriteCachePolicy`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |Dell R820: Get system |<p>Returns the metrics of a system.</p> |HTTP_AGENT |dell.server.system.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Zabbix_raw_items |Dell R820: {#SENSOR_NAME} Get sensor |<p>Returns the metrics of a sensor.</p> |HTTP_AGENT |dell.server.sensor.temp.get[{#SENSOR_NAME}] |
 |Zabbix_raw_items |Dell R820: {#SENSOR_NAME} Get sensor |<p>Returns the metrics of a sensor.</p> |HTTP_AGENT |dell.server.sensor.psu.get[{#SENSOR_NAME}] |
