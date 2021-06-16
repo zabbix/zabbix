@@ -1627,7 +1627,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if ($db_hostmacros) {
-			DB::delete('hostmacro', array_keys($db_hostmacros));
+			DB::delete('hostmacro', ['hostmacroid' => array_keys($db_hostmacros)]);
 		}
 
 		if ($upd_hostmacros) {
@@ -1635,7 +1635,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if ($ins_hostmacros) {
-			DB::create('hostmacro', $ins_hostmacros);
+			DB::insert('hostmacro', $ins_hostmacros);
 		}
 	}
 
