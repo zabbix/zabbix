@@ -879,9 +879,11 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 	zbx_uint64_t		alarmid;
 	zbx_hashset_iter_t	iter;
 	zbx_service_update_t	*itservice;
+	zbx_vector_uint64_t	serviceids;
 
 	/* get a list of service status updates that must be written to database */
 	zbx_vector_ptr_create(&updates);
+	zbx_vector_uint64_create(&serviceids);
 
 	zbx_hashset_iter_reset(service_updates, &iter);
 	while (NULL != (itservice = (zbx_service_update_t *)zbx_hashset_iter_next(&iter)))
@@ -935,9 +937,6 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 	if (0 != alarms->values_num)
 	{
 		zbx_db_insert_t		db_insert;
-		zbx_vector_uint64_t	serviceids;
-
-		zbx_vector_uint64_create(&serviceids);
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
@@ -972,7 +971,6 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		ret = zbx_db_insert_execute(&db_insert);
 
 		zbx_db_insert_clean(&db_insert);
-		zbx_vector_uint64_destroy(&serviceids);
 	}
 
 	if (0 != service_problems_new->values_num)
@@ -1012,6 +1010,12 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 				continue;
 			}
 
+			if (FAIL == zbx_vector_uint64_bsearch(&serviceids, service_problem->serviceid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
+
 			service_problem->service_problemid = service_problemid++;
 			zbx_db_insert_add_values(&db_insert, service_problem->service_problemid,
 					service_problem->eventid, service_problem->serviceid,
@@ -1026,6 +1030,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 out:
 	zbx_free(sql);
 
+	zbx_vector_uint64_destroy(&serviceids);
 	zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&updates);
 
