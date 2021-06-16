@@ -82,34 +82,19 @@ class testHost extends CAPITest {
 				'params' => [
 					'selectTags' => 'extend',
 				],
-				'expected_error' => null,
-			],
-			/* Commented out intentionally, until more thorough validation added
-			'Get host with string tag' => [
-				'params' => [
-					'selectTags' => 'tag',
-				],
-				'expected_error' => 'Invalid parameter "/": an array is expected.',
-			],*/
-			'Get host with non-existing tag field' => [
-				'params' => [
-					'selectTags' => ['_nonexist'],
-				],
-				'expected_error' => 'applyQueryOutputOptions: field "host_tag._nonexist" does not exist.',
+				'expected_result' => false
 			],
 			'Get host tag excluding value field' => [
 				'params' => [
-					'hostids' => [112233],
 					'selectTags' => ['tag'],
 				],
-				'expected_error' => null,
+				'expected_result' => ['tag']
 			],
 			'Get host tag with value' => [
 				'params' => [
-					'hostids' => [112233],
-					'selectTags' => ['tag', 'value'],
+					'selectTags' => ['value', 'tag'],
 				],
-				'expected_error' => null,
+				'expected_result' => ['tag', 'value']
 			],
 		];
 	}
@@ -117,20 +102,19 @@ class testHost extends CAPITest {
 	/**
 	* @dataProvider host_select_tags
 	*/
-	public function testHost_SelectTags($params, $expected_error) {
-		$result = $this->call('host.get', $params, $expected_error);
+	public function testHost_SelectTags($params, $expected_result) {
+		$result = $this->call('host.get', $params);
 
-		if ($expected_error === null && array_key_exists('hostids', $params)) {
-			foreach ($result['result'] as $id => $host) {
-				if ($id === '112233') {
-					$tags = $result[$id]['tags'][0];
-					if ($params['selectTags'] === ['tag']) {
-						$this->assertEquals($tags, ['tag' => 'b', 'hostid' => '112233']);
-					}
-					elseif ($params['selectTags'] === ['tag', 'value']) {
-						$this->assertEquals($tags, ['tag' => 'b', 'value' => 'b', 'hostid' => '112233']);
-					}
-				}
+		if ($expected_result === false) {
+			return;
+		}
+
+		foreach($result['result'] as $host) {
+			$this->assertArrayHasKey('tags', $host);
+
+			foreach($host['tags'] as $tag) {
+				$expected_keys_diff = array_diff($expected_result, array_keys($tag));
+				$this->assertEquals($expected_keys_diff, [], 'only expected keys should be returned');
 			}
 		}
 	}

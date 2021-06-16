@@ -74,8 +74,8 @@ INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50
 
 
 -- host tags
-INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (112233, 'API host with tag', 'API host with tag', 0, 0, '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (112233, 112233, 'b', 'b');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50032, 'API host with tag', 'API host with tag', 0, 0, '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (50033, 50032, 'b', 'b');
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'API user group for update');
