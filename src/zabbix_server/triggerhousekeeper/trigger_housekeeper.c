@@ -141,10 +141,9 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 
 		sec = zbx_time();
 		deleted = housekeep_problems_without_triggers();
-		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
-				get_process_type_string(process_type), deleted, sec,
+				get_process_type_string(process_type), deleted, zbx_time() - sec,
 				CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
 	}
 
