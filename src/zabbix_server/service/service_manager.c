@@ -1578,7 +1578,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			ret, processed_num = 0;
+	int			ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0, service_update_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
 
@@ -1621,19 +1621,24 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-//
-//		if (STAT_INTERVAL < time_now - time_stat)
-//		{
-//			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
-//					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-//					get_process_type_string(process_type), process_num,
-//					interface_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
-//
-//			time_stat = time_now;
-//			time_idle = 0;
-//			processed_num = 0;
-//		}
-//
+
+		if (STAT_INTERVAL < time_now - time_stat)
+		{
+			zbx_setproctitle("%s #%d [processed %d events, updated %d event tags, deleted %d problems,"
+					" synced %d service updates, idle "
+					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
+					get_process_type_string(process_type), process_num,
+					events_num, tags_update_num, problems_delete_num, service_update_num, time_idle,
+					time_now - time_stat);
+
+			time_stat = time_now;
+			time_idle = 0;
+			events_num = 0;
+			tags_update_num = 0;
+			problems_delete_num = 0;
+			service_update_num = 0;
+		}
+
 		if (CONFIG_SERVICEMAN_SYNC_FREQUENCY < time_now - time_flush || 1 == service_cache_reload_requested)
 		{
 			int	updated = 0, revision = time(NULL);
@@ -1654,6 +1659,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			if (0 != updated)
 				recalculate_services(&service_manager);
 
+			service_update_num += updated;
 			time_flush = time_now;
 			time_now = zbx_time();
 
@@ -1690,14 +1696,17 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS:
 					zbx_service_deserialize(message->data, message->size, &events);
 					process_events(&events, &service_manager);
+					events_num += events.values_num;
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS:
 					zbx_service_deserialize_problem_tags(message->data, message->size, &events);
 					process_problem_tags(&events, &service_manager);
+					tags_update_num += events.values_num;
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE:
 					zbx_service_deserialize_eventids(message->data, message->size, &eventids);
 					process_deleted_problems(&eventids, &service_manager);
+					problems_delete_num += events.values_num;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
