@@ -443,6 +443,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_LOG_LEVEL_DECREASE		"log_level_decrease"
 #define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
 #define ZBX_DIAGINFO			"diaginfo"
+#define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -953,14 +954,15 @@ typedef enum
 }
 zbx_task_t;
 
-#define ZBX_RTC_LOG_LEVEL_INCREASE	1
-#define ZBX_RTC_LOG_LEVEL_DECREASE	2
-#define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
-#define ZBX_RTC_CONFIG_CACHE_RELOAD	8
-#define ZBX_RTC_SNMP_CACHE_RELOAD	9
-#define ZBX_RTC_DIAGINFO		10
-#define ZBX_RTC_SECRETS_RELOAD		11
-#define ZBX_RTC_SERVICE_CACHE_RELOAD	12
+#define ZBX_RTC_LOG_LEVEL_INCREASE		1
+#define ZBX_RTC_LOG_LEVEL_DECREASE		2
+#define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
+#define ZBX_RTC_CONFIG_CACHE_RELOAD		8
+#define ZBX_RTC_SNMP_CACHE_RELOAD		9
+#define ZBX_RTC_DIAGINFO			10
+#define ZBX_RTC_SECRETS_RELOAD			11
+#define ZBX_RTC_SERVICE_CACHE_RELOAD		12
+#define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
 
 typedef enum
 {

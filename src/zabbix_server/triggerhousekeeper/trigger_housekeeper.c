@@ -92,6 +92,21 @@ static int	housekeep_problems_without_triggers(void)
 	return deleted;
 }
 
+static void	zbx_trigger_housekeeper_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
+	{
+		if (0 < zbx_sleep_get_remainder())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the trigger housekeeper");
+			zbx_wakeup();
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "trigger housekeeping procedure is already in progress");
+	}
+}
+
+
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
 	int	deleted;
@@ -114,6 +129,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 			CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
 
 	zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d second(s)", CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+
+	zbx_set_sigusr_handler(zbx_trigger_housekeeper_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
 	{

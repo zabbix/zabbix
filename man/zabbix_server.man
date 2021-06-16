@@ -83,6 +83,12 @@ Ignored if housekeeper is being currently executed.
 .RE
 .RS 4
 .TP 4
+.B trigger_housekeeper_execute
+Execute the trigger housekeeper.
+Ignored if trigger housekeeper is being currently executed.
+.RE
+.RS 4
+.TP 4
 .B secrets_reload
 Reload secrets from Vault.
 Ignored if configuration cache or secrets are being currently loaded.
