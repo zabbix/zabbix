@@ -1504,6 +1504,9 @@ static void	service_manager_trace(zbx_service_manager_t *service_manager)
 	zabbix_log(LOG_LEVEL_TRACE, "service problem tag index  : %d (%d slots)",
 			service_manager->service_problem_tags_index.num_data,
 			service_manager->service_problem_tags_index.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "service problems index  : %d (%d slots)",
+			service_manager->service_problems_index.num_data,
+			service_manager->service_problems_index.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "service matches  : %d (%d slots)",
 			service_manager->service_diffs.num_data, service_manager->service_diffs.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "problem events  : %d (%d slots)", service_manager->problem_events.num_data,
