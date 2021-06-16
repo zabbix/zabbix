@@ -25,6 +25,8 @@
 class CAuthenticationHelper extends CConfigGeneralHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
+	public const PASSWD_MIN_LENGTH = 'passwd_min_length';
+	public const PASSWD_CHECK_RULES = 'passwd_check_rules';
 	public const HTTP_AUTH_ENABLED = 'http_auth_enabled';
 	public const HTTP_CASE_SENSITIVE = 'http_case_sensitive';
 	public const HTTP_LOGIN_FORM = 'http_login_form';

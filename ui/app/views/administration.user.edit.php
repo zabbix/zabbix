@@ -113,23 +113,16 @@ if ($data['change_password']) {
 		$password1->setAttribute('autofocus', 'autofocus');
 	}
 
-	// TODO VM: get global settings here.
-	$data['password_requirements'] = [
-		'length' => 8,
-		'flags' => 0xff
-	];
-
 	$password_requirements = [];
 
-	if ($data['password_requirements']['length'] > 1) {
+	if ($data['password_requirements']['min_length'] > 1) {
 		// TODO VM: maximum allowed "minimum length" should be at most 70.
-		$password_requirements[] = _n('must be at least %1$s character long', 'must be at least %1$s characters long',
-			$data['password_requirements']['length']
+		$password_requirements[] = _n('must be at least %1$d character long', 'must be at least %1$d characters long',
+			$data['password_requirements']['min_length']
 		);
 	}
 
-	// TODO VM: replace by define.
-	if ($data['password_requirements']['flags'] & 0x01) {
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_CASE) {
 		$password_requirements[] = new CListItem([
 			_('must contain at least one lowercase and one uppercase Latin letter'),
 			' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
@@ -137,24 +130,21 @@ if ($data['change_password']) {
 		]);
 	}
 
-	// TODO VM: replace by define.
-	if ($data['password_requirements']['flags'] & 0x02) {
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_DIGITS) {
 		$password_requirements[] = new CListItem([
 			_('must contain at least one digit'),
 			' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
 		]);
 	}
 
-	// TODO VM: replace by define.
-	if ($data['password_requirements']['flags'] & 0x04) {
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_SPECIAL) {
 		$password_requirements[] = new CListItem([
 			_('must contain at least one special character'),
 			' (', (new CSpan(' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
 		]);
 	}
 
-	// TODO VM: replace by define.
-	if ($data['password_requirements']['flags'] & 0x08) {
+	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_SIMPLE) {
 		$password_requirements[] = _('must not contain user\'s name, surname or username');
 		$password_requirements[] = _('must not be one of common or context-specific passwords');
 	}
