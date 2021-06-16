@@ -1660,12 +1660,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 		if (CONFIG_SERVICEMAN_SYNC_FREQUENCY < time_now - time_flush || 1 == service_cache_reload_requested)
 		{
-			int	updated = 0, revision = time(NULL);
+			int	updated = 0, revision;
 
 			service_cache_reload_requested = 0;
 
 			do
 			{
+				revision = time(NULL);
 				DBbegin();
 				sync_services(&service_manager, &updated, revision);
 				sync_service_problem_tags(&service_manager, &updated, revision);
