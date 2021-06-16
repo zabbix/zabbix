@@ -111,7 +111,8 @@ class CAuthentication extends CApiService {
 			'ldap_configured', 'ldap_port', 'ldap_case_sensitive', 'saml_auth_enabled', 'saml_idp_entityid',
 			'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 			'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
+			'passwd_min_length', 'passwd_check_rules'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $auth) && $auth[$field_name] != $db_auth[$field_name]) {
@@ -173,7 +174,7 @@ class CAuthentication extends CApiService {
 			'saml_encrypt_assertions' =>	['type' => API_INT32, 'in' => '0,1'],
 			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:255', 'default' => DB::getDefault('config', 'passwd_min_length')],
-			'passwd_check_rules' =>			['type' => API_INT32, 'in' => PASSWD_CHECK_LENGTH.':'.(PASSWD_CHECK_LENGTH | PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')],
+			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')],
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -182,25 +183,6 @@ class CAuthentication extends CApiService {
 		// Check permissions.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		// Check if password minimal length is sufficient to validate multiple rules at once.
-		if (($auth['passwd_min_length'] == 1
-					&& ((($auth['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE
-						&& ($auth['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
-					|| (($auth['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE
-						&& ($auth['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
-					|| (($auth['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS
-						&& ($auth['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)))
-				|| ($auth['passwd_min_length'] == 2
-					&& (($auth['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE
-						&& ($auth['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS
-						&& ($auth['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid parameter "%1$s": %2$s.', '/passwd_check_rules',
-					_('length is not sufficient for selected password requirements')
-				)
-			);
 		}
 
 		$output_fields = $this->output_fields;
