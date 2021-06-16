@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:22Z'
+  date: '2021-06-16T06:17:04Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -235,7 +235,7 @@ zabbix_export:
                 -
                   name: '{#CLUSTER.NAME} (vm)'
                 -
-                  name: '{#DATACENTER.NAME} (vm)'
+                  name: '{#DATACENTER.NAME}/{#VM.FOLDER} (vm)'
                 -
                   name: '{#HV.NAME}'
               templates:
