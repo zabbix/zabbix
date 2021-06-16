@@ -1681,7 +1681,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			}
 			while (ZBX_DB_DOWN == DBcommit());
 
-
 			if (0 != updated)
 				recalculate_services(&service_manager);
 
