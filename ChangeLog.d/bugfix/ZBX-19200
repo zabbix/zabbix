@@ -1,1 +1,1 @@
-A......... [ZBX-19200] fixed host, item, trigger and graph APIs returning unnecessary fields (Ivo)
+A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
