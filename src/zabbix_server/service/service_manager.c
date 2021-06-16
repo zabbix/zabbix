@@ -1619,9 +1619,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 	service_manager_init(&service_manager);
 
-	DBbegin();
 	db_get_events(&service_manager.problem_events);
-	DBcommit();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -1654,16 +1652,22 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 			service_cache_reload_requested = 0;
 
-			DBbegin();
-			sync_services(&service_manager, &updated, revision);
-			sync_service_problem_tags(&service_manager, &updated, revision);
-			sync_services_links(&service_manager, &updated, revision);
+			do
+			{
+				DBbegin();
+				sync_services(&service_manager, &updated, revision);
+				sync_service_problem_tags(&service_manager, &updated, revision);
+				sync_services_links(&service_manager, &updated, revision);
 
-			/* load service problems once during startup */
-			if (0 == time_flush)
-				sync_service_problems(&service_manager.services, &service_manager.service_problems_index);
+				/* load service problems once during startup */
+				if (0 == time_flush)
+				{
+					sync_service_problems(&service_manager.services,
+							&service_manager.service_problems_index);
+				}
+			}
+			while (ZBX_DB_DOWN == DBcommit());
 
-			DBcommit();
 
 			if (0 != updated)
 				recalculate_services(&service_manager);
