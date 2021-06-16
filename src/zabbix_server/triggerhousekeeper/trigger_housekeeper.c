@@ -34,9 +34,9 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-extern int CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY;
+extern int		CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY;
 
-static void	housekeep_service_problems(zbx_vector_uint64_t *eventids)
+static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
@@ -106,12 +106,10 @@ static void	zbx_trigger_housekeeper_sigusr_handler(int flags)
 	}
 }
 
-
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
 	int	deleted;
-	double	sec, time_now;
-	char	sleeptext[25];
+	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -125,10 +123,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
+	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
-
-	zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d second(s)", CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
 
 	zbx_set_sigusr_handler(zbx_trigger_housekeeper_sigusr_handler);
 
@@ -139,8 +135,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		time_now = zbx_time();
-		zbx_update_env(time_now);
+		zbx_update_env(zbx_time());
 
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
@@ -148,8 +143,9 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		deleted = housekeep_problems_without_triggers();
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), deleted, sec, sleeptext);
+		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
+				get_process_type_string(process_type), deleted, sec,
+				CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
 	}
 
 	DBclose();
