@@ -20,420 +20,6 @@
 #include "db.h"
 #include "graph_linking.h"
 
-/******************************************************************************
- *                                                                            *
- * Function: DBget_same_itemid                                                *
- *                                                                            *
- * Purpose: get same itemid for selected host by itemid from template         *
- *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             itemid - item identificator from database (from template)      *
- *                                                                            *
- * Return value: new item identificator or zero if item not found             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	itemid = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64
-			" titemid:" ZBX_FS_UI64,
-			__func__, hostid, titemid);
-
-	result = DBselect(
-			"select hi.itemid"
-			" from items hi,items ti"
-			" where hi.key_=ti.key_"
-				" and hi.hostid=" ZBX_FS_UI64
-				" and ti.itemid=" ZBX_FS_UI64,
-			hostid, titemid);
-
-	if (NULL != (row = DBfetch(result)))
-		ZBX_STR2UINT64(itemid, row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, itemid);
-
-	return itemid;
-}
-
-
-
-static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	ZBX_GRAPH_ITEMS	*gitem;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	*gitems_num = 0;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (*gitems_alloc == *gitems_num)
-		{
-			*gitems_alloc += 16;
-			*gitems = (ZBX_GRAPH_ITEMS *)zbx_realloc(*gitems, *gitems_alloc * sizeof(ZBX_GRAPH_ITEMS));
-		}
-
-		gitem = &(*gitems)[*gitems_num];
-
-		ZBX_STR2UINT64(gitem->gitemid, row[0]);
-		ZBX_STR2UINT64(gitem->itemid, row[1]);
-		zbx_strlcpy(gitem->key, row[2], sizeof(gitem->key));
-		gitem->drawtype = atoi(row[3]);
-		gitem->sortorder = atoi(row[4]);
-		zbx_strlcpy(gitem->color, row[5], sizeof(gitem->color));
-		gitem->yaxisside = atoi(row[6]);
-		gitem->calc_fnc = atoi(row[7]);
-		gitem->type = atoi(row[8]);
-		gitem->flags = (unsigned char)atoi(row[9]);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() [" ZBX_FS_SIZE_T "] itemid:" ZBX_FS_UI64 " key:'%s'",
-				__func__, (zbx_fs_size_t)*gitems_num, gitem->itemid, gitem->key);
-
-		(*gitems_num)++;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcmp_graphitems                                                 *
- *                                                                            *
- * Purpose: Compare graph items from two graphs                               *
- *                                                                            *
- * Parameters: gitems1     - [IN] first graph items, sorted by itemid         *
- *             gitems1_num - [IN] number of first graph items                 *
- *             gitems2     - [IN] second graph items, sorted by itemid        *
- *             gitems2_num - [IN] number of second graph items                *
- *                                                                            *
- * Return value: SUCCEED if graph items coincide                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static int	DBcmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
-		ZBX_GRAPH_ITEMS *gitems2, int gitems2_num)
-{
-	int	res = FAIL, i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (gitems1_num != gitems2_num)
-		goto clean;
-
-	for (i = 0; i < gitems1_num; i++)
-		if (0 != strcmp(gitems1[i].key, gitems2[i].key))
-			goto clean;
-
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
-
-	return res;
-}
-
-
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_graph_to_host                                             *
- *                                                                            *
- * Purpose: copy specified graph to host                                      *
- *                                                                            *
- * Parameters: graphid - graph identificator from database                    *
- *             hostid - host identificator from database                      *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
-		const char *name, int width, int height, double yaxismin,
-		double yaxismax, unsigned char show_work_period,
-		unsigned char show_triggers, unsigned char graphtype,
-		unsigned char show_legend, unsigned char show_3d,
-		double percent_left, double percent_right,
-		unsigned char ymin_type, unsigned char ymax_type,
-		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
-		unsigned char flags, unsigned char discover)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
-	size_t		gitems_alloc = 0, gitems_num = 0,
-			chd_gitems_alloc = 0, chd_gitems_num = 0;
-	zbx_uint64_t	hst_graphid, hst_gitemid;
-	char		*sql = NULL, *name_esc, *color_esc;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset, i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	sql = (char *)zbx_malloc(sql, sql_alloc * sizeof(char));
-
-	name_esc = DBdyn_escape_string(name);
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-				"gi.type,i.flags"
-			" from graphs_items gi,items i,items dst"
-			" where gi.itemid=i.itemid"
-				" and i.key_=dst.key_"
-				" and gi.graphid=" ZBX_FS_UI64
-				" and dst.hostid=" ZBX_FS_UI64
-			" order by dst.key_",
-			graphid, hostid);
-
-	DBget_graphitems(sql, &gitems, &gitems_alloc, &gitems_num);
-
-	// select main data from target host
-	result = DBselect(
-			"select distinct g.graphid"
-			" from graphs g,graphs_items gi,items i"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64
-				" and g.name='%s'"
-				" and g.templateid is null",
-			hostid, name_esc);
-
-	/* compare graphs */
-	hst_graphid = 0;
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hst_graphid, row[0]);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,"
-					"gi.calc_fnc,gi.type,i.flags"
-				" from graphs_items gi,items i"
-				" where gi.itemid=i.itemid"
-					" and gi.graphid=" ZBX_FS_UI64
-				" order by i.key_",
-				hst_graphid);
-
-		DBget_graphitems(sql, &chd_gitems, &chd_gitems_alloc, &chd_gitems_num);
-
-		if (SUCCEED == DBcmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
-			break;	/* found equal graph */
-
-		hst_graphid = 0;
-	}
-	DBfree_result(result);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymin_type)
-		ymin_itemid = DBget_same_itemid(hostid, ymin_itemid);
-	else
-		ymin_itemid = 0;
-
-	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymax_type)
-		ymax_itemid = DBget_same_itemid(hostid, ymax_itemid);
-	else
-		ymax_itemid = 0;
-
-	if (0 != hst_graphid)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update graphs"
-				" set name='%s',"
-					"width=%d,"
-					"height=%d,"
-					"yaxismin=" ZBX_FS_DBL64_SQL ","
-					"yaxismax=" ZBX_FS_DBL64_SQL ","
-					"templateid=" ZBX_FS_UI64 ","
-					"show_work_period=%d,"
-					"show_triggers=%d,"
-					"graphtype=%d,"
-					"show_legend=%d,"
-					"show_3d=%d,"
-					"percent_left=" ZBX_FS_DBL64_SQL ","
-					"percent_right=" ZBX_FS_DBL64_SQL ","
-					"ymin_type=%d,"
-					"ymax_type=%d,"
-					"ymin_itemid=%s,"
-					"ymax_itemid=%s,"
-					"flags=%d,"
-					"discover=%d"
-				" where graphid=" ZBX_FS_UI64 ";\n",
-				name_esc, width, height, yaxismin, yaxismax,
-				graphid, (int)show_work_period, (int)show_triggers,
-				(int)graphtype, (int)show_legend, (int)show_3d,
-				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover,
-				hst_graphid);
-
-		for (i = 0; i < gitems_num; i++)
-		{
-			color_esc = DBdyn_escape_string(gitems[i].color);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update graphs_items"
-					" set drawtype=%d,"
-						"sortorder=%d,"
-						"color='%s',"
-						"yaxisside=%d,"
-						"calc_fnc=%d,"
-						"type=%d"
-					" where gitemid=" ZBX_FS_UI64 ";\n",
-					gitems[i].drawtype,
-					gitems[i].sortorder,
-					color_esc,
-					gitems[i].yaxisside,
-					gitems[i].calc_fnc,
-					gitems[i].type,
-					chd_gitems[i].gitemid);
-
-			zbx_free(color_esc);
-		}
-	}
-	else
-	{
-		hst_graphid = DBget_maxid("graphs");
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into graphs"
-				" (graphid,name,width,height,yaxismin,yaxismax,templateid,"
-				"show_work_period,show_triggers,graphtype,show_legend,"
-				"show_3d,percent_left,percent_right,ymin_type,ymax_type,"
-				"ymin_itemid,ymax_itemid,flags,discover)"
-				" values (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL64_SQL ","
-				ZBX_FS_DBL64_SQL "," ZBX_FS_UI64 ",%d,%d,%d,%d,%d," ZBX_FS_DBL64_SQL ","
-				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d,%d);\n",
-				hst_graphid, name_esc, width, height, yaxismin, yaxismax,
-				graphid, (int)show_work_period, (int)show_triggers,
-				(int)graphtype, (int)show_legend, (int)show_3d,
-				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover);
-
-		hst_gitemid = DBget_maxid_num("graphs_items", gitems_num);
-
-		for (i = 0; i < gitems_num; i++)
-		{
-			color_esc = DBdyn_escape_string(gitems[i].color);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into graphs_items (gitemid,graphid,itemid,drawtype,"
-					"sortorder,color,yaxisside,calc_fnc,type)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
-					",%d,%d,'%s',%d,%d,%d);\n",
-					hst_gitemid, hst_graphid, gitems[i].itemid,
-					gitems[i].drawtype, gitems[i].sortorder, color_esc,
-					gitems[i].yaxisside, gitems[i].calc_fnc, gitems[i].type);
-			hst_gitemid++;
-
-			zbx_free(color_esc);
-		}
-	}
-
-	zbx_free(name_esc);
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	zbx_free(gitems);
-	zbx_free(chd_gitems);
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_graphs                                           *
- *                                                                            *
- * Purpose: copy graphs from template to host                                 *
- *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-void	DBcopy_template_graphs2(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
-{
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	graphid, ymin_itemid, ymax_itemid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,"
-				"g.yaxismax,g.show_work_period,g.show_triggers,"
-				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
-				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
-				"g.ymax_itemid,g.flags,g.discover"
-			" from graphs g,graphs_items gi,items i"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
-
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		ZBX_DBROW2UINT64(ymin_itemid, row[15]);
-		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
-
-		DBcopy_graph_to_host(hostid, graphid,
-				row[1],				/* name */
-				atoi(row[2]),			/* width */
-				atoi(row[3]),			/* height */
-				atof(row[4]),			/* yaxismin */
-				atof(row[5]),			/* yaxismax */
-				(unsigned char)atoi(row[6]),	/* show_work_period */
-				(unsigned char)atoi(row[7]),	/* show_triggers */
-				(unsigned char)atoi(row[8]),	/* graphtype */
-				(unsigned char)atoi(row[9]),	/* show_legend */
-				(unsigned char)atoi(row[10]),	/* show_3d */
-				atof(row[11]),			/* percent_left */
-				atof(row[12]),			/* percent_right */
-				(unsigned char)atoi(row[13]),	/* ymin_type */
-				(unsigned char)atoi(row[14]),	/* ymax_type */
-				ymin_itemid,
-				ymax_itemid,
-				(unsigned char)atoi(row[17]),	/* flags */
-				(unsigned char)atoi(row[18]));	/* discover */
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-////////////////////////////////////////////////
-
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -463,13 +49,12 @@ typedef struct
 
 #define ZBX_FLAG_LINK_GRAPHITEM_UPDATE                                                          \
 	(ZBX_FLAG_LINK_GRAPHITEM_UPDATE_DRAWTYPE | ZBX_FLAG_LINK_GRAPHITEM_UPDATE_SORTORDER |   \
-	 ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR | ZBX_FLAG_LINK_GRAPHITEM_UPDATE_YAXISSIDE |      \
-	 ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC | ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE)
+	ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR | ZBX_FLAG_LINK_GRAPHITEM_UPDATE_YAXISSIDE |       \
+	ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC | ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE)
 
 	zbx_uint64_t	update_flags;
 }
 graph_item_entry;
-
 
 typedef struct
 {
@@ -508,15 +93,15 @@ typedef struct
 	zbx_uint64_t	ymax_itemid;
 	unsigned char	flags_orig;
 	unsigned char	flags;
- 	unsigned char	discover_orig;
- 	unsigned char	discover;
+	unsigned char	discover_orig;
+	unsigned char	discover;
 #define ZBX_FLAG_LINK_GRAPH_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_NAME			__UINT64_C(0x00000001)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH		__UINT64_C(0x00000002)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT		__UINT64_C(0x00000004)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN		__UINT64_C(0x00000008)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX		__UINT64_C(0x00000010)
-#define ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD  	__UINT64_C(0x00000020)
+#define ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD	__UINT64_C(0x00000020)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS	__UINT64_C(0x00000040)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE		__UINT64_C(0x00000080)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND		__UINT64_C(0x00000100)
@@ -530,22 +115,20 @@ typedef struct
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS		__UINT64_C(0x00010000)
 #define ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER		__UINT64_C(0x00020000)
 
-#define ZBX_FLAG_LINK_GRAPH_UPDATE                                                                  \
-	  (ZBX_FLAG_LINK_GRAPH_UNSET | ZBX_FLAG_LINK_GRAPH_UPDATE_NAME |                            \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH | ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT |                    \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN | ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX |               \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD  | ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS | \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE | ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND |           \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_3D | ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT |            \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT | ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE	|  \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE | ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID |           \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_ITEMID | ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS |               \
-	  ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER)
+#define ZBX_FLAG_LINK_GRAPH_UPDATE                                                                \
+	(ZBX_FLAG_LINK_GRAPH_UNSET | ZBX_FLAG_LINK_GRAPH_UPDATE_NAME |                            \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH | ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT |                    \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN | ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX |               \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD | ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS |  \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE | ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND |           \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_3D | ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT |            \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT | ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE         | \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE | ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID |           \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_ITEMID | ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS |               \
+	ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER)
 
 	zbx_uint64_t	update_flags;
-
 	zbx_uint64_t templateid;
-
 }
 zbx_graph_copy_t;
 
@@ -559,8 +142,8 @@ static zbx_hash_t	graphs_copies_hash_func(const void *data)
 
 static int	graphs_copies_compare_func(const void *d1, const void *d2)
 {
-	const zbx_graph_copy_t	*graph_copy_1 = (const zbx_graph_copy_t * )d1;
-	const zbx_graph_copy_t	*graph_copy_2 = (const zbx_graph_copy_t * )d2;
+	const zbx_graph_copy_t	*graph_copy_1 = (const zbx_graph_copy_t *)d1;
+	const zbx_graph_copy_t	*graph_copy_2 = (const zbx_graph_copy_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL((graph_copy_1)->graphid, (graph_copy_2)->graphid);
 
@@ -576,7 +159,48 @@ static void	graphs_copies_clean(zbx_hashset_t *x)
 
 	while (NULL != (graph_copy = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter)))
 	{
-	      //
+		zbx_free(graph_copy->name_orig);
+
+		if (0 != (graph_copy->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_NAME))
+			zbx_free(graph_copy->name);
+	}
+
+	zbx_hashset_destroy(x);
+}
+
+typedef struct zbx_graph_names_entry
+{
+	const char		*name;
+	zbx_vector_uint64_t	graphids;
+} zbx_graph_names_entry_t;
+
+static zbx_hash_t	zbx_graphs_names_hash_func(const void *data)
+{
+	const zbx_graph_names_entry_t	*graph_names_entry = (const zbx_graph_names_entry_t *)data;
+
+	return  ZBX_DEFAULT_STRING_HASH_ALGO(graph_names_entry->name, strlen(graph_names_entry->name),
+			ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	zbx_graphs_names_compare_func(const void *d1, const void *d2)
+{
+	const zbx_graph_names_entry_t	*graph_names_entry_1 = (const zbx_graph_names_entry_t *)d1;
+	const zbx_graph_names_entry_t	*graph_names_entry_2 = (const zbx_graph_names_entry_t *)d2;
+
+	return strcmp((graph_names_entry_1)->name, (graph_names_entry_2)->name);
+}
+
+
+static void	graphs_names_clean(zbx_hashset_t *x)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_graph_names_entry_t	*graph_name_entry;
+
+	zbx_hashset_iter_reset(x, &iter);
+
+	while (NULL != (graph_name_entry = (zbx_graph_names_entry_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_uint64_destroy(&(graph_name_entry->graphids));
 	}
 
 	zbx_hashset_destroy(x);
@@ -587,7 +211,6 @@ static void	graphs_copies_clean_vec_entry(zbx_graph_copy_t *copy)
 	zbx_free(copy->name);
 	zbx_free(copy);
 }
-      
 
 ZBX_PTR_VECTOR_DECL(graphs_copies, zbx_graph_copy_t*)
 ZBX_PTR_VECTOR_IMPL(graphs_copies, zbx_graph_copy_t*)
@@ -601,7 +224,6 @@ typedef struct
 	zbx_vector_gitems_t	gitems;
 }
 graphs_items_entry_t;
-
 
 static zbx_hash_t	graphs_items_hash_func(const void *data)
 {
@@ -621,28 +243,26 @@ static int	graphs_items_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void graph_item_entry_clean(graph_item_entry *x)
+static void	graph_item_entry_clean(graph_item_entry *x)
 {
-  zbx_free(x);
+	zbx_free(x);
 }
 
 static void	graphs_items_clean(zbx_hashset_t *x)
 {
-	zbx_hashset_iter_t			iter;
+	zbx_hashset_iter_t	iter;
 	graphs_items_entry_t	*trigger_entry;
 
 	zbx_hashset_iter_reset(x, &iter);
 
 	while (NULL != (trigger_entry = (graphs_items_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
-	  zbx_vector_gitems_clear_ext(&(trigger_entry->gitems), graph_item_entry_clean);
+		zbx_vector_gitems_clear_ext(&(trigger_entry->gitems), graph_item_entry_clean);
 		zbx_vector_gitems_destroy(&(trigger_entry->gitems));
 	}
 
 	zbx_hashset_destroy(x);
 }
-/////////////
-
 
 typedef struct
 {
@@ -651,13 +271,12 @@ typedef struct
 }
 itemids_map_entry_t;
 
-
 static zbx_hash_t	itemids_map_hash_func(const void *data)
 {
 	const itemids_map_entry_t	*itemids_map_entry = (const itemids_map_entry_t*) data;
 
 	return ZBX_DEFAULT_UINT64_HASH_ALGO(&(itemids_map_entry->key_itemid),
-					    sizeof(itemids_map_entry->key_itemid), ZBX_DEFAULT_HASH_SEED);
+			sizeof(itemids_map_entry->key_itemid), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	itemids_map_compare_func(const void *d1, const void *d2)
@@ -670,34 +289,16 @@ static int	itemids_map_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-/* static void     itemids_map_clean(zbx_hashset_t *x) */
-/* { */
-/* 	zbx_hashset_iter_t	iter; */
-/* 	itemids_map_entry_t	*itemids_map_entry; */
-
-/* 	zbx_hashset_iter_reset(x, &iter); */
-
-/* 	while (NULL != (itemids_map_entry = (itemids_map_entry_t *)zbx_hashset_iter_next(&iter))) */
-/* 	{ */
-/* 	  //zbx_vector_gitems_destroy(&(trigger_entry->gitems)); */
-/* 	} */
-
-/* 	zbx_hashset_destroy(x); */
-/* } */
-
-
-/////////////
-
-static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids, zbx_vector_graphs_copies_t
-					 *graphs_copies_templates, zbx_vector_uint64_t *templates_graphs_ids,
-					 zbx_vector_str_t *templates_graphs_names)
+static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
+		zbx_vector_graphs_copies_t *graphs_copies_templates, zbx_vector_uint64_t *templates_graphs_ids,
+		zbx_vector_str_t *templates_graphs_names)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_graph_copy_t	*graph_copy;
-	
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -710,6 +311,7 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids, zb
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
 				" and");
+
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
 
 	result = DBselect("%s", sql);
@@ -719,9 +321,10 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids, zb
 	while (NULL != (row = DBfetch(result)))
 	{
 		graph_copy = (zbx_graph_copy_t *)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
+
+		graph_copy->update_flags = 0;
 		ZBX_STR2UINT64(graph_copy->graphid, row[0]);
 		graph_copy->name = zbx_strdup(NULL, row[1]);
-		
 		graph_copy->width = atoi(row[2]);
 		graph_copy->height = atoi(row[3]);
 		graph_copy->yaxismin = atof(row[4]);
@@ -730,7 +333,7 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids, zb
 		graph_copy->show_triggers = (unsigned char)atoi(row[7]);
 		graph_copy->graphtype = (unsigned char)atoi(row[8]);
 		graph_copy->show_legend = (unsigned char)atoi(row[9]);
-		graph_copy->show_3d = (unsigned char)atoi(row[10]); 
+		graph_copy->show_3d = (unsigned char)atoi(row[10]);
 		graph_copy->percent_left = atof(row[11]);
 		graph_copy->percent_right = atof(row[12]);
 		graph_copy->ymin_type = (unsigned char)atoi(row[13]);
@@ -739,13 +342,10 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids, zb
 		ZBX_DBROW2UINT64(graph_copy->ymax_itemid, row[16]);
 		graph_copy->flags = (unsigned char)atoi(row[17]);
 		graph_copy->discover = (unsigned char)atoi(row[18]);
-		zbx_vector_graphs_copies_append(graphs_copies_templates, graph_copy);
 
+		zbx_vector_graphs_copies_append(graphs_copies_templates, graph_copy);
 		zbx_vector_uint64_append(templates_graphs_ids, graph_copy->graphid);
 		zbx_vector_str_append(templates_graphs_names, DBdyn_escape_string(graph_copy->name));
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER1 templated: %lu", graph_copy->graphid);
-
 	}
 
 	DBfree_result(result);
@@ -769,28 +369,27 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 			itemids_map_hash_func,
 			itemids_map_compare_func);
 #undef TRIGGER_GITEMS_HASHSET_DEF_SIZE
-
 	for (i = 0; i < graphs_copies_templates->values_num; i++)
 	{
 		zbx_vector_uint64_append(&y_data_ids, graphs_copies_templates->values[i]->ymin_itemid);
 		zbx_vector_uint64_append(&y_data_ids, graphs_copies_templates->values[i]->ymax_itemid);
 	}
-	
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			   "select ti.itemid,hi.itemid from items hi, items ti"
-			   " where hi.key_=ti.key_ "
-			   " and hi.hostid="ZBX_FS_UI64
-			   " and", hostid);
-	
+			"select ti.itemid,hi.itemid from items hi, items ti"
+			" where hi.key_=ti.key_ "
+			" and hi.hostid="ZBX_FS_UI64
+			" and", hostid);
+
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.itemid", y_data_ids.values, y_data_ids.values_num);
-	  
+
 	result = DBselect("%s", sql);
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		itemids_map_entry_t itemids_map_entry;
-		zabbix_log(LOG_LEVEL_INFORMATION, "AMERICANO STRATA: next0: %s, and next1: %s", row[0], row[1]);
+		itemids_map_entry_t	itemids_map_entry;
 
 		ZBX_STR2UINT64(itemids_map_entry.key_itemid, row[0]);
 		ZBX_STR2UINT64(itemids_map_entry.val_itemid, row[1]);
@@ -801,51 +400,42 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 
 	for (i = 0; i < graphs_copies_templates->values_num; i++)
 	{
-	  //graphs_copies_templates->values[i].ymin_type;
-	  //graphs_copies_templates->values[i].ymax_type;
+		zbx_uint64_t		ymin_itemid_new = 0, ymax_itemid_new = 0;
+		itemids_map_entry_t	*found, temp_t;
 
-	  zbx_uint64_t			ymin_itemid_new = 0, ymax_itemid_new = 0;
-	  itemids_map_entry_t	*found, temp_t;
-
-	  if (GRAPH_YAXIS_TYPE_ITEM_VALUE == graphs_copies_templates->values[i]->ymin_type)
-	  {
-	  
-		temp_t.key_itemid = graphs_copies_templates->values[i]->ymin_itemid;
-
-		if (NULL != (found = (itemids_map_entry_t*)zbx_hashset_search(&y_data_map, &temp_t)))
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == graphs_copies_templates->values[i]->ymin_type)
 		{
-			ymin_itemid_new = found->val_itemid;
-		}	  
-	  }
+			temp_t.key_itemid = graphs_copies_templates->values[i]->ymin_itemid;
 
-	  if (GRAPH_YAXIS_TYPE_ITEM_VALUE == graphs_copies_templates->values[i]->ymax_type)
-	  {	  
-		temp_t.key_itemid = graphs_copies_templates->values[i]->ymax_itemid;
+			if (NULL != (found = (itemids_map_entry_t*)zbx_hashset_search(&y_data_map, &temp_t)))
+			{
+				ymin_itemid_new = found->val_itemid;
+			}
+		}
 
-		if (NULL != (found = (itemids_map_entry_t*)zbx_hashset_search(&y_data_map, &temp_t)))
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == graphs_copies_templates->values[i]->ymax_type)
 		{
-			ymax_itemid_new = found->val_itemid;
-		}	  
-	  }
+			temp_t.key_itemid = graphs_copies_templates->values[i]->ymax_itemid;
 
+			if (NULL != (found = (itemids_map_entry_t*)zbx_hashset_search(&y_data_map, &temp_t)))
+			{
+				ymax_itemid_new = found->val_itemid;
+			}
+		}
 
-	  zabbix_log(LOG_LEVEL_INFORMATION, "AMERICANO ymin: before: %lu, after: %lu",  graphs_copies_templates->values[i]->ymin_itemid, ymin_itemid_new);
-	  zabbix_log(LOG_LEVEL_INFORMATION, "AMERICANO ymax: before: %lu, after: %lu",  graphs_copies_templates->values[i]->ymax_itemid, ymax_itemid_new);
-	  graphs_copies_templates->values[i]->ymin_itemid = ymin_itemid_new;
-	  graphs_copies_templates->values[i]->ymax_itemid = ymax_itemid_new;
-	  
-	  
+		graphs_copies_templates->values[i]->ymin_itemid = ymin_itemid_new;
+		graphs_copies_templates->values[i]->ymax_itemid = ymax_itemid_new;
 	}
 
 	zbx_free(sql);
 	zbx_hashset_destroy(&y_data_map);
 	zbx_vector_uint64_destroy(&y_data_ids);
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():", __func__);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():", __func__);
 }
-//hostid is necessary for template, for host hostid is 0
-static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
+
+/* hostid is necessary for template, for host hostid is 0 */
+static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 		zbx_hashset_t *graphs_items)
 {
 	char			*sql = NULL;
@@ -855,25 +445,25 @@ static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 
 	if (0 != hostid)
 	{
-	  /* template */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-				"gi.type,i.flags,gi.graphid"
-			" from graphs_items gi,items i,items dst"
-			" where gi.itemid=i.itemid"
-			" and i.key_=dst.key_");
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dst.hostid=" ZBX_FS_UI64, hostid); 
+		/* template */
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,"
+					"gi.calc_fnc,gi.type,i.flags,gi.graphid"
+				" from graphs_items gi,items i,items dst"
+				" where gi.itemid=i.itemid"
+				" and i.key_=dst.key_");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dst.hostid=" ZBX_FS_UI64, hostid);
 	}
 	else
-	  {
-	    /* host */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select gi.itemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-				"gi.type,i.flags,gi.graphid"
-			" from graphs_items gi,items i"
-			" where gi.itemid=i.itemid");
-	  }
-	//zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dst.hostid=" ZBX_FS_UI64, hostid); 
+	{
+		/* host */
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,"
+					"gi.calc_fnc,gi.type,i.flags,gi.graphid"
+				" from graphs_items gi,items i"
+				" where gi.itemid=i.itemid");
+	}
+
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, " and gi.graphid", graphs_ids->values,
 			graphs_ids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.key_");
@@ -886,7 +476,8 @@ static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 		graph_item_entry	*gitem;
 
 		gitem = (graph_item_entry*)zbx_malloc(NULL, sizeof(graph_item_entry));
-	      
+
+		gitem->update_flags = 0;
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(gitem->itemid, row[1]);
 		zbx_strlcpy(gitem->key, row[2], sizeof(gitem->key));
@@ -897,11 +488,7 @@ static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 		gitem->calc_fnc_orig = atoi(row[7]);
 		gitem->type_orig = atoi(row[8]);
 		gitem->flags = (unsigned char)atoi(row[9]);
-
-		
 		ZBX_STR2UINT64(temp_t.graphid, row[10]);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "TTT GITEM NEXT: gitemid: %lu, itemid: %lu, key: %s, graphid: ->%lu<-", gitem->gitemid, gitem->itemid, gitem->key, temp_t.graphid);
 
 		if (NULL != (found = (graphs_items_entry_t*)zbx_hashset_search(graphs_items, &temp_t)))
 		{
@@ -909,15 +496,12 @@ static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 		}
 		else
 		{
-		  //graphs_items_entry_t local_temp_t;
-
 			zbx_vector_gitems_create(&(temp_t.gitems));
 			zbx_vector_gitems_append(&(temp_t.gitems), gitem);
 			ZBX_STR2UINT64(temp_t.graphid, row[10]);
 
 			zbx_hashset_insert(graphs_items, &temp_t, sizeof(temp_t));
 		}
-
 	}
 
 	zbx_free(sql);
@@ -925,7 +509,8 @@ static void	get_data(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 }
 
 static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *templates_graphs_names,
-					  zbx_vector_uint64_t *host_graphs_ids, zbx_hashset_t *host_graphs_main_data)
+		zbx_vector_uint64_t *host_graphs_ids, zbx_hashset_t *host_graphs_main_data,
+		zbx_hashset_t *host_graphs_names)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
@@ -943,23 +528,23 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 				" and gi.itemid=i.itemid"
 				" and i.hostid=" ZBX_FS_UI64
 				" and g.templateid is null"
-		     " and", hostid);
+			" and", hostid);
 
-	  DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
+	DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
 			(const char**)templates_graphs_names->values, templates_graphs_names->values_num);
-	  
+
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	graphid;
-		zbx_graph_copy_t graph_copy;
+		zbx_uint64_t		graphid;
+		zbx_graph_copy_t	graph_copy;
+		zbx_graph_names_entry_t	temp_t, *found;
 
+		graph_copy.update_flags = 0;
 		ZBX_STR2UINT64(graphid, row[0]);
 		zbx_vector_uint64_append(host_graphs_ids, graphid);
 
-		// select data that might get updates for the target graph
-		
 		graph_copy.graphid = graphid;
 		graph_copy.name_orig = zbx_strdup(NULL, row[1]);
 		graph_copy.width_orig = atoi(row[2]);
@@ -967,7 +552,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		graph_copy.yaxismin_orig = atof(row[4]);
 		graph_copy.yaxismax_orig = atof(row[5]);
 		graph_copy.show_work_period_orig = (unsigned char)atoi(row[6]);
-		graph_copy.show_triggers_orig = (unsigned char)atoi(row[7]); 
+		graph_copy.show_triggers_orig = (unsigned char)atoi(row[7]);
 		graph_copy.graphtype_orig = (unsigned char)atoi(row[8]);
 		graph_copy.show_legend_orig = (unsigned char)atoi(row[9]);
 		graph_copy.show_3d_orig = (unsigned char)atoi(row[10]);
@@ -977,17 +562,35 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		graph_copy.ymax_type_orig = (unsigned char)atoi(row[14]);
 		ZBX_DBROW2UINT64(graph_copy.ymin_itemid_orig, row[15]);
 		ZBX_DBROW2UINT64(graph_copy.ymax_itemid_orig, row[16]);
+
 		graph_copy.flags_orig = (unsigned char)atoi(row[17]);
 		graph_copy.discover_orig = (unsigned char)atoi(row[18]);
 
 		zbx_hashset_insert(host_graphs_main_data, &graph_copy, sizeof(graph_copy));
+
+		temp_t.name = graph_copy.name_orig;
+
+		if (NULL != (found = (zbx_graph_names_entry_t *)zbx_hashset_search(host_graphs_names, &temp_t)))
+		{
+			zbx_vector_uint64_append(&(found->graphids), graphid);
+		}
+		else
+		{
+			zbx_graph_names_entry_t	local_temp_t;
+
+			zbx_vector_uint64_create(&(local_temp_t.graphids));
+			local_temp_t.name = graph_copy.name_orig;
+			zbx_vector_uint64_append(&(local_temp_t.graphids), graphid);
+			zbx_hashset_insert(host_graphs_names, &local_temp_t, sizeof(local_temp_t));
+		}
 	}
 
 	zbx_free(sql);
 	DBfree_result(result);
 }
 
-static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy, zbx_graph_copy_t *host_graph_copy_found)
+static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy,
+		zbx_graph_copy_t *host_graph_copy_found)
 {
 	int	res = FAIL;
 
@@ -1012,14 +615,14 @@ static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy, zb
 		res = SUCCEED;
 	}
 
-	if (template_graph_copy->yaxismin != host_graph_copy_found->yaxismin_orig)
+	if (FAIL == zbx_double_compare(template_graph_copy->yaxismin, host_graph_copy_found->yaxismin_orig))
 	{
 		host_graph_copy_found->yaxismin = template_graph_copy->yaxismin;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN;
 		res = SUCCEED;
 	}
 
-	if (template_graph_copy->yaxismax != host_graph_copy_found->yaxismax_orig)
+	if (FAIL == zbx_double_compare(template_graph_copy->yaxismax, host_graph_copy_found->yaxismax_orig))
 	{
 		host_graph_copy_found->yaxismax = template_graph_copy->yaxismax;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX;
@@ -1061,14 +664,14 @@ static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy, zb
 		res = SUCCEED;
 	}
 
-	if (template_graph_copy->percent_left != host_graph_copy_found->percent_left_orig)
+	if (FAIL == zbx_double_compare(template_graph_copy->percent_left, host_graph_copy_found->percent_left_orig))
 	{
 		host_graph_copy_found->percent_left = template_graph_copy->percent_left;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT;
 		res = SUCCEED;
 	}
 
-	if (template_graph_copy->percent_right != host_graph_copy_found->percent_right_orig)
+	if (FAIL == zbx_double_compare(template_graph_copy->percent_right, host_graph_copy_found->percent_right_orig))
 	{
 		host_graph_copy_found->percent_right = template_graph_copy->percent_right;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT;
@@ -1117,18 +720,22 @@ static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy, zb
 		res = SUCCEED;
 	}
 
+	if (SUCCEED == res)
+		host_graph_copy_found->templateid = template_graph_copy->graphid;
+
 	return res;
 }
 
 static int	mark_updates_for_host_graph_items(graphs_items_entry_t *graphs_items_template_entry_found,
 		graphs_items_entry_t *graphs_items_host_entry_found)
 {
-	int j, res = FAIL;
+	int			j, res = FAIL;
+	graph_item_entry	*template_entry, *host_entry;
 
 	for (j = 0; j < graphs_items_template_entry_found->gitems.values_num; j++)
 	{
-		graph_item_entry	*template_entry  = graphs_items_template_entry_found->gitems.values[j];
-		graph_item_entry	*host_entry = graphs_items_host_entry_found->gitems.values[j];
+		template_entry = graphs_items_template_entry_found->gitems.values[j];
+		host_entry = graphs_items_host_entry_found->gitems.values[j];
 
 		if (template_entry->drawtype_orig != host_entry->drawtype_orig)
 		{
@@ -1140,15 +747,15 @@ static int	mark_updates_for_host_graph_items(graphs_items_entry_t *graphs_items_
 		if (template_entry->sortorder_orig != host_entry->sortorder_orig)
 		{
 			host_entry->sortorder_new = template_entry->sortorder_orig;
-			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_SORTORDER;		  
+			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_SORTORDER;
 			res = SUCCEED;
 		}
 
-		if (template_entry->color_orig != host_entry->color_orig)
+		if (0 != strcmp(template_entry->color_orig, host_entry->color_orig))
 		{
 			zbx_strlcpy(host_entry->color_new, template_entry->color_orig,
 					sizeof(template_entry->color_orig));
-			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR;		  
+			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR;
 			res = SUCCEED;
 		}
 
@@ -1162,14 +769,14 @@ static int	mark_updates_for_host_graph_items(graphs_items_entry_t *graphs_items_
 		if (template_entry->calc_fnc_orig != host_entry->calc_fnc_orig)
 		{
 			host_entry->calc_fnc_new = template_entry->calc_fnc_orig;
-			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC;		  
+			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC;
 			res = SUCCEED;
 		}
 
 		if (template_entry->type_orig != host_entry->type_orig)
 		{
 			host_entry->type_new = template_entry->type_orig;
-			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE;		  
+			host_entry->update_flags |= ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE;
 			res = SUCCEED;
 		}
 	}
@@ -1177,205 +784,267 @@ static int	mark_updates_for_host_graph_items(graphs_items_entry_t *graphs_items_
 	return res;
 }
 
-static void	process_graphs(zbx_vector_graphs_copies_t *graphs_copies_templates,
-		zbx_hashset_t *host_graphs_main_data, zbx_hashset_t *templates_graphs_items,
-			       zbx_hashset_t *host_graphs_items, int *upd_graphs,
-			       zbx_vector_graphs_copies_t *graphs_copies_insert, int *total_insert_gitems_count)
+static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template_entry_temp,
+		zbx_vector_graphs_copies_t *graphs_copies_insert, zbx_graph_copy_t *template_graph_copy)
 {
-	/* iterate over templates graphs
-	   iterate over target host graphs
-  
-      	get vector of graphs items for template and target
-  	iterate and compare each
-  	if they are the same - mark_for_updates in the tempate data
-	otherwise - add to the new list of inserts */
+	zbx_graph_copy_t	*graph_copy;
 
-	int			i, j, found_match = FAIL;
-	zbx_graph_copy_t	*template_graph_copy, *host_graph_copy_found;
-	zbx_hashset_iter_t	iter1;
+	graph_copy = (zbx_graph_copy_t*)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "RRRRRRRRRRRRRRRR");
-	
-	for (i = 0; i < graphs_copies_templates->values_num; i++)
+	graph_copy->templateid = graphs_items_template_entry_temp->graphid;
+	graph_copy->name = DBdyn_escape_string(template_graph_copy->name);
+	graph_copy->width = template_graph_copy->width;
+	graph_copy->height = template_graph_copy->height;
+	graph_copy->yaxismin = template_graph_copy->yaxismin;
+	graph_copy->yaxismax = template_graph_copy->yaxismax;
+	graph_copy->show_work_period = template_graph_copy->show_work_period;
+	graph_copy->show_triggers = template_graph_copy->show_triggers;
+	graph_copy->graphtype = template_graph_copy->graphtype;
+	graph_copy->show_legend = template_graph_copy->show_legend;
+	graph_copy->show_3d = template_graph_copy->show_3d;
+	graph_copy->percent_left = template_graph_copy->percent_left;
+	graph_copy->percent_right = template_graph_copy->percent_right;
+	graph_copy->ymin_type = template_graph_copy->ymin_type;
+	graph_copy->ymax_type = template_graph_copy->ymax_type;
+	graph_copy->ymin_itemid = template_graph_copy->ymin_itemid;
+	graph_copy->ymax_itemid = template_graph_copy->ymax_itemid;
+	graph_copy->flags = template_graph_copy->flags;
+	graph_copy->discover = template_graph_copy->discover;
+
+	zbx_vector_graphs_copies_append(graphs_copies_insert, graph_copy);
+}
+
+/************************************************************************************
+ *                                                                                  *
+ * Function: process_template_graph                                                 *
+ *                                                                                  *
+ * Description: 1) gets a template graph and host graph and compares them           *
+ *              2) if they are the same (they have same names and all of            *
+ *                 their items keys are the same) and checks which fields           *
+ *                 on the target host graph need to be updated and marks            *
+ *                 them for update                                                  *
+ *                                                                                  *
+ * Parameters: host_graphid                        - [IN] target host graphid       *
+ *             host_graphs_main_data               - [IN] set of host graph copies  *
+ *                                                        with names that match the *
+ *                                                        graphs from the templates *
+ *             host_graphs_items                   - [IN] helper set for the        *
+ *                                                        host_graphs_main_data     *
+ *             graphs_items_template_entry_found   - [IN/OUT] helper set for        *
+ *                                                        template_graph_copy       *
+ *             template_graph_copy                 - [IN] template data             *
+ *             upd_graphs_or_graphs_items          - [IN/OUT] counter of updated    *
+ *                                                        graphs or graphs items    *
+ *                                                                                  *
+ * Return value: SUCCEED - the templates graph and host graph are the same          *
+ *               FAIL    - otherwise                                                *
+ *                                                                                  *
+ ***********************************************************************************/
+static int	process_template_graph(zbx_uint64_t host_graphid, zbx_hashset_t *host_graphs_main_data,
+		zbx_hashset_t *host_graphs_items, graphs_items_entry_t *graphs_items_template_entry_found,
+		zbx_graph_copy_t *template_graph_copy, int *upd_graphs_or_graphs_items)
+{
+	int			j,  found_match = FAIL;
+	zbx_graph_copy_t	main_temp_t, *host_graph_copy_found;
+	graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
+
+	main_temp_t.graphid = host_graphid;
+
+	if (NULL != (host_graph_copy_found = (zbx_graph_copy_t *) zbx_hashset_search(host_graphs_main_data,
+			&main_temp_t)))
 	{
-  		graphs_items_entry_t	*graphs_items_template_entry_found, graphs_items_template_entry_temp_t;
+		graphs_items_host_entry_temp_t.graphid = host_graph_copy_found->graphid;
 
-		template_graph_copy = graphs_copies_templates->values[i];
-		graphs_items_template_entry_temp_t.graphid = template_graph_copy->graphid;
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "RRR next template graphid: %lu", template_graph_copy->graphid);
-
-		
-		// search template graph_items
-		if (NULL != (graphs_items_template_entry_found = (graphs_items_entry_t*)zbx_hashset_search(templates_graphs_items,
-				&graphs_items_template_entry_temp_t)))
+		/* iterate over host graphs items */
+		if (NULL != (graphs_items_host_entry_found = (graphs_items_entry_t*)zbx_hashset_search(
+				host_graphs_items, &graphs_items_host_entry_temp_t)))
 		{
-			zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
+			int	same_gitems = SUCCEED;
 
-			// iterate over host graphs
-			while (NULL != (host_graph_copy_found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
+			if (graphs_items_template_entry_found->gitems.values_num !=
+					graphs_items_host_entry_found->gitems.values_num)
 			{
-			  
-				graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
+				return FAIL;
+			}
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "RRR\t\t next host graph: %lu",host_graph_copy_found->graphid);
-
-				graphs_items_host_entry_temp_t.graphid = host_graph_copy_found->graphid;
-
-				// iterate over host graphs items
-				if (NULL != (graphs_items_host_entry_found = (graphs_items_entry_t*)zbx_hashset_search(
-						host_graphs_items, &graphs_items_host_entry_temp_t)))
+			for (j = 0; j < graphs_items_template_entry_found->gitems.values_num; j++)
+			{
+				if (0 != strcmp(graphs_items_template_entry_found->gitems.values[j]->key,
+						graphs_items_host_entry_found->gitems.values[j]->key))
 				{
-					zabbix_log(LOG_LEVEL_INFORMATION, "RRR\t\t\t first values num and second : %d, %d",graphs_items_template_entry_found->gitems.values_num, graphs_items_host_entry_found->gitems.values_num);
-
-					
-					//graphs_items_host_entry_found->gitms
-					if (graphs_items_template_entry_found->gitems.values_num  !=
-							graphs_items_host_entry_found->gitems.values_num)
-					{
-						continue;
-					}
-
-					for (j = 0; j < graphs_items_template_entry_found->gitems.values_num; j++)
-					{
-
-					  zabbix_log(LOG_LEVEL_INFORMATION, "RRR\t\t\t comparing ->%s<- and ->%s<-",graphs_items_template_entry_found->gitems.values[j]->key, graphs_items_host_entry_found->gitems.values[j]->key);
-
-					  
-			    			if (0 != strcmp(graphs_items_template_entry_found->gitems.values[j]->key,
-								graphs_items_host_entry_found->gitems.values[j]->key))
-						{
-							continue;
-						}
-					}
-
-					found_match = SUCCEED;
-
-					if (SUCCEED == mark_updates_for_host_graph(template_graph_copy, host_graph_copy_found)
-						|| SUCCEED == mark_updates_for_host_graph_items(
-						graphs_items_template_entry_found, graphs_items_host_entry_found))
-					{
-					  // mark graph items for update
-
-						
-						(*upd_graphs)++;
-					}
+					same_gitems = FAIL;
 					break;
 				}
 			}
 
-			/* not found any entries on host */
-			if (FAIL == found_match)
+			if (SUCCEED == same_gitems)
+				found_match = SUCCEED;
+		}
+	}
+
+	if (SUCCEED == found_match)
+	{
+		int	graphs_updated, graphs_items_updated;
+
+		graphs_updated = mark_updates_for_host_graph(template_graph_copy, host_graph_copy_found);
+		graphs_items_updated = mark_updates_for_host_graph_items(graphs_items_template_entry_found,
+				graphs_items_host_entry_found);
+
+		if (SUCCEED == graphs_updated || SUCCEED == graphs_items_updated)
+			(*upd_graphs_or_graphs_items)++;
+	}
+
+	return found_match;
+}
+
+/************************************************************************************
+ *                                                                                  *
+ * Function: process_graphs                                                         *
+ *                                                                                  *
+ * Description: 1) gets a list graph from the templates                             *
+ *              2) gets a list of graphs_items for that graph                       *
+ *              3) gets all the current host graphs (with names that match any of   *
+ *                 the templates graphs names)                                      *
+ *              4) iterates over template graphs                                    *
+ *              5) for each template graph finds the target host graphs with names  *
+ *                 that match the template graph                                    *
+ *              6) calls the process_template_graph() that compares both graphs and *
+ *                 if they are the same marks the target host graph fields for      *
+ *                 update                                                           *
+ *              7) if process_template_graph() returns they are not the same, the   *
+ *                 copy graph from the template is prepared for insert into a       *
+ *                 target host                                                      *
+ *                                                                                  *
+ * Parameters: template_graph_copy        - [IN]     main template graph data       *
+ *             host_graphs_main_data      - [IN]     set of host graph copies       *
+ *                                                   with names that match the      *
+ *                                                   graphs from the templates      *
+ *             host_graphs_names          - [IN]     helper set for faster search   *
+ *                                                   of graphs by names             *
+ *             templates_graphs_items     - [IN]     helper set for the             *
+ *                                                   template_graph_copy            *
+ *             host_graphs_items          - [IN/OUT] helper set for the             *
+ *                                                   host_graphs_main_data          *
+ *             upd_graphs_or_graphs_items - [IN/OUT] counter of updated graphs      *
+ *             graphs_copies_insert       - [OUT]    prepared graphs for insert     *
+ *             total_insert_gitems_count  - [OUT]    total number of total          *
+ *                                                   insert gitems_count            *
+ *                                                                                  *
+ ***********************************************************************************/
+static void	process_graphs(zbx_graph_copy_t *template_graph_copy, zbx_hashset_t *host_graphs_main_data,
+		zbx_hashset_t *host_graphs_names, zbx_hashset_t *templates_graphs_items,
+		zbx_hashset_t *host_graphs_items, int *upd_graphs_or_graphs_items,
+		zbx_vector_graphs_copies_t *graphs_copies_insert, int *total_insert_gitems_count)
+{
+	int			i;
+	graphs_items_entry_t	*graphs_items_template_entry_found, graphs_items_template_entry_temp;
+
+	graphs_items_template_entry_temp.graphid = template_graph_copy->graphid;
+
+	if (NULL != (graphs_items_template_entry_found = (graphs_items_entry_t*)zbx_hashset_search(
+			templates_graphs_items, &graphs_items_template_entry_temp)))
+	{
+		int			found_match = FAIL;
+		zbx_graph_names_entry_t	temp_t, *found;
+
+		temp_t.name = template_graph_copy->name;
+
+		if (NULL != (found =  (zbx_graph_names_entry_t *)zbx_hashset_search(host_graphs_names, &temp_t)))
+		{
+			for (i = 0; i < found->graphids.values_num; i++)
 			{
-
-			  zbx_graph_copy_t *graph_copy;
-			  graph_copy = (zbx_graph_copy_t*)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
-
-			  // will need to extract fitemid
-			  graph_copy->templateid = graphs_items_template_entry_temp_t.graphid;
-
-			  graph_copy->name = DBdyn_escape_string(template_graph_copy->name);
-			  graph_copy->width = template_graph_copy->width;
-			  graph_copy->height = template_graph_copy->height;
-			  graph_copy->yaxismin = template_graph_copy->yaxismin;
-			  graph_copy->yaxismax = template_graph_copy->yaxismax;
-			  graph_copy->show_work_period = template_graph_copy->show_work_period;
-			  graph_copy->show_triggers = template_graph_copy->show_triggers;
-			  graph_copy->graphtype = template_graph_copy->graphtype;
-			  graph_copy->show_legend = template_graph_copy->show_legend;
-			  graph_copy->show_3d = template_graph_copy->show_3d;
-			  graph_copy->percent_left = template_graph_copy->percent_left;
-			  graph_copy->percent_right = template_graph_copy->percent_right;
-			  graph_copy->ymin_type = template_graph_copy->ymin_type;
-			  graph_copy->ymax_type = template_graph_copy->ymax_type;
-			  //WARNING SQL_ID_NS
-			  zabbix_log(LOG_LEVEL_INFORMATION, "OMEGA ymin: %lu", template_graph_copy->ymin_itemid);
-			  graph_copy->ymin_itemid = template_graph_copy->ymin_itemid;
-			  graph_copy->ymax_itemid = template_graph_copy->ymax_itemid;
-			  graph_copy->flags = template_graph_copy->flags;
-			  graph_copy->discover = template_graph_copy->discover;
-
-			  total_insert_gitems_count += graphs_items_template_entry_found->gitems.values_num;
-			  zbx_vector_graphs_copies_append(graphs_copies_insert, graph_copy);
+				if (SUCCEED == process_template_graph(found->graphids.values[i], host_graphs_main_data,
+						host_graphs_items, graphs_items_template_entry_found,
+						template_graph_copy, upd_graphs_or_graphs_items))
+				{
+					found_match = SUCCEED;
+					break;
+				}
 			}
-			
+		}
+
+		if (FAIL == found_match)
+		{
+			/* not found any entries on host */
+			prepare_graph_for_insert(&graphs_items_template_entry_temp, graphs_copies_insert,
+					template_graph_copy);
+			*total_insert_gitems_count += graphs_items_template_entry_found->gitems.values_num;
 		}
 	}
 }
 
 static void	update_graphs_items_updates(char **sql2, size_t *sql_alloc2, size_t *sql_offset2,
-		zbx_graph_copy_t *found, zbx_hashset_t *host_graphs_items)
+		zbx_uint64_t graphid, zbx_hashset_t *host_graphs_items)
 {
 	int			j;
 	const char		*d2;
 	graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
 
-	graphs_items_host_entry_temp_t.graphid = found->graphid;
+	graphs_items_host_entry_temp_t.graphid = graphid;
 
 	if (NULL != (graphs_items_host_entry_found = (graphs_items_entry_t*)zbx_hashset_search(host_graphs_items,
 			&graphs_items_host_entry_temp_t)))
 	{
 		for (j = 0; j < graphs_items_host_entry_found->gitems.values_num; j++)
 		{
-			graph_item_entry	*template_entry  = graphs_items_host_entry_found->gitems.values[j];
+			graph_item_entry	*host_items_entry;
+
+			host_items_entry = graphs_items_host_entry_found->gitems.values[j];
 
 			d2 = "";
 
-			if (0 != (template_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE))
+			if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE))
 			{
 				zbx_strcpy_alloc(sql2, sql_alloc2, sql_offset2, "update graphs_items set ");
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_DRAWTYPE))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_DRAWTYPE))
 				{
 					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "drawtype=%d",
-							template_entry->drawtype_new);
+							host_items_entry->drawtype_new);
 					d2 = ",";
 				}
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_SORTORDER))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_SORTORDER))
 				{
-				  zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%ssortorder=%d", d2,
-							template_entry->sortorder_new);
+					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%ssortorder=%d", d2,
+							host_items_entry->sortorder_new);
 					d2 = ",";
 				}
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_COLOR))
 				{
-					char *color_esc = DBdyn_escape_string(template_entry->color_new);
+					char *color_esc = DBdyn_escape_string(host_items_entry->color_new);
 
 					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%scolor='%s'", d2,
 							color_esc);
 					zbx_free(color_esc);
 					d2 = ",";
-
 				}
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_YAXISSIDE))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_YAXISSIDE))
 				{
-				  zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%syaxisside=%d", d2, 
-							template_entry->yaxisside_new);
+					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%syaxisside=%d", d2,
+							host_items_entry->yaxisside_new);
 					d2 = ",";
 				}
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_CALC_FNC))
 				{
-				  zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%scalc_fnc=%d", d2,
-							template_entry->calc_fnc_new);
+					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%scalc_fnc=%d", d2,
+							host_items_entry->calc_fnc_new);
 					d2 = ",";
 				}
 
-				if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE))
+				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_TYPE))
 				{
-				  zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%stype=%d", d2,
-							template_entry->type_new);
-					d2 = ",";
+					zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, "%stype=%d", d2,
+							host_items_entry->type_new);
 				}
+
+				zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, " where gitemid=" ZBX_FS_UI64 ";\n",
+					   host_items_entry->gitemid);
+				DBexecute_overflowed_sql(sql2, sql_alloc2, sql_offset2);
 			}
-
-			zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, " where gitemid=" ZBX_FS_UI64 ";\n",
-					graphs_items_host_entry_found->graphid);
-
-			DBexecute_overflowed_sql(sql2, sql_alloc2, sql_offset2);
 		}
 	}
 }
@@ -1388,10 +1057,9 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	size_t			sql_alloc = 512, sql_offset = 0, sql_alloc2 = 512, sql_offset2 = 0;
 	zbx_hashset_iter_t	iter1;
 	zbx_graph_copy_t	*found;
-	
+
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
@@ -1418,28 +1086,27 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, found->width);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, found->height);
 				d = ",";
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL64_SQL ",", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL64_SQL, d,
 						found->yaxismin);
 				d = ",";
 			}
 
-			
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL64_SQL ",", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL64_SQL, d,
 						found->yaxismax);
 				d = ",";
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%show_work_period=%d", d,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_work_period=%d", d,
 						   (int)found->show_work_period);
 				d = ",";
 			}
@@ -1470,35 +1137,35 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d,
 						(int)found->show_3d);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"%spercent_left=" ZBX_FS_DBL64_SQL ",", d, found->percent_left);
+						"%spercent_left=" ZBX_FS_DBL64_SQL, d, found->percent_left);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"%spercent_right=" ZBX_FS_DBL64_SQL ",", d, found->percent_right);
+						"%spercent_right=" ZBX_FS_DBL64_SQL, d, found->percent_right);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_type=%d", d,
 						(int)found->ymin_type);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_type=%d", d,
 						(int)found->ymax_type);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID))
 			{
@@ -1512,14 +1179,14 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
 						DBsql_id_ins(found->ymax_itemid));
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sflags=%d", d,
 						(int)found->flags);
 				d = ",";
-			}			
+			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER))
 			{
@@ -1529,26 +1196,26 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
-					found->graphid);
-			d = ",";
-			
+					found->templateid);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where graphid=" ZBX_FS_UI64 ";\n",
 					found->graphid);
 
-			//DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			// update gitems
-			update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found, host_graphs_items);
-			
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
+
+		update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found->graphid, host_graphs_items);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-	
+
 	if (16 < sql_offset)
 	{
 		if (ZBX_DB_OK > DBexecute("%s", sql))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
 			res = FAIL;
+		}
 	}
 
 	zbx_free(sql);
@@ -1556,16 +1223,19 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	if (SUCCEED == res)
 	{
 		DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
-	
+
 		if (16 < sql_offset2)
 		{
 			if (ZBX_DB_OK > DBexecute("%s", sql2))
-		       		res = FAIL;
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
+				res = FAIL;
+			}
 		}
 
 		zbx_free(sql2);
 	}
-	
+
 	return res;
 }
 
@@ -1573,13 +1243,8 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 		zbx_hashset_t *templates_graphs_items)
 {
 	int			i, j, res;
-	//char			*sql = NULL;
-	//size_t			sql_alloc = 512, sql_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_graphs_items;
-	//zbx_trigger_functions_entry_t	*found, temp_t;
 	zbx_uint64_t		graphid, graphs_itemsid;
-	
-	//DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 			"yaxismax", "templateid", "show_work_period", "show_triggers", "graphtype", "show_legend",
@@ -1596,21 +1261,10 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	{
 		char			*graph_copy_name;
 		zbx_graph_copy_t	*graph_copy = graphs_copies_insert->values[i];
-  		graphs_items_entry_t	*graphs_items_template_entry_found, graphs_items_template_entry_temp_t;
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "YMIN_ITEMID1: BEFORE1: %lu", graph_copy->ymin_itemid);
-		zabbix_log(LOG_LEVEL_INFORMATION, "YMIN_ITEMID1: BEFORE2: %s", DBsql_id_ins(graph_copy->ymin_itemid));
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 ymin_itemid: %lu", graph_copy->ymin_itemid);
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 templated: %lu", graph_copy->templateid);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 name: %s", graph_copy->name);
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 width: %d", graph_copy->width);
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 yaxismin: %f", graph_copy->yaxismin);
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERT BADGER2 ymaxtype: %d", graph_copy->ymax_type);
+		graphs_items_entry_t	*graphs_items_template_entry_found, graphs_items_template_entry_temp_t;
 
 		graph_copy_name = DBdyn_escape_string(graph_copy->name);
-										
+
 		zbx_db_insert_add_values(&db_insert, graphid, graph_copy_name, graph_copy->width,
 				graph_copy->height, graph_copy->yaxismin, graph_copy->yaxismax, graph_copy->templateid,
 				(int)graph_copy->show_work_period, (int)(graph_copy->show_triggers),
@@ -1624,13 +1278,13 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 
 		graphs_items_template_entry_temp_t.graphid = graph_copy->templateid;
 
-		if (NULL != (graphs_items_template_entry_found = (graphs_items_entry_t*)zbx_hashset_search(templates_graphs_items,
-				&graphs_items_template_entry_temp_t)))
+		if (NULL != (graphs_items_template_entry_found = (graphs_items_entry_t*)zbx_hashset_search(
+				templates_graphs_items, &graphs_items_template_entry_temp_t)))
 		{
 			for (j = 0; j < graphs_items_template_entry_found->gitems.values_num; j++)
 			{
-				graph_item_entry	*template_entry;
 				char			*color_orig_esc;
+				graph_item_entry	*template_entry;
 
 				template_entry = graphs_items_template_entry_found->gitems.values[j];
 				color_orig_esc = DBdyn_escape_string(template_entry->color_orig);
@@ -1638,8 +1292,8 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 				zbx_db_insert_add_values(&db_insert_graphs_items, graphs_itemsid++, graphid,
 						template_entry->itemid, template_entry->drawtype_orig,
 						template_entry->sortorder_orig,
-					        color_orig_esc,
-					        template_entry->yaxisside_orig, template_entry->calc_fnc_orig,
+						color_orig_esc,
+						template_entry->yaxisside_orig, template_entry->calc_fnc_orig,
 						template_entry->type_orig);
 				zbx_free(color_orig_esc);
 			}
@@ -1659,25 +1313,34 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_graphs                                           *
+ *                                                                            *
+ * Purpose: copy graphs from template to host                                 *
+ *                                                                            *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template IDs                       *
+ *                                                                            *
+ * Return value: SUCCEED - db operations successful                           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	int					upd_graphs = 0, total_insert_gitems_count = 0, res = SUCCEED;
-  	zbx_vector_graphs_copies_t		graphs_copies_templates;
-	zbx_vector_graphs_copies_t		graphs_copies_insert;
-	zbx_hashset_t				host_graphs_main_data;
-	zbx_hashset_t				templates_graphs_items;
-	zbx_hashset_t				host_graphs_items;
+	int				i, upd_graphs_or_graphs_items = 0, total_insert_gitems_count = 0,
+					res = SUCCEED;
+	zbx_vector_graphs_copies_t	graphs_copies_templates, graphs_copies_insert;
+	zbx_hashset_t			host_graphs_main_data, templates_graphs_items, host_graphs_items,
+					host_graphs_names;
+	zbx_vector_str_t		templates_graphs_names;
+	zbx_vector_uint64_t		templates_graphs_ids, host_graphs_ids;
 
-	zbx_vector_str_t			templates_graphs_names;
-	zbx_vector_uint64_t			templates_graphs_ids;
-	zbx_vector_uint64_t			host_graphs_ids;
-	
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&templates_graphs_names);
 	zbx_vector_uint64_create(&templates_graphs_ids);
 	zbx_vector_uint64_create(&host_graphs_ids);
-	
 #define	TRIGGER_GITEMS_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&templates_graphs_items, TRIGGER_GITEMS_HASHSET_DEF_SIZE,
 			graphs_items_hash_func,
@@ -1688,36 +1351,38 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	zbx_hashset_create(&host_graphs_main_data, TRIGGER_GITEMS_HASHSET_DEF_SIZE,
 			graphs_copies_hash_func,
 			graphs_copies_compare_func);
+	zbx_hashset_create(&host_graphs_names, TRIGGER_GITEMS_HASHSET_DEF_SIZE,
+			zbx_graphs_names_hash_func,
+			zbx_graphs_names_compare_func);
 #undef TRIGGER_GITEMS_HASHSET_DEF_SIZE
 	zbx_vector_graphs_copies_create(&graphs_copies_templates);
 	zbx_vector_graphs_copies_create(&graphs_copies_insert);
-	
-	get_templates_graphs_data(templateids, &graphs_copies_templates, &templates_graphs_ids, &templates_graphs_names);
-	get_data(hostid, &templates_graphs_ids, &templates_graphs_items);
+	get_templates_graphs_data(templateids, &graphs_copies_templates, &templates_graphs_ids,
+			&templates_graphs_names);
+	get_graphs_items(hostid, &templates_graphs_ids, &templates_graphs_items);
 
 	update_same_itemids(hostid, &graphs_copies_templates);
-	
-	get_target_host_main_data(hostid, &templates_graphs_names, &host_graphs_ids, &host_graphs_main_data);
+	get_target_host_main_data(hostid, &templates_graphs_names, &host_graphs_ids, &host_graphs_main_data,
+			&host_graphs_names);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "GETTING HOST GRAPHS_ITEMS");
-	get_data(0, &host_graphs_ids, &host_graphs_items);
-	zabbix_log(LOG_LEVEL_INFORMATION, "GETTING HOST GRAPHS_ITEMS DONE");
-	
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, PROCESS GRAPHS");
+	get_graphs_items(0, &host_graphs_ids, &host_graphs_items);
 
-	process_graphs(&graphs_copies_templates, &host_graphs_main_data, &templates_graphs_items, &host_graphs_items,
-			&upd_graphs, &graphs_copies_insert, &total_insert_gitems_count);
+	for (i = 0; i < graphs_copies_templates.values_num; i++)
+	{
+		process_graphs(graphs_copies_templates.values[i], &host_graphs_main_data, &host_graphs_names,
+				&templates_graphs_items, &host_graphs_items, &upd_graphs_or_graphs_items,
+				&graphs_copies_insert, &total_insert_gitems_count);
+	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "EXECUTE_GRAPHS_UPDATE");
-	
-	if (0 < upd_graphs)
+	if (0 < upd_graphs_or_graphs_items)
 		res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "EXECUTE_GRAPHS_INSERT");
-	
 	if (SUCCEED == res && 0 < graphs_copies_insert.values_num)
-		res = execute_graphs_inserts(&graphs_copies_insert, &total_insert_gitems_count, &templates_graphs_items);
-	  
+	{
+		res = execute_graphs_inserts(&graphs_copies_insert, &total_insert_gitems_count,
+				&templates_graphs_items);
+	}
+
 	zbx_vector_str_clear_ext(&templates_graphs_names, zbx_str_free);
 	zbx_vector_str_destroy(&templates_graphs_names);
 
@@ -1729,13 +1394,12 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	zbx_vector_graphs_copies_clear_ext(&graphs_copies_insert, graphs_copies_clean_vec_entry);
 	zbx_vector_graphs_copies_destroy(&graphs_copies_insert);
-	
+
+	graphs_names_clean(&host_graphs_names);
 	graphs_copies_clean(&host_graphs_main_data);
 	graphs_items_clean(&templates_graphs_items);
 	graphs_items_clean(&host_graphs_items);
 
-	
-	
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return res;
