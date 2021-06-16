@@ -67,17 +67,17 @@ class testPageDashboard extends CLegacyWebTest {
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
 			if ($user != 'super-admin') {
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No maps added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[5]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
+				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favourite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[5]//h4", 'Problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Problems by severity']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Local']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[2]//h4[text()='Host availability']");
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[1]//h4", 'System information');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favourite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
 
 			// Logout.
 			$this->zbxTestLogout();
@@ -118,8 +118,8 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[7]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphCpuId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphCpu);
-		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[7]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphMemoryId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphMemory);
+		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[8]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphCpuId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphCpu);
+		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[8]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphMemoryId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids').' AND value_id='.$this->graphCpuId));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids').' AND value_id='.$this->graphMemoryId));
 	}

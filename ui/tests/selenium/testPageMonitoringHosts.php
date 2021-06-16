@@ -995,7 +995,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-					$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
 		}
 	}
 

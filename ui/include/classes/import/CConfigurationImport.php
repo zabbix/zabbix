@@ -1741,7 +1741,7 @@ class CConfigurationImport {
 	}
 
 	private function isTemplateTrigger(array $trigger): bool {
-		$expression_parser = new CExpressionParser();
+		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
 			return false;
