@@ -2135,16 +2135,14 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
 {
 	int			i;
-	zbx_vector_ptr_t	item_diff;
 	zbx_item_diff_t		*diffs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&item_diff);
-	zbx_vector_ptr_reserve(&item_diff, history_num);
+	zbx_vector_ptr_reserve(item_diff, history_num);
 
 	/* preallocate zbx_item_diff_t structures for item_diff vector */
 	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
@@ -2164,29 +2162,26 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
 		}
 
-		zbx_vector_ptr_append(&item_diff, diff);
+		zbx_vector_ptr_append(item_diff, diff);
 	}
 
-	if (0 != item_diff.values_num)
+	if (0 != item_diff->values_num)
 	{
 		size_t	sql_offset = 0;
 
-		zbx_vector_ptr_sort(&item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diff,
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
 				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
-
-		DCconfig_items_apply_changes(&item_diff);
 	}
 
-	zbx_vector_ptr_destroy(&item_diff);
 	zbx_free(diffs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2918,10 +2913,12 @@ static void	sync_proxy_history(int *total_num, int *more)
 	int			history_num;
 	time_t			sync_start;
 	zbx_vector_ptr_t	history_items;
+	zbx_vector_ptr_t	item_diff;
 	ZBX_DC_HISTORY		history[ZBX_HC_SYNC_MAX];
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
+	zbx_vector_ptr_create(&item_diff);
 
 	sync_start = time(NULL);
 
@@ -2947,9 +2944,14 @@ static void	sync_proxy_history(int *total_num, int *more)
 			DBbegin();
 
 			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_items(history, history_num);
+			DCmass_proxy_update_items(history, history_num, &item_diff);
 		}
 		while (ZBX_DB_DOWN == DBcommit());
+
+		if (0 != item_diff.values_num)
+			DCconfig_items_apply_changes(&item_diff);
+
+		zbx_vector_ptr_destroy(&item_diff);
 
 		LOCK_CACHE;
 
