@@ -933,21 +933,30 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 	ret = SUCCEED;
 
+	for (i = 0; i < service_problems_new->values_num; i++)
+	{
+		zbx_service_problem_t	*service_problem;
+
+		service_problem = (zbx_service_problem_t *)service_problems_new->values[i];
+		zbx_vector_uint64_append(&serviceids, service_problem->serviceid);
+	}
+
+	for (i = 0; i < alarms->values_num; i++)
+	{
+		zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
+
+		zbx_vector_uint64_append(&serviceids, update->sourceid);
+	}
+
+	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBlock_ids("services", "serviceid", &serviceids);
+
 	/* write generated service alarms into database */
 	if (0 != alarms->values_num)
 	{
 		zbx_db_insert_t		db_insert;
-
-		for (i = 0; i < alarms->values_num; i++)
-		{
-			zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
-
-			zbx_vector_uint64_append(&serviceids, update->sourceid);
-		}
-
-		zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		DBlock_ids("services", "serviceid", &serviceids);
 
 		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
 
