@@ -47,7 +47,8 @@ class CAuthentication extends CApiService {
 		'ldap_bind_dn', 'ldap_case_sensitive', 'ldap_bind_password', 'saml_auth_enabled', 'saml_idp_entityid',
 		'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 		'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
+		'passwd_min_length', 'passwd_check_rules'
 	];
 
 	/**
