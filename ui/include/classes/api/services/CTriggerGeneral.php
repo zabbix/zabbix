@@ -111,8 +111,15 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->getHostTriggersByDescription($tpl_triggers_by_description)
 		);
 
-		$expression_parser = new CExpressionParser(['lldmacros' => $this instanceof CTriggerPrototype]);
-		$recovery_expression_parser = new CExpressionParser(['lldmacros' => $this instanceof CTriggerPrototype]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $this instanceof CTriggerPrototype
+		]);
+
+		$recovery_expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $this instanceof CTriggerPrototype
+		]);
 
 		// List of triggers to check for duplicates. Grouped by description.
 		$descriptions = [];
@@ -386,8 +393,15 @@ abstract class CTriggerGeneral extends CApiService {
 	private function getHostTriggersByDescription(array $tpl_triggers_by_description) {
 		$chd_triggers_description = [];
 
-		$expression_parser = new CExpressionParser(['lldmacros' => $this instanceof CTriggerPrototype]);
-		$recovery_expression_parser = new CExpressionParser(['lldmacros' => $this instanceof CTriggerPrototype]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $this instanceof CTriggerPrototype
+		]);
+
+		$recovery_expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $this instanceof CTriggerPrototype
+		]);
 
 		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
 			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.event_name,i.hostid,'.
@@ -533,7 +547,10 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return array
 	 */
 	protected function populateHostIds($descriptions) {
-		$expression_parser = new CExpressionParser(['lldmacros' => $this instanceof CTriggerPrototype]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $this instanceof CTriggerPrototype
+		]);
 
 		$hosts = [];
 
@@ -547,7 +564,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host,h.status'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.host', array_keys($hosts)).
+			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
 				' AND '.dbConditionInt('h.status',
 					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 				)
@@ -1426,13 +1443,13 @@ abstract class CTriggerGeneral extends CApiService {
 
 		switch ($class) {
 			case 'CTrigger':
-				$expression_parser = new CExpressionParser();
+				$expression_parser = new CExpressionParser(['usermacros' => true]);
 				$error_wrong_host = _('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.');
 				break;
 
 			case 'CTriggerPrototype':
-				$expression_parser = new CExpressionParser(['lldmacros' => true]);
+				$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 				$error_wrong_host = _('Incorrect trigger prototype expression. Host "%1$s" does not exist or you have no access to this host.');
 				$error_host_and_template = _('Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously.');
 				break;

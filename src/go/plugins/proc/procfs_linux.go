@@ -27,6 +27,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"zabbix.com/pkg/procfs"
@@ -59,6 +60,22 @@ func getProcessName(pid string) (name string, err error) {
 		return "", fmt.Errorf("cannot find process name starting position in /proc/%s/stat", pid)
 	}
 	return string(data[left+1 : right]), nil
+}
+
+func getProcessState(pid string) (name string, err error) {
+	var data []byte
+	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
+		return
+	}
+
+	s := strings.Split(string(data), "\n")
+	for _, tmp := range s {
+		if strings.HasPrefix(tmp, "State:") && len(tmp) > 7 {
+			return string(tmp[7:8]), nil
+		}
+	}
+
+	return "", fmt.Errorf("cannot find process state /proc/%s/status", pid)
 }
 
 func getProcessUserID(pid string) (userid int64, err error) {
@@ -167,6 +184,13 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 				continue
 			}
 		}
+		if flags&procInfoState != 0 {
+			if info.state, tmperr = getProcessState(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s state: %s", entries[0].Name(), tmperr)
+				continue
+			}
+		}
+
 		processes = append(processes, info)
 	}
 

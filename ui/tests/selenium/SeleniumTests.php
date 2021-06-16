@@ -142,6 +142,8 @@ require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
+require_once dirname(__FILE__).'/testFormulaCalculatedItem.php';
+require_once dirname(__FILE__).'/testFormulaCalculatedItemPrototype.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
@@ -301,6 +303,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
+		$suite->addTestSuite('testFormulaCalculatedItem');
+		$suite->addTestSuite('testFormulaCalculatedItemPrototype');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');

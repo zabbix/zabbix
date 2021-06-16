@@ -74,8 +74,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.NET_DNS)
 	case "net.dns.record":
 		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
-	case "proc.num":
-		cfunc = unsafe.Pointer(C.PROC_NUM)
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":

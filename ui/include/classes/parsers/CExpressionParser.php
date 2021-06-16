@@ -48,7 +48,8 @@ class CExpressionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => false             Enable low-level discovery macros usage in trigger expression.
+	 *   'usermacros' => false            Enable user macros usage in expression.
+	 *   'lldmacros' => false             Enable low-level discovery macros usage in expression.
 	 *   'collapsed_expression' => false  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
@@ -59,6 +60,7 @@ class CExpressionParser extends CParser {
 	 * @var array
 	 */
 	private $options = [
+		'usermacros' => false,
 		'lldmacros' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
@@ -523,7 +525,7 @@ class CExpressionParser extends CParser {
 	/**
 	 * Parses a constant in the expression.
 	 *
-	 * The constant can be:
+	 * The constant can be (depending on options):
 	 *  - function like func(<expression>)
 	 *  - function like func(/host/item,<params>)
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
@@ -542,11 +544,7 @@ class CExpressionParser extends CParser {
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private static function parseConstant(string $source, int &$pos, array &$tokens, array $options, int $depth): bool {
-		$user_macro_parser = new CUserMacroParser();
-
-		if (self::parseNumber($source, $pos, $tokens) || self::parseString($source, $pos, $tokens)
-				|| self::parseUsing($user_macro_parser, $source, $pos, $tokens,
-					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
+		if (self::parseNumber($source, $pos, $tokens) || self::parseString($source, $pos, $tokens)) {
 			return true;
 		}
 
@@ -572,6 +570,15 @@ class CExpressionParser extends CParser {
 
 		if (self::parseMathFunction($source, $pos, $tokens, $options, $depth)) {
 			return true;
+		}
+
+		if ($options['usermacros']) {
+			$user_macro_parser = new CUserMacroParser();
+
+			if (self::parseUsing($user_macro_parser, $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
+				return true;
+			}
 		}
 
 		if ($options['lldmacros']) {
@@ -605,7 +612,7 @@ class CExpressionParser extends CParser {
 	 */
 	private static function parseHistFunction(string $source, int &$pos, array &$tokens, array $options): bool {
 		$hist_function_parser = new CHistFunctionParser([
-			'usermacros' => true,
+			'usermacros' => $options['usermacros'],
 			'lldmacros' => $options['lldmacros'],
 			'calculated' => $options['calculated'],
 			'host_macro' => $options['host_macro'],
