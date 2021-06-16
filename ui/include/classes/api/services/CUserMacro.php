@@ -512,7 +512,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$db_hostmacros = $this->get([
-			'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'type', 'description'],
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'description'],
 			'hostmacroids' => array_column($hostmacros, 'hostmacroid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -524,6 +524,17 @@ class CUserMacro extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+		}
+
+		// CUserMacro::get does not return secret values. Loading directly from the database.
+		$options = [
+			'output' => ['hostmacroid', 'value'],
+			'hostmacroids' => array_keys($db_hostmacros)
+		];
+		$db_hostmacro_values = DBselect(DB::makeSql('hostmacro', $options));
+
+		while ($db_hostmacro_value = DBfetch($db_hostmacro_values)) {
+			$db_hostmacros[$db_hostmacro_value['hostmacroid']] += $db_hostmacro_value;
 		}
 
 		$hostmacros = $this->extendObjectsByKey($hostmacros, $db_hostmacros, 'hostmacroid', ['hostid', 'type']);
