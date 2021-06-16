@@ -1042,7 +1042,7 @@ static void	update_graphs_items_updates(char **sql2, size_t *sql_alloc2, size_t 
 				}
 
 				zbx_snprintf_alloc(sql2, sql_alloc2, sql_offset2, " where gitemid=" ZBX_FS_UI64 ";\n",
-					   host_items_entry->gitemid);
+						host_items_entry->gitemid);
 				DBexecute_overflowed_sql(sql2, sql_alloc2, sql_offset2);
 			}
 		}
@@ -1107,7 +1107,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_work_period=%d", d,
-						   (int)found->show_work_period);
+						(int)found->show_work_period);
 				d = ",";
 			}
 

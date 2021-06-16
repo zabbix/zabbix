@@ -22,8 +22,6 @@
 
 typedef struct
 {
-  //	zbx_uint64_t	*new_triggerid;
-  //	zbx_uint64_t	*cur_triggerid;
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	triggerid;
 	char		*description;
@@ -891,7 +889,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 }
 
 static void	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert_templateid_triggerids,
-				     zbx_hashset_t *zbx_insert_triggers_funcs, int *funcs_insert_count)
+		zbx_hashset_t *zbx_insert_triggers_funcs, int *funcs_insert_count)
 {
 	int		res = SUCCEED;
 	char		*sql = NULL;
@@ -1282,7 +1280,7 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 	if (SUCCEED == res && 0 < trigger_copies_insert.values_num)
 	{
 		res = execute_triggers_inserts(&trigger_copies_insert, &zbx_insert_triggers_funcs,
-					       &new_triggerids, error, &funcs_insert_count);
+				&new_triggerids, error, &funcs_insert_count);
 	}
 
 	if (SUCCEED == res)
