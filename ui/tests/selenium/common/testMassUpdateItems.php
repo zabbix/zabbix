@@ -85,13 +85,13 @@ class testMassUpdateItems extends CWebTest{
 				'type' => 2,
 				'useip' => 1,
 				'details' => [
-						'version' => 3,
-						'bulk' => 1,
-						'securityname' => 'zabbix',
-						'securitylevel' => 0,
-						'authprotocol' => 0,
-						'privprotocol' => 0,
-						'contextname' => 'zabbix'
+					'version' => 3,
+					'bulk' => 1,
+					'securityname' => 'zabbix',
+					'securitylevel' => 0,
+					'authprotocol' => 0,
+					'privprotocol' => 0,
+					'contextname' => 'zabbix'
 				]
 			]
 		]);
@@ -1310,8 +1310,8 @@ class testMassUpdateItems extends CWebTest{
 						$dialog->query('link', $value['value'])->one()->waitUntilClickable()->click();
 					}
 					else {
-						$form->query('id', $value['id'])->one()->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
-							->fill($value['value']);
+						$form->query('id', $value['id'])->one()->asMultiselect()
+								->setFillMode(CMultiselectElement::MODE_SELECT)->fill($value['value']);
 					}
 					break;
 			}
@@ -1322,13 +1322,13 @@ class testMassUpdateItems extends CWebTest{
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$error = (CTestArrayHelper::get($data['change'], 'Update interval.Delay') === '')
 				? 'Page received incorrect data'
-				: (($prototypes) ? 'Cannot update item prototypes' : 'Cannot update items');
+				: ($prototypes ? 'Cannot update item prototypes' : 'Cannot update items');
 
 			$this->assertMessage(TEST_BAD, $error, $data['details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, (($prototypes) ? 'Item prototypes updated' : 'Items updated'));
+			$this->assertMessage(TEST_GOOD, ($prototypes ? 'Item prototypes updated' : 'Items updated'));
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
@@ -1362,20 +1362,23 @@ class testMassUpdateItems extends CWebTest{
 						case 'History storage period':
 						case 'Trend storage period':
 							if (CTestArrayHelper::get($value, 'input.value', 'null') === '0' ) {
-								$this->assertEquals('Do not keep '.$value['input']['id'], $form->query('id',
-										$value['radio']['id'])->one()->asSegmentedRadio()->getValue());
+								$this->assertEquals('Do not keep '.$value['input']['id'],
+										$form->query('id',$value['radio']['id'])->one()->asSegmentedRadio()->getValue()
+								);
 							}
 							else {
-								$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
-										->one()->asSegmentedRadio()->getValue());
+								$this->assertEquals($value['radio']['value'], $form->query('id',
+										$value['radio']['id'])->one()->asSegmentedRadio()->getValue()
+								);
 
 								if ($value['radio']['value'] === 'Do not keep history') {
 									$this->assertFalse($form->query('id:history')->one()->isVisible());
 								}
 
 								if (array_key_exists('input', $value)) {
-									$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
-											->one()->getValue());
+									$this->assertEquals($value['input']['value'],
+											$form->query('id', $value['input']['id'])->one()->getValue()
+									);
 								}
 							}
 							break;
@@ -1398,7 +1401,8 @@ class testMassUpdateItems extends CWebTest{
 								unset($interval);
 
 								$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
-										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue());
+										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue()
+								);
 							}
 							break;
 
@@ -1410,25 +1414,29 @@ class testMassUpdateItems extends CWebTest{
 							unset($header);
 
 							$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
-									->asMultifieldTable()->one()->getValue());
+									->asMultifieldTable()->one()->getValue()
+							);
 							break;
 
 						case 'Applications':
 						case 'Application prototypes':
 							if ($value['action'] === 'Replace' && $data['expected_applications'] === null) {
 								$this->assertTrue($form->query('xpath://select/option[@selected and text()="-None-"]')
-										->exists());
+										->exists()
+								);
 							}
 							else {
 								foreach ($data['expected_applications'] as $application) {
 									$this->assertTrue($form->query('xpath://select/option[@selected and text()='.
-											zbx_dbstr($application).']')->exists());
+											zbx_dbstr($application).']')->exists()
+									);
 								}
 							}
 
 							foreach ($data['not_expected_applications'] as $not_application) {
 								$this->assertTrue($form->query('xpath://select/option[not(@selected) and text()='.
-										zbx_dbstr($not_application).']')->exists());
+										zbx_dbstr($not_application).']')->exists()
+								);
 							}
 							break;
 
@@ -1439,7 +1447,8 @@ class testMassUpdateItems extends CWebTest{
 							}
 							else {
 								$this->assertEquals([self::HOST_NAME.': '.$value['value']],
-									$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue());
+										$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue()
+								);
 							}
 							break;
 					}
@@ -1726,12 +1735,13 @@ class testMassUpdateItems extends CWebTest{
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, (($prototypes) ? 'Cannot update item prototypes' : 'Cannot update items'),
-					$data['details']);
+			$this->assertMessage(TEST_BAD, ($prototypes ? 'Cannot update item prototypes' : 'Cannot update items'),
+					$data['details']
+			);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, (($prototypes) ? 'Item prototypes updated' : 'Items updated'));
+			$this->assertMessage(TEST_GOOD, ($prototypes ? 'Item prototypes updated' : 'Items updated'));
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
@@ -1766,7 +1776,7 @@ class testMassUpdateItems extends CWebTest{
 
 		// Check that UI returned to previous page and hash remained unchanged.
 		$this->page->waitUntilReady();
-		$this->page->assertHeader(($prototypes) ? 'Item prototypes' : 'Items');
+		$this->page->assertHeader($prototypes ? 'Item prototypes' : 'Items');
 		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
 	}
 
@@ -1786,6 +1796,7 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table and select items.
 		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+		// TODO: Change this when findRows() is improved in TableElement.
 		foreach ($data as $name) {
 			$table->findRow('Name', $name)->select();
 		}
@@ -1793,7 +1804,7 @@ class testMassUpdateItems extends CWebTest{
 		// Open mass update form.
 		$this->query('button:Mass update')->one()->click();
 
-		return $this->query('name', (($prototypes) ? 'item_prototype_form' : 'itemForm'))->waitUntilPresent()
+		return $this->query('name', ($prototypes ? 'item_prototype_form' : 'itemForm'))->waitUntilPresent()
 				->asForm()->one();
 	}
 }

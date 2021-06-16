@@ -258,7 +258,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	}
 
 	/**
-	 * @on-before-once prepareItemData, prepareInterfaceData
+	 * @onBeforeOnce prepareItemData, prepareInterfaceData
 	 *
 	 * @dataProvider getCommonChangeData
 	 * @dataProvider getItemChangeData
@@ -343,7 +343,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	}
 
 	/**
-	 * @on-before-once prepareItemPreprocessingData
+	 * @onBeforeOnce prepareItemPreprocessingData
 	 */
 	public function testPageMassUpdateItems_Cancel() {
 		$this->executeMassUpdateCancel();
