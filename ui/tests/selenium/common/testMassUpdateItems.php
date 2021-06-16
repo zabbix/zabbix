@@ -1357,10 +1357,9 @@ class testMassUpdateItems extends CWebTest{
 									unset($interval['action'], $interval['index']);
 								}
 								unset($interval);
-								$this->assertEquals($value['Custom intervals'],
-									$form->query('id:delayFlexTable')
+								$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
 											->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue()
-									);
+								);
 							}
 							break;
 
@@ -1371,8 +1370,7 @@ class testMassUpdateItems extends CWebTest{
 							}
 							unset($header);
 
-							$this->assertEquals($value,
-									$form->query('xpath:.//div[@id="headers_pairs"]/table')
+							$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
 										->asMultifieldTable()->one()->getValue()
 							);
 							break;
@@ -2158,7 +2156,7 @@ class testMassUpdateItems extends CWebTest{
 					unset($tag);
 				}
 
-				$expected_tags = (array_key_exists('expected_tags', $data)) ? $data['expected_tags'][$name] : $expected;
+				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
 				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
@@ -2206,6 +2204,8 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table.
 		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+
+		// TODO: Change this when findRows() is improved in TableElement.
 		foreach ($data as $name) {
 			$table->findRow('Name', $name)->select();
 		}
