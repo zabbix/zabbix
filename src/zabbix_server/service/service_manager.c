@@ -1486,16 +1486,23 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 
 static void	service_manager_trace(zbx_service_manager_t *service_manager)
 {
-
-	zabbix_log(LOG_LEVEL_TRACE, "problem events  : %d (%d slots)",
-					service_manager->problem_events.num_data,
-					service_manager->problem_events.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "services  : %d (%d slots)", service_manager->services.num_data,
+			service_manager->services.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "services links  : %d (%d slots)", service_manager->services_links.num_data,
+				service_manager->services_links.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "service problem tags  : %d (%d slots)",
+			service_manager->service_problem_tags.num_data, service_manager->service_problem_tags.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "service problem tag index  : %d (%d slots)",
+			service_manager->service_problem_tags_index.num_data,
+			service_manager->service_problem_tags_index.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "service matches  : %d (%d slots)",
+			service_manager->service_diffs.num_data, service_manager->service_diffs.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "problem events  : %d (%d slots)", service_manager->problem_events.num_data,
+			service_manager->problem_events.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "recovery events  : %d (%d slots)",
-					service_manager->recovery_events.num_data,
-					service_manager->recovery_events.num_slots);
-	zabbix_log(LOG_LEVEL_TRACE, "deleted events  : %d (%d slots)",
-			service_manager->deleted_eventids.num_data, service_manager->deleted_eventids.num_slots);
-
+			service_manager->recovery_events.num_data, service_manager->recovery_events.num_slots);
+	zabbix_log(LOG_LEVEL_TRACE, "deleted events  : %d (%d slots)", service_manager->deleted_eventids.num_data,
+			service_manager->deleted_eventids.num_slots);
 }
 
 static void	recalculate_services(zbx_service_manager_t *service_manager)
@@ -1637,6 +1644,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			tags_update_num = 0;
 			problems_delete_num = 0;
 			service_update_num = 0;
+
+			service_manager_trace(&service_manager);
 		}
 
 		if (CONFIG_SERVICEMAN_SYNC_FREQUENCY < time_now - time_flush || 1 == service_cache_reload_requested)
@@ -1662,8 +1671,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			service_update_num += updated;
 			time_flush = time_now;
 			time_now = zbx_time();
-
-			service_manager_trace(&service_manager);
 		}
 
 		if (ZBX_PROBLEM_CLEANUP_FREQUENCY < time_now - time_cleanup)
