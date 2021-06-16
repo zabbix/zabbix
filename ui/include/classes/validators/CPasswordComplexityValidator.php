@@ -108,13 +108,9 @@ class CPasswordComplexityValidator extends CValidator {
 	 * Set array of context specific strings forbidden to be part of validated password.
 	 *
 	 * @param array  $context_data  Indexed array of strings that are forbidden to be part of password.
-	 *
-	 * @return CPasswordComplexityValidator
 	 */
-	public function setContextData(array $context_data = []): CPasswordComplexityValidator {
+	public function setContextData(array $context_data = []) {
 		$this->context_data = $context_data;
-
-		return $this;
 	}
 
 	/**
