@@ -4,6 +4,7 @@
 ## Overview
 
 ![Product picture](images/pic.png)
+> Courtesy of Cisco Systems, Inc. Unauthorized use not permitted.
 
 For Zabbix version: 5.4 and higher  
 The Cisco Catalyst 3750 Series switches are a premier line of enterprise-class, stackable, multilayer switches that provide high availability, security, and quality of service (QoS) to enhance the operation of the network. Its innovative unified stack management raises the bar in stack management, redundancy, and failover.
