@@ -76,7 +76,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->response->setFormData($this->getInputAll());
+			$this->response->setFormData($this->getRealInputAll());
 			$this->setResponse($this->response);
 		}
 
@@ -230,6 +230,24 @@ class CControllerAuthenticationUpdate extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION);
 	}
 
+	/**
+	 * In case of error, convert array back to integer (string) so edit form does not fail.
+	 */
+	private function getRealInputAll(): array {
+		$input = $this->getInputAll();
+		$rules = $input['passwd_check_rules'];
+		$input['passwd_check_rules'] = 0x00;
+
+		foreach ($rules as $rule) {
+			$input['passwd_check_rules'] |= $rule;
+		}
+
+		// CNewValidator thinks int32 must be a string type integer.
+		$input['passwd_check_rules'] = (string) $input['passwd_check_rules'];
+
+		return $input;
+	}
+
 	protected function doAction() {
 		$auth_valid = ($this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED)
 			? $this->validateLdap()
@@ -240,7 +258,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if (!$auth_valid) {
-			$this->response->setFormData($this->getInputAll());
+			$this->response->setFormData($this->getRealInputAll());
 			$this->setResponse($this->response);
 
 			return;
@@ -249,7 +267,7 @@ class CControllerAuthenticationUpdate extends CController {
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
 			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
-			$this->response->setFormData($this->getInputAll());
+			$this->response->setFormData($this->getRealInputAll());
 			$this->setResponse($this->response);
 
 			return;
@@ -373,18 +391,7 @@ class CControllerAuthenticationUpdate extends CController {
 				CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 			}
 			else {
-				$all_input = $this->getInputAll();
-				$rules = $all_input['passwd_check_rules'];
-				$all_input['passwd_check_rules'] = 0x00;
-
-				foreach ($rules as $rule) {
-					$all_input['passwd_check_rules'] |= $rule;
-				}
-
-				// CNewValidator thinks int32 must be a string type integer.
-				$all_input['passwd_check_rules'] = (string) $all_input['passwd_check_rules'];
-
-				$this->response->setFormData($all_input);
+				$this->response->setFormData($this->getRealInputAll());
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 		}
