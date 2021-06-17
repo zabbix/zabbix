@@ -81,7 +81,7 @@ $auth_tab = (new CFormList('list_auth'))
 				(new CList([
 					_("must not contain user's username, name or surname"),
 					_('must not be one of common or context-specific passwords')
-				]))->addClass('password-requirements-list')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 		], 'passwd_check_rules_simple'),
 		(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SIMPLE))

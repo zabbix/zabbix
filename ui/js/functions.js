@@ -736,7 +736,8 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		show_details = false;
 	}
 
-	var	$list = jQuery('<ul>'),
+	var	$list = jQuery('<ul>')
+			.addClass('list-dashed'),
 		$msg_details = jQuery('<div>')
 			.addClass('msg-details')
 			.append($list),

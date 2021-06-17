@@ -116,7 +116,6 @@ if ($data['change_password']) {
 	$password_requirements = [];
 
 	if ($data['password_requirements']['min_length'] > 1) {
-		// TODO VM: maximum allowed "minimum length" should be at most 70.
 		$password_requirements[] = _n('must be at least %1$d character long', 'must be at least %1$d characters long',
 			$data['password_requirements']['min_length']
 		);
@@ -152,7 +151,7 @@ if ($data['change_password']) {
 	$password_hint_icon = $password_requirements
 		? makeHelpIcon([
 			_('Password requirements:'),
-			(new CList($password_requirements))->addClass('password-requirements-list')
+			(new CList($password_requirements))->addClass(ZBX_STYLE_LIST_DASHED)
 		])
 		: null;
 

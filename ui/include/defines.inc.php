@@ -1835,6 +1835,7 @@ define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
+define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_VERTICAL_ACCORDION', 'list-vertical-accordion');

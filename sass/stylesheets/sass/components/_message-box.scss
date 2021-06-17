@@ -167,7 +167,7 @@
 		margin-bottom: 20px;
 	}
 
-	ul {
+	.list-dashed {
 		max-height: 300px;
 		padding: 0 5px 0 0;
 		overflow-y: auto;
@@ -175,14 +175,6 @@
 		@extend %webkit-scrollbar;
 
 		li {
-			margin-left: 1em;
-
-			&::before {
-				content: '\2013';
-				float: left;
-				margin-left: -1em;
-			}
-
 			&:only-child {
 				margin-left: 0;
 			}
