@@ -228,6 +228,11 @@ struct	_DC_TRIGGER;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)			\
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
+#	define	DBbegin_multiple_insert(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
+#	define	DBend_multiple_insert(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
+
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 #		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
 #	else
@@ -247,6 +252,8 @@ struct	_DC_TRIGGER;
 #else
 #	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	DBbegin_multiple_insert(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	DBend_multiple_insert(sql, sql_alloc, sql_offset)	do {} while (0)
 
 #	define	ZBX_SQL_EXEC_FROM	0
 #	ifdef HAVE_MYSQL
