@@ -1792,18 +1792,18 @@ footer {
     top: 7px;
     left: 10px;
     margin-bottom: 20px; }
-  .msg-details .list-dashed {
+  .msg-details ul {
     max-height: 300px;
     padding: 0 5px 0 0;
     overflow-y: auto;
     font-size: 0.85em; }
-    .msg-details .list-dashed li:only-child {
-      margin-left: 0; }
-    .msg-details .list-dashed.msg-details-border {
+    .msg-details ul.msg-details-border {
       padding-top: .5em;
       margin: 8px 0 0;
       border-top-width: 1px;
       border-top-style: dashed; }
+  .msg-details .list-dashed li:only-child {
+    margin-left: 0; }
 
 .msg-buttons {
   margin: 10px 0 0;
@@ -5132,15 +5132,15 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-content::-webkit-scrollbar, .msg-details .list-dashed::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+.dashboard-grid-widget-content::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
 .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
 .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.dashboard-grid-widget-content::-webkit-scrollbar-track, .msg-details .list-dashed::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+.dashboard-grid-widget-content::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
 .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
 .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #1f1f1f; }
-.dashboard-grid-widget-content::-webkit-scrollbar-thumb, .msg-details .list-dashed::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+.dashboard-grid-widget-content::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
 .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
 .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #383838;

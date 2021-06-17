@@ -167,24 +167,26 @@
 		margin-bottom: 20px;
 	}
 
-	.list-dashed {
+	ul {
 		max-height: 300px;
 		padding: 0 5px 0 0;
 		overflow-y: auto;
 		font-size: $font-msg-reset-size;
 		@extend %webkit-scrollbar;
 
-		li {
-			&:only-child {
-				margin-left: 0;
-			}
-		}
-
 		&.msg-details-border {
 			padding-top: .5em;
 			margin: 8px 0 0;
 			border-top-width: 1px;
 			border-top-style: dashed;
+		}
+	}
+
+	.list-dashed {
+		li {
+			&:only-child {
+				margin-left: 0;
+			}
 		}
 	}
 }
