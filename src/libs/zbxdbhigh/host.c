@@ -643,7 +643,6 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	int				ret = SUCCEED, i, j;
@@ -678,7 +677,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			" join graphs g2 on g2.name=g.name and g2.templateid is null"
 			" join graphs_items gi2 on gi2.graphid=g2.graphid"
 			" join items i2 on i2.itemid=gi2.itemid and i2.hostid=" ZBX_FS_UI64
-			" where g.graphid=gi.graphid and gi.itemid=i.itemid and ",
+			" where g.graphid=gi.graphid and gi.itemid=i.itemid and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
 
@@ -713,35 +712,40 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	}
 
 	DBfree_result(tresult);
-	sql_offset = 0;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select gi.graphid,i.key_"
-			" from items i,graphs_items gi"
-			" where gi.itemid=i.itemid"
-			" and ");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.graphid", graphids.values, graphids.values_num);
-
-	tresult = DBselect("%s", sql);
-
-	while (NULL != (trow = DBfetch(tresult)))
+	if (0 != graphids.values_num)
 	{
-		char	*itemkey;
+		sql_offset = 0;
 
-		ZBX_STR2UINT64(graphid, trow[0]);
-		itemkey = zbx_strdup(NULL, trow[1]);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select gi.graphid,i.key_"
+				" from items i,graphs_items gi"
+				" where gi.itemid=i.itemid"
+				" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.graphid", graphids.values,
+				graphids.values_num);
 
-		for (i = 0; i < graphs.values_num; i++)
+		tresult = DBselect("%s", sql);
+
+		while (NULL != (trow = DBfetch(tresult)))
 		{
-			graph = (zbx_template_graph_valid_t *)graphs.values[i];
+			char	*itemkey;
 
-			if (graphid == graph->tgraphid)
-				zbx_vector_str_append(&graph->tkeys, itemkey);
-			else if (graphid == graph->hgraphid)
-				zbx_vector_str_append(&graph->hkeys, itemkey);
+			ZBX_STR2UINT64(graphid, trow[0]);
+			itemkey = zbx_strdup(NULL, trow[1]);
+
+			for (i = 0; i < graphs.values_num; i++)
+			{
+				graph = (zbx_template_graph_valid_t *)graphs.values[i];
+
+				if (graphid == graph->tgraphid)
+					zbx_vector_str_append(&graph->tkeys, itemkey);
+				else if (graphid == graph->hgraphid)
+					zbx_vector_str_append(&graph->hkeys, itemkey);
+			}
 		}
+		DBfree_result(tresult);
 	}
-	DBfree_result(tresult);
 
 	for (i = 0; i < graphs.values_num; i++)
 	{
