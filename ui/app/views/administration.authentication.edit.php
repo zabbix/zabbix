@@ -38,7 +38,7 @@ $auth_tab = (new CFormList('list_auth'))
 	)
 	->addRow((new CTag('h4', true, _('Password policy')))->addClass('input-section-header'))
 	->addRow(new CLabel(_('Minimum password length'), 'passwd_min_length'),
-		(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 3, false, false, false))
+		(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(
