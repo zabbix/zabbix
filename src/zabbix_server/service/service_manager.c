@@ -204,8 +204,8 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 		}
 	}
 
-	zbx_vector_ptr_sort(&candidates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&candidates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_sort(&candidates, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&candidates, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	for (i = 0; i < candidates.values_num; i++)
 	{
