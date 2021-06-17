@@ -43,7 +43,6 @@ static volatile sig_atomic_t	service_cache_reload_requested;
 typedef struct
 {
 	zbx_uint64_t		serviceid;
-	zbx_uint64_t		current_eventid;
 	zbx_vector_ptr_t	service_problems;
 	zbx_vector_ptr_t	service_problem_tags;
 	zbx_vector_ptr_t	children;
@@ -185,11 +184,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 					service_problem_tag->current_eventid = event->eventid;
 
-					if (service_problem_tag->service->current_eventid != event->eventid)
-					{
-						service_problem_tag->service->current_eventid = event->eventid;
-						zbx_vector_ptr_append(&candidates, service_problem_tag->service);
-					}
+					zbx_vector_ptr_append(&candidates, service_problem_tag->service);
 				}
 			}
 
@@ -204,14 +199,13 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 				service_problem_tag->current_eventid = event->eventid;
 
-				if (service_problem_tag->service->current_eventid != event->eventid)
-				{
-					service_problem_tag->service->current_eventid = event->eventid;
-					zbx_vector_ptr_append(&candidates, service_problem_tag->service);
-				}
+				zbx_vector_ptr_append(&candidates, service_problem_tag->service);
 			}
 		}
 	}
+
+	zbx_vector_ptr_sort(&candidates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&candidates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	for (i = 0; i < candidates.values_num; i++)
 	{
@@ -223,7 +217,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 			service_problem_tag = (zbx_service_problem_tag_t *)service->service_problem_tags.values[j];
 
-			if (service->current_eventid != service_problem_tag->current_eventid)
+			if (event->eventid != service_problem_tag->current_eventid)
 				break;
 		}
 
@@ -520,6 +514,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 		}
 
 		service_problem_tag->revision = revision;
+		service_problem_tag->current_eventid = 0;
 
 		operator = (unsigned char)atoi(row[3]);
 
@@ -580,7 +575,6 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 		if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
 		{
 			service_local.revision = revision;
-			service_local.current_eventid = 0;
 
 			zbx_vector_ptr_create(&service_local.children);
 			zbx_vector_ptr_create(&service_local.parents);
@@ -595,7 +589,6 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 
 		service->revision = revision;
 
-		service->current_eventid = 0;
 		zbx_vector_ptr_clear(&service->children);
 		zbx_vector_ptr_clear(&service->parents);
 
