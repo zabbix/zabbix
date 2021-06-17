@@ -476,6 +476,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 	DB_ROW				row;
 	zbx_service_problem_tag_t	service_problem_tag_local, *service_problem_tag;
 	zbx_hashset_iter_t		iter;
+	zbx_service_t			*service = NULL;
 
 	result = DBselect("select service_problem_tagid,serviceid,tag,operator,value"
 			" from service_problem_tag"
@@ -485,7 +486,6 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 	{
 		zbx_uint64_t	serviceid;
 		unsigned char	operator;
-		zbx_service_t	*service = NULL;
 
 		ZBX_STR2UINT64(service_problem_tag_local.service_problem_tagid, row[0]);
 		ZBX_STR2UINT64(serviceid, row[1]);
