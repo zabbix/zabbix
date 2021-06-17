@@ -2910,7 +2910,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 
 static void	sync_proxy_history(int *total_num, int *more)
 {
-	int			history_num;
+	int			history_num, txn_rc;
 	time_t			sync_start;
 	zbx_vector_ptr_t	history_items;
 	zbx_vector_ptr_t	item_diff;
@@ -2946,27 +2946,36 @@ static void	sync_proxy_history(int *total_num, int *more)
 			DCmass_proxy_add_history(history, history_num);
 			DCmass_proxy_update_items(history, history_num, &item_diff);
 		}
-		while (ZBX_DB_DOWN == DBcommit());
+		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
 
 		if (0 != item_diff.values_num)
 			DCconfig_items_apply_changes(&item_diff);
 
-		zbx_vector_ptr_destroy(&item_diff);
-
 		LOCK_CACHE;
 
 		hc_push_items(&history_items);	/* return items to history cache */
-		cache->history_num -= history_num;
 
-		if (0 != hc_queue_get_size())
+		if (ZBX_DB_FAIL != txn_rc)
+		{
+			cache->history_num -= history_num;
+
+			if (0 != hc_queue_get_size())
+				*more = ZBX_SYNC_MORE;
+
+			UNLOCK_CACHE;
+
+			*total_num += history_num;
+
+			hc_free_item_values(history, history_num);
+		}
+		else
+		{
 			*more = ZBX_SYNC_MORE;
-
-		UNLOCK_CACHE;
-
-		*total_num += history_num;
-
+			UNLOCK_CACHE;
+		}
+out:
 		zbx_vector_ptr_clear(&history_items);
-		hc_free_item_values(history, history_num);
+		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
