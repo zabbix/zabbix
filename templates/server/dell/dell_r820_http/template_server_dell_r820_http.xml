@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-16T19:23:02Z</date>
+   <date>2021-06-17T16:55:30Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -730,6 +730,7 @@ return JSON.stringify(result);
                      <type>DEPENDENT</type>
                      <key>dell.server.sensor.fan.speed[{#SENSOR_NAME}]</key>
                      <delay>0</delay>
+                     <history>7d</history>
                      <status>ENABLED</status>
                      <units>rpm</units>
                      <description>The sensor value.</description>

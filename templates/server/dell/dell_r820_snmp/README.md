@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later via Zabbix SNMP Agent that works without any external scripts.
+This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later via Zabbix SNMP agent that works without any external scripts.
 
 ## Setup
 
