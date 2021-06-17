@@ -310,14 +310,14 @@ out:
 ---
 test case: 'unicode 1'
 in:
-  expression: '"//etc//пельмень_номер_1"="//etc//пельмень_номер_1"'
+  expression: '"//etc//пример_номер_1"="//etc//пример_номер_1"'
 out:
   value: 1
   return: 'SUCCEED'
 ---
 test case: 'unicode 2'
 in:
-  expression: '"пельмень номер 1"="просто пельмень"'
+  expression: '"пример номер 1"="просто пример"'
 out:
   value: 0
   return: 'SUCCEED'

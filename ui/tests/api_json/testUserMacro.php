@@ -759,8 +759,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 *
 	 * @dataProvider globalmacro_permissions
 	 */

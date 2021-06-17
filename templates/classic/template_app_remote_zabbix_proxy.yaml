@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 970c2342146549768e6b91a26089bcdf
-      template: 'Remote Zabbix proxy'
-      name: 'Remote Zabbix proxy'
+      template: 'Remote Zabbix proxy health'
+      name: 'Remote Zabbix proxy health'
       groups:
         -
           name: Templates/Applications
@@ -36,9 +36,9 @@ zabbix_export:
           triggers:
             -
               uuid: 77e66d2f6b0e48fa8a7ec5dd213eab35
-              expression: 'avg(/Remote Zabbix proxy/process.availability_manager.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.availability_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.availability_manager.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.availability_manager.avg.busy,10m)<65'
               name: 'Zabbix availability manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -63,9 +63,9 @@ zabbix_export:
           triggers:
             -
               uuid: 67089f59f77641c8ab487e2c44d563a2
-              expression: 'avg(/Remote Zabbix proxy/process.configuration_syncer.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.configuration_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.configuration_syncer.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.configuration_syncer.avg.busy,10m)<65'
               name: 'Zabbix configuration syncer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -90,9 +90,9 @@ zabbix_export:
           triggers:
             -
               uuid: f2208ef37274449fb2b61f5f55e615f1
-              expression: 'avg(/Remote Zabbix proxy/process.data_sender.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.data_sender.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.data_sender.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.data_sender.avg.busy,10m)<65'
               name: 'Zabbix data sender processes more than 75% busy'
               priority: AVERAGE
         -
@@ -117,9 +117,9 @@ zabbix_export:
           triggers:
             -
               uuid: c5a739eef8cb43f099ee902c9eb23d6e
-              expression: 'avg(/Remote Zabbix proxy/process.discoverer.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.discoverer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.discoverer.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.discoverer.avg.busy,10m)<65'
               name: 'Zabbix discoverer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -144,9 +144,9 @@ zabbix_export:
           triggers:
             -
               uuid: f75e8a72ae1642999c7560387f189129
-              expression: 'avg(/Remote Zabbix proxy/process.heartbeat_sender.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.heartbeat_sender.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.heartbeat_sender.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.heartbeat_sender.avg.busy,10m)<65'
               name: 'Zabbix heartbeat sender processes more than 75% busy'
               priority: AVERAGE
         -
@@ -171,9 +171,9 @@ zabbix_export:
           triggers:
             -
               uuid: afcd2486a21b42ae97f53353b3642301
-              expression: 'avg(/Remote Zabbix proxy/process.history_poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.history_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.history_poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.history_poller.avg.busy,10m)<65'
               name: 'Zabbix history poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -198,9 +198,9 @@ zabbix_export:
           triggers:
             -
               uuid: 872ca8a02ff948d0ab4f5000249bbf5b
-              expression: 'avg(/Remote Zabbix proxy/process.history_syncer.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.history_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.history_syncer.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.history_syncer.avg.busy,10m)<65'
               name: 'Zabbix history syncer processes more than 75% busy'
               priority: AVERAGE
         -
@@ -225,9 +225,9 @@ zabbix_export:
           triggers:
             -
               uuid: 43d8ef15170e4edd80eea85ad9990d73
-              expression: 'avg(/Remote Zabbix proxy/process.housekeeper.avg.busy,30m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.housekeeper.avg.busy,30m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.housekeeper.avg.busy,30m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.housekeeper.avg.busy,30m)<65'
               name: 'Zabbix housekeeper processes more than 75% busy'
               priority: AVERAGE
         -
@@ -252,9 +252,9 @@ zabbix_export:
           triggers:
             -
               uuid: 9c391ba5350d401b9ca56f7cd29cd457
-              expression: 'avg(/Remote Zabbix proxy/process.http_poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.http_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.http_poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.http_poller.avg.busy,10m)<65'
               name: 'Zabbix http poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -279,9 +279,9 @@ zabbix_export:
           triggers:
             -
               uuid: 8a0abc8ff0dd42b0926b5840fe5b0e2f
-              expression: 'avg(/Remote Zabbix proxy/process.icmp_pinger.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.icmp_pinger.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.icmp_pinger.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.icmp_pinger.avg.busy,10m)<65'
               name: 'Zabbix icmp pinger processes more than 75% busy'
               priority: AVERAGE
         -
@@ -306,9 +306,9 @@ zabbix_export:
           triggers:
             -
               uuid: a2aed809416b46beba8ed63554d9b7d5
-              expression: 'avg(/Remote Zabbix proxy/process.ipmi_manager.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.ipmi_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.ipmi_manager.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.ipmi_manager.avg.busy,10m)<65'
               name: 'Zabbix ipmi manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -333,9 +333,9 @@ zabbix_export:
           triggers:
             -
               uuid: e7c748c36e5740d684a5c4c68682f321
-              expression: 'avg(/Remote Zabbix proxy/process.ipmi_poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.ipmi_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.ipmi_poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.ipmi_poller.avg.busy,10m)<65'
               name: 'Zabbix ipmi poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -360,9 +360,9 @@ zabbix_export:
           triggers:
             -
               uuid: ef46070fc30b46c7be1ce3574e578449
-              expression: 'avg(/Remote Zabbix proxy/process.java_poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.java_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.java_poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.java_poller.avg.busy,10m)<65'
               name: 'Zabbix java poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -387,9 +387,9 @@ zabbix_export:
           triggers:
             -
               uuid: 6afb9db9e11842c28c059abd31c7a134
-              expression: 'avg(/Remote Zabbix proxy/process.poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.poller.avg.busy,10m)<65'
               name: 'Zabbix poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -414,9 +414,9 @@ zabbix_export:
           triggers:
             -
               uuid: fee719ea91524972897c19ce4b17bd54
-              expression: 'avg(/Remote Zabbix proxy/process.self-monitoring.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.self-monitoring.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.self-monitoring.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.self-monitoring.avg.busy,10m)<65'
               name: 'Zabbix self-monitoring processes more than 75% busy'
               priority: AVERAGE
         -
@@ -441,9 +441,9 @@ zabbix_export:
           triggers:
             -
               uuid: 9ca70574386f4b968bcda64a5d267d58
-              expression: 'avg(/Remote Zabbix proxy/process.snmp_trapper.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.snmp_trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.snmp_trapper.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.snmp_trapper.avg.busy,10m)<65'
               name: 'Zabbix snmp trapper processes more than 75% busy'
               priority: AVERAGE
         -
@@ -468,9 +468,9 @@ zabbix_export:
           triggers:
             -
               uuid: 9d7d15a747484530a61102175cbc4478
-              expression: 'avg(/Remote Zabbix proxy/process.task_manager.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.task_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.task_manager.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.task_manager.avg.busy,10m)<65'
               name: 'Zabbix task manager processes more than 75% busy'
               priority: AVERAGE
         -
@@ -495,9 +495,9 @@ zabbix_export:
           triggers:
             -
               uuid: 49a9e3e1b17146f7861daf6994956d4f
-              expression: 'avg(/Remote Zabbix proxy/process.trapper.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.trapper.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.trapper.avg.busy,10m)<65'
               name: 'Zabbix trapper processes more than 75% busy'
               priority: AVERAGE
         -
@@ -522,9 +522,9 @@ zabbix_export:
           triggers:
             -
               uuid: e446ec803eaf4ace9b7d1fdc7a89cba6
-              expression: 'avg(/Remote Zabbix proxy/process.unreachable_poller.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.unreachable_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.unreachable_poller.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.unreachable_poller.avg.busy,10m)<65'
               name: 'Zabbix unreachable poller processes more than 75% busy'
               priority: AVERAGE
         -
@@ -549,9 +549,9 @@ zabbix_export:
           triggers:
             -
               uuid: 30147687074f45e7ab0dce81a1b7cf07
-              expression: 'avg(/Remote Zabbix proxy/process.vmware_collector.avg.busy,10m)>75'
+              expression: 'avg(/Remote Zabbix proxy health/process.vmware_collector.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy/process.vmware_collector.avg.busy,10m)<65'
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.vmware_collector.avg.busy,10m)<65'
               name: 'Zabbix vmware collector processes more than 75% busy'
               priority: AVERAGE
         -
@@ -576,7 +576,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6aaad09f92f3419c9aa7164f2191a45a
-              expression: 'max(/Remote Zabbix proxy/rcache.buffer.pused,10m)>75'
+              expression: 'max(/Remote Zabbix proxy health/rcache.buffer.pused,10m)>75'
               name: 'More than 75% used in the configuration cache'
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_proxy.conf configuration file'
@@ -608,7 +608,7 @@ zabbix_export:
           triggers:
             -
               uuid: 224ec99fda0d443cba8a6c75da5a27cb
-              expression: '(last(/Remote Zabbix proxy/version,#1)<>last(/Remote Zabbix proxy/version,#2))=1 and length(last(/Remote Zabbix proxy/version))>0'
+              expression: '(last(/Remote Zabbix proxy health/version,#1)<>last(/Remote Zabbix proxy health/version,#2))=1 and length(last(/Remote Zabbix proxy health/version))>0'
               name: 'Zabbix version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix proxy version has changed. Ack to close.'
@@ -635,7 +635,7 @@ zabbix_export:
           triggers:
             -
               uuid: ac2a42046de340e1968802d92678947c
-              expression: 'max(/Remote Zabbix proxy/vmware.buffer.pused,10m)>75'
+              expression: 'max(/Remote Zabbix proxy health/vmware.buffer.pused,10m)>75'
               name: 'More than 75% used in the vmware cache'
               priority: AVERAGE
               description: 'Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file'
@@ -661,7 +661,7 @@ zabbix_export:
           triggers:
             -
               uuid: c14095c38d17486fa8fde22bd5a9d737
-              expression: 'max(/Remote Zabbix proxy/wcache.history.pused,10m)>75'
+              expression: 'max(/Remote Zabbix proxy health/wcache.history.pused,10m)>75'
               name: 'More than 75% used in the history cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryCacheSize in the zabbix_proxy.conf configuration file'
@@ -687,7 +687,7 @@ zabbix_export:
           triggers:
             -
               uuid: 43f9a4fc049e45e5b8bbb0980b518dd0
-              expression: 'max(/Remote Zabbix proxy/wcache.index.pused,10m)>75'
+              expression: 'max(/Remote Zabbix proxy health/wcache.index.pused,10m)>75'
               name: 'More than 75% used in the history index cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryIndexCacheSize in the zabbix_proxy.conf configuration file'
@@ -871,7 +871,7 @@ zabbix_export:
           triggers:
             -
               uuid: 71cd927153ef4b8480a8f13fc6b4def8
-              expression: 'min(/Remote Zabbix proxy/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
+              expression: 'min(/Remote Zabbix proxy health/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
               name: 'More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
               description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes'
@@ -929,7 +929,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix proxy performance'
-                        host: 'Remote Zabbix proxy'
+                        host: 'Remote Zabbix proxy health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -945,7 +945,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix data gathering process busy %'
-                        host: 'Remote Zabbix proxy'
+                        host: 'Remote Zabbix proxy health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '6'
@@ -961,7 +961,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix internal process busy %'
-                        host: 'Remote Zabbix proxy'
+                        host: 'Remote Zabbix proxy health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -978,7 +978,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'Zabbix cache usage, % free'
-                        host: 'Remote Zabbix proxy'
+                        host: 'Remote Zabbix proxy health'
   graphs:
     -
       uuid: 4cc55dd64cab48cc92fbde98135d7f7f
@@ -989,25 +989,25 @@ zabbix_export:
         -
           color: DD0000
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: rcache.buffer.pused
         -
           sortorder: '1'
           color: 00DDDD
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: wcache.index.pused
         -
           sortorder: '2'
           color: 3333FF
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: wcache.history.pused
         -
           sortorder: '3'
           color: 00FF00
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: vmware.buffer.pused
     -
       uuid: 1daa58364c74486ba4038e56cecf1a41
@@ -1019,67 +1019,67 @@ zabbix_export:
           sortorder: '1'
           color: '990099'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.trapper.avg.busy
         -
           sortorder: '2'
           color: '990000'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.poller.avg.busy
         -
           sortorder: '3'
           color: 0000EE
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.ipmi_poller.avg.busy
         -
           sortorder: '4'
           color: FF33FF
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.discoverer.avg.busy
         -
           sortorder: '5'
           color: 00EE00
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.icmp_pinger.avg.busy
         -
           sortorder: '6'
           color: '003300'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.http_poller.avg.busy
         -
           sortorder: '7'
           color: 33FFFF
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.unreachable_poller.avg.busy
         -
           sortorder: '8'
           color: DD0000
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.java_poller.avg.busy
         -
           sortorder: '9'
           color: '000099'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.snmp_trapper.avg.busy
         -
           sortorder: '10'
           color: 00FF00
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.vmware_collector.avg.busy
         -
           sortorder: '11'
           color: BB2A02
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.history_poller.avg.busy
     -
       uuid: 87379405c456407ebab6e033c3cae37a
@@ -1091,54 +1091,54 @@ zabbix_export:
           sortorder: '1'
           color: FFAA00
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.housekeeper.avg.busy
         -
           sortorder: '2'
           color: '990099'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.configuration_syncer.avg.busy
         -
           sortorder: '3'
           color: EE0000
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.history_syncer.avg.busy
         -
           sortorder: '4'
           color: FF66FF
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.self-monitoring.avg.busy
         -
           sortorder: '5'
           color: '960000'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.heartbeat_sender.avg.busy
         -
           sortorder: '6'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.data_sender.avg.busy
         -
           sortorder: '7'
           color: '009999'
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.task_manager.avg.busy
         -
           sortorder: '8'
           color: BBBB00
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.ipmi_manager.avg.busy
         -
           sortorder: '9'
           color: F230E0
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: process.availability_manager.avg.busy
     -
       uuid: ee5c00806cad4a5bb65bd3bcd734c88f
@@ -1147,11 +1147,11 @@ zabbix_export:
         -
           color: 00C800
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: wcache.values
         -
           sortorder: '1'
           color: C80000
           item:
-            host: 'Remote Zabbix proxy'
+            host: 'Remote Zabbix proxy health'
             key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'

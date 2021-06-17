@@ -1942,12 +1942,18 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 
 	do
 	{
+		char	*name_esc;
+
 		DBfree_result(result);
+
+		name_esc = DBdyn_escape_string(*new_name);
 
 		result = DBselect("select count(*)"
 				" from dashboard"
 				" where name='%s' and templateid is null",
-				*new_name);
+				name_esc);
+
+		zbx_free(name_esc);
 
 		if (NULL == result || NULL == (row = DBfetch(result)))
 		{
@@ -2898,15 +2904,18 @@ static int 	DBpatch_add_dashboard_page(zbx_db_dashboard_page_t *dashboard_page, 
 		int display_period, int sortorder)
 {
 	int	res;
+	char	*name_esc;
 
 	dashboard_page->dashboard_pageid = DBget_maxid("dashboard_page");
 	dashboard_page->dashboardid = dashboardid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard_page id:" ZBX_FS_UI64, dashboard_page->dashboard_pageid);
 
+	name_esc = DBdyn_escape_string(name);
 	res = DBexecute("insert into dashboard_page (dashboard_pageid,dashboardid,name,display_period,sortorder)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",'%s',%d,%d)",
-			dashboard_page->dashboard_pageid, dashboardid, name, display_period, sortorder);
+			dashboard_page->dashboard_pageid, dashboardid, name_esc, display_period, sortorder);
+	zbx_free(name_esc);
 
 	return ZBX_DB_OK > res ? FAIL : SUCCEED;
 }
@@ -2940,44 +2949,19 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
-		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1],
-					s3[ZBX_MAX_UINT64_LEN + 1], s4[ZBX_MAX_UINT64_LEN + 1],
-					s5[ZBX_MAX_UINT64_LEN + 1], *url_esc;
+		char			*url_esc;
 		zbx_db_widget_field_t	*f;
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
 		url_esc = DBdyn_escape_string(f->value_str);
 
-		if (0 != f->value_itemid)
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_itemid);
-		else
-			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_graphid)
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_graphid);
-		else
-			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_groupid)
-			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_groupid);
-		else
-			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_hostid)
-			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_hostid);
-		else
-			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, "null");
-
-		if (0 != f->value_sysmapid)
-			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_sysmapid);
-		else
-			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, "null");
-
 		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid,value_groupid,value_hostid,value_sysmapid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%s,%s,%s,%s,%s)",
 				new_fieldid++, widget->widgetid, f->type, f->name, f->value_int, url_esc,
-				s1, s2, s3, s4, s5))
+				DBsql_id_ins(f->value_itemid), DBsql_id_ins(f->value_graphid),
+				DBsql_id_ins(f->value_groupid), DBsql_id_ins(f->value_hostid),
+				DBsql_id_ins(f->value_sysmapid)))
 		{
 			ret = FAIL;
 		}
@@ -3124,6 +3108,34 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		{
 			scr_item->rowspan = 1;
 			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_COLS <= scr_item->x)
+		{
+			scr_item->x = SCREEN_MAX_COLS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->x, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->x)
+		{
+			scr_item->x = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is negative, set to 0 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_ROWS <= scr_item->y)
+		{
+			scr_item->y = SCREEN_MAX_ROWS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->y, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->y)
+		{
+			scr_item->y = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is negative, set to 0 for item " ZBX_FS_UI64,
 					scr_item->screenitemid);
 		}
 

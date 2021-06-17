@@ -25,7 +25,7 @@ class GetExpressionTreeTest extends TestCase {
 	private $expression_parser;
 
 	protected function setUp(): void {
-		$this->expression_parser = new CExpressionParser();
+		$this->expression_parser = new CExpressionParser(['usermacros' => true]);
 	}
 
 	protected function tearDown(): void {

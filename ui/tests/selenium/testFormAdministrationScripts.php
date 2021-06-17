@@ -798,7 +798,7 @@ class testFormAdministrationScripts extends CWebTest {
 
 	/**
 	 * @dataProvider getScriptsData
-	 * @backup-once scripts
+	 * @backupOnce scripts
 	 */
 	public function testFormAdministrationScripts_Create($data) {
 		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
@@ -999,7 +999,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking script cloning with only changed name.
 	 *
-	 * @on-before prepareScriptData
+	 * @onBefore prepareScriptData
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		// Added existing webhook to the list.
