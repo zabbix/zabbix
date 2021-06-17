@@ -1947,7 +1947,10 @@ class CUser extends CApiService {
 	 */
 	private function checkPassword(array $user, string $path) {
 		$context_data = array_filter(array_intersect_key($user, array_flip(['username', 'name', 'surname'])));
-		$passw_validator = new CPasswordComplexityValidator();
+		$passw_validator = new CPasswordComplexityValidator([
+			'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
+			'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
+		]);
 		$passw_validator->setContextData($context_data);
 
 		if ($passw_validator->validate($user['passwd']) === false) {
