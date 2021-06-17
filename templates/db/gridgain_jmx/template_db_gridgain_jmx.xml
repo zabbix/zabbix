@@ -1,0 +1,2379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-06-17T14:05:42Z</date>
+   <groups>
+      <group>
+         <name>Templates/Databases</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template DB GridGain by JMX</template>
+         <name>Template DB GridGain by JMX</name>
+         <description>The template to monitor GridGain In-Memory Computing Platform by Zabbix that work without any external scripts.&#13;
+  It works with both standalone and cluster instances.&#13;
+  The metrics are discoverable and collected by JMX.  &#13;
+  Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.&#13;
+  You can set {$GRIDGAIN.USER} and {$GRIDGAIN.PASSWORD} macros in the template for using on the host level.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Databases</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>GridGain</name>
+            </application>
+         </applications>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Cache groups</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]</key>
+               <delay>10m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.CACHE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.CACHE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Backups</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",Backups]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of backups configured for cache group.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Caches</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",Caches]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>List of caches.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>Cache group [{#JMXNAME}]: List of caches has changed</name>
+                           <priority>INFO</priority>
+                           <description>List of caches has changed. Significant changes have occurred in the cluster. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Local node partitions, moving</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of partitions with state MOVING for this cache group located on this node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(30m)}&gt;0</expression>
+                           <name>Cache group [{#JMXNAME}]: Rebalance in progress</name>
+                           <priority>INFO</priority>
+                           <description>Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Local node partitions, owning</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of partitions with state OWNING for this cache group located on this node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Local node entries, renting</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of entries remains to evict in RENTING partitions located on this node for this cache group.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Local node partitions, renting</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of partitions with state RENTING for this cache group located on this node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Partition copies, max</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",MaximumNumberOfPartitionCopies]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Maximum number of partition copies for all partitions of this cache group.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Partition copies, min</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Minimum number of partition copies for all partitions of this cache group.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(30m)}=0</expression>
+                           <name>Cache group [{#JMXNAME}]: There is no copy for partitions</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXNAME}]: Partitions</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",Partitions]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Count of partitions for cache group.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}&gt;={Template DB GridGain by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}</expression>
+                     <name>Cache group [{#JMXNAME}]: One or more backups are unavailable</name>
+                     <priority>WARNING</priority>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Cache group [{#JMXNAME}]: Partitions</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Thread pool metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]</key>
+               <delay>10m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.THREAD.POOL.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.THREAD.POOL.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Thread pool [{#JMXNAME}]: Pool size, core</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CorePoolSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!msg</units>
+                     <username>{$IGNITE.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The core number of threads.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Thread pool [{#JMXNAME}]: Pool size, max</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",MaximumPoolSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!msg</units>
+                     <username>{$IGNITE.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The maximum allowed number of threads.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Thread pool [{#JMXNAME}]: Pool size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",PoolSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!msg</units>
+                     <username>{$IGNITE.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current number of threads in the pool.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Thread pool [{#JMXNAME}]: Queue size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",QueueSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!msg</units>
+                     <username>{$IGNITE.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current size of the execution queue.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}</expression>
+                           <name>Thread pool [{#JMXNAME}]: Too many messages in queue (over {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)</name>
+                           <priority>AVERAGE</priority>
+                           <description>Number of messages in queue more than {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Thread pool [{#JMXNAME}]: Thread pool size</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",PoolSize]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",MaximumPoolSize]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CorePoolSize]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Data region metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]</key>
+               <delay>10m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.DATA.REGION.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.DATA.REGION.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Allocation, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",AllocationRate]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!pps</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Allocation rate (pages per second) averaged across rateTimeInternal.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Checkpoint buffer size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CheckpointBufferSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total size in bytes for checkpoint buffer.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Dirty pages</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",DirtyPages]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of pages in memory not yet synchronized with persistent storage.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Eviction, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",EvictionRate]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!pps</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Eviction rate (pages per second).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;0</expression>
+                           <name>Data region {#JMXNAME}: Node started to evict pages</name>
+                           <priority>INFO</priority>
+                           <description>You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Size, max</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",MaxSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Maximum memory region size defined by its data region.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Offheap size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",OffHeapSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Offheap size in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Offheap used size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",OffheapUsedSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total used offheap size in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Pages fill factor</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",PagesFillFactor]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The percentage of the used space.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Pages replace, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",PagesReplaceRate]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!pps</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Rate at which pages in memory are replaced with pages from persistent storage (pages per second).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;0</expression>
+                           <name>Data region {#JMXNAME}: Pages replace rate more than 0</name>
+                           <priority>WARNING</priority>
+                           <description>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Allocated, bytes</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalAllocatedSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total size of memory allocated in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Data region {#JMXNAME}: Used checkpoint buffer size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",UsedCheckpointBufferSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Used checkpoint buffer size in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100&gt;{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}</expression>
+                     <name>Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)</name>
+                     <priority>HIGH</priority>
+                     <description>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</description>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100&gt;{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}</expression>
+                     <name>Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN} in 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH} in 5m)</name>
+                           <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100&gt;{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
+                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                     <priority>HIGH</priority>
+                     <description>Data region utilization is high. Increase data region size or delete any data.</description>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}</expression>
+                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Data region utilization is high. Increase data region size or delete any data.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                           <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Data region {#JMXNAME}: Checkpoint buffer utilization</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>BOLD_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CheckpointBufferSize]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",UsedCheckpointBufferSize]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Data region {#JMXNAME}: DataRegion utilisation</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>BOLD_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",OffHeapSize]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",OffheapUsedSize]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Local node metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs active, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentActiveJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of currently active jobs concurrently executing on the node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentCancelledJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of cancelled jobs that are still running.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentPmeDuration]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>ms</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current PME duration in milliseconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.WARN}</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.WARN} for 5 min)</name>
+                           <priority>WARNING</priority>
+                           <description>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.WARN}ms.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)</name>
+                                 <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.HIGH}</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)</name>
+                           <priority>HIGH</priority>
+                           <description>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rejected, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentRejectedJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of jobs rejected after more recent collision resolution operation.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Threads count, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentThreadCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current number of live threads.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(15m)} &gt; {$GRIDGAIN.THREADS.COUNT.MAX.WARN}</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$GRIDGAIN.THREADS.COUNT.MAX.WARN} for 15 min)</name>
+                           <priority>WARNING</priority>
+                           <description>Number of running threads is over {$GRIDGAIN.THREADS.COUNT.MAX.WARN}.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)</name>
+                                 <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs waiting, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CurrentWaitingJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of queued jobs currently waiting to be executed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(15m)} &gt; {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN} for 15 min)</name>
+                           <priority>WARNING</priority>
+                           <description>Number of queued jobs is over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Heap memory used</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",HeapMemoryUsed]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>B</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current heap size that is used for object allocation.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalCancelledJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total number of jobs cancelled by the node per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs executed, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalExecutedJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total number of jobs handled by the node per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rejects, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalRejectedJobs]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total number of jobs this node rejects during collision resolution operations since node startup per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs current state</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CurrentActiveJobs]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CurrentWaitingJobs]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CurrentRejectedJobs]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CurrentCancelledJobs]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TotalCancelledJobs]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TotalRejectedJobs]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TotalExecutedJobs]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Cluster metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",ActiveBaselineNodes]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of nodes that are currently active in the baseline topology.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalBaselineNodes]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total baseline nodes that are registered in the baseline topology.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Client</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalClientNodes]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of client nodes in the cluster.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, total</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalNodes]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Total number of nodes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Server</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalServerNodes]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of server nodes in the cluster.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{change()}&lt;0</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology</name>
+                           <priority>WARNING</priority>
+                           <description>One or more server node left the topology. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{change()}&gt;0</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology</name>
+                           <priority>INFO</priority>
+                           <description>One or more server node added to the topology. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}&gt;{Template DB GridGain by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}</expression>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology</name>
+                     <priority>INFO</priority>
+                     <description>One or more server node left the topology. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>GridGain kernal metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Version</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",FullVersion]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Version of GridGain instance.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>REGEX</type>
+                           <params>(.*)-\d+
+\1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Local node ID</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LocalNodeId]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Unique identifier for this node within grid.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Uptime</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",UpTime]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>uptime</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Uptime of GridGain instance.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{nodata(10m)}=1</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)</name>
+                           <priority>WARNING</priority>
+                           <description>Zabbix has not received data for items for the last 10 minutes.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>TCP Ccmmunication SPI metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication outbound messages queue</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",OutboundMessagesQueueSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Outbound messages queue size.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages received, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",ReceivedMessagesCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!msg/s</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of  messages received per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",ReconnectCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages sent, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",SentMessagesCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!msg/s</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of  messages sent per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",SentMessagesCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",ReceivedMessagesCount]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+
+
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>TCP discovery SPI</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",Coordinator]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Current coordinator UUID.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed</name>
+                           <priority>WARNING</priority>
+                           <description>GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery message worker queue</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",MessageWorkerQueueSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Message worker queue current size.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes failed</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",NodesFailed]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Nodes failed count.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes joined</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",NodesJoined]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Nodes join count.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes left</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",NodesLeft]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Nodes left count.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery reconnect, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",ReconnectCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Number of times node tries to (re)establish connection to another node per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: TotalProcessedMessages</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalProcessedMessages]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!msg/s</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of messages received per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery messages received, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TotalReceivedMessages]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!msg/s</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of messages processed per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TotalProcessedMessages]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TotalReceivedMessages]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+
+
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Transaction metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]</key>
+               <delay>30m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Locked keys</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",LockedKeysNumber]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of keys locked on the node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions owner, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",OwnerTransactionsNumber]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of active transactions for which this node is the initiator.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions committed, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TransactionsCommittedNumber]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of transactions which were committed per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions holding lock, current</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of active transactions holding at least one key lock.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions rolledback, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",TransactionsRolledBackNumber]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of transactions which were rollback per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain instance [{#JMXIGNITEINSTANCENAME}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",OwnerTransactionsNumber]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TransactionsRolledBackNumber]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",TransactionsCommittedNumber]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+
+
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Cache metrics</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache:name=\"org.apache.gridgain.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]</key>
+               <delay>10m</delay>
+               <username>{$GRIDGAIN.USER}</username>
+               <password>{$GRIDGAIN.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXGROUP}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.CACHE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXGROUP}</macro>
+                        <value>{$GRIDGAIN.LLD.FILTER.CACHE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache gets, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheGets]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>ops</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of gets to the cache per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache hits, pct</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheHitPercentage]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Percentage of successful hits.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache misses, pct</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheMissPercentage]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>Percentage of accesses that failed to find anything.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache puts, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CachePuts]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>ops</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of puts to the cache per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache removals, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheRemovals]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>ops</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of removals from the cache per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache size</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheSize]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!keys</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of non-null values in the cache as a long value.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache transaction commits, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheTxCommits]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!tps</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of transaction commits per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache transaction rollbacks, rate</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",CacheTxRollbacks]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>!tps</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of transaction rollback per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache heap entries</name>
+                     <type>JMX</type>
+                     <key>jmx["{#JMXOBJ}",HeapEntriesCount]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!keys</units>
+                     <username>{$GRIDGAIN.USER}</username>
+                     <password>{$GRIDGAIN.PASSWORD}</password>
+                     <description>The number of entries in heap memory.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Template DB GridGain by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}</expression>
+                     <name>Cache group [{#JMXGROUP}]: All entries are in heap</name>
+                     <priority>INFO</priority>
+                     <description>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)} &gt; {Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}</expression>
+                     <name>Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m</name>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</name>
+                           <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}&gt;0 and {Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}&gt;0 and {Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0</expression>
+                     <name>Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</name>
+                     <priority>AVERAGE</priority>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache hits</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheHitPercentage]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheMissPercentage]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache ops</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheGets]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CachePuts]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheRemovals]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Cache group [{#JMXGROUP}]: Cache transactions</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheTxCommits]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB GridGain by JMX</host>
+                              <key>jmx["{#JMXOBJ}",CacheTxRollbacks]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+for (var item, i = 0; item = data.data[i++];) {
+    if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+        Object.assign(item, {
+            '{#JMXIGNITEINSTANCENAME}': 'null'
+        });
+    }
+
+}
+
+return JSON.stringify(data)
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}</macro>
+               <value>80</value>
+               <description>The maximum percent of checkpoint buffer utilization for high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}</macro>
+               <value>66</value>
+               <description>The maximum percent of checkpoint buffer utilization for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>The maximum percent of data region utilization for high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}</macro>
+               <value>80</value>
+               <description>The maximum percent of data region utilization for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.JOBS.QUEUE.MAX.WARN}</macro>
+               <value>10</value>
+               <description>The maximum number of queued jobs for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.CACHE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable cache groups.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.CACHE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered cache groups.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.DATA.REGION.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable data regions.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.DATA.REGION.NOT_MATCHES}</macro>
+               <value>^(sysMemPlc|TxLog)$</value>
+               <description>Filter to exclude discovered data regions.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.THREAD.POOL.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable thread pools.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.LLD.FILTER.THREAD.POOL.NOT_MATCHES}</macro>
+               <value>^(GridCallbackExecutor|GridRebalanceStripedExecutor|GridDataStreamExecutor|StripedExecutor)$</value>
+               <description>Filter to exclude discovered thread pools.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.PASSWORD}</macro>
+               <value>&lt;secret&gt;</value>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.PME.DURATION.MAX.HIGH}</macro>
+               <value>60000</value>
+               <description>The maximum PME duration in ms for high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.PME.DURATION.MAX.WARN}</macro>
+               <value>10000</value>
+               <description>The maximum PME duration in ms for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.THREAD.QUEUE.MAX.WARN}</macro>
+               <value>1000</value>
+               <description>Threshold for thread pool queue size. Can be used with thread pool name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.THREADS.COUNT.MAX.WARN}</macro>
+               <value>1000</value>
+               <description>The maximum number of running threads for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$GRIDGAIN.USER}</macro>
+               <value>zabbix</value>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
