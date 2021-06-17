@@ -70,7 +70,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => 7]
 					]
 				],
-				'expected_error' => 'User with username "Admin" already exists.'
+				'expected_error' => 'Incorrect value for field "/1/passwd": must be at least 8 characters long.'
 			],
 			[
 				'user' => [
@@ -173,7 +173,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with nonexistent group id',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
 					]
@@ -225,7 +225,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'API user create 1',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -238,7 +238,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => '☺',
 						'roleid' => 1,
-						'passwd' => '☺',
+						'passwd' => 'O☺0☺o☺@☺',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -251,7 +251,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'УТФ Юзер',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -264,7 +264,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'API user create with media',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],
@@ -406,7 +406,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '2',
-					'passwd' => 'zabbix'
+					'passwd' => 'Z@bb1x1234'
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
@@ -561,7 +561,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'API user updated',
-						'passwd' => 'zabbix1',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -574,7 +574,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'УТФ Юзер обновлённ',
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -587,7 +587,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'API user update with media',
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],

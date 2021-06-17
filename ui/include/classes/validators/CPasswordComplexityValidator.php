@@ -39,31 +39,24 @@ class CPasswordComplexityValidator extends CValidator {
 	private $context_data = [];
 
 	/**
-	 * Minimum required password length.
+	 * An options array.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	private $passwd_min_length;
-
-	/**
-	 * Password complexity rules.
-	 *
-	 * @var int
-	 */
-	private $passwd_check_rules;
+	private $options = [
+		'passwd_min_length' => 8,
+		'passwd_check_rules' => PASSWD_CHECK_SIMPLE
+	];
 
 	/**
 	 * Class constructor.
 	 *
 	 * @param array $options
-	 * @param int   $options['passwd_min_length']   (required) Minimum required password length.
-	 * @param int   $options['passwd_check_rules']  (required) Password complexity rules.
+	 * @param int   $options['passwd_min_length']   Minimum required password length.
+	 * @param int   $options['passwd_check_rules']  Password complexity rules.
 	 */
-	public function __construct(array $options) {
-		// Set options.
-		foreach ($options as $key => $value) {
-			$this->$key = $value;
-		}
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
 
 		self::$top_passwords_list = dirname(__FILE__).'/../data/topPasswords.php';
 	}
@@ -79,36 +72,36 @@ class CPasswordComplexityValidator extends CValidator {
 		$value = (string) $value;
 		$this->setError('');
 
-		if ($this->passwd_min_length > mb_strlen($value)) {
+		if ($this->options['passwd_min_length'] > mb_strlen($value)) {
 			$this->setError(_n('must be at least %1$d character long', 'must be at least %1$d characters long',
-				$this->passwd_min_length
+				$this->options['passwd_min_length']
 			));
 
 			return false;
 		}
 
-		$check_case = ((PASSWD_CHECK_CASE & $this->passwd_check_rules) == PASSWD_CHECK_CASE);
+		$check_case = ((PASSWD_CHECK_CASE & $this->options['passwd_check_rules']) == PASSWD_CHECK_CASE);
 		if ($check_case && self::checkCase($value) === false) {
 			$this->setError(_('must contain at least one lowercase and one uppercase Latin letter'));
 
 			return false;
 		}
 
-		$check_digits = ((PASSWD_CHECK_DIGITS & $this->passwd_check_rules) == PASSWD_CHECK_DIGITS);
+		$check_digits = ((PASSWD_CHECK_DIGITS & $this->options['passwd_check_rules']) == PASSWD_CHECK_DIGITS);
 		if ($check_digits && self::ckeckDigits($value) === false) {
 			$this->setError(_('must contain at least one digit'));
 
 			return false;
 		}
 
-		$check_special = ((PASSWD_CHECK_SPECIAL & $this->passwd_check_rules) == PASSWD_CHECK_SPECIAL);
+		$check_special = ((PASSWD_CHECK_SPECIAL & $this->options['passwd_check_rules']) == PASSWD_CHECK_SPECIAL);
 		if ($check_special && self::checkSpecialCharacters($value) === false) {
 			$this->setError(_('must contain at least one special character'));
 
 			return false;
 		}
 
-		$check_simple = ((PASSWD_CHECK_SIMPLE & $this->passwd_check_rules) == PASSWD_CHECK_SIMPLE);
+		$check_simple = ((PASSWD_CHECK_SIMPLE & $this->options['passwd_check_rules']) == PASSWD_CHECK_SIMPLE);
 		if ($check_simple && $this->chechSimple($value) === false) {
 			$this->setError(_("must not contain user's name, surname or username"));
 
@@ -191,8 +184,9 @@ class CPasswordComplexityValidator extends CValidator {
 	 * @return bool
 	 */
 	private function chechSimple(string $value): bool {
+		$value = mb_strtolower($value);
 		foreach ($this->context_data as $context_string) {
-			if (strpos($value, $context_string) !== false) {
+			if (strpos($value, mb_strtolower($context_string)) !== false) {
 				return false;
 			}
 		}

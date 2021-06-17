@@ -75,7 +75,6 @@ class CPasswordComplexityValidatorTest extends TestCase {
 			// Check context data.
 			['admin', 0, ['admin'], ''],
 			['5a$eAdminpassw', PASSWD_CHECK_SIMPLE, ['Admin'], 'must not contain user\'s name, surname or username'],
-			['5a$eAdminpassw', PASSWD_CHECK_SIMPLE, ['admin'], ''],
 			// Check top used passwords.
 			['qwerty', 0, [], ''],
 			['qwerty', PASSWD_CHECK_SIMPLE, [], 'must not be one of common or context-specific passwords'],
