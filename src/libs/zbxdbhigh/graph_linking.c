@@ -364,17 +364,19 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __func__, hostid);
 
 	zbx_vector_uint64_create(&y_data_ids);
-#define	TRIGGER_GITEMS_HASHSET_DEF_SIZE	100
-	zbx_hashset_create(&y_data_map, TRIGGER_GITEMS_HASHSET_DEF_SIZE,
-			itemids_map_hash_func,
-			itemids_map_compare_func);
-#undef TRIGGER_GITEMS_HASHSET_DEF_SIZE
 	for (i = 0; i < graphs_copies_templates->values_num; i++)
 	{
 		zbx_vector_uint64_append(&y_data_ids, graphs_copies_templates->values[i]->ymin_itemid);
 		zbx_vector_uint64_append(&y_data_ids, graphs_copies_templates->values[i]->ymax_itemid);
 	}
 
+	if (0 == y_data_ids.values_num)
+		goto out;
+#define	TRIGGER_GITEMS_HASHSET_DEF_SIZE	100
+	zbx_hashset_create(&y_data_map, TRIGGER_GITEMS_HASHSET_DEF_SIZE,
+			itemids_map_hash_func,
+			itemids_map_compare_func);
+#undef TRIGGER_GITEMS_HASHSET_DEF_SIZE
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -430,7 +432,7 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 	zbx_free(sql);
 	zbx_hashset_destroy(&y_data_map);
 	zbx_vector_uint64_destroy(&y_data_ids);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():", __func__);
 }
 
@@ -1359,6 +1361,10 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	zbx_vector_graphs_copies_create(&graphs_copies_insert);
 	get_templates_graphs_data(templateids, &graphs_copies_templates, &templates_graphs_ids,
 			&templates_graphs_names);
+
+	if (0 == templates_graphs_names.values_num)
+		goto end;
+
 	get_graphs_items(hostid, &templates_graphs_ids, &templates_graphs_items);
 
 	update_same_itemids(hostid, &graphs_copies_templates);
@@ -1382,7 +1388,7 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 		res = execute_graphs_inserts(&graphs_copies_insert, &total_insert_gitems_count,
 				&templates_graphs_items);
 	}
-
+end:
 	zbx_vector_str_clear_ext(&templates_graphs_names, zbx_str_free);
 	zbx_vector_str_destroy(&templates_graphs_names);
 
