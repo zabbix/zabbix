@@ -50,7 +50,7 @@ $passwords = array_filter($passwords, function ($pasword) {
 
 // Backslash special characters and add quotes.
 $passwords = array_map(function ($password) {
-	return '\''.addslashes($password).'\'';
+	return '\''. base64_encode($password).'\'';
 }, $passwords);
 
 // Generate file.

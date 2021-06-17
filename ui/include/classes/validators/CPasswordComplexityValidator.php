@@ -210,6 +210,8 @@ class CPasswordComplexityValidator extends CValidator {
 	 * @return bool
 	 */
 	private static function chechIfPasswordIsCommonlyUsed(string $value): bool {
-		return !(is_file(self::$top_passwords_list) && in_array($value, require self::$top_passwords_list));
+		return !(is_file(self::$top_passwords_list)
+			&& in_array(base64_encode($value), require self::$top_passwords_list)
+		);
 	}
 }
