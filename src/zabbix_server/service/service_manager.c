@@ -185,8 +185,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 					service_problem_tag->current_eventid = event->eventid;
 
-					if (service_problem_tag->service->current_eventid != event->eventid ||
-							0 == candidates.values_num)
+					if (service_problem_tag->service->current_eventid != event->eventid)
 					{
 						service_problem_tag->service->current_eventid = event->eventid;
 						zbx_vector_ptr_append(&candidates, service_problem_tag->service);
@@ -205,8 +204,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 				service_problem_tag->current_eventid = event->eventid;
 
-				if (service_problem_tag->service->current_eventid != event->eventid ||
-						0 == candidates.values_num)
+				if (service_problem_tag->service->current_eventid != event->eventid)
 				{
 					service_problem_tag->service->current_eventid = event->eventid;
 					zbx_vector_ptr_append(&candidates, service_problem_tag->service);
@@ -597,6 +595,7 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 
 		service->revision = revision;
 
+		service->current_eventid = 0;
 		zbx_vector_ptr_clear(&service->children);
 		zbx_vector_ptr_clear(&service->parents);
 
