@@ -48,7 +48,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 	*/
 	public function testPageReportsActionLog_CheckValues($auditactions) {
 		$time = $auditactions['clock'];
-		$today = date("Y-m-d H:i:s", $time);
+		$today = date("m/d/Y h:i:s A", $time);
 
 		$this->zbxTestLogin('auditacts.php?'.http_build_query([
 			'from' => date('Y-m-d H:i:s', $time - 3600),

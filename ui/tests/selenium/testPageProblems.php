@@ -674,6 +674,6 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Click on suppression icon and check text in hintbox.
 		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
-		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 Maintenance: Maintenance for suppression test');
+		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 PM Maintenance: Maintenance for suppression test');
 	}
 }
