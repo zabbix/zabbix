@@ -223,25 +223,26 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 
 		if (j == service->service_problem_tags.values_num)
 		{
-			zbx_services_diff_t	services_diff = {.serviceid = service->serviceid}, *pservices_diff;
+			zbx_services_diff_t	services_diff_local = {.serviceid = service->serviceid}, *services_diff;
 			zbx_service_problem_t	*service_problem;
 
-			if (NULL == (pservices_diff = zbx_hashset_search(services_diffs, &services_diff)))
+			if (NULL == (services_diff = zbx_hashset_search(services_diffs, &services_diff_local)))
 			{
-				zbx_vector_ptr_create(&services_diff.service_problems);
-				zbx_vector_ptr_create(&services_diff.service_problems_recovered);
-				services_diff.flags = flags;
-				pservices_diff = zbx_hashset_insert(services_diffs, &services_diff, sizeof(services_diff));
+				zbx_vector_ptr_create(&services_diff_local.service_problems);
+				zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
+				services_diff_local.flags = flags;
+				services_diff = zbx_hashset_insert(services_diffs, &services_diff_local,
+						sizeof(services_diff_local));
 			}
 
 			service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
 			service_problem->eventid = event->eventid;
 			service_problem->service_problemid = 0;
-			service_problem->serviceid = pservices_diff->serviceid;
+			service_problem->serviceid = services_diff->serviceid;
 			service_problem->severity = event->severity;
 			service_problem->clock = event->clock;
 
-			zbx_vector_ptr_append(&pservices_diff->service_problems, service_problem);
+			zbx_vector_ptr_append(&services_diff->service_problems, service_problem);
 		}
 	}
 
