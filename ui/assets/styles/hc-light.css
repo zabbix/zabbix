@@ -5841,15 +5841,14 @@ svg {
   border-radius: 50%;
   background-color: #333333;
   position: relative;
-  vertical-align: middle;
-  top: -2px;
-  /* TODO VM: should not me here! */ }
+  line-height: 1.4; }
   .icon-help-hint::after {
     content: '?';
     position: relative;
-    top: -6px;
+    top: -2px;
     left: -4px;
     font-size: 10px;
+    font-weight: bold;
     color: #ffffff; }
 
 #expressions_list .ui-sortable-helper {

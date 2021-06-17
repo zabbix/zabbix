@@ -145,7 +145,7 @@ if ($data['change_password']) {
 	}
 
 	if ($data['password_requirements']['check_rules'] & PASSWD_CHECK_SIMPLE) {
-		$password_requirements[] = _('must not contain user\'s name, surname or username');
+		$password_requirements[] = _("must not contain user's name, surname or username");
 		$password_requirements[] = _('must not be one of common or context-specific passwords');
 	}
 
