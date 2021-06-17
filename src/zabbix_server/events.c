@@ -1922,20 +1922,6 @@ void	zbx_events_update_itservices(void)
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
 
-	for (i = 0; i < events.values_num; i++)
-	{
-		DB_EVENT	*event = events.values[i];
-
-		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-			continue;
-
-		if (TRIGGER_VALUE_PROBLEM != event->value)
-			continue;
-
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->value,
-				event->severity, &event->tags);
-	}
-
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -1951,6 +1937,20 @@ void	zbx_events_update_itservices(void)
 				recovery->r_event->value, recovery->r_event->severity, &recovery->r_event->tags);
 
 		recovery->r_event->tags.values_num = values_num;
+	}
+
+	for (i = 0; i < events.values_num; i++)
+	{
+		DB_EVENT	*event = events.values[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != event->value)
+			continue;
+
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->value,
+				event->severity, &event->tags);
 	}
 
 	if (NULL == data)
