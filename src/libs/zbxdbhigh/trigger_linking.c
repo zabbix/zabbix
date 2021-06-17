@@ -1155,8 +1155,6 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 		zbx_trigger_copy_t	*trigger_copy_insert;
 
 		/* save data for trigger */
-		zabbix_log(LOG_LEVEL_INFORMATION, "INSERTING TRIGGER, SAVE DATA");
-
 		trigger_copy_insert = (zbx_trigger_copy_t *)zbx_malloc(NULL, sizeof(zbx_trigger_copy_t));
 		trigger_copy_insert->description = zbx_strdup(NULL, trigger_copy_template->description);
 		trigger_copy_insert->priority = trigger_copy_template->priority;
