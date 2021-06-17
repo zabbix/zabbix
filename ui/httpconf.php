@@ -705,6 +705,8 @@ if (isset($_REQUEST['form'])) {
 
 	if ($db_httptest) {
 		$parent_templates = zbx_toHash($data['host']['parentTemplates'], 'templateid');
+		$httptest_parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
+		$parent_templates = array_intersect_key($parent_templates, $httptest_parent_templates);
 
 		$rw_templates = $data['host']['parentTemplates']
 			? API::Template()->get([
@@ -729,6 +731,7 @@ if (isset($_REQUEST['form'])) {
 		$tags = getHttpTestTags([
 			'templates' => $parent_templates,
 			'hostid' => getRequest('hostid'),
+			'templated' => (bool) $db_httptest['templateid'],
 			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags']
 		]);

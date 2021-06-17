@@ -451,34 +451,40 @@ function userAgents() {
  */
 function getHttpTestTags(array $data): array {
 	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
+	$inherited_tags = [];
 
 	if ($data['show_inherited_tags']) {
-		$db_templates = $data['templates']
-			? API::Template()->get([
-				'output' => ['templateid'],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($data['templates']),
-				'preservekeys' => true
-			])
-			: [];
+		if ($data['templated']) {
+			$db_templates = $data['templates']
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($data['templates']),
+					'preservekeys' => true
+				])
+				: [];
 
-		$inherited_tags = [];
+			// Make list of template tags.
+			foreach ($data['templates'] as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 
-		// Make list of template tags.
-		foreach ($data['templates'] as $templateid => $template) {
-			if (array_key_exists($templateid, $db_templates)) {
-				foreach ($db_templates[$templateid]['tags'] as $tag) {
-					if (array_key_exists($tag['tag'], $inherited_tags)
-							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-							$templateid => $template
-						];
-					}
-					else {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-							'parent_templates' => [$templateid => $template],
-							'type' => ZBX_PROPERTY_INHERITED
-						];
+							if (!array_key_exists('parent_templates', $inherited_tags[$tag['tag']][$tag['value']])) {
+								$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] = [];
+							}
+
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
 					}
 				}
 			}
