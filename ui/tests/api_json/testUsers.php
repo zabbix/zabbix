@@ -238,7 +238,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => '☺',
 						'roleid' => 1,
-						'passwd' => 'O☺0☺o☺@☺',
+						'passwd' => 'O0o@O0o@',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -330,7 +330,7 @@ class testUsers extends CAPITest {
 		$user = [
 			'username' => 'API user create with multiple emails',
 			'roleid' => 1,
-			'passwd' => 'zabbix',
+			'passwd' => 'Z@bb1x1234',
 			'usrgrps' => [
 				['usrgrpid' => 7]
 			],
@@ -885,7 +885,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid roleid',
 					'roleid' => 0,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					]
@@ -1020,7 +1020,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with nonexistent media type id',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1054,7 +1054,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1105,7 +1105,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1122,7 +1122,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty second email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1139,7 +1139,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1156,7 +1156,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1173,7 +1173,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1190,7 +1190,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1207,7 +1207,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1224,7 +1224,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1241,7 +1241,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1532,7 +1532,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'all-parameters',
 					'roleid' => 3,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [['usrgrpid' => 7]],
 					'medias' => [
 							[
