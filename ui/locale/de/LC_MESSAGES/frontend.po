@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 19:52+0300\n"
+"POT-Creation-Date: 2021-06-11 19:52+0300\n"
 "PO-Revision-Date: 2020-09-15 08:12+0300\n"
 "Last-Translator: Joachim <joachim.schwender@web.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -47,7 +47,7 @@ msgstr "\"%1$s\" wird erwartet"
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%1$s\" muß zwischen 1970.01.01 und 2038.01.18 sein."
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr "\"%1$s\" Wert muss kleiner oder gleich \"%2$s\" sein"
@@ -113,7 +113,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "%1$s Datenpunkt"
 msgstr[1] "%1$s Datenpunkte"
 
-#: include/classes/api/services/CItemGeneral.php:2328
+#: include/classes/api/services/CItemGeneral.php:2342
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -1054,7 +1054,7 @@ msgstr "Anwendungsprototypen"
 msgid "Application updated"
 msgstr "Kategorie geändert"
 
-#: include/classes/api/services/CItemGeneral.php:551
+#: include/classes/api/services/CItemGeneral.php:565
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Kategorie mit ID \"%1$s\" ist nicht verfügbar auf \"%2$s\"."
@@ -1640,15 +1640,15 @@ msgstr "Abbrechen"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr "Kann entdeckte Anwendung \"%1$s\" nicht zu einem Web-Szenario hinzufügen."
 
-#: include/classes/api/services/CGraph.php:702
-#: include/classes/api/services/CGraph.php:716
-#: include/classes/api/services/CGraph.php:730
+#: include/classes/api/services/CGraph.php:703
+#: include/classes/api/services/CGraph.php:717
+#: include/classes/api/services/CGraph.php:731
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Kann nicht-numerischen Datenpunkt \"%1$s\" nicht zu Diagramm \"%2$s\" hinzufügen."
 
-#: include/classes/api/services/CGraphPrototype.php:670
-#: include/classes/api/services/CGraphPrototype.php:734
+#: include/classes/api/services/CGraphPrototype.php:671
+#: include/classes/api/services/CGraphPrototype.php:735
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Kann nicht-numerischen Datenpunkt \"%1$s\" nicht zu Diagrammprototyp \"%2$s\" hinzufügen."
@@ -1675,7 +1675,7 @@ msgstr "Kann keine Korrelationsbedingung hinzufügen"
 msgid "Cannot add dependency from a host to a template."
 msgstr "Abhängigkeit von einem Host zu einer Vorlage nicht möglich."
 
-#: include/classes/api/services/CDiscoveryRule.php:859
+#: include/classes/api/services/CDiscoveryRule.php:869
 #: include/triggers.inc.php:553
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
@@ -1855,21 +1855,21 @@ msgstr "Kann Verlauf nicht leeren"
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:2436
+#: include/classes/api/services/CDiscoveryRule.php:2446
 msgid "Cannot clone graph prototypes."
 msgstr "Kann Diagramm-Vorlagen nicht klonen."
 
-#: include/classes/api/services/CDiscoveryRule.php:2490
+#: include/classes/api/services/CDiscoveryRule.php:2500
 msgid "Cannot clone host prototypes."
 msgstr "Kann Hostprototypen nicht klonen."
 
-#: include/classes/api/services/CDiscoveryRule.php:2241
-#: include/classes/api/services/CDiscoveryRule.php:2297
-#: include/classes/api/services/CDiscoveryRule.php:2315
+#: include/classes/api/services/CDiscoveryRule.php:2251
+#: include/classes/api/services/CDiscoveryRule.php:2307
+#: include/classes/api/services/CDiscoveryRule.php:2325
 msgid "Cannot clone item prototypes."
 msgstr "Kann Datenpunktvorlagen nicht klonen."
 
-#: include/classes/api/services/CDiscoveryRule.php:772
+#: include/classes/api/services/CDiscoveryRule.php:782
 msgid "Cannot clone trigger prototypes."
 msgstr "Kann Auslöser-Vorlagen nicht klonen."
 
@@ -2148,11 +2148,11 @@ msgstr "Kann Vorlage nicht löschen"
 msgid "Cannot delete templated application."
 msgstr "Kann vorlagenbasierte Kategorie nicht löschen."
 
-#: include/classes/api/services/CGraphPrototype.php:576
+#: include/classes/api/services/CGraphPrototype.php:577
 msgid "Cannot delete templated graph prototype."
 msgstr "Kann vorlagengestützte Diagramm-Prototypen nicht löschen."
 
-#: include/classes/api/services/CGraph.php:559
+#: include/classes/api/services/CGraph.php:560
 msgid "Cannot delete templated graph."
 msgstr "Kann vorlagengestütztes Diagramm nicht löschen."
 
@@ -2160,15 +2160,15 @@ msgstr "Kann vorlagengestütztes Diagramm nicht löschen."
 msgid "Cannot delete templated host prototype."
 msgstr "Kann vorlagenbasierten Hostprototyp nicht löschen."
 
-#: include/classes/api/services/CItemPrototype.php:913
+#: include/classes/api/services/CItemPrototype.php:924
 msgid "Cannot delete templated item prototype."
 msgstr "Kann vorlagenbasierten Datenpunkt-Prototyp nicht löschen"
 
-#: include/classes/api/services/CItem.php:753
+#: include/classes/api/services/CItem.php:764
 msgid "Cannot delete templated item."
 msgstr "Kann vorlagenbasierten Datenpunkt nicht löschen."
 
-#: include/classes/api/services/CDiscoveryRule.php:555
+#: include/classes/api/services/CDiscoveryRule.php:565
 msgid "Cannot delete templated items."
 msgstr "Kann vorlagenbasierte Datenpunkte nicht löschen."
 
@@ -2392,8 +2392,8 @@ msgstr "Kann Host \"%1$s\" nicht finden, der in Tafel \"%2$s\" verwendet wird."
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kann Hostgruppe \"%1$s\" nicht finden für Hostprototyp \"%2$s\" der Suchlaufregel \"%3$s\" auf \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2086
-#: include/classes/api/services/CDiscoveryRule.php:2268
+#: include/classes/api/services/CDiscoveryRule.php:2096
+#: include/classes/api/services/CDiscoveryRule.php:2278
 #: include/classes/api/services/CItemGeneral.php:108 include/items.inc.php:498
 #: include/items.inc.php:644
 #, c-format
@@ -2619,9 +2619,8 @@ msgstr "Kann Befehl nicht abschicken. Überprüfen Sie die Verbindungen mit dem 
 msgid "Cannot send request"
 msgstr "Kann Anfrage nicht senden"
 
-#: include/classes/api/services/CTask.php:437
-#: include/classes/api/services/CTask.php:447
-#: include/classes/api/services/CTask.php:470
+#: include/classes/api/services/CTask.php:438
+#: include/classes/api/services/CTask.php:451
 #, c-format
 msgid "Cannot send request: %1$s."
 msgstr "Kann Anfrage nicht senden: %1$s."
@@ -2641,7 +2640,7 @@ msgstr "Kann \"%1$s\" für Diagramm \"%2$s\" nicht setzen."
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Kann \"%1$s\"\" für Diagramm-Prototypen \"%2$s\" nicht setzen."
 
-#: include/classes/api/services/CItemGeneral.php:311
+#: include/classes/api/services/CItemGeneral.php:325
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Kann \"%1$s\" nicht setzen für Datenpunkt \"%2$s\"."
@@ -2652,7 +2651,7 @@ msgstr "Kann \"%1$s\" nicht setzen für Datenpunkt \"%2$s\"."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Kann \"%1$s\"\" für Tafelvorlage \"%2$s\" nicht setzen."
 
-#: include/classes/api/services/CItemPrototype.php:339
+#: include/classes/api/services/CItemPrototype.php:350
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
 msgstr "\"Vorlagen-ID\" für Anwendungsprototyp in Datenpunkt-Prototyp \"%1$s\" kann nicht festgelegt werden."
@@ -2730,7 +2729,7 @@ msgstr "\"%1$s\" nicht aktualisierbar für Diagramm \"%2$s\"."
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "\"%1$s\" nicht aktualisierbar für Diagramm-Prototyp \"%2$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:265
+#: include/classes/api/services/CItemGeneral.php:279
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Kann \"%1$s\" für Datenpunkt \"%2$s\" nicht ändern."
@@ -2750,7 +2749,7 @@ msgstr "\"%1$s\" kann für vorlagebasierten Auslöser-Prototyp \"%2$s\" nicht ak
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Kann \"%1$s\"\" für einen entdeckten Host \"%2$s\" nicht aktualisieren."
 
-#: include/classes/api/services/CItemGeneral.php:195
+#: include/classes/api/services/CItemGeneral.php:209
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Kann \"%1$s\"\" für einen entdeckten Datenpunkt \"%2$s\" nicht aktualisieren."
@@ -3166,9 +3165,9 @@ msgstr "Prüfe auf Fehler mittels regulären Ausdrücken"
 msgid "Check of pre-requisites"
 msgstr "Voraussetzungen werden geprüft"
 
-#: include/classes/api/services/CItemGeneral.php:378
-#: include/classes/api/services/CItemGeneral.php:385
 #: include/classes/api/services/CItemGeneral.php:392
+#: include/classes/api/services/CItemGeneral.php:399
+#: include/classes/api/services/CItemGeneral.php:406
 msgid "Check the key, please. Default example was passed."
 msgstr "Bitte überprüfen Sie den Schlüssel. Standard-Beispiel wurde absolviert."
 
@@ -3462,12 +3461,12 @@ msgstr "Zustand \"%2$s\" in der Formel \"%3$s\" für Aktion \"%1$s\" ungenutzt."
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr "Zustand \"%2$s\" in der Formel \"%3$s\" für Korrelation \"%1$s\" ungenutzt."
 
-#: include/classes/api/services/CDiscoveryRule.php:1755
+#: include/classes/api/services/CDiscoveryRule.php:1765
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Zustand \"%2$s\" in der Formel \"%3$s\" für Suchlaufregel \"%1$s\" ungenutzt."
 
-#: include/classes/api/services/CDiscoveryRule.php:1549
+#: include/classes/api/services/CDiscoveryRule.php:1559
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
 msgstr ""
@@ -3482,12 +3481,12 @@ msgstr "Zustand \"%2$s\" in der Formel \"%3$s\" für Aktion \"%1$s\" undefiniert
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr "Zustand \"%2$s\" verwendet in Formel \"%3$s\" für Korrelation \"%1$s\" ist nicht definiert."
 
-#: include/classes/api/services/CDiscoveryRule.php:1754
+#: include/classes/api/services/CDiscoveryRule.php:1764
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Zustand \"%2$s\" verwendet in Formel \"%3$s\" für Suchlaufregel \"%1$s\" ist nicht definiert."
 
-#: include/classes/api/services/CDiscoveryRule.php:1548
+#: include/classes/api/services/CDiscoveryRule.php:1558
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr ""
@@ -3840,7 +3839,7 @@ msgstr "Enthält"
 #: include/views/configuration.template.list.php:135
 #: include/views/configuration.trigger.prototype.list.php:35
 #: include/views/configuration.triggers.list.php:174
-#: include/views/monitoring.history.php:237
+#: include/views/monitoring.history.php:240
 #: include/views/monitoring.hostscreen.php:68
 #: include/views/monitoring.overview.items.php:88
 #: include/views/monitoring.overview.triggers.php:124
@@ -5279,12 +5278,12 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "Host-Suchläufe"
 
-#: include/classes/api/services/CDiscoveryRule.php:48
+#: include/classes/api/services/CDiscoveryRule.php:58
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Suchlaufregel \"%1$s\" existiert bereits auf \"%2$s\", vererbt durch eine andere Vorlage."
 
-#: include/classes/api/services/CDiscoveryRule.php:49
+#: include/classes/api/services/CDiscoveryRule.php:59
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "Suchlaufregel\"%1$s\" existiert bereits auf \"%2$s\"."
@@ -5297,7 +5296,7 @@ msgstr "Suchlaufregel\"%1$s\" existiert bereits auf \"%2$s\"."
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Suchlaufregel \"%1$s\" ist bereits vorhanden."
 
-#: include/classes/api/services/CDiscoveryRule.php:2105
+#: include/classes/api/services/CDiscoveryRule.php:2115
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr ""
@@ -5483,7 +5482,7 @@ msgstr ""
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr ""
 
-#: include/classes/api/services/CItemPrototype.php:349
+#: include/classes/api/services/CItemPrototype.php:360
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
 msgstr ""
@@ -5684,7 +5683,7 @@ msgstr "Leere SSL-Zertifikat-Datei für Web-Szenario \"%1$s\"."
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr "SSL Schlüsseldatei leer für Web Szenario \"%1$s\"."
 
-#: include/classes/api/services/CItemPrototype.php:333
+#: include/classes/api/services/CItemPrototype.php:344
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
 msgstr ""
@@ -5702,12 +5701,12 @@ msgstr "Leere Korrelations ID."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1782
+#: include/classes/api/services/CDiscoveryRule.php:1792
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1774
+#: include/classes/api/services/CDiscoveryRule.php:1784
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Leeres Makro Filterbedingung für Suchlaufregel \"%1$s\"."
@@ -6474,7 +6473,7 @@ msgstr "Gefüllt"
 #: include/views/configuration.template.list.php:77
 #: include/views/configuration.triggers.list.php:162
 #: include/views/inventory.host.list.php:42
-#: include/views/monitoring.history.php:266
+#: include/views/monitoring.history.php:269
 #: include/views/monitoring.overview.items.php:96
 #: include/views/monitoring.screen.list.php:64
 #: include/views/monitoring.slideconf.list.php:52
@@ -6579,12 +6578,12 @@ msgstr "Formel"
 msgid "Formula missing for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1752
+#: include/classes/api/services/CDiscoveryRule.php:1762
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1545
+#: include/classes/api/services/CDiscoveryRule.php:1555
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
 msgstr ""
@@ -6782,22 +6781,22 @@ msgstr "Linie (Gradient)"
 msgid "Graph"
 msgstr "Diagramm"
 
-#: include/classes/api/services/CGraph.php:429
-#: include/classes/api/services/CGraphPrototype.php:440
+#: include/classes/api/services/CGraph.php:430
+#: include/classes/api/services/CGraphPrototype.php:441
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Diagramm \"%1$s\" existiert schon auf \"%2$s\" (geerbt aus anderer Vorlage)."
 
-#: include/classes/api/services/CGraph.php:450
-#: include/classes/api/services/CGraph.php:457
-#: include/classes/api/services/CGraphPrototype.php:466
-#: include/classes/api/services/CGraphPrototype.php:473
+#: include/classes/api/services/CGraph.php:451
+#: include/classes/api/services/CGraph.php:458
+#: include/classes/api/services/CGraphPrototype.php:467
+#: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Diagramm \"%1$s\" existiert schon auf \"%2$s\" (Unterschiedliche Elemente)."
 
-#: include/classes/api/services/CGraph.php:404
-#: include/classes/api/services/CGraphPrototype.php:415
+#: include/classes/api/services/CGraph.php:405
+#: include/classes/api/services/CGraphPrototype.php:416
 #: include/graphs.inc.php:440
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
@@ -6864,12 +6863,12 @@ msgstr "Diagrammelement"
 msgid "Graph prototype"
 msgstr "Diagramm-Prototyp"
 
-#: include/classes/api/services/CGraphPrototype.php:767
+#: include/classes/api/services/CGraphPrototype.php:768
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Diagramm-Prototyp \"%1$s\" enthält Datenpunkt-Prototypen aus mehreren Suchlaufregeln."
 
-#: include/classes/api/services/CGraphPrototype.php:773
+#: include/classes/api/services/CGraphPrototype.php:774
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
 msgstr "Diagramm-Prototyp \"%1$s\" benötigt mindestens einen Datenpunkt-Prototypen."
@@ -6920,7 +6919,7 @@ msgstr "Diagrammsumme"
 #: app/controllers/CControllerPopupGeneric.php:313
 #: include/views/configuration.graph.edit.php:101
 #: include/views/configuration.graph.list.php:139
-#: include/views/monitoring.history.php:251
+#: include/views/monitoring.history.php:254
 msgid "Graph type"
 msgstr "Diagrammtyp"
 
@@ -6938,10 +6937,10 @@ msgstr "Diagramm mit der ID \"%1$s\" ist nicht verfügbar."
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Diagramm namens \"%1$s\" existiert bereits (ggf. als Diagrammprototyp)."
 
-#: include/classes/api/services/CGraph.php:411
-#: include/classes/api/services/CGraph.php:432
-#: include/classes/api/services/CGraphPrototype.php:422
-#: include/classes/api/services/CGraphPrototype.php:443
+#: include/classes/api/services/CGraph.php:412
+#: include/classes/api/services/CGraph.php:433
+#: include/classes/api/services/CGraphPrototype.php:423
+#: include/classes/api/services/CGraphPrototype.php:444
 msgid "Graph with same name but other type exist."
 msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 
@@ -8339,22 +8338,22 @@ msgstr "Der Funktion wurden falsche/fehlerhafte Argumente übergeben"
 #: include/classes/api/services/CHost.php:1382
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
-#: include/classes/api/services/CItemGeneral.php:250
-#: include/classes/api/services/CItemGeneral.php:1194
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1252
-#: include/classes/api/services/CItemGeneral.php:1289
-#: include/classes/api/services/CItemGeneral.php:1304
-#: include/classes/api/services/CItemGeneral.php:1332
-#: include/classes/api/services/CItemGeneral.php:1378
-#: include/classes/api/services/CItemGeneral.php:1401
-#: include/classes/api/services/CItemGeneral.php:1450
-#: include/classes/api/services/CItemGeneral.php:1494
-#: include/classes/api/services/CItemGeneral.php:1507
-#: include/classes/api/services/CItemGeneral.php:1560
-#: include/classes/api/services/CItemGeneral.php:1571
-#: include/classes/api/services/CItemGeneral.php:1586
-#: include/classes/api/services/CItemGeneral.php:1597
+#: include/classes/api/services/CItemGeneral.php:264
+#: include/classes/api/services/CItemGeneral.php:1208
+#: include/classes/api/services/CItemGeneral.php:1241
+#: include/classes/api/services/CItemGeneral.php:1266
+#: include/classes/api/services/CItemGeneral.php:1303
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1392
+#: include/classes/api/services/CItemGeneral.php:1415
+#: include/classes/api/services/CItemGeneral.php:1464
+#: include/classes/api/services/CItemGeneral.php:1508
+#: include/classes/api/services/CItemGeneral.php:1521
+#: include/classes/api/services/CItemGeneral.php:1574
+#: include/classes/api/services/CItemGeneral.php:1585
+#: include/classes/api/services/CItemGeneral.php:1600
+#: include/classes/api/services/CItemGeneral.php:1611
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:101
 #: include/classes/api/services/CMapElement.php:120
@@ -8413,7 +8412,7 @@ msgstr "Unzulässige Zeichen im Vorlagennamen \"%1$s\"."
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Unzulässige Aktionsbedingung: Port \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1747
+#: include/classes/api/services/CDiscoveryRule.php:1757
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Unzulässige Aktionsbedingung in Suchlaufregel \"%1$s\"."
@@ -8432,12 +8431,12 @@ msgstr "Falscher benutzerdefinierter Ausdruck \"%2$s\" für Aktion \"%1$s\": %3$
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr "Falscher benutzerdefinierter Ausdruck \"%2$s\" für Korrelation \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1753
+#: include/classes/api/services/CDiscoveryRule.php:1763
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Falscher benutzerdefinierter Ausdruck \"%2$s\" für die Suchlaufregel \"%1$s\":%3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1546
+#: include/classes/api/services/CDiscoveryRule.php:1556
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
 msgstr ""
@@ -8495,7 +8494,7 @@ msgstr "Unzulässiger Datei-Upload."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Falscher Filter Bedingung Formel-ID für die Aktion \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1783
+#: include/classes/api/services/CDiscoveryRule.php:1793
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Falsche Filterbedingung Formel-ID für die Suchlaufregel \"%1$s\"."
@@ -8505,12 +8504,12 @@ msgstr "Falsche Filterbedingung Formel-ID für die Suchlaufregel \"%1$s\"."
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr "Falscher Filter Bedingung Formel-ID für die Korrelation \"%1$s\" gegeben."
 
-#: include/classes/api/services/CDiscoveryRule.php:1775
+#: include/classes/api/services/CDiscoveryRule.php:1785
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Falsche Filterbedingung Makro für die Suchlaufregel \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1581
+#: include/classes/api/services/CDiscoveryRule.php:1591
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
 msgstr ""
@@ -8521,7 +8520,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Falscher Filter Bedingungsoperator für Aktion \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1787
+#: include/classes/api/services/CDiscoveryRule.php:1797
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Falsche Filterbedingung Operator für die Suchlaufregel \"%1$s\"."
@@ -8846,7 +8845,7 @@ msgstr "Falsche Art der Berechnung für die Aktion \"%1$s\"."
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr "Falsche Art der Berechnung für die Korrelation \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1740
+#: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Unzulässige Aktionsbedingung in Suchlaufregel \"%1$s\"."
@@ -8903,8 +8902,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:525
 #: include/classes/api/services/CDRule.php:587
 #: include/classes/api/services/CDRule.php:600
-#: include/classes/api/services/CItemGeneral.php:484
-#: include/classes/api/services/CItemGeneral.php:2305
+#: include/classes/api/services/CItemGeneral.php:498
+#: include/classes/api/services/CItemGeneral.php:2319
 #: include/classes/validators/CNewValidator.php:122
 #: include/classes/validators/CNewValidator.php:135
 #: include/classes/validators/CNewValidator.php:148
@@ -9034,8 +9033,8 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1809
-#: include/classes/api/services/CDiscoveryRule.php:2207
+#: include/classes/api/services/CDiscoveryRule.php:1819
+#: include/classes/api/services/CDiscoveryRule.php:2217
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -9075,57 +9074,57 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2211
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
-#: include/classes/api/services/CItemGeneral.php:209
-#: include/classes/api/services/CItemGeneral.php:429
-#: include/classes/api/services/CItemGeneral.php:440
-#: include/classes/api/services/CItemGeneral.php:446
+#: include/classes/api/services/CItemGeneral.php:223
+#: include/classes/api/services/CItemGeneral.php:443
 #: include/classes/api/services/CItemGeneral.php:454
-#: include/classes/api/services/CItemGeneral.php:466
-#: include/classes/api/services/CItemGeneral.php:472
-#: include/classes/api/services/CItemGeneral.php:478
-#: include/classes/api/services/CItemGeneral.php:491
-#: include/classes/api/services/CItemGeneral.php:517
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1238
-#: include/classes/api/services/CItemGeneral.php:1256
-#: include/classes/api/services/CItemGeneral.php:1271
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1309
-#: include/classes/api/services/CItemGeneral.php:1316
-#: include/classes/api/services/CItemGeneral.php:1324
-#: include/classes/api/services/CItemGeneral.php:1337
-#: include/classes/api/services/CItemGeneral.php:1348
-#: include/classes/api/services/CItemGeneral.php:1358
-#: include/classes/api/services/CItemGeneral.php:1365
-#: include/classes/api/services/CItemGeneral.php:1383
-#: include/classes/api/services/CItemGeneral.php:1406
-#: include/classes/api/services/CItemGeneral.php:1457
-#: include/classes/api/services/CItemGeneral.php:1464
-#: include/classes/api/services/CItemGeneral.php:1470
-#: include/classes/api/services/CItemGeneral.php:1477
-#: include/classes/api/services/CItemGeneral.php:1485
+#: include/classes/api/services/CItemGeneral.php:460
+#: include/classes/api/services/CItemGeneral.php:468
+#: include/classes/api/services/CItemGeneral.php:480
+#: include/classes/api/services/CItemGeneral.php:486
+#: include/classes/api/services/CItemGeneral.php:492
+#: include/classes/api/services/CItemGeneral.php:505
+#: include/classes/api/services/CItemGeneral.php:531
+#: include/classes/api/services/CItemGeneral.php:1246
+#: include/classes/api/services/CItemGeneral.php:1252
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1285
+#: include/classes/api/services/CItemGeneral.php:1308
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1330
+#: include/classes/api/services/CItemGeneral.php:1338
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1362
+#: include/classes/api/services/CItemGeneral.php:1372
+#: include/classes/api/services/CItemGeneral.php:1379
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1420
+#: include/classes/api/services/CItemGeneral.php:1471
+#: include/classes/api/services/CItemGeneral.php:1478
+#: include/classes/api/services/CItemGeneral.php:1484
+#: include/classes/api/services/CItemGeneral.php:1491
 #: include/classes/api/services/CItemGeneral.php:1499
-#: include/classes/api/services/CItemGeneral.php:1510
-#: include/classes/api/services/CItemGeneral.php:1515
-#: include/classes/api/services/CItemGeneral.php:1523
+#: include/classes/api/services/CItemGeneral.php:1513
+#: include/classes/api/services/CItemGeneral.php:1524
 #: include/classes/api/services/CItemGeneral.php:1529
-#: include/classes/api/services/CItemGeneral.php:1540
-#: include/classes/api/services/CItemGeneral.php:1564
-#: include/classes/api/services/CItemGeneral.php:1577
-#: include/classes/api/services/CItemGeneral.php:1590
-#: include/classes/api/services/CItemGeneral.php:1605
-#: include/classes/api/services/CItemGeneral.php:1615
-#: include/classes/api/services/CItemGeneral.php:1953
-#: include/classes/api/services/CItemGeneral.php:1973
-#: include/classes/api/services/CItemGeneral.php:1980
-#: include/classes/api/services/CItemGeneral.php:1990
-#: include/classes/api/services/CItemGeneral.php:2070
+#: include/classes/api/services/CItemGeneral.php:1537
+#: include/classes/api/services/CItemGeneral.php:1543
+#: include/classes/api/services/CItemGeneral.php:1554
+#: include/classes/api/services/CItemGeneral.php:1578
+#: include/classes/api/services/CItemGeneral.php:1591
+#: include/classes/api/services/CItemGeneral.php:1604
+#: include/classes/api/services/CItemGeneral.php:1619
+#: include/classes/api/services/CItemGeneral.php:1629
+#: include/classes/api/services/CItemGeneral.php:1967
+#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1994
+#: include/classes/api/services/CItemGeneral.php:2004
 #: include/classes/api/services/CItemGeneral.php:2084
-#: include/classes/api/services/CItemGeneral.php:2248
-#: include/classes/api/services/CItem.php:819
-#: include/classes/api/services/CItem.php:827
-#: include/classes/api/services/CItemPrototype.php:979
-#: include/classes/api/services/CItemPrototype.php:987
+#: include/classes/api/services/CItemGeneral.php:2098
+#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItem.php:830
+#: include/classes/api/services/CItem.php:838
+#: include/classes/api/services/CItemPrototype.php:990
+#: include/classes/api/services/CItemPrototype.php:998
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMapElement.php:85
@@ -9535,12 +9534,12 @@ msgstr "Ungültige interne Daten-Speicherdauer: %1$s."
 msgid "Invalid interval \"%1$s\"."
 msgstr "Ungültiges Intervall \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:50
+#: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Ungültiger Schlüssel \"%1$s\" für Suchlaufregel \"%2$s\" auf \"%3$s\": %4$s."
 
-#: include/classes/api/services/CItem.php:53
+#: include/classes/api/services/CItem.php:64
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Ungültiger Schlüssel \"%1$s\" für Datenpunkt \"%2$s\"auf \"%3$s\": %4$s."
@@ -9594,29 +9593,29 @@ msgstr "Ungültige Anzahl an Parametern."
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CAutoregistration.php:151
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CDiscoveryRule.php:1593
-#: include/classes/api/services/CDiscoveryRule.php:1613
-#: include/classes/api/services/CDiscoveryRule.php:1625
-#: include/classes/api/services/CDiscoveryRule.php:1644
-#: include/classes/api/services/CDiscoveryRule.php:1655
-#: include/classes/api/services/CDiscoveryRule.php:1667
-#: include/classes/api/services/CDiscoveryRule.php:1675
-#: include/classes/api/services/CDiscoveryRule.php:1686
-#: include/classes/api/services/CDiscoveryRule.php:1697
-#: include/classes/api/services/CDiscoveryRule.php:1829
-#: include/classes/api/services/CDiscoveryRule.php:1915
-#: include/classes/api/services/CDiscoveryRule.php:1932
-#: include/classes/api/services/CDiscoveryRule.php:1950
-#: include/classes/api/services/CDiscoveryRule.php:1958
-#: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItemGeneral.php:2269
-#: include/classes/api/services/CItemGeneral.php:2275
-#: include/classes/api/services/CItemGeneral.php:2284
-#: include/classes/api/services/CItemGeneral.php:2291
-#: include/classes/api/services/CItemGeneral.php:2322
-#: include/classes/api/services/CItemGeneral.php:2327
-#: include/classes/api/services/CItemGeneral.php:2337
-#: include/classes/api/services/CItemGeneral.php:2366
+#: include/classes/api/services/CDiscoveryRule.php:1603
+#: include/classes/api/services/CDiscoveryRule.php:1623
+#: include/classes/api/services/CDiscoveryRule.php:1635
+#: include/classes/api/services/CDiscoveryRule.php:1654
+#: include/classes/api/services/CDiscoveryRule.php:1665
+#: include/classes/api/services/CDiscoveryRule.php:1677
+#: include/classes/api/services/CDiscoveryRule.php:1685
+#: include/classes/api/services/CDiscoveryRule.php:1696
+#: include/classes/api/services/CDiscoveryRule.php:1707
+#: include/classes/api/services/CDiscoveryRule.php:1839
+#: include/classes/api/services/CDiscoveryRule.php:1925
+#: include/classes/api/services/CDiscoveryRule.php:1942
+#: include/classes/api/services/CDiscoveryRule.php:1960
+#: include/classes/api/services/CDiscoveryRule.php:1968
+#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2283
+#: include/classes/api/services/CItemGeneral.php:2289
+#: include/classes/api/services/CItemGeneral.php:2298
+#: include/classes/api/services/CItemGeneral.php:2305
+#: include/classes/api/services/CItemGeneral.php:2336
+#: include/classes/api/services/CItemGeneral.php:2341
+#: include/classes/api/services/CItemGeneral.php:2351
+#: include/classes/api/services/CItemGeneral.php:2380
 #: include/classes/api/services/CModule.php:291
 #: include/classes/api/services/CTriggerGeneral.php:1686
 #: include/classes/api/services/CTriggerGeneral.php:1702
@@ -9859,12 +9858,12 @@ msgid "Item"
 msgstr "Datenpunkt"
 
 #: include/classes/api/services/CHostPrototype.php:1056
-#: include/classes/api/services/CItem.php:51
+#: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Datenpunkt \"%1$s\" existiert bereits auf \"%2$s\"; vererbt von einer anderen Vorlage."
 
-#: include/classes/api/services/CItem.php:52
+#: include/classes/api/services/CItem.php:63
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Datenpunkt \"%1$s\" existiert bereits auf \"%2$s\"."
@@ -9874,7 +9873,7 @@ msgstr "Datenpunkt \"%1$s\" existiert bereits auf \"%2$s\"."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:936
+#: include/classes/api/services/CItem.php:947
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Datenpunkt \"%1$s\" kann das fehlende Inventarfeld Nummer \"%2$d\" nicht befüllen. Zur Wahl steht: 0 (nicht befüllen) bis %3$d."
@@ -9884,8 +9883,8 @@ msgstr "Datenpunkt \"%1$s\" kann das fehlende Inventarfeld Nummer \"%2$d\" nicht
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Datenpunkt \"%1$s\" existiert nicht in Vorlage \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2208
-#: include/classes/api/services/CItemGeneral.php:1954
+#: include/classes/api/services/CDiscoveryRule.php:2218
+#: include/classes/api/services/CItemGeneral.php:1968
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Datenpunkt \"%1$s\" ist nicht vorhanden oder Sie haben keinen Zugriff auf diesen"
@@ -9937,7 +9936,7 @@ msgstr "Element im Zustand \"nicht unterstützt\""
 msgid "Item not selected"
 msgstr "Datenpunkt nicht ausgewählt"
 
-#: include/classes/api/services/CItemGeneral.php:1222
+#: include/classes/api/services/CItemGeneral.php:1236
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr ""
@@ -9957,7 +9956,7 @@ msgstr "Elementen-Prototyp"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:968
+#: include/classes/api/services/CItemGeneral.php:982
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr ""
@@ -10010,11 +10009,11 @@ msgstr ""
 msgid "Item updated"
 msgstr "Element geändert"
 
-#: include/classes/api/services/CItemGeneral.php:361
+#: include/classes/api/services/CItemGeneral.php:375
 msgid "Item uses host interface from non-parent host."
 msgstr "Element nutzt Hostschnittstelle eines nicht übergeordneten Hosts."
 
-#: include/classes/api/services/CItemGeneral.php:364
+#: include/classes/api/services/CItemGeneral.php:378
 msgid "Item uses incorrect interface type."
 msgstr "Schnittstellentyp ist ungeeignet für dieses Element."
 
@@ -10039,32 +10038,32 @@ msgstr ""
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "Datenpunkt mit ID \"%1$s\" ist nicht verfügbar."
 
-#: include/classes/api/services/CItemGeneral.php:599
+#: include/classes/api/services/CItemGeneral.php:613
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\" als Suchlaufregel."
 
-#: include/classes/api/services/CItemGeneral.php:605
+#: include/classes/api/services/CItemGeneral.php:619
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\" als Prototyp-basierter Datenpunkt."
 
-#: include/classes/api/services/CItemGeneral.php:602
+#: include/classes/api/services/CItemGeneral.php:616
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\" als Datenpunktprototyp."
 
-#: include/classes/api/services/CItemGeneral.php:596
+#: include/classes/api/services/CItemGeneral.php:610
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\" als Datenpunkt."
 
-#: include/classes/api/services/CItemGeneral.php:608
+#: include/classes/api/services/CItemGeneral.php:622
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\" als unbekanntes Element. "
 
-#: include/classes/api/services/CItemGeneral.php:1811
+#: include/classes/api/services/CItemGeneral.php:1825
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Datenpunkt mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\"."
@@ -10139,8 +10138,8 @@ msgstr "JMX-Schnittstellen"
 msgid "JSON data"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2337
-#: include/classes/api/services/CItemGeneral.php:2366
+#: include/classes/api/services/CItemGeneral.php:2351
+#: include/classes/api/services/CItemGeneral.php:2380
 msgid "JSON is expected"
 msgstr ""
 
@@ -10218,7 +10217,7 @@ msgstr "Kerberos"
 msgid "Key"
 msgstr "Schlüssel"
 
-#: include/classes/api/services/CItemGeneral.php:413
+#: include/classes/api/services/CItemGeneral.php:427
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Schlüssel \"%1$s\" entspricht nicht <grpmax|grpmin|grpsum|grpavg>[\"Host-Gruppe(n)\", \"Schlüssel\", \"<last|min|max|avg|sum|count>\", \"Parameter\"]."
@@ -10655,7 +10654,7 @@ msgstr "Lokal"
 
 #: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:289
+#: include/views/monitoring.history.php:292
 #: include/views/monitoring.screen.constructor.edit.php:720
 msgid "Local time"
 msgstr "Lokalzeit"
@@ -11352,7 +11351,7 @@ msgstr ""
 msgid "Missing \"itemid\" field for item."
 msgstr "Feld \"itemid\" fehlt bei Datenpunkt."
 
-#: include/classes/api/services/CItemPrototype.php:327
+#: include/classes/api/services/CItemPrototype.php:338
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
 msgstr ""
@@ -11905,7 +11904,7 @@ msgstr "Kein \"%1$s\" für Screen-Vorlage übergeben."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Kein \"%2$s\" für Filterbedingung der Aktion \"%1$s\" gegeben."
 
-#: include/classes/api/services/CDiscoveryRule.php:1791
+#: include/classes/api/services/CDiscoveryRule.php:1801
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Kein \"%2$s\" für eine Filterbedingung der Suchlaufregel \"%1$s\" übergeben."
@@ -11915,12 +11914,12 @@ msgstr "Kein \"%2$s\" für eine Filterbedingung der Suchlaufregel \"%1$s\" über
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Kein \"%2$s\" für Filter der Aktion \"%1$s\" gegeben."
 
-#: include/classes/api/services/CDiscoveryRule.php:1759
+#: include/classes/api/services/CDiscoveryRule.php:1769
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Kein \"%2$s\" für den Filter der Suchlaufregel \"%1$s\" übergeben."
 
-#: include/classes/api/services/CItemGeneral.php:531
+#: include/classes/api/services/CItemGeneral.php:545
 msgid "No SNMP OID specified."
 msgstr "Keine SNMP OID angegeben."
 
@@ -11943,7 +11942,7 @@ msgstr ""
 msgid "No authentication user name specified for action operation command \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:501
+#: include/classes/api/services/CItemGeneral.php:515
 msgid "No authentication user name specified."
 msgstr "Kein Benutzername für Authentifizierung angegeben."
 
@@ -11996,7 +11995,7 @@ msgstr "Keine Standardschnittstelle für Typ \"%1$s\" bei \"%2$s\"."
 msgid "No details"
 msgstr "Keine Details"
 
-#: include/classes/api/services/CDiscoveryRule.php:610
+#: include/classes/api/services/CDiscoveryRule.php:620
 msgid "No discovery rule IDs given."
 msgstr "Keine Suchlauf-IDs festgelegt."
 
@@ -12038,7 +12037,7 @@ msgstr "Keine Diagramm-Prototyp-ID für Screen-Element übergeben."
 msgid "No graphs added."
 msgstr "Keine Diagramme hinzugefügt."
 
-#: include/classes/api/services/CDiscoveryRule.php:613
+#: include/classes/api/services/CDiscoveryRule.php:623
 msgid "No host IDs given."
 msgstr "Keine Host-IDs angegeben."
 
@@ -12084,7 +12083,7 @@ msgstr "Kein Bild"
 msgid "No interface found"
 msgstr "Keine Schnittstelle gefunden"
 
-#: include/classes/api/services/CItemGeneral.php:358
+#: include/classes/api/services/CItemGeneral.php:372
 msgid "No interface found."
 msgstr "Keine Schnittstelle gefunden."
 
@@ -12198,11 +12197,11 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: include/classes/api/services/CDashboard.php:371
 #: include/classes/api/services/CDashboard.php:396
 #: include/classes/api/services/CDashboard.php:1236
-#: include/classes/api/services/CDiscoveryRule.php:548
-#: include/classes/api/services/CDiscoveryRule.php:589
-#: include/classes/api/services/CDiscoveryRule.php:625
-#: include/classes/api/services/CDiscoveryRule.php:1712
-#: include/classes/api/services/CDiscoveryRule.php:1984
+#: include/classes/api/services/CDiscoveryRule.php:558
+#: include/classes/api/services/CDiscoveryRule.php:599
+#: include/classes/api/services/CDiscoveryRule.php:635
+#: include/classes/api/services/CDiscoveryRule.php:1722
+#: include/classes/api/services/CDiscoveryRule.php:1994
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -12212,11 +12211,11 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: include/classes/api/services/CEvent.php:859
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
-#: include/classes/api/services/CGraph.php:554
-#: include/classes/api/services/CGraph.php:688
-#: include/classes/api/services/CGraphPrototype.php:571
-#: include/classes/api/services/CGraphPrototype.php:656
-#: include/classes/api/services/CGraphPrototype.php:718
+#: include/classes/api/services/CGraph.php:555
+#: include/classes/api/services/CGraph.php:689
+#: include/classes/api/services/CGraphPrototype.php:572
+#: include/classes/api/services/CGraphPrototype.php:657
+#: include/classes/api/services/CGraphPrototype.php:719
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
 #: include/classes/api/services/CHostGroup.php:770
@@ -12251,11 +12250,11 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: include/classes/api/services/CImage.php:419
 #: include/classes/api/services/CImage.php:471
 #: include/classes/api/services/CImage.php:493
-#: include/classes/api/services/CItemGeneral.php:201
-#: include/classes/api/services/CItemGeneral.php:303
-#: include/classes/api/services/CItemGeneral.php:318
-#: include/classes/api/services/CItem.php:746
-#: include/classes/api/services/CItemPrototype.php:906
+#: include/classes/api/services/CItemGeneral.php:215
+#: include/classes/api/services/CItemGeneral.php:317
+#: include/classes/api/services/CItemGeneral.php:332
+#: include/classes/api/services/CItem.php:757
+#: include/classes/api/services/CItemPrototype.php:917
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -12289,8 +12288,8 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: include/classes/api/services/CScript.php:631
 #: include/classes/api/services/CService.php:988
 #: include/classes/api/services/CService.php:1012
-#: include/classes/api/services/CTask.php:425
-#: include/classes/api/services/CTask.php:492
+#: include/classes/api/services/CTask.php:427
+#: include/classes/api/services/CTask.php:474
 #: include/classes/api/services/CTemplate.php:846
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
@@ -12326,7 +12325,7 @@ msgstr "Keine Berechtigungen für dieses bestimmte Objekt oder es existiert nich
 msgid "No private key file specified for action operation command \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:509
+#: include/classes/api/services/CItemGeneral.php:523
 msgid "No private key file specified."
 msgstr "Keine Datei mit privatem Schlüssel angegeben."
 
@@ -12339,7 +12338,7 @@ msgstr "Kein Proxy"
 msgid "No public key file specified for action operation command \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:506
+#: include/classes/api/services/CItemGeneral.php:520
 msgid "No public key file specified."
 msgstr "Keine Datei mit öffentlichem Schlüssel angegeben."
 
@@ -12423,7 +12422,7 @@ msgstr "Kein"
 #: app/views/popup.generic.php:530 include/graphs.inc.php:24
 #: include/items.inc.php:156 include/triggers.inc.php:1217
 #: include/views/configuration.triggers.list.php:71
-#: include/views/monitoring.history.php:253
+#: include/views/monitoring.history.php:256
 msgid "Normal"
 msgstr "Normal"
 
@@ -12873,11 +12872,11 @@ msgstr "Nur Administratoren können Slide-Show Besitzer festgelegt."
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Nur Datenpunkte, die mit aktiven Hosts verbunden sind, werden gezählt"
 
-#: include/classes/api/services/CItemGeneral.php:1444
+#: include/classes/api/services/CItemGeneral.php:1458
 msgid "Only one Prometheus step is allowed."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1412
+#: include/classes/api/services/CItemGeneral.php:1426
 msgid "Only one change step is allowed."
 msgstr "Nur eine Änderungschritt ist zulässig."
 
@@ -12885,8 +12884,8 @@ msgstr "Nur eine Änderungschritt ist zulässig."
 msgid "Only one check can be unique."
 msgstr "Nur eine Prüfung kann als einzigartig markiert werden."
 
-#: include/classes/api/services/CItemGeneral.php:1389
-#: include/classes/api/services/CItemGeneral.php:1434
+#: include/classes/api/services/CItemGeneral.php:1403
+#: include/classes/api/services/CItemGeneral.php:1448
 msgid "Only one throttling step is allowed."
 msgstr ""
 
@@ -14976,7 +14975,7 @@ msgstr "SNMP-Schnittstellen"
 msgid "SNMP trap"
 msgstr "SNMP-Trap"
 
-#: include/classes/api/services/CItemGeneral.php:525
+#: include/classes/api/services/CItemGeneral.php:539
 msgid "SNMP trap key is invalid."
 msgstr "Schlüssel für SNMP-Trap ist unzulässig."
 
@@ -16136,7 +16135,7 @@ msgstr "Das angegebene Skript existiert nicht oder Sie haben nicht die notwendig
 msgid "Specify host to see the graphs."
 msgstr ""
 
-#: app/views/popup.generic.php:166 include/views/monitoring.history.php:292
+#: app/views/popup.generic.php:166 include/views/monitoring.history.php:295
 msgid "Specify some filter condition to see the values."
 msgstr ""
 
@@ -16145,7 +16144,7 @@ msgid "Speed"
 msgstr "Geschwindigkeit"
 
 #: app/views/popup.generic.php:521 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:254
+#: include/views/monitoring.history.php:257
 msgid "Stacked"
 msgstr "Gestapelt"
 
@@ -17103,7 +17102,7 @@ msgstr "Timeout"
 #: include/classes/screens/CScreenHistory.php:449
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:288
+#: include/views/monitoring.history.php:291
 msgid "Timestamp"
 msgstr "Zeitstempel"
 
@@ -17494,7 +17493,7 @@ msgstr "Dienstag"
 msgid "Turkish (tr_TR)"
 msgstr "Türkisch (tr_TR)"
 
-#: include/classes/api/services/CItem.php:997
+#: include/classes/api/services/CItem.php:1008
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Zwei Datenpunkte (\"%1$s\" und \"%2$s\") können nicht das gleiche Inventarfeld \"%3$s\" befüllen."
@@ -17588,7 +17587,7 @@ msgstr "Ermittlungsart"
 msgid "Type of information"
 msgstr "Informationstyp"
 
-#: include/classes/api/services/CItemGeneral.php:422
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 
@@ -17898,7 +17897,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1792
+#: include/classes/api/services/CDiscoveryRule.php:1802
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Nicht unterstützter Parameter \"%2$s\" für die Filterbedingung der Suchlaufregel \"%1$s\"."
@@ -17908,7 +17907,7 @@ msgstr "Nicht unterstützter Parameter \"%2$s\" für die Filterbedingung der Suc
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1760
+#: include/classes/api/services/CDiscoveryRule.php:1770
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Nicht unterstützter Parameter \"%2$s\" für den Filter der Suchlaufregel \"%1$s\". "
@@ -18624,7 +18623,7 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:197
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/monitoring.history.php:161
-#: include/views/monitoring.history.php:290
+#: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
 msgstr "Wert"
@@ -19107,7 +19106,7 @@ msgstr ""
 msgid "XML is empty"
 msgstr "XML ist leer"
 
-#: include/classes/api/services/CItemGeneral.php:2322
+#: include/classes/api/services/CItemGeneral.php:2336
 msgid "XML is expected"
 msgstr ""
 
@@ -19484,9 +19483,9 @@ msgid "a number is too large"
 msgstr "eine Zahl ist zu groß"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1272
-#: include/classes/api/services/CItemGeneral.php:1349
-#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1286
+#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1373
 #: include/classes/api/services/CScreen.php:394
 msgid "a numeric value is expected"
 msgstr "ein numerischer Wert erwartet"
@@ -19568,8 +19567,8 @@ msgstr "Alle Medien"
 
 #: include/classes/api/services/CDRule.php:467
 #: include/classes/api/services/CDRule.php:474
-#: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItemGeneral.php:2284
+#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/api/services/CModule.php:291
 #: include/classes/import/validators/C44XmlValidator.php:2133
 #: include/classes/import/validators/C44XmlValidator.php:2153
@@ -19679,7 +19678,7 @@ msgstr ""
 msgid "blinking"
 msgstr "Blinkt"
 
-#: include/classes/api/services/CItemGeneral.php:447
+#: include/classes/api/services/CItemGeneral.php:461
 msgid "both username and password should be either present or empty"
 msgstr ""
 
@@ -19690,7 +19689,7 @@ msgstr ""
 msgid "calculated"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:209
+#: include/classes/api/services/CItemGeneral.php:223
 msgid "cannot be changed"
 msgstr "nicht änderbar"
 
@@ -19722,7 +19721,7 @@ msgstr "nicht änderbar"
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1933
+#: include/classes/api/services/CDiscoveryRule.php:1943
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -19732,19 +19731,19 @@ msgstr "nicht änderbar"
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CHost.php:1892
 #: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CItemGeneral.php:440
-#: include/classes/api/services/CItemGeneral.php:467
-#: include/classes/api/services/CItemGeneral.php:473
-#: include/classes/api/services/CItemGeneral.php:479
-#: include/classes/api/services/CItemGeneral.php:518
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1256
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1309
-#: include/classes/api/services/CItemGeneral.php:1337
-#: include/classes/api/services/CItemGeneral.php:1457
-#: include/classes/api/services/CItemGeneral.php:1499
-#: include/classes/api/services/CItemGeneral.php:1616
+#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:481
+#: include/classes/api/services/CItemGeneral.php:487
+#: include/classes/api/services/CItemGeneral.php:493
+#: include/classes/api/services/CItemGeneral.php:532
+#: include/classes/api/services/CItemGeneral.php:1246
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1308
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1471
+#: include/classes/api/services/CItemGeneral.php:1513
+#: include/classes/api/services/CItemGeneral.php:1630
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
@@ -19800,7 +19799,7 @@ msgstr "nicht änderbar"
 msgid "cannot be empty"
 msgstr "darf nicht leer sein"
 
-#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2290
 msgid "cannot convert to JSON, result value too long"
 msgstr ""
 
@@ -19808,7 +19807,7 @@ msgstr ""
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1916
+#: include/classes/api/services/CDiscoveryRule.php:1926
 msgid "cannot update property for templated discovery rule"
 msgstr "Kann Eigenschaften für eine vorlagengestützte Suchlaufregel nicht aktualisieren"
 
@@ -19825,7 +19824,7 @@ msgstr "Prüfen des Ausdrucks beginnend bei \"%1$s\""
 msgid "circular dependency is not allowed"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1991
+#: include/classes/api/services/CItemGeneral.php:2005
 #: include/classes/import/CConfigurationImport.php:2848
 msgid "circular item dependency is not allowed"
 msgstr "zirkuläre Datenpunkt Abhängigkeit ist nicht zulässig"
@@ -19938,8 +19937,9 @@ msgid "discovery"
 msgstr "Suchlauf"
 
 #: include/classes/api/services/CTask.php:449
-msgid "discovery rule is disabled"
-msgstr "Suchlaufregel deaktiviert"
+#, c-format
+msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
@@ -19994,8 +19994,8 @@ msgstr ""
 msgid "first"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1317
-#: include/classes/api/services/CItemGeneral.php:1465
+#: include/classes/api/services/CItemGeneral.php:1331
+#: include/classes/api/services/CItemGeneral.php:1479
 msgid "first parameter is expected"
 msgstr "erster Parameter erwartet"
 
@@ -20048,17 +20048,13 @@ msgstr "Host"
 msgid "host group"
 msgstr "Host-Gruppe"
 
-#: include/classes/api/services/CTask.php:470
-msgid "host is not monitored"
-msgstr ""
-
 #: include/classes/widgets/CWidgetHelper.php:616
 #: include/classes/widgets/CWidgetHelper.php:976
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1974
+#: include/classes/api/services/CItemGeneral.php:1988
 msgid "hostid of dependent item and master item should match"
 msgstr "Host-ID des abhängigen Datenpunktes und Haupt-Datenpunkt sollten übereinstimmen"
 
@@ -20117,12 +20113,12 @@ msgctxt "event source"
 msgid "internal"
 msgstr "interne"
 
-#: include/classes/api/services/CItemGeneral.php:1478
+#: include/classes/api/services/CItemGeneral.php:1492
 msgid "invalid Prometheus output"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1471
-#: include/classes/api/services/CItemGeneral.php:1486
+#: include/classes/api/services/CItemGeneral.php:1485
+#: include/classes/api/services/CItemGeneral.php:1500
 msgid "invalid Prometheus pattern"
 msgstr ""
 
@@ -20184,7 +20180,8 @@ msgid "item"
 msgstr "Datenpunkt"
 
 #: include/classes/api/services/CTask.php:450
-msgid "item is disabled"
+#, c-format
+msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:636
@@ -20278,7 +20275,7 @@ msgstr "Karte"
 msgid "matches"
 msgstr "übereinstimmend"
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1395
 #: include/classes/graphdraw/CPieGraphDraw.php:293 include/forms.inc.php:1306
@@ -20295,17 +20292,17 @@ msgstr "max."
 msgid "max() - Maximum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2085
+#: include/classes/api/services/CItemGeneral.php:2099
 msgid "maximum dependent items count reached"
 msgstr "maximale Anzahl abhängiger Datenpunkte erreicht"
 
-#: include/classes/api/services/CItemGeneral.php:2071
+#: include/classes/api/services/CItemGeneral.php:2085
 #: include/classes/import/CConfigurationImport.php:2796
 #: include/classes/import/CConfigurationImport.php:2863
 msgid "maximum number of dependency levels reached"
 msgstr "maximale Anzahl von Abhängigkeitsebenen erreicht"
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1379
 #: include/classes/graphdraw/CLineGraphDraw.php:1392
 #: include/classes/graphdraw/CPieGraphDraw.php:289 include/forms.inc.php:1305
@@ -20394,8 +20391,8 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2269
-#: include/classes/api/services/CItemGeneral.php:2291
+#: include/classes/api/services/CItemGeneral.php:2283
+#: include/classes/api/services/CItemGeneral.php:2305
 msgid "nonempty key and value pair expected"
 msgstr ""
 
@@ -20531,7 +20528,7 @@ msgstr "rechts"
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1981
+#: include/classes/api/services/CItemGeneral.php:1995
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
@@ -20554,8 +20551,8 @@ msgctxt "adjective"
 msgid "second"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1325
-#: include/classes/api/services/CItemGeneral.php:1511
+#: include/classes/api/services/CItemGeneral.php:1339
+#: include/classes/api/services/CItemGeneral.php:1525
 msgid "second parameter is expected"
 msgstr "Zweiter Parameter erwartet"
 
@@ -20578,13 +20575,13 @@ msgstr "Kurzbeschreibung"
 #: include/classes/api/services/CHost.php:1938
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
-#: include/classes/api/services/CItemGeneral.php:454
-#: include/classes/api/services/CItemGeneral.php:492
-#: include/classes/api/services/CItemGeneral.php:1383
-#: include/classes/api/services/CItemGeneral.php:1406
-#: include/classes/api/services/CItemGeneral.php:1578
-#: include/classes/api/services/CItemGeneral.php:1606
-#: include/classes/api/services/CItemGeneral.php:2248
+#: include/classes/api/services/CItemGeneral.php:468
+#: include/classes/api/services/CItemGeneral.php:506
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1420
+#: include/classes/api/services/CItemGeneral.php:1592
+#: include/classes/api/services/CItemGeneral.php:1620
+#: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMediatype.php:786
@@ -20669,9 +20666,9 @@ msgstr "Vorlagen ID \"%1$s\" kommt %2$s mal vor"
 #: app/controllers/CControllerDashboardUpdate.php:150
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CDashboard.php:388
-#: include/classes/api/services/CDiscoveryRule.php:1594
-#: include/classes/api/services/CDiscoveryRule.php:1951
-#: include/classes/api/services/CDiscoveryRule.php:1959
+#: include/classes/api/services/CDiscoveryRule.php:1604
+#: include/classes/api/services/CDiscoveryRule.php:1961
+#: include/classes/api/services/CDiscoveryRule.php:1969
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2195
 #: include/classes/api/services/CHttpTest.php:742
@@ -20701,7 +20698,7 @@ msgstr "Marker \"%1$s\" fehlt"
 msgid "third"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1516
+#: include/classes/api/services/CItemGeneral.php:1530
 msgid "third parameter is expected"
 msgstr ""
 
@@ -20771,10 +20768,10 @@ msgstr "unerwartetes Ende des Schlüssels"
 msgid "unexpected end of macro"
 msgstr "unerwartetes Ende des Makros"
 
-#: include/classes/api/services/CDiscoveryRule.php:1614
-#: include/classes/api/services/CDiscoveryRule.php:1645
-#: include/classes/api/services/CDiscoveryRule.php:1668
-#: include/classes/api/services/CDiscoveryRule.php:1687
+#: include/classes/api/services/CDiscoveryRule.php:1624
+#: include/classes/api/services/CDiscoveryRule.php:1655
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#: include/classes/api/services/CDiscoveryRule.php:1697
 #: include/classes/api/services/CHttpTest.php:456
 #: include/classes/api/services/CHttpTest.php:480
 #: include/classes/validators/CApiInputValidator.php:914
@@ -20799,9 +20796,9 @@ msgstr "unerwarteter Text \"%1$s\""
 #: include/classes/api/services/CEvent.php:870
 #: include/classes/api/services/CHost.php:1872
 #: include/classes/api/services/CHost.php:1878
-#: include/classes/api/services/CItemGeneral.php:1239
-#: include/classes/api/services/CItemGeneral.php:1565
-#: include/classes/api/services/CItemGeneral.php:1591
+#: include/classes/api/services/CItemGeneral.php:1253
+#: include/classes/api/services/CItemGeneral.php:1579
+#: include/classes/api/services/CItemGeneral.php:1605
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:730
@@ -20859,7 +20856,7 @@ msgstr "nicht unterstützte Version"
 msgid "value"
 msgstr "Wert"
 
-#: include/classes/api/services/CDiscoveryRule.php:1830
+#: include/classes/api/services/CDiscoveryRule.php:1840
 #, c-format
 msgid "value \"%1$s\" already exists"
 msgstr ""
@@ -20900,10 +20897,10 @@ msgid "value is too long"
 msgstr "Wert ist zu lang"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CDiscoveryRule.php:1626
-#: include/classes/api/services/CDiscoveryRule.php:1657
-#: include/classes/api/services/CDiscoveryRule.php:1677
-#: include/classes/api/services/CDiscoveryRule.php:1698
+#: include/classes/api/services/CDiscoveryRule.php:1636
+#: include/classes/api/services/CDiscoveryRule.php:1667
+#: include/classes/api/services/CDiscoveryRule.php:1687
+#: include/classes/api/services/CDiscoveryRule.php:1708
 #: include/classes/api/services/CEvent.php:772
 #: include/classes/api/services/CHost.php:1022
 #: include/classes/api/services/CHost.php:2057
@@ -20920,7 +20917,7 @@ msgstr "Wert ist zu lang"
 msgid "value must be one of %1$s"
 msgstr "Wert muss einer von %1$s sein"
 
-#: include/classes/api/services/CItemGeneral.php:1524
+#: include/classes/api/services/CItemGeneral.php:1538
 msgid "value of first parameter is too long"
 msgstr ""
 
@@ -20928,11 +20925,11 @@ msgstr ""
 msgid "value of new event tag"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1530
+#: include/classes/api/services/CItemGeneral.php:1544
 msgid "value of second parameter is too long"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1541
+#: include/classes/api/services/CItemGeneral.php:1555
 #, c-format
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
@@ -20942,11 +20939,11 @@ msgstr ""
 msgid "via"
 msgstr "per"
 
-#: include/classes/api/services/CTask.php:439
+#: include/classes/api/services/CTask.php:440
 msgid "wrong discovery rule type"
 msgstr "Falscher Suchlaufregel-Typ"
 
-#: include/classes/api/services/CTask.php:440
+#: include/classes/api/services/CTask.php:441
 msgid "wrong item type"
 msgstr ""
 

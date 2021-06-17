@@ -120,7 +120,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '90002'
 					]
 				],
-				'expected_error' => 'Cannot send request: host is not monitored.'
+				'expected_error' => 'Cannot send request: item "Api item in disabled host" on host "API disabled host" is not monitored.'
 			],
 			[
 				'task' => [
@@ -129,7 +129,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '90003'
 					]
 				],
-				'expected_error' => 'Cannot send request: host is not monitored.'
+				'expected_error' => 'Cannot send request: discovery rule "Api LLD rule in disabled host" on host "API disabled host" is not monitored.'
 			],
 			// Item disabled
 			[
@@ -139,7 +139,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '90000'
 					]
 				],
-				'expected_error' => 'Cannot send request: item is disabled.'
+				'expected_error' => 'Cannot send request: item "Api disabled item" on host "Zabbix server" is not monitored.'
 			],
 			// LLD rule disabled
 			[
@@ -149,7 +149,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '90001'
 					]
 				],
-				'expected_error' => 'Cannot send request: discovery rule is disabled.'
+				'expected_error' => 'Cannot send request: discovery rule "Api disabled LLD rule" on host "Zabbix server" is not monitored.'
 			],
 			// Success item check now
 			[
@@ -199,7 +199,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '110004'
 					]
 				],
-				'expected_error' => 'Cannot send request: host is not monitored.'
+				'expected_error' => 'Cannot send request: item "templated-item" on host "Template with item" is not monitored.'
 			],
 			[
 				'task' => [
@@ -208,7 +208,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '110005'
 					]
 				],
-				'expected_error' => 'Cannot send request: host is not monitored.'
+				'expected_error' => 'Cannot send request: discovery rule "templated-lld-rule" on host "Template with item" is not monitored.'
 			]
 		];
 	}
