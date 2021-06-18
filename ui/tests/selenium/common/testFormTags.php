@@ -624,17 +624,23 @@ class testFormTags extends CWebTest {
 	 * @param string   $form     object configuration form
 	 */
 	private function checkTagFields($data, $object, $form) {
-		if ($object === 'trigger' || $object === 'trigger prototype') {
-			$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']));
-		}
-		elseif ($object === 'item' || $object === 'item prototype') {
-			$id = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($data['name']));
-		}
-		elseif ($object === 'web scenario') {
-			$id = CDBHelper::getValue('SELECT httptestid FROM httptest WHERE name='.zbx_dbstr($data['name']));
-		}
-		else {
-			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
+		switch ($object) {
+			case 'trigger':
+			case 'trigger prototype':
+				$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']));
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($data['name']));
+				break;
+
+			case 'web scenario':
+				$id = CDBHelper::getValue('SELECT httptestid FROM httptest WHERE name='.zbx_dbstr($data['name']));
+				break;
+
+			default:
+				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		}
 
 		$this->page->open($this->saved_link.$id);

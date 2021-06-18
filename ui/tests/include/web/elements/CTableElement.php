@@ -178,11 +178,12 @@ class CTableElement extends CElement {
 	/**
 	 * Find rows by column value or by criteria in function.
 	 *
-	 * @param array $param    column data or function.
+	 * @param array $param   column name or function
+	 * @param mixed $data    row data
 	 *
 	 * @return CElementCollection
 	 */
-	public function findRows($param) {
+	public function findRows($param, $data = []) {
 		if (is_callable($param)) {
 			foreach ($this->getRows() as $i => $row) {
 				if (call_user_func($param, $row)) {
@@ -192,26 +193,13 @@ class CTableElement extends CElement {
 		}
 		else {
 			$rows = [];
-
-			if (CTestArrayHelper::isAssociative($param)) {
-				$param = [$param];
+			if (!is_array($data)) {
+				$data = [$data];
 			}
 
 			foreach ($this->getRows() as $row) {
-				foreach ($param as $columns) {
-					$found = true;
-
-					foreach ($columns as $name => $value) {
-						if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
-							$found = false;
-							break;
-						}
-					}
-
-					if ($found) {
-						$rows[] = $row;
-						break;
-					}
+				if (in_array($row->getColumnData($param, ''), $data)) {
+					$rows[] = $row;
 				}
 			}
 
