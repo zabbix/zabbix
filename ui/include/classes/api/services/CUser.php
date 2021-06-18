@@ -558,8 +558,6 @@ class CUser extends CApiService {
 
 			$user = $this->checkLoginOptions($user);
 
-			unset($user['name']);
-
 			if (array_key_exists('passwd', $user)) {
 				$user_data = $user + array_intersect_key($db_user, array_flip(['username', 'name', 'surname']));
 				$this->checkPassword($user_data, '/'.($i + 1).'/passwd');
