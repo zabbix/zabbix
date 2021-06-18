@@ -78,24 +78,39 @@ class testHost extends CAPITest {
 
 	public static function host_select_tags() {
 		return [
-			'Get host with extend tags' => [
+			'Get test host tag as extend' => [
 				'params' => [
-					'selectTags' => 'extend',
+					'hostids' => [50032],
+					'selectTags' => 'extend'
 				],
-				'expected_result' => false
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b', 'value' => 'b']
+					]
+				]
 			],
-			'Get host tag excluding value field' => [
+			'Get test host tag excluding value' => [
 				'params' => [
-					'selectTags' => ['tag'],
+					'hostids' => [50032],
+					'selectTags' => ['tag']
 				],
-				'expected_result' => ['tag']
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b']
+					]
+				]
 			],
-			'Get host tag with value' => [
+			'Get test host tag excluding name' => [
 				'params' => [
-					'selectTags' => ['value', 'tag'],
+					'hostids' => [50032],
+					'selectTags' => ['value']
 				],
-				'expected_result' => ['tag', 'value']
-			],
+				'expected_result' => [
+					'tags' => [
+						['value' => 'b']
+					]
+				]
+			]
 		];
 	}
 
@@ -105,16 +120,10 @@ class testHost extends CAPITest {
 	public function testHost_SelectTags($params, $expected_result) {
 		$result = $this->call('host.get', $params);
 
-		if ($expected_result === false) {
-			return;
-		}
-
 		foreach($result['result'] as $host) {
-			$this->assertArrayHasKey('tags', $host);
-
-			foreach($host['tags'] as $tag) {
-				$expected_keys_diff = array_diff($expected_result, array_keys($tag));
-				$this->assertEquals($expected_keys_diff, [], 'only expected keys should be returned');
+			foreach($expected_result as $field => $expected_value){
+				$this->assertArrayHasKey($field, $host, 'Field should be present.');
+				$this->assertEquals($host[$field], $expected_value, 'Returned value should match.');
 			}
 		}
 	}
