@@ -1371,11 +1371,13 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 {
 	int	i;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __func__, events->values_num);
+
 	for (i = 0; i < events->values_num; i++)
 	{
 		zbx_event_t	*event, **ptr;
 
-		event = events->values[i];
+		event = (zbx_event_t *)events->values[i];
 
 		/*  skip problem or recovery if trigger and it's associated problems are already deleted */
 		if (NULL != (zbx_hashset_search(&service_manager->deleted_eventids, &event->eventid)))
@@ -1437,6 +1439,8 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 	db_update_services(&service_manager->services, &service_manager->service_diffs,
 			&service_manager->service_problems_index);
 	zbx_hashset_clear(&service_manager->service_diffs);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	service_manager_init(zbx_service_manager_t *service_manager)
@@ -1486,8 +1490,34 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 	zbx_hashset_destroy(&service_manager->deleted_eventids);
 }
 
+static void	dump_events(zbx_hashset_t *events)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_event_t		**ptr, *event;
+	int			i;
+
+	zbx_hashset_iter_reset(events, &iter);
+	while (NULL != (ptr = (zbx_event_t **)zbx_hashset_iter_next(&iter)))
+	{
+		event = *ptr;
+
+		zabbix_log(LOG_LEVEL_TRACE, "eventid:" ZBX_FS_UI64 " value:%d severity:%d clock:%d", event->eventid,
+				event->value, event->severity, event->clock);
+
+		for (i = 0; i < event->tags.values_num; i++)
+		{
+			const zbx_tag_t	*tag = (const zbx_tag_t *)event->tags.values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "  tag:'%s' value:'%s'", tag->tag, tag->value);
+		}
+	}
+}
+
 static void	service_manager_trace(zbx_service_manager_t *service_manager)
 {
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		return;
+
 	zabbix_log(LOG_LEVEL_TRACE, "services  : %d (%d slots)", service_manager->services.num_data,
 			service_manager->services.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "services links  : %d (%d slots)", service_manager->services_links.num_data,
@@ -1508,6 +1538,13 @@ static void	service_manager_trace(zbx_service_manager_t *service_manager)
 			service_manager->recovery_events.num_data, service_manager->recovery_events.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "deleted events  : %d (%d slots)", service_manager->deleted_eventids.num_data,
 			service_manager->deleted_eventids.num_slots);
+
+	zabbix_log(LOG_LEVEL_TRACE, "recovery events  : %d (%d slots)",
+				service_manager->recovery_events.num_data, service_manager->recovery_events.num_slots);
+
+	zabbix_log(LOG_LEVEL_TRACE, "events:");
+	dump_events(&service_manager->problem_events);
+	dump_events(&service_manager->recovery_events);
 }
 
 static void	recalculate_services(zbx_service_manager_t *service_manager)
