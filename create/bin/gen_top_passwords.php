@@ -19,7 +19,8 @@
 **/
 
 
-define('DEST_FILENAME', dirname(__FILE__).'/topPasswords.php');
+define('DEST_FILENAME_PATTERN', dirname(__FILE__).'/topPasswords%1$d.php');
+define('NUMBER_OF_FILES_TO_SPLIT', 4);
 
 $files = [];
 for ($i = 1; $argc > $i; $i++) {
@@ -48,13 +49,16 @@ $passwords = array_filter($passwords, function ($pasword) {
 	return !preg_match('/[^\x20-\x7e]/', $pasword);
 });
 
-// Backslash special characters and add quotes.
+// Base64-encode each password and add quotes around it.
 $passwords = array_map(function ($password) {
 	return '\''. base64_encode($password).'\'';
 }, $passwords);
 
-// Generate file.
-$source = "<?php declare(strict_types = 1);\n".
+$passwords = array_chunk($passwords, ceil(count($passwords) / NUMBER_OF_FILES_TO_SPLIT));
+$write_status = [];
+foreach ($passwords as $nr => $passwords_chunk) {
+	// Generate file.
+	$source = "<?php declare(strict_types = 1);\n".
 		"/**\n".
 		" * This file is meant to strengthen password validation for internal users. Passwords included in the list\n".
 		" * are considered weak due to their common use and are not allowed to be chosen by Zabbix internal users\n".
@@ -66,15 +70,21 @@ $source = "<?php declare(strict_types = 1);\n".
 		" */\n".
 		"\n".
 		"\n".
-		"return [".implode(', ', $passwords)."];".
+		"return [".implode(', ', $passwords_chunk)."];".
 		"\n";
 
-$result = file_put_contents(DEST_FILENAME, $source);
-if ($result) {
-	fwrite(STDOUT, 'File written: "'.DEST_FILENAME.'"'."\n");
-	exit(0);
+	$filename = sprintf(DEST_FILENAME_PATTERN, ($nr + 1));
+	$write_status[$filename] = (bool) file_put_contents($filename, $source);
 }
-else {
-	fwrite(STDERR, 'Cannot write file: "'.DEST_FILENAME.'"'."\n");
-	exit(1);
-}
+
+// Output results.
+array_walk($write_status, function ($status, $filename) {
+	if ($status) {
+		fwrite(STDOUT, 'File written: "'.$filename.'"'."\n");
+	}
+	else {
+		fwrite(STDERR, 'Cannot write file: "'.$filename.'"'."\n");
+	}
+});
+
+exit((array_sum($write_status) == NUMBER_OF_FILES_TO_SPLIT) ? 0 : 1);

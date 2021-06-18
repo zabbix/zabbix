@@ -25,11 +25,11 @@
 class CPasswordComplexityValidator extends CValidator {
 
 	/**
-	 * File of common used passwords.
+	 * Files of common used passwords.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private static $top_passwords_list;
+	private static $top_passwords_lists;
 
 	/**
 	 * Strings forbidden to be part of validated password.
@@ -58,7 +58,8 @@ class CPasswordComplexityValidator extends CValidator {
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		self::$top_passwords_list = dirname(__FILE__).'/../data/topPasswords.php';
+		// Collect files containing common used passwords list.
+		self::$top_passwords_lists = array_filter(glob(dirname(__FILE__).'/../data/topPasswords[0-9]*.php'), 'is_file');
 	}
 
 	/**
@@ -204,8 +205,12 @@ class CPasswordComplexityValidator extends CValidator {
 	 * @return bool
 	 */
 	private static function chechIfPasswordIsCommonlyUsed(string $value): bool {
-		return !(is_file(self::$top_passwords_list)
-			&& in_array(base64_encode($value), require self::$top_passwords_list)
-		);
+		$value = base64_encode($value);
+		foreach (self::$top_passwords_lists as $file) {
+			if (in_array($value, require $file)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
