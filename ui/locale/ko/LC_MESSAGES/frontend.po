@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 19:52+0300\n"
+"POT-Creation-Date: 2021-06-18 19:52+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1613,9 +1613,9 @@ msgstr "취소"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr "디스커버리된 어플리케이션 \"%1$s\"를 Web시나리오에 추가할 수 없습니다."
 
-#: include/classes/api/services/CGraph.php:703
-#: include/classes/api/services/CGraph.php:717
-#: include/classes/api/services/CGraph.php:731
+#: include/classes/api/services/CGraph.php:706
+#: include/classes/api/services/CGraph.php:720
+#: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "수치형이 아닌 아이템 \"%1$s\"는 그래프 \"%2$s\"에 추가할 수 없습니다."
@@ -1643,7 +1643,7 @@ msgstr "상관관계를 추가할 수 없습니다"
 msgid "Cannot add correlation condition"
 msgstr "상관관계의 조건을 추가할 수 없습니다"
 
-#: include/classes/api/services/CTrigger.php:962
+#: include/classes/api/services/CTrigger.php:970
 #: include/classes/api/services/CTriggerPrototype.php:780
 msgid "Cannot add dependency from a host to a template."
 msgstr "호스트에서 템플릿에 의존관계는 작성할 수 없습니다."
@@ -1890,12 +1890,12 @@ msgstr "발견된 호스트 \"%1$s\"에 호스트 프로토타입은 작성할 �
 msgid "Cannot create another database connection."
 msgstr "데이터베이스에 커넥션을 작성할 수 없습니다."
 
-#: include/classes/api/services/CTrigger.php:996
+#: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:811
 msgid "Cannot create circular dependencies."
 msgstr "순환하는 의존관계는 작성할 수 없습니다."
 
-#: include/classes/api/services/CTrigger.php:968
+#: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
 msgstr "재귀적 의존관계(dependency on itself)는 허용되지 않습니다."
 
@@ -1947,7 +1947,7 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "대시보드를 삭제할 수 없습니다."
 
-#: include/classes/api/services/CTrigger.php:866
+#: include/classes/api/services/CTrigger.php:874
 #: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
 msgstr "의존관계를 삭제할 수 없습니다"
@@ -1990,7 +1990,7 @@ msgstr[0] "그룹을 삭제할 수 없습니다"
 msgid "Cannot delete host"
 msgstr "호스트를 삭제할 수 없습니다"
 
-#: include/classes/api/services/CHost.php:1454
+#: include/classes/api/services/CHost.php:1463
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2019,7 +2019,7 @@ msgstr "이미지를 삭제할 수 없습니다"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1241
+#: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
 msgstr "인벤토리를 삭제할 수 없습니다."
 
@@ -2110,7 +2110,7 @@ msgstr "템플릿 어플리케이션을 삭제할 수 없습니다."
 msgid "Cannot delete templated graph prototype."
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:560
+#: include/classes/api/services/CGraph.php:563
 msgid "Cannot delete templated graph."
 msgstr ""
 
@@ -2122,7 +2122,7 @@ msgstr "템플릿 호스트 프로토타입을 삭제할 수 없습니다."
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:764
+#: include/classes/api/services/CItem.php:767
 msgid "Cannot delete templated item."
 msgstr "템플릿 아이템을 삭제할 수 없습니다."
 
@@ -2130,7 +2130,7 @@ msgstr "템플릿 아이템을 삭제할 수 없습니다."
 msgid "Cannot delete templated items."
 msgstr "템플릿 아이템을 삭제할 수 없습니다."
 
-#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:661
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "템플릿 트리거 \"%1$s:%2$s\"를 삭제할 수 없습니다"
@@ -2441,7 +2441,7 @@ msgstr "트리를 포맷으로 할 수 없습니다. 서비스 링크의 로직 
 msgid "Cannot format tree."
 msgstr "트리를 포맷할 수 없습니다."
 
-#: include/classes/api/services/CTemplate.php:905
+#: include/classes/api/services/CTemplate.php:906
 msgid "Cannot have empty visible template name."
 msgstr "템플릿 표시명에 공백은 설정할 수 없습니다."
 
@@ -2455,12 +2455,12 @@ msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는
 msgid "Cannot insert trigger expression"
 msgstr "트리거 조건식을 추가할 수 없습니다"
 
-#: include/classes/api/services/CHost.php:1219
+#: include/classes/api/services/CHost.php:1228
 msgid "Cannot link template"
 msgstr "템플릿을 링크할 수 없습니다"
 
-#: include/classes/api/services/CTemplate.php:992
-#: include/classes/api/services/CTemplate.php:1006
+#: include/classes/api/services/CTemplate.php:993
+#: include/classes/api/services/CTemplate.php:1007
 msgid "Cannot link template."
 msgstr "템플릿을 링크할 수 없습니다."
 
@@ -2475,19 +2475,19 @@ msgstr[0] ""
 msgid "Cannot logout."
 msgstr "로그아웃 할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1085
+#: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
 msgstr "호스트명을 일괄갱신할 수 없습니다"
 
-#: include/classes/api/services/CTemplate.php:1130
+#: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
 msgstr "템플릿명을 일괄갱신할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1071
+#: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
 msgstr "호스트의 표시명은 일괄갱신할 수 없습니다."
 
-#: include/classes/api/services/CTemplate.php:1095
+#: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
 msgstr "템플릿의 표시명을 일괄갱신할 수 없습니다."
 
@@ -2596,9 +2596,9 @@ msgstr "아이템 프로토타입 \"%1$s\"내의 어플리케이션 프로토타
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "스크린\"%1$s\"에 \"templateid\"를 설정할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1136
-#: include/classes/api/services/CHost.php:2084
-#: include/classes/api/services/CHost.php:2245
+#: include/classes/api/services/CHost.php:1145
+#: include/classes/api/services/CHost.php:2093
+#: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "비활성의 상태의 인벤토리 항목은 설정할 수 없습니다."
 
@@ -2633,12 +2633,12 @@ msgstr "Web시나리오의 링크삭제와 삭제를 할 수 없습니다."
 msgid "Cannot unlink and clear applications."
 msgstr "어플리케이션의 삭제와 링크 삭제를 할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1203
 msgid "Cannot unlink template"
 msgstr "템플릿의 링크를 삭제할 수 없습니다"
 
-#: include/classes/api/services/CTemplate.php:957
-#: include/classes/api/services/CTemplate.php:980
+#: include/classes/api/services/CTemplate.php:958
+#: include/classes/api/services/CTemplate.php:981
 msgid "Cannot unlink template."
 msgstr "템플릿의 링크를 삭제할 수 없습니다."
 
@@ -2678,7 +2678,7 @@ msgstr "템플릿 트리거 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "템플릿의 트리거 프로토타입 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:2222
+#: include/classes/api/services/CHost.php:2231
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "디스커버리 된 호스트 \"%1$s\" 의\"%2$s\"를 갱신할 수 없습니다."
@@ -2689,8 +2689,8 @@ msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "디스커버리 된 아이템 \"%1$s\"의 \"%2$s\"를 갱신할 수 없습니다"
 
 #: include/classes/api/services/CTriggerGeneral.php:923
-#: include/classes/api/services/CTrigger.php:697
-#: include/classes/api/services/CTrigger.php:826
+#: include/classes/api/services/CTrigger.php:705
+#: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "디스커버리 된 트리거 \"%1$s\"의 \"%2$s\"를 갱신할 수 없습니다"
@@ -2793,7 +2793,7 @@ msgstr "발견된 호스트 \"%1$s\"의 그룹을 갱신할 수 없습니다"
 msgid "Cannot update host"
 msgstr "호스트를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1042
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "호스트의 암호화 설정을 갱신할 수 없습니다. 양 측의 접속설정을 확인할 필요가 있습니다."
 
@@ -2911,8 +2911,8 @@ msgstr "템플릿의 어플리케이션을 갱신할 수 없습니다"
 msgid "Cannot update templates"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:856
-#: include/classes/api/services/CTemplate.php:1191
+#: include/classes/api/services/CTemplate.php:857
+#: include/classes/api/services/CTemplate.php:1192
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 템플릿을 갱신할 수 없습니다."
@@ -4826,7 +4826,7 @@ msgstr "트리거를 삭제하시겠습니까?"
 msgid "Delete web scenario?"
 msgstr "Web시나리오를 삭제하시겠습니까?"
 
-#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "삭제: 호스트\"%1$s\"."
@@ -4836,7 +4836,7 @@ msgstr "삭제: 호스트\"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\" 호스트 프로토타입\"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:822
+#: include/classes/api/services/CTemplate.php:823
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "삭제: 템플릿 \"%1$s\"."
@@ -5417,7 +5417,7 @@ msgstr "맵을 위한 \"name\"의 값 \"%1$s\"이 중복되었습니다."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "스크린을 위한 \"name\"의 값 \"%1$s\"가 중복되었습니다."
 
-#: include/classes/api/services/CTrigger.php:1138
+#: include/classes/api/services/CTrigger.php:1146
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
@@ -5427,14 +5427,14 @@ msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "트리거 프로토타입 \"%1$s\"의 의존관계가 중복되었습니다."
 
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2275
+#: include/classes/api/services/CHost.php:2029
+#: include/classes/api/services/CHost.php:2284
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2027
-#: include/classes/api/services/CHost.php:2295
+#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:2304
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5644,9 +5644,9 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:154
 #: include/classes/api/services/CHostInterface.php:574
 #: include/classes/api/services/CHostInterface.php:618
-#: include/classes/api/services/CHost.php:846
-#: include/classes/api/services/CHost.php:1418
-#: include/classes/api/services/CHost.php:1954
+#: include/classes/api/services/CHost.php:855
+#: include/classes/api/services/CHost.php:1427
+#: include/classes/api/services/CHost.php:1963
 #: include/classes/api/services/CHostPrototype.php:950
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
@@ -5665,8 +5665,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:630
-#: include/classes/api/services/CTrigger.php:794
+#: include/classes/api/services/CTemplate.php:631
+#: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:479
 #: include/classes/api/services/CUserMacro.php:526
 #: include/classes/api/services/CUserMacro.php:626
@@ -6207,7 +6207,7 @@ msgstr "URL을 해석할 수 없었습니다."
 msgid "Failed to update dashboard"
 msgstr "대시보드의 변경에 실패하였습니다"
 
-#: include/classes/api/services/CTemplate.php:579
+#: include/classes/api/services/CTemplate.php:580
 msgid "Failed to update template."
 msgstr "템플릿의 갱신 실패."
 
@@ -6255,8 +6255,8 @@ msgstr "항목 \"%1$s\"는 NULL로 설정할 수 없습니다."
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:983
-#: include/classes/api/services/CHost.php:991
-#: include/classes/api/services/CTemplate.php:884
+#: include/classes/api/services/CHost.php:1000
+#: include/classes/api/services/CTemplate.php:885
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6308,7 +6308,7 @@ msgstr "미디어 타입 \"%2$s\"를 위한 필드 \"%1$s\"를 지정해 주십�
 msgid "Field \"%1$s\" must be missing."
 msgstr "항목 \"%1$s\"가 입력되어 있지 않습니다."
 
-#: include/classes/api/services/CTemplate.php:464
+#: include/classes/api/services/CTemplate.php:465
 msgid "Field \"host\" is mandatory."
 msgstr "항목 \"host\"는 필수입니다."
 
@@ -6693,40 +6693,40 @@ msgstr "그라데이션 라인"
 msgid "Graph"
 msgstr "그래프"
 
-#: include/classes/api/services/CGraph.php:430
+#: include/classes/api/services/CGraph.php:433
 #: include/classes/api/services/CGraphPrototype.php:441
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "그래프 \"%1$s\"는 \"%2$s\"에 이미 존재합니다 (다른 템플릿에서 계승)."
 
-#: include/classes/api/services/CGraph.php:451
-#: include/classes/api/services/CGraph.php:458
+#: include/classes/api/services/CGraph.php:454
+#: include/classes/api/services/CGraph.php:461
 #: include/classes/api/services/CGraphPrototype.php:467
 #: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "그래프 \"%1$s\"는 \"%2$s\"에 이미 존재합니다 (아이템은 동일하지 않습니다)."
 
-#: include/classes/api/services/CGraph.php:405
+#: include/classes/api/services/CGraph.php:408
 #: include/classes/api/services/CGraphPrototype.php:416
 #: include/graphs.inc.php:440
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 
-#: include/classes/api/services/CGraph.php:367
+#: include/classes/api/services/CGraph.php:370
 #: include/classes/api/services/CGraphPrototype.php:371
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은 \"%2$s\"에 존재하지 않습니다 (Y축의 최대값용 아이템)."
 
-#: include/classes/api/services/CGraph.php:375
+#: include/classes/api/services/CGraph.php:378
 #: include/classes/api/services/CGraphPrototype.php:380
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은 \"%2$s\"에 존재하지 않습니다 (Y축의 최소값용 아이템)."
 
-#: include/classes/api/services/CGraph.php:361
+#: include/classes/api/services/CGraph.php:364
 #: include/classes/api/services/CGraphPrototype.php:365
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
@@ -6848,8 +6848,8 @@ msgstr "ID \"%1$s\"의 그래프는 사용할 수 없습니다."
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "\"%1$s\"의 이름을 지닌 그래프는 그래프 혹은 그래프 프로토타입에 이미 존재합니다."
 
-#: include/classes/api/services/CGraph.php:412
-#: include/classes/api/services/CGraph.php:433
+#: include/classes/api/services/CGraph.php:415
+#: include/classes/api/services/CGraph.php:436
 #: include/classes/api/services/CGraphPrototype.php:423
 #: include/classes/api/services/CGraphPrototype.php:444
 msgid "Graph with same name but other type exist."
@@ -7242,17 +7242,17 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "호스트"
 
-#: include/classes/api/services/CHost.php:1098
-#: include/classes/api/services/CTemplate.php:496
+#: include/classes/api/services/CHost.php:1107
+#: include/classes/api/services/CTemplate.php:497
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "호스트 \"%1$s\"는 이미 존재합니다."
 
 #: include/classes/api/services/CHostGroup.php:1541
-#: include/classes/api/services/CHost.php:1057
-#: include/classes/api/services/CHost.php:1991
-#: include/classes/api/services/CHost.php:2185
+#: include/classes/api/services/CHost.php:1066
+#: include/classes/api/services/CHost.php:2000
+#: include/classes/api/services/CHost.php:2194
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "호스트\"%1$s\"에 호스트 그룹을 설정해 주세요."
@@ -7536,7 +7536,7 @@ msgstr "호스트 서브넷 마스크"
 msgid "Host time"
 msgstr "호스트 시간"
 
-#: include/classes/api/services/CHost.php:920
+#: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
 msgstr "호스트의 갱신에 실패하였습니다."
 
@@ -7549,17 +7549,17 @@ msgstr "호스트를 갱신하였습니다"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 호스트는 사용할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:2115
-#: include/classes/api/services/CHost.php:2356
-#: include/classes/api/services/CTemplate.php:1156
+#: include/classes/api/services/CHost.php:2124
+#: include/classes/api/services/CHost.php:2365
+#: include/classes/api/services/CTemplate.php:1157
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "같은 호스트 이름\"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:2121
-#: include/classes/api/services/CHost.php:2363
-#: include/classes/api/services/CTemplate.php:522
-#: include/classes/api/services/CTemplate.php:1121
+#: include/classes/api/services/CHost.php:2130
+#: include/classes/api/services/CHost.php:2372
+#: include/classes/api/services/CTemplate.php:523
+#: include/classes/api/services/CTemplate.php:1122
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미 존재합니다."
@@ -8237,7 +8237,7 @@ msgstr "설정항목이 잘못되어 있습니다."
 #: include/classes/api/services/CHostInterface.php:1173
 #: include/classes/api/services/CHostInterface.php:1191
 #: include/classes/api/services/CHostInterface.php:1208
-#: include/classes/api/services/CHost.php:1382
+#: include/classes/api/services/CHost.php:1391
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
 #: include/classes/api/services/CItemGeneral.php:264
@@ -8290,9 +8290,9 @@ msgstr "인터페이스의 bulk의 값이 올바르지 않습니다."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 SLA의 값의 계산이 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1080
-#: include/classes/api/services/CHost.php:1979
-#: include/classes/api/services/CHost.php:2269
+#: include/classes/api/services/CHost.php:1089
+#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8303,8 +8303,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "프록시명 \"%1$s\"에 이용되고 있는 문자열이 올바르지 않습니다."
 
-#: include/classes/api/services/CTemplate.php:474
-#: include/classes/api/services/CTemplate.php:1166
+#: include/classes/api/services/CTemplate.php:475
+#: include/classes/api/services/CTemplate.php:1167
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "템플릿 이름 \"%1$s\"에서 이용되고 있는 문자열이 올바르지 않습니다."
@@ -8471,9 +8471,9 @@ msgstr "이미지의 인덱스가 올바르지 않습니다."
 #: include/classes/api/services/CAction.php:2927
 #: include/classes/api/services/CAction.php:2939
 #: include/classes/api/services/CHostInterface.php:664
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CHost.php:1973
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1072
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2180
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:480
 #: include/classes/api/services/CProxy.php:619
@@ -8481,10 +8481,10 @@ msgstr "이미지의 인덱스가 올바르지 않습니다."
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:469
-#: include/classes/api/services/CTemplate.php:610
+#: include/classes/api/services/CTemplate.php:470
+#: include/classes/api/services/CTemplate.php:611
 #: include/classes/api/services/CTemplateScreen.php:596
-#: include/classes/api/services/CTrigger.php:799
+#: include/classes/api/services/CTrigger.php:807
 msgid "Incorrect input parameters."
 msgstr "입력된 파라미터가 올바르지 않습니다."
 
@@ -8498,8 +8498,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2090
-#: include/classes/api/services/CHost.php:2251
+#: include/classes/api/services/CHost.php:2099
+#: include/classes/api/services/CHost.php:2260
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8671,8 +8671,8 @@ msgstr "서비스 \"%1$s\"의 정렬이 올바르지 않습니다."
 msgid "Incorrect source value."
 msgstr "소스 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2217
+#: include/classes/api/services/CHost.php:2071
+#: include/classes/api/services/CHost.php:2226
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "호스트 \"%1$s\" 상태가 올바르지 않습니다."
@@ -8959,21 +8959,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:1021
-#: include/classes/api/services/CHost.php:1871
-#: include/classes/api/services/CHost.php:1877
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHost.php:1903
-#: include/classes/api/services/CHost.php:1909
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1030
+#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1886
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
-#: include/classes/api/services/CHost.php:2000
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2194
-#: include/classes/api/services/CHost.php:2211
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:2009
+#: include/classes/api/services/CHost.php:2065
+#: include/classes/api/services/CHost.php:2203
+#: include/classes/api/services/CHost.php:2220
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:223
@@ -9023,8 +9023,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2084
 #: include/classes/api/services/CItemGeneral.php:2098
 #: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItem.php:830
-#: include/classes/api/services/CItem.php:838
+#: include/classes/api/services/CItem.php:833
+#: include/classes/api/services/CItem.php:841
 #: include/classes/api/services/CItemPrototype.php:990
 #: include/classes/api/services/CItemPrototype.php:998
 #: include/classes/api/services/CMaintenance.php:495
@@ -9066,7 +9066,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
-#: include/classes/api/services/CTemplate.php:429
+#: include/classes/api/services/CTemplate.php:430
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:709
 #: include/classes/api/services/CTriggerGeneral.php:729
@@ -9702,7 +9702,7 @@ msgstr "유저 세션데이터의 보존기간이 올바르지 않습니다 : %1
 msgid "Inventory"
 msgstr "인벤토리"
 
-#: include/classes/api/services/CHost.php:1260
+#: include/classes/api/services/CHost.php:1269
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "호스트\"%1$s\"의 인벤토리를 비활성 하였습니다."
@@ -9775,7 +9775,7 @@ msgstr "아이템\"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:947
+#: include/classes/api/services/CItem.php:950
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "아이템\"%1$s\"는 항목번호가 존재하지 않는 호스트 인벤토리\"%2$d\"를 자동설정할 수 없습니다. 0 (자동설정안함)에서 %3$d의 사이로 설정해 주십시오."
@@ -11973,8 +11973,8 @@ msgstr "인터페이스를 찾을 수 없습니다."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2069
-#: include/classes/api/services/CHost.php:2262
+#: include/classes/api/services/CHost.php:2078
+#: include/classes/api/services/CHost.php:2271
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr ""
@@ -12091,8 +12091,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CEvent.php:859
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
-#: include/classes/api/services/CGraph.php:555
-#: include/classes/api/services/CGraph.php:689
+#: include/classes/api/services/CGraph.php:558
+#: include/classes/api/services/CGraph.php:692
 #: include/classes/api/services/CGraphPrototype.php:572
 #: include/classes/api/services/CGraphPrototype.php:657
 #: include/classes/api/services/CGraphPrototype.php:719
@@ -12110,10 +12110,10 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CHostInterface.php:585
 #: include/classes/api/services/CHostInterface.php:859
 #: include/classes/api/services/CHostInterface.php:888
-#: include/classes/api/services/CHost.php:1387
-#: include/classes/api/services/CHost.php:1422
-#: include/classes/api/services/CHost.php:2045
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:1396
+#: include/classes/api/services/CHost.php:1431
+#: include/classes/api/services/CHost.php:2054
+#: include/classes/api/services/CHost.php:2186
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
@@ -12133,7 +12133,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CItemGeneral.php:215
 #: include/classes/api/services/CItemGeneral.php:317
 #: include/classes/api/services/CItemGeneral.php:332
-#: include/classes/api/services/CItem.php:757
+#: include/classes/api/services/CItem.php:760
 #: include/classes/api/services/CItemPrototype.php:917
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
@@ -12170,16 +12170,16 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:427
 #: include/classes/api/services/CTask.php:474
-#: include/classes/api/services/CTemplate.php:846
+#: include/classes/api/services/CTemplate.php:847
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:961
-#: include/classes/api/services/CTrigger.php:645
-#: include/classes/api/services/CTrigger.php:692
-#: include/classes/api/services/CTrigger.php:726
-#: include/classes/api/services/CTrigger.php:819
+#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:700
+#: include/classes/api/services/CTrigger.php:734
+#: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
@@ -12325,7 +12325,7 @@ msgstr "코멘트없음"
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1041
+#: include/classes/api/services/CTrigger.php:1049
 #: include/classes/api/services/CTriggerPrototype.php:859
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
@@ -15631,7 +15631,7 @@ msgstr "단축"
 msgid "Show"
 msgstr "보이기"
 
-#: app/views/monitoring.latest.view.php:110
+#: app/views/monitoring.latest.view.php:111
 #: app/views/monitoring.problem.view.php:333
 msgid "Show details"
 msgstr "자세히 표시"
@@ -16479,16 +16479,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "템플릿"
 
-#: include/classes/api/services/CHost.php:1109
-#: include/classes/api/services/CTemplate.php:486
+#: include/classes/api/services/CHost.php:1118
+#: include/classes/api/services/CTemplate.php:487
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "템플릿\"%1$s\"은 이미 존재합니다."
 
 #: include/classes/api/services/CHostGroup.php:1546
-#: include/classes/api/services/CTemplate.php:420
-#: include/classes/api/services/CTemplate.php:1088
+#: include/classes/api/services/CTemplate.php:421
+#: include/classes/api/services/CTemplate.php:1089
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "템플릿 \"%1$s\"에 호스트그룹을 설정해주세요."
@@ -16552,17 +16552,17 @@ msgstr "템플릿을 갱신하였습니다"
 msgid "Template value"
 msgstr "템플릿 값"
 
-#: include/classes/api/services/CHost.php:2136
-#: include/classes/api/services/CHost.php:2381
-#: include/classes/api/services/CTemplate.php:1143
+#: include/classes/api/services/CHost.php:2145
+#: include/classes/api/services/CHost.php:2390
+#: include/classes/api/services/CTemplate.php:1144
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "같은 이름 \"%1$s\"를 지닌 템플릿이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:2142
-#: include/classes/api/services/CHost.php:2389
-#: include/classes/api/services/CTemplate.php:509
-#: include/classes/api/services/CTemplate.php:1108
+#: include/classes/api/services/CHost.php:2151
+#: include/classes/api/services/CHost.php:2398
+#: include/classes/api/services/CTemplate.php:510
+#: include/classes/api/services/CTemplate.php:1109
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "같은 표시 이름\"%1$s\"를 지닌 템플릿이 이미 존재합니다."
@@ -17130,7 +17130,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "트리거를 추가하였습니다"
 
-#: include/classes/api/services/CTrigger.php:1084
+#: include/classes/api/services/CTrigger.php:1092
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수 없습니다."
 
@@ -17343,7 +17343,7 @@ msgstr "화"
 msgid "Turkish (tr_TR)"
 msgstr "터키어 (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1008
+#: include/classes/api/services/CItem.php:1011
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "2개의 아이템(\"%1$s\"와 \"%2$s\")에서 하나의 호스트의 인벤토리 항목 \"%3$s\"을 자동적으로 설정할 수는 없습니다."
@@ -17519,11 +17519,11 @@ msgstr "URL"
 msgid "Ukrainian (uk_UA)"
 msgstr "우크라이나어 (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:192
+#: include/classes/core/CConfigFile.php:196
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:202
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to create the configuration file."
 msgstr "설정 파일을 작성할 수 없습니다."
 
@@ -17534,7 +17534,7 @@ msgstr "설정 파일을 작성할 수 없습니다."
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:198
+#: include/classes/core/CConfigFile.php:201
 msgid "Unable to overwrite the existing configuration file."
 msgstr "설정 파일을 덮어쓰기 할 수 없습니다."
 
@@ -17858,7 +17858,7 @@ msgstr "갱신시 실행내용"
 msgid "Update problem"
 msgstr "장애 갱신"
 
-#: include/classes/api/services/CHost.php:1355
+#: include/classes/api/services/CHost.php:1364
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "호스트 \"%1$s\" 의 스테이터스를 갱신했습니다."
@@ -18650,7 +18650,7 @@ msgstr "가상 메모리 사이즈의 바이트 단위 혹은 전체에서 퍼�
 msgid "Visible name"
 msgstr "표시명"
 
-#: include/classes/api/services/CHost.php:2287
+#: include/classes/api/services/CHost.php:2296
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "호스트명을 설정하지 않은 경우 표시명은 필수항목입니다."
 
@@ -18879,8 +18879,8 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 의존관계 필드가 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1967
-#: include/classes/api/services/CHost.php:2165
+#: include/classes/api/services/CHost.php:1976
+#: include/classes/api/services/CHost.php:2174
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "호스트 \"%1$s\"의 필드가 올바르지 않습니다."
@@ -19100,8 +19100,8 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:947
-#: include/classes/api/services/CHost.php:1012
+#: include/classes/api/services/CHost.php:956
+#: include/classes/api/services/CHost.php:1021
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:528
@@ -19116,11 +19116,11 @@ msgstr ""
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:44
 #: include/classes/api/services/CTask.php:244
-#: include/classes/api/services/CTemplate.php:449
-#: include/classes/api/services/CTemplate.php:605
-#: include/classes/api/services/CTemplate.php:641
-#: include/classes/api/services/CTemplate.php:1080
-#: include/classes/api/services/CTemplate.php:1186
+#: include/classes/api/services/CTemplate.php:450
+#: include/classes/api/services/CTemplate.php:606
+#: include/classes/api/services/CTemplate.php:642
+#: include/classes/api/services/CTemplate.php:1081
+#: include/classes/api/services/CTemplate.php:1187
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:352
 #: include/classes/api/services/CUserMacro.php:447
@@ -19441,7 +19441,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr "공백문자(empty string)로 지정해 주십시오."
 
-#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1913
 #: include/classes/validators/CApiInputValidator.php:1019
 msgid "an even number of hexadecimal characters is expected"
 msgstr "16진수 문자로 입력해주세요"
@@ -19569,8 +19569,8 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CItemGeneral.php:454
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:487
@@ -20160,7 +20160,7 @@ msgstr "최소"
 msgid "min() - Minimum value for period T"
 msgstr "min() - 기간T 안의 최소치"
 
-#: include/classes/api/services/CHost.php:1910
+#: include/classes/api/services/CHost.php:1919
 #: include/classes/validators/CApiInputValidator.php:1013
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20409,10 +20409,10 @@ msgid "short description"
 msgstr "짧은 설명"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:468
@@ -20509,10 +20509,10 @@ msgstr "템플릿ID \"%1$s\"가 %2$s번 사용되고 있습니다"
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #: include/classes/api/services/CDiscoveryRule.php:1961
 #: include/classes/api/services/CDiscoveryRule.php:1969
-#: include/classes/api/services/CHost.php:2001
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:2010
+#: include/classes/api/services/CHost.php:2204
 #: include/classes/api/services/CHttpTest.php:742
-#: include/classes/api/services/CTemplate.php:430
+#: include/classes/api/services/CTemplate.php:431
 #: include/classes/validators/CApiInputValidator.php:942
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20634,8 +20634,8 @@ msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1872
-#: include/classes/api/services/CHost.php:1878
+#: include/classes/api/services/CHost.php:1881
+#: include/classes/api/services/CHost.php:1887
 #: include/classes/api/services/CItemGeneral.php:1253
 #: include/classes/api/services/CItemGeneral.php:1579
 #: include/classes/api/services/CItemGeneral.php:1605
@@ -20742,9 +20742,9 @@ msgstr "값이 너무 깁니다"
 #: include/classes/api/services/CDiscoveryRule.php:1687
 #: include/classes/api/services/CDiscoveryRule.php:1708
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:2057
-#: include/classes/api/services/CHost.php:2212
+#: include/classes/api/services/CHost.php:1031
+#: include/classes/api/services/CHost.php:2066
+#: include/classes/api/services/CHost.php:2221
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 19:52+0300\n"
+"POT-Creation-Date: 2021-06-18 19:52+0300\n"
 "PO-Revision-Date: 2021-03-19 17:58+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -1637,9 +1637,9 @@ msgstr "Ματαίωση"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:703
-#: include/classes/api/services/CGraph.php:717
-#: include/classes/api/services/CGraph.php:731
+#: include/classes/api/services/CGraph.php:706
+#: include/classes/api/services/CGraph.php:720
+#: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Αδύνατη η προσθήκη μη αριθμητικού συλλέκτη \"%1$s\" στο γράφημα \"%2$s\"."
@@ -1667,7 +1667,7 @@ msgstr ""
 msgid "Cannot add correlation condition"
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:962
+#: include/classes/api/services/CTrigger.php:970
 #: include/classes/api/services/CTriggerPrototype.php:780
 msgid "Cannot add dependency from a host to a template."
 msgstr "Αδύνατη η προσθήκη εξάρτησης απο ξενιστή σε σχεδιότυπο."
@@ -1918,12 +1918,12 @@ msgstr "Αδύνατη η δημιουργία πρωτότυπου ξενιστ
 msgid "Cannot create another database connection."
 msgstr "Αδύνατη η δημιουργία σύνδεσης άλλης βάσης δεδομένων."
 
-#: include/classes/api/services/CTrigger.php:996
+#: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:811
 msgid "Cannot create circular dependencies."
 msgstr "Αδύνατη η δημιουργία κυκλικών εξαρτήσεων."
 
-#: include/classes/api/services/CTrigger.php:968
+#: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
 msgstr "Αδύνατη η δημιουργία αυτοεξάρτησης σε έναυσμα."
 
@@ -1977,7 +1977,7 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CTrigger.php:866
+#: include/classes/api/services/CTrigger.php:874
 #: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
 msgstr "Αδύνατη η διαγραφή εξάρτησης"
@@ -2021,7 +2021,7 @@ msgstr[1] "Αδύνατη η διαγραφή ομάδων"
 msgid "Cannot delete host"
 msgstr "Αδύνατη η διαγραφή ξενιστή"
 
-#: include/classes/api/services/CHost.php:1454
+#: include/classes/api/services/CHost.php:1463
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2052,7 +2052,7 @@ msgstr "Αδύνατη η διαγραφή εικόνας"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1241
+#: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
 msgstr "Αδύνατη η διαγραφή απογραφής."
 
@@ -2151,7 +2151,7 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπης κατηγορ
 msgid "Cannot delete templated graph prototype."
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:560
+#: include/classes/api/services/CGraph.php:563
 msgid "Cannot delete templated graph."
 msgstr ""
 
@@ -2163,7 +2163,7 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπου πρωτότυ
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:764
+#: include/classes/api/services/CItem.php:767
 msgid "Cannot delete templated item."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτη."
 
@@ -2171,7 +2171,7 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτ
 msgid "Cannot delete templated items."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπων συλλεκτών."
 
-#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:661
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου εναύσματος \"%1$s:%2$s\"."
@@ -2504,7 +2504,7 @@ msgstr "Αδύνατον ο μορφότυπος Δένδρου. Έλεγξε τ
 msgid "Cannot format tree."
 msgstr "Αδύνατον ο μορφότυπος δένδρου."
 
-#: include/classes/api/services/CTemplate.php:905
+#: include/classes/api/services/CTemplate.php:906
 msgid "Cannot have empty visible template name."
 msgstr "Δεν μπορώ να έχω κενό ορατό όνομα σχεδιότυπου."
 
@@ -2519,12 +2519,12 @@ msgstr[1] "Δεν μπορώ να εισάγω σχεδιότυπο \"%1$s\", σ
 msgid "Cannot insert trigger expression"
 msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος"
 
-#: include/classes/api/services/CHost.php:1219
+#: include/classes/api/services/CHost.php:1228
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
-#: include/classes/api/services/CTemplate.php:992
-#: include/classes/api/services/CTemplate.php:1006
+#: include/classes/api/services/CTemplate.php:993
+#: include/classes/api/services/CTemplate.php:1007
 msgid "Cannot link template."
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου."
 
@@ -2540,19 +2540,19 @@ msgstr[1] ""
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
 
-#: include/classes/api/services/CHost.php:1085
+#: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξενιστή."
 
-#: include/classes/api/services/CTemplate.php:1130
+#: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχεδιότυπου."
 
-#: include/classes/api/services/CHost.php:1071
+#: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος ξενιστή."
 
-#: include/classes/api/services/CTemplate.php:1095
+#: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος σχεδιότυπου."
 
@@ -2661,9 +2661,9 @@ msgstr ""
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Αδύνατη η τοποθέτηση \"templateid\" για οθόνη \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1136
-#: include/classes/api/services/CHost.php:2084
-#: include/classes/api/services/CHost.php:2245
+#: include/classes/api/services/CHost.php:1145
+#: include/classes/api/services/CHost.php:2093
+#: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Αδύνατη η τοποθέτηση πεδίων απογραφής σε απενεργοποιημένη απογραφή."
 
@@ -2699,12 +2699,12 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός σε�
 msgid "Cannot unlink and clear applications."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κατηγοριών."
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1203
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
-#: include/classes/api/services/CTemplate.php:957
-#: include/classes/api/services/CTemplate.php:980
+#: include/classes/api/services/CTemplate.php:958
+#: include/classes/api/services/CTemplate.php:981
 msgid "Cannot unlink template."
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου."
 
@@ -2744,7 +2744,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2222
+#: include/classes/api/services/CHost.php:2231
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr ""
@@ -2755,8 +2755,8 @@ msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:923
-#: include/classes/api/services/CTrigger.php:697
-#: include/classes/api/services/CTrigger.php:826
+#: include/classes/api/services/CTrigger.php:705
+#: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr ""
@@ -2860,7 +2860,7 @@ msgstr "Αδύνατη η ενημέρωση ομάδων εντοπισμένω
 msgid "Cannot update host"
 msgstr "Αδύνατη η ενημέρωση ξενιστή"
 
-#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1042
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
 
@@ -2982,8 +2982,8 @@ msgstr "Αδύνατη η ενημέρωση σχεδιότυπων κατηγο
 msgid "Cannot update templates"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:856
-#: include/classes/api/services/CTemplate.php:1191
+#: include/classes/api/services/CTemplate.php:857
+#: include/classes/api/services/CTemplate.php:1192
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση σχεδιότυπων εντοπισμένου ξενιστή \"%1$s\"."
@@ -4904,7 +4904,7 @@ msgstr "Διαγραφή εναύσματος;"
 msgid "Delete web scenario?"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
@@ -4914,7 +4914,7 @@ msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Πρωτότυπος ξενιστής \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:822
+#: include/classes/api/services/CTemplate.php:823
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Διεγράφη: Σχεδιότυπο \"%1$s\"."
@@ -5496,7 +5496,7 @@ msgstr ""
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1138
+#: include/classes/api/services/CTrigger.php:1146
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Διπλότυπο εξαρτήσεων σε έναυσμα \"%1$s\"."
@@ -5506,14 +5506,14 @@ msgstr "Διπλότυπο εξαρτήσεων σε έναυσμα \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2275
+#: include/classes/api/services/CHost.php:2029
+#: include/classes/api/services/CHost.php:2284
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2027
-#: include/classes/api/services/CHost.php:2295
+#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:2304
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5723,9 +5723,9 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:154
 #: include/classes/api/services/CHostInterface.php:574
 #: include/classes/api/services/CHostInterface.php:618
-#: include/classes/api/services/CHost.php:846
-#: include/classes/api/services/CHost.php:1418
-#: include/classes/api/services/CHost.php:1954
+#: include/classes/api/services/CHost.php:855
+#: include/classes/api/services/CHost.php:1427
+#: include/classes/api/services/CHost.php:1963
 #: include/classes/api/services/CHostPrototype.php:950
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
@@ -5744,8 +5744,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:630
-#: include/classes/api/services/CTrigger.php:794
+#: include/classes/api/services/CTemplate.php:631
+#: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:479
 #: include/classes/api/services/CUserMacro.php:526
 #: include/classes/api/services/CUserMacro.php:626
@@ -6288,7 +6288,7 @@ msgstr ""
 msgid "Failed to update dashboard"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:579
+#: include/classes/api/services/CTemplate.php:580
 msgid "Failed to update template."
 msgstr "Αποτυχία ενημέρωσης σχεδιότυπου."
 
@@ -6336,8 +6336,8 @@ msgstr "Πεδίο \"%1$s\" δεν ορίζεται NULL."
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:983
-#: include/classes/api/services/CHost.php:991
-#: include/classes/api/services/CTemplate.php:884
+#: include/classes/api/services/CHost.php:1000
+#: include/classes/api/services/CTemplate.php:885
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6389,7 +6389,7 @@ msgstr ""
 msgid "Field \"%1$s\" must be missing."
 msgstr "Πεδίο \"%1$s\" πρέπει να λείπει."
 
-#: include/classes/api/services/CTemplate.php:464
+#: include/classes/api/services/CTemplate.php:465
 msgid "Field \"host\" is mandatory."
 msgstr "Πεδίο \"ξενιστής\" υποχρεωτικό."
 
@@ -6774,40 +6774,40 @@ msgstr "Χρωμοβαθμισμένη γραμμή"
 msgid "Graph"
 msgstr "Γράφημα"
 
-#: include/classes/api/services/CGraph.php:430
+#: include/classes/api/services/CGraph.php:433
 #: include/classes/api/services/CGraphPrototype.php:441
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\" (εξαρτώμενο από άλλο σχεδιότυπο)."
 
-#: include/classes/api/services/CGraph.php:451
-#: include/classes/api/services/CGraph.php:458
+#: include/classes/api/services/CGraph.php:454
+#: include/classes/api/services/CGraph.php:461
 #: include/classes/api/services/CGraphPrototype.php:467
 #: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\" (συλλέκτες όχι πανομοιότυποι)."
 
-#: include/classes/api/services/CGraph.php:405
+#: include/classes/api/services/CGraph.php:408
 #: include/classes/api/services/CGraphPrototype.php:416
 #: include/graphs.inc.php:440
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
-#: include/classes/api/services/CGraph.php:367
+#: include/classes/api/services/CGraph.php:370
 #: include/classes/api/services/CGraphPrototype.php:371
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "Γράφημα \"%1$s\" δεν κληρονομείται. Δεν χρειάζονται συλλέκτες σε \"%2$s\" (Ymax τιμή συλλέκτη)."
 
-#: include/classes/api/services/CGraph.php:375
+#: include/classes/api/services/CGraph.php:378
 #: include/classes/api/services/CGraphPrototype.php:380
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "Γράφημα \"%1$s\" δεν κληρονομείται. Δεν χρειάζονται συλλέκτες σε \"%2$s\" (Ymin τιμή συλλέκτη)."
 
-#: include/classes/api/services/CGraph.php:361
+#: include/classes/api/services/CGraph.php:364
 #: include/classes/api/services/CGraphPrototype.php:365
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
@@ -6930,8 +6930,8 @@ msgstr ""
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Γράφημα με όνομα \"%1$s\" υπάρχει ήδη σε γραφήματα ή πρωτότυπα γραφήματα."
 
-#: include/classes/api/services/CGraph.php:412
-#: include/classes/api/services/CGraph.php:433
+#: include/classes/api/services/CGraph.php:415
+#: include/classes/api/services/CGraph.php:436
 #: include/classes/api/services/CGraphPrototype.php:423
 #: include/classes/api/services/CGraphPrototype.php:444
 msgid "Graph with same name but other type exist."
@@ -7326,17 +7326,17 @@ msgid_plural "Hosts"
 msgstr[0] "Ξενιστής"
 msgstr[1] "Ξενιστές"
 
-#: include/classes/api/services/CHost.php:1098
-#: include/classes/api/services/CTemplate.php:496
+#: include/classes/api/services/CHost.php:1107
+#: include/classes/api/services/CTemplate.php:497
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Ο ξενιστής \"%1$s\" υπάρχει ήδη."
 
 #: include/classes/api/services/CHostGroup.php:1541
-#: include/classes/api/services/CHost.php:1057
-#: include/classes/api/services/CHost.php:1991
-#: include/classes/api/services/CHost.php:2185
+#: include/classes/api/services/CHost.php:1066
+#: include/classes/api/services/CHost.php:2000
+#: include/classes/api/services/CHost.php:2194
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr ""
@@ -7624,7 +7624,7 @@ msgstr "Μάσκα υποδικτύου ξενιστή"
 msgid "Host time"
 msgstr "Χρόνος ξενιστή"
 
-#: include/classes/api/services/CHost.php:920
+#: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
 msgstr "Αποτυχία ενημέρωσης ξενιστή."
 
@@ -7637,17 +7637,17 @@ msgstr "Ξενιστής ενημερώθηκε"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2115
-#: include/classes/api/services/CHost.php:2356
-#: include/classes/api/services/CTemplate.php:1156
+#: include/classes/api/services/CHost.php:2124
+#: include/classes/api/services/CHost.php:2365
+#: include/classes/api/services/CTemplate.php:1157
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/api/services/CHost.php:2121
-#: include/classes/api/services/CHost.php:2363
-#: include/classes/api/services/CTemplate.php:522
-#: include/classes/api/services/CTemplate.php:1121
+#: include/classes/api/services/CHost.php:2130
+#: include/classes/api/services/CHost.php:2372
+#: include/classes/api/services/CTemplate.php:523
+#: include/classes/api/services/CTemplate.php:1122
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
@@ -8325,7 +8325,7 @@ msgstr "Λανθασμένα ορίσματα πέρασαν στην συνάρ
 #: include/classes/api/services/CHostInterface.php:1173
 #: include/classes/api/services/CHostInterface.php:1191
 #: include/classes/api/services/CHostInterface.php:1208
-#: include/classes/api/services/CHost.php:1382
+#: include/classes/api/services/CHost.php:1391
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
 #: include/classes/api/services/CItemGeneral.php:264
@@ -8378,9 +8378,9 @@ msgstr "Λανθασμένη ομαδική τιμή διεπαφής."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Λανθασμένη τιμή υπολογισμού SLA για υπηρεσία \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1080
-#: include/classes/api/services/CHost.php:1979
-#: include/classes/api/services/CHost.php:2269
+#: include/classes/api/services/CHost.php:1089
+#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8391,8 +8391,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα διαμεσολαβητή \"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:474
-#: include/classes/api/services/CTemplate.php:1166
+#: include/classes/api/services/CTemplate.php:475
+#: include/classes/api/services/CTemplate.php:1167
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα σχεδιότυπου \"%1$s\"."
@@ -8559,9 +8559,9 @@ msgstr "Δείκτης λανθασμένης εικόνας."
 #: include/classes/api/services/CAction.php:2927
 #: include/classes/api/services/CAction.php:2939
 #: include/classes/api/services/CHostInterface.php:664
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CHost.php:1973
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1072
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2180
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:480
 #: include/classes/api/services/CProxy.php:619
@@ -8569,10 +8569,10 @@ msgstr "Δείκτης λανθασμένης εικόνας."
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:469
-#: include/classes/api/services/CTemplate.php:610
+#: include/classes/api/services/CTemplate.php:470
+#: include/classes/api/services/CTemplate.php:611
 #: include/classes/api/services/CTemplateScreen.php:596
-#: include/classes/api/services/CTrigger.php:799
+#: include/classes/api/services/CTrigger.php:807
 msgid "Incorrect input parameters."
 msgstr "Λανθασμένες παράμετροι εισόδου."
 
@@ -8586,8 +8586,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2090
-#: include/classes/api/services/CHost.php:2251
+#: include/classes/api/services/CHost.php:2099
+#: include/classes/api/services/CHost.php:2260
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8759,8 +8759,8 @@ msgstr ""
 msgid "Incorrect source value."
 msgstr "Λανθασμένη τιμή προέλευσης."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2217
+#: include/classes/api/services/CHost.php:2071
+#: include/classes/api/services/CHost.php:2226
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Λανθασμένη κατάσταση ξενιστή \"%1$s\"."
@@ -9047,21 +9047,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:1021
-#: include/classes/api/services/CHost.php:1871
-#: include/classes/api/services/CHost.php:1877
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHost.php:1903
-#: include/classes/api/services/CHost.php:1909
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1030
+#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1886
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
-#: include/classes/api/services/CHost.php:2000
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2194
-#: include/classes/api/services/CHost.php:2211
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:2009
+#: include/classes/api/services/CHost.php:2065
+#: include/classes/api/services/CHost.php:2203
+#: include/classes/api/services/CHost.php:2220
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:223
@@ -9111,8 +9111,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2084
 #: include/classes/api/services/CItemGeneral.php:2098
 #: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItem.php:830
-#: include/classes/api/services/CItem.php:838
+#: include/classes/api/services/CItem.php:833
+#: include/classes/api/services/CItem.php:841
 #: include/classes/api/services/CItemPrototype.php:990
 #: include/classes/api/services/CItemPrototype.php:998
 #: include/classes/api/services/CMaintenance.php:495
@@ -9154,7 +9154,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
-#: include/classes/api/services/CTemplate.php:429
+#: include/classes/api/services/CTemplate.php:430
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:709
 #: include/classes/api/services/CTriggerGeneral.php:729
@@ -9790,7 +9790,7 @@ msgstr ""
 msgid "Inventory"
 msgstr "Απογραφή"
 
-#: include/classes/api/services/CHost.php:1260
+#: include/classes/api/services/CHost.php:1269
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Απενεργοποιημένη απογραφή ξενιστή \"%1$s\"."
@@ -9863,7 +9863,7 @@ msgstr "Συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:947
+#: include/classes/api/services/CItem.php:950
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπές πεδίο απογραφής ξενιστή \"%2$d\". Επιλογές: απο 0 (μήν συμπληρώνεις) έως %3$d."
@@ -12082,8 +12082,8 @@ msgstr "Δεν βρέθηκε διεπαφή."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2069
-#: include/classes/api/services/CHost.php:2262
+#: include/classes/api/services/CHost.php:2078
+#: include/classes/api/services/CHost.php:2271
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr ""
@@ -12200,8 +12200,8 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CEvent.php:859
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
-#: include/classes/api/services/CGraph.php:555
-#: include/classes/api/services/CGraph.php:689
+#: include/classes/api/services/CGraph.php:558
+#: include/classes/api/services/CGraph.php:692
 #: include/classes/api/services/CGraphPrototype.php:572
 #: include/classes/api/services/CGraphPrototype.php:657
 #: include/classes/api/services/CGraphPrototype.php:719
@@ -12219,10 +12219,10 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CHostInterface.php:585
 #: include/classes/api/services/CHostInterface.php:859
 #: include/classes/api/services/CHostInterface.php:888
-#: include/classes/api/services/CHost.php:1387
-#: include/classes/api/services/CHost.php:1422
-#: include/classes/api/services/CHost.php:2045
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:1396
+#: include/classes/api/services/CHost.php:1431
+#: include/classes/api/services/CHost.php:2054
+#: include/classes/api/services/CHost.php:2186
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
@@ -12242,7 +12242,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CItemGeneral.php:215
 #: include/classes/api/services/CItemGeneral.php:317
 #: include/classes/api/services/CItemGeneral.php:332
-#: include/classes/api/services/CItem.php:757
+#: include/classes/api/services/CItem.php:760
 #: include/classes/api/services/CItemPrototype.php:917
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
@@ -12279,16 +12279,16 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:427
 #: include/classes/api/services/CTask.php:474
-#: include/classes/api/services/CTemplate.php:846
+#: include/classes/api/services/CTemplate.php:847
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:961
-#: include/classes/api/services/CTrigger.php:645
-#: include/classes/api/services/CTrigger.php:692
-#: include/classes/api/services/CTrigger.php:726
-#: include/classes/api/services/CTrigger.php:819
+#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:700
+#: include/classes/api/services/CTrigger.php:734
+#: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
@@ -12434,7 +12434,7 @@ msgstr "Μη αναγνώριση"
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1041
+#: include/classes/api/services/CTrigger.php:1049
 #: include/classes/api/services/CTriggerPrototype.php:859
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
@@ -15747,7 +15747,7 @@ msgstr ""
 msgid "Show"
 msgstr "Εμφάνιση"
 
-#: app/views/monitoring.latest.view.php:110
+#: app/views/monitoring.latest.view.php:111
 #: app/views/monitoring.problem.view.php:333
 msgid "Show details"
 msgstr "Εμφάνιση λεπτομερειών"
@@ -16595,16 +16595,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Σχεδιότυπο"
 
-#: include/classes/api/services/CHost.php:1109
-#: include/classes/api/services/CTemplate.php:486
+#: include/classes/api/services/CHost.php:1118
+#: include/classes/api/services/CTemplate.php:487
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Το σχεδιότυπο \"%1$s\" υπάρχει ήδη."
 
 #: include/classes/api/services/CHostGroup.php:1546
-#: include/classes/api/services/CTemplate.php:420
-#: include/classes/api/services/CTemplate.php:1088
+#: include/classes/api/services/CTemplate.php:421
+#: include/classes/api/services/CTemplate.php:1089
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr ""
@@ -16668,17 +16668,17 @@ msgstr "Το σχεδιότυπο ενημερώθηκε"
 msgid "Template value"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2136
-#: include/classes/api/services/CHost.php:2381
-#: include/classes/api/services/CTemplate.php:1143
+#: include/classes/api/services/CHost.php:2145
+#: include/classes/api/services/CHost.php:2390
+#: include/classes/api/services/CTemplate.php:1144
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/api/services/CHost.php:2142
-#: include/classes/api/services/CHost.php:2389
-#: include/classes/api/services/CTemplate.php:509
-#: include/classes/api/services/CTemplate.php:1108
+#: include/classes/api/services/CHost.php:2151
+#: include/classes/api/services/CHost.php:2398
+#: include/classes/api/services/CTemplate.php:510
+#: include/classes/api/services/CTemplate.php:1109
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
@@ -17248,7 +17248,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Έναυσμα προστέθηκε"
 
-#: include/classes/api/services/CTrigger.php:1084
+#: include/classes/api/services/CTrigger.php:1092
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Έναυσμα δεν μπορεί να εξαρτάται με κληρονόμο έναυσμα."
 
@@ -17466,7 +17466,7 @@ msgstr "Τρίτη"
 msgid "Turkish (tr_TR)"
 msgstr "Τουρκικά (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1008
+#: include/classes/api/services/CItem.php:1011
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Δύο συλλέκτες (\"%1$s\" και \"%2$s\") δεν μπορούν να συμπληρώσουν ίδιο πεδίο απογραφής ξενιστή \"%3$s\", αυτό θα οδηγούσε σε σύγκρουση."
@@ -17642,11 +17642,11 @@ msgstr "URLs"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ουκρανικά (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:192
+#: include/classes/core/CConfigFile.php:196
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:202
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to create the configuration file."
 msgstr ""
 
@@ -17657,7 +17657,7 @@ msgstr ""
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:198
+#: include/classes/core/CConfigFile.php:201
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
@@ -17982,7 +17982,7 @@ msgstr ""
 msgid "Update problem"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1355
+#: include/classes/api/services/CHost.php:1364
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr ""
@@ -18780,7 +18780,7 @@ msgstr ""
 msgid "Visible name"
 msgstr "Ορατό όνομα"
 
-#: include/classes/api/services/CHost.php:2287
+#: include/classes/api/services/CHost.php:2296
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Το ορατό όνομα δεν μπορεί να είναι κενό αν το όνομα ξενιστή απουσιάζει."
 
@@ -19011,8 +19011,8 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Λάθος πεδία για εξάρτηση υπηρεσίας \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1967
-#: include/classes/api/services/CHost.php:2165
+#: include/classes/api/services/CHost.php:1976
+#: include/classes/api/services/CHost.php:2174
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Λάθος πεδία για ξενιστή \"%1$s\"."
@@ -19232,8 +19232,8 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:947
-#: include/classes/api/services/CHost.php:1012
+#: include/classes/api/services/CHost.php:956
+#: include/classes/api/services/CHost.php:1021
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:528
@@ -19248,11 +19248,11 @@ msgstr ""
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:44
 #: include/classes/api/services/CTask.php:244
-#: include/classes/api/services/CTemplate.php:449
-#: include/classes/api/services/CTemplate.php:605
-#: include/classes/api/services/CTemplate.php:641
-#: include/classes/api/services/CTemplate.php:1080
-#: include/classes/api/services/CTemplate.php:1186
+#: include/classes/api/services/CTemplate.php:450
+#: include/classes/api/services/CTemplate.php:606
+#: include/classes/api/services/CTemplate.php:642
+#: include/classes/api/services/CTemplate.php:1081
+#: include/classes/api/services/CTemplate.php:1187
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:352
 #: include/classes/api/services/CUserMacro.php:447
@@ -19573,7 +19573,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1913
 #: include/classes/validators/CApiInputValidator.php:1019
 msgid "an even number of hexadecimal characters is expected"
 msgstr ""
@@ -19701,8 +19701,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CItemGeneral.php:454
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:487
@@ -20292,7 +20292,7 @@ msgstr "ελάχ."
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1910
+#: include/classes/api/services/CHost.php:1919
 #: include/classes/validators/CApiInputValidator.php:1013
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20541,10 +20541,10 @@ msgid "short description"
 msgstr "σύντομη περιγραφή"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:468
@@ -20641,10 +20641,10 @@ msgstr "το ID σχεδιότυπου \"%1$s\" πέρασε %2$s φορές"
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #: include/classes/api/services/CDiscoveryRule.php:1961
 #: include/classes/api/services/CDiscoveryRule.php:1969
-#: include/classes/api/services/CHost.php:2001
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:2010
+#: include/classes/api/services/CHost.php:2204
 #: include/classes/api/services/CHttpTest.php:742
-#: include/classes/api/services/CTemplate.php:430
+#: include/classes/api/services/CTemplate.php:431
 #: include/classes/validators/CApiInputValidator.php:942
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20766,8 +20766,8 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1872
-#: include/classes/api/services/CHost.php:1878
+#: include/classes/api/services/CHost.php:1881
+#: include/classes/api/services/CHost.php:1887
 #: include/classes/api/services/CItemGeneral.php:1253
 #: include/classes/api/services/CItemGeneral.php:1579
 #: include/classes/api/services/CItemGeneral.php:1605
@@ -20874,9 +20874,9 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1687
 #: include/classes/api/services/CDiscoveryRule.php:1708
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:2057
-#: include/classes/api/services/CHost.php:2212
+#: include/classes/api/services/CHost.php:1031
+#: include/classes/api/services/CHost.php:2066
+#: include/classes/api/services/CHost.php:2221
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
