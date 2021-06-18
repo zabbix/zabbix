@@ -79,7 +79,7 @@ $auth_tab = (new CFormList('list_auth'))
 			makeHelpIcon([
 				_('Password requirements:'),
 				(new CList([
-					_("must not contain user's username, name or surname"),
+					_("must not contain user's name, surname or username"),
 					_('must not be one of common or context-specific passwords')
 				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
