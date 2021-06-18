@@ -25,6 +25,11 @@
 #include "zbxregexp.h"
 #include "log.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include "aclapi.h"
+#include "sddl.h"
+#endif
+
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
 extern int	CONFIG_TIMEOUT;
@@ -841,3 +846,192 @@ err:
 
 	return ret;
 }
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			*filename, *ownertype, *resulttype;
+	int			ret = SYSINFO_RET_FAIL;
+	wchar_t			*wpath;
+	HANDLE			handle;
+	PSECURITY_DESCRIPTOR	sec = NULL;
+	PSID			sid = NULL;
+
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		goto err;
+	}
+
+	filename = get_rparam(request, 0);
+	ownertype = get_rparam(request, 1);
+	resulttype = get_rparam(request, 2);
+
+	if (NULL == filename || '\0' == *filename || NULL == (wpath = zbx_utf8_to_unicode(filename)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		goto err;
+	}
+
+	if (INVALID_HANDLE_VALUE == (handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL, NULL)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file information."));
+		goto err;
+	}
+
+	if (NULL != ownertype && '\0' != *ownertype && 0 != strcmp(ownertype, "user"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto err;
+	}
+
+	if (ERROR_SUCCESS != GetSecurityInfo(handle, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
+			&sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
+		goto err;
+	}
+
+	if (NULL != resulttype && 0 == strcmp(resulttype, "id"))
+	{
+		wchar_t	*sid_string = NULL;
+
+		if (TRUE != ConvertSidToStringSid(sid, &sid_string))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain SID."));
+			goto err_sec;
+		}
+
+		SET_STR_RESULT(result, zbx_unicode_to_utf8(sid_string));
+		LocalFree(sid_string);
+	}
+	else if (NULL == resulttype || '\0' == *resulttype || 0 == strcmp(resulttype, "name"))
+	{
+		DWORD		acc_sz = 0, dmn_sz = 0;
+		wchar_t		*acc_name = NULL, *dmn_name = NULL;
+		SID_NAME_USE	acc_type = SidTypeUnknown;
+
+		LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz, &acc_type);
+
+		acc_name = (wchar_t *)zbx_malloc(acc_name, acc_sz * sizeof(wchar_t));
+		dmn_name = (wchar_t *)zbx_malloc(dmn_name, dmn_sz * sizeof(wchar_t));
+
+		if (TRUE != LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz,
+				&acc_type))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
+			zbx_free(acc_name);
+			zbx_free(dmn_name);
+			goto err_sec;
+		}
+
+		SET_STR_RESULT(result, zbx_unicode_to_utf8(acc_name));
+
+		zbx_free(acc_name);
+		zbx_free(dmn_name);
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto err_sec;
+	}
+
+	ret = SYSINFO_RET_OK;
+err_sec:
+	LocalFree(sec);
+err:
+	return ret;
+}
+#else
+int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*filename, *ownertype, *resulttype;
+	int		ret = SYSINFO_RET_FAIL, type;
+	zbx_stat_t	st;
+
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		goto err;
+	}
+
+	filename = get_rparam(request, 0);
+	ownertype = get_rparam(request, 1);
+	resulttype = get_rparam(request, 2);
+
+	if (NULL == filename || '\0' == *filename)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		goto err;
+	}
+
+	if (SUCCEED != zbx_stat(filename, &st))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file information."));
+		goto err;
+	}
+
+	if (NULL != ownertype && 0 == strcmp(ownertype, "group"))
+	{
+		type = 1;
+	}
+	else if (NULL == ownertype || '\0' == *ownertype || 0 == strcmp(ownertype, "user"))
+	{
+		type = 0;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto err;
+	}
+
+	if (NULL != resulttype && 0 == strcmp(resulttype, "id"))
+	{
+		if (1 == type)
+			SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_gid));
+		else
+			SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_uid));
+	}
+	else if (NULL == resulttype || '\0' == *resulttype || 0 == strcmp(resulttype, "name"))
+	{
+		if (1 == type)
+		{
+			struct group	*grp;
+
+			grp = getgrgid(st.st_gid);
+
+			if (NULL == grp)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain group name."));
+				goto err;
+			}
+
+			SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
+		}
+		else
+		{
+			struct passwd	*pwd;
+
+			pwd = getpwuid(st.st_uid);
+
+			if (NULL == pwd)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
+				goto err;
+			}
+
+			SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
+		}
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto err;
+	}
+
+	ret = SYSINFO_RET_OK;
+err:
+	return ret;
+}
+#endif

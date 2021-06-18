@@ -321,6 +321,10 @@ class CHelpItems {
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
 				],
 				[
+					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
+					'description' => _('File owner information. Returns character string')
+				],
+				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
 					'description' => _('Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter')
 				],
@@ -673,6 +677,10 @@ class CHelpItems {
 				[
 					'key' => 'vfs.file.md5sum[file]',
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
+				],
+				[
+					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
+					'description' => _('File owner information. Returns character string')
 				],
 				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
