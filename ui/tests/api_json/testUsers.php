@@ -1566,7 +1566,7 @@ class testUsers extends CAPITest {
 
 		foreach ($methods as $method) {
 			if ($method == 'user.update') {
-				$user['userid'] = '9';
+				$user['userid'] = DBfetch(DBselect('SELECT userid FROM users WHERE username='.zbx_dbstr($user['username'])));
 				$user['username'] = 'updated-'.$user['username'];
 			}
 			$result = $this->call($method, $user, $expected_error);
