@@ -2984,7 +2984,8 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
-						ZBX_DEFAULT_PTR_COMPARE_FUNC))
+	                                            *
+	 *                                          		ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
 				}
@@ -3151,6 +3152,24 @@ out:
 	zbx_free(contexts);
 #endif
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_execute_default                                    *
+ *                                                                            *
+ * Purpose: executes the prepared database bulk insert operation              *
+ *          without default values                                            *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ * Return value: Returns SUCCEED if the operation completed successfully or   *
+ *               FAIL otherwise.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_execute_default(zbx_db_insert_t *self)
+{
+	return zbx_db_insert_execute(self);
 }
 
 /******************************************************************************
