@@ -1866,16 +1866,6 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			update_preproc_num, delete_preproc_num);
 }
 
-static const char	*DBget_field_default(const char *table_name, const char *field_name)
-{
-	const ZBX_TABLE		*table;
-	const ZBX_FIELD		*field;
-
-	if (NULL != (table = DBget_table(table_name)) && NULL != (field = DBget_field(table, field_name)))
-		return field->default_value;
-	else
-		return NULL;
-}
 /******************************************************************************
  *                                                                            *
  * Function: copy_template_item_tags                                          *
@@ -1888,12 +1878,12 @@ static const char	*DBget_field_default(const char *table_name, const char *field
 static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 {
 	int				i, j, new_tag_num = 0, update_tag_num = 0, delete_tag_num = 0;
-	char				*sql = NULL, *sql_ins = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0,sql_ins_alloc = 0, sql_ins_offset = 0;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_template_item_t		*item;
 	zbx_template_item_tag_t		*tag;
 	zbx_vector_uint64_t		deleteids;
-	zbx_uint64_t			tagid;
+	zbx_db_insert_t			db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1930,10 +1920,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_tag_num)
-	{
-		DBbegin_multiple_insert(&sql_ins, &sql_ins_alloc, &sql_ins_offset);
-		tagid = DBget_maxid("item_tag");
-	}
+		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1946,51 +1933,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			tag = (zbx_template_item_tag_t *)item->item_tags.values[j];
 			if (0 == tag->itemtagid)
 			{
-				const char	*def_field;
-				char		*def_field_esc, *ins_field = NULL, *ins_value = NULL;
-				size_t		ins_field_alloc = 0, ins_field_offset = 0,
-						ins_value_alloc = 0, ins_value_offset = 0;
-
-				zbx_strcpy_alloc(&sql_ins, &sql_ins_alloc, &sql_ins_offset, "insert into item_tag ");
-				zbx_strcpy_alloc(&ins_field, &ins_field_alloc, &ins_field_offset, "(itemtagid,itemid");
-				zbx_snprintf_alloc(&ins_value, &ins_value_alloc, &ins_value_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 , tagid++, item->itemid);
-				def_field = DBget_field_default("item_tag", "tag");
-				if (NULL != def_field)
-				{
-					def_field_esc = DBdyn_escape_string(def_field);
-					if (0 != strcmp(tag->tag, def_field_esc))
-					{
-						zbx_strcpy_alloc(&ins_field, &ins_field_alloc, &ins_field_offset,
-								",tag");
-						zbx_snprintf_alloc(&ins_value, &ins_value_alloc, &ins_value_offset,
-								",'%s'", tag->tag);
-					}
-					zbx_free(def_field_esc);
-				}
-
-				def_field = DBget_field_default("item_tag", "value");
-				if (NULL != def_field)
-				{
-					def_field_esc = DBdyn_escape_string(def_field);
-					if (0 != strcmp(tag->value, def_field_esc))
-					{
-						zbx_strcpy_alloc(&ins_field, &ins_field_alloc, &ins_field_offset,
-								",value");
-						zbx_snprintf_alloc(&ins_value, &ins_value_alloc, &ins_value_offset,
-								",'%s'", tag->value);
-					}
-					zbx_free(def_field_esc);
-				}
-				zbx_strcpy_alloc(&ins_field, &ins_field_alloc, &ins_field_offset, ")");
-				zbx_strcpy_alloc(&ins_value, &ins_value_alloc, &ins_value_offset, ")");
-
-				zbx_snprintf_alloc(&sql_ins, &sql_ins_alloc, &sql_ins_offset, "%s values %s;\n",
-						ins_field, ins_value);
-
-				zbx_free(ins_field);
-				zbx_free(ins_value);
-
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, tag->tag, tag->value);
 				continue;
 			}
 
@@ -2037,7 +1980,11 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != new_tag_num)
-		DBexecute("%s", sql_ins);
+	{
+		zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
 
 	if (0 != deleteids.values_num)
 	{
@@ -2050,7 +1997,6 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		delete_tag_num = deleteids.values_num;
 	}
 	zbx_free(sql);
-	zbx_free(sql_ins);
 	zbx_vector_uint64_destroy(&deleteids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __func__, new_tag_num, update_tag_num,
