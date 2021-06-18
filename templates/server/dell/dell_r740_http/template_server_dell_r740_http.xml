@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-18T07:50:15Z</date>
+   <date>2021-06-18T08:14:47Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -12,6 +12,8 @@
          <template>Template Server DELL PowerEdge R740 by HTTP</template>
          <name>Template Server DELL PowerEdge R740 by HTTP</name>
          <description>Template for DELL PowerEdge R740 servers with iDRAC 8/9 firmware 4.32 and later and Redfish API enabled.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
