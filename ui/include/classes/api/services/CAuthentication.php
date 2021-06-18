@@ -158,7 +158,7 @@ class CAuthentication extends CApiService {
 			'ldap_bind_dn' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_dn')],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_bind_password' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_password')],
-			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
+			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
 			'saml_idp_entityid' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_idp_entityid')],
 			'saml_sso_url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_sso_url')],
 			'saml_slo_url' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'saml_slo_url')],
