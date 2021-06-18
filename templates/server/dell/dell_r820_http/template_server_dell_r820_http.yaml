@@ -178,22 +178,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -208,13 +208,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -239,7 +239,7 @@ zabbix_export:
                       system = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       system = null;
                   }
                   
@@ -365,22 +365,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -395,13 +395,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -426,7 +426,7 @@ zabbix_export:
                       storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       storages = null;
                   }
                   
@@ -529,22 +529,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -559,13 +559,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -590,7 +590,7 @@ zabbix_export:
                       storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       storages = null;
                   }
                   
@@ -730,22 +730,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -760,13 +760,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -775,7 +775,7 @@ zabbix_export:
                       sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       sensors = null;
                   }
                   
@@ -981,22 +981,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -1011,13 +1011,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -1042,7 +1042,7 @@ zabbix_export:
                       adapters = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       adapters = null;
                   }
                   
@@ -1273,22 +1273,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -1303,13 +1303,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -1334,7 +1334,7 @@ zabbix_export:
                       storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       storages = null;
                   }
                   
@@ -1455,22 +1455,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -1485,13 +1485,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -1516,7 +1516,7 @@ zabbix_export:
                       sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       sensors = null;
                   }
                   
@@ -1652,22 +1652,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -1682,13 +1682,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -1713,7 +1713,7 @@ zabbix_export:
                       sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       sensors = null;
                   }
                   
@@ -1959,22 +1959,22 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new CurlHttpRequest();
-                      api_request.AddHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.Log(4, '[ DELL ] Sending request: ' + url);
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
                       try {
-                          response = api_request.Get(url);
+                          response = api_request.get(url);
                       } catch (error) {
-                          Zabbix.Log(4, '[ DELL ] Get request returned error ' + error);
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
                           throw 'Get request returned error ' + error + '. Check debug log for more information.';
                       }
                   
-                      Zabbix.Log(4, '[ DELL ] Received response with status code ' +
-                          api_request.Status() + '\n' + response);
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.Status() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.Status();
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
                           if (response !== null) {
                               if (typeof response.message === 'string') {
                                   message += ': ' + response.message;
@@ -1989,13 +1989,13 @@ zabbix_export:
                               response = JSON.parse(response);
                           }
                           catch (error) {
-                              Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
                               response = null;
                           }
                       }
                   
                       return {
-                          status: api_request.Status(),
+                          status: api_request.getStatus(),
                           body: response
                       };
                   }
@@ -2020,7 +2020,7 @@ zabbix_export:
                       storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.Log(4, '[ DELL ] Failed to parse response.');
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
                       storages = null;
                   }
                   
