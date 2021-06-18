@@ -1307,11 +1307,11 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 		graphid++;
 	}
 
-	res = zbx_db_insert_execute_default(&db_insert);
+	res = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED == res)
-		zbx_db_insert_execute_default(&db_insert_graphs_items);
+		zbx_db_insert_execute(&db_insert_graphs_items);
 
 	zbx_db_insert_clean(&db_insert_graphs_items);
 
