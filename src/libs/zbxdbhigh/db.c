@@ -2984,8 +2984,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
-	                                            *
-	 *                                          		ZBX_DEFAULT_PTR_COMPARE_FUNC))
+						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
 				}
