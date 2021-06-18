@@ -532,12 +532,14 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = [];
-		$data['discover'] = $graph['discover'];
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
 			$data['graphDiscovery'] = $graph['graphDiscovery'];
+		}
+		else {
+			$data['discover'] = $graph['discover'];
 		}
 
 		// if no host has been selected for the navigation panel, use the first graph host
@@ -714,7 +716,7 @@ else {
 
 	// Get graphs after paging.
 	$options = [
-		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
+		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
@@ -722,9 +724,13 @@ else {
 		'preservekeys' => true
 	];
 
-	$data['graphs'] = hasRequest('parent_discoveryid')
-		? API::GraphPrototype()->get($options)
-		: API::Graph()->get($options + ['selectGraphDiscovery' => ['ts_delete']]);
+	if (hasRequest('parent_discoveryid')) {
+		$options['output'][] = 'discover';
+		$data['graphs'] = API::GraphPrototype()->get($options);
+	}
+	else {
+		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['ts_delete']]);
+	}
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
