@@ -900,7 +900,7 @@ return JSON.stringify(result);
                <authtype>BASIC</authtype>
                <username>{$API.USER}</username>
                <password>{$API.PASSWORD}</password>
-               <url>{$API.URL}/redfish/v1/Systems/System.Embedded.1/NetworkInterfaces</url>
+               <url>{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters</url>
                <description>The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.</description>
                <item_prototypes>
                   <item_prototype>
