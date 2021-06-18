@@ -966,7 +966,7 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
-          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/NetworkInterfaces'
+          url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
           preprocessing:
             -
               type: JAVASCRIPT
