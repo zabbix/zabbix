@@ -466,7 +466,10 @@ static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *gra
 				" where gi.itemid=i.itemid");
 	}
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, " and gi.graphid", graphs_ids->values,
+	if (0 < graphs_ids->values_num)
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.graphid", graphs_ids->values,
 			graphs_ids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.key_");
 
