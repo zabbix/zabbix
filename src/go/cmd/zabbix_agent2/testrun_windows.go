@@ -39,6 +39,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.file.regmatch[c:\windows\win.ini,fonts]`,
 		`vfs.file.md5sum[c:\windows\win.ini]`,
 		`vfs.file.cksum[c:\windows\win.ini]`,
+		`vfs.file.owner[c:\windows\win.ini]`,
 		`vfs.dir.size[c:\windows]`,
 		`vfs.dir.count[c:\windows]`,
 		`net.dns[,zabbix.com]`,

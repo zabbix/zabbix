@@ -41,6 +41,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.file.regmatch[/etc/passwd,root]`,
 		`vfs.file.md5sum[/etc/passwd]`,
 		`vfs.file.cksum[/etc/passwd]`,
+		`vfs.file.owner[/etc/passwd]`,
 		`vfs.dir.size[/var/log]`,
 		`vfs.dir.count[/var/log]`,
 		`net.dns[,zabbix.com]`,
