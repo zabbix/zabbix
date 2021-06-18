@@ -143,4 +143,50 @@ class testHost extends CAPITest {
 			}
 		}
 	}
+
+	public static function host_output_field_presence() {
+		return [
+			[
+				'request' => [
+					'output' => 'extend'
+				],
+				'expected_result' => [
+					'hostid' => true,
+					'inventory_mode' => true,
+					'tls_psk_identity' => false,
+					'tls_psk' => false
+				],
+			],
+			[
+				'request' => [
+					'output' => ['host', 'tls_psk', 'tls_psk_identity']
+				],
+				'expected_result' => [
+					'hostid' => true,
+					'host' => true,
+					'inventory_mode' => false,
+					'tls_psk_identity' => false,
+					'tls_psk' => false
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider host_output_field_presence
+	 */
+	public function testHost_OutputFieldPresence($request, $expected_result) {
+		$result = $this->call('host.get', $request, null);
+
+		foreach($result['result'] as $host) {
+			foreach($expected_result as $key => $present) {
+				if ($present) {
+					$this->assertArrayHasKey($key, $host, 'Key should be present in host output.');
+				}
+				else {
+					$this->assertArrayNotHasKey($key, $host, 'Key should NOT be present in host output');
+				}
+			}
+		}
+	}
 }
