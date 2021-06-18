@@ -322,7 +322,7 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 	{
 		graph_copy = (zbx_graph_copy_t *)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
 
-		graph_copy->update_flags = 0;
+		graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
 		ZBX_STR2UINT64(graph_copy->graphid, row[0]);
 		graph_copy->name = zbx_strdup(NULL, row[1]);
 		graph_copy->width = atoi(row[2]);
@@ -479,7 +479,7 @@ static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *gra
 
 		gitem = (graph_item_entry*)zbx_malloc(NULL, sizeof(graph_item_entry));
 
-		gitem->update_flags = 0;
+		gitem->update_flags = ZBX_FLAG_LINK_GRAPHITEM_UNSET;
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(gitem->itemid, row[1]);
 		zbx_strlcpy(gitem->key, row[2], sizeof(gitem->key));
@@ -543,7 +543,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		zbx_graph_copy_t	graph_copy;
 		zbx_graph_names_entry_t	temp_t, *found;
 
-		graph_copy.update_flags = 0;
+		graph_copy.update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
 		ZBX_STR2UINT64(graphid, row[0]);
 		zbx_vector_uint64_append(host_graphs_ids, graphid);
 
@@ -1304,11 +1304,11 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 		graphid++;
 	}
 
-	res = zbx_db_insert_execute(&db_insert);
+	res = zbx_db_insert_execute_default(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED == res)
-		zbx_db_insert_execute(&db_insert_graphs_items);
+		zbx_db_insert_execute_default(&db_insert_graphs_items);
 
 	zbx_db_insert_clean(&db_insert_graphs_items);
 

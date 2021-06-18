@@ -400,7 +400,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 					links.values[i].second);
 		}
 
-		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_execute_default(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
 
@@ -481,7 +481,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_free(sql);
 
 	zbx_db_insert_autoincrement(&db_insert, "triggertagid");
-	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_execute_default(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	zbx_vector_uint64_destroy(&triggerids);
@@ -643,7 +643,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		zbx_target_host_trigger_entry_t		target_host_trigger_entry;
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
-		target_host_trigger_entry.update_flags = 0;
+		target_host_trigger_entry.update_flags = ZBX_FLAG_LINK_TRIGGER_UNSET;
 		ZBX_STR2UINT64(target_host_trigger_entry.triggerid,row[0]);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
@@ -1091,11 +1091,11 @@ func_out:
 		triggerid++;
 	}
 
-	res = zbx_db_insert_execute(&db_insert);
+	res = zbx_db_insert_execute_default(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED == res)
-		res = zbx_db_insert_execute(&db_insert_funcs);
+		res = zbx_db_insert_execute_default(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
 	DBend_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
