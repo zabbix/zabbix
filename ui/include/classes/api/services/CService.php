@@ -522,6 +522,7 @@ class CService extends CApiService {
 		$db_parent_services = $this->get([
 			'output' => ['name', 'triggerid'],
 			'serviceids' => $parent_serviceids,
+			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -560,7 +561,8 @@ class CService extends CApiService {
 
 		$count = $this->get([
 			'countOutput' => true,
-			'serviceids' => $child_serviceids
+			'serviceids' => $child_serviceids,
+			'editable' => true
 		]);
 
 		if ($count != count($child_serviceids)) {
