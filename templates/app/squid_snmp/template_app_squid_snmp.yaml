@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:15Z'
+  date: '2021-06-18T06:43:40Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -126,11 +126,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Storage Swap Size'
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '1048576'
           tags:
             -
               tag: Application
