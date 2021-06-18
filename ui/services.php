@@ -282,8 +282,7 @@ if (hasRequest('form')) {
 					'name' => $child_service['name'],
 					'triggerid' => $child_service['triggerid'],
 					'trigger' => ($child_service['triggerid'] == 0) ? '' : $child_service['trigger']['description'],
-					'serviceid' => $dependency['servicedownid'],
-					'soft' => $dependency['soft']
+					'serviceid' => $dependency['servicedownid']
 				];
 			}
 

@@ -22,26 +22,25 @@
 class CControllerServiceList extends CControllerServiceListGeneral {
 
 	protected function doAction(): void {
-		$serviceid = $this->hasInput('serviceid') ? $this->getInput('serviceid') : null;
-
-		$this->updateFilter();
-		$filter = $this->getFilter();
+		parent::doAction();
 
 		$data = [
 			'can_edit' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES),
-			'filter' => $filter,
+			'path' => $this->path,
+			'breadcrumbs' => $this->getBreadcrumbs($this->path),
+			'filter' => $this->filter,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'service.list'),
 			'refresh_url' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'service.list.refresh')
-				->setArgument('filter_name', $filter['name'])
-				->setArgument('filter_status', $filter['status'])
-				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_name', $this->filter['name'])
+				->setArgument('filter_status', $this->filter['status'])
+				->setArgument('filter_evaltype', $this->filter['evaltype'])
+				->setArgument('filter_tags', $this->filter['tags'])
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'serviceid' => $serviceid,
+			'service' => $this->service,
 			'tags' => []
 		];
 

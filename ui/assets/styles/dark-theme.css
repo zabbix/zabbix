@@ -658,12 +658,18 @@ footer {
     grid-column: 2 / -1;
     text-align: left;
     line-height: 24px; }
+  .form-grid .form-actions button:not(:first-of-type) {
+    margin-left: 10px; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
     grid-column-start: 3 !important; }
   .form-grid .form-field.offset-3 {
     grid-column-start: 4 !important; }
+  .form-grid .form-field table {
+    width: 100%; }
+  .form-grid .form-field td {
+    padding: 0 5px 5px 0; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-fixed {
@@ -679,6 +685,10 @@ footer {
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
     grid-column-start: initial;
     grid-column-end: span 1; }
+  .form-grid .table-forms-separator {
+    line-height: 1.4; }
+    .form-grid .table-forms-separator td {
+      padding: 5px 5px 5px 0; }
 
 .btn-add,
 .btn-edit,
@@ -2391,10 +2401,8 @@ pre, pre a, pre td, pre span {
           margin-right: 5px; }
         .header-navigation > ul > li > ul.breadcrumbs > li {
           margin-right: 0; }
-          .header-navigation > ul > li > ul.breadcrumbs > li::after {
+          .header-navigation > ul > li > ul.breadcrumbs > li:not(:last-child)::after {
             content: "/"; }
-          .header-navigation > ul > li > ul.breadcrumbs > li:last-child::after {
-            content: ""; }
       .header-navigation > ul > li .status-container {
         margin-right: 5px; }
     .header-navigation > ul li > span {
@@ -2423,17 +2431,6 @@ pre, pre a, pre td, pre span {
 
 form.is-loading {
   position: relative; }
-
-.form-grid .table-forms-separator {
-  line-height: 1.4; }
-  .form-grid .table-forms-separator td {
-    padding: 5px 5px 5px 0; }
-.form-grid .form-field table {
-  width: 100%; }
-.form-grid .form-field td {
-  padding: 0 5px 5px 0; }
-.form-grid .form-actions button:not(:first-of-type) {
-  margin-left: 10px; }
 
 .list-table {
   width: 100%;

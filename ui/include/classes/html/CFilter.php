@@ -110,6 +110,10 @@ class CFilter extends CDiv {
 		return $this->name;
 	}
 
+	public function getTabsCount() {
+		return count($this->tabs);
+	}
+
 	/**
 	 * Add variable to filter form.
 	 *

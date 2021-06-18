@@ -31,6 +31,14 @@
 		line-height: 24px;
 	}
 
+	.form-actions {
+		button {
+			&:not(:first-of-type) {
+				margin-left: 10px;
+			}
+		}
+	}
+
 	.form-field {
 		$offsets: (
 				1: 2,
@@ -42,6 +50,14 @@
 			&.offset-#{$offset} {
 				grid-column-start: $value !important;
 			}
+		}
+
+		table {
+			width: 100%;
+		}
+
+		td {
+			padding: 0 5px 5px 0;
 		}
 	}
 
@@ -74,6 +90,14 @@
 		.form-field:not(.field-fluid) {
 				grid-column-start: initial;
 				grid-column-end: span 1;
+		}
+	}
+
+	.table-forms-separator {
+		line-height: 1.4;
+
+		td {
+			padding: 5px 5px 5px 0;
 		}
 	}
 }

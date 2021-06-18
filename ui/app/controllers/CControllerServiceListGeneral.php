@@ -21,12 +21,19 @@
 
 abstract class CControllerServiceListGeneral extends CController {
 
+	protected $service;
+
+	protected $path;
+	protected $filter;
+
 	protected $validation_fields = [
 		'serviceid' =>			'db services.serviceid',
+		'path' =>				'array',
 		'filter_name' =>		'string',
 		'filter_status' =>		'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
 		'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 		'filter_tags' =>		'array',
+		'filter_set' =>			'in 1',
 		'page' =>				'ge 1',
 	];
 
@@ -49,7 +56,26 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	protected function doAction() {
-		// TODO: Implement doAction() method.
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['name', 'status', 'goodsla', 'sortorder'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParent' => ['serviceid', 'name', 'sortorder'],
+				'selectParentDependencies' => [],
+				'selectDependencies' => [],
+				'selectTrigger' => ['description'],
+				'preservekeys' => true
+			]);
+
+			if ($db_service) {
+				$this->service = reset($db_service);
+			}
+		}
+
+		$this->path = $this->getPath();
+
+		$this->updateFilter();
+		$this->filter = $this->getFilter();
 	}
 
 	protected function updateFilter(): void {
@@ -101,5 +127,88 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 
 		return $filter;
+	}
+
+	protected function getPath(): array {
+		$path = [];
+
+		if ($this->service !== null) {
+			$db_service = $this->service;
+
+			while (true) {
+				$path[] = $db_service['serviceid'];
+
+				if ($this->hasInput('path')) {
+					$path_serviceids = $this->getInput('path', []);
+
+					$db_services = API::Service()->get([
+						'output' => [],
+						'serviceids' => $path_serviceids,
+						'preservekeys' => true
+					]);
+
+					foreach (array_reverse($path_serviceids) as $serviceid) {
+						if (array_key_exists($serviceid, $db_services)) {
+							$path[] = $serviceid;
+						}
+					}
+
+					break;
+				}
+
+				if (!$db_service['parentDependencies']) {
+					break;
+				}
+
+				$db_service = API::Service()->get([
+					'output' => [],
+					'serviceids' => $db_service['parentDependencies'][0],
+					'selectParentDependencies' => []
+				]);
+
+				if (!$db_service) {
+					break;
+				}
+
+				$db_service = reset($db_service);
+			}
+		}
+
+		return array_reverse($path);
+	}
+
+	protected function getBreadcrumbs(array $path): array {
+		$breadcrumbs = [[
+			'name' => _('All services'),
+			'curl' => (new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		]];
+
+		$db_services = API::Service()->get([
+			'output' => ['name'],
+			'serviceids' => $path,
+			'preservekeys' => true
+		]);
+
+		$parent_serviceids = [];
+
+		foreach ($path as $serviceid) {
+			$breadcrumbs[] = [
+				'name' => $db_services[$serviceid]['name'],
+				'curl' => (new CUrl('zabbix.php'))
+					->setArgument('action', $this->getAction())
+					->setArgument('path', $parent_serviceids)
+					->setArgument('serviceid', $serviceid)
+			];
+
+			$parent_serviceids[] = $serviceid;
+		}
+
+		if ($this->hasInput('filter_set')) {
+			$breadcrumbs[] = [
+				'name' => _('Filter results')
+			];
+		}
+
+		return $breadcrumbs;
 	}
 }

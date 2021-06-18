@@ -231,12 +231,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 				&.breadcrumbs > li {
 					margin-right: 0;
 
-					&::after {
+					&:not(:last-child)::after {
 						content: "/";
-					}
-
-					&:last-child::after {
-						content: "";
 					}
 				}
 			}
@@ -282,34 +278,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 form {
 	&.is-loading {
 		position: relative;
-	}
-}
-
-.form-grid {
-	.table-forms-separator {
-		line-height: 1.4;
-
-		td {
-			padding: 5px 5px 5px 0;
-		}
-	}
-
-	.form-field {
-		table {
-			width: 100%;
-		}
-
-		td {
-			padding: 0 5px 5px 0;
-		}
-	}
-
-	.form-actions {
-		button {
-			&:not(:first-of-type) {
-				margin-left: 10px;
-			}
-		}
 	}
 }
 
@@ -2117,6 +2085,7 @@ $icon-widget-btn: (
 		}
 	}
 
+	.btn-info,
 	.btn-time,
 	.filter-trigger {
 		border-radius: 2px;
@@ -2140,6 +2109,7 @@ $icon-widget-btn: (
 		}
 	}
 
+	.btn-info,
 	.btn-time {
 		padding: 0 34px 0 10px;
 
@@ -2150,6 +2120,15 @@ $icon-widget-btn: (
 			height: 24px;
 			width: 24px;
 			background: url($sprite-path) no-repeat -87px -583px;
+		}
+	}
+
+	.btn-info {
+		width: initial;
+		background-image: none;
+
+		&::after {
+			background: url($sprite-path) no-repeat -398px -407px;
 		}
 	}
 
@@ -2167,6 +2146,7 @@ $icon-widget-btn: (
 	}
 
 	.ui-state-focus {
+		.btn-info,
 		.btn-time,
 		.filter-trigger {
 			box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2174,6 +2154,7 @@ $icon-widget-btn: (
 		}
 
 		&.ui-tabs-active {
+			.btn-info,
 			.btn-time,
 			.filter-trigger {
 				box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2182,6 +2163,7 @@ $icon-widget-btn: (
 	}
 
 	.ui-tabs-active {
+		.btn-info,
 		.btn-time,
 		.filter-trigger {
 			color: $font-color;
@@ -2191,6 +2173,13 @@ $icon-widget-btn: (
 			border-radius: 2px 2px 0 0;
 			margin: -1px 0 0 6px;
 			padding: 1px 34px 7px 10px;
+		}
+
+		.btn-info {
+			&::after {
+				background-position: -398px -430px;
+				top: 1px;
+			}
 		}
 
 		.btn-time {
@@ -2209,6 +2198,7 @@ $icon-widget-btn: (
 
 	.ui-state-hover {
 		&.ui-tabs-active {
+			.btn-info,
 			.btn-time,
 			.filter-trigger {
 				background-color: $action-hover-color;

@@ -31,10 +31,17 @@ $this->includeJsFile('monitoring.service.list.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
-	? (new CFilter($data['view_curl']))
+if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
+	$filter = (new CFilter($data['view_curl']))
 		->setProfile('web.service.filter')
-		->setActiveTab($data['active_tab'])
+		->setActiveTab($data['active_tab']);
+
+	$filter
+		->addTab(
+			(new CLink(_('Info'), '#tab_'.$filter->getTabsCount()))->addClass(ZBX_STYLE_BTN_INFO),
+			(new CDiv('test'))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->setId('tab_'.$filter->getTabsCount()))
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
@@ -69,7 +76,12 @@ $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
 					)
 				])
 		])
-	: null;
+		->addVar('action', 'service.list')
+		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null);
+}
+else {
+	$filter = null;
+}
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -88,6 +100,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
+					->setArgument('path', $data['path'])
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($dependencies_count)
@@ -100,6 +113,18 @@ foreach ($data['services'] as $serviceid => $service) {
 		sprintf('%.4f', $service['goodsla']),
 		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : ''
 	]));
+}
+
+$breadcrumbs = [];
+if (count($data['breadcrumbs']) > 1) {
+	foreach($data['breadcrumbs'] as $key => $path_item) {
+		$breadcrumbs[] = (new CSpan())
+			->addItem(array_key_exists('curl', $path_item)
+				? new CLink($path_item['name'], $path_item['curl'])
+				: $path_item['name']
+			)
+			->addClass(array_key_last($data['breadcrumbs']) === $key ? ZBX_STYLE_SELECTED : null);
+	}
 }
 
 (new CWidget())
@@ -119,6 +144,9 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
+	->setNavigation(
+		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
+	)
 	->addItem([
 		$filter,
 		$table,
@@ -128,7 +156,7 @@ foreach ($data['services'] as $serviceid => $service) {
 
 (new CScriptTag('
 	initializeView(
-		'.json_encode($data['serviceid']).',
+		'.json_encode($data['service'] !== null ? $data['service']['serviceid'] : null).',
 		'.json_encode($data['page']).'
 	);
 '))
