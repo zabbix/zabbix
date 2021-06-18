@@ -471,6 +471,8 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 	zbx_hashset_iter_t		iter;
 	zbx_service_t			*service = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	result = DBselect("select service_problem_tagid,serviceid,tag,operator,value"
 			" from service_problem_tag"
 			" order by serviceid");
@@ -556,6 +558,8 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 		(*updated)++;
 		zbx_hashset_iter_remove(&iter);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	sync_services(zbx_service_manager_t *service_manager, int *updated, int revision)
@@ -564,6 +568,8 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 	DB_ROW			row;
 	zbx_service_t		service_local, *service;
 	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect("select serviceid,status,algorithm from services");
 
@@ -631,6 +637,8 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 		zbx_hashset_iter_remove(&iter);
 		(*updated)++;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	sync_services_links(zbx_service_manager_t *service_manager, int *updated, int revision)
@@ -639,6 +647,8 @@ static void	sync_services_links(zbx_service_manager_t *service_manager, int *upd
 	DB_ROW			row;
 	zbx_hashset_iter_t	iter;
 	zbx_services_link_t	services_link_local, *services_link;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect("select linkid,serviceupid,servicedownid from services_links");
 
@@ -686,6 +696,8 @@ static void	sync_services_links(zbx_service_manager_t *service_manager, int *upd
 		zbx_hashset_iter_remove(&iter);
 		(*updated)++;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *service_problems_index)
@@ -693,6 +705,8 @@ static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *servic
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_service_t	service_local, *service;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect("select service_problemid,eventid,serviceid,severity from service_problem");
 
@@ -718,6 +732,8 @@ static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *servic
 		add_service_problem(service, service_problems_index, service_problem);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	service_clean(zbx_service_t *service)
@@ -1307,6 +1323,8 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 {
 	int	i, now;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __func__, eventids->values_num);
+
 	now = time(NULL);
 
 	for (i = 0; i < eventids->values_num; i++)
@@ -1334,11 +1352,15 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 	db_update_services(&service_manager->services, &service_manager->service_diffs,
 			&service_manager->service_problems_index);
 	zbx_hashset_clear(&service_manager->service_diffs);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
 {
 	int	i, j;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __func__, events->values_num);
 
 	for (i = 0; i < events->values_num; i++)
 	{
@@ -1365,6 +1387,8 @@ static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t
 	db_update_services(&service_manager->services, &service_manager->service_diffs,
 			&service_manager->service_problems_index);
 	zbx_hashset_clear(&service_manager->service_diffs);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
@@ -1481,6 +1505,8 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 
 static void	service_manager_free(zbx_service_manager_t *service_manager)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_hashset_destroy(&service_manager->service_problems_index);
 	zbx_hashset_destroy(&service_manager->services_links);
 	zbx_hashset_destroy(&service_manager->service_problem_tags);
@@ -1488,6 +1514,8 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 	zbx_hashset_destroy(&service_manager->problem_events);
 	zbx_hashset_destroy(&service_manager->recovery_events);
 	zbx_hashset_destroy(&service_manager->deleted_eventids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	dump_events(zbx_hashset_t *events)
@@ -1597,12 +1625,16 @@ static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_pair_t	*pair;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_hashset_iter_reset(&service_manager->deleted_eventids, &iter);
 	while (NULL != (pair = (zbx_uint64_pair_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (ZBX_PROBLEM_CLEANUP_AGE < now - (int)pair->second)
 			zbx_hashset_iter_remove(&iter);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	zbx_serviceman_sigusr_handler(int flags)
