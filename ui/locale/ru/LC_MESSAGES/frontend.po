@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-28 19:54+0300\n"
-"PO-Revision-Date: 2021-02-18 23:33+0300\n"
+"PO-Revision-Date: 2021-06-15 21:34+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,11 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1613684033.000000\n"
+"X-POOTLE-MTIME: 1623785653.000000\n"
 
 #: include/classes/items/CHelpItems.php:1087
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr "\tСреднее время чтения с виртуального диска , <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
+msgstr "\tСреднее время чтения с виртуального диска, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1043,11 +1043,11 @@ msgstr "В качестве альтернативы, вы можете уста
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Количество физической памяти гостя, которое выгружено в файл подкачки, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Общее количество потребляемой физической памяти хоста на резервное копирование страниц физической памяти гостя,  <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
 #: include/triggers.inc.php:1283
@@ -1503,11 +1503,11 @@ msgstr "Средняя"
 
 #: include/classes/items/CHelpItems.php:1083
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Среднее количество ожидающих запросов чтения к виртуальному диску в течении интервала опроса, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
 #: include/classes/items/CHelpItems.php:1103
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Среднее количество ожидающих запросов записи к виртуальному диску в течении интервала опроса, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 msgid "Axes"
@@ -1667,19 +1667,19 @@ msgstr "Загрузка ЦПУ. Возвращает дробное значе�
 
 #: include/classes/items/CHelpItems.php:983
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Затраченное время CPU на ожидание операций к файлу подкачки, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр CPU"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Использование CPU в процентном отношении в течении интервала, который зависит от управления питанием или HT, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Использование CPU в процентном отношении в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
 #: include/classes/items/CHelpItems.php:991
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Использование CPU в процентном отношении в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:571
@@ -1980,7 +1980,7 @@ msgstr "Не удалось очистить историю"
 
 #: items.php:1352
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr "Не удалось очистить историю: по крайней мере один из выбранных элементов данных не принадлежит к какому либо узлу сети под мониторингом"
+msgstr "Не удалось очистить историю: по крайней мере один из выбранных элементов данных не принадлежит к какому либо узлу сети под наблюдением"
 
 #: include/classes/api/services/CDiscoveryRule.php:2475
 msgid "Cannot clone graph prototypes."
@@ -4811,7 +4811,7 @@ msgstr "По умолчанию"
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
-msgstr "Доступ по умолчанию к новым Веб элементам"
+msgstr "Доступ по умолчанию к новым элементам пользовательского интерфейса"
 
 #: app/views/administration.userrole.edit.php:266
 msgid "Default access to new actions"
@@ -8229,7 +8229,7 @@ msgstr "Соответствие иконок обновлено"
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27 include/html.inc.php:869
 msgid "Icon mapping"
-msgstr "Сответствия иконок"
+msgstr "Соответствия иконок"
 
 #: include/classes/api/services/CIconMap.php:400
 #, c-format
@@ -9817,7 +9817,7 @@ msgstr "Ошибочный метод API \"%1$s\"."
 #: include/classes/api/services/CHostInterface.php:829
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr "Не верный IP адрес \"%1$s\"."
+msgstr "Ошибочный IP адрес \"%1$s\"."
 
 #: include/classes/core/CJsonRpc.php:176
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -10505,7 +10505,7 @@ msgstr "ожидалась JSON строка"
 #: include/classes/core/CJsonRpc.php:150
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "Ошибка при формировании JSON-RPC ошибки. Нет такой ошибки \"%1$s\"."
 
 #: include/items.inc.php:1807
 #: include/views/configuration.host.discovery.edit.php:759
@@ -12177,7 +12177,7 @@ msgstr "Время ожидания сети при выполнении скр�
 
 #: include/classes/items/CHelpItems.php:1067
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
-msgstr ""
+msgstr "Утилизация сети (совокупность скоростей передачи и приёма) в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр сетевого интерфейса"
 
 #: app/views/administration.proxy.list.php:157 include/func.inc.php:191
 msgid "Never"
@@ -12976,7 +12976,7 @@ msgstr "Количество CPU. Возвращает целое число"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
-msgstr ""
+msgstr "Количество доступных путей к хранилищу данных, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <хранилище данных> - имя хранилища данных, <id раздела> - внутренний id физического устройства с vmware.hv.datastore.discovery"
 
 #: include/classes/items/CHelpItems.php:1167
 msgid "Number of enabled items on the host."
@@ -14023,7 +14023,7 @@ msgstr "Пиковое использование памяти: %1$s"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Процент времени, когда виртуальной машине не удалось запуститься по причине конкурирования за доступ к физическим CPU, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:164
 msgid "Percentage"
@@ -14031,11 +14031,11 @@ msgstr "Проценты"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Процент использования физической памяти хоста, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Процент времени, когда виртуальная машина была готова, но не удалось запланировать выполнение на физическом CPU, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр CPU"
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:145
 msgid "Percentile line (left)"
@@ -14218,7 +14218,7 @@ msgstr "Тип Post"
 
 #: include/classes/items/CHelpItems.php:935
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
-msgstr ""
+msgstr "Потребляемая мощность, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <макс> - максимально разрешенная потребляемая мощность"
 
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
@@ -17018,7 +17018,7 @@ msgstr "Время загрузки системы. Возвращает цел�
 #: include/classes/helpers/CDateTimeZoneHelper.php:74
 #: include/classes/helpers/CDateTimeZoneHelper.php:80 include/users.inc.php:81
 msgid "System default"
-msgstr "Системная по умолчанию"
+msgstr "Системное по умолчанию"
 
 #: include/func.inc.php:1657
 msgid "System error occurred. Please contact Zabbix administrator."
@@ -17423,7 +17423,7 @@ msgstr "Группа элементов данных более не обнар�
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Среднее время записи на виртуальный диск, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
 #: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -17753,7 +17753,7 @@ msgstr "Всего затрачено времени на SQL: %1$s"
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Общее время, в секундах, прошедшее с момента последней загрузки операционной системы, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -18264,7 +18264,7 @@ msgstr "Украинский (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:241
 msgid "Unable to change configuration file permissions to 0600."
-msgstr "Не удалось изменить права файла конфигурации на 0600."
+msgstr "Не удалось изменить права доступа к файлу конфигурации на 0600."
 
 #: include/classes/core/CConfigFile.php:251
 msgid "Unable to create the configuration file."
@@ -19383,7 +19383,7 @@ msgstr "Соответствия значений у преобразовани�
 
 #: include/classes/items/CHelpItems.php:439
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Значение темы MQTT.Формат возвращаемых данных зависит от содержимого темы. Если используются шаблоны, значения темы возвращаются в JSON"
+msgstr "Значение темы MQTT. Формат возвращаемых данных зависит от содержимого темы. Если используются шаблоны, значения темы возвращаются в JSON"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:515
@@ -20213,7 +20213,7 @@ msgstr "ожидается относительное время"
 
 #: include/classes/validators/CApiInputValidator.php:2092
 msgid "a string, number or null value is expected"
-msgstr ""
+msgstr "ожидается строка, число или отсутствие значения"
 
 #: include/classes/validators/CNewValidator.php:273
 msgid "a time is expected"
@@ -20319,7 +20319,7 @@ msgstr "ожидается массив или строка символов"
 
 #: include/classes/validators/CApiInputValidator.php:2072
 msgid "an array or object is expected"
-msgstr ""
+msgstr "ожидается массив или объект"
 
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
