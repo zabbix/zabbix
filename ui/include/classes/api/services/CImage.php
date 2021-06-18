@@ -183,8 +183,7 @@ class CImage extends CApiService {
 
 		$this->validateCreate($images);
 
-		$imageids = [];
-		foreach ($images as $image) {
+		foreach ($images as &$image) {
 			// decode BASE64
 			$image['image'] = base64_decode($image['image']);
 
@@ -247,10 +246,13 @@ class CImage extends CApiService {
 				break;
 			}
 
-			$imageids[] = $imageid;
+			$image['imageid'] = $imageid;
 		}
+		unset($image);
 
-		return ['imageids' => $imageids];
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_IMAGE, $images);
+
+		return ['imageids' => array_column($images, 'imageid')];
 	}
 
 	/**
@@ -265,7 +267,13 @@ class CImage extends CApiService {
 
 		$images = zbx_toArray($images);
 
-		$this->validateUpdate($images);
+		$db_images = $this->get([
+			'output' => ['imageid', 'name', 'imagetype'],
+			'imageids' => array_column($images, 'imageid'),
+			'preservekeys' => true
+		]);
+
+		$this->validateUpdate($images, $db_images);
 
 		foreach ($images as $image) {
 			$values = [];
@@ -335,6 +343,8 @@ class CImage extends CApiService {
 			}
 		}
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, $images, $db_images);
+
 		return ['imageids' => zbx_objectValues($images, 'imageid')];
 	}
 
@@ -401,12 +411,19 @@ class CImage extends CApiService {
 			);
 		}
 
+		$db_images = $this->get([
+			'output' => ['name'],
+			'imageids' => $imageids
+		]);
+
 		DB::update('sysmaps_elements', ['values' => ['iconid_off' => 0], 'where' => ['iconid_off' => $imageids]]);
 		DB::update('sysmaps_elements', ['values' => ['iconid_on' => 0], 'where' => ['iconid_on' => $imageids]]);
 		DB::update('sysmaps_elements', ['values' => ['iconid_disabled' => 0], 'where' => ['iconid_disabled' => $imageids]]);
 		DB::update('sysmaps_elements', ['values' => ['iconid_maintenance' => 0], 'where' => ['iconid_maintenance' => $imageids]]);
 
 		DB::delete('images', ['imageid' => $imageids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IMAGE, $db_images);
 
 		return ['imageids' => $imageids];
 	}
@@ -473,7 +490,7 @@ class CImage extends CApiService {
 	 * @throws APIException if wrong fields are passed.
 	 * @throws APIException if image with same name already exists.
 	 */
-	protected function validateUpdate(array $images) {
+	protected function validateUpdate(array $images, array $db_images) {
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -488,32 +505,26 @@ class CImage extends CApiService {
 			}
 		}
 
-		$dbImages = API::getApiService()->select($this->tableName(), [
-			'filter' => ['imageid' => zbx_objectValues($images, 'imageid')],
-			'output' => ['imageid', 'name'],
-			'preservekeys' => true
-		]);
-
 		$changedImageNames = [];
 		foreach ($images as $image) {
-			if (!isset($dbImages[$image['imageid']])) {
+			if (!isset($db_images[$image['imageid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			if (array_key_exists('imagetype', $image)) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot update "imagetype" for image "%1$s".', $dbImages[$image['imageid']]['name'])
+					_s('Cannot update "imagetype" for image "%1$s".', $db_images[$image['imageid']]['name'])
 				);
 			}
 
 			if (isset($image['name']) && !zbx_empty($image['name'])
-					&& $dbImages[$image['imageid']]['name'] !== $image['name']) {
+					&& $db_images[$image['imageid']]['name'] !== $image['name']) {
 				if (isset($changedImageNames[$image['name']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 				}
 				else {
-					$changedImageNames[$image['name']] = $image['name'];
+					$changedImageNames[$image['name']] = true;
 				}
 			}
 		}
@@ -522,7 +533,7 @@ class CImage extends CApiService {
 		if ($changedImageNames) {
 			$dbImages = API::getApiService()->select($this->tableName(), [
 				'output' => ['name'],
-				'filter' => ['name' => $changedImageNames],
+				'filter' => ['name' => array_keys($changedImageNames)],
 				'limit' => 1
 			]);
 

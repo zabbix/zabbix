@@ -99,7 +99,6 @@ if (hasRequest('delete') && $service) {
 	$result = API::Service()->delete([$service['serviceid']]);
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
 		unset($_REQUEST['form']);
 	}
 	unset($service);
@@ -145,19 +144,15 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Service updated');
 		$messageFailed = _('Cannot update service');
-		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$result = API::Service()->create($request);
 
 		$messageSuccess = _('Service created');
 		$messageFailed = _('Cannot add service');
-		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		$serviceid = (isset($service['serviceid'])) ? $service['serviceid'] : reset($result['serviceids']);
-		add_audit($auditAction, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 		unset($_REQUEST['form']);
 	}
 

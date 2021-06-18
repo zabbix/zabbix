@@ -557,13 +557,13 @@ class CMap extends CMapElement {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $sysmapids) {
+	protected function validateDelete(array $sysmapids, ?array &$db_maps) {
 		if (!$sysmapids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$db_maps = $this->get([
-			'output' => ['sysmapid'],
+			'output' => ['sysmapid', 'name'],
 			'sysmapids' => $sysmapids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1662,6 +1662,11 @@ class CMap extends CMapElement {
 
 		$sysmapids = DB::insert('sysmaps', $maps);
 
+		foreach ($maps as $key => &$map) {
+			$map['sysmapid'] = $sysmapids[$key];
+		}
+		unset($map);
+
 		$shared_users = [];
 		$shared_user_groups = [];
 		$urls = [];
@@ -1836,6 +1841,8 @@ class CMap extends CMapElement {
 		if ($shapes) {
 			$this->createShapes($shapes);
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAP, $maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2293,6 +2300,8 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAP, $maps, $db_maps);
+
 		return ['sysmapids' => $sysmapids];
 	}
 
@@ -2304,7 +2313,7 @@ class CMap extends CMapElement {
 	 * @return array
 	 */
 	public function delete(array $sysmapids) {
-		$this->validateDelete($sysmapids);
+		$this->validateDelete($sysmapids, $db_maps);
 
 		DB::delete('sysmaps_elements', [
 			'elementid' => $sysmapids,
@@ -2320,6 +2329,8 @@ class CMap extends CMapElement {
 			'value_id' => $sysmapids
 		]);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}

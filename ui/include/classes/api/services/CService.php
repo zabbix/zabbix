@@ -153,17 +153,17 @@ class CService extends CApiService {
 		$this->validateCreate($services);
 
 		// save the services
-		$serviceIds = DB::insert($this->tableName(), $services);
+		$serviceids = DB::insert($this->tableName(), $services);
 
 		$dependencies = [];
 		$serviceTimes = [];
-		foreach ($services as $key => $service) {
-			$serviceId = $serviceIds[$key];
+		foreach ($services as $key => &$service) {
+			$service['serviceid'] = $serviceids[$key];
 
 			// save dependencies
 			if (!empty($service['dependencies'])) {
 				foreach ($service['dependencies'] as $dependency) {
-					$dependency['serviceid'] = $serviceId;
+					$dependency['serviceid'] = $service['serviceid'];
 					$dependencies[] = $dependency;
 				}
 			}
@@ -172,7 +172,7 @@ class CService extends CApiService {
 			if (!empty($service['parentid'])) {
 				$dependencies[] = [
 					'serviceid' => $service['parentid'],
-					'dependsOnServiceid' => $serviceId,
+					'dependsOnServiceid' => $service['serviceid'],
 					'soft' => 0
 				];
 			}
@@ -180,11 +180,12 @@ class CService extends CApiService {
 			// save service times
 			if (isset($service['times'])) {
 				foreach ($service['times'] as $serviceTime) {
-					$serviceTime['serviceid'] = $serviceId;
+					$serviceTime['serviceid'] = $service['serviceid'];
 					$serviceTimes[] = $serviceTime;
 				}
 			}
 		}
+		unset($service);
 
 		if ($dependencies) {
 			$this->addDependencies($dependencies);
@@ -196,7 +197,9 @@ class CService extends CApiService {
 
 		updateItServices();
 
-		return ['serviceids' => $serviceIds];
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_IT_SERVICE, $services);
+
+		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
 	/**
@@ -206,7 +209,7 @@ class CService extends CApiService {
 	 *
 	 * @param array $services
 	 */
-	public function validateUpdate(array $services) {
+	public function validateUpdate(array $services, array $db_services) {
 		foreach ($services as $service) {
 			if (empty($service['serviceid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
@@ -215,39 +218,38 @@ class CService extends CApiService {
 
 		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
 
-		$services = $this->extendObjects($this->tableName(), $services, ['name']);
-		foreach ($services as $service) {
-			$this->checkName($service);
+		foreach ($db_services as $db_service) {
+			$this->checkName($db_service);
 
-			if (isset($service['algorithm'])) {
-				$this->checkAlgorithm($service);
+			if (isset($db_service['algorithm'])) {
+				$this->checkAlgorithm($db_service);
 			}
-			if (isset($service['showsla'])) {
-				$this->checkShowSla($service);
+			if (isset($db_service['showsla'])) {
+				$this->checkShowSla($db_service);
 			}
-			if (isset($service['goodsla'])) {
-				$this->checkGoodSla($service);
+			if (isset($db_service['goodsla'])) {
+				$this->checkGoodSla($db_service);
 			}
-			if (isset($service['sortorder'])) {
-				$this->checkSortOrder($service);
+			if (isset($db_service['sortorder'])) {
+				$this->checkSortOrder($db_service);
 			}
-			if (isset($service['triggerid'])) {
-				$this->checkTriggerId($service);
+			if (isset($db_service['triggerid'])) {
+				$this->checkTriggerId($db_service);
 			}
-			if (isset($service['status'])) {
-				$this->checkStatus($service);
+			if (isset($db_service['status'])) {
+				$this->checkStatus($db_service);
 			}
-			if (isset($service['parentid'])) {
-				$this->checkParentId($service);
+			if (isset($db_service['parentid'])) {
+				$this->checkParentId($db_service);
 			}
 
-			$error = _s('Wrong fields for service "%1$s".', $service['name']);
-			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
+			$error = _s('Wrong fields for service "%1$s".', $db_service['name']);
+			$this->checkUnsupportedFields($this->tableName(), $db_service, $error, [
 				'parentid', 'dependencies', 'times'
 			]);
 		}
 
-		$this->checkTriggerPermissions($services);
+		$this->checkTriggerPermissions($db_services);
 	}
 
 	/**
@@ -259,7 +261,14 @@ class CService extends CApiService {
 	 */
 	public function update(array $services) {
 		$services = zbx_toArray($services);
-		$this->validateUpdate($services);
+
+		$db_services = $this->get([
+			'output' => ['name', 'triggerid', 'algorithm', 'parentid', 'showsla', 'goodsla', 'sortorder'],
+			'serviceids' => array_column($services, 'serviceid'),
+			'preservekeys' => true
+		]);
+
+		$this->validateUpdate($services, $db_services);
 
 		// save the services
 		foreach ($services as $service) {
@@ -330,6 +339,8 @@ class CService extends CApiService {
 
 		updateItServices();
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IT_SERVICE, $services, $db_services);
+
 		return ['serviceids' => zbx_objectValues($services, 'serviceid')];
 	}
 
@@ -356,14 +367,23 @@ class CService extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $serviceIds) {
-		$this->validateDelete($serviceIds);
+	public function delete(array $serviceids) {
+		$this->validateDelete($serviceids);
 
-		DB::delete($this->tableName(), ['serviceid' => $serviceIds]);
+		$db_services = $this->get([
+			'output' => ['name'],
+			'serviceids' => $serviceids,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		DB::delete($this->tableName(), ['serviceid' => $serviceids]);
 
 		updateItServices();
 
-		return ['serviceids' => $serviceIds];
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, $db_services);
+
+		return ['serviceids' => $serviceids];
 	}
 
 	/**
