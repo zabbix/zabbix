@@ -868,11 +868,13 @@ static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_st
  *                                                                            *
  * Function: its_write_status_and_alarms                                      *
  *                                                                            *
- * Purpose: writes service status changes and generated service alarms into   *
- *          database                                                          *
+ * Purpose: writes service status changes, generated service alarms, service  *
+ *          problem changes into database                                     *
  *                                                                            *
- * Parameters: itservices - [IN] the services data                            *
- *             alarms     - [IN] the service alarms update queue              *
+ * Parameters: alarms               - [IN] the service alarms update queue    *
+ *             service_updates      - [IN] the service status updates         *
+ *             service_problems_new - [IN] the service problems               *
+ *             service_problemids   - [IN] the service problems to delete     *
  *                                                                            *
  * Return value: SUCCEED - the data was written successfully                  *
  *               FAIL    - otherwise                                          *
