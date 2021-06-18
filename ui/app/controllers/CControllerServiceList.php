@@ -22,7 +22,14 @@
 class CControllerServiceList extends CControllerServiceListGeneral {
 
 	protected function doAction(): void {
-		parent::doAction();
+		if ($this->hasInput('serviceid')) {
+			$this->service = $this->getService($this->getInput('serviceid'));
+		}
+
+		$this->path = $this->getPath();
+
+		$this->updateFilter();
+		$this->filter = $this->getFilter();
 
 		$data = [
 			'can_edit' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES),
@@ -46,7 +53,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
-		$db_servicesids = API::Service()->get([
+		$db_serviceids = API::Service()->get([
 			'output' => [],
 			'sortfield' => ['sortorder', 'name'],
 			'sortorder' => ZBX_SORT_UP,
@@ -54,17 +61,15 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'limit' => $limit
 		]);
 
-		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $db_servicesids, ZBX_SORT_UP,
+		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $db_serviceids, ZBX_SORT_UP,
 			$data['view_curl']
 		);
 		$data['page'] =  $this->hasInput('page') ? $this->getInput('page') : null;
 
 		$data['services'] = API::Service()->get([
-			'output' => ['name', 'status', 'goodsla', 'sortorder'],
-			'serviceids' => array_keys($db_servicesids),
-			'selectParent' => ['serviceid', 'name', 'sortorder'],
-			'selectDependencies' => [],
-			'selectTrigger' => ['description'],
+			'output' => ['name', 'status', 'goodsla'],
+			'serviceids' => array_keys($db_serviceids),
+			'selectChildren' => [],
 			'preservekeys' => true
 		]);
 

@@ -91,17 +91,17 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['services'] as $serviceid => $service) {
-	$dependencies_count = count($service['dependencies']);
+	$children_count = count($service['children']);
 
 	$table->addRow(new CRow([
 		new CCheckBox('serviceids['.$serviceid.']', $serviceid),
-		$dependencies_count > 0
+		$children_count > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list.edit')
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($dependencies_count)
+				CViewHelper::showNum($children_count)
 			]
 			: $service['name'],
 		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
@@ -136,7 +136,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(
 					(new CSimpleButton(_('Create service')))
 						->addClass('js-service-create')
-						->setAttribute('data-serviceid', $data['serviceid'])
+						->setAttribute('data-serviceid', $data['service']['serviceid'])
 				)
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
@@ -167,7 +167,7 @@ foreach ($data['services'] as $serviceid => $service) {
 
 (new CScriptTag('
 	initializeView(
-		'.json_encode($data['serviceid']).',
+		'.json_encode($data['service']['serviceid']).',
 		null
 	);
 '))

@@ -55,27 +55,16 @@ abstract class CControllerServiceListGeneral extends CController {
 		return $ret;
 	}
 
-	protected function doAction() {
-		if ($this->hasInput('serviceid')) {
-			$db_service = API::Service()->get([
-				'output' => ['name', 'status', 'goodsla', 'sortorder'],
-				'serviceids' => $this->getInput('serviceid'),
-				'selectParent' => ['serviceid', 'name', 'sortorder'],
-				'selectParentDependencies' => [],
-				'selectDependencies' => [],
-				'selectTrigger' => ['description'],
-				'preservekeys' => true
-			]);
+	protected function getService($serviceid): ?array {
+		$db_service = API::Service()->get([
+			'output' => ['serviceid', 'name', 'status', 'goodsla'],
+			'serviceids' => $serviceid,
+			'selectParents' => ['serviceid', 'name'],
+			'selectChildren' => [],
+			'selectTrigger' => ['description']
+		]);
 
-			if ($db_service) {
-				$this->service = reset($db_service);
-			}
-		}
-
-		$this->path = $this->getPath();
-
-		$this->updateFilter();
-		$this->filter = $this->getFilter();
+		return $db_service ? reset($db_service) : null;
 	}
 
 	protected function updateFilter(): void {
@@ -130,54 +119,55 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	protected function getPath(): array {
+		if ($this->service === null) {
+			return [];
+		}
+
 		$path = [];
+		$db_service = $this->service;
 
-		if ($this->service !== null) {
-			$db_service = $this->service;
+		while (true) {
+			if ($this->hasInput('path')) {
+				$path_serviceids = $this->getInput('path', []);
 
-			while (true) {
-				$path[] = $db_service['serviceid'];
-
-				if ($this->hasInput('path')) {
-					$path_serviceids = $this->getInput('path', []);
-
-					$db_services = API::Service()->get([
-						'output' => [],
-						'serviceids' => $path_serviceids,
-						'preservekeys' => true
-					]);
-
-					foreach (array_reverse($path_serviceids) as $serviceid) {
-						if (array_key_exists($serviceid, $db_services)) {
-							$path[] = $serviceid;
-						}
-					}
-
-					break;
-				}
-
-				if (!$db_service['parentDependencies']) {
-					break;
-				}
-
-				$db_service = API::Service()->get([
+				$db_services = API::Service()->get([
 					'output' => [],
-					'serviceids' => $db_service['parentDependencies'][0],
-					'selectParentDependencies' => []
+					'serviceids' => $path_serviceids,
+					'preservekeys' => true
 				]);
 
-				if (!$db_service) {
-					break;
+				foreach (array_reverse($path_serviceids) as $serviceid) {
+					if (array_key_exists($serviceid, $db_services)) {
+						$path[] = $serviceid;
+					}
 				}
 
-				$db_service = reset($db_service);
+				break;
 			}
+
+			if (!$db_service['parents']) {
+				break;
+			}
+
+			$db_service = API::Service()->get([
+				'output' => ['serviceid'],
+				'serviceids' => $db_service['parents'][0]['serviceid'],
+				'selectParents' => ['serviceid']
+			]);
+
+			if (!$db_service) {
+				break;
+			}
+
+			$db_service = reset($db_service);
+
+			$path[] = $db_service['serviceid'];
 		}
 
 		return array_reverse($path);
 	}
 
-	protected function getBreadcrumbs(array $path): array {
+	protected function getBreadcrumbs(): array {
 		$breadcrumbs = [[
 			'name' => _('All services'),
 			'curl' => (new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
@@ -185,13 +175,13 @@ abstract class CControllerServiceListGeneral extends CController {
 
 		$db_services = API::Service()->get([
 			'output' => ['name'],
-			'serviceids' => $path,
+			'serviceids' => $this->path,
 			'preservekeys' => true
 		]);
 
 		$parent_serviceids = [];
 
-		foreach ($path as $serviceid) {
+		foreach ($this->path as $serviceid) {
 			$breadcrumbs[] = [
 				'name' => $db_services[$serviceid]['name'],
 				'curl' => (new CUrl('zabbix.php'))
@@ -201,6 +191,16 @@ abstract class CControllerServiceListGeneral extends CController {
 			];
 
 			$parent_serviceids[] = $serviceid;
+		}
+
+		if ($this->service !== null) {
+			$breadcrumbs[] = [
+				'name' => $this->service['name'],
+				'curl' => (new CUrl('zabbix.php'))
+					->setArgument('action', $this->getAction())
+					->setArgument('path', $parent_serviceids)
+					->setArgument('serviceid', $this->service['serviceid'])
+			];
 		}
 
 		if ($this->hasInput('filter_set')) {

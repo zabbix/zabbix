@@ -93,17 +93,17 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['services'] as $serviceid => $service) {
-	$dependencies_count = count($service['dependencies']);
+	$children_count = count($service['children']);
 
 	$table->addRow(new CRow([
-		$dependencies_count > 0
+		$children_count > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
 					->setArgument('path', $data['path'])
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($dependencies_count)
+				CViewHelper::showNum($children_count)
 			]
 			: $service['name'],
 		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
