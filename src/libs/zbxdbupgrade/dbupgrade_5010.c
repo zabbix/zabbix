@@ -1314,6 +1314,34 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 					scr_item->screenitemid);
 		}
 
+		if (SCREEN_MAX_COLS <= scr_item->x)
+		{
+			scr_item->x = SCREEN_MAX_COLS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->x, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->x)
+		{
+			scr_item->x = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is negative, set to 0 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_ROWS <= scr_item->y)
+		{
+			scr_item->y = SCREEN_MAX_ROWS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->y, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->y)
+		{
+			scr_item->y = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is negative, set to 0 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
 		DBpatch_trace_screen_item(scr_item);
 
 		if (0 == DBpatch_is_convertible_screen_item(scr_item->resourcetype))

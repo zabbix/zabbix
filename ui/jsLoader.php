@@ -161,10 +161,8 @@ $tranStrings = [
 	],
 	'class.dashboard.widget.placeholder.js' => [
 		'Add a new widget' => _('Add a new widget'),
-		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Release to create a widget.' => _('Release to create a widget.'),
-		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard')
+		'Release to create a widget.' => _('Release to create a widget.')
 	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),

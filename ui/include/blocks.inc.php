@@ -187,6 +187,7 @@ function getSystemStatusData(array $filter) {
 				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 

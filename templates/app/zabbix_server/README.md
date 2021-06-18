@@ -1,5 +1,5 @@
 
-# Zabbix Server
+# Zabbix server health
 
 ## Overview
 

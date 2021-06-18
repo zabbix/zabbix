@@ -160,6 +160,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			// Special processing for calculated item formula.
 			if ($field === 'params_f') {
 				$expression_parser = new CExpressionParser([
+					'usermacros' => true,
 					'lldmacros' => $support_lldmacros,
 					'calculated' => true,
 					'host_macro' => true,
