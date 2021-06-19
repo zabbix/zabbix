@@ -346,7 +346,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
-				'popup.massupdate.triggerprototype', 'popup.service.edit'
+				'popup.massupdate.triggerprototype', 'popup.massupdate.service', 'popup.service.edit'
 			],
 			preprocessing_popup_actions = ['popup.massupdate.item', 'popup.massupdate.itemprototype'],
 			dialogue_class = '';
