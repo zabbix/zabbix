@@ -1661,7 +1661,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0, service_update_num = 0;
+	int			ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
+				service_update_num = 0, exitting = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
 
@@ -1806,6 +1807,15 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (NULL != message)
+			continue;
+
+		if (1 == exitting)
+			break;
+
+		if (!ZBX_IS_RUNNING())
+			exitting = 1;
 	}
 
 	service_manager_free(&service_manager);
