@@ -2649,6 +2649,8 @@ New features:
 ..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18695] fixed file_put_contents() runtime error if web server has no write permissions for zabbix.conf.php (agriscenko)
+A......... [ZBX-19424] fixed trigger handling failing if host name looks like a number (jfreibergs)
 .......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
 .......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
 A......... [ZBX-19447] implemented item type validation by API (miks)
