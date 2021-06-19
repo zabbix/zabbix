@@ -113,15 +113,15 @@ foreach ($data['services'] as $serviceid => $service) {
 		(new CCol([
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)
-				->addClass('js-service-add-child')
+				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
-				->addClass('js-service-edit')
+				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
-				->addClass('js-service-remove')
+				->addClass('js-remove-service')
 				->setAttribute('data-serviceid', $serviceid)
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]));
@@ -135,7 +135,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			(new CList())
 				->addItem(
 					(new CSimpleButton(_('Create service')))
-						->addClass('js-service-create')
+						->addClass('js-create-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])
 				)
 				->addItem(

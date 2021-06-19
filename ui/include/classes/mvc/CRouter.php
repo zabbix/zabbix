@@ -175,6 +175,7 @@ class CRouter {
 		'popup.scriptexec'							=> ['CControllerPopupScriptExec',						'layout.json',			'popup.scriptexec'],
 		'popup.service.create'						=> ['CControllerPopupServiceCreate',					'layout.json',			null],
 		'popup.service.edit'						=> ['CControllerPopupServiceEdit',						'layout.json',			'popup.service.edit'],
+		'popup.service.time.edit'					=> ['CControllerPopupServiceTimeEdit',					'layout.json',			'popup.service.time'],
 		'popup.service.update'						=> ['CControllerPopupServiceUpdate',					'layout.json',			null],
 		'popup.services'							=> ['CControllerPopupServices',							'layout.json',			'popup.services'],
 		'popup.tabfilter.delete'					=> ['CControllerPopupTabFilterDelete',					'layout.json',			null],

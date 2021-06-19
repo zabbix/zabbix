@@ -76,12 +76,12 @@
 		}
 
 		const initActionButtons = () => {
-			for (const element of document.querySelectorAll('.js-service-create, .js-service-add-child')) {
+			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
 				let popup_options = {};
 
-				if (element.dataset.parent_serviceid !== 'undefined') {
+				if (element.dataset.serviceid !== 'undefined') {
 					popup_options = {
-						parent_serviceids: [element.dataset.parent_serviceid]
+						parent_serviceids: [element.dataset.serviceid]
 					};
 				}
 
@@ -90,13 +90,13 @@
 				});
 			}
 
-			for (const element of document.querySelectorAll('.js-service-edit')) {
+			for (const element of document.querySelectorAll('.js-edit-service')) {
 				element.addEventListener('click', (e) => {
 					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, null, e.target);
 				});
 			}
 
-			for (const element of document.querySelectorAll('.js-service-remove')) {
+			for (const element of document.querySelectorAll('.js-remove-service')) {
 				element.addEventListener('click', (e) => {
 					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
 						const url_delete = new Curl('zabbix.php', false);

@@ -30,7 +30,7 @@ class CControllerPopupServiceUpdate extends CController {
 			'triggerid' =>			'db services.triggerid',
 			'sortorder' =>			'required|db services.sortorder|ge 0|le 999',
 			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
-			'goodsla' =>			'db services.goodsla',
+			'goodsla' =>			'string',
 			'times' =>				'array',
 			'tags' =>				'array',
 			'child_serviceids' =>	'array_db services.serviceid',
@@ -66,9 +66,31 @@ class CControllerPopupServiceUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$service = [];
+		$service = [
+			'showsla' => SERVICE_SHOW_SLA_OFF
+		];
 
-		$this->getInputs($service, ['serviceid', 'name', 'algorithm', 'sortorder', 'showsla', 'goodsla']);
+		$this->getInputs($service, ['serviceid', 'name', 'algorithm', 'triggerid', 'sortorder', 'showsla', 'goodsla']);
+
+		$service['parents'] = [];
+		foreach ($this->getInput('parent_serviceids', []) as $parent_serviceid) {
+			$service['parents'][] = ['serviceid' => $parent_serviceid];
+		}
+
+		$service['times'] = $this->getInput('times', []);
+
+		$service['tags'] = [];
+		foreach ($this->getInput('tags', []) as $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				continue;
+			}
+			$service['tags'][] = $tag;
+		}
+
+		$service['children'] = [];
+		foreach ($this->getInput('child_serviceids', []) as $child_serviceid) {
+			$service['children'][] = ['serviceid' => $child_serviceid];
+		}
 
 		$result = API::Service()->update($service);
 

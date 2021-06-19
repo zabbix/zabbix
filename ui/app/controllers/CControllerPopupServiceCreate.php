@@ -29,7 +29,7 @@ class CControllerPopupServiceCreate extends CController {
 			'triggerid' =>			'db services.triggerid',
 			'sortorder' =>			'required|db services.sortorder|ge 0|le 999',
 			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
-			'goodsla' =>			'db services.goodsla',
+			'goodsla' =>			'string',
 			'times' =>				'array',
 			'tags' =>				'array',
 			'child_serviceids' =>	'array_db services.serviceid',
@@ -58,9 +58,30 @@ class CControllerPopupServiceCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$service = [];
+		$service = [
+			'showsla' => SERVICE_SHOW_SLA_OFF
+		];
 
-		$this->getInputs($service, ['name', 'algorithm', 'sortorder', 'showsla', 'goodsla']);
+		$this->getInputs($service, ['name', 'algorithm', 'triggerid', 'sortorder', 'showsla', 'goodsla']);
+
+		foreach ($this->getInput('parent_serviceids', []) as $parent_serviceid) {
+			$service['parents'][] = ['serviceid' => $parent_serviceid];
+		}
+
+		if ($this->hasInput('times')) {
+			$service['times'] = $this->getInput('times');
+		}
+
+		foreach ($this->getInput('tags', []) as $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				continue;
+			}
+			$service['tags'][] = $tag;
+		}
+
+		foreach ($this->getInput('child_serviceids', []) as $child_serviceid) {
+			$service['children'][] = ['serviceid' => $child_serviceid];
+		}
 
 		$result = API::Service()->create($service);
 

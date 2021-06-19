@@ -34,11 +34,10 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 			'triggerid' =>			'db services.triggerid',
 			'sortorder' =>			'db services.sortorder|ge 0|le 999',
 			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
-			'goodsla' =>			'db services.goodsla',
+			'goodsla' =>			'string',
 			'times' =>				'array',
 			'tags' =>				'array',
-			'child_serviceids' =>	'array_db services.serviceid',
-			'form_refresh' =>		'int32'
+			'child_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,12 +62,12 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 			return false;
 		}
 
-		if ($this->hasInput('serviceid') && !$this->hasInput('form_refresh')) {
+		if ($this->hasInput('serviceid')) {
 			$services = API::Service()->get([
 				'output' => ['serviceid', 'name', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder'],
-				//'selectParents' => ['serviceid', 'name'],
-				//'selectChildren' => ['serviceid', 'name', 'triggerid'],
-				//'selectTags' => ['tag', 'value'],
+				'selectParents' => ['serviceid', 'name'],
+				'selectChildren' => ['serviceid', 'name', 'triggerid'],
+				'selectTags' => ['tag', 'value'],
 				'selectTimes' => ['type', 'ts_from', 'ts_to', 'note'],
 				'serviceids' => $this->getInput('serviceid')
 			]);
@@ -78,7 +77,7 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 			}
 
 			$service = reset($services);
-			$service['trigger'] = [];
+			$service['trigger'] = '';
 
 			if ($service['triggerid'] != 0) {
 				$trigger = API::Trigger()->get([
@@ -89,10 +88,7 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 				]);
 				$trigger = reset($trigger);
 				$host = reset($trigger['hosts']);
-				$service['trigger'] = [
-					'triggerid' => $service['triggerid'],
-					'description' => $host['name'].NAME_DELIMITER.$trigger['description']
-				];
+				$service['trigger'] = $host['name'].NAME_DELIMITER.$trigger['description'];
 			}
 
 			$this->service = $service;
@@ -109,54 +105,74 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 			'name' => '',
 			'ms_parent_services' => [],
 			'algorithm' => SERVICE_ALGORITHM_MAX,
-			'ms_trigger' => [],
+			'triggerid' => 0,
+			'trigger' => '',
 			'sortorder' => $db_defaults['sortorder'],
 			'showsla' => $db_defaults['showsla'],
 			'goodsla' => $db_defaults['goodsla'],
 			'times' => [],
-			'tags' => [],
+			'tags' => [['tag' => '', 'value' => '']],
 			'children' => [],
 			'form_refresh' => 0
 		];
 
-		if ($this->hasInput('serviceid') && !$this->hasInput('form_refresh')) {
+		if ($this->hasInput('serviceid')) {
 			$data['serviceid'] = $this->service['serviceid'];
 			$data['name'] = $this->service['name'];
 			$data['algorithm'] = $this->service['algorithm'];
+			$data['triggerid'] = $this->service['triggerid'];
+			$data['trigger'] = $this->service['trigger'];
 			$data['sortorder'] = $this->service['sortorder'];
 			$data['showsla'] = $this->service['showsla'];
 			$data['goodsla'] = $this->service['goodsla'];
 			$data['times'] = $this->service['times'];
-			//$data['tags'] = $this->service['tags'];
-			//$data['children'] = $this->service['children'];
+			$data['tags'] = $this->service['tags'];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
-//			if ($this->service['parents']) {
-//				CArrayHelper::sort($this->service['parents'], ['name']);
-//				$data['ms_parent_services'] = CArrayHelper::renameObjectsKeys($this->service['parents'], [
-//					'serviceid' => 'id'
-//				]);
-//			}
-
-			if ($this->service['trigger']) {
-				$data['ms_trigger'] = CArrayHelper::renameObjectsKeys([$this->service['trigger']], [
-					'triggerid' => 'id',
-					'description' => 'name'
+			if ($this->service['parents']) {
+				$data['ms_parent_services'] = CArrayHelper::renameObjectsKeys($this->service['parents'], [
+					'serviceid' => 'id'
 				]);
+				CArrayHelper::sort($data['ms_parent_services'], ['name']);
+			}
+
+			if ($this->service['children']) {
+				$triggerids = [];
+				foreach ($this->service['children'] as $child) {
+					if ($child['triggerid'] != 0) {
+						$triggerids[$child['triggerid']] = true;
+					}
+				}
+
+				$triggers = $triggerids
+					? API::Trigger()->get([
+						'output' => ['description'],
+						'expandDescription' => true,
+						'triggerids' => array_keys($triggerids),
+						'preservekeys' => true
+					])
+					: [];
+
+				foreach ($this->service['children'] as $child) {
+					$data['children'][] = [
+						'serviceid' => $child['serviceid'],
+						'name' => $child['name'],
+						'triggerid' => $child['triggerid'],
+						'trigger' => ($child['triggerid'] != 0 && array_key_exists($child['triggerid'], $triggers))
+							? $triggers[$child['triggerid']]['description']
+							: ''
+					];
+				}
+
+				CArrayHelper::sort($data['children'], ['name', 'serviceid']);
 			}
 		}
 
-		$this->getInputs($data, ['name', 'algorithm', 'sortorder', 'showsla', 'goodsla', 'form_refresh']);
-
-		if ($data['form_refresh'] != 0) {
-			$data['times'] = $this->getInput('times', []);
-//			$data['tags'] = $this->getInput('tags', []);
-		}
-
-		if ($data['tags']) {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-		}
-		else {
-			$data['tags'][] = ['tag' => '', 'value' => ''];
+		if ($this->hasInput('parent_serviceids')) {
+			$data['ms_parent_services'] = CArrayHelper::renameObjectsKeys(API::Service()->get([
+				'output' => ['serviceid', 'name'],
+				'serviceids' => $this->getInput('parent_serviceids')
+			]), ['serviceid' => 'id']);
 		}
 
 		$data += [

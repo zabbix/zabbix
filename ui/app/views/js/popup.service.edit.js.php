@@ -38,16 +38,66 @@ $('#showsla').on('change', function() {
 $('#algorithm').on('change', function() {
 	const status_disabled = ($(this).val() == <?= SERVICE_ALGORITHM_NONE ?>);
 
-	$('#showsla, #goodsla').prop('disabled', status_disabled);
+	$('#trigger, #trigger-btn, #showsla, #goodsla').prop('disabled', status_disabled);
 
 	if (!status_disabled) {
 		$('#showsla').trigger('change');
-		$('#triggerid').multiSelect('enable');
-	}
-	else {
-		$('#triggerid').multiSelect('disable');
 	}
 }).trigger('change');
+
+var counter = 0;
+var service_time_tmpl = new Template(document.querySelector('#service-time-row-tmpl').innerHTML);
+
+var ServiceTime = class {
+
+	constructor(data, old_row = null) {
+		data.counter = counter++;
+		this.data = data;
+		this.old_row = old_row;
+
+		this.render();
+	}
+
+	render() {
+		this.prepareNewRow();
+
+		if (this.old_row instanceof Element) {
+			return this.old_row.replaceWith(this.new_row);
+		}
+
+		return document
+			.querySelector('#times-table tbody')
+			.append(this.new_row);
+	}
+
+	prepareNewRow() {
+		const row = document.createElement('tr');
+
+		row.innerHTML = service_time_tmpl.evaluate(this.data);
+		row.querySelector('.js-edit-service-time').addEventListener('click', (e) => {
+			const popup_options = {
+				edit: 1,
+				type: row.querySelector('input[name*=type]').value,
+				ts_from: row.querySelector('input[name*=ts_from]').value,
+				ts_to: row.querySelector('input[name*=ts_to]').value,
+				ts_note: row.querySelector('input[name*=note]').value
+			};
+			PopUp('popup.service.time.edit', popup_options, null, e.target);
+		});
+		row.querySelector('.js-remove-service-time').addEventListener('click', () => {
+			row.remove();
+		});
+
+		this.new_row = row;
+	}
+}
+
+document.querySelector('#times-table .js-add-service-time').addEventListener('click', (e) => {
+	PopUp('popup.service.time.edit', {}, null, e.target);
+});
+
+var service_times = <?= json_encode(array_values($data['times'])) ?>;
+service_times.forEach((service_time) => new ServiceTime(service_time));
 
 /**
  * @param {Overlay} overlay
@@ -66,8 +116,6 @@ function submitService(overlay) {
 	})
 		.then(response => response.json())
 		.then(response => {
-
-
 			if ('errors' in response) {
 				overlay.unsetLoading();
 				$(response.errors).insertBefore($form);
