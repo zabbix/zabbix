@@ -73,8 +73,8 @@ class CService extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
-			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
+			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
+			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
 			'selectTrigger' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ts_from', 'ts_to', 'type', 'note']), 'default' => null],
@@ -362,24 +362,42 @@ class CService extends CApiService {
 
 		$serviceids = array_keys($result);
 
-		if ($options['selectParents'] !== null && $options['selectParents'] !== API_OUTPUT_COUNT) {
+		if ($options['selectParents'] !== null) {
 			$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
 			$parents = $this->get([
-				'output' => $options['selectParents'],
+				'output' => ($options['selectParents'] === API_OUTPUT_COUNT) ? [] : $options['selectParents'],
 				'serviceids' => $relation_map->getRelatedIds(),
+				'sortfield' => $options['sortfield'],
+				'sortorder' => $options['sortorder'],
 				'preservekeys' => true
 			]);
 			$result = $relation_map->mapMany($result, $parents, 'parents');
+
+			if ($options['selectParents'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['parents'] = (string) count($row['parents']);
+				}
+				unset($row);
+			}
 		}
 
 		if ($options['selectChildren'] !== null && $options['selectChildren'] !== API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
 			$children = $this->get([
-				'output' => $options['selectChildren'],
+				'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
 				'serviceids' => $relation_map->getRelatedIds(),
+				'sortfield' => $options['sortfield'],
+				'sortorder' => $options['sortorder'],
 				'preservekeys' => true
 			]);
 			$result = $relation_map->mapMany($result, $children, 'children');
+
+			if ($options['selectChildren'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['children'] = (string) count($row['children']);
+				}
+				unset($row);
+			}
 		}
 
 		if ($options['selectTrigger'] !== null && $options['selectTrigger'] !== API_OUTPUT_COUNT) {
