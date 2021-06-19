@@ -1,12 +1,28 @@
 Changes for 5.4.2rc1
 
 New features:
+.........T [ZBXNEXT-6706] changed the group name to {#DATACENTER.NAME}/{#VM.FOLDER} for discovered VM (mchudinov)
+.........T [ZBXNEXT-6723] updated template names (abakaldin)
 .......PS. [ZBXNEXT-6517] added {#VM.FOLDER} macro with chain of vm parent folders to the vmware vm discovery (MVekslers)
 ....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 ...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 
 Bug fixes:
+.........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
+A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
+..F....... [ZBX-18896] fixed semi-transparent loading layer does not cover entire modal window (gcalenko)
+.........T [ZBX-19534] fixed pipeline items in Template Gitlab by HTTP (ychukina)
+..F....... [ZBX-19418] fixed template import from version 5.0 with JavaScript preprocessing in item (jfreibergs)
+.........T [ZBX-19349] fixed parameters of some keys in "PostgreSQL by Zabbix agent 2" (abakaldin)
+.........T [ZBX-19219] added Cisco image usage policy note and fixed directory structure for Cisco templates (afayantsev)
+....I...S. [ZBX-19532] fixed x or y axis exceed limit during screen to dashboard conversion (akozlovs)
+..F....... [ZBX-19508] removed "Delete missing" column header from media type import popup (Ivo)
+..F....... [ZBX-18695] fixed file_put_contents() runtime error if web server has no write permissions for zabbix.conf.php (agriscenko)
+A......... [ZBX-19424] fixed trigger handling failing if host name looks like a number (jfreibergs)
+..F....... [ZBX-18265] changed "Monitoring > Hosts > Latest data" to show Items without data by default (jfreibergs)
+A......... [ZBX-19272] fixed runtime error in settings helper (rlataria)
+A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
 .........T [ZBXNEXT-6700] fixed macros in Template Gitlab by HTTP (ychukina)
 ..F....... [ZBX-19548] fixed PHP runtime errors in the "Problems by severity" vidget (Sasha)
 .......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
