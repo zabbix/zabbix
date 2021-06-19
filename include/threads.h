@@ -26,10 +26,12 @@
 	/* the ZBXEndThread function is implemented in service.c file */
 	void	CALLBACK ZBXEndThread(ULONG_PTR dwParam);
 
-	#define ZBX_THREAD_ERROR	0
+	#define ZBX_THREAD_ERROR		0
 
-	#define ZBX_THREAD_HANDLE	HANDLE
-	#define ZBX_THREAD_HANDLE_NULL	NULL
+	#define ZBX_THREAD_HANDLE		HANDLE
+	#define ZBX_THREAD_HANDLE_NULL		NULL
+
+	#define ZBX_THREAD_PRIORITY_NONE	0
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
 		unsigned (__stdcall *pointer_name)(void *)
@@ -50,10 +52,10 @@
 	int	zbx_fork(void);
 	void	zbx_child_fork(pid_t *pid);
 
-	#define ZBX_THREAD_ERROR	-1
+	#define ZBX_THREAD_ERROR		-1
 
-	#define ZBX_THREAD_HANDLE	pid_t
-	#define ZBX_THREAD_HANDLE_NULL	0
+	#define ZBX_THREAD_HANDLE		pid_t
+	#define ZBX_THREAD_HANDLE_NULL		0
 
 	#define ZBX_THREAD_PRIORITY_NONE	0
 	#define ZBX_THREAD_PRIORITY_FIRST	1

@@ -292,7 +292,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 #else
 	/* wait for threads to finish first. although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-	threads_kill(threads, threads_num, ret);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
 #endif
 
 	for (i = 0; i < threads_num; i++)
