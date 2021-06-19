@@ -275,8 +275,9 @@ class CService extends CApiService {
 
 		$db_services = $this->get([
 			'output' => ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder'],
-			'serviceids' => array_column($services, 'serviceid'),
+			'selectParents' => ['serviceid'],
 			'selectChildren' => ['serviceid'],
+			'serviceids' => array_column($services, 'serviceid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
