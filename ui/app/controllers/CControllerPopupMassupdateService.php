@@ -25,10 +25,11 @@ class CControllerPopupMassupdateService extends CControllerPopupMassupdateAbstra
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids' =>		'required|array_id',
-			'update' =>		'in 1',
-			'visible' =>	'array',
-			'tags' =>		'array'
+			'ids' =>				'required|array_id',
+			'update' =>				'in 1',
+			'visible' =>			'array',
+			'tags' =>				'array',
+			'mass_update_tags' =>	'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE])
 		];
 
 		$ret = $this->validateInput($fields);
