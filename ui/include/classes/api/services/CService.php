@@ -381,7 +381,7 @@ class CService extends CApiService {
 			}
 		}
 
-		if ($options['selectChildren'] !== null && $options['selectChildren'] !== API_OUTPUT_COUNT) {
+		if ($options['selectChildren'] !== null) {
 			$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
 			$children = $this->get([
 				'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
@@ -456,21 +456,10 @@ class CService extends CApiService {
 		foreach ($services as $service) {
 			$has_trigger = array_key_exists('triggerid', $service) && $service['triggerid'] != 0;
 
-			if (!$has_trigger) {
-				continue;
-			}
+			$has_children = (array_key_exists('children', $service) && $service['children'])
+				|| ($db_services !== null && count($db_services[$service['serviceid']]['children']) > 0);
 
-			if (array_key_exists('children', $service)) {
-				$has_children = (bool) $service['children'];
-			}
-			else if ($db_services !== null) {
-				$has_children = (bool) $db_services[$service['serviceid']]['children'];
-			}
-			else {
-				$has_children = false;
-			}
-
-			if ($has_children) {
+			if ($has_trigger && $has_children) {
 				$name = array_key_exists('name', $service)
 					? $service['name']
 					: $db_services[$service['serviceid']]['name'];
