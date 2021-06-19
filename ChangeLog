@@ -12,6 +12,13 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+.........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
+A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
+.........T [ZBX-19349] fixed parameters of some keys in "Template DB PostgreSQL agent 2" (abakaldin)
+.........T [ZBX-19219] added Cisco image usage policy note and fixed directory structure for Cisco templates (afayantsev)
+..F....... [ZBX-18695] fixed file_put_contents() runtime error if web server has no write permissions for zabbix.conf.php (agriscenko)
+A......... [ZBX-19424] fixed trigger handling failing if host name looks like a number (jfreibergs)
+..F....... [ZBX-18265] changed "Monitoring > Hosts > Latest data" to show Items without data by default (jfreibergs)
 .......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
 ..F....... [ZBX-19203] fixed filter values to be unset when switching between pages and resetting filter in latest data history screen (miks)
 .......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
