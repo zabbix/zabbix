@@ -1931,6 +1931,7 @@ class CHost extends CHostGeneral {
 
 				$groupids[$group['groupid']] = true;
 			}
+
 			// Validate tags.
 			if (array_key_exists('tags', $host)) {
 				$this->validateTags($host);

@@ -20,7 +20,7 @@
 
 
 /**
- * Services API implementation.
+ * Class containing methods for operations with services.
  */
 class CService extends CApiService {
 
