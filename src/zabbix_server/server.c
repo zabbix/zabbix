@@ -1346,7 +1346,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
 				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -1403,7 +1403,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:

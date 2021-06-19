@@ -221,7 +221,8 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
  *                                threads to exit immediately on FAIL         *
  *                                                                            *
  ******************************************************************************/
-static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, int ret)
+static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority,
+		int ret)
 {
 	int	i;
 
@@ -231,9 +232,15 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, int ret)
 			continue;
 
 		if (SUCCEED != ret)
+		{
 			zbx_thread_kill_fatal(threads[i]);
-		else
-			zbx_thread_kill(threads[i]);
+			continue;
+		}
+
+		if (priority != threads_flags[i])
+			continue;
+
+		zbx_thread_kill(threads[i]);
 	}
 }
 
@@ -252,27 +259,33 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	int		i;
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
+	int		j;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
 	sigprocmask(SIG_BLOCK, &set, NULL);
 
-	/* signal all threads to go into idle state and wait for flagged threads to exit */
-	threads_kill(threads, threads_num, ret);
+	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
 
-	for (i = 0; i < threads_num; i++)
+	for (j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
 	{
-		if (!threads[i] || ZBX_THREAD_WAIT_EXIT != threads_flags[i])
-			continue;
+		threads_kill(threads, threads_num, threads_flags, j, ret);
 
-		zbx_thread_wait(threads[i]);
+		for (i = 0; i < threads_num; i++)
+		{
+			if (!threads[i] || j != threads_flags[i])
+				continue;
 
-		threads[i] = ZBX_THREAD_HANDLE_NULL;
+			zbx_thread_wait(threads[i]);
+
+			threads[i] = ZBX_THREAD_HANDLE_NULL;
+		}
 	}
 
 	/* signal idle threads to exit */
-	threads_kill(threads, threads_num, FAIL);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
 #else
 	/* wait for threads to finish first. although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
