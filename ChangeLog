@@ -5,7 +5,6 @@ New features:
 .........T [ZBXNEXT-6706] changed the group name to {#DATACENTER.NAME}/{#VM.FOLDER} for discovered VM (mchudinov)
 .........T [ZBXNEXT-6723] updated template names (abakaldin)
 .......PS. [ZBXNEXT-6517] added {#VM.FOLDER} macro with chain of vm parent folders to the vmware vm discovery (MVekslers)
-....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 ...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 ...G...... [ZBXNEXT-284] added timeout parameter to zabbix_sender and zabbix_get (asestakovs)
@@ -18,6 +17,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 .........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
 A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
 ..F....... [ZBX-18896] fixed semi-transparent loading layer does not cover entire modal window (gcalenko)
@@ -95,11 +95,11 @@ New features:
 .........T [ZBXNEXT-6706] changed the group name to {#DATACENTER.NAME}/{#VM.FOLDER} for discovered VM (mchudinov)
 .........T [ZBXNEXT-6723] updated template names (abakaldin)
 .......PS. [ZBXNEXT-6517] added {#VM.FOLDER} macro with chain of vm parent folders to the vmware vm discovery (MVekslers)
-....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 ...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 
 Bug fixes:
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 .........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
 A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
 ..F....... [ZBX-18896] fixed semi-transparent loading layer does not cover entire modal window (gcalenko)
@@ -961,7 +961,6 @@ Changes for 5.0.13rc1
 
 New features:
 .........T [ZBXNEXT-6671] added templates DELL PowerEdge R720 SNMP, R720 by HTTP, R740 SNMP, R740 by HTTP, R820 SNMP, R820 by HTTP, R840 SNMP, R840 by HTTP (mchudinov)
-....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 ...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 .........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
@@ -972,6 +971,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 .........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
 A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
 .........T [ZBX-19349] fixed parameters of some keys in "Template DB PostgreSQL agent 2" (abakaldin)
