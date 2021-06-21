@@ -1,6 +1,7 @@
 Changes for 5.0.13rc1
 
 New features:
+.........T [ZBXNEXT-6671] added templates DELL PowerEdge R720 SNMP, R720 by HTTP, R740 SNMP, R740 by HTTP, R820 SNMP, R820 by HTTP, R840 SNMP, R840 by HTTP (mchudinov)
 ....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 ...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
