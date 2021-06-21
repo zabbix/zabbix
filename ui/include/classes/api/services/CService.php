@@ -401,7 +401,7 @@ class CService extends CApiService {
 			}
 		}
 
-		if ($options['selectTrigger'] !== null && $options['selectTrigger'] !== API_OUTPUT_COUNT) {
+		if ($options['selectTrigger'] !== null) {
 			$relation_map = $this->createRelationMap($result, 'serviceid', 'triggerid');
 			$triggers = API::Trigger()->get([
 				'output' => $options['selectTrigger'],
@@ -411,7 +411,7 @@ class CService extends CApiService {
 			$result = $relation_map->mapOne($result, $triggers, 'trigger');
 		}
 
-		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
+		if ($options['selectTags'] !== null) {
 			$tags = API::getApiService()->select('service_tag', [
 				'output' => $this->outputExtend($options['selectTags'], ['servicetagid', 'serviceid']),
 				'filter' => ['serviceid' => $serviceids],
@@ -422,7 +422,7 @@ class CService extends CApiService {
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
-		if ($options['selectTimes'] !== null && $options['selectTimes'] !== API_OUTPUT_COUNT) {
+		if ($options['selectTimes'] !== null) {
 			$times = API::getApiService()->select('services_times', [
 				'output' => $this->outputExtend($options['selectTimes'], ['timeid', 'serviceid']),
 				'filter' => ['serviceid' => $serviceids],
@@ -433,7 +433,7 @@ class CService extends CApiService {
 			$result = $relation_map->mapMany($result, $times, 'times');
 		}
 
-		if ($options['selectAlarms'] !== null && $options['selectAlarms'] !== API_OUTPUT_COUNT) {
+		if ($options['selectAlarms'] !== null) {
 			$alarms = API::getApiService()->select('service_alarms', [
 				'output' => $this->outputExtend($options['selectAlarms'], ['servicealarmid', 'serviceid']),
 				'filter' => ['serviceid' => $serviceids],
