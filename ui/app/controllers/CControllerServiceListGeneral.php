@@ -23,52 +23,32 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	protected $service;
 
-	protected $path;
-	protected $filter;
+	protected function doAction(): void {
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid', 'name'],
+				'selectChildren' => [],
+				'selectTrigger' => ['description']
+			]);
 
-	protected $validation_fields = [
-		'serviceid' =>			'db services.serviceid',
-		'path' =>				'array',
-		'filter_name' =>		'string',
-		'filter_status' =>		'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
-		'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-		'filter_tags' =>		'array',
-		'filter_set' =>			'in 1',
-		'page' =>				'ge 1',
-	];
+			if (!$db_service) {
+				$this->setResponse(new CControllerResponseData([
+					'error' => _('No permissions to referred object or it does not exist!')
+				]));
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
+				return;
 
-	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
-	}
+			}
 
-	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->validation_fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->service = reset($db_service);
 		}
-
-		return $ret;
-	}
-
-	protected function getService($serviceid): ?array {
-		$db_service = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla'],
-			'serviceids' => $serviceid,
-			'selectParents' => ['serviceid', 'name'],
-			'selectChildren' => [],
-			'selectTrigger' => ['description']
-		]);
-
-		return $db_service ? reset($db_service) : null;
 	}
 
 	protected function updateFilter(): void {
 		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.service.serviceid', $this->getInput('serviceid', ''), PROFILE_TYPE_ID);
 			CProfile::update('web.service.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 
 			CProfile::update('web.service.filter_status', $this->getInput('filter_status', SERVICE_STATUS_ANY), PROFILE_TYPE_INT);
@@ -90,6 +70,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			CProfile::updateArray('web.service.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.service.serviceid');
 			CProfile::delete('web.service.filter_name');
 			CProfile::delete('web.service.filter_status');
 			CProfile::deleteIdx('web.service.filter.evaltype');
@@ -167,7 +148,7 @@ abstract class CControllerServiceListGeneral extends CController {
 		return array_reverse($path);
 	}
 
-	protected function getBreadcrumbs(): array {
+	protected function getBreadcrumbs($path): array {
 		$breadcrumbs = [[
 			'name' => _('All services'),
 			'curl' => (new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
@@ -175,13 +156,13 @@ abstract class CControllerServiceListGeneral extends CController {
 
 		$db_services = API::Service()->get([
 			'output' => ['name'],
-			'serviceids' => $this->path,
+			'serviceids' => $path,
 			'preservekeys' => true
 		]);
 
 		$parent_serviceids = [];
 
-		foreach ($this->path as $serviceid) {
+		foreach ($path as $serviceid) {
 			$breadcrumbs[] = [
 				'name' => $db_services[$serviceid]['name'],
 				'curl' => (new CUrl('zabbix.php'))

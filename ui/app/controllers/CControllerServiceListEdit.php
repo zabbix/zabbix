@@ -21,32 +21,58 @@
 
 class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
+	protected function init(): void {
+		$this->disableSIDValidation();
+	}
+
+	protected function checkInput(): bool {
+		$fields = [
+			'serviceid' => 'db services.serviceid',
+			'path' => 'array',
+			'filter_name' => 'string',
+			'filter_status' => 'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
+			'filter_evaltype' => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' => 'array',
+			'filter_set' => 'in 1',
+			'filter_rst' => 'in 1',
+			'page' => 'ge 1',
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
 			&& $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
 	}
 
 	protected function doAction(): void {
-		if ($this->hasInput('serviceid')) {
-			$this->service = $this->getService($this->getInput('serviceid'));
-		}
+		parent::doAction();
 
-		$this->path = $this->getPath();
+		$path = $this->getPath();
 
 		$this->updateFilter();
-		$this->filter = $this->getFilter();
+		$filter = $this->getFilter();
 
 		$data = [
-			'path' => $this->getPath(),
-			'filter' => $this->filter,
+			'path' => $path,
+			'filter' => $filter,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
-			'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'service.list.edit'),
+			'view_curl' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list.edit')
+				->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null),
 			'refresh_url' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'service.list.edit.refresh')
-				->setArgument('filter_name', $this->filter['name'])
-				->setArgument('filter_status', $this->filter['status'])
-				->setArgument('filter_evaltype', $this->filter['evaltype'])
-				->setArgument('filter_tags', $this->filter['tags'])
+				->setArgument('filter_name', $filter['name'])
+				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_evaltype', $filter['evaltype'])
+				->setArgument('filter_tags', $filter['tags'])
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
@@ -64,9 +90,12 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'limit' => $limit
 		]);
 
-		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $db_serviceids, ZBX_SORT_UP,
+		$page_num = $this->getInput('page', 1);
+		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP,
 			$data['view_curl']
 		);
+		CPagerHelper::savePage('service.list.edit', $page_num);
+		$data['page'] =  $page_num > 1 ? $page_num : null;
 
 		$data['services'] = API::Service()->get([
 			'output' => ['name', 'status', 'goodsla'],
