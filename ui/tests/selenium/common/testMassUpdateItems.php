@@ -137,7 +137,7 @@ class testMassUpdateItems extends CWebTest{
 						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
 					'details' => 'No interface found.'
 				]
@@ -442,7 +442,7 @@ class testMassUpdateItems extends CWebTest{
 									'period' => ''
 								]
 							]
-						],
+						]
 					],
 					'details' => 'Invalid interval "".'
 				]
@@ -599,7 +599,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'URL' => ['id' => 'url', 'value' => ''],
+						'URL' => ['id' => 'url', 'value' => '']
 					],
 					'details' => 'Invalid parameter "/url": cannot be empty.'
 				]
@@ -681,7 +681,7 @@ class testMassUpdateItems extends CWebTest{
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
+						'Type' => ['id' => 'type', 'value' => 'Dependent item']
 					],
 					'details' => 'Incorrect value for field "master_itemid": cannot be empty.'
 				]
@@ -736,7 +736,7 @@ class testMassUpdateItems extends CWebTest{
 						'App for remove 1',
 						'App for remove 2',
 						'App for replace 1',
-						'App for replace 2',
+						'App for replace 2'
 					]
 				]
 			],
@@ -1100,7 +1100,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'expected_applications' => [
 						'App for remove 1',
-						'App for remove 2',
+						'App for remove 2'
 					],
 					'not_expected_applications' => [
 						'Old Application 1',
@@ -1190,7 +1190,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Calculated'],
-						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
 					]
 				]
 			],
@@ -1202,7 +1202,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI'],
+						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI']
 					]
 				]
 			]
