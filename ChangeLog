@@ -1,6 +1,7 @@
 Changes for 5.4.2rc1
 
 New features:
+.........T [ZBXNEXT-6671] added templates DELL PowerEdge R720 SNMP, R720 by HTTP, R740 SNMP, R740 by HTTP, R820 SNMP, R820 by HTTP, R840 SNMP, R840 by HTTP (mchudinov)
 .........T [ZBXNEXT-6706] changed the group name to {#DATACENTER.NAME}/{#VM.FOLDER} for discovered VM (mchudinov)
 .........T [ZBXNEXT-6723] updated template names (abakaldin)
 .......PS. [ZBXNEXT-6517] added {#VM.FOLDER} macro with chain of vm parent folders to the vmware vm discovery (MVekslers)
