@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-18 19:57+0300\n"
+"POT-Creation-Date: 2021-06-21 11:21+0300\n"
 "PO-Revision-Date: 2021-06-17 14:02+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -775,7 +775,7 @@ msgstr "Активно до"
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:128
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:518 include/forms.inc.php:1476
-#: include/forms.inc.php:2037 include/views/configuration.action.edit.php:133
+#: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:304
 #: include/views/configuration.action.edit.php:386
 #: include/views/configuration.action.edit.php:462
@@ -1935,9 +1935,9 @@ msgstr "Не удалось привязать анонимно к LDAP серв
 msgid "Cannot bind to LDAP server."
 msgstr "Не удалось привязать к LDAP серверу."
 
-#: include/forms.inc.php:1858 include/forms.inc.php:1865
-#: include/forms.inc.php:1875 include/forms.inc.php:1909
-#: include/forms.inc.php:1916 include/forms.inc.php:1926
+#: include/forms.inc.php:1861 include/forms.inc.php:1868
+#: include/forms.inc.php:1878 include/forms.inc.php:1912
+#: include/forms.inc.php:1919 include/forms.inc.php:1929
 #, c-format
 msgid "Cannot build expression tree: %1$s."
 msgstr "Не удалось построить дерево выражения: %1$s."
@@ -6547,8 +6547,8 @@ msgstr "Выражение не может быть пустым"
 msgid "Expression constructor"
 msgstr "Конструктор выражения"
 
-#: include/forms.inc.php:1859 include/forms.inc.php:1866
-#: include/forms.inc.php:1876
+#: include/forms.inc.php:1862 include/forms.inc.php:1869
+#: include/forms.inc.php:1879
 msgid "Expression syntax error."
 msgstr "Синтаксическая ошибка в выражении."
 
@@ -14512,8 +14512,8 @@ msgstr "Восстановление"
 msgid "Recovery expression"
 msgstr "Выражение восстановления"
 
-#: include/forms.inc.php:1910 include/forms.inc.php:1917
-#: include/forms.inc.php:1927
+#: include/forms.inc.php:1913 include/forms.inc.php:1920
+#: include/forms.inc.php:1930
 msgid "Recovery expression syntax error."
 msgstr "Синтаксическая ошибка в выражении восстановления."
 
@@ -14667,7 +14667,7 @@ msgstr "Удаленная команда"
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
 #: include/classes/widgets/CWidgetHelper.php:506
 #: include/classes/widgets/CWidgetHelper.php:559 include/forms.inc.php:1456
-#: include/forms.inc.php:2001 include/views/configuration.action.edit.php:97
+#: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:258
 #: include/views/configuration.action.edit.php:286
 #: include/views/configuration.action.edit.php:368
@@ -21333,7 +21333,7 @@ msgstr "заданная учётная запись не уникальна"
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:494
-#: include/classes/widgets/CWidgetHelper.php:538 include/forms.inc.php:1993
+#: include/classes/widgets/CWidgetHelper.php:538 include/forms.inc.php:1996
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -21599,7 +21599,7 @@ msgstr "неподдерживаемый номер версии"
 #: include/classes/widgets/CWidgetHelper.php:554
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:1998
+#: include/forms.inc.php:2001
 #: include/views/configuration.host.discovery.edit.php:186
 #: include/views/configuration.host.discovery.edit.php:324
 #: include/views/configuration.item.edit.php:222

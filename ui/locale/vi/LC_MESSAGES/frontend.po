@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-18 19:57+0300\n"
+"POT-Creation-Date: 2021-06-21 11:21+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -731,7 +731,7 @@ msgstr "Kích hoạt"
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:128
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:518 include/forms.inc.php:1476
-#: include/forms.inc.php:2037 include/views/configuration.action.edit.php:133
+#: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:304
 #: include/views/configuration.action.edit.php:386
 #: include/views/configuration.action.edit.php:462
@@ -1889,9 +1889,9 @@ msgstr "Không thể liên kết ẩn danh với máy chủ LDAP."
 msgid "Cannot bind to LDAP server."
 msgstr "Không thể liên kết với máy chủ LDAP."
 
-#: include/forms.inc.php:1858 include/forms.inc.php:1865
-#: include/forms.inc.php:1875 include/forms.inc.php:1909
-#: include/forms.inc.php:1916 include/forms.inc.php:1926
+#: include/forms.inc.php:1861 include/forms.inc.php:1868
+#: include/forms.inc.php:1878 include/forms.inc.php:1912
+#: include/forms.inc.php:1919 include/forms.inc.php:1929
 #, c-format
 msgid "Cannot build expression tree: %1$s."
 msgstr ""
@@ -6384,8 +6384,8 @@ msgstr "Biểu thức không thể bị rỗng"
 msgid "Expression constructor"
 msgstr "Người xây dựng biểu thức"
 
-#: include/forms.inc.php:1859 include/forms.inc.php:1866
-#: include/forms.inc.php:1876
+#: include/forms.inc.php:1862 include/forms.inc.php:1869
+#: include/forms.inc.php:1879
 msgid "Expression syntax error."
 msgstr "Biểu thức lỗi cú pháp."
 
@@ -14295,8 +14295,8 @@ msgstr "Sự phục hồi"
 msgid "Recovery expression"
 msgstr "Biểu thức phục hồi"
 
-#: include/forms.inc.php:1910 include/forms.inc.php:1917
-#: include/forms.inc.php:1927
+#: include/forms.inc.php:1913 include/forms.inc.php:1920
+#: include/forms.inc.php:1930
 msgid "Recovery expression syntax error."
 msgstr "Phục hồi lỗi cú pháp biểu thức."
 
@@ -14448,7 +14448,7 @@ msgstr "Lệnh từ xa"
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
 #: include/classes/widgets/CWidgetHelper.php:506
 #: include/classes/widgets/CWidgetHelper.php:559 include/forms.inc.php:1456
-#: include/forms.inc.php:2001 include/views/configuration.action.edit.php:97
+#: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:258
 #: include/views/configuration.action.edit.php:286
 #: include/views/configuration.action.edit.php:368
@@ -21075,7 +21075,7 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:494
-#: include/classes/widgets/CWidgetHelper.php:538 include/forms.inc.php:1993
+#: include/classes/widgets/CWidgetHelper.php:538 include/forms.inc.php:1996
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -21341,7 +21341,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/classes/widgets/CWidgetHelper.php:554
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:1998
+#: include/forms.inc.php:2001
 #: include/views/configuration.host.discovery.edit.php:186
 #: include/views/configuration.host.discovery.edit.php:324
 #: include/views/configuration.item.edit.php:222
