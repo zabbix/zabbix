@@ -109,7 +109,7 @@ class CFilter extends CDiv {
 	}
 
 	public function setApplyUrl(CUrl $url): self {
-		$this->form->setAction($url
+		$this->form->setAction((clone $url)
 			->setArgument('filter_set', 1)
 			->getUrl()
 		);
@@ -118,7 +118,7 @@ class CFilter extends CDiv {
 	}
 
 	public function setResetUrl(CUrl $url): self {
-		$this->reset_url = $url
+		$this->reset_url = (clone $url)
 			->setArgument('filter_rst', 1)
 			->getUrl();
 
@@ -222,9 +222,10 @@ class CFilter extends CDiv {
 					(new CSubmitButton(_('Apply'), 'filter_set', 1))
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				)
-				->addItem((new CRedirectButton(_('Reset'), $this->reset_url))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+				->addItem(
+					(new CRedirectButton(_('Reset'), $this->reset_url))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				);
 		}
 
