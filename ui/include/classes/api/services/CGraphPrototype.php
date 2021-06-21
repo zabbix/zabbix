@@ -397,7 +397,7 @@ class CGraphPrototype extends CGraphGeneral {
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'hostids' => $chdHost['hostid'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 
 			if ($chdGraph = reset($chdGraphs)) {
