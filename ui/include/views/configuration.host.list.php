@@ -52,8 +52,8 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 ]);
 
 // filter
-$filter = new CFilter(new CUrl('hosts.php'));
-$filter
+$filter = (new CFilter())
+	->setResetUrl(new CUrl('hosts.php'))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [

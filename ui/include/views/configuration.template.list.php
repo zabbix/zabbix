@@ -35,8 +35,8 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'tags' => $filter_tags
 ]);
 
-$filter = new CFilter(new CUrl('templates.php'));
-$filter
+$filter = (new CFilter())
+	->setResetUrl(new CUrl('templates.php'))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [

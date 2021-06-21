@@ -36,7 +36,8 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
-	? (new CFilter($data['view_curl']))
+	? (new CFilter())
+		->setResetUrl($data['view_curl'])
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

@@ -29,7 +29,8 @@ $this->addJsFile('multiselect.js');
 
 $this->includeJsFile('reports.auditlog.list.js.php');
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])));
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
 
 $select_filter_resourcetype = (new CSelect('filter_resourcetype'))
 	->setId('resourcetype-select')

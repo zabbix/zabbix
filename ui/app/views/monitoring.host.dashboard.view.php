@@ -126,7 +126,7 @@ $widget = (new CWidget())
 
 if ($data['has_time_selector']) {
 	$widget->addItem(
-		(new CFilter(new CUrl()))
+		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],

@@ -32,16 +32,17 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
-	$filter = (new CFilter($data['view_curl']))
+	$filter = (new CFilter())
+		->setResetUrl($data['view_curl'])
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
 
 	$filter
 		->addTab(
-			(new CLink(_('Info'), '#tab_'.$filter->getTabsCount()))->addClass(ZBX_STYLE_BTN_INFO),
+			(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
 			(new CDiv('test'))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->setId('tab_'.$filter->getTabsCount()))
+				->setId('tab_info'))
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)

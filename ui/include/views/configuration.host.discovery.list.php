@@ -52,7 +52,8 @@ if ($data['hostid'] != 0) {
 }
 
 // Add filter tab.
-$filter = (new CFilter((new CUrl('host_discovery.php'))->setArgument('context', $data['context'])))
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('host_discovery.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context']);

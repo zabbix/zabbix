@@ -30,8 +30,8 @@ if ($data['uncheck']) {
 $this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.token.list.js.php');
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'token.list')));
-$filter
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'token.list'))
 	->addVar('action', 'token.list')
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])

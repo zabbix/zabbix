@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$filter = new CFilter((new CUrl('items.php'))->setArgument('context', $data['context']));
+$filter = (new CFilter())->setResetUrl((new CUrl('items.php'))->setArgument('context', $data['context']));
 $filter_column_1 = new CFormList();
 $filter_column_2 = new CFormList();
 $filter_column_3 = new CFormList();

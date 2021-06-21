@@ -115,7 +115,7 @@ $action_list->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 $header['right']->addItem($action_list);
 
 // create filter
-$filter_form = new CFilter(new CUrl());
+$filter_form = new CFilter();
 $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
