@@ -2126,6 +2126,7 @@ Changes for 4.0.32rc2
 New features:
 
 Bug fixes:
+A......... [ZBX-19558] fixed creating of dependent item prototypes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.32rc1
