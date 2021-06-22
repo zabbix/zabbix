@@ -96,8 +96,10 @@ class CControllerPopupValueMapUpdate extends CController {
 				return false;
 			}
 			elseif ($type == VALUEMAP_MAPPING_TYPE_REGEXP
-					&& @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
+					&& ($value === '' || @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false)) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
+					($value === '') ? _('cannot be empty') : _('invalid regular expression')
+				));
 
 				return false;
 			}
