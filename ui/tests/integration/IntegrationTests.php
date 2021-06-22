@@ -34,6 +34,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
+		$suite->addTestSuite('testTriggerLinking');
 
 		return $suite;
 	}
