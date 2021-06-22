@@ -3,6 +3,8 @@ Changes for 5.4.2rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-19425] fixed resolution of host macros when actions are executed on the server (dgoloscapov, vso)
+........S. [ZBX-19585] fixed crash when macro function is used in trigger prototype (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.2rc1
