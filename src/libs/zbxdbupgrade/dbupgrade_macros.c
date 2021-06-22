@@ -22,6 +22,8 @@
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
 
+#define SUBJECT_FIELD_LEN	255
+
 /******************************************************************************
  *                                                                            *
  * Function: str_rename_macro                                                 *
@@ -124,6 +126,10 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 
 				field_esc = DBdyn_escape_string(field);
+
+				if (0 == strcmp(fields[i], "subject"))
+					field_esc[zbx_strlen_utf8_nchars(field_esc, SUBJECT_FIELD_LEN)] = '\0';
+
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i], field_esc);
 				zbx_free(field_esc);
 			}
