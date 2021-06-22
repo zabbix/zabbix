@@ -41,6 +41,14 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	protected $host_name_remove = 'Host for macros remove';
 
+	/**
+	 * The id of the host for removing inherited macros.
+	 *
+	 * @var integer
+	 */
+	protected static $hostid_remove_inherited;
+
+
 	public static function getCreateMacrosHostData() {
 		return [
 			[
@@ -408,12 +416,75 @@ class testFormMacrosHost extends testFormMacros {
 		$this->checkUpdate($data, $this->host_name_update, 'hosts', 'host');
 	}
 
-	public function testFormMacrosHost_Remove() {
-		$this->checkRemove($this->host_name_remove, 'hosts', 'host');
+	public function testFormMacrosHost_RemoveAll() {
+		$this->checkRemoveAll($this->host_name_remove, 'hosts', 'host');
 	}
 
-	public function testFormMacrosHost_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
+	/**
+	 * @dataProvider getCheckInheritedMacrosData
+	 */
+	public function testFormMacrosHost_ChangeInheritedMacro($data) {
+		$this->checkChangeInheritedMacros($data, 'hosts', 'host');
+	}
+
+	public function prepareHostRemoveMacrosData() {
+		$response = CDataHelper::call('host.create', [
+				'host' => 'Host for Inherited macros removing',
+				'groups' => [
+					['groupid' => '4']
+				],
+				'interfaces' => [
+					'type'=> 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '192.168.3.1',
+					'dns' => '',
+					'port' => '10050'
+				],
+				'macros' => [
+					[
+						'macro' => '{$TEST_MACRO123}',
+						'value' => 'test123',
+						'description' => 'description 123'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
+						'value' => 'test1',
+						'description' => 'description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
+						'value' => 'test2',
+						'description' => 'description 2'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
+						'value' => 'test global 1',
+						'description' => 'global description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
+						'value' => 'test global 2',
+						'description' => 'global description 2'
+					],
+					[
+						'macro' => '{$SNMP_COMMUNITY}',
+						'value' => 'redefined value',
+						'description' => 'redefined description'
+					]
+				]
+		]);
+		$this->assertArrayHasKey('hostids', $response);
+		self::$hostid_remove_inherited = $response['hostids'][0];
+	}
+
+	/**
+	 * @dataProvider getRemoveInheritedMacrosData
+	 *
+	 * @onBeforeOnce prepareHostRemoveMacrosData
+	 */
+	public function testFormMacrosHost_RemoveInheritedMacro($data) {
+		$this->checkRemoveInheritedMacros($data, self::$hostid_remove_inherited, 'hosts', 'host');
 	}
 
 	public function getSecretMacrosLayoutData() {

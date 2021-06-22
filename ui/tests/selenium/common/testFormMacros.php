@@ -94,7 +94,7 @@ abstract class testFormMacros extends CWebTest {
 	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
-	protected function checkRemove($name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+	protected function checkRemoveAll($name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 		$this->page->login()->open(
@@ -105,7 +105,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
-		$this->removeMacros();
+		$this->removeAllMacros();
 		$form->submit();
 
 		$message = CMessageElement::find()->one();
@@ -118,20 +118,65 @@ abstract class testFormMacros extends CWebTest {
 		$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, null);
 	}
 
+	public static function getCheckInheritedMacrosData() {
+		return [
+			[
+				[
+					'case' => 'Add new macro',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$NEW_CHECK_MACRO}',
+							'value' => 'new check macro',
+							'description' => 'new check macro description'
+						]
+					]
+				]
+			],
+			[
+				[
+					'case' => 'Redefine global macro on Host',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$SNMP_COMMUNITY}',
+							'value' => 'new redifined value',
+							'description' => 'new redifined description'
+						]
+					]
+				]
+			],
+			[
+				[
+					'case' => 'Redefine global macro in Inherited',
+					'macros' => [
+						[
+							'macro' => '{$DEFAULT_DELAY}',
+							'value' => '100500',
+							'description' => 'new delay description'
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * Test changing and resetting global macro on host, prototype or template.
 	 *
+	 * @param array  $data		    given data provider
 	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
 	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
-	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
+	protected function checkChangeInheritedMacros($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
-
-			$name = 'Host prototype with edited global {#MACRO}';
+			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill([ucfirst($host_type).' name' => $name]);
 			$form->selectTab('Groups');
 			$form->fill(['Groups' => 'Zabbix servers']);
@@ -139,33 +184,147 @@ abstract class testFormMacros extends CWebTest {
 		else {
 			$this->page->login()->open($host_type.'s.php?form=create');
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
-
-			$name = $host_type.' with edited global macro';
+			$name = $host_type.' with edited global macro '.time();
 			$form->fill([
 				ucfirst($host_type).' name' => $name,
 				'Groups' => 'Zabbix servers'
 			]);
 		}
 		$form->selectTab('Macros');
-		// Go to inherited macros.
-		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
-		// Check inherited macros before changes.
-		$this->checkInheritedGlobalMacros();
+		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 
-		$edited_macros = [
-			[
-				'macro' => '{$1}',
-				'value' => 'New updated Numeric macro 1',
-				'description' => 'New updated Test description 2'
-			]
-		];
+		switch ($data['case']) {
+			case 'Add new macro':
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
 
-		$count = count($edited_macros);
-		// Change macro to edited values.
-		for ($i = 0; $i < $count; $i += 1) {
-			$this->query('id:macros_'.$i.'_change')->one()->click();
-			$this->query('id:macros_'.$i.'_value')->one()->fill($edited_macros[$i]['value']);
-			$this->query('id:macros_'.$i.'_description')->one()->fill($edited_macros[$i]['description']);
+				// Get all global macros before changes.
+				$global_macros = $this->getGlobalMacrosFrotendTable();
+
+				// Return to object's macros.
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+				$this->fillMacros($data['macros']);
+
+				// Get all object's macros.
+				$hostmacros = $this->getMacros();
+
+				// By default macro type is Text, which reffers to 0.
+				foreach ($hostmacros as &$macro) {
+					$macro['type'] = 0;
+				}
+				unset($macro);
+
+				// Go to global macros.
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				// Check that host macro is editable.
+				foreach ($data['macros'] as $data_macro) {
+					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']')->waitUntilPresent()->one()->isEnabled()
+					);
+
+					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
+
+					// Get macro index.
+					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3
+					);
+
+					// Fill macro description by new description using found macro index.
+					$this->assertTrue($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
+				}
+
+				// Add newly added macros to global macros array.
+				$expected_global_macros = array_merge($global_macros, $hostmacros);
+
+				// Compare new macros table from global and inherited macros page with expected result.
+				$this->assertEquals($this->sortMacros($expected_global_macros), $this->getGlobalMacrosFrotendTable());
+				break;
+
+			case 'Redefine global macro on Host':
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				// Get all global macros before changes.
+				$global_macros = $this->getGlobalMacrosFrotendTable();
+
+				// Return to object's macros.
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+				$this->fillMacros($data['macros']);
+
+				// Redefine macro values in expected Global macros.
+				foreach ($data['macros'] as $data_macro) {
+					foreach ($global_macros as &$global_macro) {
+						if ($global_macro['macro'] === $data_macro['macro']) {
+							$global_macro['value'] = $data_macro['value'];
+							$global_macro['description'] = $data_macro['description'];
+						}
+					}
+					unset($global_macro);
+				}
+				$expected_global_macros = $global_macros;
+
+				// Compare new macros table from global and inherited macros page with expected result.
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				// Check enabled/disabled fields.
+				foreach ($data['macros'] as $data_macro) {
+					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
+							->waitUntilPresent()->one()->isEnabled()
+					);
+
+					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
+					// Get macro index.
+					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3
+					);
+
+					// Fill macro description by new description using found macro index.
+					$this->assertTrue($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
+					$this->assertTrue($this->query('xpath://textarea[text()='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Remove"]')->exists()
+					);
+				}
+
+				$this->assertEquals($expected_global_macros, $this->getGlobalMacrosFrotendTable());
+				break;
+
+			case 'Redefine global macro in Inherited':
+				// Get all object's macros.
+				$hostmacros = $this->getMacros();
+
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				foreach ($data['macros'] as $data_macro) {
+					// Find necessary row by macro name and click Change button.
+					$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']/../..//button[text()="Change"]')->waitUntilPresent()->one()->click();
+
+					// Fill macro value by new value.
+					$this->getValueField($data_macro['macro'])->fill($data_macro['value']);
+
+					// Get macro index.
+					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3);
+
+					// Fill macro description by new description using found macro index.
+					$this->query('id:macros_'.$macro_index[1].'_description')->one()->fill($data_macro['description']);
+				}
+
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+				$expected_hostmacros = ($hostmacros[0]['macro'] !== '')
+					? array_merge($data['macros'], $hostmacros)
+					: $data['macros'];
+
+				// Compare host macros table with expected result.
+				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros());
+				break;
 		}
 
 		$form->submit();
@@ -180,28 +339,205 @@ abstract class testFormMacros extends CWebTest {
 		);
 
 		$form->selectTab('Macros');
-		$this->assertMacros($edited_macros);
-
-		// Remove edited macro and reset to global.
-		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
-		for ($i = 0; $i < $count; $i += 1) {
-			$this->query('id:macros_'.$i.'_change')->waitUntilVisible()->one()->click();
-		}
-		$form->submit();
-
-		$this->page->open(
-			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
-			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
-
+/*
 		$form->selectTab('Macros');
 		$this->assertMacros();
 
 		// Check inherited macros again after remove.
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
 		$this->checkInheritedGlobalMacros();
+ */
 	}
+
+
+	public static function getRemoveInheritedMacrosData() {
+		return [
+			[
+				[
+					'case' => 'Remove macro from Host',
+					'macros' => [
+						[
+							'macro' => '{$MACRO_FOR_DELETE_HOST1}'
+						],
+						[
+							'macro' => '{$MACRO_FOR_DELETE_HOST2}'
+						]
+					]
+				]
+			],
+			[
+				[
+					'case' => 'Remove macro from Inherited',
+					'macros' => [
+						[
+							'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}'
+						],
+						[
+							'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}'
+						]
+					]
+				]
+			],
+			[
+				[
+					'case' => 'Remove redefined macro in Inherited',
+					'macros' => [
+						[
+							'macro' => '{$SNMP_COMMUNITY}',
+							'value' => 'public',
+							'description' => ''
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test removing and resetting global macro on host, prototype or template.
+	 *
+	 * @param array  $data		    given data provider
+	 * @param array  $id		    host's, prototype's or template's id
+	 * @param string $form_type		string used in form selector
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param boolean $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
+	 */
+	protected function checkRemoveInheritedMacros($data, $id, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+		$this->page->login()->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
+
+		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Macros');
+		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
+
+		switch ($data['case']) {
+			case 'Remove macro from Host':
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				// Get all global macros before changes.
+				$global_macros = $this->getGlobalMacrosFrotendTable();
+
+				// Return to object's macros.
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+				$this->removeMacros($data['macros']);
+
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				foreach ($data['macros'] as $data_macro) {
+					foreach ($global_macros as $i => &$global_macro) {
+						if ($global_macro['macro'] === $data_macro['macro']) {
+							unset($global_macros[$i]);
+						}
+					}
+					unset($global_macro);
+				}
+				$expected_global_macros = $global_macros;
+
+				$this->assertEquals($this->sortMacros($expected_global_macros), $this->getGlobalMacrosFrotendTable());
+				break;
+
+			case 'Remove macro from Inherited':
+				// Get all object's macros.
+				$hostmacros = $this->getMacros();
+
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				$this->removeMacros($data['macros']);
+
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+
+				foreach ($data['macros'] as $data_macro) {
+					foreach ($hostmacros as $i => &$hostmacro) {
+						if ($hostmacro['macro'] === $data_macro['macro']) {
+							unset($hostmacros[$i]);
+						}
+					}
+					unset($hostmacro);
+				}
+				$expected_hostmacros = $hostmacros;
+
+				// Compare host macros table with expected result.
+				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros());
+				break;
+
+			case 'Remove redefined macro in Inherited':
+				// Get all object's macros before changes.
+				$hostmacros = $this->getMacros();
+
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				$this->removeMacros($data['macros']);
+
+				$radio_switcher->fill('Host macros');
+				$this->page->waitUntilReady();
+
+				// Delete reset macros from hostmacros array.
+				foreach ($data['macros'] as $data_macro) {
+					foreach ($hostmacros as $i => &$hostmacro) {
+						if ($hostmacro['macro'] === $data_macro['macro']) {
+							unset($hostmacros[$i]);
+						}
+					}
+					unset($hostmacro);
+				}
+
+				$expected_hostmacros = ($hostmacros === [])
+					? [[ 'macro' => '', 'value' => '', 'description' => '']]
+					: $hostmacros;
+
+				// Check that reset macros were deleted from hostmacros array.
+				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros());
+
+				// Return to Global macros table and check fields and values there.
+				$radio_switcher->fill('Inherited and host macros');
+				$this->page->waitUntilReady();
+
+				// Check enabled/disabled fields and values.
+				foreach ($data['macros'] as $data_macro) {
+					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']/../..//button[text()="Change"]')->exists()
+					);
+
+					// Check macro field disabled.
+					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
+							->waitUntilPresent()->one()->isEnabled()
+					);
+
+					// Check macro value and disabled field.
+					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']/../..//div[contains(@class, "macro-value")]/textarea')->waitUntilPresent()->one()->isEnabled()
+					);
+					$this->assertEquals($data_macro['value'], $this->getValueField($data_macro['macro'])->getValue());
+
+					// Get macro index.
+					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3);
+
+					// Check macro description and disabled field.
+					$this->assertFalse($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
+					$this->assertEquals($data_macro['description'],
+							$this->query('id:macros_'.$macro_index[1].'_description')->one()->getValue()
+					);
+				}
+				break;
+		}
+
+		$form->submit();
+
+		// Check form and DB.
+
+	}
+
 
 	/**
 	 *  Check adding and saving macros in host, host prototype or template form.
@@ -278,23 +614,28 @@ abstract class testFormMacros extends CWebTest {
 	 */
 	public function checkInheritedGlobalMacros($hostmacros = []) {
 		// Create two macros arrays: from DB and from Frontend form.
-		$macros = [
-			// Merge global macros with host defined macros.
-			'database' => array_merge(
-					CDBHelper::getAll('SELECT macro, value, description, type FROM globalmacro'),
-					$hostmacros
-				),
-			'frontend' => []
-		];
+		$macros_db = array_merge(
+			CDBHelper::getAll('SELECT macro, value, description, type FROM globalmacro'),
+			$hostmacros
+		);
 
 		// If the macro is expected to have type "Secret text", replace the value from db with the secret macro pattern.
-		for ($i = 0; $i < count($macros['database']); $i++) {
-			if (intval($macros['database'][$i]['type']) === ZBX_MACRO_TYPE_SECRET) {
-				$macros['database'][$i]['value'] = '******';
+		for ($i = 0; $i < count($macros_db); $i++) {
+			if (intval($macros_db[$i]['type']) === ZBX_MACRO_TYPE_SECRET) {
+				$macros_db[$i]['value'] = '******';
 			}
 		}
 
+		// Compare macros from DB with macros from Frontend.
+		$this->assertEquals($this->sortMacros($macros_db), $this->getGlobalMacrosFrotendTable());
+	}
+
+	/**
+	 *
+	 */
+	public function getGlobalMacrosFrotendTable() {
 		// Write macros rows from Frontend to array.
+		$macros_frontend = [];
 		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
 		$count = $table->getRows()->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
@@ -306,20 +647,10 @@ abstract class testFormMacros extends CWebTest {
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($macro_value->getInputType() === CInputGroupElement::TYPE_SECRET) ?
 					ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
-
-			$macros['frontend'][] = $macro;
+			$macros_frontend[] = $macro;
 		}
 
-		// Sort arrays by Macros.
-		foreach ($macros as &$array) {
-			usort($array, function ($a, $b) {
-				return strcmp($a['macro'], $b['macro']);
-			});
-		}
-		unset($array);
-
-		// Compare macros from DB with macros from Frontend.
-		$this->assertEquals($macros['database'], $macros['frontend']);
+		return $this->sortMacros($macros_frontend);
 	}
 
 	/**
@@ -528,7 +859,7 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 *  Check how secret macro is resolved in item name for host, host prototype and template entities.
 	 *
-	 * @param array		$data		given data provider
+	 * @param array		$macro		given macro
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
@@ -594,5 +925,20 @@ abstract class testFormMacros extends CWebTest {
 		}
 		$this->page->open($url)->waitUntilReady();
 		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+	}
+
+	/**
+	 * Sort all macros array by Macros.
+	 *
+	 * @param array $macros    macros to be sorted
+	 *
+	 * @return array
+	 */
+	private function sortMacros($macros) {
+		usort($macros, function ($a, $b) {
+			return strcmp($a['macro'], $b['macro']);
+		});
+
+		return $macros;
 	}
 }

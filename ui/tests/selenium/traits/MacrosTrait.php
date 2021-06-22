@@ -97,8 +97,20 @@ trait MacrosTrait {
 	 *
 	 * @return $this
 	 */
-	public function removeMacros() {
+	public function removeAllMacros() {
 		return $this->getMacrosTable()->clear();
+	}
+
+	/**
+	 * Remove macro by macro name.
+	 *
+	 * @param array $macros   macros to be removed
+	 */
+	public function removeMacros($macros) {
+		foreach ($macros as $macro) {
+			$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
+				']/../..//button[text()="Remove"]')->waitUntilPresent()->one()->click();
+		}
 	}
 
 	/**
