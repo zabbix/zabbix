@@ -67,6 +67,7 @@ class CWidgetHelper {
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $dialogue_name))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
@@ -135,6 +136,15 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldTextBox $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getProblemBox($field) {
+		return static::getTextBox($field)->setAttribute('data-trim', 1);
+	}
+
+	/**
 	 * @param CWidgetFieldUrl $field
 	 *
 	 * @return CTextBox
@@ -142,6 +152,7 @@ class CWidgetHelper {
 	public static function getUrlBox($field) {
 		return (new CTextBox($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
+			->setAttribute('data-trim', 1)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
@@ -472,6 +483,7 @@ class CWidgetHelper {
 		foreach ($tags as $tag) {
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
@@ -482,6 +494,7 @@ class CWidgetHelper {
 					->setModern(true)
 					->setEnabled($enabled),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))

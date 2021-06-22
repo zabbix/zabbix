@@ -61,7 +61,7 @@ $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $fiel
 $scripts[] = $field_hostids->getPostJS();
 
 // Problem.
-$form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::getTextBox($fields['problem']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::getProblemBox($fields['problem']));
 
 // Severity.
 $form_list->addRow(
@@ -89,6 +89,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['tag_name_format']),
 // Tag display priority.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 	CWidgetHelper::getTextBox($fields['tag_priority'])
+		->setAttribute('data-trim', 1)
 		->setAttribute('placeholder', _('comma-separated list'))
 		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
 );
