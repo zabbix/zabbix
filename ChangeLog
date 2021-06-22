@@ -17,6 +17,8 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+........S. [ZBX-19425] fixed resolution of host macros when actions are executed on the server (dgoloscapov, vso)
+........S. [ZBX-19585] fixed crash when macro function is used in trigger prototype (vso)
 ....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
 .........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
 A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
