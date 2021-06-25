@@ -1337,7 +1337,7 @@ zabbix_export:
       dashboards:
         -
           uuid: 9ddc1ce7e9ea4d7dba8e282366084f3b
-          name: 'Netowrk interfaces'
+          name: 'Network interfaces'
           pages:
             -
               widgets:
