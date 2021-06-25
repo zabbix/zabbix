@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-06-21 11:21+0300\n"
-"PO-Revision-Date: 2021-06-09 06:50+0300\n"
+"PO-Revision-Date: 2021-06-22 11:54+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1623214217.000000\n"
+"X-POOTLE-MTIME: 1624355654.000000\n"
 
 #: include/classes/items/CHelpItems.php:1073
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -912,7 +912,7 @@ msgstr "הוספת וידג׳ט"
 
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Added"
-msgstr ""
+msgstr "נוסף"
 
 #: jsLoader.php:318
 #, c-format
@@ -6383,7 +6383,7 @@ msgstr "הרחבת תקלה יחידה"
 #: app/partials/scheduledreport.table.html.php:92
 #: app/views/reports.scheduledreport.list.php:64
 msgid "Expired"
-msgstr ""
+msgstr "התוקף פג"
 
 #: include/views/configuration.maintenance.list.php:67
 #: include/views/configuration.maintenance.list.php:97
@@ -6394,7 +6394,7 @@ msgstr "פג"
 #: app/partials/scheduledreport.table.html.php:95
 #, c-format
 msgid "Expired on %1$s."
-msgstr ""
+msgstr "התוקף יפוג ב־%1$s."
 
 #: app/views/administration.token.edit.php:82
 #: app/views/administration.token.list.php:133
@@ -8113,7 +8113,7 @@ msgstr "אם המסנן תואם"
 
 #: include/classes/api/services/CReport.php:356
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
-msgstr ""
+msgstr "אם לא צוינו קבוצות משתמשים, יש לכלול לפחות משתמש אחד ברשימת הדיוור."
 
 #: include/func.inc.php:1516 include/func.inc.php:1536
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -10583,7 +10583,7 @@ msgstr "מקרא"
 #: app/controllers/CControllerPopupTriggerExpr.php:615
 #: app/controllers/CControllerPopupTriggerExpr.php:733
 msgid "Length"
-msgstr ""
+msgstr "אורך"
 
 #: setup.php:197
 msgid "Licensed under"
@@ -19761,7 +19761,7 @@ msgstr "abs()‎ - ערך מוחלט"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:288
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "acos()‎ - הקוסינוס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
 #: include/forms.inc.php:157
 msgid "affects only filtered data"
@@ -19893,7 +19893,7 @@ msgstr "ascii()‎ - מחזירה את קוד ה־ASCII של התו השמאלי
 
 #: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "asin()‎ - הסינוס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:71
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -19907,7 +19907,7 @@ msgstr "יש לציין אפשרות שכתוב אחת לפחות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:309
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "atan()‎ - הטנגנס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:316
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
@@ -20275,7 +20275,7 @@ msgstr "גילוי"
 #: include/classes/api/services/CTask.php:452
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
-msgstr ""
+msgstr "כלל הגילוי „%1$s” במארח „%2$s” אינו במעקב"
 
 #: app/views/popup.lldoperation.php:67 include/actions.inc.php:27
 #: include/correlation.inc.php:34
@@ -20601,7 +20601,7 @@ msgstr "פריט"
 #: include/classes/api/services/CTask.php:453
 #, c-format
 msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
-msgstr ""
+msgstr "הפריט „%1$s” במארח „%2$s” אינו במעקב"
 
 #: include/classes/widgets/CWidgetHelper.php:636
 #: include/classes/widgets/CWidgetHelper.php:993
@@ -21164,7 +21164,7 @@ msgstr "sinh()‎ - הסינוס ההיפרבולי של הערך"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:904
 msgid "skewness() - Measures the asymmetry of the probability distribution"
-msgstr ""
+msgstr "skewness()‎ - מודדת את האסימטריה של התפלגות ההסתברות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:911
 msgid "sqrt() - Square root of a value"
