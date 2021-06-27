@@ -110,7 +110,7 @@ There are no template links in this template.
 |Kafka |Kafka: Request queue size |<p>The size of the delay queue.</p> |JMX |jmx["kafka.server:type=Request","queue-size"] |
 |Kafka |Kafka: Version |<p>Current version of brocker.</p> |JMX |jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Kafka |Kafka: Uptime |<p>Service uptime in seconds.</p> |JMX |jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (Math.floor((Date.now()-Number(value))/1000))`</p> |
-|Kafka |Kafka: ZooKeeper client request latency |<p>Latency in millseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
+|Kafka |Kafka: ZooKeeper client request latency |<p>Latency in milliseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
 |Kafka |Kafka: ZooKeeper connection status |<p>Connection status of broker's ZooKeeper session.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Kafka |Kafka: ZooKeeper disconnect rate |<p>ZooKeeper client disconnect per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
