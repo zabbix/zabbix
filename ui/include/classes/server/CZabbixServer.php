@@ -593,6 +593,7 @@ class CZabbixServer {
 				}
 
 				$this->error = $dErrorMsg.$errorMsg;
+				print $this->error;
 			}
 
 			$this->socket = $socket;

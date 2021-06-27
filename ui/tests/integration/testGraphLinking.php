@@ -22,38 +22,41 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * Test suite for trigger linking.
+ * Test suite for graph linking.
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @hosts test_trigger_linking
+ * @hosts test_graph_linking
  * @backup history
  */
-class testTriggerLinking extends CIntegrationTest {
-	const HOST_NAME = 'test_trigger_linking';
+class testGraphLinking extends CIntegrationTest {
+	const HOST_NAME = 'test_graph_linking';
 
 	const TEMPLATE_NAME_PRE = 'strata_template_name';
 
 	const ITEM_NAME_PRE = 'strata_item_name';
 	const ITEM_KEY_PRE = 'strata_item_key';
-	const TAG_NAME_PRE = 'strata_tag';
-	const TAG_VALUE_PRE = 'strata_value';
-	const TRIGGER_DESCRIPTION_PRE = 'strata_trigger_description';
 
-	const TRIGGER_PRIORITY = 4;
-	const TRIGGER_STATUS = 1;
-	const TRIGGER_COMMENTS_PRE = 'strata_comment';
-	const TRIGGER_URL_PRE = 'strata_url';
-	const TRIGGER_TYPE = 1;
-	const TRIGGER_RECOVERY_MODE = 1;
-	const TRIGGER_CORRELATION_MODE = 1;
-	const TRIGGER_CORRELATION_TAG_PRE = 'strata_correlation_tag';
-	const TRIGGER_MANUAL_CLOSE = 1;
-	const TRIGGER_OPDATA_PRE = 'strata_opdata';
-	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
+	const GRAPH_HEIGHT = 33;
+	const GRAPH_WIDTH = 319;
+	const GRAPH_NAME_PRE = 'strata_graph_name';
+	const GRAPH_TYPE = 1;
+	const GRAPH_PERCENT_LEFT = 1;
+	const GRAPH_PERCENT_RIGHT = 100;
+	const GRAPH_SHOW_3D = 1;
+	const GRAPH_SHOW_LEGEND = 1;
+	const GRAPH_SHOW_WORK_PERIOD = 1;
+	const GRAPH_SHOW_TRIGGERS = 1;
+	const GRAPH_YAXISMAX = 417;
+	const GRAPH_YAXISMIN = 18;
 
-	const NUMBER_OF_TEMPLATES = 10;
-	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 10;
+	const GRAPH_YMAX_TYPE = 2;
+	const GRAPH_YMIN_TYPE = 1;
+
+	const GRAPH_ITEM_COLOR = '00AA00';
+
+	const NUMBER_OF_TEMPLATES = 5;
+	const NUMBER_OF_GRAPHS_PER_TEMPLATE = 5;
 
 	private static $templateids = array();
 
@@ -87,8 +90,7 @@ class testTriggerLinking extends CIntegrationTest {
 					'operationtype' => 2
 				]
 			]
-		]
-		);
+		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
@@ -110,8 +112,7 @@ class testTriggerLinking extends CIntegrationTest {
 					$templateids_for_api_call
 				]
 			],
-		]
-		);
+		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
@@ -124,7 +125,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->createTemplates();
 
-		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE; $i++) {
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE; $i++) {
 			$templ_counter = floor($i / self::NUMBER_OF_TEMPLATES);
 			$templateid_loc = self::$templateids[$templ_counter];
 			$response = $this->call('item.create', [
@@ -137,28 +138,29 @@ class testTriggerLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertEquals(1, count($response['result']['itemids']));
+			$itemid = $response['result']['itemids'][0];
 
-			$response = $this->call('trigger.create', [
-				'description' => self::TRIGGER_DESCRIPTION_PRE . "_" . $i,
-				'priority' => self::TRIGGER_PRIORITY,
-				'status' => self::TRIGGER_STATUS,
-				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . $i,
-				'url' => self::TRIGGER_URL_PRE . "_" . $i,
-				'type' => self::TRIGGER_TYPE,
-				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . $i,
-				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . $i,
-				'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . $i,
-				'expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
-				self::ITEM_KEY_PRE . "_" . $i . ')=2',
-				'recovery_expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
-				self::ITEM_KEY_PRE . "_" . $i . ')=3',
-				'tags' => [
+			$response = $this->call('graph.create', [
+				'height' => self::GRAPH_HEIGHT + $i,
+				'width' => self::GRAPH_WIDTH + $i,
+				'name' => self::GRAPH_NAME_PRE . '_' . $i,
+				'graphtype' => self::GRAPH_TYPE,
+				'percent_left' => self::GRAPH_PERCENT_LEFT + $i,
+				'percent_right' => self::GRAPH_PERCENT_RIGHT - $i,
+				'show_3d' => self::GRAPH_SHOW_3D,
+				'show_legend' => self::GRAPH_SHOW_LEGEND,
+				'show_work_period' => self::GRAPH_SHOW_WORK_PERIOD,
+				'show_triggers' => self::GRAPH_SHOW_TRIGGERS,
+				'yaxismax' => self::GRAPH_YAXISMAX + $i,
+				'yaxismin' => self::GRAPH_YAXISMIN + $i,
+				'ymax_itemid' => $itemid,
+				'ymax_type' => self::GRAPH_YMAX_TYPE,
+				'ymin_type' => self::GRAPH_YMIN_TYPE,
+
+				'gitems' => [
 					[
-						'tag' => self::TAG_NAME_PRE . "_" . $i,
-						'value' => self::TAG_VALUE_PRE . "_" . $i
+						'itemid' => $itemid,
+						'color' => self::GRAPH_ITEM_COLOR
 					]
 				]
 			]);
@@ -200,82 +202,95 @@ class testTriggerLinking extends CIntegrationTest {
 		];
 	}
 
-	public function checkTriggersCreate() {
+	public function checkGraphsCreate() {
 
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('host', $response['result'][0]);
 		$hostname = $response['result'][0]['host'];
+		$hostid = $response['result'][0]['hostid'];
 
-		$response = $this->call('trigger.get', [
+		$response = $this->call('item.get', ['hostids' => $hostid]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$item_data = $response['result'];
+
+		$itemids = array();
+		foreach ($item_data as $entry) {
+			array_push($itemids, $entry['itemid']);
+		}
+		sort($itemids);
+
+		$response = $this->call('graph.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME
 			],
 			'output' => [
-				'triggerid',
-				'description',
-				'priority',
-				'status',
-				'templateid',
-				'comments',
-				'url',
-				'type',
-				'flags',
-				'recovery_mode',
-				'correlation_mode',
-				'correlation_tag',
-				'manual_close',
-				'opdata',
-				'discover',
-				'event_name',
-				'functions',
-				'expression',
-				'recovery_expression'
+				'graphid',
+				'height',
+				'width',
+				'name',
+				'graphtype',
+				'percent_left',
+				'percent_right',
+				'show_3d',
+				'show_legend',
+				'show_work_period',
+				'show_triggers',
+				'yaxismax',
+				'yaxismin',
+				'ymax_itemid',
+				'ymax_type',
+				'ymin_type',
+				'selectGraphItems'
 			],
 			'selectFunctions' => 'extend',
-			'sortfield' => 'triggerid'
+			'sortfield' => 'graphid'
 		]
 		);
 
-		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE,
+		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE,
 							count($response['result']));
 
 		$i = 0;
 		foreach ($response['result'] as $entry) {
 
-			$this->assertArrayHasKey('tags', $entry);
-			$this->assertArrayHasKey(0, $entry['tags']);
-			$this->assertArrayHasKey('tag', $entry['tags'][0]);
-			$this->assertEquals(self::TAG_NAME_PRE . "_" . $i, $entry['tags'][0]['tag']);
+			$this->assertEquals($entry['height'], self::GRAPH_HEIGHT + $i);
+			$this->assertEquals($entry['width'], self::GRAPH_WIDTH + $i);
+			$this->assertEquals($entry['name'], self::GRAPH_NAME_PRE . '_' . $i);
+			$this->assertEquals($entry['graphtype'], self::GRAPH_TYPE);
+			$this->assertEquals($entry['percent_left'], self::GRAPH_PERCENT_LEFT + $i);
+			$this->assertEquals($entry['percent_right'], self::GRAPH_PERCENT_RIGHT - $i);
+			$this->assertEquals($entry['show_3d'], self::GRAPH_SHOW_3D);
+			$this->assertEquals($entry['show_legend'], self::GRAPH_SHOW_LEGEND);
+			$this->assertEquals($entry['show_work_period'], self::GRAPH_SHOW_WORK_PERIOD);
+			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS);
+			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i);
+			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i);
+			$this->assertEquals($entry['ymax_itemid'], $itemids[$i]);
+			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE);
+			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE);
 
-			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . $i);
-			$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY);
-			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS);
-			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . $i);
-			$this->assertEquals($entry['url'],         self::TRIGGER_URL_PRE . "_" . $i);
-			$this->assertEquals($entry['type'],        self::TRIGGER_TYPE);
+			$graph_item_response = $this->call('graphitem.get', [
+				'output' => 'extend',
+				'graphids' => $entry['graphid']
+			]);
 
-			$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE);
-			$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE);
-			$this->assertEquals($entry['correlation_tag'],  self::TRIGGER_CORRELATION_TAG_PRE . "_" . $i);
-			$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE);
-			$this->assertEquals($entry['opdata'],           self::TRIGGER_OPDATA_PRE . "_" . $i);
-			$this->assertEquals($entry['event_name'],       self::TRIGGER_EVENT_NAME_PRE . "_" . $i);
-			$this->assertEquals($entry['functions'][0]['parameter'], '$');
-			$this->assertEquals($entry['functions'][0]['function'], 'last');
-			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2");
-			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3");
+			$this->assertArrayHasKey(0, $graph_item_response['result']);
+			$this->assertArrayHasKey('itemid', $graph_item_response['result'][0]);
+			$this->assertEquals($graph_item_response['result'][0]['itemid'], $itemids[$i]);
+			$this->assertEquals($graph_item_response['result'][0]['color'], self::GRAPH_ITEM_COLOR);
+
 			$i++;
 		}
 	}
 
 	/**
-	* Test trigger linking cases.
+	* Test graph linking cases.
 	*
 	* @required-components server
 	*/
-	public function testTriggerLinking_checkMe() {
+	public function testGraphLinking_checkMe() {
 
 		$this->reloadConfigurationCache();
 
@@ -286,6 +301,6 @@ class testTriggerLinking extends CIntegrationTest {
 			'End of DBregister_host_active():SUCCEED'
 		]);
 
-		$this->checkTriggersCreate();
+		$this->checkGraphsCreate();
 	}
 }

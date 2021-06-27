@@ -35,6 +35,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
+		$suite->addTestSuite('testGraphLinking');
 
 		return $suite;
 	}
