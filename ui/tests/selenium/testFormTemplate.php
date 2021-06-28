@@ -257,7 +257,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_FullCloneTemplate() {
 		$cloned_template_name = 'Full cloned template';
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('templates.php?page=2');
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->template_clone);
 		$this->zbxTestClickWait('full_clone');
