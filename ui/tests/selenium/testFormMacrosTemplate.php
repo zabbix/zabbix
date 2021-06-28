@@ -41,6 +41,13 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	protected $template_name_remove = 'Template to test graphs';
 
+	/**
+	 * The id of the template for removing inherited macros.
+	 *
+	 * @var integer
+	 */
+	protected static $templateid_remove_inherited;
+
 	public static function getCreateMacrosTemplateData() {
 		return [
 			[
@@ -408,12 +415,67 @@ class testFormMacrosTemplate extends testFormMacros {
 		$this->checkUpdate($data, $this->template_name_update, 'templates', 'template');
 	}
 
-	public function testFormMacrosTemplate_Remove() {
-		$this->checkRemove($this->template_name_remove, 'templates', 'template');
+	public function testFormMacrosTemplate_RemoveAll() {
+		$this->checkRemoveAll($this->template_name_remove, 'templates', 'template');
 	}
 
-	public function testFormMacrosTemplate_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('templates', 'template');
+	/**
+	 * @dataProvider getCheckInheritedMacrosData
+	 */
+	public function testFormMacrosTemplate_ChangeInheritedMacro($data) {
+		$this->checkChangeInheritedMacros($data, 'templates', 'template');
+	}
+
+	public function prepareTemplateRemoveMacrosData() {
+		$response = CDataHelper::call('template.create', [
+				'host' => 'Template for Inherited macros removing',
+				'groups' => [
+					['groupid' => '4']
+				],
+				'macros' => [
+					[
+						'macro' => '{$TEST_MACRO123}',
+						'value' => 'test123',
+						'description' => 'description 123'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
+						'value' => 'test1',
+						'description' => 'description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
+						'value' => 'test2',
+						'description' => 'description 2'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
+						'value' => 'test global 1',
+						'description' => 'global description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
+						'value' => 'test global 2',
+						'description' => 'global description 2'
+					],
+					[
+						'macro' => '{$SNMP_COMMUNITY}',
+						'value' => 'redefined value',
+						'description' => 'redefined description'
+					]
+				]
+		]);
+		$this->assertArrayHasKey('templateids', $response);
+		self::$templateid_remove_inherited = $response['templateids'][0];
+	}
+
+	/**
+	 * @dataProvider getRemoveInheritedMacrosData
+	 *
+	 * @onBeforeOnce prepareTemplateRemoveMacrosData
+	 */
+	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
+		$this->checkRemoveInheritedMacros($data, self::$templateid_remove_inherited, 'templates', 'template');
 	}
 
 	public function getCreateSecretMacrosData() {
