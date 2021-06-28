@@ -2125,31 +2125,26 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_proxy_update_items                                        *
+ * Function: DCmass_proxy_prepare_itemdiff                                    *
  *                                                                            *
- * Purpose: update items info after new value is received                     *
+ * Purpose: prepare itemdiff after receiving new values                       *
  *                                                                            *
  * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
+ *             item_diff   - vector to store prepared diff                    *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
+static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
 {
 	int			i;
-	zbx_item_diff_t		*diffs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_reserve(item_diff, history_num);
 
-	/* preallocate zbx_item_diff_t structures for item_diff vector */
-	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
-
 	for (i = 0; i < history_num; i++)
 	{
-		zbx_item_diff_t	*diff = &diffs[i];
+		zbx_item_diff_t	*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 
 		diff->itemid = history[i].itemid;
 		diff->state = history[i].state;
@@ -2164,6 +2159,25 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, 
 
 		zbx_vector_ptr_append(item_diff, diff);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCmass_proxy_update_items                                        *
+ *                                                                            *
+ * Purpose: update items info after new value is received                     *
+ *                                                                            *
+ * Parameters: history     - array of history data                            *
+ *             history_num - number of history structures                     *
+ *                                                                            *
+ * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != item_diff->values_num)
 	{
@@ -2181,8 +2195,6 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
 	}
-
-	zbx_free(diffs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2939,6 +2951,8 @@ static void	sync_proxy_history(int *total_num, int *more)
 		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 		proxy_prepare_history(history, history_items.values_num);
 
+		DCmass_proxy_prepare_itemdiff(history, history_num, &item_diff);
+
 		do
 		{
 			DBbegin();
@@ -2948,15 +2962,15 @@ static void	sync_proxy_history(int *total_num, int *more)
 		}
 		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
 
-		if (0 != item_diff.values_num)
-			DCconfig_items_apply_changes(&item_diff);
-
 		LOCK_CACHE;
 
 		hc_push_items(&history_items);	/* return items to history cache */
 
 		if (ZBX_DB_FAIL != txn_rc)
 		{
+			if (0 != item_diff.values_num)
+				DCconfig_items_apply_changes(&item_diff);
+
 			cache->history_num -= history_num;
 
 			if (0 != hc_queue_get_size())
@@ -2975,6 +2989,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 		}
 out:
 		zbx_vector_ptr_clear(&history_items);
+		zbx_vector_ptr_clear(&item_diff);
 		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
