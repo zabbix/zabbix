@@ -609,7 +609,13 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
-		$result = $this->getClient($component)->sendDataValues($type, $values);
+		$client = $this->getClient($component);
+		$result = $client->sendDataValues($type, $values);
+
+		// Check that client component can connect.
+		$this->assertTrue(($result !== false),
+			sprintf('Component "%s" connection failed: %s', $component, $client->getError())
+		);
 
 		// Check that discovery data was sent.
 		$this->assertTrue(array_key_exists('processed', $result), 'Result doesn\'t contain "processed" count.');
