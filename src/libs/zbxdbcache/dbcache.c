@@ -2136,7 +2136,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
  ******************************************************************************/
 static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
 {
-	int			i;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2174,7 +2174,7 @@ static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_n
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
+static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2491,7 +2491,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
+static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int	i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0;
 
@@ -2956,8 +2956,8 @@ static void	sync_proxy_history(int *total_num, int *more)
 		{
 			DBbegin();
 
-			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_items(&item_diff);
+			DBmass_proxy_add_history(history, history_num);
+			DBmass_proxy_update_items(&item_diff);
 		}
 		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
 
