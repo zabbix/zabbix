@@ -2988,7 +2988,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 		}
 
 		zbx_vector_ptr_clear(&history_items);
-		zbx_vector_ptr_clear(&item_diff);
+		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
 		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
