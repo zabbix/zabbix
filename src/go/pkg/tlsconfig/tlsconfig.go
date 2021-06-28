@@ -6,7 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/url"
+
+	"zabbix.com/pkg/uri"
 )
 
 type Details struct {
@@ -41,19 +42,14 @@ func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 		return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify}, nil
 	}
 
-	var host string
-	url, err := url.Parse(details.RawUri)
+	url, err := uri.New(details.RawUri, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	if url.Scheme == "" {
-		host = details.RawUri
-	} else {
-		host = url.Host
-	}
+	fmt.Println(url.Host())
 
-	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: host}, nil
+	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: url.Host()}, nil
 }
 
 func CreateDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (Details, error) {
