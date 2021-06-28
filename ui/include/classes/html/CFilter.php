@@ -21,10 +21,12 @@
 
 class CFilter extends CDiv {
 
+	// Filter form object name and id attribute.
+	private const FORM_NAME = 'zbx_filter';
+
 	// Filter form object.
 	private $form;
-	// Filter form object name and id attribute.
-	private $name = 'zbx_filter';
+
 	// Visibility of 'Apply', 'Reset' form buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
 
@@ -99,13 +101,9 @@ class CFilter extends CDiv {
 
 		$this->form = (new CForm('get'))
 			->cleanItems()
-			->setAttribute('name', $this->name);
+			->setAttribute('name', self::FORM_NAME);
 
 		$this->reset_url = new CUrl();
-	}
-
-	public function getName() {
-		return $this->name;
 	}
 
 	public function setApplyUrl(CUrl $url): self {

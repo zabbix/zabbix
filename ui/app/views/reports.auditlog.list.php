@@ -56,7 +56,7 @@ $filter_form = (new CFormList())
 					'srctbl' => 'users',
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_userids_'
 				]
 			]

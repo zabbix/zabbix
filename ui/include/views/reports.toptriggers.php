@@ -43,7 +43,7 @@ $filter_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $filterForm->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'groupids_',
 					'real_hosts' => true,
 					'enrich_parent_groups' => true
@@ -63,7 +63,7 @@ $filter_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $filterForm->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'hostids_'
 				]
 			]
