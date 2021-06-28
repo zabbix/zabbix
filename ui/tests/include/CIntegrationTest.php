@@ -612,9 +612,9 @@ class CIntegrationTest extends CAPITest {
 		$client = $this->getClient($component);
 		$result = $client->sendDataValues($type, $values);
 
-		// Check that client component can connect.
+		// Check that data was sent succesfuly.
 		$this->assertTrue(($result !== false),
-			sprintf('Component "%s" connection failed: %s', $component, $client->getError())
+			sprintf('Component "%s" failed to send data %s', $component, $client->getError())
 		);
 
 		// Check that discovery data was sent.
