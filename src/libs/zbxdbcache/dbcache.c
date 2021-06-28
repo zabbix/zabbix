@@ -2169,13 +2169,12 @@ static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_n
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
+ * Parameters: item_diff - diff of items to be updated                        *
  *                                                                            *
  * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
+static void	DCmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2958,7 +2957,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 			DBbegin();
 
 			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_items(history, history_num, &item_diff);
+			DCmass_proxy_update_items(&item_diff);
 		}
 		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
 
@@ -2987,7 +2986,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 			*more = ZBX_SYNC_MORE;
 			UNLOCK_CACHE;
 		}
-out:
+
 		zbx_vector_ptr_clear(&history_items);
 		zbx_vector_ptr_clear(&item_diff);
 		zbx_vector_ptr_destroy(&item_diff);
