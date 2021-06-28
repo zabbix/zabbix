@@ -614,7 +614,7 @@ class CIntegrationTest extends CAPITest {
 
 		// Check that data was sent succesfuly.
 		$this->assertTrue(($result !== false),
-			sprintf('Component "%s" failed to send data %s', $component, $client->getError())
+			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
 		);
 
 		// Check that discovery data was sent.
