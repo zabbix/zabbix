@@ -594,141 +594,118 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 	DBfree_result(result);
 }
 
-static int	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy,
+static void	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy,
 		zbx_graph_copy_t *host_graph_copy_found)
 {
-	int	res = FAIL;
-
 	if (0 != strcmp(template_graph_copy->name, host_graph_copy_found->name_orig))
 	{
 		host_graph_copy_found->name = zbx_strdup(NULL, template_graph_copy->name);
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_NAME;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->width != host_graph_copy_found->width_orig)
 	{
 		host_graph_copy_found->width = template_graph_copy->width;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->height != host_graph_copy_found->height_orig)
 	{
 		host_graph_copy_found->height = template_graph_copy->height;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT;
-		res = SUCCEED;
 	}
 
 	if (FAIL == zbx_double_compare(template_graph_copy->yaxismin, host_graph_copy_found->yaxismin_orig))
 	{
 		host_graph_copy_found->yaxismin = template_graph_copy->yaxismin;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN;
-		res = SUCCEED;
 	}
 
 	if (FAIL == zbx_double_compare(template_graph_copy->yaxismax, host_graph_copy_found->yaxismax_orig))
 	{
 		host_graph_copy_found->yaxismax = template_graph_copy->yaxismax;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->show_work_period != host_graph_copy_found->show_work_period_orig)
 	{
 		host_graph_copy_found->show_work_period = template_graph_copy->show_work_period;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->show_triggers != host_graph_copy_found->show_triggers_orig)
 	{
 		host_graph_copy_found->show_triggers = template_graph_copy->show_triggers;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->graphtype != host_graph_copy_found->graphtype_orig)
 	{
 		host_graph_copy_found->graphtype = template_graph_copy->graphtype;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->show_legend != host_graph_copy_found->show_legend_orig)
 	{
 		host_graph_copy_found->show_legend = template_graph_copy->show_legend;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->show_3d != host_graph_copy_found->show_3d_orig)
 	{
 		host_graph_copy_found->show_3d = template_graph_copy->show_3d;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_3D;
-		res = SUCCEED;
 	}
 
 	if (FAIL == zbx_double_compare(template_graph_copy->percent_left, host_graph_copy_found->percent_left_orig))
 	{
 		host_graph_copy_found->percent_left = template_graph_copy->percent_left;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT;
-		res = SUCCEED;
 	}
 
 	if (FAIL == zbx_double_compare(template_graph_copy->percent_right, host_graph_copy_found->percent_right_orig))
 	{
 		host_graph_copy_found->percent_right = template_graph_copy->percent_right;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->ymin_type != host_graph_copy_found->ymin_type_orig)
 	{
 		host_graph_copy_found->ymin_type = template_graph_copy->ymin_type;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->ymax_type != host_graph_copy_found->ymax_type_orig)
 	{
 		host_graph_copy_found->ymax_type = template_graph_copy->ymax_type;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->ymin_itemid != host_graph_copy_found->ymin_itemid_orig)
 	{
 		host_graph_copy_found->ymin_itemid = template_graph_copy->ymin_itemid;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->ymax_itemid != host_graph_copy_found->ymax_itemid_orig)
 	{
 		host_graph_copy_found->ymax_itemid = template_graph_copy->ymax_itemid;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_ITEMID;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->flags != host_graph_copy_found->flags_orig)
 	{
 		host_graph_copy_found->flags = template_graph_copy->flags;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS;
-		res = SUCCEED;
 	}
 
 	if (template_graph_copy->discover != host_graph_copy_found->discover_orig)
 	{
 		host_graph_copy_found->discover = template_graph_copy->discover;
 		host_graph_copy_found->update_flags |= ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER;
-		res = SUCCEED;
 	}
 
-	if (SUCCEED == res)
-		host_graph_copy_found->templateid = template_graph_copy->graphid;
-
-	return res;
+	host_graph_copy_found->templateid = template_graph_copy->graphid;
 }
 
 static int	mark_updates_for_host_graph_items(graphs_items_entry_t *graphs_items_template_entry_found,
@@ -889,14 +866,10 @@ static int	process_template_graph(zbx_uint64_t host_graphid, zbx_hashset_t *host
 
 	if (SUCCEED == found_match)
 	{
-		int	graphs_updated, graphs_items_updated;
+		mark_updates_for_host_graph(template_graph_copy, host_graph_copy_found);
+		mark_updates_for_host_graph_items(graphs_items_template_entry_found, graphs_items_host_entry_found);
 
-		graphs_updated = mark_updates_for_host_graph(template_graph_copy, host_graph_copy_found);
-		graphs_items_updated = mark_updates_for_host_graph_items(graphs_items_template_entry_found,
-				graphs_items_host_entry_found);
-
-		if (SUCCEED == graphs_updated || SUCCEED == graphs_items_updated)
-			(*upd_graphs_or_graphs_items)++;
+		(*upd_graphs_or_graphs_items)++;
 	}
 
 	return found_match;
@@ -1071,143 +1044,136 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	{
 		d = "";
 
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE))
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set ");
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_NAME))
 		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set ");
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_NAME))
-			{
-				char	*name_esc = DBdyn_escape_string(found->name);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
-				zbx_free(name_esc);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%swidth=%d", d, found->width);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, found->height);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL64_SQL, d,
-						found->yaxismin);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL64_SQL, d,
-						found->yaxismax);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_work_period=%d", d,
-						(int)found->show_work_period);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_triggers=%d", d,
-						(int)found->show_triggers);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sgraphtype=%d", d,
-						(int)found->graphtype);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_legend=%d", d,
-						(int)found->show_legend);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_3D))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d,
-						(int)found->show_3d);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"%spercent_left=" ZBX_FS_DBL64_SQL, d, found->percent_left);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"%spercent_right=" ZBX_FS_DBL64_SQL, d, found->percent_right);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_type=%d", d,
-						(int)found->ymin_type);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_type=%d", d,
-						(int)found->ymax_type);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_itemid=%s", d,
-						DBsql_id_ins(found->ymin_itemid));
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_ITEMID))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
-						DBsql_id_ins(found->ymax_itemid));
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sflags=%d", d,
-						(int)found->flags);
-				d = ",";
-			}
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d,
-						(int)found->discover);
-				d = ",";
-			}
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
-					found->templateid);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where graphid=" ZBX_FS_UI64 ";\n",
-					found->graphid);
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			char	*name_esc = DBdyn_escape_string(found->name);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
+			zbx_free(name_esc);
+			d = ",";
 		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_WIDTH))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%swidth=%d", d, found->width);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_HEIGHT))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, found->height);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMIN))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismin=" ZBX_FS_DBL64_SQL, d,
+					found->yaxismin);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YAXISMAX))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%syaxismax=" ZBX_FS_DBL64_SQL, d,
+					found->yaxismax);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_WORK_PERIOD))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_work_period=%d", d,
+					(int)found->show_work_period);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_TRIGGERS))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_triggers=%d", d,
+					(int)found->show_triggers);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_GRAPHTYPE))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sgraphtype=%d", d,
+					(int)found->graphtype);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_LEGEND))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_legend=%d", d,
+					(int)found->show_legend);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_SHOW_3D))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d, (int)found->show_3d);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_LEFT))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_left=" ZBX_FS_DBL64_SQL, d,
+					found->percent_left);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_PERCENT_RIGHT))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spercent_right=" ZBX_FS_DBL64_SQL, d,
+					found->percent_right);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_TYPE))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_type=%d", d,
+					(int)found->ymin_type);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_TYPE))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_type=%d", d, (int)found->ymax_type);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMIN_ITEMID))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_itemid=%s", d,
+					DBsql_id_ins(found->ymin_itemid));
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_YMAX_ITEMID))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
+					DBsql_id_ins(found->ymax_itemid));
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_FLAGS))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sflags=%d", d, (int)found->flags);
+			d = ",";
+		}
+
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_DISCOVER))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, (int)found->discover);
+			d = ",";
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
+				found->templateid);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where graphid=" ZBX_FS_UI64 ";\n",
+				found->graphid);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found->graphid, host_graphs_items);
 	}
