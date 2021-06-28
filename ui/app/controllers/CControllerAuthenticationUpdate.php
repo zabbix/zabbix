@@ -76,7 +76,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->response->setFormData($this->getRealInputAll());
+			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 		}
 
@@ -232,9 +232,11 @@ class CControllerAuthenticationUpdate extends CController {
 
 	/**
 	 * In case of error, convert array back to integer (string) so edit form does not fail.
+	 *
+	 * @return array
 	 */
-	private function getRealInputAll(): array {
-		$input = $this->getInputAll();
+	public function getInputAll() {
+		$input = parent::getInputAll();
 		$rules = $input['passwd_check_rules'];
 		$input['passwd_check_rules'] = 0x00;
 
@@ -258,7 +260,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if (!$auth_valid) {
-			$this->response->setFormData($this->getRealInputAll());
+			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 
 			return;
@@ -267,7 +269,7 @@ class CControllerAuthenticationUpdate extends CController {
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
 			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
-			$this->response->setFormData($this->getRealInputAll());
+			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 
 			return;
@@ -391,7 +393,7 @@ class CControllerAuthenticationUpdate extends CController {
 				CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 			}
 			else {
-				$this->response->setFormData($this->getRealInputAll());
+				$this->response->setFormData($this->getInputAll());
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 		}
