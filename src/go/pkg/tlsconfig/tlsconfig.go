@@ -47,8 +47,6 @@ func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 		return nil, err
 	}
 
-	fmt.Println(url.Host())
-
 	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: url.Host()}, nil
 }
 
