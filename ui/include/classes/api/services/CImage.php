@@ -412,8 +412,9 @@ class CImage extends CApiService {
 		}
 
 		$db_images = $this->get([
-			'output' => ['name'],
-			'imageids' => $imageids
+			'output' => ['imageid', 'name'],
+			'imageids' => $imageids,
+			'preservekeys' => true
 		]);
 
 		DB::update('sysmaps_elements', ['values' => ['iconid_off' => 0], 'where' => ['iconid_off' => $imageids]]);
@@ -485,6 +486,7 @@ class CImage extends CApiService {
 	 * Validate update.
 	 *
 	 * @param array $images
+	 * @param array $db_images
 	 *
 	 * @throws APIException if user has no permissions.
 	 * @throws APIException if wrong fields are passed.

@@ -205,9 +205,10 @@ class CService extends CApiService {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $services
+	 * @param array $db_services
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	public function validateUpdate(array $services, array $db_services) {
 		foreach ($services as $service) {
@@ -216,40 +217,45 @@ class CService extends CApiService {
 			}
 		}
 
-		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
+		$this->checkServicePermissions(array_column($services, 'serviceid'));
 
-		foreach ($db_services as $db_service) {
-			$this->checkName($db_service);
+		foreach ($services as $service) {
+			$this->checkName($service);
 
-			if (isset($db_service['algorithm'])) {
-				$this->checkAlgorithm($db_service);
+			if (array_key_exists('algorithm', $service)) {
+				$this->checkAlgorithm($service);
 			}
-			if (isset($db_service['showsla'])) {
-				$this->checkShowSla($db_service);
+			if (array_key_exists('showsla', $service)) {
+				$this->checkShowSla($service);
 			}
-			if (isset($db_service['goodsla'])) {
-				$this->checkGoodSla($db_service);
+			if (array_key_exists('goodsla', $service)) {
+				$this->checkGoodSla($service);
 			}
-			if (isset($db_service['sortorder'])) {
-				$this->checkSortOrder($db_service);
+			if (array_key_exists('sortorder', $service)) {
+				$this->checkSortOrder($service);
 			}
-			if (isset($db_service['triggerid'])) {
-				$this->checkTriggerId($db_service);
+			if (array_key_exists('triggerid', $service)) {
+				$this->checkTriggerId($service);
 			}
-			if (isset($db_service['status'])) {
-				$this->checkStatus($db_service);
+			if (array_key_exists('status', $service)) {
+				$this->checkStatus($service);
 			}
-			if (isset($db_service['parentid'])) {
-				$this->checkParentId($db_service);
+			if (array_key_exists('parentid', $service)) {
+				$this->checkParentId($service);
 			}
+		}
 
-			$error = _s('Wrong fields for service "%1$s".', $db_service['name']);
-			$this->checkUnsupportedFields($this->tableName(), $db_service, $error, [
+		foreach ($services as &$service) {
+			$service += $db_services[$service['serviceid']];
+
+			$error = _s('Wrong fields for service "%1$s".', $service['name']);
+			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
 				'parentid', 'dependencies', 'times'
 			]);
 		}
+		unset($service);
 
-		$this->checkTriggerPermissions($db_services);
+		$this->checkTriggerPermissions($services);
 	}
 
 	/**
@@ -263,7 +269,7 @@ class CService extends CApiService {
 		$services = zbx_toArray($services);
 
 		$db_services = $this->get([
-			'output' => ['name', 'triggerid', 'algorithm', 'parentid', 'showsla', 'goodsla', 'sortorder'],
+			'output' => ['serviceid', 'name', 'triggerid', 'algorithm', 'parentid', 'showsla', 'goodsla', 'sortorder'],
 			'serviceids' => array_column($services, 'serviceid'),
 			'preservekeys' => true
 		]);
