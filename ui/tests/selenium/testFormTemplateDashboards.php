@@ -1049,6 +1049,8 @@ class testFormTemplateDashboards extends CWebTest {
 	/**
 	 * Function that checks the layout of a template dashboard with widgets from monitoring hosts view.
 	 *
+	 * @ignoreBrowserErrors
+	 *
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
