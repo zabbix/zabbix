@@ -88,8 +88,18 @@ trait MacrosTrait {
 	 *
 	 * @return array
 	 */
-	public function getMacros() {
-		return $this->getMacrosTable()->getValue();
+	public function getMacros($with_type = false) {
+		$values = $this->getMacrosTable()->getValue();
+
+		if ($with_type) {
+			foreach ($values as &$value) {
+				$value['type'] = ($this->getValueField($value['macro'])->getInputType() === CInputGroupElement::TYPE_SECRET)
+						? ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
+			}
+			unset($value);
+		}
+
+		return $values;
 	}
 
 	/**

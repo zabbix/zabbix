@@ -482,7 +482,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'hostPrototype', 'host prototype', self::IS_PROTOTYPE);
+		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'hostPrototype', 'host prototype',
+				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function getCreateSecretMacrosData() {
