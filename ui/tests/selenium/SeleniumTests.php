@@ -134,6 +134,7 @@ require_once dirname(__FILE__).'/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
+require_once dirname(__FILE__).'/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUser.php';
 require_once dirname(__FILE__).'/testFormUserMedia.php';
@@ -293,6 +294,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUser');
