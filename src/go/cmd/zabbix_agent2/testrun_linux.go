@@ -49,6 +49,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.tcp.dns[,zabbix.com]`,
 		`net.tcp.dns.query[,zabbix.com]`,
 		`net.tcp.port[,80]`,
+		`net.tcp.socket.count[,80]`,
 		`system.users.num`,
 		`log[logfile]`,
 		`log.count[logfile]`,

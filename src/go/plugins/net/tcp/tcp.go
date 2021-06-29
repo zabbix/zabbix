@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cakturk/go-netstat/netstat"
 	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
@@ -41,6 +42,8 @@ const (
 	errorInvalidFirstParam  = "Invalid first parameter."
 	errorInvalidSecondParam = "Invalid second parameter."
 	errorInvalidThirdParam  = "Invalid third parameter."
+	errorInvalidFourthParam = "Invalid fourth parameter."
+	errorInvalidFifthParam  = "Invalid fifth parameter."
 	errorTooManyParams      = "Too many parameters."
 	errorUnsupportedMetric  = "Unsupported metric."
 )
@@ -523,6 +526,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		} else if key == "net.tcp.service.perf" {
 			return p.exportNetServicePerf(params), nil
 		}
+	case "net.tcp.socket.count":
+		return p.exportNetTcpSocketCount(params)
 	}
 
 	/* SHOULD_NEVER_HAPPEN */
@@ -541,4 +546,149 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
+}
+
+// exportNetTcpSocketCount - returns number of TCP sockets that match parameters.
+func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error) {
+	if len(params) > 5 {
+		return 0, errors.New(errorTooManyParams)
+	}
+	var laddres net.IP
+	var lNet *net.IPNet
+	if len(params) > 0 && len(params[0]) > 0 {
+		if ip := net.ParseIP(params[0]); ip != nil {
+			laddres = ip
+		} else if _, lNet, err = net.ParseCIDR(params[0]); err != nil {
+			return 0, errors.New(errorInvalidFirstParam)
+		}
+	}
+	lport := 0
+	if len(params) > 1 && len(params[1]) > 0 {
+		if port, err := strconv.ParseUint(params[1], 10, 16); err != nil {
+			if lport, err = net.LookupPort("tcp", params[1]); err != nil {
+				if lport, err = net.LookupPort("tcp6", params[1]); err != nil {
+					return 0, errors.New(errorInvalidSecondParam)
+				}
+			}
+		} else {
+			lport = int(port)
+		}
+	}
+	var raddres net.IP
+	var rNet *net.IPNet
+	if len(params) > 2 && len(params[2]) > 0 {
+		if ip := net.ParseIP(params[2]); ip != nil {
+			raddres = ip
+		} else if _, rNet, err = net.ParseCIDR(params[2]); err != nil {
+			return 0, errors.New(errorInvalidThirdParam)
+		}
+	}
+	rport := 0
+	if len(params) > 3 && len(params[3]) > 0 {
+		if port, err := strconv.ParseUint(params[3], 10, 16); err != nil {
+			if rport, err = net.LookupPort("tcp", params[3]); err != nil {
+				if rport, err = net.LookupPort("tcp6", params[3]); err != nil {
+					return 0, errors.New(errorInvalidFourthParam)
+				}
+			}
+		} else {
+			rport = int(port)
+		}
+	}
+	var state netstat.SkState
+	if len(params) > 4 && len(params[4]) > 0 {
+		switch params[4] {
+		case "established":
+			state = netstat.Established
+		case "syn_sent":
+			state = netstat.SynSent
+		case "syn_recv":
+			state = netstat.SynRecv
+		case "fin_wait1":
+			state = netstat.FinWait1
+		case "fin_wait2":
+			state = netstat.FinWait2
+		case "time_wait":
+			state = netstat.TimeWait
+		case "close":
+			state = netstat.Close
+		case "close_wait":
+			state = netstat.CloseWait
+		case "last_ack":
+			state = netstat.LastAck
+		case "listen":
+			state = netstat.Listen
+		case "closing":
+			state = netstat.Closing
+		default:
+			return 0, errors.New(errorInvalidFourthParam)
+		}
+	}
+
+	return netStatCount(laddres, lNet, lport, raddres, rNet, rport, state)
+}
+
+// netstatCount - returns number of sockets that match parameters.
+func netStatCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP, rNet *net.IPNet, rport int,
+	state netstat.SkState) (result int, err error) {
+
+	tabs, err := netstat.TCPSocks(func(s *netstat.SockTabEntry) bool {
+		if state != 0 && s.State != state {
+			return false
+		}
+		if lport != 0 && s.LocalAddr.Port != uint16(lport) {
+			return false
+		}
+		if laddres != nil && !laddres.IsUnspecified() && !s.LocalAddr.IP.Equal(laddres) {
+			return false
+		}
+		if lNet != nil && !lNet.Contains(s.LocalAddr.IP) {
+			return false
+		}
+		if rport != 0 && s.RemoteAddr.Port != uint16(rport) {
+			return false
+		}
+		if raddres != nil && !raddres.IsUnspecified() && !s.RemoteAddr.IP.Equal(raddres) {
+			return false
+		}
+		if rNet != nil && !rNet.Contains(s.RemoteAddr.IP) {
+			return false
+		}
+
+		return true
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	tabs6, err := netstat.TCP6Socks(func(s *netstat.SockTabEntry) bool {
+		if state != 0 && s.State != state {
+			return false
+		}
+		if lport != 0 && s.LocalAddr.Port != uint16(lport) {
+			return false
+		}
+		if laddres != nil && !laddres.IsUnspecified() && !s.LocalAddr.IP.Equal(laddres) {
+			return false
+		}
+		if lNet != nil && !lNet.Contains(s.LocalAddr.IP) {
+			return false
+		}
+		if rport != 0 && s.RemoteAddr.Port != uint16(rport) {
+			return false
+		}
+		if raddres != nil && !raddres.IsUnspecified() && !s.RemoteAddr.IP.Equal(raddres) {
+			return false
+		}
+		if rNet != nil && !rNet.Contains(s.RemoteAddr.IP) {
+			return false
+		}
+
+		return true
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return len(tabs) + len(tabs6), nil
 }
