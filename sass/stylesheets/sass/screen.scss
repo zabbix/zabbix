@@ -35,6 +35,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/radio-list-control";
+@import "components/service/info";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-select";
@@ -4168,6 +4169,14 @@ a.link-action {
 	high-bg: $alt-dark-orange,
 	disaster-bg: $alt-red,
 ) {
+	// Dynamically generated classes:
+	//  .na-bg
+	//  .normal-bg
+	//  .info-bg
+	//  .average-bg
+	//  .warning-bg
+	//  .high-bg
+	//  .disaster-bg
 	.#{$severity-type} {
 		color: darken($color, 45%);
 		position: relative;

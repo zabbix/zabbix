@@ -28,9 +28,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			$db_service = API::Service()->get([
 				'output' => ['serviceid', 'name', 'status', 'goodsla'],
 				'serviceids' => $this->getInput('serviceid'),
-				'selectParents' => ['serviceid', 'name'],
-				'selectChildren' => [],
-				'selectTrigger' => ['description']
+				'selectParents' => ['serviceid']
 			]);
 
 			if (!$db_service) {
@@ -43,15 +41,23 @@ abstract class CControllerServiceListGeneral extends CController {
 			}
 
 			$this->service = reset($db_service);
+
+			$this->service['parents'] = API::Service()->get([
+				'output' => ['serviceid', 'name'],
+				'serviceids' => array_column($this->service['parents'], 'serviceid'),
+				'selectChildren' => API_OUTPUT_COUNT
+			]);
 		}
 	}
 
 	protected function updateFilter(): void {
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.service.serviceid', $this->getInput('serviceid', ''), PROFILE_TYPE_ID);
-			CProfile::update('web.service.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.service.serviceid', $this->getInput('serviceid', 0), PROFILE_TYPE_ID);
 
-			CProfile::update('web.service.filter_status', $this->getInput('filter_status', SERVICE_STATUS_ANY), PROFILE_TYPE_INT);
+			CProfile::update('web.service.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.service.filter_status', $this->getInput('filter_status', SERVICE_STATUS_ANY),
+				PROFILE_TYPE_INT
+			);
 
 			$evaltype = $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
 			CProfile::update('web.service.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
@@ -69,7 +75,8 @@ abstract class CControllerServiceListGeneral extends CController {
 			CProfile::updateArray('web.service.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.service.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
-		elseif ($this->hasInput('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')
+				|| (CProfile::get('web.service.serviceid', 0) != $this->getInput('serviceid', 0))) {
 			CProfile::delete('web.service.serviceid');
 			CProfile::delete('web.service.filter_name');
 			CProfile::delete('web.service.filter_status');

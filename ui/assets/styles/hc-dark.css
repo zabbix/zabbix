@@ -1965,6 +1965,57 @@ footer {
   .radio-list-control + .icon-info {
     margin-left: 5px; }
 
+.service-info {
+  display: grid;
+  grid-template-columns: min-content auto;
+  row-gap: 10px;
+  column-gap: 10px;
+  margin: -10px 0;
+  padding: 10px 10px;
+  border-left: 4px solid #23d545; }
+  .service-info .service-info-label::after {
+    content: ':'; }
+  .service-info .service-name {
+    grid-column: 1 / -1;
+    margin: 5px 0;
+    font-size: 1.5em; }
+  .service-info .service-status {
+    display: inline-block;
+    padding: 0 4px;
+    border-radius: 3px;
+    background-color: #23d545;
+    color: #000000 !important; }
+  .service-info.service-status-na-bg {
+    border-color: var(--severity-color-na-bg); }
+    .service-info.service-status-na-bg .service-status {
+      background-color: var(--severity-color-na-bg);
+      color: #2a353a; }
+  .service-info.service-status-info-bg {
+    border-color: var(--severity-color-info-bg); }
+    .service-info.service-status-info-bg .service-status {
+      background-color: var(--severity-color-info-bg);
+      color: #00268e; }
+  .service-info.service-status-average-bg {
+    border-color: var(--severity-color-average-bg); }
+    .service-info.service-status-average-bg .service-status {
+      background-color: var(--severity-color-average-bg);
+      color: #733100; }
+  .service-info.service-status-warning-bg {
+    border-color: var(--severity-color-warning-bg); }
+    .service-info.service-status-warning-bg .service-status {
+      background-color: var(--severity-color-warning-bg);
+      color: #734d00; }
+  .service-info.service-status-high-bg {
+    border-color: var(--severity-color-high-bg); }
+    .service-info.service-status-high-bg .service-status {
+      background-color: var(--severity-color-high-bg);
+      color: #52190b; }
+  .service-info.service-status-disaster-bg {
+    border-color: var(--severity-color-disaster-bg); }
+    .service-info.service-status-disaster-bg .service-status {
+      background-color: var(--severity-color-disaster-bg);
+      color: #4b0c0c; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -3482,6 +3533,7 @@ button {
       color: #7d7d7d;
       background-color: transparent;
       border: 0; }
+  .ui-tabs-nav .btn-info,
   .ui-tabs-nav .btn-time,
   .ui-tabs-nav .filter-trigger {
     border-radius: 2px;
@@ -3492,19 +3544,24 @@ button {
     margin: 0 0 0 6px;
     min-height: 24px;
     vertical-align: bottom; }
+    .ui-tabs-nav .btn-info::after,
     .ui-tabs-nav .btn-time::after,
     .ui-tabs-nav .filter-trigger::after {
       content: '';
       position: absolute; }
-    .ui-tabs-nav .btn-time:focus, .ui-tabs-nav .btn-time:hover,
+    .ui-tabs-nav .btn-info:focus, .ui-tabs-nav .btn-info:hover,
+    .ui-tabs-nav .btn-time:focus,
+    .ui-tabs-nav .btn-time:hover,
     .ui-tabs-nav .filter-trigger:focus,
     .ui-tabs-nav .filter-trigger:hover {
       color: #333333;
       background-color: lightgray;
       border-color: lightgray;
       cursor: pointer; }
+  .ui-tabs-nav .btn-info,
   .ui-tabs-nav .btn-time {
     padding: 0 34px 0 10px; }
+    .ui-tabs-nav .btn-info::after,
     .ui-tabs-nav .btn-time::after {
       margin: 0 5px;
       right: 0;
@@ -3512,6 +3569,11 @@ button {
       height: 24px;
       width: 24px;
       background: url("../img/icon-sprite.svg?20200407") no-repeat -87px -583px; }
+  .ui-tabs-nav .btn-info {
+    width: initial;
+    background-image: none; }
+    .ui-tabs-nav .btn-info::after {
+      background: url("../img/icon-sprite.svg?20200407") no-repeat -398px -407px; }
   .ui-tabs-nav .filter-trigger {
     padding: 0 34px 0 10px; }
     .ui-tabs-nav .filter-trigger::after {
@@ -3521,15 +3583,18 @@ button {
       height: 24px;
       width: 24px;
       background: url("../img/icon-sprite.svg?20200407") no-repeat -87px -547px; }
+  .ui-tabs-nav .ui-state-focus .btn-info,
   .ui-tabs-nav .ui-state-focus .btn-time,
   .ui-tabs-nav .ui-state-focus .filter-trigger {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
     color: #333333;
     background-color: lightgray;
     border-color: lightgray; }
+  .ui-tabs-nav .ui-state-focus.ui-tabs-active .btn-info,
   .ui-tabs-nav .ui-state-focus.ui-tabs-active .btn-time,
   .ui-tabs-nav .ui-state-focus.ui-tabs-active .filter-trigger {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35); }
+  .ui-tabs-nav .ui-tabs-active .btn-info,
   .ui-tabs-nav .ui-tabs-active .btn-time,
   .ui-tabs-nav .ui-tabs-active .filter-trigger {
     color: #ffffff;
@@ -3539,11 +3604,15 @@ button {
     border-radius: 2px 2px 0 0;
     margin: -1px 0 0 6px;
     padding: 1px 34px 7px 10px; }
+  .ui-tabs-nav .ui-tabs-active .btn-info::after {
+    background-position: -398px -430px;
+    top: 1px; }
   .ui-tabs-nav .ui-tabs-active .btn-time::after {
     background-position: -246px -583px;
     top: 1px; }
   .ui-tabs-nav .ui-tabs-active .filter-trigger::after {
     background-position: -246px -547px; }
+  .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-info,
   .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-time,
   .ui-tabs-nav .ui-state-hover.ui-tabs-active .filter-trigger {
     background-color: #454545; }

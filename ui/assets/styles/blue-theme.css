@@ -1978,6 +1978,57 @@ footer {
   .radio-list-control + .icon-info {
     margin-left: 5px; }
 
+.service-info {
+  display: grid;
+  grid-template-columns: min-content auto;
+  row-gap: 10px;
+  column-gap: 10px;
+  margin: -10px 0;
+  padding: 10px 10px;
+  border-left: 4px solid #429e47; }
+  .service-info .service-info-label::after {
+    content: ':'; }
+  .service-info .service-name {
+    grid-column: 1 / -1;
+    margin: 5px 0;
+    font-size: 1.5em; }
+  .service-info .service-status {
+    display: inline-block;
+    padding: 0 4px;
+    border-radius: 3px;
+    background-color: #429e47;
+    color: #ffffff; }
+  .service-info.service-status-na-bg {
+    border-color: var(--severity-color-na-bg); }
+    .service-info.service-status-na-bg .service-status {
+      background-color: var(--severity-color-na-bg);
+      color: #2a353a; }
+  .service-info.service-status-info-bg {
+    border-color: var(--severity-color-info-bg); }
+    .service-info.service-status-info-bg .service-status {
+      background-color: var(--severity-color-info-bg);
+      color: #00268e; }
+  .service-info.service-status-average-bg {
+    border-color: var(--severity-color-average-bg); }
+    .service-info.service-status-average-bg .service-status {
+      background-color: var(--severity-color-average-bg);
+      color: #733100; }
+  .service-info.service-status-warning-bg {
+    border-color: var(--severity-color-warning-bg); }
+    .service-info.service-status-warning-bg .service-status {
+      background-color: var(--severity-color-warning-bg);
+      color: #734d00; }
+  .service-info.service-status-high-bg {
+    border-color: var(--severity-color-high-bg); }
+    .service-info.service-status-high-bg .service-status {
+      background-color: var(--severity-color-high-bg);
+      color: #52190b; }
+  .service-info.service-status-disaster-bg {
+    border-color: var(--severity-color-disaster-bg); }
+    .service-info.service-status-disaster-bg .service-status {
+      background-color: var(--severity-color-disaster-bg);
+      color: #4b0c0c; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;

@@ -101,7 +101,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data['services'] = API::Service()->get([
 			'output' => ['name', 'status', 'goodsla'],
 			'serviceids' => array_keys($db_serviceids),
-			'selectChildren' => [],
+			'selectChildren' => API_OUTPUT_COUNT,
 			'preservekeys' => true
 		]);
 

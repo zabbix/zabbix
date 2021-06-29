@@ -38,12 +38,66 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
 
+	if ($data['service'] !== null) {
+		$parents = [];
+		foreach ($data['service']['parents'] as $parent) {
+			array_push($parents,
+				(new CLink($parent['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('path', $data['path'])
+					->setArgument('serviceid', $parent['serviceid'])
+				))->setAttribute('data-serviceid', $parent['serviceid']),
+				CViewHelper::showNum($parent['children']),
+				', '
+			);
+		}
+		array_pop($parents);
+
+		if (in_array($data['service']['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
+			$service_status = _('OK');
+			$service_status_style_class = null;
+		}
+		else {
+			$service_status = getSeverityName($data['service']['status']);
+			$service_status_style_class = 'service-status-'.getSeverityStyle($data['service']['status']);
+		}
+
+		$filter
+			->addTab(
+				(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
+				(new CDiv())
+					->setId('tab_info')
+					->addClass(ZBX_STYLE_FILTER_CONTAINER)
+					->addItem(
+						(new CDiv())
+							->addClass(ZBX_STYLE_SERVICE_INFO)
+							->addClass($service_status_style_class)
+							->addItem([
+								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME)
+							])
+							->addItem([
+								(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('Status')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv((new CDiv($service_status))->addClass(ZBX_STYLE_SERVICE_STATUS)))
+									->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv(sprintf('%.4f', $data['service']['goodsla'])))
+									->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv())->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+					)
+			);
+	}
+
 	$filter
-		->addTab(
-			(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
-			(new CDiv('test'))
-				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->setId('tab_info'))
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
@@ -95,17 +149,15 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['services'] as $serviceid => $service) {
-	$children_count = count($service['children']);
-
 	$table->addRow(new CRow([
-		$children_count > 0
+		$service['children'] > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
 					->setArgument('path', $data['path'])
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($children_count)
+				CViewHelper::showNum($service['children'])
 			]
 			: $service['name'],
 		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
