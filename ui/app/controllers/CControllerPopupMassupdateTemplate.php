@@ -276,7 +276,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 									}
 									elseif ($update_existing) {
 										$hostmacroid = $template_macros_by_macro[$macro['macro']]['hostmacroid'];
-										$template['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
+										$template['macros'][] = ['hostmacroid' => $hostmacroid] + $macro;
 									}
 								}
 								break;
@@ -289,7 +289,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 								foreach ($macros as $macro) {
 									if (array_key_exists($macro['macro'], $template_macros_by_macro)) {
 										$hostmacroid = $template_macros_by_macro[$macro['macro']]['hostmacroid'];
-										$template['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
+										$template['macros'][] = ['hostmacroid' => $hostmacroid] + $macro;
 									}
 									elseif ($add_missing) {
 										$template['macros'][] = $macro;
@@ -306,6 +306,8 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 									$template['macros'] = $except_selected
 										? array_intersect_key($template_macros_by_macro, $macros_by_macro)
 										: array_diff_key($template_macros_by_macro, $macros_by_macro);
+
+									$template['macros'] = array_values($template['macros']);
 								}
 								break;
 
@@ -317,8 +319,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 								$template['macros'] = [];
 								break;
 						}
-
-						$template['macros'] = array_values($template['macros']);
 					}
 
 					unset($template['parentTemplates']);

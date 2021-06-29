@@ -1725,7 +1725,7 @@ class CApiInputValidator {
 	 *
 	 * @return string
 	 */
-	private static function trimMacro(string $macro): string {
+	public static function trimMacro(string $macro): string {
 		$user_macro_parser = new CUserMacroParser();
 
 		$user_macro_parser->parse($macro);
@@ -1749,7 +1749,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param array  $rule['uniq']    (optional) subsets of unique fields ([['hostid', 'name'], [...]])
-	 * @param array  $rule['fields']  (optional)
+	 * @param array  $rule['fields']
 	 * @param array  $data
 	 * @param string $path
 	 * @param string $error
