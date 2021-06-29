@@ -147,7 +147,7 @@ abstract class testFormMacros extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'macro' => '{$SNMP_COMMUNITY}',
-							'value' => 'new redifined value 1',
+							'value' => 'new redefined value 1',
 							'description' => 'new redifined description 1'
 						],
 						[
@@ -280,7 +280,6 @@ abstract class testFormMacros extends CWebTest {
 					}
 					unset($global_macro);
 				}
-				$expected_redefined_global_macros = $global_macros;
 
 				// Compare new macros table from global and inherited macros page with expected result.
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
@@ -305,7 +304,7 @@ abstract class testFormMacros extends CWebTest {
 					);
 				}
 
-				$this->assertEquals($expected_redefined_global_macros, $this->getGlobalMacrosFrotendTable());
+				$this->assertEquals($global_macros, $this->getGlobalMacrosFrotendTable());
 				break;
 
 			case 'Redefine global macro in Inherited':
@@ -352,13 +351,13 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
-			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
 		$form->selectTab('Macros');
 
-		// Check all macros after form save.
+		// Check all macros after form saving in frontend and db.
 		switch ($data['case']) {
 			case 'Add new macro':
 				// Compare new macros table from host macros page with expected result.
@@ -383,11 +382,6 @@ abstract class testFormMacros extends CWebTest {
 				// Compare new macros table from host macros page with expected result.
 				$this->assertEquals($data['macros'], $this->getMacros(true));
 
-				$db_macros = CDBHelper::getAll('SELECT macro, value, description, type'.
-						' FROM hostmacro'.
-						' WHERE hostid ='.$id
-				);
-
 				// Compare new macros table with db.
 				$this->assertEquals($this->getMacros(true),
 					$this->sortMacros(CDBHelper::getAll('SELECT macro, value, description, type'.
@@ -398,7 +392,7 @@ abstract class testFormMacros extends CWebTest {
 
 				// Compare new macros table from global and inherited macros page with expected result.
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
-				$this->assertEquals($expected_redefined_global_macros, $this->getGlobalMacrosFrotendTable());
+				$this->assertEquals($global_macros, $this->getGlobalMacrosFrotendTable());
 				break;
 
 			case 'Redefine global macro in Inherited':
@@ -418,7 +412,6 @@ abstract class testFormMacros extends CWebTest {
 				break;
 		}
 	}
-
 
 	public static function getRemoveInheritedMacrosData() {
 		return [
@@ -466,12 +459,12 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 * Test removing and resetting global macro on host, prototype or template.
 	 *
-	 * @param array  $data		    given data provider
-	 * @param array  $id		    host's, prototype's or template's id
-	 * @param string $form_type		string used in form selector
-	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param boolean $is_prototype	defines is it prototype or not
-	 * @param int $lld_id			points to LLD rule id where host prototype belongs
+	 * @param array      $data		       given data provider
+	 * @param array      $id		       host's, prototype's or template's id
+	 * @param string     $form_type	   string used in form selector
+	 * @param string     $host_type	   string defining is it host, template or host prototype
+	 * @param boolean    $is_prototype	   defines is it prototype or not
+	 * @param int        $lld_id		   points to LLD rule id where host prototype belongs
 	 */
 	protected function checkRemoveInheritedMacros($data, $id, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$this->page->login()->open(
@@ -496,6 +489,11 @@ abstract class testFormMacros extends CWebTest {
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
 				$this->removeMacros($data['macros']);
+				$hostmacros = $this->getMacros(true);
+
+				$expected_hostmacros = ($hostmacros === [])
+					? [[ 'macro' => '', 'value' => '', 'description' => '']]
+					: $hostmacros;
 
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
@@ -508,19 +506,18 @@ abstract class testFormMacros extends CWebTest {
 					}
 					unset($global_macro);
 				}
-				$expected_global_macros = $global_macros;
 
-				$this->assertEquals($this->sortMacros($expected_global_macros), $this->getGlobalMacrosFrotendTable());
+				$this->assertEquals($this->sortMacros($global_macros), $this->getGlobalMacrosFrotendTable());
 				break;
 
 			case 'Remove macro from Inherited':
 				// Get all object's macros.
-				$hostmacros = $this->getMacros();
+				$hostmacros = $this->getMacros(true);
 
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
-
 				$this->removeMacros($data['macros']);
+				$global_macros = $this->getGlobalMacrosFrotendTable();
 
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
@@ -532,16 +529,26 @@ abstract class testFormMacros extends CWebTest {
 						}
 					}
 					unset($hostmacro);
+
+					foreach ($global_macros as $i => &$global_macro) {
+						if ($global_macro['macro'] === $data_macro['macro']) {
+							unset($global_macros[$i]);
+						}
+					}
+					unset($global_macro);
 				}
-				$expected_hostmacros = $hostmacros;
+
+				$expected_hostmacros = ($hostmacros === [])
+					? [[ 'macro' => '', 'value' => '', 'description' => '']]
+					: $hostmacros;
 
 				// Compare host macros table with expected result.
-				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros());
+				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros(true));
 				break;
 
 			case 'Remove redefined macro in Inherited':
 				// Get all object's macros before changes.
-				$hostmacros = $this->getMacros();
+				$hostmacros = $this->getMacros(true);
 
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
@@ -566,7 +573,7 @@ abstract class testFormMacros extends CWebTest {
 					: $hostmacros;
 
 				// Check that reset macros were deleted from hostmacros array.
-				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros());
+				$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros(true));
 
 				// Return to Global macros table and check fields and values there.
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
@@ -604,17 +611,39 @@ abstract class testFormMacros extends CWebTest {
 
 		$form->submit();
 
+		$this->page->open(
+			$is_prototype
+				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
+
+		$form->invalidate();
+		$form->selectTab('Macros');
+
+		// Compare host macros table with expected result.
+		$this->assertEquals($this->sortMacros($expected_hostmacros), $this->getMacros(true));
+
+		// Compare new host macros table with db.
+		$this->assertEquals($this->getMacros(true),
+			$this->sortMacros(CDBHelper::getAll('SELECT macro, value, description, type'.
+				' FROM hostmacro'.
+				' WHERE hostid ='.$id)
+			)
+		);
+
+		// Check all macros after form save.
 		switch ($data['case']) {
 			case 'Remove macro from Host':
-
-				break;
-
 			case 'Remove macro from Inherited':
-
+				// Compare new macros table from global and inherited macros page with expected result.
+				$radio_switcher->fill('Inherited and '.$host_type.' macros');
+				$this->assertEquals($this->sortMacros($global_macros), $this->getGlobalMacrosFrotendTable());
 				break;
 
 			case 'Remove redefined macro in Inherited':
-
+				// Check global macros.
+				$radio_switcher->fill('Inherited and '.$host_type.' macros');
+				$this->checkInheritedGlobalMacros($expected_hostmacros);
 				break;
 		}
 	}
@@ -711,7 +740,9 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
+	 * Get values from global macros table.
 	 *
+	 * @return array
 	 */
 	public function getGlobalMacrosFrotendTable() {
 		// Write macros rows from Frontend to array.
