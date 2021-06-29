@@ -273,8 +273,8 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 
 		// Add a widget.
 		$dialogue = $dashboard->edit()->addWidget();
-		$form = $dialogue->asForm();
-		$type = $form->getValue('Type');
+		$form = $dialogue->asForm()->waitUntilVisible();
+		$type = $form->getField('Type')->getValue();
 		$form->fill($data['fields']);
 		if ($type !== 'Host availability') {
 			$form->waitUntilReloaded();
