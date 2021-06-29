@@ -49,7 +49,8 @@ function tabFilterDelete(overlay) {
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, {bubbles: true}));
+				const properties = {detail: {index: form_data['idx2']}, bubbles: true};
+				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, properties));
 			}
 		})
 		.always(() => {
