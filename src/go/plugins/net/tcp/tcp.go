@@ -621,15 +621,15 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 		case "closing":
 			state = netstat.Closing
 		default:
-			return 0, errors.New(errorInvalidFourthParam)
+			return 0, errors.New(errorInvalidFifthParam)
 		}
 	}
 
-	return netStatCount(laddres, lNet, lport, raddres, rNet, rport, state)
+	return netStatTcpCount(laddres, lNet, lport, raddres, rNet, rport, state)
 }
 
-// netstatCount - returns number of sockets that match parameters.
-func netStatCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP, rNet *net.IPNet, rport int,
+// netStatTcpCount - returns number of TCP sockets that match parameters.
+func netStatTcpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP, rNet *net.IPNet, rport int,
 	state netstat.SkState) (result int, err error) {
 
 	tabs, err := netstat.TCPSocks(func(s *netstat.SockTabEntry) bool {
