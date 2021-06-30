@@ -561,9 +561,7 @@ class CUser extends CApiService {
 			if (array_key_exists('passwd', $user)) {
 				$user_data = $user + array_intersect_key($db_user, array_flip(['username', 'name', 'surname']));
 				$this->checkPassword($user_data, '/'.($i + 1).'/passwd');
-			}
 
-			if (array_key_exists('passwd', $user)) {
 				if ($db_user['username'] == ZBX_GUEST_USER) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
@@ -1936,14 +1934,14 @@ class CUser extends CApiService {
 	 * @param string $user['username']  (optional)
 	 * @param string $user['name']      (optional)
 	 * @param string $user['surname']   (optional)
-	 * @param string $user['passwd']    (required)
-	 * @param string $path              (required) Password field path to display error message.
+	 * @param string $user['passwd']
+	 * @param string $path              Password field path to display error message.
 	 *
 	 * @throws APIException if the input is invalid.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	private function checkPassword(array $user, string $path) {
+	private function checkPassword(array $user, string $path): bool {
 		$context_data = array_filter(array_intersect_key($user, array_flip(['username', 'name', 'surname'])));
 		$passw_validator = new CPasswordComplexityValidator([
 			'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
