@@ -20,22 +20,60 @@
 package file
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 )
 
 // Export -
 func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
-	if len(params) != 1 {
+	if len(params) == 0 || len(params) > 2 {
 		return nil, errors.New("Invalid number of parameters.")
 	}
 	if "" == params[0] {
 		return nil, errors.New("Invalid first parameter.")
 	}
+	mode := "bytes"
+	if len(params) == 2 && len(params[1]) != 0 {
+		mode = params[1]
+	}
 
-	if f, err := stdOs.Stat(params[0]); err == nil {
-		return f.Size(), nil
-	} else {
-		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
+	switch mode {
+	case "bytes":
+		if f, err := stdOs.Stat(params[0]); err == nil {
+			return f.Size(), nil
+		} else {
+			return nil, fmt.Errorf("Cannot obtain file information: %s", err)
+		}
+	case "lines":
+		return lineCounter(params[0])
+	default:
+		return nil, errors.New("Invalid second parameter.")
+	}
+}
+
+// lineCounter - count number of line in file
+func lineCounter(fileName string) (result interface{}, err error) {
+	var file *os.File
+	if file, err = os.Open(fileName); err != nil {
+		return nil, fmt.Errorf("Invalid first parameter: %s", err)
+	}
+	defer file.Close()
+	buf := make([]byte, 32*1024)
+	count := 0
+	lineSep := []byte{'\n'}
+
+	for {
+		c, err := file.Read(buf)
+		count += bytes.Count(buf[:c], lineSep)
+
+		switch {
+		case err == io.EOF:
+			return count, nil
+		case err != nil:
+			return nil, fmt.Errorf("Invalid file content: %s", err)
+		}
 	}
 }
