@@ -1,0 +1,1 @@
+........S. [ZBX-19440] fixed trying to save non-UTF8 symbols to item_rtdata.error (dgoloscapov)
