@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('layout.mode.js');
@@ -35,47 +36,111 @@ $this->includeJsFile('monitoring.service.list.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$filter = ($web_layout_mode == ZBX_LAYOUT_NORMAL)
-	? (new CFilter())
-		->setApplyUrl($data['view_curl'])
+if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
+	$filter = (new CFilter())
+		->addVar('action', 'service.list.edit')
+		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
 		->setResetUrl($data['view_curl'])
 		->setProfile('web.service.filter')
-		->setActiveTab($data['active_tab'])
-		->addFilterTab(_('Filter'), [
-			(new CFormGrid())
-				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-				->addItem([
-					new CLabel(_('Name'), 'filter_select'),
-					new CFormField(
-						(new CTextBox('filter_select', $data['filter']['name']))
-							->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		->setActiveTab($data['active_tab']);
+
+	if ($data['service'] !== null) {
+		$parents = [];
+		foreach ($data['service']['parents'] as $parent) {
+			array_push($parents,
+				(new CLink($parent['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list.edit')
+					->setArgument('path', $data['path'])
+					->setArgument('serviceid', $parent['serviceid'])
+				))->setAttribute('data-serviceid', $parent['serviceid']),
+				CViewHelper::showNum($parent['children']),
+				', '
+			);
+		}
+		array_pop($parents);
+
+		if (in_array($data['service']['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
+			$service_status = _('OK');
+			$service_status_style_class = null;
+		}
+		else {
+			$service_status = getSeverityName($data['service']['status']);
+			$service_status_style_class = 'service-status-'.getSeverityStyle($data['service']['status']);
+		}
+
+		$filter
+			->addTab(
+				(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
+				(new CDiv())
+					->setId('tab_info')
+					->addClass(ZBX_STYLE_FILTER_CONTAINER)
+					->addItem(
+						(new CDiv())
+							->addClass(ZBX_STYLE_SERVICE_INFO)
+							->addClass($service_status_style_class)
+							->addItem([
+								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME)
+							])
+							->addItem([
+								(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('Status')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv((new CDiv($service_status))->addClass(ZBX_STYLE_SERVICE_STATUS)))
+									->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv(sprintf('%.4f', $data['service']['goodsla'])))
+									->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
+							->addItem([
+								(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv($data['service']['tags']))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							])
 					)
-				])
-				->addItem([
-					new CLabel(_('Status')),
-					new CFormField(
-						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-							->addValue(_('Any'), SERVICE_STATUS_ANY)
-							->addValue(_('OK'), SERVICE_STATUS_OK)
-							->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
-							->setModern(true)
-					)
-				]),
-			(new CFormGrid())
-				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-				->addItem([
-					new CLabel(_('Tags')),
-					new CFormField(
-						CTagFilterFieldHelper::getTagFilterField([
-							'evaltype' => $data['filter']['evaltype'],
-							'tags' => $data['filter']['tags'] ?: [
-								['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
-							]
-						])
-					)
-				])
-		])
-	: null;
+			);
+	}
+
+	$filter->addFilterTab(_('Filter'), [
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Name'), 'filter_select'),
+				new CFormField(
+					(new CTextBox('filter_select', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Status')),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), SERVICE_STATUS_ANY)
+						->addValue(_('OK'), SERVICE_STATUS_OK)
+						->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+						->setModern(true)
+				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Tags')),
+				new CFormField(
+					CTagFilterFieldHelper::getTagFilterField([
+						'evaltype' => $data['filter']['evaltype'],
+						'tags' => $data['filter']['tags'] ?: [
+							['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						]
+					])
+				)
+			])
+	]);
+}
+else {
+	$filter = null;
+}
 
 $form = (new CForm())->setName('service_form');
 
@@ -93,17 +158,15 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['services'] as $serviceid => $service) {
-	$children_count = count($service['children']);
-
 	$table->addRow(new CRow([
 		new CCheckBox('serviceids['.$serviceid.']', $serviceid),
-		$children_count > 0
+		$service['children'] > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list.edit')
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($children_count)
+				CViewHelper::showNum($service['children'])
 			]
 			: $service['name'],
 		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('layout.mode.js');
@@ -33,7 +34,8 @@ $web_layout_mode = $this->getLayoutMode();
 
 if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 	$filter = (new CFilter())
-		->setApplyUrl($data['view_curl'])
+		->addVar('action', 'service.list')
+		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
 		->setResetUrl($data['view_curl'])
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
@@ -97,43 +99,40 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 			);
 	}
 
-	$filter
-		->addFilterTab(_('Filter'), [
-			(new CFormGrid())
-				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-				->addItem([
-					new CLabel(_('Name'), 'filter_select'),
-					new CFormField(
-						(new CTextBox('filter_select', $data['filter']['name']))
-							->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					)
-				])
-				->addItem([
-					new CLabel(_('Status')),
-					new CFormField(
-						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-							->addValue(_('Any'), SERVICE_STATUS_ANY)
-							->addValue(_('OK'), SERVICE_STATUS_OK)
-							->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
-							->setModern(true)
-					)
-				]),
-			(new CFormGrid())
-				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-				->addItem([
-					new CLabel(_('Tags')),
-					new CFormField(
-						CTagFilterFieldHelper::getTagFilterField([
-							'evaltype' => $data['filter']['evaltype'],
-							'tags' => $data['filter']['tags'] ?: [
-								['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
-							]
-						])
-					)
-				])
-		])
-		->addVar('action', 'service.list')
-		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null);
+	$filter->addFilterTab(_('Filter'), [
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Name'), 'filter_select'),
+				new CFormField(
+					(new CTextBox('filter_select', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Status')),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), SERVICE_STATUS_ANY)
+						->addValue(_('OK'), SERVICE_STATUS_OK)
+						->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+						->setModern(true)
+				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Tags')),
+				new CFormField(
+					CTagFilterFieldHelper::getTagFilterField([
+						'evaltype' => $data['filter']['evaltype'],
+						'tags' => $data['filter']['tags'] ?: [
+							['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						]
+					])
+				)
+			])
+	]);
 }
 else {
 	$filter = null;
