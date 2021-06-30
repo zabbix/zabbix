@@ -449,10 +449,10 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Event handler for 'Delete' button.
 			 *
-			 * @param {object} ev.detail.index  Index of deleted tab.
+			 * @param {object} ev.detail.idx2  Index of deleted tab.
 			 */
 			deleteFilterTab: (ev) => {
-				this.delete(this._items[ev.detail.index]);
+				this.delete(this._items[ev.detail.idx2]);
 			},
 
 			/**
