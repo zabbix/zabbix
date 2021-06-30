@@ -116,7 +116,7 @@ if ($data['change_password']) {
 	$password_requirements = [];
 
 	if ($data['password_requirements']['min_length'] > 1) {
-		$password_requirements[] = _n('must be at least %1$d character long', 'must be at least %1$d characters long',
+		$password_requirements[] = _s('must be at least %1$d characters long',
 			$data['password_requirements']['min_length']
 		);
 	}
