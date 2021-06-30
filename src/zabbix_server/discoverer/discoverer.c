@@ -899,10 +899,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-#ifdef HAVE_NETSNMP
-	zbx_init_snmp();
-#endif
-
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
