@@ -1,0 +1,1 @@
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
