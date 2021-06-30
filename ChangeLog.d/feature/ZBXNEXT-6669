@@ -1,1 +1,1 @@
-A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] removed old frontend auditlog calls from image, map, proxy, service, graph; added new API audit calls to image, map, proxy, service, graph and graph prototype (rlataria)
+A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend to API in image, map, proxy, service, graph and graph prototype (rlataria)

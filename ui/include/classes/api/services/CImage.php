@@ -268,7 +268,7 @@ class CImage extends CApiService {
 		$images = zbx_toArray($images);
 
 		$db_images = $this->get([
-			'output' => ['imageid', 'name', 'imagetype'],
+			'output' => ['name', 'imagetype'],
 			'imageids' => array_column($images, 'imageid'),
 			'preservekeys' => true
 		]);
