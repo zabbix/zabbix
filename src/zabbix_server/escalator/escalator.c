@@ -1932,7 +1932,7 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
-static	int	postpone_escalation(const DB_ESCALATION *escalation)
+static int	postpone_escalation(const DB_ESCALATION *escalation, const DB_EVENT *event)
 {
 	int		ret;
 	char		*sql;
@@ -1945,7 +1945,7 @@ static	int	postpone_escalation(const DB_ESCALATION *escalation)
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = DBfetch(result)) || ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
 		ret = ZBX_ESCALATION_SKIP;
 	else
 		ret = ZBX_ESCALATION_PROCESS;
@@ -1998,7 +1998,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 		if (0 != escalation->r_eventid)
 		{
-			ret = postpone_escalation(escalation);
+			ret = postpone_escalation(escalation, event);
 			goto out;
 		}
 	}
@@ -2008,7 +2008,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		{
 			if (0 != escalation->r_eventid)
 			{
-				ret = postpone_escalation(escalation);
+				ret = postpone_escalation(escalation, event);
 				goto out;
 			}
 
