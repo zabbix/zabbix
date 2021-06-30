@@ -399,7 +399,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Miniumum apply latency of OSDs'
+          description: 'Minimum apply latency of OSDs'
           preprocessing:
             -
               type: JSONPATH

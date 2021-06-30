@@ -912,7 +912,7 @@ zabbix_export:
               newvalue: equipmentProblem
             -
               value: '83'
-              newvalue: decomissioning
+              newvalue: decommissioning
             -
               value: '84'
               newvalue: chassisLimitExceeded
@@ -1088,7 +1088,7 @@ zabbix_export:
               newvalue: inoperable
             -
               value: '101'
-              newvalue: decomissioning
+              newvalue: decommissioning
             -
               value: '201'
               newvalue: biosRestore
