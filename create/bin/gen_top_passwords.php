@@ -19,8 +19,8 @@
 **/
 
 
-define('DEST_FILENAME_PATTERN', dirname(__FILE__).'/topPasswords%1$d.php');
-define('NUMBER_OF_FILES_TO_SPLIT', 4);
+define('DEST_FILENAME_PATTERN', __DIR__.'/topPasswords%1$d.php');
+define('NUMBER_OF_PASSWORDS_PER_FILE', 200000);
 
 $files = [];
 for ($i = 1; $argc > $i; $i++) {
@@ -33,7 +33,7 @@ for ($i = 1; $argc > $i; $i++) {
 }
 
 if (!$files) {
-	echo "No input file specified.\n";
+	fwrite(STDERR, 'No input file specified.'."\n");
 	exit(1);
 }
 
@@ -44,9 +44,9 @@ foreach (array_keys($files) as $filename) {
 }
 $passwords = array_keys($passwords);
 
-// Filter passwords.
-$passwords = array_filter($passwords, function ($pasword) {
-	return !preg_match('/[^\x20-\x7e]/', $pasword);
+// Remove passwords containing non-printable characters.
+$passwords = array_filter($passwords, function ($password) {
+	return !preg_match('/[^\x20-\x7e]/', $password);
 });
 
 // Base64-encode each password and add quotes around it.
@@ -54,19 +54,19 @@ $passwords = array_map(function ($password) {
 	return '\''. base64_encode($password).'\'';
 }, $passwords);
 
-$passwords = array_chunk($passwords, ceil(count($passwords) / NUMBER_OF_FILES_TO_SPLIT));
+$passwords = array_chunk($passwords, NUMBER_OF_PASSWORDS_PER_FILE);
 $write_status = [];
 foreach ($passwords as $nr => $passwords_chunk) {
 	// Generate file.
 	$source = "<?php declare(strict_types = 1);\n".
 		"/**\n".
-		" * This file is meant to strengthen password validation for internal users. Passwords included in the list\n".
-		" * are considered weak due to their common use and are not allowed to be chosen by Zabbix internal users\n".
-		" * for security reasons. The file is generated automatically from the list of NCSC \"Top 100k passwords\",\n".
-		" * the list of SecLists \"Top 1M passwords\" and the list of Zabbix context-specific passwords.\n".
+		" * This file is meant to strengthen password validation for internal users. Passwords included in the list are\n".
+		" * considered weak due to their common use and are not allowed to be chosen by Zabbix internal users for security\n".
+		" * reasons. The file is generated automatically from the list of NCSC \"Top 100k passwords\", the list of SecLists \"Top 1M\n".
+		" * passwords\" and the list of Zabbix context-specific passwords.\n".
 		" *\n".
-		" * The list of passwords is used to check for commonly used passwords according to the password policy.\n".
-		" * Passwords are stored as indexed array of base64-encoded strings.\n".
+		" * The list of passwords is used to check for commonly used passwords according to the password policy. Passwords are\n".
+		" * stored as array of base64-encoded strings.\n".
 		" */\n".
 		"\n".
 		"\n".
@@ -75,16 +75,14 @@ foreach ($passwords as $nr => $passwords_chunk) {
 
 	$filename = sprintf(DEST_FILENAME_PATTERN, ($nr + 1));
 	$write_status[$filename] = (bool) file_put_contents($filename, $source);
-}
 
-// Output results.
-array_walk($write_status, function ($status, $filename) {
-	if ($status) {
+	// Output results.
+	if ($write_status[$filename]) {
 		fwrite(STDOUT, 'File written: "'.$filename.'"'."\n");
 	}
 	else {
 		fwrite(STDERR, 'Cannot write file: "'.$filename.'"'."\n");
 	}
-});
+}
 
-exit((array_sum($write_status) == NUMBER_OF_FILES_TO_SPLIT) ? 0 : 1);
+exit((array_sum($write_status) == count($write_status)) ? 0 : 1);
