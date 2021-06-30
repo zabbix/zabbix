@@ -6117,3 +6117,94 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 
 	return str;
 }
+
+static char	*utf8_chr_next(char *str)
+{
+	++str;
+
+	while (0x80 == (0xc0 & (unsigned char)*str))
+		str++;
+
+	return str;
+}
+
+static char	*utf8_chr_prev(char *str)
+{
+	--str;
+
+	while (0x80 == (0xc0 & (unsigned char)*str))
+		str--;
+
+	return str;
+}
+
+static int	strchr_utf8(const char *seq, char *c)
+{
+	size_t		len, c_len;
+	const char	*next;
+
+	if (0 == (c_len = zbx_utf8_char_len(c)))
+		return FAIL;
+
+	if (1 == c_len)
+		return (NULL == strchr(seq, *c) ? FAIL : SUCCEED);
+
+	/* check for broken utf-8 sequence in character */
+	if (c + c_len != utf8_chr_next(c))
+		return FAIL;
+
+	while ('\0' != *seq)
+	{
+		next = utf8_chr_next((char *)seq);
+
+		if (0 == (len = next - seq))
+			return FAIL;
+
+		if (len == c_len && 0 == memcmp(seq, c, len))
+			return SUCCEED;
+
+		seq = next;
+	}
+
+	return FAIL;
+}
+
+void	zbx_ltrim_utf8(char *str, const char *charlist)
+{
+	char	*next;
+
+	for (next = str; '\0' != *next; next = utf8_chr_next(next))
+	{
+		if (SUCCEED != strchr_utf8(charlist, next))
+			break;
+	}
+
+	if (next != str)
+	{
+		size_t	len;
+
+		if (0 != (len = strlen(next)))
+			memmove(str, next, len);
+
+		str[len] = '\0';
+	}
+}
+
+void	zbx_rtrim_utf8(char *str, const char *charlist)
+{
+	char	*prev, *last;
+
+	for (last = str + strlen(str), prev = last; ; prev = utf8_chr_prev(prev))
+	{
+
+		if (SUCCEED != strchr_utf8(charlist, prev))
+			break;
+
+		if ((last = prev) <= str)
+			break;
+	}
+
+	*last = '\0';
+}
+
+
