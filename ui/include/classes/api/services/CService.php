@@ -219,10 +219,11 @@ class CService extends CApiService {
 
 		$this->checkServicePermissions(array_column($services, 'serviceid'));
 
+		$services = $this->extendFromObjects(zbx_toHash($services, 'serviceid'), $db_services, ['name']);
+
 		foreach ($services as $service) {
-			if (array_key_exists('name', $service)) {
-				$this->checkName($service);
-			}
+			$this->checkName($service);
+
 			if (array_key_exists('algorithm', $service)) {
 				$this->checkAlgorithm($service);
 			}
@@ -244,11 +245,7 @@ class CService extends CApiService {
 			if (array_key_exists('parentid', $service)) {
 				$this->checkParentId($service);
 			}
-		}
 
-		$services = $this->extendFromObjects(zbx_toHash($services, 'serviceid'), $db_services, ['name']);
-
-		foreach ($services as $service) {
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
 				'parentid', 'dependencies', 'times'
