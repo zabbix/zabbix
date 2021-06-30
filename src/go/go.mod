@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
-	github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5 // indirect
+	github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5
 	github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3
 	github.com/chromedp/chromedp v0.6.0
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
