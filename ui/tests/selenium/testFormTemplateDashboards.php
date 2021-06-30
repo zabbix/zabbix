@@ -162,7 +162,7 @@ class testFormTemplateDashboards extends CWebTest {
 							],
 							[
 								'type' => 'clock',
-								'name' => 'Widget 4 dublicate check',
+								'name' => 'Widget 4 duplicate check',
 								'x' => 4,
 								'y' => 0,
 								'width' => 4,
@@ -633,7 +633,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Clock',
-						'Name' => 'Widget 4 dublicate check'
+						'Name' => 'Widget 4 duplicate check'
 					],
 					'duplicate widget' => true
 				]
@@ -1015,6 +1015,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$form->fill($data['fields']);
 		$form->reload();
+		$form->invalidate();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
@@ -1040,6 +1041,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 		$form->fill($data['fields']);
 		$form->reload();
+		$form->invalidate();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
