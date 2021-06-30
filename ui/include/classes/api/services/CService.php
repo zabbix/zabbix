@@ -326,14 +326,22 @@ class CService extends CApiService {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['parentids'] !== null) {
-			$sqlParts['from'][] = 'services_links slp';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid';
+			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_join'][] = [
+				'table' => 'services_links',
+				'alias' => 'slp',
+				'using' => 'servicedownid',
+			];
 			$sqlParts['where'][] = dbConditionId('slp.serviceupid', $options['parentids']);
 		}
 
 		if ($options['childids'] !== null) {
-			$sqlParts['from'][] = 'services_links slc';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid';
+			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_join'][] = [
+				'table' => 'services_links',
+				'alias' => 'slc',
+				'using' => 'serviceupid',
+			];
 			$sqlParts['where'][] = dbConditionId('slc.servicedownid', $options['childids']);
 		}
 
