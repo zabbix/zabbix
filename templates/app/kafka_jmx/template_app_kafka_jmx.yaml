@@ -1137,7 +1137,7 @@ zabbix_export:
           units: ms
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
-          description: 'Latency in millseconds for ZooKeeper requests from broker.'
+          description: 'Latency in milliseconds for ZooKeeper requests from broker.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
