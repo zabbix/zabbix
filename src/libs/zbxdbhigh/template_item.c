@@ -703,9 +703,11 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 					if (itemid != rule->itemid)
 						continue;
 
-					if (rule->conditions.values_num > rule->conditionids.values_num)
+					index = rule->conditionids.values_num;
+
+					if (rule->conditions.values_num > index)
 					{
-						condition = (zbx_lld_rule_condition_t *)rule->conditions.values[i];
+						condition = (zbx_lld_rule_condition_t *)rule->conditions.values[index];
 						ZBX_STR2UCHAR(uchar_orig, row[2]);
 						str_orig = zbx_strdup(str_orig, row[3]);
 						if (uchar_orig != condition->op)
