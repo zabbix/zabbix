@@ -116,7 +116,7 @@ trait MacrosTrait {
 	 *
 	 * @param array $macros   macros to be removed
 	 */
-	public function removeMacros($macros) {
+	public function removeMacro($macros) {
 		foreach ($macros as $macro) {
 			$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
 				']/../..//button[text()="Remove"]')->waitUntilPresent()->one()->click();

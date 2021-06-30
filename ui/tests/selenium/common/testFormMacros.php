@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Macros tests.
@@ -30,59 +31,432 @@ abstract class testFormMacros extends CWebTest {
 
 	use MacrosTrait;
 
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
 	}
 
-	/**
-	 * Test creating of host or template with Macros.
-	 *
-	 * @param array	$data			given data provider
-	 * @param string $form_type		string used in form selector
-	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param boolean $is_prototype	defines is it prototype or not
-	 * @param int $lld_id			points to LLD rule id where host prototype belongs
-	 */
-	protected function checkCreate($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		$this->page->login()->open(
-			$is_prototype
-			? 'host_prototypes.php?form=create&parent_discoveryid='.$lld_id
-			: $host_type.'s.php?form=create'
-		);
+	public static function getCreateMacrosData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'Name' => 'With MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$1234}',
+							'value' => '!@#$%^&*()_+/*',
+							'description' => '!@#$%^&*()_+/*'
+						],
+						[
+							'macro' => '{$M:regex:^[0-9a-z]}',
+							'value' => 'regex',
+							'description' => 'context macro with regex'
+						],
+						[
+							'macro' => '{$MACRO1}',
+							'value' => 'Value_1',
+							'description' => 'Test macro Description 1'
+						],
+						[
+							'macro' => '{$MACRO3}',
+							'value' => '',
+							'description' => ''
+						],
+						[
+							'macro' => '{$MACRO4}',
+							'value' => 'value',
+							'description' => ''
+						],
+						[
+							'macro' => '{$MACRO5}',
+							'value' => '',
+							'description' => 'DESCRIPTION'
+						],
+						[
+							'macro' => '{$MACRO6}',
+							'value' => 'Значение',
+							'description' => 'Описание'
+						],
+						[
+							'macro' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}',
+							'description' => '{$MACRO:A}'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => '',
+							'description' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'Without dollar in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With empty MACRO',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '',
+							'value' => 'Macro_Value',
+							'description' => 'Macro Description'
+						]
+					],
+					'error_details_host' => 'Invalid macro "": macro is empty.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'macro' => '{$MACRO}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_details_host' => 'Macro "{$MACRO}" is not unique.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_details_host' => 'Macro "{$MACRO:regex:"^[0-9].*$"}" is not unique.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+				]
+			]
+		];
+	}
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
-		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
-
-		if ($is_prototype) {
-			$form->selectTab('Groups');
-		}
-		$form->fill(['Groups' => 'Zabbix servers']);
-
-		$this->checkMacros($data, $form_type, $data['Name'], $host_type, $is_prototype, $lld_id);
+	public static function getUpdateMacrosData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$UPDATED_MACRO1}',
+							'value' => 'updated value1',
+							'description' => 'updated description 1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$UPDATED_MACRO2}',
+							'value' => 'Updated value 2',
+							'description' => 'Updated description 2'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$UPDATED_MACRO1}',
+							'value' => '',
+							'description' => ''
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$UPDATED_MACRO2}',
+							'value' => 'Updated Value 2',
+							'description' => ''
+						],
+						[
+							'macro' => '{$UPDATED_MACRO3}',
+							'value' => '',
+							'description' => 'Updated Description 3'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:A}',
+							'value' => '{$MACRO:B}',
+							'description' => '{$MACRO:C}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$UPDATED_MACRO_1}',
+							'value' => '',
+							'description' => 'DESCRIPTION'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'macro' => '{$UPDATED_MACRO_2}',
+							'value' => 'Значение',
+							'description' => 'Описание'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[a-z]"}',
+							'value' => 'regex',
+							'description' => ''
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9a-z]}',
+							'value' => '',
+							'description' => 'DESCRIPTION'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'macro' => '{$UPDATED_MACRO_2}',
+							'value' => 'Значение',
+							'description' => 'Описание'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'Without dollar in Macros',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With empty Macro',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '',
+							'value' => 'Macro_Value',
+							'description' => 'Macro Description'
+						]
+					],
+					'error_details_host' => 'Invalid macro "": macro is empty.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated Macros',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_details_host' => 'Macro "{$MACRO}" is not unique.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex Macros',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_details_host' => 'Macro "{$M:regex:"[a-z]"}" is not unique.',
+					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex Macros and quotes',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9].*$}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_details_host' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.',
+					'error_details_prototype' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
+				]
+			]
+		];
 	}
 
 	/**
-	 * Test updating Macros in host, host prototype or template.
+	 *  Check adding and saving macros in host, host prototype or template form.
 	 *
-	 * @param array	$data			given data provider
-	 * @param string $name			name of host where changes are made
-	 * @param string $form_type		string used in form selector
-	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param boolean $is_prototype	defines is it prototype or not
-	 * @param int $lld_id			points to LLD rule id where host prototype belongs
+	 * @param array	     $data			given data provider
+	 * @param string     $form_type		string used in form selector
+	 * @param string     $host_type		string defining is it host, template or host prototype
+	 * @param string     $name			name of host where changes are made
+	 * @param boolean    $update		true if update, false if create
+	 * @param boolean    $is_prototype	defines is it prototype or not
+	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
-	protected function checkUpdate($data, $name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+	public function checkMacros($data, $form_type, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = $this->getHash();
+		}
 
-		$this->page->login()->open(
-			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
-			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
+		if ($update) {
+			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
+			$this->page->login()->open(
+				$is_prototype
+					? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+				);
+		}
+		else {
+			$this->page->login()->open(
+				$is_prototype
+					? 'host_prototypes.php?form=create&parent_discoveryid='.$lld_id
+					: $host_type.'s.php?form=create'
+			);
+
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
+			$form->fill([ucfirst($host_type).' name' => $name]);
+
+			if ($is_prototype) {
+				$form->selectTab('Groups');
+			}
+			$form->fill(['Groups' => 'Zabbix servers']);
+		}
+
+		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Macros');
+		$this->fillMacros($data['macros']);
+		$form->submit();
+
+		$object = $is_prototype ? 'host prototype' : $host_type;
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, $update ? ucfirst($object).' updated' : ucfirst($object).' added');
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
+				// Check the results in form.
+				$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, $data);
+				break;
+			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, $update ? 'Cannot update '.$object : 'Cannot add '.$object,
+						($is_prototype ? $data['error_details_prototype'] : $data['error_details_host'])
+				);
+				// Check that DB hash is not changed.
+				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
+				break;
+		}
 	}
 
 	/**
@@ -108,11 +482,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->removeAllMacros();
 		$form->submit();
 
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-
-		$this->assertEquals(($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated', $message->getTitle());
-
+		$this->assertMessage(TEST_GOOD, ($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 		// Check the results in form.
 		$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, null);
@@ -459,12 +829,12 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 * Test removing and resetting global macro on host, prototype or template.
 	 *
-	 * @param array      $data		       given data provider
-	 * @param array      $id		       host's, prototype's or template's id
-	 * @param string     $form_type	   string used in form selector
-	 * @param string     $host_type	   string defining is it host, template or host prototype
-	 * @param boolean    $is_prototype	   defines is it prototype or not
-	 * @param int        $lld_id		   points to LLD rule id where host prototype belongs
+	 * @param array      $data		      given data provider
+	 * @param array      $id		      host's, prototype's or template's id
+	 * @param string     $form_type	      string used in form selector
+	 * @param string     $host_type	      string defining is it host, template or host prototype
+	 * @param boolean    $is_prototype    defines is it prototype or not
+	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
 	 */
 	protected function checkRemoveInheritedMacros($data, $id, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$this->page->login()->open(
@@ -488,7 +858,7 @@ abstract class testFormMacros extends CWebTest {
 				// Return to object's macros.
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
-				$this->removeMacros($data['macros']);
+				$this->removeMacro($data['macros']);
 				$hostmacros = $this->getMacros(true);
 
 				$expected_hostmacros = ($hostmacros === [])
@@ -516,7 +886,7 @@ abstract class testFormMacros extends CWebTest {
 
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
-				$this->removeMacros($data['macros']);
+				$this->removeMacro($data['macros']);
 				$global_macros = $this->getGlobalMacrosFrotendTable();
 
 				$radio_switcher->fill(ucfirst($host_type).' macros');
@@ -553,7 +923,7 @@ abstract class testFormMacros extends CWebTest {
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
 
-				$this->removeMacros($data['macros']);
+				$this->removeMacro($data['macros']);
 
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
@@ -649,53 +1019,14 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 *  Check adding and saving macros in host, host prototype or template form.
-	 *
-	 * @param array	$data			given data provider
-	 * @param string $form_type		string used in form selector
-	 * @param string $name			name of host where changes are made
-	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param boolean $is_prototype	defines is it prototype or not
-	 * @param int $lld_id			points to LLD rule id where host prototype belongs
-	 */
-	private function checkMacros($data = null, $form_type, $name, $host_type, $is_prototype, $lld_id) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = $this->getHash();
-		}
-
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
-		$form->selectTab('Macros');
-		$this->fillMacros($data['macros']);
-		$form->submit();
-
-		$message = CMessageElement::find()->one();
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertTrue($message->isGood());
-				$this->assertEquals($data['success_message'], $message->getTitle());
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
-				// Check the results in form.
-				$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, $data);
-				break;
-			case TEST_BAD:
-				$this->assertTrue($message->isBad());
-				$this->assertEquals($data['error_message'], $message->getTitle());
-				$this->assertTrue($message->hasLine($data['error_details']));
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
-				break;
-		}
-	}
-
-	/**
 	 * Checking saved macros in host, host prototype or template form.
 	 *
-	 * @param string $name			name of host where changes are made
-	 * @param boolean $is_prototype	defines is it prototype or not
-	 * @param int $lld_id			points to LLD rule id where host prototype belongs
-	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param string $form_type		string used in form selector
-	 * @param array	$data			given data provider
+	 * @param string     $name			  name of host where changes are made
+	 * @param boolean    $is_prototype    defines is it prototype or not
+	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
+	 * @param string     $host_type		  string defining is it host, template or host prototype
+	 * @param string     $form_type		  string used in form selector
+	 * @param array	     $data			  given data provider
 	 */
 	private function checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type,  $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
@@ -857,31 +1188,34 @@ abstract class testFormMacros extends CWebTest {
 		// Check that macro type is set correctly.
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
 
-		// Check that textarea input element is not available for secret text macros.
+		// Check text from value field.
 		$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 
 		// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
 		$this->checkInheritedTab($data['macro_fields'], true);
+
 		// Check that macro value is hidden but is still accessible after switching back to instance macros list.
-		$value_field = $this->getValueField($data['macro_fields']['macro']);
-		$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
+		$data_value_field = $this->getValueField($data['macro_fields']['macro']);
+		$this->assertEquals(CInputGroupElement::TYPE_SECRET, $data_value_field->getInputType());
 
 		// Change macro type back to text (is needed) before saving the changes.
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
-			$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
+			$data_value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
 		}
 
 		$this->query('button:Update')->one()->click();
+
+		// Check value field for guest account.
 		$this->openMacrosTab($url, $source);
-		$value_field = $this->getValueField($data['macro_fields']['macro']);
+		$guest_value_field = $this->getValueField($data['macro_fields']['macro']);
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
-			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
+			$this->assertEquals($data['macro_fields']['value']['text'], $guest_value_field->getValue());
 			// Switch to tab with inherited and instance macros and verify that the value is plain text.
 			$this->checkInheritedTab($data['macro_fields'], false);
 		}
 		else {
-			$this->assertEquals('******', $value_field->getValue());
+			$this->assertEquals('******', $guest_value_field->getValue());
 			// Switch to tab with inherited and instance macros and verify that the value is secret and is not accessible.
 			$this->checkInheritedTab($data['macro_fields'], true, false);
 		}
@@ -890,11 +1224,12 @@ abstract class testFormMacros extends CWebTest {
 		$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 		$type = (CTestArrayHelper::get($data, 'back_to_text', false)) ? ZBX_MACRO_TYPE_TEXT : ZBX_MACRO_TYPE_SECRET;
 		$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], $type],
-				array_values(CDBHelper::getRow($sql)));
+				array_values(CDBHelper::getRow($sql))
+		);
 	}
 
 	/**
-	 *  Check updateof secret macros for host, host prototype and template entities.
+	 *  Check update of secret macros for host, host prototype and template entities.
 	 *
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
@@ -905,7 +1240,6 @@ abstract class testFormMacros extends CWebTest {
 		$this->fillMacros([$data]);
 
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
-		$value_field = $this->getValueField($data['macro']);
 		$secret = (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) ===
 				CInputGroupElement::TYPE_SECRET) ? true : false;
 		$this->checkInheritedTab($data, $secret);
