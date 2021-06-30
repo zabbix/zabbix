@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:25Z'
+  date: '2021-06-18T12:22:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -107,7 +107,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+last(//php-fpm.listen_queue_len)=0)*100'
+          params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100'
           description: 'Queue utilization'
           tags:
             -
