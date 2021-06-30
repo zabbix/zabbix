@@ -226,6 +226,7 @@ typedef struct
 	zbx_uint64_t			interfaceid;
 	zbx_uint64_t			templateid;
 	zbx_uint64_t			master_itemid;
+	zbx_uint64_t			master_itemid_orig;
 	char				*name;
 	char				*key;
 	char				*delay;
@@ -473,6 +474,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->jmx_endpoint = zbx_strdup(NULL, row[28]);
 		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
+		ZBX_DBROW2UINT64(item->master_itemid_orig, row[77]);
+
 		item->timeout = zbx_strdup(NULL, row[30]);
 		item->url = zbx_strdup(NULL, row[31]);
 		item->query_fields = zbx_strdup(NULL, row[32]);
@@ -559,7 +562,6 @@ do {							\
 			SET_FLAG_STR(row[74], item->lifetime, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME);
 			SET_FLAG_UCHAR(row[75], item->evaltype, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_EVALTYPE);
 			SET_FLAG_STR(row[76], item->jmx_endpoint, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_JMX_ENDPOINT);
-			SET_FLAG_UINT64(row[77], item->master_itemid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID);
 			SET_FLAG_STR(row[78], item->timeout, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIMEOUT);
 			SET_FLAG_STR(row[79], item->url, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_URL);
 			SET_FLAG_STR(row[80], item->query_fields, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY_FIELDS);
@@ -1229,6 +1231,10 @@ dependent:
 	for (i = 0; i < item->dependent_items.values_num; i++)
 	{
 		dependent = (zbx_template_item_t *)item->dependent_items.values[i];
+
+		if (dependent->master_itemid_orig != item->itemid)
+			dependent->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID;
+
 		dependent->master_itemid = item->itemid;
 		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, sql, sql_alloc,
 				sql_offset);
