@@ -1,4 +1,4 @@
-// +build !windows !386
+// +build linux windows,amd64
 
 /*
 ** Zabbix
