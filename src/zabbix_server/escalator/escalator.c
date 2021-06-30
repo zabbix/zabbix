@@ -1932,7 +1932,7 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
-static int	check_unfinished_alerts(const DB_ESCALATION *escalation, const DB_EVENT *event, const DB_ACTION *action)
+static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 {
 	int		ret;
 	char		*sql;
@@ -1948,11 +1948,8 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation, const DB_EVE
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)) || (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed &&
-			action->pause_suppressed == ACTION_PAUSE_SUPPRESSED_TRUE))
-	{
+	if (NULL != (row = DBfetch(result)))
 		ret = FAIL;
-	}
 	else
 		ret = SUCCEED;
 
@@ -2002,16 +1999,13 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
 
-		if (0 == skip && SUCCEED != check_unfinished_alerts(escalation, event, action))
+		if (0 == skip && SUCCEED != check_unfinished_alerts(escalation))
 			skip = 1;
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
-			if (SUCCEED != check_unfinished_alerts(escalation, event, action))
-				skip = 1;
-
 			/* item disabled or deleted? */
 			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
 
@@ -2038,6 +2032,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 			if (NULL != *error)
 				goto out;
+
+			if (SUCCEED != check_unfinished_alerts(escalation))
+				skip = 1;
 		}
 	}
 
