@@ -246,15 +246,14 @@ class CService extends CApiService {
 			}
 		}
 
-		foreach ($services as &$service) {
-			$service += $db_services[$service['serviceid']];
+		$services = $this->extendFromObjects(zbx_toHash($services, 'serviceid'), $db_services, ['name']);
 
+		foreach ($services as $service) {
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
 				'parentid', 'dependencies', 'times'
 			]);
 		}
-		unset($service);
 
 		$this->checkTriggerPermissions($services);
 	}
