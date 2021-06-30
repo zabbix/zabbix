@@ -19,8 +19,8 @@
 **/
 
 
-define('DEST_FILENAME_PATTERN', __DIR__.'/topPasswords%1$d.php');
-define('NUMBER_OF_PASSWORDS_PER_FILE', 200000);
+define('DEST_FILENAME_PATTERN', __DIR__.'/top_passwords_%1$d.php');
+define('NUMBER_OF_PASSWORDS_PER_FILE', 250000);
 
 $files = [];
 for ($i = 1; $argc > $i; $i++) {
@@ -55,7 +55,6 @@ $passwords = array_map(function ($password) {
 }, $passwords);
 
 $passwords = array_chunk($passwords, NUMBER_OF_PASSWORDS_PER_FILE);
-$write_status = [];
 foreach ($passwords as $nr => $passwords_chunk) {
 	// Generate file.
 	$source = "<?php declare(strict_types = 1);\n".
@@ -74,15 +73,14 @@ foreach ($passwords as $nr => $passwords_chunk) {
 		"\n";
 
 	$filename = sprintf(DEST_FILENAME_PATTERN, ($nr + 1));
-	$write_status[$filename] = (bool) file_put_contents($filename, $source);
 
-	// Output results.
-	if ($write_status[$filename]) {
-		fwrite(STDOUT, 'File written: "'.$filename.'"'."\n");
-	}
-	else {
+	if (!file_put_contents($filename, $source)) {
 		fwrite(STDERR, 'Cannot write file: "'.$filename.'"'."\n");
+
+		exit(1);
 	}
+
+	fwrite(STDOUT, 'File written: "'.$filename.'"'."\n");
 }
 
-exit((array_sum($write_status) == count($write_status)) ? 0 : 1);
+exit(0);

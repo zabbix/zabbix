@@ -29,7 +29,13 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @var array
 	 */
-	private static $top_passwords_lists;
+	private const TOP_PASSWORDS_FILES_LIST = [
+		__DIR__.'/../../../data/top_passwords/top_passwords_1.php',
+		__DIR__.'/../../../data/top_passwords/top_passwords_2.php',
+		__DIR__.'/../../../data/top_passwords/top_passwords_3.php',
+		__DIR__.'/../../../data/top_passwords/top_passwords_4.php',
+		__DIR__.'/../../../data/top_passwords/top_passwords_5.php'
+	];
 
 	/**
 	 * Strings forbidden to be part of validated password.
@@ -44,8 +50,8 @@ class CPasswordComplexityValidator extends CValidator {
 	 * @var array
 	 */
 	private $options = [
-		'passwd_min_length' => 8,
-		'passwd_check_rules' => PASSWD_CHECK_SIMPLE
+		'passwd_min_length' => 0,
+		'passwd_check_rules' => 0x00
 	];
 
 	/**
@@ -57,9 +63,6 @@ class CPasswordComplexityValidator extends CValidator {
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
-
-		// Collect files containing common used passwords list.
-		self::$top_passwords_lists = array_filter(glob(__DIR__.'/../data/topPasswords[0-9]*.php'), 'is_file');
 	}
 
 	/**
@@ -79,29 +82,29 @@ class CPasswordComplexityValidator extends CValidator {
 			return false;
 		}
 
-		$check_case = ((PASSWD_CHECK_CASE & $this->options['passwd_check_rules']) == PASSWD_CHECK_CASE);
+		$check_case = $this->options['passwd_check_rules'] & PASSWD_CHECK_CASE;
 		if ($check_case && self::checkCase($value) === false) {
 			$this->setError(_('must contain at least one lowercase and one uppercase Latin letter'));
 
 			return false;
 		}
 
-		$check_digit = ((PASSWD_CHECK_DIGITS & $this->options['passwd_check_rules']) == PASSWD_CHECK_DIGITS);
-		if ($check_digit && self::checkDigit($value) === false) {
+		$check_digit = $this->options['passwd_check_rules'] & PASSWD_CHECK_DIGITS;
+		if ($check_digit && self::containsDigit($value) === false) {
 			$this->setError(_('must contain at least one digit'));
 
 			return false;
 		}
 
-		$check_special = ((PASSWD_CHECK_SPECIAL & $this->options['passwd_check_rules']) == PASSWD_CHECK_SPECIAL);
-		if ($check_special && self::checkSpecialCharacters($value) === false) {
+		$check_special = $this->options['passwd_check_rules'] & PASSWD_CHECK_SPECIAL;
+		if ($check_special && self::containsSpecialCharacter($value) === false) {
 			$this->setError(_('must contain at least one special character'));
 
 			return false;
 		}
 
-		$check_simple = ((PASSWD_CHECK_SIMPLE & $this->options['passwd_check_rules']) == PASSWD_CHECK_SIMPLE);
-		if ($check_simple && $this->checkSimple($value) === false) {
+		$check_simple = $this->options['passwd_check_rules'] & PASSWD_CHECK_SIMPLE;
+		if ($check_simple && $this->isSimple($value) === false) {
 			$this->setError(_("must not contain user's name, surname or username"));
 
 			return false;
@@ -130,18 +133,18 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @static
 	 *
-	 * @param string $value  String to check.
+	 * @param string $password  Password to check.
 	 *
 	 * @return bool
 	 */
-	private static function checkSpecialCharacters(string $value): bool {
+	private static function containsSpecialCharacter(string $password): bool {
 		$spec_chars = [
 			' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
 			'?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'
 		];
 
 		foreach ($spec_chars as $char) {
-			if (stripos($value, $char) !== false) {
+			if (stripos($password, $char) !== false) {
 				return true;
 			}
 		}
@@ -154,12 +157,12 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @static
 	 *
-	 * @param string $value  String to check.
+	 * @param string $password  Password to check.
 	 *
 	 * @return bool
 	 */
-	private static function checkCase(string $value): bool {
-		return (preg_match('/^(?=.*[a-z])(?=.*[A-Z]).+$/', $value) == 1);
+	private static function checkCase(string $password): bool {
+		return (preg_match('/^(?=.*[a-z])(?=.*[A-Z]).+$/', $password) == 1);
 	}
 
 	/**
@@ -167,25 +170,24 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @static
 	 *
-	 * @param string $value  String to check.
+	 * @param string $password  Password to check.
 	 *
 	 * @return bool
 	 */
-	private static function checkDigit(string $value): bool {
-		return (preg_match('/\d/', $value) == 1);
+	private static function containsDigit(string $password): bool {
+		return (preg_match('/\d/', $password) == 1);
 	}
 
 	/**
 	 * Check if string doesn't contain context specific substring.
 	 *
-	 * @param string $value  String to check.
+	 * @param string $password  Password to check.
 	 *
 	 * @return bool
 	 */
-	private function checkSimple(string $value): bool {
-		$value = mb_strtolower($value);
+	private function isSimple(string $password): bool {
 		foreach ($this->context_data as $context_string) {
-			if (stripos($value, mb_strtolower($context_string)) !== false) {
+			if (mb_stripos($password, $context_string) !== false) {
 				return false;
 			}
 		}
@@ -198,14 +200,14 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @static
 	 *
-	 * @param string $value  String to check.
+	 * @param string $password  Password to check.
 	 *
 	 * @return bool
 	 */
-	private static function checkIfPasswordIsCommonlyUsed(string $value): bool {
-		$value = base64_encode($value);
-		foreach (self::$top_passwords_lists as $file) {
-			if (in_array($value, require $file)) {
+	private static function checkIfPasswordIsCommonlyUsed(string $password): bool {
+		$password = base64_encode($password);
+		foreach (self::TOP_PASSWORDS_FILES_LIST as $file) {
+			if (in_array($password, require $file)) {
 				return false;
 			}
 		}

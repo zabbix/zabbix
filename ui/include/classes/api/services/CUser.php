@@ -1943,15 +1943,15 @@ class CUser extends CApiService {
 	 */
 	private function checkPassword(array $user, string $path): bool {
 		$context_data = array_filter(array_intersect_key($user, array_flip(['username', 'name', 'surname'])));
-		$passw_validator = new CPasswordComplexityValidator([
+		$passwd_validator = new CPasswordComplexityValidator([
 			'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
 			'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
 		]);
-		$passw_validator->setContextData($context_data);
+		$passwd_validator->setContextData($context_data);
 
-		if ($passw_validator->validate($user['passwd']) === false) {
+		if ($passwd_validator->validate($user['passwd']) === false) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', $path, $passw_validator->getError())
+				_s('Incorrect value for field "%1$s": %2$s.', $path, $passwd_validator->getError())
 			);
 		}
 
