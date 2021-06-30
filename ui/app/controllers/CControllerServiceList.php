@@ -99,11 +99,14 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data['page'] =  $page_num > 1 ? $page_num : null;
 
 		$data['services'] = API::Service()->get([
-			'output' => ['name', 'status', 'goodsla'],
+			'output' => ['serviceid', 'name', 'status', 'goodsla'],
 			'serviceids' => array_keys($db_serviceids),
 			'selectChildren' => API_OUTPUT_COUNT,
+			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
+
+		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

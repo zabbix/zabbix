@@ -91,7 +91,7 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 							])
 							->addItem([
 								(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-								(new CDiv())->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+								(new CDiv($data['service']['tags']))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 							])
 					)
 			);

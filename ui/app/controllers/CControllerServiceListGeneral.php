@@ -28,7 +28,8 @@ abstract class CControllerServiceListGeneral extends CController {
 			$db_service = API::Service()->get([
 				'output' => ['serviceid', 'name', 'status', 'goodsla'],
 				'serviceids' => $this->getInput('serviceid'),
-				'selectParents' => ['serviceid']
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
 			]);
 
 			if (!$db_service) {
@@ -41,7 +42,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			}
 
 			$this->service = reset($db_service);
-
+			$this->service['tags'] = makeTags([$this->service], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT);
 			$this->service['parents'] = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => array_column($this->service['parents'], 'serviceid'),
