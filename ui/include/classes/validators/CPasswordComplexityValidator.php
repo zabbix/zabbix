@@ -59,7 +59,7 @@ class CPasswordComplexityValidator extends CValidator {
 		$this->options = $options + $this->options;
 
 		// Collect files containing common used passwords list.
-		self::$top_passwords_lists = array_filter(glob(dirname(__FILE__).'/../data/topPasswords[0-9]*.php'), 'is_file');
+		self::$top_passwords_lists = array_filter(glob(__DIR__.'/../data/topPasswords[0-9]*.php'), 'is_file');
 	}
 
 	/**
@@ -74,9 +74,7 @@ class CPasswordComplexityValidator extends CValidator {
 		$this->setError('');
 
 		if ($this->options['passwd_min_length'] > mb_strlen($value)) {
-			$this->setError(_n('must be at least %1$d character long', 'must be at least %1$d characters long',
-				$this->options['passwd_min_length']
-			));
+			$this->setError(_s('must be at least %1$d characters long', $this->options['passwd_min_length']));
 
 			return false;
 		}
@@ -88,8 +86,8 @@ class CPasswordComplexityValidator extends CValidator {
 			return false;
 		}
 
-		$check_digits = ((PASSWD_CHECK_DIGITS & $this->options['passwd_check_rules']) == PASSWD_CHECK_DIGITS);
-		if ($check_digits && self::ckeckDigits($value) === false) {
+		$check_digit = ((PASSWD_CHECK_DIGITS & $this->options['passwd_check_rules']) == PASSWD_CHECK_DIGITS);
+		if ($check_digit && self::checkDigit($value) === false) {
 			$this->setError(_('must contain at least one digit'));
 
 			return false;
@@ -103,13 +101,13 @@ class CPasswordComplexityValidator extends CValidator {
 		}
 
 		$check_simple = ((PASSWD_CHECK_SIMPLE & $this->options['passwd_check_rules']) == PASSWD_CHECK_SIMPLE);
-		if ($check_simple && $this->chechSimple($value) === false) {
+		if ($check_simple && $this->checkSimple($value) === false) {
 			$this->setError(_("must not contain user's name, surname or username"));
 
 			return false;
 		}
 
-		if ($check_simple && self::chechIfPasswordIsCommonlyUsed($value) === false) {
+		if ($check_simple && self::checkIfPasswordIsCommonlyUsed($value) === false) {
 			$this->setError(_('must not be one of common or context-specific passwords'));
 
 			return false;
@@ -123,7 +121,7 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @param array  $context_data  Indexed array of strings that are forbidden to be part of password.
 	 */
-	public function setContextData(array $context_data = []) {
+	public function setContextData(array $context_data = []): void {
 		$this->context_data = $context_data;
 	}
 
@@ -143,7 +141,7 @@ class CPasswordComplexityValidator extends CValidator {
 		];
 
 		foreach ($spec_chars as $char) {
-			if (strpos($value, $char) !== false) {
+			if (stripos($value, $char) !== false) {
 				return true;
 			}
 		}
@@ -173,7 +171,7 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private static function ckeckDigits(string $value): bool {
+	private static function checkDigit(string $value): bool {
 		return (preg_match('/\d/', $value) == 1);
 	}
 
@@ -184,10 +182,10 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function chechSimple(string $value): bool {
+	private function checkSimple(string $value): bool {
 		$value = mb_strtolower($value);
 		foreach ($this->context_data as $context_string) {
-			if (strpos($value, mb_strtolower($context_string)) !== false) {
+			if (stripos($value, mb_strtolower($context_string)) !== false) {
 				return false;
 			}
 		}
@@ -204,13 +202,14 @@ class CPasswordComplexityValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private static function chechIfPasswordIsCommonlyUsed(string $value): bool {
+	private static function checkIfPasswordIsCommonlyUsed(string $value): bool {
 		$value = base64_encode($value);
 		foreach (self::$top_passwords_lists as $file) {
 			if (in_array($value, require $file)) {
 				return false;
 			}
 		}
+
 		return true;
 	}
 }

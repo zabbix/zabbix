@@ -26,10 +26,10 @@ class CPasswordComplexityValidatorTest extends TestCase {
 	/**
 	 * Array of passwords, minimum password lengths and expected error messages of password complexity validation.
 	 */
-	public function dataProviderCheckPasswordsLength() {
+	public function dataProviderCheckPasswordsLength(): array {
 		return [
 			['', 0, ''],
-			['', 1, 'must be at least 1 character long'],
+			['', 1, 'must be at least 1 characters long'],
 			['a', 1, ''],
 			['a', 2, 'must be at least 2 characters long'],
 			['abc', 2, '']
@@ -39,7 +39,7 @@ class CPasswordComplexityValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProviderCheckPasswordsLength
 	 */
-	public function testPasswordsLength($password, $passwd_min_length, $expected_error) {
+	public function testPasswordsLength($password, $passwd_min_length, $expected_error): void {
 		$validator = new CPasswordComplexityValidator([
 			'passwd_min_length' => $passwd_min_length,
 			'passwd_check_rules' => 0x00
@@ -53,7 +53,7 @@ class CPasswordComplexityValidatorTest extends TestCase {
 	/**
 	 * Array of passwords, validation rules, context data and expected error messages of password complexity validation.
 	 */
-	public function dataProviderCheckPasswordsRules() {
+	public function dataProviderCheckPasswordsRules(): array {
 		return [
 			// Check upper/lower case.
 			['abc', 0, [], ''],
@@ -85,7 +85,7 @@ class CPasswordComplexityValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProviderCheckPasswordsRules
 	 */
-	public function testPasswordsValidationRules($password, $rules, $context_data, $expected_error) {
+	public function testPasswordsValidationRules($password, $rules, $context_data, $expected_error): void {
 		$validator = new CPasswordComplexityValidator([
 			'passwd_min_length' => 3,
 			'passwd_check_rules' => $rules
