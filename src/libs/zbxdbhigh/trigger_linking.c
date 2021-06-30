@@ -972,7 +972,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	int				i, j, res;
 	char				*sql_update_triggers_expr = NULL;
 	size_t				sql_update_triggers_expr_alloc = 512, sql_update_triggers_expr_offset = 0;
-	zbx_uint64_t			triggerid, functionid;
+	zbx_uint64_t			triggerid, triggerid2, functionid;
 	zbx_db_insert_t			db_insert, db_insert_funcs;
 	zbx_trigger_functions_entry_t	*found, temp_t;
 
@@ -986,12 +986,11 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", NULL);
 
-	triggerid = DBget_maxid_num("triggers", trigger_copies_insert->values_num);
+	triggerid = triggerid2 = DBget_maxid_num("triggers", trigger_copies_insert->values_num);
 	functionid = DBget_maxid_num("functions", *funcs_insert_count);
 
 	for (i = 0; i < trigger_copies_insert->values_num; i++)
 	{
-		zbx_eval_context_t	ctx, ctx_r;
 		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
 
 		zbx_db_insert_add_values(&db_insert, triggerid, trigger_copy_template->description,
@@ -1005,6 +1004,17 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 				trigger_copy_template->event_name);
 
 		zbx_vector_uint64_append(new_triggerids, triggerid);
+
+		triggerid++;
+	}
+
+	res = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	for (i = 0; i < trigger_copies_insert->values_num; i++)
+	{
+		zbx_eval_context_t	ctx, ctx_r;
+		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
 
 		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, trigger_copy_template->expression,
 				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
@@ -1041,7 +1051,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 				}
 
 				zbx_db_insert_add_values(&db_insert_funcs, functionid++,
-						found->itemids.values[j], triggerid, found->names.values[j],
+						found->itemids.values[j], triggerid2, found->names.values[j],
 						found->parameters.values[j]);
 			}
 		}
@@ -1078,7 +1088,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			zbx_snprintf_alloc(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
 					&sql_update_triggers_expr_offset,
 					" where triggerid=" ZBX_FS_UI64 ";\n",
-					triggerid);
+					triggerid2);
 
 			DBexecute_overflowed_sql(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
 					&sql_update_triggers_expr_offset);
@@ -1089,11 +1099,8 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == (int)trigger_copy_template->recovery_mode)
 			zbx_eval_clear(&ctx_r);
 func_out:
-		triggerid++;
+		triggerid2++;
 	}
-
-	res = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED == res)
 		res = zbx_db_insert_execute(&db_insert_funcs);
