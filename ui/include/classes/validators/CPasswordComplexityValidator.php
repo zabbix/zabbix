@@ -82,28 +82,28 @@ class CPasswordComplexityValidator extends CValidator {
 			return false;
 		}
 
-		$check_case = $this->options['passwd_check_rules'] & PASSWD_CHECK_CASE;
+		$check_case = ($this->options['passwd_check_rules'] & PASSWD_CHECK_CASE);
 		if ($check_case && self::checkCase($value) === false) {
 			$this->setError(_('must contain at least one lowercase and one uppercase Latin letter'));
 
 			return false;
 		}
 
-		$check_digit = $this->options['passwd_check_rules'] & PASSWD_CHECK_DIGITS;
+		$check_digit = ($this->options['passwd_check_rules'] & PASSWD_CHECK_DIGITS);
 		if ($check_digit && self::containsDigit($value) === false) {
 			$this->setError(_('must contain at least one digit'));
 
 			return false;
 		}
 
-		$check_special = $this->options['passwd_check_rules'] & PASSWD_CHECK_SPECIAL;
+		$check_special = ($this->options['passwd_check_rules'] & PASSWD_CHECK_SPECIAL);
 		if ($check_special && self::containsSpecialCharacter($value) === false) {
 			$this->setError(_('must contain at least one special character'));
 
 			return false;
 		}
 
-		$check_simple = $this->options['passwd_check_rules'] & PASSWD_CHECK_SIMPLE;
+		$check_simple = ($this->options['passwd_check_rules'] & PASSWD_CHECK_SIMPLE);
 		if ($check_simple && $this->isSimple($value) === false) {
 			$this->setError(_("must not contain user's name, surname or username"));
 
