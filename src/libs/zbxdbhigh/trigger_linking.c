@@ -83,13 +83,14 @@ typedef struct
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x10)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x20)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME	__UINT64_C(0x40)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x40)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x80)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE                                                                  \
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS | ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE |            \
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |   \
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |                 \
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
 
 	zbx_uint64_t	update_flags;
 }
@@ -585,7 +586,7 @@ static void	get_templates_triggers_data(zbx_uint64_t hostid, const zbx_vector_ui
 		trigger_copy = (zbx_trigger_copy_t *)zbx_malloc(NULL, sizeof(zbx_trigger_copy_t));
 		trigger_copy->hostid = hostid;
 		ZBX_STR2UINT64(trigger_copy->triggerid, row[0]);
-		trigger_copy->templateid=trigger_copy->triggerid;
+		trigger_copy->templateid = trigger_copy->triggerid;
 		trigger_copy->description = zbx_strdup(NULL, row[1]);
 		trigger_copy->expression = zbx_strdup(NULL, row[2]);
 		trigger_copy->recovery_expression = zbx_strdup(NULL, row[9]);
@@ -644,8 +645,9 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
 		target_host_trigger_entry.update_flags = ZBX_FLAG_LINK_TRIGGER_UNSET;
-		ZBX_STR2UINT64(target_host_trigger_entry.triggerid,row[0]);
+		ZBX_STR2UINT64(target_host_trigger_entry.triggerid, row[0]);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
+
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UINT64(target_host_trigger_entry.flags_orig, row[4]);
@@ -789,6 +791,7 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 	}
 
 	main_found->templateid = trigger_copy->triggerid;
+	main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID;
 }
 
 static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
@@ -807,65 +810,70 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 	{
 		d = "";
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS))
+		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
-			d = ",";
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
+						found->recovery_mode);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_mode=%d", d,
+						found->correlation_mode);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
+						found->manual_close);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
+			{
+				char	*opdata_esc = DBdyn_escape_string(found->opdata);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
+				zbx_free(opdata_esc);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, found->discover);
+				d = ",";
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
+			{
+				char	*event_name_esc = DBdyn_escape_string(found->event_name);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
+						found->event_name);
+				d = ",";
+				zbx_free(event_name_esc);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
+					found->templateid);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
+					found->triggerid);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
-					found->recovery_mode);
-			d = ",";
-		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_mode=%d", d,
-					found->correlation_mode);
-			d = ",";
-		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
-					found->manual_close);
-			d = ",";
-		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
-		{
-			char	*opdata_esc = DBdyn_escape_string(found->opdata);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
-			zbx_free(opdata_esc);
-			d = ",";
-		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdiscover=%d", d, found->discover);
-			d = ",";
-		}
-
-		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
-		{
-			char	*event_name_esc = DBdyn_escape_string(found->event_name);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
-					found->event_name);
-			d = ",";
-			zbx_free(event_name_esc);
-		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
-				found->templateid);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
-				found->triggerid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1124,7 +1132,7 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 
 			main_temp_t.triggerid = found->triggerids.values[j];
 
-			if (NULL != (main_found =  (zbx_target_host_trigger_entry_t *)zbx_hashset_search(
+			if (NULL != (main_found = (zbx_target_host_trigger_entry_t *)zbx_hashset_search(
 					zbx_host_triggers_main_data, &main_temp_t)) &&
 					SUCCEED == compare_triggers(trigger_copy_template, main_found,
 					zbx_templates_triggers_funcs, zbx_host_triggers_funcs))
