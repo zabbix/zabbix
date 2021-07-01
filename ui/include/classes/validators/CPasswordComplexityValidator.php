@@ -25,17 +25,11 @@
 class CPasswordComplexityValidator extends CValidator {
 
 	/**
-	 * Files of common used passwords.
+	 * File of common used passwords.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private const TOP_PASSWORDS_FILES_LIST = [
-		__DIR__.'/../../../data/top_passwords/top_passwords_1.php',
-		__DIR__.'/../../../data/top_passwords/top_passwords_2.php',
-		__DIR__.'/../../../data/top_passwords/top_passwords_3.php',
-		__DIR__.'/../../../data/top_passwords/top_passwords_4.php',
-		__DIR__.'/../../../data/top_passwords/top_passwords_5.php'
-	];
+	private const TOP_PASSWORDS_FILE = __DIR__.'/../../../data/top_passwords.txt';
 
 	/**
 	 * Strings forbidden to be part of validated password.
@@ -206,10 +200,14 @@ class CPasswordComplexityValidator extends CValidator {
 	 */
 	private static function checkIfPasswordIsCommonlyUsed(string $password): bool {
 		$password = base64_encode($password);
-		foreach (self::TOP_PASSWORDS_FILES_LIST as $file) {
-			if (in_array($password, require $file)) {
-				return false;
+
+		if (($handle = fopen(self::TOP_PASSWORDS_FILE, 'r')) !== false) {
+			while (($line = fgets($handle, 512)) !== false) {
+				if ($password === trim($line)) {
+					return false;
+				}
 			}
+			fclose($handle);
 		}
 
 		return true;

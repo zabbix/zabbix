@@ -19,8 +19,7 @@
 **/
 
 
-define('DEST_FILENAME_PATTERN', __DIR__.'/top_passwords_%1$d.php');
-define('NUMBER_OF_PASSWORDS_PER_FILE', 250000);
+define('DEST_FILENAME', __DIR__.'/top_passwords.txt');
 
 $files = [];
 for ($i = 1; $argc > $i; $i++) {
@@ -50,37 +49,28 @@ $passwords = array_filter($passwords, function ($password) {
 });
 
 // Base64-encode each password and add quotes around it.
-$passwords = array_map(function ($password) {
-	return '\''. base64_encode($password).'\'';
-}, $passwords);
+$passwords = array_map('base64_encode', $passwords);
 
-$passwords = array_chunk($passwords, NUMBER_OF_PASSWORDS_PER_FILE);
-foreach ($passwords as $nr => $passwords_chunk) {
-	// Generate file.
-	$source = "<?php declare(strict_types = 1);\n".
-		"/**\n".
-		" * This file is meant to strengthen password validation for internal users. Passwords included in the list are\n".
-		" * considered weak due to their common use and are not allowed to be chosen by Zabbix internal users for security\n".
-		" * reasons. The file is generated automatically from the list of NCSC \"Top 100k passwords\", the list of SecLists \"Top 1M\n".
-		" * passwords\" and the list of Zabbix context-specific passwords.\n".
-		" *\n".
-		" * The list of passwords is used to check for commonly used passwords according to the password policy. Passwords are\n".
-		" * stored as array of base64-encoded strings.\n".
-		" */\n".
-		"\n".
-		"\n".
-		"return [".implode(', ', $passwords_chunk)."];".
-		"\n";
+// Generate file.
+$source = "#\n".
+	"# This file is meant to strengthen password validation for internal users. Passwords included in the list are considered\n".
+	"# weak due to their common use and are not allowed to be chosen by Zabbix internal users for security reasons. The file \n".
+	"# is generated automatically from the list of NCSC \"Top 100k passwords\", the list of SecLists \"Top 1M passwords\" and the\n".
+	"# list of Zabbix context-specific passwords.\n".
+	"#\n".
+	"# The list of passwords is used to check for commonly used passwords according to the password policy. Passwords are\n".
+	"# stored as base64-encoded strings.\n".
+	"#\n".
+	"\n".
+	"\n".
+	implode("\n", $passwords).
+	"\n";
 
-	$filename = sprintf(DEST_FILENAME_PATTERN, ($nr + 1));
-
-	if (!file_put_contents($filename, $source)) {
-		fwrite(STDERR, 'Cannot write file: "'.$filename.'"'."\n");
-
-		exit(1);
-	}
-
-	fwrite(STDOUT, 'File written: "'.$filename.'"'."\n");
+if (file_put_contents(DEST_FILENAME, $source)) {
+	fwrite(STDOUT, 'File written: "'.DEST_FILENAME.'"'."\n");
+	exit(0);
 }
-
-exit(0);
+else {
+	fwrite(STDERR, 'Cannot write file: "'.DEST_FILENAME.'"'."\n");
+	exit(1);
+}
