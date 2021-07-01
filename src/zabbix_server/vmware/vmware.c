@@ -280,7 +280,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_IP(nicType, addr)									\
 	ZBX_XPATH_PROP_NAME("config.virtualNicManagerInfo.netConfig")					\
 		"/*[local-name()='VirtualNicManagerNetConfig'][*[local-name()='nicType'][text()='"	\
-		nicType "']]//*[local-name()='ip']/*[local-name()='" addr "']"
+		nicType "']]/*[local-name()='candidateVnic'][*[local-name()='key']"			\
+		"=../*[local-name()='selectedVnic']]//*[local-name()='ip']/*[local-name()='" addr "']"
 #define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
 #define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
 		"/*[local-name()='ipV6Address']/*[local-name()='ipAddress']"
