@@ -103,9 +103,9 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('Name'), 'filter_select'),
+				new CLabel(_('Name'), 'filter_name'),
 				new CFormField(
-					(new CTextBox('filter_select', $data['filter']['name']))
+					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
@@ -147,13 +147,18 @@ $table = (new CTableInfo())
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
 	]);
 
+$path = $data['path'];
+if ($data['service'] !== null) {
+	$path[] = $data['service']['serviceid'];
+}
+
 foreach ($data['services'] as $serviceid => $service) {
 	$table->addRow(new CRow([
 		$service['children'] > 0
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
-					->setArgument('path', $data['path'])
+					->setArgument('path', $path)
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($service['children'])

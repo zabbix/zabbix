@@ -21,6 +21,14 @@
 
 abstract class CControllerServiceListGeneral extends CController {
 
+	private const WITHOUT_PARENTS_SERVICEID = 0;
+
+	private const FILTER_DEFAULT_NAME = '';
+	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
+	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
+
+	protected $is_filter_empty = true;
+
 	protected $service;
 
 	protected function doAction(): void {
@@ -52,16 +60,20 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	protected function updateFilter(): void {
-		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.service.serviceid', $this->getInput('serviceid', 0), PROFILE_TYPE_ID);
+		$serviceid = $this->getInput('serviceid', self::WITHOUT_PARENTS_SERVICEID);
 
-			CProfile::update('web.service.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.service.filter_status', $this->getInput('filter_status', SERVICE_STATUS_ANY),
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.service.filter_name', $this->getInput('filter_name', self::FILTER_DEFAULT_NAME),
+				PROFILE_TYPE_STR
+			);
+
+			CProfile::update('web.service.filter_status', $this->getInput('filter_status', self::FILTER_DEFAULT_STATUS),
 				PROFILE_TYPE_INT
 			);
 
-			$evaltype = $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
-			CProfile::update('web.service.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
+			CProfile::update('web.service.filter.evaltype',
+				$this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE), PROFILE_TYPE_INT
+			);
 
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
 			foreach ($this->getInput('filter_tags', []) as $tag) {
@@ -76,9 +88,8 @@ abstract class CControllerServiceListGeneral extends CController {
 			CProfile::updateArray('web.service.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.service.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
-		elseif ($this->hasInput('filter_rst')
-				|| (CProfile::get('web.service.serviceid', 0) != $this->getInput('serviceid', 0))) {
-			CProfile::delete('web.service.serviceid');
+		elseif ($this->hasInput('filter_rst') || (CProfile::get('web.service.serviceid') != $serviceid)) {
+			CProfile::update('web.service.serviceid', $serviceid, PROFILE_TYPE_ID);
 			CProfile::delete('web.service.filter_name');
 			CProfile::delete('web.service.filter_status');
 			CProfile::deleteIdx('web.service.filter.evaltype');
@@ -90,9 +101,10 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	protected function getFilter(): array {
 		$filter = [
-			'name' => CProfile::get('web.service.filter_name', ''),
-			'status' => CProfile::get('web.service.filter_status', SERVICE_STATUS_ANY),
-			'evaltype' => CProfile::get('web.service.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'serviceid' => CProfile::get('web.service.serviceid', self::WITHOUT_PARENTS_SERVICEID),
+			'name' => CProfile::get('web.service.filter_name', self::FILTER_DEFAULT_NAME),
+			'status' => CProfile::get('web.service.filter_status', self::FILTER_DEFAULT_STATUS),
+			'evaltype' => CProfile::get('web.service.filter.evaltype', self::FILTER_DEFAULT_EVALTYPE),
 			'tags' => []
 		];
 
@@ -102,6 +114,13 @@ abstract class CControllerServiceListGeneral extends CController {
 				'value' => CProfile::get('web.service.filter.tags.value', null, $i),
 				'operator' => CProfile::get('web.service.filter.tags.operator', null, $i)
 			];
+		}
+
+		if ($filter['name'] != self::FILTER_DEFAULT_NAME
+				|| $filter['status'] != self::FILTER_DEFAULT_STATUS
+				|| $filter['evaltype'] != self::FILTER_DEFAULT_EVALTYPE
+				|| $filter['tags']) {
+			$this->is_filter_empty = false;
 		}
 
 		return $filter;
@@ -199,5 +218,81 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 
 		return $breadcrumbs;
+	}
+
+	protected function prepareData(array $filter): array {
+		if ($filter['status'] == SERVICE_STATUS_OK) {
+			$filter_status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		}
+		elseif ($filter['status'] == SERVICE_STATUS_PROBLEM) {
+			$filter_status = array_column(getSeverities(TRIGGER_SEVERITY_INFORMATION), 'value');
+		}
+		else {
+			$filter_status = null;
+		}
+
+		$db_services = API::Service()->get([
+			'output' => [],
+			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && $this->is_filter_empty)
+				? null
+				: ['serviceid'],
+			'parentids' => $this->is_filter_empty ? $filter['serviceid'] : null,
+			'search' => ($filter['name'] === '')
+				? null
+				: ['name' => $filter['name']],
+			'filter' => [
+				'status' => $filter_status
+			],
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
+			'preservekeys' => true
+		]);
+
+		if (!$db_services || $this->is_filter_empty || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
+			return array_keys($db_services);
+		}
+
+		$filtered_serviceids = [];
+
+		do {
+			$parentids = [];
+
+			foreach ($db_services as $db_serviceid => $db_service) {
+				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
+
+				if (array_key_exists($filter['serviceid'], $service_parentids)) {
+					$filtered_serviceids[$db_serviceid] = true;
+					unset($db_services[$db_serviceid]);
+				}
+				else {
+					$parentids += $service_parentids;
+				}
+			}
+
+			$x_services = API::Service()->get([
+				'output' => [],
+				'selectParents' => ['serviceid'],
+				'serviceids' => $parentids,
+				'preservekeys' => true
+			]);
+
+			if (!$x_services) {
+				break;
+			}
+
+			foreach ($db_services as &$db_service) {
+				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
+
+				$new_parentids = [];
+				foreach ($service_parentids as $service_parentid) {
+					$new_parentids += array_column($x_services[$service_parentid]['parents'], null, 'serviceid');
+				}
+
+				$db_service['parents'] = $new_parentids;
+			}
+			unset($db_service);
+		} while (true);
+
+		return array_keys($filtered_serviceids);
 	}
 }

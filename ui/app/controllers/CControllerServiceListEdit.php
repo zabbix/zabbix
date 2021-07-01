@@ -62,6 +62,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$data = [
 			'path' => $path,
+			'breadcrumbs' => $this->getBreadcrumbs($path),
 			'filter' => $filter,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'view_curl' => (new CUrl('zabbix.php'))
@@ -76,19 +77,10 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'service' => $this->service,
-			'tags' => []
+			'service' => $this->service
 		];
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-
-		$db_serviceids = API::Service()->get([
-			'output' => [],
-			'sortfield' => ['sortorder', 'name'],
-			'sortorder' => ZBX_SORT_UP,
-			'preservekeys' => true,
-			'limit' => $limit
-		]);
+		$db_serviceids = $this->prepareData($filter);
 
 		$page_num = $this->getInput('page', 1);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP,
@@ -99,9 +91,11 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$data['services'] = API::Service()->get([
 			'output' => ['serviceid', 'name', 'status', 'goodsla'],
-			'serviceids' => array_keys($db_serviceids),
+			'serviceids' => $db_serviceids,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
+			'sortfield' => ['sortorder', 'name'],
+			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true
 		]);
 

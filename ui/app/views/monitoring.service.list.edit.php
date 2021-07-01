@@ -107,9 +107,9 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('Name'), 'filter_select'),
+				new CLabel(_('Name'), 'filter_name'),
 				new CFormField(
-					(new CTextBox('filter_select', $data['filter']['name']))
+					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
@@ -157,6 +157,11 @@ $table = (new CTableInfo())
 		(new CColHeader())
 	]);
 
+$path = $data['path'];
+if ($data['service'] !== null) {
+	$path[] = $data['service']['serviceid'];
+}
+
 foreach ($data['services'] as $serviceid => $service) {
 	$table->addRow(new CRow([
 		new CCheckBox('serviceids['.$serviceid.']', $serviceid),
@@ -164,6 +169,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list.edit')
+					->setArgument('path', $path)
 					->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($service['children'])
@@ -192,6 +198,18 @@ foreach ($data['services'] as $serviceid => $service) {
 	]));
 }
 
+$breadcrumbs = [];
+if (count($data['breadcrumbs']) > 1) {
+	foreach($data['breadcrumbs'] as $key => $path_item) {
+		$breadcrumbs[] = (new CSpan())
+			->addItem(array_key_exists('curl', $path_item)
+				? new CLink($path_item['name'], $path_item['curl'])
+				: $path_item['name']
+			)
+			->addClass(array_key_last($data['breadcrumbs']) === $key ? ZBX_STYLE_SELECTED : null);
+	}
+}
+
 (new CWidget())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
@@ -211,6 +229,9 @@ foreach ($data['services'] as $serviceid => $service) {
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
+	)
+	->setNavigation(
+		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
 	->addItem([
 		$filter,
