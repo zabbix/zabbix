@@ -197,7 +197,7 @@ class testGraphLinking extends CIntegrationTest {
 				'ServerActive'	=> '127.0.0.1',
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
-				'PidFile'       => '/tmp/zabbix_agent.pid'
+				'PidFile'       => '/tmp/zabbix_agentd.pid'
 			]
 		];
 	}
