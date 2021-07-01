@@ -65,6 +65,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`zabbix.stats[127.0.0.1,10051]`,
 		`kernel.maxfiles`,
 		`kernel.maxproc`,
+		`kernel.openfiles`,
 		`vfs.fs.size[/,free]`,
 		`vfs.fs.inode[/,free]`,
 		`vfs.fs.discovery`,
