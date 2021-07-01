@@ -202,6 +202,16 @@ class CPasswordComplexityValidator extends CValidator {
 		$password = base64_encode($password);
 
 		if (($handle = fopen(self::TOP_PASSWORDS_FILE, 'r')) !== false) {
+			// Skip disclaimer.
+			$prev_line = null;
+			while (($line = fgets($handle, 512)) !== false) {
+				if ($prev_line === '' && trim($line) === '') {
+					break;
+				}
+				$prev_line = trim($line);
+			}
+
+			// Check passwords.
 			while (($line = fgets($handle, 512)) !== false) {
 				if ($password === trim($line)) {
 					return false;

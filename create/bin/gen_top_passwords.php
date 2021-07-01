@@ -59,7 +59,7 @@ $source = "#\n".
 	"# list of Zabbix context-specific passwords.\n".
 	"#\n".
 	"# The list of passwords is used to check for commonly used passwords according to the password policy. Passwords are\n".
-	"# stored as base64-encoded strings.\n".
+	"# stored as base64-encoded strings. There must be two newlines before passwords.\n".
 	"#\n".
 	"\n".
 	"\n".
