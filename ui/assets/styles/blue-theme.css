@@ -4790,36 +4790,6 @@ a.link-action {
   a.link-action:focus {
     color: #0275b8; }
 
-.progress-bar-container {
-  display: inline-block;
-  white-space: nowrap;
-  position: relative; }
-  .progress-bar-container a {
-    border: none !important; }
-    .progress-bar-container a:hover .progress-bar-label, .progress-bar-container a:focus .progress-bar-label {
-      display: block; }
-
-.progress-bar-bg {
-  padding: 3px 0 2px;
-  font-size: 0.917em;
-  line-height: 1em;
-  display: inline-block; }
-  .progress-bar-bg.green-bg {
-    background-color: #34af67; }
-  .progress-bar-bg.red-bg {
-    background-color: #d64e4e; }
-
-.progress-bar-label {
-  display: none;
-  color: #ffffff;
-  font-size: 0.917em; }
-  .progress-bar-label span {
-    position: absolute; }
-    .progress-bar-label span:first-child {
-      left: .35em; }
-    .progress-bar-label span:last-child {
-      right: .35em; }
-
 .status-container .status-na-bg,
 .status-container .status-info-bg,
 .status-container .status-warning-bg,

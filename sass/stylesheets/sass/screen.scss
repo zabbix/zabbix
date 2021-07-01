@@ -3966,56 +3966,6 @@ a.link-action {
 	}
 }
 
-.progress-bar-container {
-	display: inline-block;
-	white-space: nowrap;
-	position: relative;
-
-	a {
-		border: none !important;
-
-		&:hover,
-		&:focus {
-			.progress-bar-label {
-				display: block;
-			}
-		}
-	}
-}
-
-.progress-bar-bg {
-	padding: 3px 0 2px;
-	font-size: $font-h3-size;
-	line-height: 1em;
-	display: inline-block;
-
-	&.green-bg {
-		background-color: darken(desaturate($alt-green, 10%), 16%);
-	}
-
-	&.red-bg {
-		background-color: darken(desaturate($alt-red, 10%), 5%);
-	}
-}
-
-.progress-bar-label {
-	display: none;
-	color: $white;
-	font-size: $font-h3-size;
-
-	span {
-		position: absolute;
-
-		&:first-child {
-			left: .35em;
-		}
-
-		&:last-child {
-			right: .35em;
-		}
-	}
-}
-
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;

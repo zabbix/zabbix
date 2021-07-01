@@ -60,7 +60,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$filter = $this->getFilter();
 
 		$data = [
-			'can_edit' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES),
+			'can_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES),
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path),
 			'filter' => $filter,

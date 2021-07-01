@@ -48,8 +48,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
-			&& $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
+			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES);
 	}
 
 	protected function doAction(): void {

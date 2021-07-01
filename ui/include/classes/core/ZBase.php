@@ -328,7 +328,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/macros',
-			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
 			$this->rootDir.'/include/classes/html/svg',

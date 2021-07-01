@@ -856,17 +856,6 @@ a.link-action {
 	}
 }
 
-.progress-bar-container {
-	a {
-		&:hover,
-		&:focus {
-			.progress-bar-label {
-				color: #ffffff !important;
-			}
-		}
-	}
-}
-
 .multiselect-suggest {
 	li {
 		&.suggest-hover {
