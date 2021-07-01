@@ -102,7 +102,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		if lport != 0 && s.LocalAddr.Port != uint16(lport) {
 			return false
 		}
-		if laddres != nil && !laddres.IsUnspecified() && !s.LocalAddr.IP.Equal(laddres) {
+		if laddres != nil && !s.LocalAddr.IP.Equal(laddres) {
 			return false
 		}
 		if lNet != nil && !lNet.Contains(s.LocalAddr.IP) {
@@ -111,7 +111,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		if rport != 0 && s.RemoteAddr.Port != uint16(rport) {
 			return false
 		}
-		if raddres != nil && !raddres.IsUnspecified() && !s.RemoteAddr.IP.Equal(raddres) {
+		if raddres != nil && !s.RemoteAddr.IP.Equal(raddres) {
 			return false
 		}
 		if rNet != nil && !rNet.Contains(s.RemoteAddr.IP) {
@@ -131,7 +131,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		if lport != 0 && s.LocalAddr.Port != uint16(lport) {
 			return false
 		}
-		if laddres != nil && !laddres.IsUnspecified() && !s.LocalAddr.IP.Equal(laddres) {
+		if laddres != nil && !s.LocalAddr.IP.Equal(laddres) {
 			return false
 		}
 		if lNet != nil && !lNet.Contains(s.LocalAddr.IP) {
@@ -140,7 +140,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		if rport != 0 && s.RemoteAddr.Port != uint16(rport) {
 			return false
 		}
-		if raddres != nil && !raddres.IsUnspecified() && !s.RemoteAddr.IP.Equal(raddres) {
+		if raddres != nil && !s.RemoteAddr.IP.Equal(raddres) {
 			return false
 		}
 		if rNet != nil && !rNet.Contains(s.RemoteAddr.IP) {
