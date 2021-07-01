@@ -294,7 +294,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 * @on-before prepareСloneTemplatedLLDPreprocessing
+	 * @onBefore prepareСloneTemplatedLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLLD() {
 		$link = 'host_discovery.php?form=update&itemid='.self::INHERITANCE_LLDID;
@@ -314,7 +314,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 * @on-before prepareCloneLLDPreprocessing
+	 * @onBefore prepareCloneLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneLLD() {
 		$link = 'host_discovery.php?form=update&itemid='.self::CLONE_LLDID;

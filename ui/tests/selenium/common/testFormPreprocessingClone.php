@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup hosts, items
+ * Common code for cloning hosts and templates with preprocessing steps in items.
  */
 class testFormPreprocessingClone extends CWebTest {
 
@@ -218,10 +218,9 @@ class testFormPreprocessingClone extends CWebTest {
 		CDataHelper::setSessionId(null);
 
 		CDataHelper::call('item.update', [
-				'itemid' => $this->itemid,
-				'preprocessing' => $this->getItemPreprocessing()
-			]
-		);
+			'itemid' => $this->itemid,
+			'preprocessing' => $this->getItemPreprocessing()
+		]);
 	}
 
 	/**
@@ -231,10 +230,9 @@ class testFormPreprocessingClone extends CWebTest {
 		CDataHelper::setSessionId(null);
 
 		CDataHelper::call('itemprototype.update', [
-				'itemid' => $this->item_prototypeid,
-				'preprocessing' => $this->getItemPreprocessing()
-			]
-		);
+			'itemid' => $this->item_prototypeid,
+			'preprocessing' => $this->getItemPreprocessing()
+		]);
 	}
 
 	/**
@@ -256,16 +254,16 @@ class testFormPreprocessingClone extends CWebTest {
 
 		// Get item key and preprocessing.
 		$item_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->itemid);
-		$item_original_steps = $this->openFormAndGetPreprocessingSteps('items.php?form=update&hostid='.$this->hostid.
+		$item_original_steps = $this->getSteps('items.php?form=update&hostid='.$this->hostid.
 				'&itemid='.$this->itemid);
 
 		// Get LLD key and  preprocessing.
 		$lld_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->lldid);
-		$lld_original_steps = $this->openFormAndGetPreprocessingSteps('host_discovery.php?form=update&itemid='.$this->lldid);
+		$lld_original_steps = $this->getSteps('host_discovery.php?form=update&itemid='.$this->lldid);
 
 		// Get item prototype key and preprocessing.
 		$item_prototype_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->item_prototypeid);
-		$item_prototype_original_steps = $this->openFormAndGetPreprocessingSteps('disc_prototypes.php?form=update&parent_discoveryid='.
+		$item_prototype_original_steps = $this->getSteps('disc_prototypes.php?form=update&parent_discoveryid='.
 				$this->lldid.'&itemid='.$this->item_prototypeid);
 
 		// Open host or template and make a full clone of it.
@@ -288,20 +286,20 @@ class testFormPreprocessingClone extends CWebTest {
 		// Get new cloned item id and assert item preprocessing.
 		$new_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.' AND key_ ='.
 				zbx_dbstr($item_key));
-		$item_cloned_steps = $this->openFormAndGetPreprocessingSteps('items.php?form=update&hostid='.$cloned_hostid.
+		$item_cloned_steps = $this->getSteps('items.php?form=update&hostid='.$cloned_hostid.
 				'&itemid='.$new_itemid);
 		$this->assertEquals($item_original_steps, $item_cloned_steps);
 
 		// Get new cloned lld rule id and assert lld preprocessing.
 		$new_lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.
 				' AND key_ ='.zbx_dbstr($lld_key));
-		$lld_cloned_steps = $this->openFormAndGetPreprocessingSteps('host_discovery.php?form=update&itemid='.$new_lldid);
+		$lld_cloned_steps = $this->getSteps('host_discovery.php?form=update&itemid='.$new_lldid);
 		$this->assertEquals($lld_original_steps, $lld_cloned_steps);
 
 		// Get new cloned item prototype id and assert item prototype preprocessing.
 		$new_item_prototypeid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.
 				' AND key_ ='.zbx_dbstr($item_prototype_key));
-		$item_prototype_cloned_steps = $this->openFormAndGetPreprocessingSteps('disc_prototypes.php?form=update&parent_discoveryid='.
+		$item_prototype_cloned_steps = $this->getSteps('disc_prototypes.php?form=update&parent_discoveryid='.
 				$new_lldid.'&itemid='.$new_item_prototypeid);
 		$this->assertEquals($item_prototype_original_steps, $item_prototype_cloned_steps);
 	}
@@ -313,12 +311,10 @@ class testFormPreprocessingClone extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function openFormAndGetPreprocessingSteps($link) {
+	private function getSteps($link) {
 		$this->page->open($link);
 		$this->query('name:itemForm')->asForm()->waitUntilPresent()->one()->selectTab('Preprocessing');
 
 		return $this->listPreprocessingSteps();
 	}
 }
-
-

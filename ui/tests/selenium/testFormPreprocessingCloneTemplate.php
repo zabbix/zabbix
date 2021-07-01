@@ -21,7 +21,9 @@
 require_once dirname(__FILE__).'/common/testFormPreprocessingClone.php';
 
 /**
- * @backup hosts
+ * Test of cloning template with preprocessing steps in items.
+ *
+ * @backup hosts, items
  */
 class testFormPreprocessingCloneTemplate extends testFormPreprocessingClone {
 
@@ -31,7 +33,7 @@ class testFormPreprocessingCloneTemplate extends testFormPreprocessingClone {
 	public $item_prototypeid = 15021;	// itemDiscovery.
 
 	/**
-	 * @on-before prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
+	 * @onBefore prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
 	 */
 	public function testFormPreprocessingCloneTemplate_FullCloneTemplate() {
 		$this->executeCloning(true);

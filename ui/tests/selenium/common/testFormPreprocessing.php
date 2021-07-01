@@ -2521,12 +2521,15 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check cloning of inherited preprocessing steps in items, prototypes or LLD rules.
 	 *
-	 * @param string $link    cloned item, prototype or LLD URL
-	 * @param string $item    what is being cloned: item, prototype or LLD rule
+	 * @param string    $link         cloned item, prototype or LLD URL
+	 * @param string    $item         what is being cloned: item, prototype or LLD rule
+	 * @param string    $templated    is it templated item or not
 	 */
 	protected function checkCloneItem($link, $item, $templated = false) {
-		$cloned_name = 'Cloned_testInheritancePreprocessingSteps'.time();
-		$cloned_key = 'cloned-preprocessing'.time();
+		$cloned_values = [
+			'Name'	=> 'Cloned_testInheritancePreprocessingSteps'.time(),
+			'Key' => 'cloned-preprocessing'.time()
+		];
 
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
@@ -2545,22 +2548,19 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Clone item.
 		$form->query('button:Clone')->waitUntilPresent()->one()->click();
 		$form->invalidate();
-		$form->fill([
-			'Name'	=> $cloned_name,
-			'Key' => $cloned_key
-		]);
+		$form->fill($cloned_values);
 
-		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
+		$this->checkPreprocessingSteps($form, $original_steps);
 		$form->submit();
-		$message = ($item === 'Discovery rule') ?  $item.' created' :  $item.' added';
+		$message = ($item === 'Discovery rule') ? $item.' created' : $item.' added';
 		$this->assertMessage(TEST_GOOD, $message);
 
 		// Open cloned item and check preprocessing steps in saved form.
-		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_key));
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_values['Key']));
 		$this->page->open($this->ready_link.$id);
 		$form->invalidate();
-		$this->assertEquals($cloned_name, $form->getField('Name')->getValue());
-		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
+		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());
+		$this->checkPreprocessingSteps($form, $original_steps);
 	}
 
 	/**
@@ -2570,11 +2570,11 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param CFormElement	$form				item, prototype or LLD configuration form
 	 * @param array			$original_steps		preprocessing steps of original item
 	 */
-	private function selectPreprocessingAndCheckSteps($form, $original_steps) {
+	private function checkPreprocessingSteps($form, $original_steps) {
 		$form->selectTab('Preprocessing');
 		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
 
-		// Check preprocessing steps in cloned form.
+		// Check that preprocessing steps in cloned form are editable.
 		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));

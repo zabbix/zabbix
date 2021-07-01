@@ -122,7 +122,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	}
 
 	/**
-	 * @on-before prepareCloneItemPrototypePreprocessing
+	 * @onBefore prepareCloneItemPrototypePreprocessing
 	 */
 	public function testFormPreprocessingItemPrototype_CloneItemPrototype() {
 		$link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::CLONE_RULEID.

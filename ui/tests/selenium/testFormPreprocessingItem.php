@@ -170,7 +170,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	}
 
 	/**
-	 * @on-before prepareCloneItemPreprocessing
+	 * @onBefore prepareCloneItemPreprocessing
 	 *
 	 * @backup profiles
 	 */
