@@ -88,7 +88,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allRegexps
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
@@ -106,7 +106,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup-once regexps
+	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');

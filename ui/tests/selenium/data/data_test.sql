@@ -1075,6 +1075,13 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (40001, 'Simp
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
 
+INSERT INTO applications (applicationid, hostid, name) VALUES (5000, 40001, 'Old Application 1');
+INSERT INTO applications (applicationid, hostid, name) VALUES (5001, 40001, 'Old Application 2');
+INSERT INTO applications (applicationid, hostid, name) VALUES (5002, 40001, 'App for replace 1');
+INSERT INTO applications (applicationid, hostid, name) VALUES (5003, 40001, 'App for replace 2');
+INSERT INTO applications (applicationid, hostid, name) VALUES (5004, 40001, 'App for remove 1');
+INSERT INTO applications (applicationid, hostid, name) VALUES (5005, 40001, 'App for remove 2');
+
 -- testFormItem interfaces
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '10052');

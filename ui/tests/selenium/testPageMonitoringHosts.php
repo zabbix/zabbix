@@ -704,7 +704,7 @@ class testPageMonitoringHosts extends CWebTest {
 	/**
 	 * @backup hosts
 	 *
-	 * @on-before-once prepareUpdateData
+	 * @onBeforeOnce prepareUpdateData
 	 */
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
