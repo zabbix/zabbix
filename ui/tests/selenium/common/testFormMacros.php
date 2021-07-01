@@ -594,7 +594,7 @@ abstract class testFormMacros extends CWebTest {
 				// Get all object's macros.
 				$hostmacros = $this->getMacros();
 
-				// By default macro type is Text, which reffers to 0.
+				// By default macro type is Text, which refers to 0.
 				foreach ($hostmacros as &$macro) {
 					$macro['type'] = 0;
 				}
