@@ -197,8 +197,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'Hostname'		=>  self::HOST_NAME,
 				'ServerActive'	=> '127.0.0.1',
 				'DebugLevel'    => 4,
-				'LogFileSize'   => 0,
-				'PidFile'       => '/tmp/zabbix_agentd.pid'
+				'LogFileSize'   => 0
 			]
 		];
 	}
