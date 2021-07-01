@@ -57,6 +57,8 @@ $tags_form_grid = (new CFormGrid())
 
 $form->addItem($tags_form_grid);
 
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
+
 $output = [
 	'header' => $data['title'],
 	'body' => $form->toString(),

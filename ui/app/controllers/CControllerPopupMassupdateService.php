@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
+require_once __DIR__.'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateService extends CControllerPopupMassupdateAbstract {
+class CControllerPopupMassupdateService extends CControllerPopup {
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -74,8 +74,6 @@ class CControllerPopupMassupdateService extends CControllerPopupMassupdateAbstra
 			$result = true;
 
 			try {
-				DBstart();
-
 				$options = [
 					'output' => ['serviceid'],
 					'serviceids' => $serviceids
@@ -147,20 +145,23 @@ class CControllerPopupMassupdateService extends CControllerPopupMassupdateAbstra
 			}
 			catch (Exception $e) {
 				$result = false;
-				CMessageHelper::setErrorTitle(_('Cannot update services'));
 			}
 
-			DBend($result);
-
 			if ($result) {
-				$messages = CMessageHelper::getMessages();
 				$output = ['title' => _('Services updated')];
-				if (count($messages)) {
+
+				$messages = CMessageHelper::getMessages();
+
+				if ($messages) {
 					$output['messages'] = array_column($messages, 'message');
 				}
 			}
 			else {
-				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+				CMessageHelper::setErrorTitle(_('Cannot update services'));
+
+				$output = [
+					'errors' => makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString()
+				];
 			}
 
 			$this->setResponse(
