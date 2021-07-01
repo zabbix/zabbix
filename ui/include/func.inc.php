@@ -2600,3 +2600,39 @@ function generateUuidV4($seed = '') {
 
 	return bin2hex($data);
 }
+
+/**
+ * Generate CUID hash.
+ *
+ * Based on server CUID implementation.
+ *
+ * @return string
+ */
+function generateCuid(): string {
+	static $CUID_COUNTER = 0;
+
+	$BASE = 36;
+	$BLOCK_SIZE = 4;
+
+	$pad = function (string $value, int $size) use ($BASE): string {
+		$DECIMAL = 10;
+		return substr(str_pad(base_convert($value, $DECIMAL, $BASE), $size, '0', STR_PAD_LEFT), 0, $size);
+	};
+
+	$timestamp = $pad(floor(microtime(true) * 1000), $BLOCK_SIZE * 2);
+
+	$hostname_num = array_sum(array_map(function ($char) {
+		return ord($char);
+	}, str_split(gethostname()))) + strlen(gethostname()) + $BASE;
+
+	$fingerprint = $pad(getmypid(), $BLOCK_SIZE / 2) . $pad($hostname_num, $BLOCK_SIZE / 2);
+
+	$counter = $pad($CUID_COUNTER++, $BLOCK_SIZE);
+
+	$random1 = mt_rand() / mt_getrandmax() * pow($BASE, $BLOCK_SIZE);
+	$random_block1 = $pad(floor($random1), $BLOCK_SIZE);
+	$random2 = mt_rand() / mt_getrandmax() * pow($BASE, $BLOCK_SIZE);
+	$random_block2 = $pad(floor($random2), $BLOCK_SIZE);
+
+	return sprintf('c%s%s%s%s%s', $timestamp, $counter, $fingerprint, $random_block1, $random_block2);
+}
