@@ -876,7 +876,7 @@ abstract class CGraphGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function inherit(array $graphs, array $hostids = null): void {
-		$graphs = zbx_toHash($graphs, 'graphid');
+		$graphs = array_column($graphs, null, 'graphid');
 
 		if ($hostids === null) {
 			/*
@@ -895,13 +895,12 @@ abstract class CGraphGeneral extends CApiService {
 			 */
 			$itemids_of_templates_linked_to_hosts = DBfetchColumn(
 				DBselect(
-					'SELECT i.itemid'.
+					'SELECT DISTINCT i.itemid'.
 					' FROM items i,hosts h,hosts_templates ht'.
-					' WHERE h.hostid=i.hostid'.
-						' AND ht.templateid=i.hostid'.
+					' WHERE i.hostid=h.hostid'.
+						' AND h.hostid=ht.templateid'.
 						' AND '.dbConditionId('i.itemid', $graphids_first_itemids).
-						' AND h.status='.HOST_STATUS_TEMPLATE.
-					' GROUP BY i.itemid'
+						' AND h.status='.HOST_STATUS_TEMPLATE
 				),
 				'itemid'
 			);
