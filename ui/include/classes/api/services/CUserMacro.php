@@ -340,12 +340,8 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($globalmacros as $index => $globalmacro) {
-			if (!array_key_exists($globalmacro['globalmacroid'], $db_globalmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($globalmacros) != count($db_globalmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$globalmacros = $this->extendObjectsByKey($globalmacros, $db_globalmacros, 'globalmacroid', ['type']);
@@ -373,6 +369,8 @@ class CUserMacro extends CApiService {
 	 * Check for duplicated macros.
 	 *
 	 * @param array      $globalmacros
+	 * @param string     $globalmacros[]['globalmacroid']  (optional if $db_globalmacros is null)
+	 * @param string     $globalmacros[]['macro']          (optional if $db_globalmacros is not null)
 	 * @param array|null $db_globalmacros
 	 *
 	 * @throws APIException if macros already exists.
@@ -446,12 +444,8 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($globalmacroids as $globalmacroid) {
-			if (!array_key_exists($globalmacroid, $db_globalmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($globalmacroids) != count($db_globalmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -518,12 +512,8 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($hostmacros as $hostmacro) {
-			if (!array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($hostmacros) != count($db_hostmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// CUserMacro::get does not return secret values. Loading directly from the database.
@@ -564,7 +554,7 @@ class CUserMacro extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkHostDuplicates($hostmacros);
+		$this->checkHostDuplicates($hostmacros, $db_hostmacros);
 	}
 
 	/**
@@ -572,31 +562,31 @@ class CUserMacro extends CApiService {
 	 * the "hostmacroid" field is set, the method will only fail, if a macro with a different hostmacroid exists.
 	 * Assumes the "macro", "hostid" and "hostmacroid" fields are valid.
 	 *
-	 * @param array  $hostmacros
-	 * @param string $hostmacros[]['hostmacroid']
-	 * @param string $hostmacros[]['hostid']
-	 * @param string $hostmacros[]['macro']        (optional)
+	 * @param array      $hostmacros
+	 * @param string     $hostmacros[]['hostmacroid']  (optional if $db_hostmacros is null)
+	 * @param string     $hostmacros[]['hostid']
+	 * @param string     $hostmacros[]['macro']        (optional if $db_hostmacros is not null)
+	 * @param array|null $db_hostmacros
 	 *
 	 * @throws APIException if any of the given macros already exist.
 	 */
-	private function checkHostDuplicates(array $hostmacros) {
+	private function checkHostDuplicates(array $hostmacros, array $db_hostmacros = null) {
 		$macro_names = [];
 		$existing_macros = [];
-		$user_macro_parser = new CUserMacroParser();
 
 		// Parse each macro, get unique names and, if context exists, narrow down the search.
-		foreach ($hostmacros as $hostmacro) {
-			if (!array_key_exists('macro', $hostmacro)) {
+		foreach ($hostmacros as $index => $hostmacro) {
+			if ($db_hostmacros !== null && (!array_key_exists('macro', $hostmacro)
+					|| CApiInputValidator::trimMacro($hostmacro['macro'])
+						=== CApiInputValidator::trimMacro($db_hostmacros[$hostmacro['hostmacroid']]['macro']))) {
+				unset($hostmacros[$index]);
+
 				continue;
 			}
 
-			$user_macro_parser->parse($hostmacro['macro']);
+			[$macro_name, $details] = explode(':', CApiInputValidator::trimMacro($hostmacro['macro']), 2);
 
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
-
-			$macro_names[] = ($context === null && $regex === null) ? '{$'.$macro_name : '{$'.$macro_name.':';
+			$macro_names[($details === null) ? '{$'.$macro_name : '{$'.$macro_name.':'] = true;
 			$existing_macros[$hostmacro['hostid']] = [];
 		}
 
@@ -607,7 +597,7 @@ class CUserMacro extends CApiService {
 		$options = [
 			'output' => ['hostmacroid', 'hostid', 'macro'],
 			'filter' => ['hostid' => array_keys($existing_macros)],
-			'search' => ['macro' => $macro_names],
+			'search' => ['macro' => array_keys($macro_names)],
 			'searchByAny' => true,
 			'startSearch' => true
 		];
@@ -616,54 +606,29 @@ class CUserMacro extends CApiService {
 
 		// Collect existing unique macro names and their contexts for each host.
 		while ($db_hostmacro = DBfetch($db_hostmacros)) {
-			$user_macro_parser->parse($db_hostmacro['macro']);
+			$trimmed_macro = CApiInputValidator::trimMacro($db_hostmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
-
-			$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] =
-				['context' => $context, 'regex' => $regex];
+			$existing_macros[$db_hostmacro['hostid']][$trimmed_macro] = $db_hostmacro['hostmacroid'];
 		}
 
 		// Compare each macro name and context to existing one.
 		foreach ($hostmacros as $hostmacro) {
-			if (!array_key_exists('macro', $hostmacro)) {
-				continue;
-			}
-
 			$hostid = $hostmacro['hostid'];
+			$trimmed_macro = CApiInputValidator::trimMacro($hostmacro['macro']);
 
-			$user_macro_parser->parse($hostmacro['macro']);
+			if (array_key_exists($trimmed_macro, $existing_macros[$hostid])) {
+				$db_hostmacroid = $existing_macros[$hostid][$trimmed_macro];
 
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
+				if (!array_key_exists('hostmacroid', $hostmacro)
+						|| bccomp($hostmacro['hostmacroid'], $db_hostmacroid) != 0) {
+					$hosts = DB::select('hosts', [
+						'output' => ['name'],
+						'hostids' => $hostid
+					]);
 
-			if (array_key_exists($macro_name, $existing_macros[$hostid])) {
-				$has_context = ($context !== null && in_array($context,
-					array_column($existing_macros[$hostid][$macro_name], 'context'), true
-				));
-				$has_regex = ($regex !== null && in_array($regex,
-					array_column($existing_macros[$hostid][$macro_name], 'regex'), true
-				));
-				$is_macro_without_context = ($context === null && $regex === null);
-
-				if ($is_macro_without_context || $has_context || $has_regex) {
-					foreach ($existing_macros[$hostid][$macro_name] as $hostmacroid => $macro_details) {
-						if ((!array_key_exists('hostmacroid', $hostmacro)
-									|| bccomp($hostmacro['hostmacroid'], $hostmacroid) != 0)
-								&& $context === $macro_details['context'] && $regex === $macro_details['regex']) {
-							$hosts = DB::select('hosts', [
-								'output' => ['name'],
-								'hostids' => $hostid
-							]);
-
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
-							);
-						}
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
+					);
 				}
 			}
 		}
@@ -720,12 +685,8 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($hostmacroids as $hostmacroid) {
-			if (!array_key_exists($hostmacroid, $db_hostmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($hostmacroids) != count($db_hostmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -747,7 +708,7 @@ class CUserMacro extends CApiService {
 	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
-	 * @param array $hostids    an array of host or template IDs
+	 * @param array $hostids  An array of host or template IDs.
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
