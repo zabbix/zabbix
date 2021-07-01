@@ -162,6 +162,9 @@ class testTriggerLinking extends CIntegrationTest {
 					]
 				]
 			]);
+
+			$this->assertArrayHasKey('triggerids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['triggerids']);
 		}
 
 		$this->setupActions();
@@ -205,7 +208,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('host', $response['result'][0]);
-		$hostname = $response['result'][0]['host'];
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
@@ -280,12 +282,13 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::startComponent(self::COMPONENT_AGENT);
+		self::restartComponent(self::COMPONENT_AGENT);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
 		]);
 
 		$this->checkTriggersCreate();
+		self::stopComponent(self::COMPONENT_AGENT);
 	}
 }
