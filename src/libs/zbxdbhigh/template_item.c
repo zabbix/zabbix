@@ -27,11 +27,12 @@
 #include "../zbxalgo/vectorimpl.h"
 
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;
-ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *);
+ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
 struct _zbx_template_item_preproc_t
 {
 	zbx_uint64_t	item_preprocid;
+#define ZBX_FLAG_TEMPLATE_ITEM_PREPROC_RESET_FLAG			__UINT64_C(0x000000000000)
 #define ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_TYPE			__UINT64_C(0x000000000001)
 #define ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_PARAMS			__UINT64_C(0x000000000002)
 #define ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER		__UINT64_C(0x000000000004)
@@ -53,7 +54,7 @@ struct _zbx_template_item_preproc_t
 	char		*error_handler_params;
 };
 
-ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *);
+ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
 typedef struct _zbx_template_item_tag_t zbx_template_item_tag_t;
 ZBX_PTR_VECTOR_DECL(item_tag_ptr, zbx_template_item_tag_t *);
@@ -61,6 +62,7 @@ ZBX_PTR_VECTOR_DECL(item_tag_ptr, zbx_template_item_tag_t *);
 struct _zbx_template_item_tag_t
 {
 	zbx_uint64_t	itemtagid;
+#define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
 #define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG		__UINT64_C(0x000000000001)
 #define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE		__UINT64_C(0x000000000002)
 #define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE			\
@@ -75,7 +77,7 @@ struct _zbx_template_item_tag_t
 	char		*value;
 };
 
-ZBX_PTR_VECTOR_IMPL(item_tag_ptr, zbx_template_item_tag_t *);
+ZBX_PTR_VECTOR_IMPL(item_tag_ptr, zbx_template_item_tag_t *)
 
 typedef struct _zbx_template_item_param_t zbx_template_item_param_t;
 ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *);
@@ -83,6 +85,7 @@ ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *);
 struct _zbx_template_item_param_t
 {
 	zbx_uint64_t	item_parameterid;
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
 #define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME	__UINT64_C(0x000000000001)
 #define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE	__UINT64_C(0x000000000002)
 #define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE			\
@@ -97,14 +100,15 @@ struct _zbx_template_item_param_t
 	char		*value;
 };
 
-ZBX_PTR_VECTOR_IMPL(item_param_ptr, zbx_template_item_param_t *);
+ZBX_PTR_VECTOR_IMPL(item_param_ptr, zbx_template_item_param_t *)
 
 typedef struct _zbx_template_lld_macro_t zbx_template_lld_macro_t;
-ZBX_PTR_VECTOR_DECL(lld_macro_ptr, zbx_template_lld_macro_t *);
+ZBX_PTR_VECTOR_DECL(lld_macro_ptr, zbx_template_lld_macro_t *)
 
 struct _zbx_template_lld_macro_t
 {
 	zbx_uint64_t	lld_macro_pathid;
+#define ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
 #define ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_LLD_MACRO	__UINT64_C(0x000000000001)
 #define ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_PATH		__UINT64_C(0x000000000002)
 #define ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE			\
@@ -119,106 +123,59 @@ struct _zbx_template_lld_macro_t
 	char		*path;
 };
 
-ZBX_PTR_VECTOR_IMPL(lld_macro_ptr, zbx_template_lld_macro_t *);
+ZBX_PTR_VECTOR_IMPL(lld_macro_ptr, zbx_template_lld_macro_t *)
 
 typedef struct
 {
 	zbx_uint64_t			itemid;
-	/* interfaceid should be updated */
+#define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INTERFACEID	__UINT64_C(0x000000000001)
-	/* templateid should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TEMPLATEID	__UINT64_C(0x000000000002)
-	/* name should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME		__UINT64_C(0x000000000004)
-	/* type should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TYPE		__UINT64_C(0x000000000008)
-	/* value_type should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUE_TYPE	__UINT64_C(0x000000000010)
-	/* delay should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DELAY		__UINT64_C(0x000000000020)
-	/* history should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HISTORY		__UINT64_C(0x000000000040)
-	/* trends should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRENDS		__UINT64_C(0x000000000080)
-	/* status should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS		__UINT64_C(0x000000000100)
-	/* trapper_hosts should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRAPPER_HOSTS	__UINT64_C(0x000000000200)
-	/* units should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_UNITS		__UINT64_C(0x000000000400)
-	/* formula should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FORMULA		__UINT64_C(0x000000000800)
-	/* logtimefmt should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LOGTIMEFMT	__UINT64_C(0x000000001000)
-	/* valuemapid should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUEMAPID	__UINT64_C(0x000000002000)
-	/* params should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PARAMS		__UINT64_C(0x000000004000)
-	/* ipmi_sensor should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_IPMI_SENSOR	__UINT64_C(0x000000008000)
-	/* snmp_oid should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SNMP_OID		__UINT64_C(0x000000010000)
-	/* authtype should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_AUTHTYPE		__UINT64_C(0x000000020000)
-	/* username should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_USERNAME		__UINT64_C(0x000000040000)
-	/* password should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PASSWORD		__UINT64_C(0x000000080000)
-	/* publickey should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PUBLICKEY		__UINT64_C(0x000000100000)
-	/* privatekey should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PRIVATEKEY	__UINT64_C(0x000000200000)
-	/* flags should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FLAGS		__UINT64_C(0x000000400000)
-	/* description should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DESCRIPTION	__UINT64_C(0x000000800000)
-	/* inventory_link should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INVENTORY_LINK	__UINT64_C(0x000001000000)
-	/* lifetime should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME		__UINT64_C(0x000002000000)
-	/* evaltype should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_EVALTYPE		__UINT64_C(0x000004000000)
-	/* jmx_endpoint should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_JMX_ENDPOINT	__UINT64_C(0x000008000000)
-	/* master_itemid should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID	__UINT64_C(0x000010000000)
-	/* timeout should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIMEOUT		__UINT64_C(0x000020000000)
-	/* url should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_URL		__UINT64_C(0x000040000000)
-	/* query_fields should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY_FIELDS	__UINT64_C(0x000080000000)
-	/* posts should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POSTS		__UINT64_C(0x000100000000)
-	/* status_codes should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS_CODES	__UINT64_C(0x000200000000)
-	/* follow_redirects should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FOLLOW_REDIRECTS	__UINT64_C(0x000400000000)
-	/* post_type should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POST_TYPE		__UINT64_C(0x000800000000)
-	/* http_proxy should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HTTP_PROXY	__UINT64_C(0x001000000000)
-	/* headers should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HEADERS		__UINT64_C(0x002000000000)
-	/* retrieve_mode should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RETRIEVE_MODE	__UINT64_C(0x004000000000)
-	/* request_method should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_REQUEST_METHOD	__UINT64_C(0x008000000000)
-	/* output_format should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_OUTPUT_FORMAT	__UINT64_C(0x010000000000)
-	/* ssl_cert_file should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_CERT_FILE	__UINT64_C(0x020000000000)
-	/* ssl_key_file should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_FILE	__UINT64_C(0x040000000000)
-	/* ssl_key_password should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_PASSWORD	__UINT64_C(0x080000000000)
-	/* verify_peer should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_PEER	__UINT64_C(0x100000000000)
-	/* verify_host should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_HOST	__UINT64_C(0x200000000000)
-	/* allow_traps should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS	__UINT64_C(0x400000000000)
-	/* discover should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER		__UINT64_C(0x800000000000)
 
 	zbx_uint64_t			upd_flags;
@@ -288,11 +245,9 @@ zbx_template_item_t;
 typedef struct
 {
 	zbx_uint64_t	item_conditionid;
-	/* macro should be updated */
+#define ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_RESET_FLAG	__UINT64_C(0x00000000)
 #define ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO		__UINT64_C(0x00000001)
-	/* value should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE		__UINT64_C(0x00000002)
-	/* operator should be updated */
 #define ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR	__UINT64_C(0x00000004)
 	zbx_uint64_t	upd_flags;
 	char		*macro;
@@ -398,18 +353,18 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select ti.itemid,ti.name,ti.key_,ti.type,ti.value_type,ti.delay,"
 				"ti.history,ti.trends,ti.status,ti.trapper_hosts,ti.units,"
-				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_oid,ti.authtype,"
-				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.description,"
-				"ti.inventory_link,ti.lifetime,hi.itemid,ti.evaltype,"
+				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_oid,"
+				"ti.authtype,ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,"
+				"ti.description,ti.inventory_link,ti.lifetime,hi.itemid,ti.evaltype,"
 				"ti.jmx_endpoint,ti.master_itemid,ti.timeout,ti.url,ti.query_fields,ti.posts,"
 				"ti.status_codes,ti.follow_redirects,ti.post_type,ti.http_proxy,ti.headers,"
 				"ti.retrieve_mode,ti.request_method,ti.output_format,ti.ssl_cert_file,ti.ssl_key_file,"
 				"ti.ssl_key_password,ti.verify_peer,ti.verify_host,ti.allow_traps,ti.discover,"
 				"hi.interfaceid,hi.templateid,hi.name,hi.type,hi.value_type,hi.delay,"
 				"hi.history,hi.trends,hi.status,hi.trapper_hosts,hi.units,"
-				"hi.formula,hi.logtimefmt,hi.valuemapid,hi.params,hi.ipmi_sensor,hi.snmp_oid,hi.authtype,"
-				"hi.username,hi.password,hi.publickey,hi.privatekey,hi.flags,hi.description,"
-				"hi.inventory_link,hi.lifetime,hi.evaltype,"
+				"hi.formula,hi.logtimefmt,hi.valuemapid,hi.params,hi.ipmi_sensor,hi.snmp_oid,"
+				"hi.authtype,hi.username,hi.password,hi.publickey,hi.privatekey,hi.flags,"
+				"hi.description,hi.inventory_link,hi.lifetime,hi.evaltype,"
 				"hi.jmx_endpoint,hi.master_itemid,hi.timeout,hi.url,hi.query_fields,hi.posts,"
 				"hi.status_codes,hi.follow_redirects,hi.post_type,hi.http_proxy,hi.headers,"
 				"hi.retrieve_mode,hi.request_method,hi.output_format,hi.ssl_cert_file,hi.ssl_key_file,"
@@ -496,7 +451,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
 		ZBX_STR2UCHAR(item->discover, row[48]);
 
-		item->upd_flags = 0;
+		item->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG;
 
 		if (SUCCEED != DBis_null(row[26]))
 		{
@@ -506,31 +461,31 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 
 #define SET_FLAG_STR(r, i, f)			\
 						\
-do {						\
+{						\
 	str_orig = zbx_strdup(str_orig, (r));	\
 	if (0 != strcmp(str_orig, (i)))		\
 		item->upd_flags |= f;		\
-} while (0)
+}
 
 #define SET_FLAG_UCHAR(r, i, f)		\
 					\
-do {					\
+{					\
 	ZBX_STR2UCHAR(uchar_orig, (r));	\
 	if (uchar_orig != (i))		\
 		item->upd_flags |= f;	\
-} while (0)
+}
 
 
 #define SET_FLAG_UINT64(r, i, f)			\
 							\
-do {							\
+{							\
 	if (SUCCEED == DBis_null(r))			\
 		uint64_orig = 0;			\
 	else						\
 		ZBX_STR2UINT64(uint64_orig, (r));	\
 	if (uint64_orig != (i))				\
 		item->upd_flags |= f;			\
-} while (0)
+}
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
@@ -686,7 +641,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 				ZBX_STR2UCHAR(condition->op, row[2]);
 				condition->macro = zbx_strdup(NULL, row[3]);
 				condition->value = zbx_strdup(NULL, row[4]);
-				condition->upd_flags = 0;
+				condition->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_RESET_FLAG;
 
 				zbx_vector_ptr_append(&rule->conditions, condition);
 			}
@@ -696,9 +651,9 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 				for (i = 0; i < rules->values_num; i++)
 				{
-					char		*str_orig = NULL;
+					char		*str_orig;
 					unsigned char	uchar_orig;
-					zbx_uint64_t	flags = 0;
+					zbx_uint64_t	flags = ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_RESET_FLAG;
 
 					rule = (zbx_lld_rule_map_t *)rules->values[i];
 
@@ -711,7 +666,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 					{
 						condition = (zbx_lld_rule_condition_t *)rule->conditions.values[index];
 						ZBX_STR2UCHAR(uchar_orig, row[2]);
-						str_orig = zbx_strdup(str_orig, row[3]);
+						str_orig = zbx_strdup(NULL, row[3]);
 						if (uchar_orig != condition->op)
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR;
 						if (0 != strcmp(str_orig, condition->macro))
@@ -1202,10 +1157,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			d = ",";
 		}
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER))
-		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdiscover=%d", d, (int)item->discover);
-			d = ",";
-		}
+
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 	}
 	else
@@ -1420,7 +1373,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition set ");
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%soperator=%d", d, (int)condition->op);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%soperator=%d", d,
+						(int)condition->op);
 				d = ",";
 			}
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO))
@@ -1434,7 +1388,6 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			{
 				value_esc = DBdyn_escape_string(condition->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
-				d = ",";
 				zbx_free(value_esc);
 			}
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_conditionid=" ZBX_FS_UI64 ";\n",
@@ -1724,7 +1677,7 @@ static int	template_item_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: copy template item preprocessing options                          *
  *                                                                            *
- * Parameters: items       - [IN] array of new/updated items                  *
+ * Parameters: items       - [IN] vector of new/updated items                 *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
@@ -1880,7 +1833,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
  *                                                                            *
  * Purpose: copy template item tags                                           *
  *                                                                            *
- * Parameters: items       - [IN] array of new/updated items                  *
+ * Parameters: items       - [IN] vector of new/updated items                 *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
@@ -2017,7 +1970,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
  *                                                                            *
  * Purpose: copy template item script parameters                              *
  *                                                                            *
- * Parameters: items       - [IN] array of new/updated items                  *
+ * Parameters: items       - [IN] vector of new/updated items                 *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
@@ -2158,7 +2111,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
  *                                                                            *
  * Purpose: copy template discovery item lld macro paths                      *
  *                                                                            *
- * Parameters: items       - [IN] array of new/updated items                  *
+ * Parameters: items       - [IN] vector of new/updated items                 *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
@@ -2729,6 +2682,7 @@ static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 	zbx_template_item_preproc_t *op2 = *(zbx_template_item_preproc_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(op1->step, op2->step);
+
 	return 0;
 }
 
@@ -2738,6 +2692,7 @@ static int	template_item_tag_sort_by_tag(const void *d1, const void *d2)
 	zbx_template_item_tag_t	*it2 = *(zbx_template_item_tag_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
+
 	return 0;
 }
 
@@ -2747,6 +2702,7 @@ static int	template_item_param_sort_by_name(const void *d1, const void *d2)
 	zbx_template_item_param_t	*ip2 = *(zbx_template_item_param_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ip1->name, ip2->name);
+
 	return 0;
 }
 
@@ -2756,6 +2712,7 @@ static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 	zbx_template_lld_macro_t	*ip2 = *(zbx_template_lld_macro_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ip1->lld_macro, ip2->lld_macro);
+
 	return 0;
 }
 /******************************************************************************
@@ -2764,7 +2721,7 @@ static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: create item_preproc vectors in item data                          *
  *                                                                            *
- * Parameters: templateids - [IN] array of template IDs                       *
+ * Parameters: templateids - [IN] vector of template IDs                      *
  *             items       - [IN/OUT] the template items                      *
  *                                                                            *
  ******************************************************************************/
@@ -2821,7 +2778,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			ppdst = (zbx_template_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_template_item_preproc_t));
 
-			ppdst->upd_flags = 0;
+			ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PREPROC_RESET_FLAG;
 			ZBX_STR2UINT64(ppdst->item_preprocid, row[0]);
 			ppdst->step = atoi(row[2]);
 			ppdst->type = atoi(row[3]);
@@ -2859,7 +2816,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		}
 		ppdst = (zbx_template_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_template_item_preproc_t));
 
-		ppdst->upd_flags = 0;
+		ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PREPROC_RESET_FLAG;
 		ZBX_STR2UINT64(ppdst->item_preprocid, row[0]);
 		ppdst->step = atoi(row[2]);
 		ppdst->type = atoi(row[3]);
@@ -2892,7 +2849,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 				ppdst = (zbx_template_item_preproc_t *)zbx_malloc(NULL,
 						sizeof(zbx_template_item_preproc_t));
 				ppdst->item_preprocid = 0;
-				ppdst->upd_flags = 0;
+				ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PREPROC_RESET_FLAG;
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
 				ppdst->params = zbx_strdup(NULL, ppsrc->params);
@@ -2958,7 +2915,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
  *                                                                            *
  * Purpose: create item_tags vectors in item data                             *
  *                                                                            *
- * Parameters: templateids - [IN] array of template IDs                       *
+ * Parameters: templateids - [IN] vector of template IDs                      *
  *             items       - [IN/OUT] the template items                      *
  *                                                                            *
  ******************************************************************************/
@@ -3004,7 +2961,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3014,7 +2972,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 
 			ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
 
-			ptdst->upd_flags = 0;
+			ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
 			ZBX_STR2UINT64(ptdst->itemtagid, row[0]);
 			ptdst->tag = zbx_strdup(NULL, row[2]);
 			ptdst->value = zbx_strdup(NULL, row[3]);
@@ -3048,7 +3006,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		}
 		ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
 
-		ptdst->upd_flags = 0;
+		ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
 		ZBX_STR2UINT64(ptdst->itemtagid, row[0]);
 		ptdst->tag = zbx_strdup(NULL, row[2]);
 		ptdst->value = zbx_strdup(NULL, row[3]);
@@ -3077,7 +3035,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 				ptsrc = (zbx_template_item_tag_t *)item->template_tags.values[j];
 				ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
 				ptdst->itemtagid = 0;
-				ptdst->upd_flags = 0;
+				ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
 				ptdst->tag = zbx_strdup(NULL, ptsrc->tag);
 				ptdst->value = zbx_strdup(NULL, ptsrc->value);
 				zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
@@ -3129,7 +3087,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
  *                                                                            *
  * Purpose: create item_params vectors in item data                           *
  *                                                                            *
- * Parameters: templateids - [IN] array of template IDs                       *
+ * Parameters: templateids - [IN] vector of template IDs                      *
  *             items       - [IN/OUT] the template items                      *
  *                                                                            *
  ******************************************************************************/
@@ -3175,7 +3133,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3185,7 +3144,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 
-			ppdst->upd_flags = 0;
+			ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
 			ZBX_STR2UINT64(ppdst->item_parameterid, row[0]);
 			ppdst->name = zbx_strdup(NULL, row[2]);
 			ppdst->value = zbx_strdup(NULL, row[3]);
@@ -3219,7 +3178,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 		}
 		ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 
-		ppdst->upd_flags = 0;
+		ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
 		ZBX_STR2UINT64(ppdst->item_parameterid, row[0]);
 		ppdst->name = zbx_strdup(NULL, row[2]);
 		ppdst->value = zbx_strdup(NULL, row[3]);
@@ -3248,7 +3207,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 				ppsrc = (zbx_template_item_param_t *)item->template_params.values[j];
 				ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 				ppdst->item_parameterid = 0;
-				ppdst->upd_flags = 0;
+				ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
 				ppdst->name = zbx_strdup(NULL, ppsrc->name);
 				ppdst->value = zbx_strdup(NULL, ppsrc->value);
 				zbx_vector_item_param_ptr_append(&item->item_params, ppdst);
@@ -3296,11 +3255,11 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 /******************************************************************************
  *                                                                            *
- * Function: link_template_lld_macro                                          *
+ * Function: link_template_lld_macro_paths                                    *
  *                                                                            *
  * Purpose: create lld_macro vectors in item data                             *
  *                                                                            *
- * Parameters: templateids - [IN] array of template IDs                       *
+ * Parameters: templateids - [IN] vector of template IDs                      *
  *             lld_itemids - [IN] the template discovery item ids             *
  *             lld_items   - [IN/OUT] the template discovery items            *
  *             items       - [IN/OUT] the template items                      *
@@ -3335,7 +3294,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3345,7 +3305,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 			plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
 
-			plmpdst->upd_flags = 0;
+			plmpdst->upd_flags = ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_RESET_FLAG;
 			ZBX_STR2UINT64(plmpdst->lld_macro_pathid, row[0]);
 			plmpdst->lld_macro = zbx_strdup(NULL, row[2]);
 			plmpdst->path = zbx_strdup(NULL, row[3]);
@@ -3379,7 +3339,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 		}
 		plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
 
-		plmpdst->upd_flags = 0;
+		plmpdst->upd_flags = ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_RESET_FLAG;
 		ZBX_STR2UINT64(plmpdst->lld_macro_pathid, row[0]);
 		plmpdst->lld_macro = zbx_strdup(NULL, row[2]);
 		plmpdst->path = zbx_strdup(NULL, row[3]);
@@ -3408,7 +3368,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 				plmpsrc = (zbx_template_lld_macro_t *)item->template_lld_macros.values[j];
 				plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
 				plmpdst->lld_macro_pathid = 0;
-				plmpdst->upd_flags = 0;
+				plmpdst->upd_flags = ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_RESET_FLAG;
 				plmpdst->lld_macro = zbx_strdup(NULL, plmpsrc->lld_macro);
 				plmpdst->path = zbx_strdup(NULL, plmpsrc->path);
 				zbx_vector_lld_macro_ptr_append(&item->item_lld_macros, plmpdst);

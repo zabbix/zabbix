@@ -29,7 +29,7 @@
 #include "../zbxalgo/vectorimpl.h"
 
 typedef struct _zbx_template_graph_valid_t zbx_template_graph_valid_t;
-ZBX_PTR_VECTOR_DECL(graph_valid_ptr, zbx_template_graph_valid_t *);
+ZBX_PTR_VECTOR_DECL(graph_valid_ptr, zbx_template_graph_valid_t *)
 
 struct _zbx_template_graph_valid_t
 {
@@ -40,7 +40,7 @@ struct _zbx_template_graph_valid_t
 	zbx_vector_str_t	hkeys;
 };
 
-ZBX_PTR_VECTOR_IMPL(graph_valid_ptr, zbx_template_graph_valid_t *);
+ZBX_PTR_VECTOR_IMPL(graph_valid_ptr, zbx_template_graph_valid_t *)
 
 static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 {
@@ -564,7 +564,7 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	int				ret = SUCCEED, i, j;
-	char				*sql = NULL;
+	char				*sql;
 	unsigned char			t_flags, h_flags, type;
 	DB_RESULT			tresult;
 	DB_ROW				trow;
@@ -585,7 +585,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	zbx_vector_graph_valid_ptr_create(&graphs);
 	zbx_vector_uint64_create(&graphids);
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 	sql_offset = 0;
 
@@ -3088,7 +3088,7 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(const zbx_uint64_t inte
  * Purpose: auxiliary function for DBcopy_template_host_prototypes()          *
  *                                                                            *
  * Parameters: host_prototypes      - [IN] vector of host prototypes          *
- *             del_hosttemplateids  - [IN] host template ids for delate       *
+ *             del_hosttemplateids  - [IN] host template ids for delete       *
  *             del_hostmacroids     - [IN] host macro ids for delete          *
  *             del_tagids           - [IN] tag ids for delete                 *
  *             del_interfaceids     - [IN] interface ids for delete           *
@@ -4544,7 +4544,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
 	char			*template_names, err[MAX_STRING_LEN];
-	zbx_db_insert_t 	*db_insert_htemplates = NULL;
+	zbx_db_insert_t 	*db_insert_htemplates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4592,7 +4592,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	hosttemplateid = DBget_maxid_num("hosts_templates", lnk_templateids->values_num);
 
-	db_insert_htemplates = zbx_malloc(db_insert_htemplates, sizeof(zbx_db_insert_t));
+	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
 	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
 
