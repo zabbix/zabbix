@@ -6118,6 +6118,17 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_chr_next                                                    *
+ *                                                                            *
+ * Purpose: return pointer to the next utf-8 character                        *
+ *                                                                            *
+ * Parameters: str  - [IN] the input string                                   *
+ *                                                                            *
+ * Return value: A pointer to the next utf-8 character.                       *
+ *                                                                            *
+ ******************************************************************************/
 static char	*utf8_chr_next(char *str)
 {
 	++str;
@@ -6128,6 +6139,17 @@ static char	*utf8_chr_next(char *str)
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_chr_prev                                                    *
+ *                                                                            *
+ * Purpose: return pointer to the previous utf-8 character                    *
+ *                                                                            *
+ * Parameters: str  - [IN] the input string                                   *
+ *                                                                            *
+ * Return value: A pointer to the previous utf-8 character.                   *
+ *                                                                            *
+ ******************************************************************************/
 static char	*utf8_chr_prev(char *str)
 {
 	--str;
@@ -6138,6 +6160,19 @@ static char	*utf8_chr_prev(char *str)
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: strchr_utf8                                                      *
+ *                                                                            *
+ * Purpose: checks if string contains utf-8 character                         *
+ *                                                                            *
+ * Parameters: seq  - [IN] the input string                                   *
+ *             c    - [IN] the utf-8 character to look for                    *
+ *                                                                            *
+ * Return value: SUCCEED - the string contains the specified character        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	strchr_utf8(const char *seq, char *c)
 {
 	size_t		len, c_len;
@@ -6169,6 +6204,17 @@ static int	strchr_utf8(const char *seq, char *c)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ltrim_utf8                                                   *
+ *                                                                            *
+ * Purpose: trim the specified utf-8 characters from the left side of input   *
+ *          string                                                            *
+ *                                                                            *
+ * Parameters: str      - [IN] the input string                               *
+ *             charlist - [IN] the characters to trim                         *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_ltrim_utf8(char *str, const char *charlist)
 {
 	char	*next;
@@ -6190,6 +6236,17 @@ void	zbx_ltrim_utf8(char *str, const char *charlist)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rtrim_utf8                                                   *
+ *                                                                            *
+ * Purpose: trim the specified utf-8 characters from the right side of input  *
+ *          string                                                            *
+ *                                                                            *
+ * Parameters: str      - [IN] the input string                               *
+ *             charlist - [IN] the characters to trim                         *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_rtrim_utf8(char *str, const char *charlist)
 {
 	char	*prev, *last;
