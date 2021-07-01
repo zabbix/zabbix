@@ -635,7 +635,8 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 				rule = (zbx_lld_rule_map_t *)rules->values[index];
 
-				condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
+				condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL,
+						sizeof(zbx_lld_rule_condition_t));
 
 				ZBX_STR2UINT64(condition->item_conditionid, row[0]);
 				ZBX_STR2UCHAR(condition->op, row[2]);
@@ -1230,8 +1231,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	{
 		itemid = DBget_maxid_num("items", new_items);
 
-		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
-				"delay", "history", "trends", "status", "trapper_hosts", "units",
+		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type",
+				"value_type", "delay", "history", "trends", "status", "trapper_hosts", "units",
 				"formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
 				"snmp_oid", "authtype", "username", "password", "publickey", "privatekey",
 				"templateid", "flags", "description", "inventory_link", "interfaceid", "lifetime",
@@ -2768,7 +2769,8 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		{
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3205,7 +3207,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			if (j >= item->item_params.values_num)
 			{
 				ppsrc = (zbx_template_item_param_t *)item->template_params.values[j];
-				ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
+				ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL,
+						sizeof(zbx_template_item_param_t));
 				ppdst->item_parameterid = 0;
 				ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
 				ppdst->name = zbx_strdup(NULL, ppsrc->name);
@@ -3366,7 +3369,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 			if (j >= item->item_lld_macros.values_num)
 			{
 				plmpsrc = (zbx_template_lld_macro_t *)item->template_lld_macros.values[j];
-				plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_template_lld_macro_t));
+				plmpdst = (zbx_template_lld_macro_t *)zbx_malloc(NULL,
+						sizeof(zbx_template_lld_macro_t));
 				plmpdst->lld_macro_pathid = 0;
 				plmpdst->upd_flags = ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_RESET_FLAG;
 				plmpdst->lld_macro = zbx_strdup(NULL, plmpsrc->lld_macro);
