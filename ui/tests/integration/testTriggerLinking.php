@@ -172,6 +172,7 @@ class testTriggerLinking extends CIntegrationTest {
 		return true;
 	}
 
+	//				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 	/**
 	* Component configuration provider for agent related tests.
 	*
@@ -182,13 +183,14 @@ class testTriggerLinking extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 0,
-				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
 			]
 		];
 	}
+
+	//'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
 
 	/**
 	* Component configuration provider for agent related tests.
@@ -202,7 +204,6 @@ class testTriggerLinking extends CIntegrationTest {
 				'ServerActive'	=> '127.0.0.1',
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
-				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 			]
