@@ -60,7 +60,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$filter = $this->getFilter();
 
 		$view_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.list.edit')
+			->setArgument('action', 'service.list')
 			->setArgument('path', $path ?: null)
 			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
 		if ($this->is_filtered) {
