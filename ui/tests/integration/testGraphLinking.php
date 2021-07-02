@@ -212,7 +212,6 @@ class testGraphLinking extends CIntegrationTest {
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('host', $response['result'][0]);
-		$hostname = $response['result'][0]['host'];
 		$hostid = $response['result'][0]['hostid'];
 
 		$response = $this->call('item.get', ['hostids' => $hostid]);
