@@ -189,7 +189,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'ListenPort' => self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051)
 			]
 		];
 	}
@@ -205,7 +205,7 @@ class testTriggerLinking extends CIntegrationTest {
 		return [
 			self::COMPONENT_AGENT => [
 				'Hostname'		=>  self::HOST_NAME,
-				'ServerActive'	=> '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'ServerActive'	=> '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
