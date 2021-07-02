@@ -876,6 +876,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$c = CLogHelper::readLog($this->getLogPath($component), false);
+		$c2 = CLogHelper::readLog($this->getLogPath(self::COMPONENT_AGENT), false);
 		for ($r = 0; $r < $iterations; $r++) {
 			if ($this->isLogLinePresent($component, $lines, $incremental)) {
 				return;
@@ -897,6 +898,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		throw new Exception('Failed to wait for '.$description.' to be present in '.$component .
-				'log file path:'.self::getLogPath($component).' and log file contents: ' . $c);
+							'log file path:'.self::getLogPath($component).' and server log file contents: ' . $c  . "\n and agent file: " . $c2);
 	}
 }
