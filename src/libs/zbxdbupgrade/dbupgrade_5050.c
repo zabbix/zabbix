@@ -82,7 +82,7 @@ static int	DBpatch_5050006(void)
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("DELETE FROM ids WHERE table_name='auditlog' AND field_name='auditid'"))
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
 	{
 		return FAIL;
 	}
