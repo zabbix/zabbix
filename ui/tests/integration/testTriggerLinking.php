@@ -181,7 +181,11 @@ class testTriggerLinking extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 0
+				'LogFileSize' => 0,
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
+				'SocketDir' => PHPUNIT_COMPONENT_DIR,
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
 			]
 		];
 	}
@@ -284,7 +288,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::startComponent(self::COMPONENT_AGENT);
+		self::restartComponent(self::COMPONENT_AGENT);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
