@@ -1183,6 +1183,7 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NULL		|0			|-|items
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|-|acknowledges
+FIELD		|servicealarmid	|t_id		|	|NULL		|0			|-|service_alarms
 UNIQUE		|1		|triggerid,itemid,escalationid
 INDEX		|2		|eventid
 INDEX		|3		|nextcheck
@@ -1872,4 +1873,4 @@ INDEX		|2			|serviceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050011	|5050011
+ROW		|5050012	|5050012

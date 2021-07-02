@@ -5421,6 +5421,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid'
+			],
+			'servicealarmid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'service_alarms',
+				'ref_field' => 'servicealarmid'
 			]
 		]
 	],
@@ -8551,7 +8558,7 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			],
+			]
 		]
 	],
 	'service_problem' => [
@@ -8567,7 +8574,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'problem',
-				'ref_field' => 'eventid',
+				'ref_field' => 'eventid'
 			],
 			'serviceid' => [
 				'null' => false,
@@ -8579,9 +8586,9 @@ return [
 			'severity' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 1,
+				'length' => 10,
 				'default' => '0'
-			],
+			]
 		]
 	],
 	'dbversion' => [

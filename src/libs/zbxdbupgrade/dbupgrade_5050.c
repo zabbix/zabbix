@@ -224,6 +224,14 @@ static int	DBpatch_5050011(void)
 	return DBdrop_field("services", "triggerid");
 }
 
+static int	DBpatch_5050012(void)
+{
+	const ZBX_FIELD	field = {"servicealarmid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+
 #endif
 
 DBPATCH_START(5050)
@@ -242,5 +250,6 @@ DBPATCH_ADD(5050008, 0, 1)
 DBPATCH_ADD(5050009, 0, 1)
 DBPATCH_ADD(5050010, 0, 1)
 DBPATCH_ADD(5050011, 0, 1)
+DBPATCH_ADD(5050012, 0, 1)
 
 DBPATCH_END()
