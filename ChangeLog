@@ -93,8 +93,18 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 Changes for 5.4.3rc1
 
 New features:
+.........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
+.......P.. [ZBX-19500] added avoiding of configuration cache update during ongoing transaction on proxy (dgoloscapov)
+.........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+.........T [ZBX-19230] fixed typo in Windows template (abakaldin)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+..F....... [ZBX-19497] fixed incorrect message for value mapping of types "regex" and "range" in value map edit modal (gcalenko, vmaksimovs)
+.........T [ZBX-19586] fixed calculated item expression in "Template PHP-FPM by Zabbix agent" and "Template PHP-FPM by HTTP" (ychukina)
+.........T [ZBX-19545] fixed discovery of MPM event in Template Apache (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.2
