@@ -54,7 +54,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	info, err := stdOs.Stat(params[0])
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain file %s information: %s", params[0], err)
+		return nil, err
 	}
 	stat := info.Sys().(*syscall.Stat_t)
 	if stat == nil {
