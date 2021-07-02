@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
 
-define('ZABBIX_DB_VERSION',		5050005);
+define('ZABBIX_DB_VERSION',		5050006);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -220,12 +220,9 @@ define('AUDIT_ACTION_UPDATE',	1);
 define('AUDIT_ACTION_DELETE',	2);
 define('AUDIT_ACTION_LOGIN',	3);
 define('AUDIT_ACTION_LOGOUT',	4);
-define('AUDIT_ACTION_ENABLE',	5);
-define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // Currently not used but need for compatibility with old audit records.
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);

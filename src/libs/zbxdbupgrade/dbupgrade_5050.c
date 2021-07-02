@@ -77,6 +77,19 @@ static int	DBpatch_5050005(void)
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
+static int	DBpatch_5050006(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("DELETE FROM ids WHERE table_name='auditlog' AND field_name='auditid'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -89,5 +102,6 @@ DBPATCH_ADD(5050002, 0, 1)
 DBPATCH_ADD(5050003, 0, 1)
 DBPATCH_ADD(5050004, 0, 1)
 DBPATCH_ADD(5050005, 0, 1)
+DBPATCH_ADD(5050006, 0, 1)
 
 DBPATCH_END()
