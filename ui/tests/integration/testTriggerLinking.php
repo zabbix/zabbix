@@ -284,7 +284,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::restartComponent(self::COMPONENT_AGENT);
+		self::startComponent(self::COMPONENT_AGENT);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
