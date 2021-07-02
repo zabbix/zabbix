@@ -352,7 +352,7 @@ class CIntegrationTest extends CAPITest {
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		throw new Exception('Failed to wait for component "'.$component.'" to start.');
+		throw new Exception('Failed to wait for component "'.$component.'" to start. pid path:' .  self::getPidPath($component) . " and pid is: " . pid);
 	}
 
 	/**
