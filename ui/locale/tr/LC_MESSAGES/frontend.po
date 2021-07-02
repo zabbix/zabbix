@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:20+0300\n"
+"POT-Creation-Date: 2021-07-02 19:53+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -9118,9 +9118,11 @@ msgstr ""
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerScheduledReportCreate.php:82
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
@@ -11133,7 +11135,7 @@ msgstr "Şuna eşleştirildi"
 msgid "Mapping"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/views/administration.iconmap.edit.php:124
 #: app/views/popup.valuemap.edit.php:112
 msgid "Mappings"
@@ -18772,8 +18774,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -19670,7 +19674,7 @@ msgstr "bir karakter string bekleniyor"
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:114
+#: app/controllers/CControllerPopupValueMapUpdate.php:125
 #: include/classes/validators/CApiInputValidator.php:684
 msgid "a floating point value is expected"
 msgstr ""
@@ -20002,7 +20006,9 @@ msgstr "değiştirilemez"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
@@ -20549,12 +20555,12 @@ msgstr ""
 msgid "invalid number of parameters in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:106
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: include/classes/validators/CApiInputValidator.php:2233
 msgid "invalid range expression"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:105
 #: include/classes/validators/CApiInputValidator.php:1603
 msgid "invalid regular expression"
 msgstr "geçersiz düzenli ifade"
@@ -21493,7 +21499,7 @@ msgid "value \"%1$s\" not found"
 msgstr "\"%1$s\" değeri bulunamadı"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:71
-#: app/controllers/CControllerPopupValueMapUpdate.php:126
+#: app/controllers/CControllerPopupValueMapUpdate.php:137
 #: include/classes/api/services/CValueMap.php:571
 #: include/classes/api/services/CValueMap.php:583
 #: include/classes/validators/CApiInputValidator.php:1701

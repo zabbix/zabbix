@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:20+0300\n"
+"POT-Creation-Date: 2021-07-02 19:53+0300\n"
 "PO-Revision-Date: 2021-06-14 04:53+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -9036,9 +9036,11 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerScheduledReportCreate.php:82
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
@@ -11041,7 +11043,7 @@ msgstr "マッピング文字列"
 msgid "Mapping"
 msgstr "マッピング"
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/views/administration.iconmap.edit.php:124
 #: app/views/popup.valuemap.edit.php:112
 msgid "Mappings"
@@ -18651,8 +18653,10 @@ msgstr "バリデーション"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -19550,7 +19554,7 @@ msgstr "文字列で指定してください"
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "日付はYYYY-MM-DDフォーマットで指定してください。"
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:114
+#: app/controllers/CControllerPopupValueMapUpdate.php:125
 #: include/classes/validators/CApiInputValidator.php:684
 msgid "a floating point value is expected"
 msgstr "浮動小数点の値で指定してください"
@@ -19882,7 +19886,9 @@ msgstr "変更できません"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
@@ -20429,12 +20435,12 @@ msgstr "ホスト名が正しくありません"
 msgid "invalid number of parameters in function \"%1$s\""
 msgstr "関数\"%1$s\"内のパラメーターの数が正しくありません"
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:106
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: include/classes/validators/CApiInputValidator.php:2233
 msgid "invalid range expression"
 msgstr "範囲の条件式が正しくありません"
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:105
 #: include/classes/validators/CApiInputValidator.php:1603
 msgid "invalid regular expression"
 msgstr "正規表現が正しくありません"
@@ -21373,7 +21379,7 @@ msgid "value \"%1$s\" not found"
 msgstr "値\"%1$s\"が存在しません"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:71
-#: app/controllers/CControllerPopupValueMapUpdate.php:126
+#: app/controllers/CControllerPopupValueMapUpdate.php:137
 #: include/classes/api/services/CValueMap.php:571
 #: include/classes/api/services/CValueMap.php:583
 #: include/classes/validators/CApiInputValidator.php:1701
