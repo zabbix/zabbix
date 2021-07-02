@@ -205,6 +205,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'ServerActive'	=> '127.0.0.1',
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
+				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 			]
