@@ -139,6 +139,11 @@ abstract class CControllerServiceListGeneral extends CController {
 		return $filter;
 	}
 
+	/**
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
 	protected function getPath(): array {
 		if ($this->service === null) {
 			return [];
@@ -188,6 +193,13 @@ abstract class CControllerServiceListGeneral extends CController {
 		return array_reverse($path);
 	}
 
+	/**
+	 * @param $path
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
 	protected function getBreadcrumbs($path): array {
 		$breadcrumbs = [[
 			'name' => _('All services'),
@@ -233,6 +245,13 @@ abstract class CControllerServiceListGeneral extends CController {
 		return $breadcrumbs;
 	}
 
+	/**
+	 * @param array $filter
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
 	protected function prepareData(array $filter): array {
 		if ($filter['status'] == SERVICE_STATUS_OK) {
 			$filter_status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
@@ -284,26 +303,26 @@ abstract class CControllerServiceListGeneral extends CController {
 				}
 			}
 
-			$x_services = API::Service()->get([
+			$db_parent_services = API::Service()->get([
 				'output' => [],
 				'selectParents' => ['serviceid'],
 				'serviceids' => $parentids,
 				'preservekeys' => true
 			]);
 
-			if (!$x_services) {
+			if (!$db_parent_services) {
 				break;
 			}
 
 			foreach ($db_services as &$db_service) {
 				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
 
-				$new_parentids = [];
+				$parentids = [];
 				foreach ($service_parentids as $service_parentid) {
-					$new_parentids += array_column($x_services[$service_parentid]['parents'], null, 'serviceid');
+					$parentids += array_column($db_parent_services[$service_parentid]['parents'], null, 'serviceid');
 				}
 
-				$db_service['parents'] = $new_parentids;
+				$db_service['parents'] = $parentids;
 			}
 			unset($db_service);
 		} while (true);
