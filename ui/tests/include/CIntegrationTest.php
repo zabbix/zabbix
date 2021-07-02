@@ -877,7 +877,7 @@ class CIntegrationTest extends CAPITest {
 
 		$c = CLogHelper::readLog($this->getLogPath($component), false);
 		for ($r = 0; $r < $iterations; $r++) {
-			if ($this->isLogLinePresent($component, $lines, $incremental) !== null) {
+			if ($this->isLogLinePresent($component, $lines, $incremental)) {
 				return;
 			}
 
