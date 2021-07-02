@@ -39,15 +39,21 @@ static int	DBpatch_4000001(void)
 {
 	DB_RESULT	result;
 	int		ret;
-	const char	*fields[] = {"def_shortdata", "def_longdata", "r_shortdata", "r_longdata", "ack_shortdata",
-				"ack_longdata"};
+	zbx_field_len_t	fields[] = {
+			{"def_shortdata", 0},
+			{"def_longdata", 0},
+			{"r_shortdata", 0},
+			{"r_longdata", 0},
+			{"ack_shortdata", 0},
+			{"ack_longdata", 0}
+	};
 
 	/* 0 - EVENT_SOURCE_TRIGGERS */
 	result = DBselect("select actionid,def_shortdata,def_longdata,r_shortdata,r_longdata,ack_shortdata,"
 			"ack_longdata from actions where eventsource=0");
 
 	ret = db_rename_macro(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}", NULL, 0);
+			"{EVENT.NAME}");
 
 	DBfree_result(result);
 
@@ -58,7 +64,10 @@ static int	DBpatch_4000002(void)
 {
 	DB_RESULT	result;
 	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	zbx_field_len_t	fields[] = {
+			{"subject", 0},
+			{"message", 0}
+	};
 
 	/* 0 - EVENT_SOURCE_TRIGGERS */
 	result = DBselect("select om.operationid,om.subject,om.message"
@@ -68,7 +77,7 @@ static int	DBpatch_4000002(void)
 				" and a.eventsource=0");
 
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}", NULL, 0);
+			"{EVENT.NAME}");
 
 	DBfree_result(result);
 
@@ -79,7 +88,7 @@ static int	DBpatch_4000003(void)
 {
 	DB_RESULT	result;
 	int		ret;
-	const char	*fields[] = {"command"};
+	zbx_field_len_t	fields[] = {{"command", 0}};
 
 	/* 0 - EVENT_SOURCE_TRIGGERS */
 	result = DBselect("select oc.operationid,oc.command"
@@ -89,7 +98,7 @@ static int	DBpatch_4000003(void)
 				" and a.eventsource=0");
 
 	ret = db_rename_macro(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}", NULL, 0);
+			"{EVENT.NAME}");
 
 	DBfree_result(result);
 

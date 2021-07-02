@@ -27,7 +27,7 @@ typedef struct
 }
 zbx_field_len_t;
 
-int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields, int fields_num,
-		const char *oldmacro, const char *newmacro, const zbx_field_len_t *limits, const int limits_num);
+int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_field_len_t *fields, int fields_num,
+		const char *oldmacro, const char *newmacro);
 
 #endif
