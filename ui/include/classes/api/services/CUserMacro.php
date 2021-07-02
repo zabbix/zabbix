@@ -584,9 +584,11 @@ class CUserMacro extends CApiService {
 				continue;
 			}
 
-			[$macro_name, $details] = explode(':', CApiInputValidator::trimMacro($hostmacro['macro']), 2);
+			$trimmed_macro = CApiInputValidator::trimMacro($hostmacro['macro']);
+			[$macro_name] = explode(':', $trimmed_macro, 2);
+			$macro_name = !isset($trimmed_macro[strlen($macro_name)]) ? '{$'.$macro_name : '{$'.$macro_name.':';
 
-			$macro_names[($details === null) ? '{$'.$macro_name : '{$'.$macro_name.':'] = true;
+			$macro_names[$macro_name] = true;
 			$existing_macros[$hostmacro['hostid']] = [];
 		}
 
