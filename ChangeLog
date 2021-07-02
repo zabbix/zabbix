@@ -986,8 +986,16 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.14rc1
 
 New features:
+.........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
+.........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
+.........T [ZBX-19230] fixed typo in Windows template (abakaldin)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+.........T [ZBX-19586] fixed calculated item expression in "Template PHP-FPM by Zabbix agent" and "Template PHP-FPM by HTTP" (ychukina)
+.........T [ZBX-19545] fixed discovery of MPM event in Template Apache (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.13
