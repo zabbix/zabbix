@@ -221,7 +221,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5dcc607026d24e63b2f099540a5d8e9b
-              expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
+              expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=1 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
               name: 'PHP-FPM: Service is down'
               priority: HIGH
               manual_close: 'YES'
@@ -415,7 +415,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PHP-FPM: Service is down'
-                  expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
+                  expression: 'last(/PHP-FPM by HTTP/php-fpm.ping)=1 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1'
             -
               uuid: 9ed4047bdcd74e649814c5d004ba78c7
               expression: 'last(/PHP-FPM by HTTP/php-fpm.uptime)<10m'
