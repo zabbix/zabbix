@@ -855,6 +855,10 @@ class CIntegrationTest extends CAPITest {
 		return CLogHelper::isLogLinePresent(self::getLogPath($component), $lines, $incremental);
 	}
 
+	protected static function getLogLinePresent($component, $lines, $incremental = true) {
+		return CLogHelper::getLogLinePresent(self::getLogPath($component), $lines, $incremental);
+	}
+
 	/**
 	 * Wait until line is present in log.
 	 *
@@ -876,7 +880,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		for ($r = 0; $r < $iterations; $r++) {
-			if ($this->isLogLinePresent($component, $lines, $incremental)) {
+			$l = $this->getLogLinePresent($component, $lines, $incremental);
+			if ($l !== null) {
 				return;
 			}
 
@@ -895,6 +900,6 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file.');
+		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file, : ' . $l);
 	}
 }

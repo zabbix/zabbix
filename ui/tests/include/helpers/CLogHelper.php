@@ -159,4 +159,8 @@ class CLogHelper {
 	public static function isLogLinePresent($path, $lines, $incremental = true) {
 		return (self::readLogUntil($path, $lines, $incremental) !== null);
 	}
+
+	public static function getLogLinePresent($path, $lines, $incremental = true) {
+		return self::readLogUntil($path, $lines, $incremental);
+	}
 }
