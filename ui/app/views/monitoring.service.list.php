@@ -32,7 +32,21 @@ $this->includeJsFile('monitoring.service.list.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
+$breadcrumbs = [];
+$filter = null;
+
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+	if (count($data['breadcrumbs']) > 1) {
+		while ($path_item = array_shift($data['breadcrumbs'])) {
+			$breadcrumbs[] = (new CSpan())
+				->addItem(array_key_exists('curl', $path_item)
+					? new CLink($path_item['name'], $path_item['curl'])
+					: $path_item['name']
+				)
+				->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
+		}
+	}
+
 	$filter = (new CFilter())
 		->addVar('action', 'service.list')
 		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
@@ -138,17 +152,21 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 			])
 	]);
 }
-else {
-	$filter = null;
-}
 
 if ($data['is_filtered']) {
+	$path = $data['path'];
+	if ($data['service'] !== null) {
+		$path[] = $data['service']['serviceid'];
+	}
+
 	$header = [
 		(new CColHeader(_('Parent services')))->addStyle('width: 15%'),
 		(new CColHeader(_('Name')))->addStyle('width: 10%')
 	];
 }
 else {
+	$path = null;
+
 	$header = [
 		(new CColHeader(_('Name')))->addStyle('width: 25%')
 	];
@@ -161,16 +179,6 @@ $table = (new CTableInfo())
 		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
 	]));
-
-if (!$data['is_filtered']) {
-	$path = $data['path'];
-	if ($data['service'] !== null) {
-		$path[] = $data['service']['serviceid'];
-	}
-}
-else {
-	$path = null;
-}
 
 foreach ($data['services'] as $serviceid => $service) {
 	$row = [];
@@ -213,18 +221,6 @@ foreach ($data['services'] as $serviceid => $service) {
 		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
 		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : ''
 	])));
-}
-
-$breadcrumbs = [];
-if (count($data['breadcrumbs']) > 1) {
-	while ($path_item = array_shift($data['breadcrumbs'])) {
-		$breadcrumbs[] = (new CSpan())
-			->addItem(array_key_exists('curl', $path_item)
-				? new CLink($path_item['name'], $path_item['curl'])
-				: $path_item['name']
-			)
-			->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
-	}
 }
 
 (new CWidget())
