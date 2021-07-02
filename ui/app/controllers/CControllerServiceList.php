@@ -59,15 +59,26 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$this->updateFilter();
 		$filter = $this->getFilter();
 
+		$view_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'service.list.edit')
+			->setArgument('path', $path ?: null)
+			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
+		if ($this->is_filtered) {
+			$view_url
+				->setArgument('filter_name', $filter['name'])
+				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_evaltype', $filter['evaltype'])
+				->setArgument('filter_tags', $filter['tags']);
+		}
+
 		$data = [
 			'can_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES),
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path),
 			'filter' => $filter,
+			'is_filtered' => $this->is_filtered,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
-			'view_curl' => (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null),
+			'view_curl' => $view_url,
 			'refresh_url' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'service.list.refresh')
 				->setArgument('filter_name', $filter['name'])
@@ -77,6 +88,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'service' => $this->service
 		];
 
@@ -90,10 +102,11 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data['page'] =  $page_num > 1 ? $page_num : null;
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla'],
-			'serviceids' => $db_serviceids,
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
+			'selectParents' => $this->is_filtered ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
+			'serviceids' => $db_serviceids,
 			'sortfield' => ['sortorder', 'name'],
 			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true

@@ -40,20 +40,21 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
 
-	if ($data['service'] !== null) {
+	if ($data['service'] !== null && !$data['is_filtered']) {
 		$parents = [];
-		foreach ($data['service']['parents'] as $parent) {
-			array_push($parents,
-				(new CLink($parent['name'], (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list')
-					->setArgument('path', $data['path'])
-					->setArgument('serviceid', $parent['serviceid'])
-				))->setAttribute('data-serviceid', $parent['serviceid']),
-				CViewHelper::showNum($parent['children']),
-				', '
-			);
+		while ($parent = array_shift($data['service']['parents'])) {
+			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list')
+				->setArgument('serviceid', $parent['serviceid'])
+			))->setAttribute('data-serviceid', $parent['serviceid']);
+			$parents[] = CViewHelper::showNum($parent['children']);
+
+			if (!$data['service']['parents']) {
+				break;
+			}
+
+			$parents[] = ', ';
 		}
-		array_pop($parents);
 
 		if (in_array($data['service']['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
 			$service_status = _('OK');
@@ -88,7 +89,10 @@ if (($web_layout_mode == ZBX_LAYOUT_NORMAL)) {
 							])
 							->addItem([
 								(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-								(new CDiv(sprintf('%.4f', $data['service']['goodsla'])))
+								(new CDiv(($data['service']['showsla'] == SERVICE_SHOW_SLA_ON)
+									? sprintf('%.4f', $data['service']['goodsla'])
+									: ''
+								))
 									->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 							])
 							->addItem([
@@ -138,23 +142,61 @@ else {
 	$filter = null;
 }
 
+if ($data['is_filtered']) {
+	$header = [
+		(new CColHeader(_('Parent services')))->addStyle('width: 15%'),
+		(new CColHeader(_('Name')))->addStyle('width: 10%')
+	];
+}
+else {
+	$header = [
+		(new CColHeader(_('Name')))->addStyle('width: 25%')
+	];
+}
+
 $table = (new CTableInfo())
-	->setHeader([
-		(new CColHeader(_('Name')))->addStyle('width: 25%'),
+	->setHeader(array_merge($header, [
 		(new CColHeader(_('Status')))->addStyle('width: 14%'),
 		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
 		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
-	]);
+	]));
 
-$path = $data['path'];
-if ($data['service'] !== null) {
-	$path[] = $data['service']['serviceid'];
+if (!$data['is_filtered']) {
+	$path = $data['path'];
+	if ($data['service'] !== null) {
+		$path[] = $data['service']['serviceid'];
+	}
+}
+else {
+	$path = null;
 }
 
 foreach ($data['services'] as $serviceid => $service) {
-	$table->addRow(new CRow([
-		$service['children'] > 0
+	$row = [];
+
+	if ($data['is_filtered']) {
+		$parents = [];
+		$count = 0;
+		while ($parent = array_shift($service['parents'])) {
+			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list')
+				->setArgument('serviceid', $parent['serviceid'])
+			))->setAttribute('data-serviceid', $parent['serviceid']);
+
+			$count++;
+			if ($count >= $data['max_in_table'] || !$service['parents']) {
+				break;
+			}
+
+			$parents[] = ', ';
+		}
+
+		$row[] = $parents;
+	}
+
+	$table->addRow(new CRow(array_merge($row, [
+		($service['children'] > 0)
 			? [
 				(new CLink($service['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.list')
@@ -168,20 +210,20 @@ foreach ($data['services'] as $serviceid => $service) {
 			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
 			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
 		'',
-		sprintf('%.4f', $service['goodsla']),
+		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
 		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : ''
-	]));
+	])));
 }
 
 $breadcrumbs = [];
 if (count($data['breadcrumbs']) > 1) {
-	foreach($data['breadcrumbs'] as $key => $path_item) {
+	while ($path_item = array_shift($data['breadcrumbs'])) {
 		$breadcrumbs[] = (new CSpan())
 			->addItem(array_key_exists('curl', $path_item)
 				? new CLink($path_item['name'], $path_item['curl'])
 				: $path_item['name']
 			)
-			->addClass(array_key_last($data['breadcrumbs']) === $key ? ZBX_STYLE_SELECTED : null);
+			->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
 	}
 }
 
@@ -214,6 +256,7 @@ if (count($data['breadcrumbs']) > 1) {
 
 (new CScriptTag('
 	initializeView(
+		'.json_encode($data['path'] ?: null).',
 		'.json_encode($data['service'] !== null ? $data['service']['serviceid'] : null).',
 		'.json_encode($data['page']).'
 	);

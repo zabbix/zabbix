@@ -29,7 +29,7 @@
 </script>
 
 <script>
-	function initializeView(serviceid, page) {
+	function initializeView(path, serviceid, page) {
 
 		const init = () => {
 			initViewModeSwitcher();
@@ -47,6 +47,10 @@
 							? 'service.list'
 							: 'service.list.edit'
 						);
+
+						if (path !== null) {
+							url.setArgument('path', path);
+						}
 
 						if (serviceid !== null) {
 							url.setArgument('serviceid', serviceid);
