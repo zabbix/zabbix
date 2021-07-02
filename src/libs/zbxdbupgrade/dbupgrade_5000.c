@@ -75,9 +75,10 @@ static int	DBpatch_5000002(void)
 
 static int	DBpatch_5000003(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	const char		*fields[] = {"subject", "message"};
+	const zbx_field_len_t	len_limits[] = {{"subject", 255}};
 
 	result = DBselect("select om.operationid,om.subject,om.message"
 			" from opmessage om,operations o,actions a"
@@ -86,7 +87,7 @@ static int	DBpatch_5000003(void)
 				" and a.eventsource=0 and o.operationtype=11");
 
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
-			"{EVENT.RECOVERY.NAME}");
+			"{EVENT.RECOVERY.NAME}", len_limits, ARRSIZE(len_limits));
 
 	DBfree_result(result);
 
@@ -96,14 +97,15 @@ static int	DBpatch_5000003(void)
 
 static int	DBpatch_5000004(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	const char		*fields[] = {"subject", "message"};
+	const zbx_field_len_t	len_limits[] = {{"subject", 255}};
 
 	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
 
 	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
-			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}", len_limits, ARRSIZE(len_limits));
 
 	DBfree_result(result);
 

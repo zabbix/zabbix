@@ -47,7 +47,7 @@ static int	DBpatch_4000001(void)
 			"ack_longdata from actions where eventsource=0");
 
 	ret = db_rename_macro(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}");
+			"{EVENT.NAME}", NULL, 0);
 
 	DBfree_result(result);
 
@@ -68,7 +68,7 @@ static int	DBpatch_4000002(void)
 				" and a.eventsource=0");
 
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}");
+			"{EVENT.NAME}", NULL, 0);
 
 	DBfree_result(result);
 
@@ -89,7 +89,7 @@ static int	DBpatch_4000003(void)
 				" and a.eventsource=0");
 
 	ret = db_rename_macro(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
-			"{EVENT.NAME}");
+			"{EVENT.NAME}", NULL, 0);
 
 	DBfree_result(result);
 

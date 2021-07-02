@@ -20,7 +20,14 @@
 #ifndef ZABBIX_DBUPGRADE_MACROS_H
 #define ZABBIX_DBUPGRADE_MACROS_H
 
+typedef struct
+{
+	char	*field_name;
+	size_t	max_len;
+}
+zbx_field_len_t;
+
 int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields, int fields_num,
-		const char *oldmacro, const char *newmacro);
+		const char *oldmacro, const char *newmacro, const zbx_field_len_t *limits, const int limits_num);
 
 #endif

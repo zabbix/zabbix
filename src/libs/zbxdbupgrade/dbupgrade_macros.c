@@ -21,8 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
-
-#define SUBJECT_FIELD_LEN	255
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -95,13 +94,16 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
  *             fields_num - [IN] the number of fields to check                *
  *             oldmacro   - [IN] the macro to rename                          *
  *             newmacro   - [IN] the new macro name                           *
+ *             limits     - [IN] the limits of field lengths to check         *
+ *                               after renaming the macros                    *
+ *             fields_num - [IN] the number of field length limits to check   *
  *                                                                            *
  * Return value: SUCCEED  - macros were renamed successfully                  *
  *               FAIL     - database error occurred                           *
  *                                                                            *
  ******************************************************************************/
 int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields, int fields_num,
-		const char *oldmacro, const char *newmacro)
+		const char *oldmacro, const char *newmacro, const zbx_field_len_t *limits, const int limits_num)
 {
 	DB_ROW		row;
 	char		*sql = 0, *field = NULL, *field_esc;
@@ -120,18 +122,39 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const
 		{
 			if (SUCCEED == str_rename_macro(row[i + 1], oldmacro, newmacro, &field, &field_alloc))
 			{
-				if (old_offset == sql_offset)
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
-				else
-					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+				int	j, skip = 0;
 
-				field_esc = DBdyn_escape_string(field);
+				if (NULL != limits)
+				{
+					for (j = 0; j < limits_num; j++)
+					{
+						if (0 == strcmp(fields[i], limits[j].field_name) && zbx_strlen_utf8(field) > limits[j].max_len)
+						{
+							zbx_uint64_t	id;
 
-				if (0 == strcmp(fields[i], "subject"))
-					field_esc[zbx_strlen_utf8_nchars(field_esc, SUBJECT_FIELD_LEN)] = '\0';
+							ZBX_STR2UINT64(id, row[0]);
+							zabbix_log(LOG_LEVEL_WARNING, "cannot rename macros (maximum length of " ZBX_FS_UI64
+									" chars exceeded) in %s.%s (%s: " ZBX_FS_UI64 ")", limits[j].max_len, table,
+									limits[j].field_name, pkey, id);
+							skip = 1;
+							break;
+						}
+					}
+				}
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i], field_esc);
-				zbx_free(field_esc);
+				if (0 == skip)
+				{
+					field_esc = DBdyn_escape_string(field);
+
+					if (old_offset == sql_offset)
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
+					else
+						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i], field_esc);
+
+					zbx_free(field_esc);
+				}
 			}
 		}
 
