@@ -171,8 +171,6 @@ class testGraphLinking extends CIntegrationTest {
 		return true;
 	}
 
-	//				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
-
 	/**
 	* Component configuration provider for agent related tests.
 	*
@@ -186,12 +184,10 @@ class testGraphLinking extends CIntegrationTest {
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+				'ListenPort' => self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051)
 			]
 		];
 	}
-
-	//				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
 
 	/**
 	* Component configuration provider for agent related tests.
@@ -202,11 +198,11 @@ class testGraphLinking extends CIntegrationTest {
 		return [
 			self::COMPONENT_AGENT => [
 				'Hostname'		=>  self::HOST_NAME,
-				'ServerActive'	=> '127.0.0.1',
+				'ServerActive'	=>
+						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid'
 			]
 		];
 	}
