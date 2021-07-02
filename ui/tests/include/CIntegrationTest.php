@@ -900,6 +900,7 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file, : ' . $l);
+		throw new Exception('Failed to wait for '.$description.' to be present in '.$component .
+				'log file path:'.self::getLogPath($component).' and log file contents: ' . $l);
 	}
 }
