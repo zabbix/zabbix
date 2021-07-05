@@ -619,13 +619,6 @@ class CUserMacro extends CApiService {
 			$trimmed_macro = CApiInputValidator::trimMacro($hostmacro['macro']);
 
 			if (array_key_exists($trimmed_macro, $existing_macros[$hostid])) {
-				$db_hostmacroid = $existing_macros[$hostid][$trimmed_macro];
-
-				if (array_key_exists('hostmacroid', $hostmacro)
-						&& bccomp($hostmacro['hostmacroid'], $db_hostmacroid) == 0) {
-					continue;
-				}
-
 				$hosts = DB::select('hosts', [
 					'output' => ['name'],
 					'hostids' => $hostid
