@@ -488,7 +488,9 @@ abstract class CHostBase extends CApiService {
 	 * @param array  $db_hosts
 	 * @param array  $db_hosts[<hostid>]['macros']
 	 *
-	 * @return array
+	 * @return array Array of passed hosts/templates with padded macros data, when it's necessary.
+	 *
+	 * @throws APIException if input of host macros data is invalid.
 	 */
 	protected function validateHostMacros(array $hosts, array $db_hosts): array {
 		$hostmacro_defaults = [
@@ -560,7 +562,14 @@ abstract class CHostBase extends CApiService {
 			foreach ($macros as $hostmacroid => $macro) {
 				if (array_key_exists($macro, $db_macros) && bccomp($hostmacroid, $db_macros[$macro]) != 0
 						&& array_key_exists($db_macros[$macro], $macros)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $macro));
+					$hosts = DB::select('hosts', [
+						'output' => ['name'],
+						'hostids' => $host[$id_field_name]
+					]);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro "%1$s" already exists on "%2$s".', $macro, $hosts[0]['name'])
+					);
 				}
 			}
 
@@ -594,30 +603,32 @@ abstract class CHostBase extends CApiService {
 		$del_hostmacroids = [];
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('macros', $host)) {
-				$db_host = $db_hosts[$host[$id_field_name]];
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
 
-				foreach ($host['macros'] as $hostmacro) {
-					if (array_key_exists('hostmacroid', $hostmacro)) {
-						$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
-						unset($db_host['macros'][$hostmacro['hostmacroid']]);
+			$db_host = $db_hosts[$host[$id_field_name]];
 
-						$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+			foreach ($host['macros'] as $hostmacro) {
+				if (array_key_exists('hostmacroid', $hostmacro)) {
+					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+					unset($db_host['macros'][$hostmacro['hostmacroid']]);
 
-						if ($upd_hostmacro) {
-							$upd_hostmacros[] = [
-								'values' => $upd_hostmacro,
-								'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
-							];
-						}
-					}
-					else {
-						$ins_hostmacros[] = $hostmacro + ['hostid' => $host[$id_field_name]];
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
+						];
 					}
 				}
-
-				$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_host['macros']));
+				else {
+					$ins_hostmacros[] = $hostmacro + ['hostid' => $host[$id_field_name]];
+				}
 			}
+
+			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_host['macros']));
 		}
 
 		if ($del_hostmacroids) {
