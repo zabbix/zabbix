@@ -664,6 +664,15 @@ abstract class CDashboardGeneral extends CApiService {
 		$ins_widgets = [];
 		$upd_widgets = [];
 
+		$widget_schema = DB::getSchema('widget')['fields'];
+		$trimmable_properties = [];
+
+		foreach($widget_schema as $property => $spec) {
+			if ($spec['type'] === DB::FIELD_TYPE_CHAR) {
+				$trimmable_properties[] = $property;
+			}
+		}
+
 		foreach ($dashboards as $dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
@@ -675,6 +684,10 @@ abstract class CDashboardGeneral extends CApiService {
 				}
 
 				foreach ($dashboard_page['widgets'] as $widget) {
+					foreach($trimmable_properties as $property) {
+						$widget[$property] = trim($widget[$property]);
+					}
+
 					if (array_key_exists('widgetid', $widget)) {
 						$upd_widget = DB::getUpdatedValues('widget', $widget, $db_widgets[$widget['widgetid']]);
 
@@ -767,6 +780,10 @@ abstract class CDashboardGeneral extends CApiService {
 					$widget_fields = [];
 
 					foreach ($widget['fields'] as $widget_field) {
+						if ($widget_field['type'] === ZBX_WIDGET_FIELD_TYPE_STR) {
+							$widget_field['value'] = trim($widget_field['value']);
+						}
+
 						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
 						$widget_fields[$widget_field['type']][$widget_field['name']][] = $widget_field;
 					}

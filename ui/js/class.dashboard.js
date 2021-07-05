@@ -1150,6 +1150,12 @@ class CDashboard extends CBaseComponent {
 				}
 			}
 
+			form.addEventListener('focusout', (e) => {
+				if (e.target.matches('[data-trim="1"]')) {
+					e.target.value = e.target.value.trim();
+				}
+			});
+
 			try {
 				new TabIndicators();
 			}

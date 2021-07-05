@@ -66,6 +66,7 @@ class CWidgetHelper {
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $name))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
@@ -141,12 +142,22 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldTextBox $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getProblemBox($field) {
+		return static::getTextBox($field)->setAttribute('data-trim', 1);
+	}
+
+	/**
 	 * @param CWidgetFieldUrl $field
 	 *
 	 * @return CTextBox
 	 */
 	public static function getUrlBox($field) {
 		return (new CTextBox($field->getName(), $field->getValue()))
+			->setAttribute('data-trim', 1)
 			->setAriaRequired(self::isAriaRequired($field))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
@@ -491,12 +502,14 @@ class CWidgetHelper {
 
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
 					->setEnabled($enabled),
 				$zselect_operator,
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
+					->setAttribute('data-trim', 1)
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
