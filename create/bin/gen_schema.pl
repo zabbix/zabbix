@@ -41,7 +41,7 @@ my %c = (
 	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
-	"t_cuid"	=>	"ZBX_TYPE_CHAR"
+	"t_cuid"	=>	"ZBX_TYPE_CUID"
 );
 
 $c{"before"} = "/*
@@ -254,7 +254,6 @@ sub process_field
 {
 	my $line = $_[0];
 	my $type_2;
-
 	newstate("field");
 
 	my $name = "";
@@ -273,7 +272,6 @@ sub process_field
 	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
-
 		if ($type eq "ZBX_TYPE_CHAR")
 		{
 			for ($length)
@@ -292,6 +290,10 @@ sub process_field
 		elsif ($type eq "ZBX_TYPE_LONGTEXT")
 		{
 			$length = "ZBX_TYPE_LONGTEXT_LEN";
+		}
+		elsif ($type eq "ZBX_TYPE_CUID")
+		{
+			$length = 25;
 		}
 		else
 		{
