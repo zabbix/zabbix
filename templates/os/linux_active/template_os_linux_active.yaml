@@ -1300,7 +1300,7 @@ zabbix_export:
           triggers:
             -
               uuid: a49d7ca808c345ec8ef516fdc3b0d5ff
-              expression: '(last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed'
               priority: INFO
               manual_close: 'YES'
