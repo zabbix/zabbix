@@ -5049,7 +5049,7 @@ return [
 				'default' => ''
 			],
 			'resourceid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
@@ -5068,8 +5068,7 @@ return [
 			'recordsetid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 25,
-				'default' => ''
+				'length' => 25
 			],
 			'details' => [
 				'null' => false,

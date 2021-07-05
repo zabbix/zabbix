@@ -40,7 +40,8 @@ my %c = (
 	"t_serial"	=>	"ZBX_TYPE_UINT",
 	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
-	"t_varchar"	=>	"ZBX_TYPE_CHAR"
+	"t_varchar"	=>	"ZBX_TYPE_CHAR",
+	"t_cuid"	=>	"ZBX_TYPE_CHAR"
 );
 
 $c{"before"} = "/*
@@ -95,7 +96,8 @@ my %mysql = (
 	"t_serial"	=>	"bigint unsigned",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar"
 );
 
 my %oracle = (
@@ -115,7 +117,8 @@ my %oracle = (
 	"t_serial"	=>	"number(20)",
 	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
-	"t_varchar"	=>	"nvarchar2"
+	"t_varchar"	=>	"nvarchar2",
+	"t_cuid"	=>	"nvarchar2"
 );
 
 my %postgresql = (
@@ -135,7 +138,8 @@ my %postgresql = (
 	"t_serial"	=>	"bigserial",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar"
 );
 
 my %sqlite3 = (
@@ -155,7 +159,8 @@ my %sqlite3 = (
 	"t_serial"	=>	"integer",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar"
 );
 
 sub rtrim($)
