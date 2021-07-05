@@ -339,7 +339,7 @@ zabbix_export:
           triggers:
             -
               uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
-              expression: '(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
+              expression: 'last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2) and length(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
         -
@@ -788,7 +788,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8111eb42b0e74fffb43da474677ebc2f
-              expression: '(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2))=1 and length(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
+              expression: 'last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2) and length(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
         -

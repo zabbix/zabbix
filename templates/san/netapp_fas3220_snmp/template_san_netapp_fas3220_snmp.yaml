@@ -1397,7 +1397,7 @@ zabbix_export:
   triggers:
     -
       uuid: 3e2d95918f364248ae07a2e436a986a0
-      expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])>0 and (last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#2))=1'
+      expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])>0 and last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedMessage],#2)'
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: 'last(/NetApp FAS3220 SNMP/fas3220.disk[diskFailedCount])=0'
       name: 'NetApp FAS3220: Number of failed disks has changed'
