@@ -978,7 +978,7 @@ zabbix_export:
           triggers:
             -
               uuid: c5991152d2da4df7ae0d978233c5a859
-              expression: '(last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2))=1 and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
+              expression: 'last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2) and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
               priority: INFO
               description: 'Squid version has changed. Ack to close.'

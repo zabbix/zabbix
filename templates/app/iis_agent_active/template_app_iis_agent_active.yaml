@@ -742,7 +742,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 27a93967a29849f3aef833db136e1b8e
-                  expression: '(last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2))=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   name: 'IIS: Application pool {#APPPOOL} has been recycled'
                   priority: INFO
             -

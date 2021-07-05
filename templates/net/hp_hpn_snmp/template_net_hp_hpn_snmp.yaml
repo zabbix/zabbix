@@ -87,7 +87,7 @@ zabbix_export:
           triggers:
             -
               uuid: a9dcdf4129d041eca8dadc8bfbc455ee
-              expression: '(last(/HP Enterprise Switch SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch SNMP/system.hw.firmware,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.firmware))>0'
+              expression: 'last(/HP Enterprise Switch SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -117,7 +117,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6b9b9b0d1ff24074bb344d04efe53444
-              expression: '(last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP Enterprise Switch SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
