@@ -147,7 +147,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go to Template form.
-		$this->page->login()->open('templates.php?groupid=1');
+		$this->page->login()->open('templates.php?page=2');
 		$this->query('link', $this->template)->one()->click();
 
 		$templates_form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();

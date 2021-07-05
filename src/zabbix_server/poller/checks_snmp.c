@@ -102,6 +102,7 @@ typedef struct
 zbx_snmpidx_mapping_t;
 
 static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
+static char		zbx_snmp_init_done;
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -2106,6 +2107,26 @@ int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poll
 	return errcode;
 }
 
+static void	zbx_init_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	if (1 == zbx_snmp_init_done)
+		return;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	init_snmp(progname);
+	zbx_snmp_init_done = 1;
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type)
 {
 	struct snmp_session	*ss;
@@ -2115,6 +2136,8 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
+
+	zbx_init_snmp();	/* avoid high CPU usage by only initializing SNMP once used */
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
@@ -2176,22 +2199,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_init_snmp(void)
-{
-	sigset_t	mask, orig_mask;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-
-	init_snmp(progname);
-
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
-}
-
 static void	zbx_shutdown_snmp(void)
 {
 	sigset_t	mask, orig_mask;
@@ -2204,6 +2211,7 @@ static void	zbx_shutdown_snmp(void)
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
+	zbx_snmp_init_done = 0;
 
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
@@ -2212,9 +2220,12 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]", get_process_type_string(process_type),
 			process_num);
+
+	if (0 == zbx_snmp_init_done)
+		return;
+
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
-	zbx_init_snmp();
 }
 
 #endif	/* HAVE_NETSNMP */

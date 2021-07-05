@@ -274,9 +274,10 @@ class CTemplate extends CHostGeneral {
 					$result = $template['rowscount'];
 				}
 			}
-			else{
+			else {
 				$template['templateid'] = $template['hostid'];
-				unset($template['hostid']);
+				// Templates share table with hosts and host prototypes. Therefore remove template unrelated fields.
+				unset($template['hostid'], $template['discover']);
 
 				$result[$template['templateid']] = $template;
 			}
