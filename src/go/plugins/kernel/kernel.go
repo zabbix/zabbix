@@ -45,7 +45,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		"kernel.maxproc",
 		"kernel.maxfiles",
 		"kernel.openfiles":
-		return getNum(key)
+		return getFirstNum(key)
 	default:
 		/* SHOULD_NEVER_HAPPEN */
 		return 0, plugin.UnsupportedMetricError

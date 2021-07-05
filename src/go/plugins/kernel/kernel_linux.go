@@ -27,10 +27,10 @@ import (
 	"strings"
 )
 
-// getNum  - get first number from file
-func getNum(key string) (max uint64, err error) {
+// getFirstNum  - get first number from file
+func getFirstNum(key string) (max uint64, err error) {
 	fileName := "/proc"
-	if os.Getenv("HOST_PROC") != "" { // Docker envirment
+	if os.Getenv("HOST_PROC") != "" { // Docker environment
 		fileName = os.Getenv("HOST_PROC")
 	}
 
