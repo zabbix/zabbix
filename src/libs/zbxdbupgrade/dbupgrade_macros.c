@@ -124,9 +124,9 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_f
 			{
 				if (0 != field->max_len && zbx_strlen_utf8(value) > field->max_len)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "cannot rename macros (maximum length of " ZBX_FS_UI64
-							" chars exceeded) in %s.%s (%s:%s)", field->max_len, table,
-							field->field_name, pkey, row[0]);
+					zabbix_log(LOG_LEVEL_WARNING, "cannot rename macros in table \"%s\" row "
+							"\"%s:%s\" field \"%s\": value is too long",
+							table, pkey, row[0], field->field_name);
 					continue;
 				}
 
