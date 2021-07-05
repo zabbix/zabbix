@@ -2033,7 +2033,7 @@ out:
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
-static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
+int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
 {
 	unsigned char	netmask[16] = {0};
 	int		i, j, bytes;
@@ -2153,7 +2153,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 }
 #endif
 
-static int	validate_cidr(const char *ip, const char *cidr, void *value)
+int	validate_cidr(const char *ip, const char *cidr, void *value)
 {
 	if (SUCCEED == is_ip4(ip))
 		return is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);

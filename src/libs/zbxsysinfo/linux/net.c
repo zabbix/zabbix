@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "comms.h"
 
 typedef struct
 {
@@ -42,6 +43,19 @@ typedef struct
 	zbx_uint64_t ocompressed;
 }
 net_stat_t;
+
+typedef struct
+{
+	char		*laddr;
+	unsigned int	lport;
+	char		*raddr;
+	unsigned int	rport;
+	unsigned int	state;
+}
+net_count_info_t;
+
+#define ZBX_ADDR_TYPE_IPV4	0
+#define ZBX_ADDR_TYPE_IPV6	1
 
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
@@ -759,4 +773,354 @@ out:
 	SET_UI64_RESULT(result, listen);
 
 	return ret;
+}
+
+static int	check_ip_mask(char *addr, int addr_type, unsigned int ip_cmpr, const char *ip_cmpr6, char **error)
+{
+	char	*cidr_sep, ip[65];
+	int	ret = FAIL, type;
+	int	prefix_sz;
+
+	if (NULL != strchr(addr, ':'))
+		type = AF_INET6;
+	else
+		type = AF_INET;
+
+	if (NULL != (cidr_sep = strchr(addr, '/')))
+	{
+		*cidr_sep = '\0';
+
+		if (FAIL == validate_cidr(addr, cidr_sep + 1, &prefix_sz))
+		{
+			*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s\"", addr);
+			goto out;
+		}
+	}
+	else if (FAIL == is_supported_ip(addr))
+	{
+		*error = zbx_dsprintf(*error, "IP is not supported \"%s\"", addr);
+		goto out;
+	}
+	else
+		prefix_sz = 32;
+
+	if (ZBX_ADDR_TYPE_IPV4 == addr_type)
+	{
+		ip_cmpr = htonl(ip_cmpr);
+
+		if (NULL == inet_ntop(type, &ip_cmpr, ip, sizeof(ip)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot convert IP address");
+			goto out;
+		}
+
+		ret = subnet_match(type, prefix_sz, addr, ip);
+	}
+	else
+		ret = subnet_match(type, prefix_sz, addr, ip_cmpr6);
+
+out:
+	if (NULL != cidr_sep)
+		*cidr_sep = '/';
+
+	return ret;
+}
+
+static int	get_connection_state(const char *name)
+{
+	int	state;
+
+	if (0 == strcmp(name, "established"))
+		state = 1;
+	else if (0 == strcmp(name, "syn_sent"))
+		state = 2;
+	else if (0 == strcmp(name, "syn_recv"))
+		state = 3;
+	else if (0 == strcmp(name, "fin_wait1"))
+		state = 4;
+	else if (0 == strcmp(name, "fin_wait2"))
+		state = 5;
+	else if (0 == strcmp(name, "time_wait"))
+		state = 6;
+	else if (0 == strcmp(name, "close"))
+		state = 7;
+	else if (0 == strcmp(name, "close_wait"))
+		state = 8;
+	else if (0 == strcmp(name, "last_ack"))
+		state = 9;
+	else if (0 == strcmp(name, "listen"))
+		state = 10;
+	else if (0 == strcmp(name, "closing"))
+		state = 11;
+	else
+		state = 0;
+
+	return state;
+}
+
+static unsigned short	get_service_port_udp(const char *name)
+{
+	unsigned short	port;
+
+	if (0 == strcmp(name, "ntp"))
+		port = ZBX_DEFAULT_NTP_PORT;
+	else
+		port = 0;
+
+	return port;
+}
+
+static unsigned short	get_service_port_tcp(const char *name)
+{
+	unsigned short	port;
+
+	if (0 == strcmp(name, "ssh"))
+		port = ZBX_DEFAULT_LDAP_PORT;
+	else if (0 == strcmp(name, "ldap"))
+		port = ZBX_DEFAULT_LDAP_PORT;
+	else if (0 == strcmp(name, "ftp"))
+		port = ZBX_DEFAULT_FTP_PORT;
+	else if (0 == strcmp(name, "http"))
+		port = ZBX_DEFAULT_HTTP_PORT;
+	else if (0 == strcmp(name, "pop"))
+		port = ZBX_DEFAULT_POP_PORT;
+	else if (0 == strcmp(name, "nntp"))
+		port = ZBX_DEFAULT_NNTP_PORT;
+	else if (0 == strcmp(name, "imap"))
+		port = ZBX_DEFAULT_IMAP_PORT;
+	else if (0 == strcmp(name, "https"))
+		port = ZBX_DEFAULT_HTTPS_PORT;
+	else if (0 == strcmp(name, "telnet"))
+		port = ZBX_DEFAULT_TELNET_PORT;
+	else
+		port = 0;
+
+	return port;
+}
+
+static int	get_proc_net_count(const char *filename, int addr_type, net_count_info_t *result_exp,
+		zbx_uint64_t *count, char **error)
+{
+	char			line[MAX_STRING_LEN];
+	FILE			*f;
+	net_count_info_t	result;
+	int			ret = SUCCEED;
+
+	if (NULL == (f = fopen(filename, "r")))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", filename, zbx_strerror(errno));
+		return FAIL;
+	}
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		unsigned int	laddr, raddr;
+		char		*p;
+
+		if (NULL == (p = strstr(line, ":")))
+			continue;
+
+		if (ZBX_ADDR_TYPE_IPV6 == addr_type)
+		{
+			if (5 == sscanf(p, ": %s:%x %s:%x %x",
+					result.laddr,
+					&result.lport,
+					result.raddr,
+					&result.rport,
+					&result.state))
+			{
+				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
+						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV6, 0,
+						result.laddr, error))
+				{
+					if (NULL != *error)
+					{
+						*error = zbx_dsprintf(*error, "Invalid first argument: \"%s\"", *error);
+						ret = FAIL;
+						break;
+					}
+
+					continue;
+				}
+
+				if (NULL != result_exp->raddr && '\0' != *result_exp->raddr &&
+						SUCCEED != check_ip_mask(result_exp->raddr, ZBX_ADDR_TYPE_IPV6, 0,
+						result.raddr, error))
+				{
+					if (NULL != *error)
+					{
+						*error = zbx_dsprintf(*error, "Invalid third argument: \"%s\"", *error);
+						ret = FAIL;
+						break;
+					}
+
+					continue;
+				}
+
+				if ((0 != result_exp->lport && result_exp->lport != result.lport) ||
+						(0 != result_exp->rport && result_exp->rport != result.rport) ||
+						(0 != result_exp->state && result_exp->state != result.state))
+				{
+					continue;
+				}
+
+				(*count)++;
+			}
+		}
+		else
+		{
+			if (5 == sscanf(p, ": %x:%x %x:%x %x",
+					&laddr,
+					&result.lport,
+					&raddr,
+					&result.rport,
+					&result.state))
+			{
+				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
+						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV4,
+						htonl(laddr), NULL, error))
+				{
+					if (NULL != *error)
+					{
+						*error = zbx_dsprintf(*error, "Invalid first argument: \"%s\"", *error);
+						ret = FAIL;
+						break;
+					}
+
+					continue;
+				}
+
+				if (NULL != result_exp->raddr && '\0' != *result_exp->raddr &&
+						SUCCEED != check_ip_mask(result_exp->raddr, ZBX_ADDR_TYPE_IPV4,
+						htonl(raddr), NULL, error))
+				{
+					if (NULL != *error)
+					{
+						*error = zbx_dsprintf(*error, "Invalid third argument: \"%s\"", *error);
+						ret = FAIL;
+						break;
+					}
+
+					continue;
+				}
+
+				if ((0 != result_exp->lport && result_exp->lport != result.lport) ||
+						(0 != result_exp->rport && result_exp->rport != result.rport) ||
+						(0 != result_exp->state && result_exp->state != result.state))
+				{
+					continue;
+				}
+
+				(*count)++;
+			}
+		}
+	}
+
+	zbx_fclose(f);
+
+	return ret;
+}
+
+int	NET_TCP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	net_count_info_t	res;
+	char			*error = NULL, *lport, *rport, *state;
+	zbx_uint64_t		count = 0;
+
+	if (5 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	memset(&res, 0, sizeof(res));
+
+	res.laddr = get_rparam(request, 0);
+	lport = get_rparam(request, 1);
+	res.raddr = get_rparam(request, 2);
+	rport = get_rparam(request, 3);
+	state = get_rparam(request, 4);
+
+	if (NULL != lport && '\0' != *lport && 0 == (res.lport = get_service_port_tcp(lport)) &&
+			SUCCEED != is_ushort(lport, &res.lport))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != rport && '\0' != *rport && 0 == (res.rport = get_service_port_tcp(rport)) &&
+			SUCCEED != is_ushort(rport, &res.rport))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != state && '\0' != *state && 0 == (res.state = get_connection_state(state)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED != get_proc_net_count("/proc/net/tcp", ZBX_ADDR_TYPE_IPV4, &res, &count, &error) ||
+			SUCCEED != get_proc_net_count("/proc/net/tcp6", ZBX_ADDR_TYPE_IPV6, &res, &count, &error))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		return SYSINFO_RET_FAIL;
+	}
+
+	SET_UI64_RESULT(result, count);
+
+	return SYSINFO_RET_OK;
+}
+
+int	NET_UDP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	net_count_info_t	res;
+	char			*error = NULL, *lport, *rport, *state;
+	zbx_uint64_t		count = 0;
+
+	if (5 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	memset(&res, 0, sizeof(res));
+
+	res.laddr = get_rparam(request, 0);
+	lport = get_rparam(request, 1);
+	res.raddr = get_rparam(request, 2);
+	rport = get_rparam(request, 3);
+	state = get_rparam(request, 4);
+
+	if (NULL != lport && '\0' != *lport && 0 == (res.lport = get_service_port_udp(lport)) &&
+			SUCCEED != is_ushort(lport, &res.lport))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != rport && '\0' != *rport && 0 == (res.rport = get_service_port_udp(rport)) &&
+			SUCCEED != is_ushort(rport, &res.rport))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != state && '\0' != *state && 0 == (res.state = get_connection_state(state)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED != get_proc_net_count("/proc/net/udp", ZBX_ADDR_TYPE_IPV4, &res, &count, &error) ||
+			SUCCEED != get_proc_net_count("/proc/net/udp6", ZBX_ADDR_TYPE_IPV6, &res, &count, &error))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		return SYSINFO_RET_FAIL;
+	}
+
+	SET_UI64_RESULT(result, count);
+
+	return SYSINFO_RET_OK;
 }

@@ -244,6 +244,7 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn);
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -257,7 +258,9 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_TCP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_UDP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);

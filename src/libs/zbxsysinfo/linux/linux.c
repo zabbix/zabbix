@@ -26,6 +26,7 @@ ZBX_METRIC parameters_specific[] =
 {
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL},
+	{"kernel.openfiles",	0,		KERNEL_OPENFILES,	NULL},
 
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
@@ -38,6 +39,9 @@ ZBX_METRIC parameters_specific[] =
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
 	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
+
+	{"net.tcp.count",	CF_HAVEPARAMS,	NET_TCP_COUNT,		",,127.0.0.1,80"},
+	{"net.udp.count",	CF_HAVEPARAMS,	NET_UDP_COUNT,		",,127.0.0.1,80"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo,bytes"},
