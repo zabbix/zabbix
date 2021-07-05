@@ -621,17 +621,19 @@ class CUserMacro extends CApiService {
 			if (array_key_exists($trimmed_macro, $existing_macros[$hostid])) {
 				$db_hostmacroid = $existing_macros[$hostid][$trimmed_macro];
 
-				if (!array_key_exists('hostmacroid', $hostmacro)
-						|| bccomp($hostmacro['hostmacroid'], $db_hostmacroid) != 0) {
-					$hosts = DB::select('hosts', [
-						'output' => ['name'],
-						'hostids' => $hostid
-					]);
-
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
-					);
+				if (array_key_exists('hostmacroid', $hostmacro)
+						&& bccomp($hostmacro['hostmacroid'], $db_hostmacroid) == 0) {
+					continue;
 				}
+
+				$hosts = DB::select('hosts', [
+					'output' => ['name'],
+					'hostids' => $hostid
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
+				);
 			}
 		}
 	}
