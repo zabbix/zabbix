@@ -94,9 +94,6 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
  *             fields_num - [IN] the number of fields to check                *
  *             oldmacro   - [IN] the macro to rename                          *
  *             newmacro   - [IN] the new macro name                           *
- *             limits     - [IN] the limits of field lengths to check         *
- *                               after renaming the macros                    *
- *             fields_num - [IN] the number of field length limits to check   *
  *                                                                            *
  * Return value: SUCCEED  - macros were renamed successfully                  *
  *               FAIL     - database error occurred                           *
