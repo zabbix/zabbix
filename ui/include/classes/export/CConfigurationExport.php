@@ -600,14 +600,34 @@ class CConfigurationExport {
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
+		// Dependent items may be web items, but at this point they are removed from $hosts.
+		foreach ($discovery_rules as $discovery_rule) {
+			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT
+					&& !array_key_exists($discovery_rule['master_itemid'], $itemids)) {
+				$unresolved_master_itemids[$discovery_rule['master_itemid']] = true;
+			}
+		}
+
+		if ($unresolved_master_itemids) {
+			$master_items = API::Item()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($unresolved_master_itemids),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+		}
+
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-				if (!array_key_exists($discovery_rule['master_itemid'], $itemids)) {
-					// Do not export dependent discovery rule with master item from template.
-					continue;
-				}
+				$master_itemid = $discovery_rule['master_itemid'];
 
-				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+				if (array_key_exists($master_itemid, $itemids)) {
+					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
+				}
+				else {
+					$discovery_rule['master_item'] = ['key_' => $master_items[$master_itemid]['key_']];
+				}
 			}
 
 			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {

@@ -956,6 +956,49 @@ class CConfigurationImport {
 		$itemsToCreate = [];
 		$itemsToUpdate = [];
 
+		/*
+		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
+		 * references at this point. For items and item prototypes web items are found while processing the order of
+		 * them, but for LLD rules there is no ordering, so this is done independetly. Sp due to the nature of constant
+		 * item refreshing after each entity type is processed, it's safer to collect web items once more here where it
+		 * is necessary. Collect host IDs and master item keys that cannot be resolved and then find web items and add
+		 * references to item list.
+		 */
+		$unresolved_master_items = [];
+		$hostids = [];
+
+		foreach ($allDiscoveryRules as $host => $discovery_rules) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			$hostids[$hostid] = true;
+
+			foreach ($discovery_rules as $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item['master_item'])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
+					if (!$this->referencer->resolveItem($hostid, $item['master_item']['key'])) {
+						$unresolved_master_items[$item['master_item']['key']] = true;
+					}
+				}
+			}
+		}
+
+		if ($unresolved_master_items) {
+			$items = API::Item()->get([
+				'output' => ['hostid', 'itemid', 'key_'],
+				'hostids' => array_keys($hostids),
+				'filter' => ['key_' => array_keys($unresolved_master_items)],
+				'webitems' => true
+			]);
+
+			foreach ($items as $item) {
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $item['itemid']);
+			}
+		}
+
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
@@ -1001,13 +1044,7 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-					if (!array_key_exists('key', $item['master_item'])) {
-						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('cannot be empty')
-						));
-					}
-
-					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
+					$item['master_itemid'] = $this->referencer->resolveItem($hostId, $item['master_item']['key']);
 				}
 
 				unset($item['master_item']);
