@@ -96,6 +96,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		return FirstHostname, nil
 	case "agent.hostmetadata":
+		if Options.HostMetadataItem == "agent.hostmetadata" {
+			return nil, errors.New("Invalid recursive HostMetadataItem value")
+		}
 		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
 			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)
 	case "agent.ping":
