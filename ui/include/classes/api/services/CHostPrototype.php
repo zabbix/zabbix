@@ -367,9 +367,7 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$host_prototypes = $this->createReal($host_prototypes);
-		$this->createInterfaces($host_prototypes);
-		$this->createHostMacros($host_prototypes);
+		$this->createReal($host_prototypes);
 		$this->inherit($host_prototypes);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
@@ -381,10 +379,8 @@ class CHostPrototype extends CHostBase {
 	 * Creates the host prototypes and inherits them to linked hosts and templates.
 	 *
 	 * @param array $hostPrototypes
-	 *
-	 * @return array	an array of host prototypes with host IDs
 	 */
-	protected function createReal(array $hostPrototypes) {
+	protected function createReal(array &$hostPrototypes) {
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
@@ -460,7 +456,8 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		return $hostPrototypes;
+		$this->createInterfaces($hostPrototypes);
+		$this->createHostMacros($hostPrototypes);
 	}
 
 	/**
@@ -542,12 +539,8 @@ class CHostPrototype extends CHostBase {
 			'preservekeys' => true
 		]);
 
-		foreach ($host_prototypes as $host_prototype) {
-			if (!array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($host_prototypes) != count($db_host_prototypes)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
@@ -815,13 +808,11 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// save the new host prototypes
-		if (!zbx_empty($insertHostPrototypes)) {
-			$insertHostPrototypes = $this->createReal($insertHostPrototypes);
-			$this->createInterfaces($insertHostPrototypes);
-			$this->createHostMacros($insertHostPrototypes);
+		if ($insertHostPrototypes) {
+			$this->createReal($insertHostPrototypes);
 		}
 
-		if (!zbx_empty($updateHostPrototypes)) {
+		if ($updateHostPrototypes) {
 			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
 			$this->updateInterfaces($updateHostPrototypes);
 			$macros = array_column($updateHostPrototypes, 'macros', 'hostid');
@@ -1586,7 +1577,7 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Update host prototype macros, key is host prototype id and value is array of arrays with macro objects.
 	 *
-	 * @param array $macros     Array with macros objects.
+	 * @param array $update_macros  Array with macros objects.
 	 */
 	protected function updateMacros(array $update_macros) {
 		$ins_hostmacros = [];

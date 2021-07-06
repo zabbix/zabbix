@@ -325,8 +325,6 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function create(array $templates) {
-		$templates = zbx_toArray($templates);
-
 		$this->validateCreate($templates);
 
 		$ins_templates = [];
@@ -421,6 +419,8 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$templates) {
+		$templates = zbx_toArray($templates);
+
 		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],

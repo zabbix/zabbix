@@ -625,8 +625,6 @@ class CHost extends CHostGeneral {
 	 * @return array
 	 */
 	public function create($hosts) {
-		$hosts = zbx_toArray($hosts);
-
 		$this->validateCreate($hosts);
 
 		foreach ($hosts as &$host) {
@@ -768,8 +766,6 @@ class CHost extends CHostGeneral {
 	 * @return array
 	 */
 	public function update($hosts) {
-		$hosts = zbx_toArray($hosts);
-
 		$hosts = $this->validateUpdate($hosts, $db_hosts);
 
 		$inventories = [];
@@ -1845,6 +1841,8 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $hosts) {
+		$hosts = zbx_toArray($hosts);
+
 		if (!$hosts) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -2068,6 +2066,8 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null) {
+		$hosts = zbx_toArray($hosts);
+
 		if (!$hosts) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
