@@ -117,8 +117,8 @@ class testUserRolesPermissions extends CWebTest {
 						'Import',
 						'Delete'
 					],
-					'button_selector' => [
-						'xpath://*[@data-url="sysmap.php?sysmapid=1"]'
+					'button_texts' => [
+						'Edit map'
 					],
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
@@ -133,8 +133,8 @@ class testUserRolesPermissions extends CWebTest {
 						'Create dashboard',
 						'Delete'
 					],
-					'button_selector' => [
-						'xpath://button[@id="dashboard-edit"]'
+					'button_texts' => [
+						'Edit dashboard'
 					],
 					'list_link' => 'zabbix.php?action=dashboard.list',
 					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=122',
@@ -150,11 +150,11 @@ class testUserRolesPermissions extends CWebTest {
 						'Create maintenance period',
 						'Delete'
 					],
-					'button_selector' => [
-						'xpath://button[@id="update"]',
-						'xpath://button[@id="clone"]',
-						'xpath://button[@id="delete"]',
-						'xpath://button[@id="cancel"]'
+					'button_texts' => [
+						'Update',
+						'Clone',
+						'Delete',
+						'Cancel'
 					],
 					'list_link' => 'maintenance.php',
 					'action_link' => 'maintenance.php?form=update&maintenanceid=5',
@@ -172,12 +172,12 @@ class testUserRolesPermissions extends CWebTest {
 						'Disable',
 						'Delete'
 					],
-					'button_selector' => [
-						'xpath://button[@id="update"]',
-						'xpath://button[@id="clone"]',
-						'xpath://button[@id="test"]',
-						'xpath://button[@id="delete"]',
-						'xpath://button[@id="cancel"]'
+					'button_texts' => [
+						'Update',
+						'Clone',
+						'Test',
+						'Delete',
+						'Cancel'
 					],
 					'list_link' => 'zabbix.php?action=scheduledreport.list',
 					'action' => 'Manage scheduled reports',
@@ -208,8 +208,8 @@ class testUserRolesPermissions extends CWebTest {
 					: $data['action_link']);
 			$this->page->waitUntilReady();
 
-			foreach ($data['button_selector'] as $button) {
-				$this->assertTrue($this->query($button)->one()->isEnabled(($button === 'xpath://button[@id="cancel"]') ? true : $action_status));
+			foreach ($data['button_texts'] as $text) {
+				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
 			}
 
 			if ($action_status) {
