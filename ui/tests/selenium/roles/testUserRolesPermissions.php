@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup role, module, users, report
  *
- * @on-before prepareUserData, prepareReportData
+ * @onBefore prepareUserData, prepareReportData
  */
 class testUserRolesPermissions extends CWebTest {
 
@@ -120,11 +120,9 @@ class testUserRolesPermissions extends CWebTest {
 					'button_selector' => [
 						'xpath://*[@data-url="sysmap.php?sysmapid=1"]'
 					],
-					'list_page' => 'sysmaps.php',
-					'action_page' => 'zabbix.php?action=map.view&sysmapid=1',
-					'action' => [
-						'Create and edit maps' => false
-					],
+					'list_link' => 'sysmaps.php',
+					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
+					'action' => 'Create and edit maps',
 					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
 				]
 			],
@@ -138,11 +136,9 @@ class testUserRolesPermissions extends CWebTest {
 					'button_selector' => [
 						'xpath://button[@id="dashboard-edit"]'
 					],
-					'list_page' => 'zabbix.php?action=dashboard.list',
-					'action_page' => 'zabbix.php?action=dashboard.view&dashboardid=122',
-					'action' => [
-						'Create and edit dashboards' => false
-					],
+					'list_link' => 'zabbix.php?action=dashboard.list',
+					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=122',
+					'action' => 'Create and edit dashboards',
 					'check_links' => ['zabbix.php?action=dashboard.view&new=1']
 				]
 			],
@@ -160,11 +156,9 @@ class testUserRolesPermissions extends CWebTest {
 						'xpath://button[@id="delete"]',
 						'xpath://button[@id="cancel"]'
 					],
-					'list_page' => 'maintenance.php',
-					'action_page' => 'maintenance.php?form=update&maintenanceid=5',
-					'action' => [
-						'Create and edit maintenance' => false
-					],
+					'list_link' => 'maintenance.php',
+					'action_link' => 'maintenance.php?form=update&maintenanceid=5',
+					'action' => 'Create and edit maintenance',
 					'check_links' => ['maintenance.php?form=create']
 				]
 			],
@@ -185,10 +179,8 @@ class testUserRolesPermissions extends CWebTest {
 						'xpath://button[@id="delete"]',
 						'xpath://button[@id="cancel"]'
 					],
-					'list_page' => 'zabbix.php?action=scheduledreport.list',
-					'action' => [
-						'Manage scheduled reports' => false
-					],
+					'list_link' => 'zabbix.php?action=scheduledreport.list',
+					'action' => 'Manage scheduled reports',
 					'check_links' => ['zabbix.php?action=scheduledreport.edit']
 				]
 			]
@@ -203,23 +195,28 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_PageActions($data) {
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
-			$this->page->open($data['list_page']);
+			$this->page->open($data['list_link']);
+
 			foreach ($data['buttons'] as $button) {
 				$this->query('class:list-table')->asTable()->waitUntilReady()->one()->getRow(0)->select();
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
 			$this->page->open((array_key_exists('report', $data))
-					? 'zabbix.php?action=scheduledreport.edit&reportid='.self::$report_id
-					: $data['action_page']);
+					? 'zabbix.php?action=scheduledreport.edit&reportid='.self::$reportid
+					: $data['action_link']);
 			$this->page->waitUntilReady();
+
 			foreach ($data['button_selector'] as $button) {
 				$this->assertTrue($this->query($button)->one()->isEnabled(($button === 'xpath://button[@id="cancel"]') ? true : $action_status));
 			}
+
 			if ($action_status) {
-				$this->changeAction($data['action']);
+				$this->changeRoleRule([$data['action'] => false]);
 			}
 		}
+
 		$this->checkLinks($data['check_links']);
 	}
 
@@ -228,28 +225,28 @@ class testUserRolesPermissions extends CWebTest {
 			// Comment.
 			[
 				[
-					'activity_id' => 'message',
+					'activityid' => 'message',
 					'action' => 'Add problem comments'
 				]
 			],
 			// Severity.
 			[
 				[
-					'activity_id' => 'change_severity',
+					'activityid' => 'change_severity',
 					'action' => 'Change severity'
 				]
 			],
 			// Acknowledge problem.
 			[
 				[
-					'activity_id' => 'acknowledge_problem',
+					'activityid' => 'acknowledge_problem',
 					'action' => 'Acknowledge problems'
 				]
 			],
 			// Close problem.
 			[
 				[
-					'activity_id' => 'close_problem',
+					'activityid' => 'close_problem',
 					'action' => 'Close problems'
 				]
 			]
@@ -263,13 +260,14 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ProblemActions($data) {
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag')
 					->query('link', 'No')->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($dialog->query('id', $data['activity_id'])->one()->isEnabled($action_status));
-			$this->changeAction($data['action'], ($action_status === true) ? false : true);
+			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
+			$this->changeRoleRule([$data['action'] => ($action_status === true) ? false : true]);
 		}
 	}
 
@@ -291,6 +289,7 @@ class testUserRolesPermissions extends CWebTest {
 			'Close problems' => false
 		];
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
@@ -305,6 +304,7 @@ class testUserRolesPermissions extends CWebTest {
 
 			// Event details page.
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
+
 			foreach (['2', '5'] as $table_number) {
 				$table = $this->query('xpath:(//*[@class="list-table"])['.$table_number.']')->asTable()->one();
 				$this->assertTrue($table->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
@@ -314,10 +314,11 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('overview.php?type=0')->waitUntilReady();
 			$this->query('class:list-table')->asTable()->one()->query('xpath://td[@class="disaster-bg cursor-pointer"]')->one()->click();
 			$this->page->waitUntilReady();
+
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			if ($action_status) {
 				$this->assertTrue($popup->hasItems($context_before));
-				$this->changeAction($actions);
+				$this->changeRoleRule($actions);
 			}
 			else {
 				$context_after = array_values(array_diff($context_before, ['Acknowledge']));
@@ -397,19 +398,21 @@ class testUserRolesPermissions extends CWebTest {
 			'Configuration'
 		];
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			$this->page->open($data['link'])->waitUntilReady();
 			$this->query($data['selector'])->waitUntilPresent()->one()->click();
+
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			if ($action_status) {
 				$this->assertTrue($popup->hasItems($context_before));
 				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-				$this->changeAction(['Execute scripts' => false]);
+				$this->changeRoleRule(['Execute scripts' => false]);
 			}
 			else {
 				$this->assertTrue($popup->hasItems($context_after));
 				$this->assertEquals(['HOST'], $popup->getTitles()->asText());
-				$this->changeAction(['Execute scripts' => true]);
+				$this->changeRoleRule(['Execute scripts' => true]);
 			}
 		}
 	}
@@ -433,20 +436,23 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
+
 			for ($i = 1; $i <= $page_number; ++$i) {
 				$all_pages[] = $this->query('xpath:(//ul[@class="menu-main"]/li/a)['.$i.']')->one()->getText();
 			}
+
 			if ($action_status) {
 				$this->assertEquals($pages_before, $all_pages);
-				$this->changeAction(['5th Module' => false]);
+				$this->changeRoleRule(['5th Module' => false]);
 				$all_pages = [];
 			}
 			else {
 				$pages_after = array_values(array_diff($pages_before, ['Module 5 menu']));
 				$this->assertEquals($pages_after, $all_pages);
-				$this->changeAction(['5th Module' => true]);
+				$this->changeRoleRule(['5th Module' => true]);
 			}
 		}
 	}
@@ -458,9 +464,7 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Inventory',
 					'page' => 'Overview',
 					'remove_ui' => [
-						'Inventory' => [
-							'Hosts'
-						]
+						'Hosts'
 					],
 					'link' => ['hostinventoriesoverview.php']
 				]
@@ -470,9 +474,7 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Inventory',
 					'page' => 'Hosts',
 					'remove_ui' => [
-						'Inventory' => [
 							'Overview'
-						]
 					],
 					'link' => ['hostinventories.php']
 				]
@@ -482,14 +484,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Availability report',
 					'remove_ui' => [
-						'Reports' => [
-							'Scheduled reports',
-							'System information',
-							'Triggers top 100',
-							'Audit',
-							'Action log',
-							'Notifications'
-						]
+						'Scheduled reports',
+						'System information',
+						'Triggers top 100',
+						'Audit',
+						'Action log',
+						'Notifications'
 					],
 					'link' => ['report2.php']
 				]
@@ -499,14 +499,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'System information',
 					'remove_ui' => [
-						'Reports' => [
-							'Scheduled reports',
-							'Availability report',
-							'Triggers top 100',
-							'Audit',
-							'Action log',
-							'Notifications'
-						]
+						'Scheduled reports',
+						'Availability report',
+						'Triggers top 100',
+						'Audit',
+						'Action log',
+						'Notifications'
 					],
 					'link' => ['zabbix.php?action=report.status']
 				]
@@ -516,14 +514,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Availability report',
 					'remove_ui' => [
-						'Reports' => [
-							'System information',
-							'Scheduled reports',
-							'Triggers top 100',
-							'Audit',
-							'Action log',
-							'Notifications'
-						]
+						'System information',
+						'Scheduled reports',
+						'Triggers top 100',
+						'Audit',
+						'Action log',
+						'Notifications'
 					],
 					'link' => ['report2.php']
 				]
@@ -533,14 +529,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Triggers top 100',
 					'remove_ui' => [
-						'Reports' => [
-							'Availability report',
-							'System information',
-							'Scheduled reports',
-							'Audit',
-							'Action log',
-							'Notifications'
-						]
+						'Availability report',
+						'System information',
+						'Scheduled reports',
+						'Audit',
+						'Action log',
+						'Notifications'
 					],
 					'link' => ['toptriggers.php']
 				]
@@ -550,14 +544,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Audit',
 					'remove_ui' => [
-						'Reports' => [
-							'Availability report',
-							'System information',
-							'Scheduled reports',
-							'Triggers top 100',
-							'Action log',
-							'Notifications'
-						]
+						'Availability report',
+						'System information',
+						'Scheduled reports',
+						'Triggers top 100',
+						'Action log',
+						'Notifications'
 					],
 					'link' => ['zabbix.php?action=auditlog.list']
 				]
@@ -567,14 +559,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Action log',
 					'remove_ui' => [
-						'Reports' => [
-							'Availability report',
-							'System information',
-							'Scheduled reports',
-							'Triggers top 100',
-							'Audit',
-							'Notifications'
-						]
+						'Availability report',
+						'System information',
+						'Scheduled reports',
+						'Triggers top 100',
+						'Audit',
+						'Notifications'
 					],
 					'link' => ['auditacts.php']
 				]
@@ -584,14 +574,12 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Reports',
 					'page' => 'Notifications',
 					'remove_ui' => [
-						'Reports' => [
-							'Availability report',
-							'System information',
-							'Scheduled reports',
-							'Triggers top 100',
-							'Audit',
-							'Action log'
-						]
+						'Availability report',
+						'System information',
+						'Scheduled reports',
+						'Triggers top 100',
+						'Audit',
+						'Action log'
 					],
 					'link' => ['report4.php']
 				]
@@ -601,15 +589,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Host groups',
 					'remove_ui' => [
-						'Configuration' => [
-							'Templates',
-							'Hosts',
-							'Maintenance',
-							'Actions',
-							'Event correlation',
-							'Discovery',
-							'Services'
-						]
+						'Templates',
+						'Hosts',
+						'Maintenance',
+						'Actions',
+						'Event correlation',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['hostgroups.php']
 				]
@@ -619,15 +605,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Templates',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Hosts',
-							'Maintenance',
-							'Actions',
-							'Event correlation',
-							'Discovery',
-							'Services'
-						]
+						'Host groups',
+						'Hosts',
+						'Maintenance',
+						'Actions',
+						'Event correlation',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['templates.php']
 				]
@@ -637,15 +621,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Hosts',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Maintenance',
-							'Actions',
-							'Event correlation',
-							'Discovery',
-							'Services'
-						]
+						'Host groups',
+						'Templates',
+						'Maintenance',
+						'Actions',
+						'Event correlation',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['hosts.php']
 				]
@@ -655,15 +637,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Maintenance',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Hosts',
-							'Actions',
-							'Event correlation',
-							'Discovery',
-							'Services'
-						]
+						'Host groups',
+						'Templates',
+						'Hosts',
+						'Actions',
+						'Event correlation',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['maintenance.php']
 				]
@@ -673,15 +653,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Actions',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Hosts',
-							'Maintenance',
-							'Event correlation',
-							'Discovery',
-							'Services'
-						]
+						'Host groups',
+						'Templates',
+						'Hosts',
+						'Maintenance',
+						'Event correlation',
+						'Discovery',
+						'Services'
 					],
 					'link' => [
 						'actionconf.php?eventsource=0',
@@ -696,15 +674,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Event correlation',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Hosts',
-							'Maintenance',
-							'Actions',
-							'Discovery',
-							'Services'
-						]
+						'Host groups',
+						'Templates',
+						'Hosts',
+						'Maintenance',
+						'Actions',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=correlation.list']
 				]
@@ -714,15 +690,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Discovery',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Hosts',
-							'Maintenance',
-							'Actions',
-							'Event correlation',
-							'Services'
-						]
+						'Host groups',
+						'Templates',
+						'Hosts',
+						'Maintenance',
+						'Actions',
+						'Event correlation',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=discovery.list']
 				]
@@ -732,15 +706,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Configuration',
 					'page' => 'Services',
 					'remove_ui' => [
-						'Configuration' => [
-							'Host groups',
-							'Templates',
-							'Hosts',
-							'Maintenance',
-							'Actions',
-							'Event correlation',
-							'Discovery'
-						]
+						'Host groups',
+						'Templates',
+						'Hosts',
+						'Maintenance',
+						'Actions',
+						'Event correlation',
+						'Discovery'
 					],
 					'link' => ['services.php']
 				]
@@ -750,16 +722,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'General',
 					'remove_ui' => [
-						'Administration' => [
-							'Proxies',
-							'Authentication',
-							'User groups',
-							'User roles',
-							'Users',
-							'Media types',
-							'Scripts',
-							'Queue'
-						]
+						'Proxies',
+						'Authentication',
+						'User groups',
+						'User roles',
+						'Users',
+						'Media types',
+						'Scripts',
+						'Queue'
 					],
 					'link' => [
 						'zabbix.php?action=gui.edit',
@@ -781,16 +751,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Proxies',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Authentication',
-							'User groups',
-							'User roles',
-							'Users',
-							'Media types',
-							'Scripts',
-							'Queue'
-						]
+						'General',
+						'Authentication',
+						'User groups',
+						'User roles',
+						'Users',
+						'Media types',
+						'Scripts',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=proxy.list']
 				]
@@ -800,16 +768,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Authentication',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'User groups',
-							'User roles',
-							'Users',
-							'Media types',
-							'Scripts',
-							'Queue'
-						]
+						'General',
+						'Proxies',
+						'User groups',
+						'User roles',
+						'Users',
+						'Media types',
+						'Scripts',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=authentication.edit']
 				]
@@ -819,16 +785,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'User groups',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'User roles',
-							'Users',
-							'Media types',
-							'Scripts',
-							'Queue'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'User roles',
+						'Users',
+						'Media types',
+						'Scripts',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=usergroup.list']
 				]
@@ -838,16 +802,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Users',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'User roles',
-							'User groups',
-							'Media types',
-							'Scripts',
-							'Queue'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'User roles',
+						'User groups',
+						'Media types',
+						'Scripts',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=user.list']
 				]
@@ -857,16 +819,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Media types',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'User roles',
-							'User groups',
-							'Users',
-							'Scripts',
-							'Queue'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'User roles',
+						'User groups',
+						'Users',
+						'Scripts',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=mediatype.list']
 				]
@@ -876,16 +836,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Scripts',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'User roles',
-							'User groups',
-							'Users',
-							'Media types',
-							'Queue'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'User roles',
+						'User groups',
+						'Users',
+						'Media types',
+						'Queue'
 					],
 					'link' => ['zabbix.php?action=script.list']
 				]
@@ -895,16 +853,14 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'page' => 'Queue',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'User roles',
-							'User groups',
-							'Users',
-							'Media types',
-							'Scripts'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'User roles',
+						'User groups',
+						'Users',
+						'Media types',
+						'Scripts'
 					],
 					'link' => [
 						'zabbix.php?action=queue.overview',
@@ -919,16 +875,14 @@ class testUserRolesPermissions extends CWebTest {
 					'user_roles' => true,
 					'page' => 'User roles',
 					'remove_ui' => [
-						'Administration' => [
-							'General',
-							'Proxies',
-							'Authentication',
-							'Queue',
-							'User groups',
-							'Users',
-							'Media types',
-							'Scripts'
-						]
+						'General',
+						'Proxies',
+						'Authentication',
+						'Queue',
+						'User groups',
+						'Users',
+						'Media types',
+						'Scripts'
 					],
 					'link' => ['zabbix.php?action=userrole.list']
 				]
@@ -938,15 +892,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Problems',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Dashboard',
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=problem.view']
 				]
@@ -956,15 +908,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Hosts',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Dashboard',
+						'Problems',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=host.view']
 				]
@@ -974,15 +924,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Overview',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Hosts',
-							'Latest data',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Dashboard',
+						'Problems',
+						'Hosts',
+						'Latest data',
+						'Maps',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['overview.php']
 				]
@@ -992,15 +940,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Latest data',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Hosts',
-							'Overview',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Dashboard',
+						'Problems',
+						'Hosts',
+						'Overview',
+						'Maps',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=latest.view']
 				]
@@ -1010,15 +956,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Maps',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Discovery',
-							'Services'
-						]
+						'Dashboard',
+						'Problems',
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Discovery',
+						'Services'
 					],
 					'link' => ['sysmaps.php']
 				]
@@ -1028,15 +972,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Discovery',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Services'
-						]
+						'Dashboard',
+						'Problems',
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Services'
 					],
 					'link' => ['zabbix.php?action=discovery.view']
 				]
@@ -1046,15 +988,13 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Services',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Dashboard',
-							'Problems',
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Discovery'
-						]
+						'Dashboard',
+						'Problems',
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Discovery'
 					],
 					'link' => ['srv_status.php']
 				]
@@ -1081,8 +1021,10 @@ class testUserRolesPermissions extends CWebTest {
 			]
 		];
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link', $data['section']);
+
 			if ($data['section'] !== 'Monitoring') {
 				$main_section->waitUntilReady()->one()->click();
 				$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
@@ -1091,17 +1033,19 @@ class testUserRolesPermissions extends CWebTest {
 						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
 				});
 			}
+
 			$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
+
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
 					$this->clickSignout();
 					$this->page->userLogin('Admin', 'zabbix');
-					$this->changeAction($data['remove_ui']);
+					$this->changeRoleRule([$data['section'] => $data['remove_ui']]);
 					$this->clickSignout();
 					$this->page->userLogin('user_for_role', 'zabbix');
 				}
 				else {
-					$this->changeAction($data['remove_ui']);
+					$this->changeRoleRule([$data['section'] => $data['remove_ui']]);
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 				}
 			}
@@ -1110,7 +1054,7 @@ class testUserRolesPermissions extends CWebTest {
 					$this->checkLinks($data['link']);
 					$this->clickSignout();
 					$this->page->userLogin('Admin', 'zabbix');
-					$this->changeAction($user_roles);
+					$this->changeRoleRule($user_roles);
 					$this->clickSignout();
 				}
 				else {
@@ -1128,15 +1072,13 @@ class testUserRolesPermissions extends CWebTest {
 					'page' => 'Dashboard',
 					'button' => 'Problems',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Problems',
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Problems',
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Discovery',
+						'Services'
 					]
 				]
 			],
@@ -1144,14 +1086,12 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'button' => 'Hosts',
 					'remove_ui' => [
-						'Monitoring' => [
-							'Hosts',
-							'Overview',
-							'Latest data',
-							'Maps',
-							'Discovery',
-							'Services'
-						]
+						'Hosts',
+						'Overview',
+						'Latest data',
+						'Maps',
+						'Discovery',
+						'Services'
 					]
 				]
 			]
@@ -1160,13 +1100,11 @@ class testUserRolesPermissions extends CWebTest {
 //				[
 //					'button' => 'Overview',
 //					'remove_ui' => [
-//						'Monitoring' => [
-//							'Overview',
-//							'Latest data',
-//							'Maps',
-//							'Discovery',
-//							'Services'
-//						]
+//						'Overview',
+//						'Latest data',
+//						'Maps',
+//						'Discovery',
+//						'Services'
 //					]
 //				]
 //			]
@@ -1179,30 +1117,23 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getDashboardData
 	 */
 	public function testUserRolesPermissions_Dashboard($data) {
-		$enabled_ui = [
-			'Monitoring' => [
-				'Dashboard',
-				'Problems',
-				'Hosts',
-				'Overview',
-				'Latest data',
-				'Maps',
-				'Discovery',
-				'Services'
-			]
-		];
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link:Monitoring');
+
 			if (array_key_exists('page', $data)) {
 				$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
 			}
+
 			if ($action_status) {
-				$this->changeAction($data['remove_ui']);
+				$this->changeRoleRule(['Monitoring' => $data['remove_ui']]);
 			}
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
-				$this->changeAction($enabled_ui);
+				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Overview', 'Latest data', 'Maps',
+						'Discovery', 'Services']]
+				);
 			}
 		}
 	}
@@ -1212,11 +1143,12 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ManageApi() {
 		$this->page->userLogin('user_for_role', 'zabbix');
+
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
 				$this->page->open('zabbix.php?action=user.token.list');
 				$this->page->waitUntilReady();
-				$this->changeAction(['Manage API tokens' => false]);
+				$this->changeRoleRule(['Manage API tokens' => false]);
 			}
 			else {
 				$this->checkLinks(['zabbix.php?action=user.token.list']);
@@ -1235,19 +1167,21 @@ class testUserRolesPermissions extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "user_for_role". '.
 					'You have no permissions to access this page.');
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
+
 			if ($page === 'Dashboard') {
 				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
+
 			$this->page->waitUntilReady();
 		}
 	}
 
 	/**
-	 * Enable/disable action.
+	 * Enable/disable actions and UI.
 	 *
-	 * @param array $action		action name in role page with status true/false
+	 * @param array $action		action with true/false status or UI section with page
 	 */
-	private function changeAction($action) {
+	private function changeRoleRule($action) {
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid);
 		$this->page->waitUntilReady();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
