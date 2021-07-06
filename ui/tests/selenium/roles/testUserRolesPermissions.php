@@ -463,7 +463,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Inventory',
 					'page' => 'Overview',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Hosts'
 					],
 					'link' => ['hostinventoriesoverview.php']
@@ -473,7 +473,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Inventory',
 					'page' => 'Hosts',
-					'remove_ui' => [
+					'displayed_ui' => [
 							'Overview'
 					],
 					'link' => ['hostinventories.php']
@@ -483,7 +483,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Availability report',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Scheduled reports',
 						'System information',
 						'Triggers top 100',
@@ -498,7 +498,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'System information',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Scheduled reports',
 						'Availability report',
 						'Triggers top 100',
@@ -513,7 +513,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Availability report',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'System information',
 						'Scheduled reports',
 						'Triggers top 100',
@@ -528,7 +528,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Triggers top 100',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Availability report',
 						'System information',
 						'Scheduled reports',
@@ -543,7 +543,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Audit',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Availability report',
 						'System information',
 						'Scheduled reports',
@@ -558,7 +558,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Action log',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Availability report',
 						'System information',
 						'Scheduled reports',
@@ -573,7 +573,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Reports',
 					'page' => 'Notifications',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Availability report',
 						'System information',
 						'Scheduled reports',
@@ -588,7 +588,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Host groups',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Templates',
 						'Hosts',
 						'Maintenance',
@@ -604,7 +604,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Templates',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Hosts',
 						'Maintenance',
@@ -620,7 +620,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Hosts',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Maintenance',
@@ -636,7 +636,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Maintenance',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Hosts',
@@ -652,7 +652,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Actions',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Hosts',
@@ -673,7 +673,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Event correlation',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Hosts',
@@ -689,7 +689,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Discovery',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Hosts',
@@ -705,7 +705,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Services',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Host groups',
 						'Templates',
 						'Hosts',
@@ -721,7 +721,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'General',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Proxies',
 						'Authentication',
 						'User groups',
@@ -750,7 +750,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Proxies',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Authentication',
 						'User groups',
@@ -767,7 +767,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Authentication',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'User groups',
@@ -784,7 +784,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'User groups',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -801,7 +801,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Users',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -818,7 +818,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Media types',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -835,7 +835,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Scripts',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -852,7 +852,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Administration',
 					'page' => 'Queue',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -874,7 +874,7 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Administration',
 					'user_roles' => true,
 					'page' => 'User roles',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'General',
 						'Proxies',
 						'Authentication',
@@ -891,7 +891,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Problems',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Hosts',
 						'Overview',
@@ -907,7 +907,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Hosts',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Overview',
@@ -923,7 +923,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Overview',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
@@ -939,7 +939,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Latest data',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
@@ -955,7 +955,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Maps',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
@@ -971,7 +971,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Discovery',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
@@ -987,7 +987,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'section' => 'Monitoring',
 					'page' => 'Services',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
@@ -1040,12 +1040,12 @@ class testUserRolesPermissions extends CWebTest {
 				if (array_key_exists('user_roles', $data)) {
 					$this->clickSignout();
 					$this->page->userLogin('Admin', 'zabbix');
-					$this->changeRoleRule([$data['section'] => $data['remove_ui']]);
+					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
 					$this->clickSignout();
 					$this->page->userLogin('user_for_role', 'zabbix');
 				}
 				else {
-					$this->changeRoleRule([$data['section'] => $data['remove_ui']]);
+					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 				}
 			}
@@ -1071,7 +1071,7 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'page' => 'Dashboard',
 					'button' => 'Problems',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Problems',
 						'Hosts',
 						'Overview',
@@ -1085,7 +1085,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'button' => 'Hosts',
-					'remove_ui' => [
+					'displayed_ui' => [
 						'Hosts',
 						'Overview',
 						'Latest data',
@@ -1099,7 +1099,7 @@ class testUserRolesPermissions extends CWebTest {
 //			[
 //				[
 //					'button' => 'Overview',
-//					'remove_ui' => [
+//					'displayed_ui' => [
 //						'Overview',
 //						'Latest data',
 //						'Maps',
@@ -1127,7 +1127,7 @@ class testUserRolesPermissions extends CWebTest {
 			}
 
 			if ($action_status) {
-				$this->changeRoleRule(['Monitoring' => $data['remove_ui']]);
+				$this->changeRoleRule(['Monitoring' => $data['displayed_ui']]);
 			}
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
