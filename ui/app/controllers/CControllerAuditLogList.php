@@ -168,8 +168,6 @@ class CControllerAuditLogList extends CController {
 			AUDIT_ACTION_ADD => _('Add'),
 			AUDIT_ACTION_UPDATE => _('Update'),
 			AUDIT_ACTION_DELETE => _('Delete'),
-			AUDIT_ACTION_ENABLE => _('Enable'),
-			AUDIT_ACTION_DISABLE => _('Disable'),
 			AUDIT_ACTION_EXECUTE => _('Execute')
 		];
 	}
@@ -182,7 +180,6 @@ class CControllerAuditLogList extends CController {
 	static public function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
-			AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
 			AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
 			AUDIT_RESOURCE_HOST => _('Host'),
 			AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),

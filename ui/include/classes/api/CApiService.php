@@ -1142,14 +1142,14 @@ class CApiService {
 	 * @param string $userid
 	 * @param string $ip
 	 */
-	protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
+	/* protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
 		if ($userid === null) {
 			$userid = self::$userData['userid'];
 			$ip = self::$userData['userip'];
 		}
 
 		CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
-	}
+	} */
 
 	/**
 	 * Add audit records.
