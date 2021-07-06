@@ -114,12 +114,11 @@ class CAudit {
 
 			$old_value = $old_object[$key];
 			$current_key = $parent_key !== '' ? $parent_key.'.'.$key : $key;
-			if ($i > 0) {
-				$current_key .= '['.$i.']';
-			}
 
 			if (is_array($value)) {
+				$current_key .= '['.$i.']';
 				$array[$current_key] = self::getDetailsArrayRecursive($value, $old_value, $current_key, $resourcetype);
+				$i++;
 			}
 			else {
 				if ($value == $old_value) {
@@ -131,7 +130,6 @@ class CAudit {
 					self::sanitizeValue($old_value, $old_object, $key, $resourcetype)
 				];
 			}
-			$i++;
 		}
 
 		return $array;
