@@ -602,7 +602,7 @@ static size_t	get_string_field_size(unsigned char type)
 		case ZBX_TYPE_SHORTTEXT:
 			return 65535u;
 		case ZBX_TYPE_CUID:
-			return CUID_LEN;
+			return CUID_LEN - 1;
 	default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -620,7 +620,7 @@ static size_t	get_string_field_size(unsigned char type)
 		case ZBX_TYPE_SHORTTEXT:
 			return 4000u;
 		case ZBX_TYPE_CUID:
-			return CUID_LEN;
+			return CUID_LEN - 1;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);

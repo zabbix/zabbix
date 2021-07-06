@@ -97,7 +97,7 @@ my %mysql = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar"
+	"t_cuid"	=>	"varchar(25)"
 );
 
 my %oracle = (
@@ -118,7 +118,7 @@ my %oracle = (
 	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
 	"t_varchar"	=>	"nvarchar2",
-	"t_cuid"	=>	"nvarchar2"
+	"t_cuid"	=>	"nvarchar2(25)"
 );
 
 my %postgresql = (
@@ -139,7 +139,7 @@ my %postgresql = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar"
+	"t_cuid"	=>	"varchar(25)"
 );
 
 my %sqlite3 = (
@@ -160,7 +160,7 @@ my %sqlite3 = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar"
+	"t_cuid"	=>	"varchar(25)"
 );
 
 sub rtrim($)
@@ -293,7 +293,7 @@ sub process_field
 		}
 		elsif ($type eq "ZBX_TYPE_CUID")
 		{
-			$length = 25;
+			$length = 0;
 		}
 		else
 		{
