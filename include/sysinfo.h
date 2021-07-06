@@ -345,10 +345,12 @@ zbx_mpoint_t;
 
 #define ZBX_LLD_MACRO_FSNAME		"{#FSNAME}"
 #define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
+#define ZBX_LLD_MACRO_FSLABEL		"{#FSLABEL}"
 #define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
 
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
+#define ZBX_SYSINFO_TAG_FSLABEL			"fslabel"
 #define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
 #define ZBX_SYSINFO_TAG_BYTES			"bytes"
 #define ZBX_SYSINFO_TAG_INODES			"inodes"
