@@ -124,8 +124,8 @@ class testTimezone extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test4567',
+						'Password (once again)' => 'test4567',
 						'Time zone' => 'UTC'
 					],
 					'time_diff' => '-3 hours',
@@ -139,8 +139,8 @@ class testTimezone extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test4567',
+						'Password (once again)' => 'test4567',
 						'Time zone' => 'System default'
 					],
 					'time_diff' => '+0 hours',
@@ -154,8 +154,8 @@ class testTimezone extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test4567',
+						'Password (once again)' => 'test4567',
 						'Time zone' => 'Pacific/Niue'
 					],
 					'time_diff' => '-14 hours',
@@ -169,8 +169,8 @@ class testTimezone extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test4567',
+						'Password (once again)' => 'test4567',
 						'Time zone' => 'Asia/Magadan'
 					],
 					'time_diff' => '+8 hours',

@@ -198,8 +198,8 @@ class testLanguage extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Language' => 'Russian (ru_RU)'
 					],
 					'page_title' => 'Панель',
@@ -215,8 +215,8 @@ class testLanguage extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Language' => 'System default'
 					],
 					'page_title' => 'Dashboard',
@@ -232,8 +232,8 @@ class testLanguage extends CWebTest {
 						'Groups' => [
 							'Selenium user group'
 						],
-						'Password' => 'test',
-						'Password (once again)' => 'test',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Language' => 'English (en_GB)'
 					],
 					'page_title' => 'Dashboard',
