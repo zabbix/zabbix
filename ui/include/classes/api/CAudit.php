@@ -61,6 +61,28 @@ class CAudit {
 		AUDIT_RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard']
 	];
 
+	static private $masked_fields = [
+		'config' => [
+			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+		],
+		'globalmacro' => [
+			'fields' => ['value' => true],
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+		],
+		'hosts' => [
+			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+		],
+		'media_type' => [
+			'fields' => ['passwd' => true]
+		],
+		'token' => [
+			'fields' => ['token' => true]
+		],
+		'users' => [
+			'fields' => ['passwd' => true]
+		]
+	];
+
 	/**
 	 * Add simple audit record.
 	 *
@@ -70,7 +92,7 @@ class CAudit {
 	 * @param int    $resourcetype  AUDIT_RESOURCE_*
 	 * @param string $note
 	 */
-	static public function addDetails($userid, $ip, $action, $resourcetype, $note = '') {
+	/* static public function addDetails($userid, $ip, $action, $resourcetype, $note = '') {
 		DB::insert('auditlog', [[
 			'userid' => $userid,
 			'clock' => time(),
@@ -79,6 +101,73 @@ class CAudit {
 			'resourcetype' => $resourcetype,
 			'note' => $note
 		]]);
+	} */
+
+	static private function getDetailsArrayRecursive(array $new_object, array $old_object, string $parent_key = '',
+			int $resourcetype): array {
+		$array = [];
+		$i = 0;
+		foreach ($new_object as $key => $value) {
+			if (!array_key_exists($key, $old_object)) {
+				continue;
+			}
+
+			$old_value = $old_object[$key];
+			$current_key = $parent_key !== '' ? $parent_key.'.'.$key : $key;
+			if ($i > 0) {
+				$current_key .= '['.$i.']';
+			}
+
+			if (is_array($value)) {
+				$array[$current_key] = self::getDetailsArrayRecursive($value, $old_value, $current_key, $resourcetype);
+			}
+			else {
+				if ($value == $old_value) {
+					continue;
+				}
+
+
+				$array[$current_key] = ['update', self::sanitizeValue($value, $new_object, $key, $resourcetype),
+					self::sanitizeValue($old_value, $old_object, $key, $resourcetype)
+				];
+			}
+			$i++;
+		}
+
+		return $array;
+	}
+
+	static private function isSanitizeField(array $object, string $key, int $resourcetype): bool {
+		$table_masked_fields = [];
+		list(, , $table_name) = self::$supported_type[$resourcetype];
+
+		if (!array_key_exists($table_name, self::$masked_fields)) {
+			return false;
+		}
+
+		$table_masked_fields = self::$masked_fields[$table_name]['fields'];
+
+		if (!array_key_exists('conditions', self::$masked_fields[$table_name])) {
+			return array_key_exists($key, $table_masked_fields);
+		}
+
+		if (array_key_exists($key, $table_masked_fields)) {
+			if (!array_key_exists('conditions', self::$masked_fields[$table_name])) {
+				return true;
+			}
+
+			foreach (self::$masked_fields[$table_name]['conditions'] as $field_name => $value) {
+				if (array_key_exists($field_name, $object) && $object[$field_name] == $value) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	static private function sanitizeValue(string $value, array $object, string $key, int $resourcetype): string {
+		return self::isSanitizeField($object, $key, $resourcetype) ? ZBX_SECRET_MASK : $value;
 	}
 
 	/**
@@ -92,105 +181,28 @@ class CAudit {
 	 * @param array  $objects_old
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
-		$masked_fields = [
-			'config' => [
-				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-			],
-			'globalmacro' => [
-				'fields' => ['value' => true],
-				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
-			],
-			'hosts' => [
-				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-			],
-			'media_type' => [
-				'fields' => ['passwd' => true]
-			],
-			'token' => [
-				'fields' => ['token' => true]
-			],
-			'users' => [
-				'fields' => ['passwd' => true]
-			]
-		];
-
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
 			return;
 		}
 
-		list($field_name_resourceid, $field_name_resourcename, $table_name) = self::$supported_type[$resourcetype];
+		$auditid = generateCuid();
+		$recordsetid = generateCuid();
+
+		list($field_name_resourceid, $field_name_resourcename) = self::$supported_type[$resourcetype];
 
 		$clock = time();
 		$ip = substr($ip, 0, 39);
 
 		$auditlog = [];
-		$objects_diff = [];
 
 		foreach ($objects as $object) {
 			$resourceid = $object[$field_name_resourceid];
+			$diff = [];
 
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
 
-				/**
-				 * Convert two dimension array to one dimension array,
-				 * because array_diff and array_intersect work only with one dimension array.
-				 */
-				$object_old = array_filter($object_old, function ($val) {
-					return !is_array($val);
-				});
-				$object = array_filter($object, function ($val) {
-					return !is_array($val);
-				});
-
-				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
-
-				if (!$object_diff) {
-					continue;
-				}
-
-				if (array_key_exists($table_name, $masked_fields)) {
-					$table_masked_fields = $masked_fields[$table_name]['fields'];
-					$mask_object_old = true;
-					$mask_object = true;
-
-					if (array_key_exists('conditions', $masked_fields[$table_name])) {
-						foreach ($masked_fields[$table_name]['conditions'] as $field_name => $value) {
-							if ($mask_object_old) {
-								$mask_object_old = ($object_old[$field_name] == $value);
-							}
-							if ($mask_object) {
-								$mask_object = array_key_exists($field_name, $object)
-									? ($object[$field_name] == $value)
-									: ($object_old[$field_name] == $value);
-							}
-						}
-					}
-				}
-				else {
-					$table_masked_fields = [];
-					$mask_object_old = false;
-					$mask_object = false;
-				}
-
-				foreach ($object_diff as $field_name => &$values) {
-					if (array_key_exists($field_name, $table_masked_fields)) {
-						if ($mask_object_old) {
-							$object_old[$field_name] = ZBX_SECRET_MASK;
-						}
-						if ($mask_object) {
-							$object[$field_name] = ZBX_SECRET_MASK;
-						}
-					}
-
-					$values = [
-						'old' => $object_old[$field_name],
-						'new' => $object[$field_name]
-					];
-				}
-				unset($values);
-
-				$objects_diff[] = $object_diff;
+				$diff[] = self::getDetailsArrayRecursive($object, $object_old, '', $resourcetype);
 
 				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
 			}
@@ -203,36 +215,21 @@ class CAudit {
 			}
 
 			$auditlog[] = [
+				'auditid' => $auditid,
 				'userid' => $userid,
 				'clock' => $clock,
 				'ip' => $ip,
 				'action' => $action,
 				'resourcetype' => $resourcetype,
 				'resourceid' => $resourceid,
-				'resourcename' => $resourcename
+				'resourcename' => $resourcename,
+				'recordsetid' => $recordsetid,
+				'details' => json_encode($diff)
 			];
 		}
 
 		if ($auditlog) {
-			$auditids = DB::insertBatch('auditlog', $auditlog);
-
-			if ($action == AUDIT_ACTION_UPDATE) {
-				$auditlog_details = [];
-
-				foreach ($objects_diff as $index => $object_diff) {
-					foreach ($object_diff as $field_name => $values) {
-						$auditlog_details[] = [
-							'auditid' => $auditids[$index],
-							'table_name' => $table_name,
-							'field_name' => $field_name,
-							'oldvalue' => $values['old'],
-							'newvalue' => $values['new']
-						];
-					}
-				}
-
-				DB::insertBatch('auditlog_details', $auditlog_details);
-			}
+			DB::insertBatch('auditlog', $auditlog, false);
 		}
 	}
 }
