@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -98,13 +99,14 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
  *               FAIL     - database error occurred                           *
  *                                                                            *
  ******************************************************************************/
-int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields, int fields_num,
+int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_field_len_t *fields, int fields_num,
 		const char *oldmacro, const char *newmacro)
 {
 	DB_ROW		row;
-	char		*sql = 0, *field = NULL, *field_esc;
+	char		*sql = 0, *value = NULL, *value_esc;
 	size_t		sql_alloc = 4096, sql_offset = 0, field_alloc = 0, old_offset;
 	int		i, ret = SUCCEED;
+	zbx_field_len_t	*field;
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
@@ -116,16 +118,29 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const
 
 		for (i = 0; i < fields_num; i++)
 		{
-			if (SUCCEED == str_rename_macro(row[i + 1], oldmacro, newmacro, &field, &field_alloc))
+			field = fields + i;
+
+			if (SUCCEED == str_rename_macro(row[i + 1], oldmacro, newmacro, &value, &field_alloc))
 			{
+				if (0 != field->max_len && zbx_strlen_utf8(value) > field->max_len)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot rename macros in table \"%s\" row "
+							"\"%s:%s\" field \"%s\": value is too long",
+							table, pkey, row[0], field->field_name);
+					continue;
+				}
+
+				value_esc = DBdyn_escape_string(value);
+
 				if (old_offset == sql_offset)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
 				else
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 
-				field_esc = DBdyn_escape_string(field);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i], field_esc);
-				zbx_free(field_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i].field_name,
+						value_esc);
+
+				zbx_free(value_esc);
 			}
 		}
 
@@ -142,7 +157,7 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	zbx_free(field);
+	zbx_free(value);
 	zbx_free(sql);
 
 	return ret;
