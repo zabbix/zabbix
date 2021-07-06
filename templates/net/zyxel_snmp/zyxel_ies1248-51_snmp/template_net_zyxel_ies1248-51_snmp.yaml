@@ -106,7 +106,7 @@ zabbix_export:
           triggers:
             -
               uuid: b64e891456674457ab4abf994b097277
-              expression: '(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#2))=1 and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion))>0'
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#2) and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion))>0'
               name: 'ZYXEL IES1248-51: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -249,7 +249,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2f2972169c164053a8d439b0e572b0c6
-              expression: '(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#2))=1 and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber))>0'
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#2) and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber))>0'
               name: 'ZYXEL IES1248-51: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -715,7 +715,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 93a58c14939d4c3491646171910fe5ad
-                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Link down'
@@ -922,7 +922,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8d90a989c82a4890a3a1a0b8eeb53462
-                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Link down'

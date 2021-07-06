@@ -94,7 +94,7 @@ zabbix_export:
           triggers:
             -
               uuid: ab4a91cf3c2a4305a59727558c00a1f8
-              expression: '(last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2))=1 and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
+              expression: 'last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO

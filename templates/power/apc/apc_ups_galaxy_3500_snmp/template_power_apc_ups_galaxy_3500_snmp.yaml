@@ -648,7 +648,7 @@ zabbix_export:
           triggers:
             -
               uuid: 811ff6e90d904c8c98feadc89a18e733
-              expression: '(last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0],#1)<>last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0],#2))=1 and length(last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0]))>0'
+              expression: 'last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0],#1)<>last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Galaxy 3500 SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'

@@ -23,8 +23,7 @@
  * @var CView $this
  */
 
-$rulesTable = (new CTable())
-	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
+$rules_table = new CTable();
 
 $titles = [
 	'groups' => _('Groups'),
@@ -44,6 +43,18 @@ $titles = [
 if ($data['user']['type'] == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
 	$titles['mediaTypes'] = _('Media types');
+}
+
+$col_update = false;
+$col_create = false;
+$col_delete = false;
+
+foreach ($titles as $key => $title) {
+	if (array_key_exists($key, $data['rules'])) {
+		$col_update = ($col_update || array_key_exists('updateExisting', $data['rules'][$key]));
+		$col_create = ($col_create || array_key_exists('createMissing', $data['rules'][$key]));
+		$col_delete = ($col_delete || array_key_exists('deleteMissing', $data['rules'][$key]));
+	}
 }
 
 foreach ($titles as $key => $title) {
@@ -88,6 +99,7 @@ foreach ($titles as $key => $title) {
 				$checkbox_create->setAttribute('disabled', 'disabled');
 			}
 			break;
+
 		default:
 			if ($data['user']['type'] != USER_TYPE_SUPER_ADMIN && $data['user']['type'] != USER_TYPE_ZABBIX_ADMIN) {
 				if ($checkbox_update !== null) {
@@ -104,13 +116,20 @@ foreach ($titles as $key => $title) {
 			}
 	}
 
-	$rulesTable->addRow([
+	$rules_table->addRow([
 		$title,
-		(new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER),
-		(new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER),
-		(new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER)
+		$col_update ? (new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER) : null,
+		$col_create ? (new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER) : null,
+		$col_delete ? (new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER) : null
 	]);
 }
+
+$rules_table->setHeader([
+	'',
+	$col_update ? _('Update existing') : null,
+	$col_create ? _('Create new') : null,
+	$col_delete ? _('Delete missing') : null
+]);
 
 $form_list = (new CFormList())
 	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
@@ -119,7 +138,7 @@ $form_list = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Rules'), new CDiv($rulesTable));
+	->addRow(_('Rules'), new CDiv($rules_table));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')

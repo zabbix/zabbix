@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:21Z'
+  date: '2021-06-22T16:33:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -253,7 +253,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5296d69af0704d0e8a07398f0b4c9685
-              expression: '(last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2))=1 and length(last(/Apache by HTTP/apache.version))>0'
+              expression: 'last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0'
               name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
@@ -722,13 +722,15 @@ zabbix_export:
             key: apache.get_status
           preprocessing:
             -
-              type: JSONPATH
-              parameters:
-                - $.ServerMPM
-            -
               type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(value === ''event'' ? [{''{#SINGLETON}'': ''''}] : []);'
+                - |
+                  return JSON.stringify(JSON.parse(value).ServerMPM === 'event'
+                      ? [{'{#SINGLETON}': ''}] : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       macros:
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
@@ -759,6 +761,10 @@ zabbix_export:
                   height: '5'
                   fields:
                     -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -770,6 +776,10 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid
@@ -784,7 +794,15 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
                       value: '1'
                     -
                       type: GRAPH_PROTOTYPE
@@ -801,7 +819,15 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
                       value: '1'
                     -
                       type: GRAPH_PROTOTYPE
@@ -813,8 +839,12 @@ zabbix_export:
                   type: GRAPH_CLASSIC
                   'y': '10'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
                     -
                       type: GRAPH
                       name: graphid

@@ -1191,7 +1191,7 @@ zabbix_export:
           triggers:
             -
               uuid: 93a52f22c79b40539fcd3a26183daad9
-              expression: '(last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2))=1 and length(last(/Remote Zabbix server health/version))>0'
+              expression: 'last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0'
               name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Remote Zabbix server version has changed. Ack to close.'

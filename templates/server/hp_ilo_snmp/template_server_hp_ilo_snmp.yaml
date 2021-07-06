@@ -100,7 +100,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7e8d377e1b49469a8b19b94e6dad97ce
-              expression: '(last(/HP iLO SNMP/system.hw.serialnumber,#1)<>last(/HP iLO SNMP/system.hw.serialnumber,#2))=1 and length(last(/HP iLO SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/HP iLO SNMP/system.hw.serialnumber,#1)<>last(/HP iLO SNMP/system.hw.serialnumber,#2) and length(last(/HP iLO SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -528,7 +528,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 87bcd812474b44729da19f49344ba976
-                  expression: '(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'

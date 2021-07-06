@@ -245,7 +245,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2d5cf100fe094c819d725ee598d37de8
-                  expression: '(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#2))=1 and length(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}]))>0'
+                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}]))>0'
                   name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
